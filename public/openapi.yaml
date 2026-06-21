@@ -138,6 +138,97 @@ components:
         category: { type: string, enum: [CONSULTA, EXAME] }
         basePrice: { type: number }
         basePriceLabel: { type: string }
+    PatientOverview:
+      type: object
+      description: Visão Cliente 360° consolidada de um beneficiário.
+      properties:
+        patient:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            cpf: { type: string }
+            birthDate: { type: string, format: date-time }
+            birthDateLabel: { type: string }
+            phone: { type: string, nullable: true }
+            company:
+              type: object
+              nullable: true
+              properties:
+                id: { type: string }
+                name: { type: string }
+                cnpj: { type: string }
+            createdAt: { type: string, format: date-time }
+            createdAtLabel: { type: string }
+        summary:
+          type: object
+          properties:
+            totalAppointments: { type: integer }
+            totalUsages: { type: integer }
+            totalRecords: { type: integer }
+            totalInvoiced: { type: number }
+            totalInvoicedLabel: { type: string }
+            pendingAmount: { type: number }
+            pendingAmountLabel: { type: string }
+        appointments:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              scheduledAt: { type: string, format: date-time }
+              scheduledAtLabel: { type: string }
+              status: { type: string }
+              reason: { type: string, nullable: true }
+              providerName: { type: string }
+              usagesCount: { type: integer }
+        usages:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              procedure: { type: string }
+              category: { type: string }
+              priceCharged: { type: number }
+              priceLabel: { type: string }
+              billed: { type: boolean }
+              performedAt: { type: string, format: date-time }
+              performedAtLabel: { type: string }
+              appointmentId: { type: string }
+              appointmentDateLabel: { type: string }
+        medicalRecords:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              content: { type: string }
+              createdAt: { type: string, format: date-time }
+              createdAtLabel: { type: string }
+              providerName: { type: string }
+              appointmentDateLabel: { type: string, nullable: true }
+        invoices:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              total: { type: number }
+              totalLabel: { type: string }
+              status: { type: string }
+              createdAt: { type: string, format: date-time }
+              createdAtLabel: { type: string }
+              company: { type: string, nullable: true }
+              items:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id: { type: string }
+                    description: { type: string }
+                    amount: { type: number }
+                    amountLabel: { type: string }
 
 security:
   - sessionCookie: []
@@ -343,6 +434,7 @@ paths:
                       type: object
                       properties:
                         patientId: { type: string }
+                        patientId: { type: string }
                         patientName: { type: string }
                         company: { type: string, nullable: true }
                         total: { type: number }
@@ -361,6 +453,7 @@ paths:
                       type: object
                       properties:
                         id: { type: string }
+                        patientId: { type: string }
                         patientName: { type: string }
                         company: { type: string, nullable: true }
                         total: { type: number }
@@ -402,6 +495,30 @@ paths:
                       itemsCount: { type: integer }
         '400': { description: Sem procedimentos pendentes ou paciente não informado }
         '404': { description: Paciente não encontrado }
+
+  /api/interno/patients/{id}/overview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Interno]
+      summary: Visão Cliente 360° de um beneficiário
+      description: >
+        Consolida dados pessoais, empresa, atendimentos, procedimentos Pay Per Use,
+        prontuário eletrônico e faturas em uma única resposta (sem duplicar dados).
+      responses:
+        '200':
+          description: Overview consolidado do beneficiário
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overview: { $ref: '#/components/schemas/PatientOverview' }
+        '403': { description: Acesso negado (role != INTERNO) }
+        '404': { description: Beneficiário não encontrado }
 
   /api/pj/overview:
     get:

@@ -62,6 +62,7 @@ export async function GET() {
       })),
       invoices: invoices.map((inv) => ({
         id: inv.id,
+        patientId: inv.patientId,
         patientName: inv.patient.name,
         company: inv.company?.name ?? null,
         total: inv.total,

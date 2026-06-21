@@ -99,6 +99,7 @@ Base local: **`http://localhost:3000`**
 | `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP) | `PRESTADOR` |
 | `/interno/login` | Login do **Portal Interno** | Público |
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
+| `/interno/beneficiarios/{id}` | **Cliente 360°** — visão consolidada do beneficiário | `INTERNO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
 | `/pj` | Dashboard corporativo (beneficiários e faturas) | `PJ` |
 
@@ -200,6 +201,7 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | `GET` | `/api/interno/billing` | Procedimentos pendentes (agrupados) e faturas emitidas. |
+| `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°** consolidada de um beneficiário. |
 | `POST` | `/api/interno/invoices` | Gera a fatura Pay Per Use de um paciente. Body: `{ patientId }`. |
 
 ### Portal da Empresa (`role: PJ`)
@@ -244,13 +246,13 @@ sistema-bibi/
 │   │   │   ├── pj/          # overview
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
-│   │   ├── interno/         # /interno e /interno/login
+│   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id]
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth de API
+│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
