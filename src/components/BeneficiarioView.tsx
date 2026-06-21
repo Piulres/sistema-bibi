@@ -102,11 +102,16 @@ export default function BeneficiarioView() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const res = await fetch("/api/beneficiario/overview");
-      const data = await res.json();
+      const [overviewRes, providersRes] = await Promise.all([
+        fetch("/api/beneficiario/overview"),
+        fetch("/api/beneficiario/providers"),
+      ]);
+      const overviewData = await overviewRes.json();
+      const providersData = await providersRes.json();
       if (!active) return;
-      if (!res.ok) setError(data.error ?? "Erro ao carregar seus dados");
-      else setOverview(data.overview);
+      if (!overviewRes.ok) setError(overviewData.error ?? "Erro ao carregar seus dados");
+      else setOverview(overviewData.overview);
+      setProviders(providersData.providers ?? []);
       setLoading(false);
     })();
     return () => {

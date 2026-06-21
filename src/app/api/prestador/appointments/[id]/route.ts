@@ -55,6 +55,8 @@ export async function GET(
       records: appointment.medicalRecords.map((r) => ({
         id: r.id,
         content: r.content,
+        recordType: r.recordType,
+        title: r.title,
         createdAt: r.createdAt,
       })),
     });

@@ -1,7 +1,8 @@
 # Sistema Bibi — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
-Última atualização: reflete os 8 épicos da evolução comercial da POC.
+Última atualização: reflete os **8 épicos comerciais**, **Tier 1 (ciclo de receita)**,
+**Tier 2 (operação table stakes)**, **design system / white label** e preparação Netlify.
 
 ---
 
@@ -12,6 +13,10 @@ Cada clínica/hospital é um **tenant**. O núcleo de negócio é **Pay Per Use*
 apenas procedimentos efetivamente utilizados, com **precificação dinâmica** por empresa.
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
+
+**Branches / PRs em evolução:**
+- Tier 1 (receita): PR #17 — PIX, fatura de assinatura, lembretes
+- Tier 2 (operação): PR #18 — CRUD admin, agenda, relatórios, PEP estruturado
 
 ---
 
@@ -24,7 +29,7 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 | Empresa PJ | `/pj/login` | `/pj` | `PJ` | RH / gestores corporativos |
 | Beneficiário | `/beneficiario/login` | `/beneficiario` | `BENEFICIARIO` | Pacientes (self-service) |
 
-**Senha demo (todos):** `bibi123`
+**Senha demo (todos):** `bibi123` (armazenada com hash scrypt no seed — ver §4)
 
 | Portal | E-mail |
 |--------|--------|
@@ -45,8 +50,16 @@ npm run dev                   # http://localhost:3000
 ```
 
 Variáveis `.env`:
-- `DATABASE_URL` — SQLite (padrão `file:./dev.db`)
-- `SESSION_SECRET` — HMAC do cookie de sessão
+
+| Variável | Descrição |
+|----------|-----------|
+| `DATABASE_URL` | SQLite (padrão `file:./dev.db`) |
+| `SESSION_SECRET` | HMAC do cookie de sessão |
+| `PAYMENT_GATEWAY` | `mock` (POC) ou `asaas`/`efi`/`inter` — Tier 1 |
+| `COMMUNICATION_PROVIDER` | `console` (POC) ou `sendgrid`/`twilio`/`meta` — Tier 1 |
+| `CRON_SECRET` | Protege `POST /api/cron/reminders` — Tier 1 |
+
+Scripts úteis: `npm run db:reset`, `npm run netlify:build`, `npm run lint`.
 
 ---
 
@@ -55,9 +68,10 @@ Variáveis `.env`:
 - **Cookie httpOnly** `bibi_session` assinado com HMAC-SHA256 (`src/lib/session.ts`)
 - **Proxy otimista** (`src/proxy.ts`) — redireciona ao login se não houver cookie
 - **Validação real** em cada página/API via `getSessionUser()` / `requireUser([roles])`
+- **Senhas:** hash **scrypt** via `src/lib/password.ts` (seed e novos usuários); login aceita legado texto puro durante migração
 - Dados isolados por `tenantId` em todas as queries de negócio
 - PJ: escopo por `user.companyId`
-- Beneficiário: escopo por `user.patientId` (anti-IDOR — sem ID na URL da API)
+- Beneficiário: escopo por `user.patientId` (anti-IDOR — sem ID na URL da API de overview)
 
 ---
 
@@ -68,20 +82,24 @@ Entidades principais:
 | Modelo | Descrição |
 |--------|-----------|
 | `Tenant` | Clínica/hospital (SaaS) |
+| `TenantBranding` | White label: cores, logo, `colorScheme`, `displayName` |
 | `User` | Login; `role` + opcional `companyId` (PJ) ou `patientId` (Beneficiário) |
 | `Company` | Empresa contratante; status CRM (LEAD → CANCELADO) |
 | `Patient` | Beneficiário/paciente |
 | `Procedure` | Catálogo (CONSULTA/EXAME) com preço base |
 | `PricingRule` | Multiplicador por empresa (precificação dinâmica) |
-| `Appointment` | Agendamento |
+| `Appointment` | Agendamento (status: AGENDADO → REALIZADO/CANCELADO) |
 | `ProcedureUsage` | **Núcleo Pay Per Use** — preço congelado no uso |
-| `MedicalRecord` | Prontuário (PEP) |
-| `Invoice` / `InvoiceItem` | Fatura e itens |
-| `Subscription` / `SubscriptionCharge` | Recorrência |
+| `MedicalRecord` | PEP — `recordType`, `title`, `content` (Tier 2) |
+| `Invoice` / `InvoiceItem` | Fatura; item pode ser Pay Per Use (`usageId`) ou assinatura (`subscriptionChargeId`) — Tier 1 |
+| `Payment` | Histórico de pagamento (PIX pendente/confirmado, manual) — Tier 1 |
+| `Subscription` / `SubscriptionCharge` | Recorrência (PENDENTE/FATURADA/CANCELADA) |
 | `Message` | Comunicação outbound (EMAIL/SMS/WHATSAPP) |
 | `TimelineEvent` | Auditoria universal |
 
 SQLite não suporta enums Prisma — `role`, `status`, `category` são `String`.
+
+**PEP — tipos de registro (`recordType`):** EVOLUCAO, ANAMNESE, RECEITA, ATESTADO.
 
 ---
 
@@ -89,10 +107,11 @@ SQLite não suporta enums Prisma — `role`, `status`, `category` são `String`.
 
 1. **Prestador** vê agenda em `/prestador`, abre atendimento
 2. Registra **procedimentos** — preço calculado com desconto corporativo e congelado
-3. Registra **PEP** e marca atendimento REALIZADO
+3. Registra **PEP** (template estruturado opcional) e marca atendimento REALIZADO
 4. **Interno** vê pendências em `/interno` (faturamento), gera **fatura**
-5. **PJ** acompanha consumo em `/pj`
-6. **Beneficiário** vê consumo transparente em `/beneficiario`
+5. **Tier 1:** cobrança PIX, marcar PAGA, bridge assinatura → fatura
+6. **PJ** acompanha consumo em `/pj`
+7. **Beneficiário** vê consumo transparente e pode **agendar consulta** em `/beneficiario`
 
 Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% desconto).
 
@@ -100,53 +119,65 @@ Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% descon
 
 ## 7. Módulos do Portal Interno
 
-| Rota | Módulo | Épico |
-|------|--------|-------|
+| Rota | Módulo | Épico / Tier |
+|------|--------|--------------|
 | `/interno/dashboard` | Dashboard Executivo (KPIs) | 8 |
-| `/interno` | Faturamento Pay Per Use | core |
+| `/interno` | Faturamento Pay Per Use (+ PIX/pagar — Tier 1) | core / T1 |
+| `/interno/agenda` | Agendamentos (criar, status) | T2 |
+| `/interno/cadastros` | CRUD: beneficiários, empresas, procedimentos, usuários | T2 |
 | `/interno/crm` | Pipeline CRM corporativo | 3 |
-| `/interno/assinaturas` | Recorrência | 5 |
-| `/interno/comunicacao` | Fila de mensagens | 7 |
+| `/interno/assinaturas` | Recorrência (+ faturar cobrança — Tier 1) | 5 / T1 |
+| `/interno/comunicacao` | Fila de mensagens (+ lembretes automáticos — Tier 1) | 7 / T1 |
+| `/interno/relatorios` | Exportação CSV (faturamento, CRM) | T2 |
+| `/interno/branding` | White label (cores, logo, tema escuro) | design |
 | `/interno/beneficiarios/[id]` | Cliente 360° | 1 |
 
 ---
 
-## 8. Épicos implementados
+## 8. Épicos implementados (1–8)
 
 ### Épico 1 — Cliente 360°
 - `getPatientOverview()` — consolida paciente, atendimentos, procedimentos, PEP, faturas, timeline
 - API: `GET /api/interno/patients/[id]/overview`
 
 ### Épico 2 — Timeline Universal
-- `TimelineEvent` + `recordTimelineEvent()` em login, atendimento, faturamento, CRM, etc.
+- `TimelineEvent` + `recordTimelineEvent()` em login, atendimento, faturamento, CRM, pagamentos, etc.
+- Ações incluem `INVOICE_ISSUED`, `INVOICE_PAID`, `CHARGE_SENT` (Tier 1)
 - Visível no Cliente 360° e no portal do beneficiário
 
 ### Épico 3 — CRM Corporativo
 - `Company.status`: LEAD, PROPOSTA, NEGOCIACAO, ATIVO, INADIMPLENTE, CANCELADO
 - API: `GET /api/interno/crm/pipeline`, `PATCH /api/interno/companies/[id]/status`
+- CRUD de empresas: `GET/POST /api/interno/companies`, `PATCH /api/interno/companies/[id]` (Tier 2)
 
 ### Épico 4 — Motor de Cobrança
 - Contratos Strategy: PIX, boleto, cartão (`src/lib/payments/`)
-- **Sem adapter fake** — `PaymentProviderNotConfiguredError` se gateway não registrado
+- **Adapter POC:** `MockPixAdapter` (`PAYMENT_GATEWAY=mock`) — Tier 1
+- Gateways reais previstos: Asaas, Efí, Banco Inter
 - Doc: `docs/PAYMENTS.md`
-- Gateways previstos: Asaas, Efí, Banco Inter (`PAYMENT_GATEWAY` env)
+- Serviço: `src/lib/invoice-service.ts` — PIX, marcar PAGA, bridge assinatura (Tier 1)
 
 ### Épico 5 — Recorrência
 - `Subscription` + `SubscriptionCharge` (PENDENTE/FATURADA/CANCELADA)
 - Ciclos: MENSAL, TRIMESTRAL, SEMESTRAL, ANUAL
 - API: `/api/interno/subscriptions/**`
+- **Tier 1:** `POST /api/interno/subscriptions/charges/[chargeId]/invoice` — cobrança vira fatura
 
 ### Épico 6 — Portal Beneficiário
 - `User.patientId` vincula login ao `Patient`
 - API: `GET /api/beneficiario/overview` (escopo sessão, sem IDOR)
-- Self-service: agenda, consumo, faturas, assinatura, PEP
+- Self-service: consumo, faturas, assinatura, PEP, timeline
+- **Tier 1:** pagar fatura via PIX (`POST/PATCH /api/beneficiario/invoices/[id]/pay`)
+- **Tier 2:** agendamento self-service (`GET providers/slots`, `POST appointments`)
 
 ### Épico 7 — Comunicação
 - `Message` enfileirada (PENDENTE) → dispatch via provider
 - Contratos: EMAIL, SMS, WHATSAPP (`src/lib/communications/`)
-- **Sem adapter fake** — SendGrid, Twilio, Meta (`COMMUNICATION_PROVIDER` env)
+- **Adapter POC:** `ConsoleEmailAdapter` (`COMMUNICATION_PROVIDER=console`) — Tier 1
+- Provedores reais: SendGrid, Twilio, Meta
 - Doc: `docs/COMMUNICATIONS.md`
 - Templates: APPOINTMENT_REMINDER, INVOICE_DUE, SUBSCRIPTION_DUE, GENERIC
+- **Tier 1:** `reminder-service.ts` + `POST /api/interno/reminders` + cron `POST /api/cron/reminders`
 
 ### Épico 8 — Dashboard Executivo
 - `getExecutiveDashboard()` — KPIs: Pay Per Use pendente, MRR, CRM, fila de mensagens, timeline
@@ -154,7 +185,56 @@ Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% descon
 
 ---
 
-## 9. KPIs do Dashboard Executivo
+## 9. Tier 1 — Ciclo de receita (PR #17)
+
+Fecha o ciclo financeiro da POC:
+
+| Feature | Descrição |
+|---------|-----------|
+| Bridge assinatura → fatura | `SubscriptionCharge` vira `Invoice` + status FATURADA |
+| Marcar fatura PAGA | Modelo `Payment` + timeline `INVOICE_PAID` |
+| PIX mock | Gerar QR/copia-e-cola, confirmar pagamento (interno e beneficiário) |
+| Comunicação real (POC) | Dispatch via console adapter |
+| Lembretes automáticos | Consultas 24h, assinatura 3 dias, Pay Per Use pendente |
+
+**APIs principais:**
+- `POST /api/interno/subscriptions/charges/[chargeId]/invoice`
+- `POST /api/interno/invoices/[id]/pay` — marcar manual
+- `POST /api/interno/invoices/[id]/pix` — gerar PIX
+- `POST /api/interno/invoices/[id]/confirm-pix`
+- `POST /api/beneficiario/invoices/[id]/pay` — PIX beneficiário
+- `POST /api/interno/reminders` — lembretes + auto-dispatch
+- `POST /api/cron/reminders` — job agendado (header `x-cron-secret`)
+
+---
+
+## 10. Tier 2 — Operação table stakes (PR #18)
+
+Alinha com iClinic/Feegow no dia a dia:
+
+| Feature | Descrição |
+|---------|-----------|
+| CRUD Admin | Beneficiários, empresas, procedimentos, usuários (`/interno/cadastros`) |
+| Agenda interna | Criar/reagendar, alterar status (`/interno/agenda`) |
+| Agendamento self-service | Beneficiário escolhe prestador + slot 30min (8h–18h) |
+| Relatórios CSV | Faturamento + CRM (`/interno/relatorios`) |
+| PEP estruturado | Templates SOAP, anamnese, receita, atestado |
+| Hash de senha | scrypt em seed, login e criação de usuários |
+
+**APIs principais:**
+- `GET/POST /api/interno/patients`, `PATCH /api/interno/patients/[id]`
+- `GET/POST /api/interno/companies`, `PATCH /api/interno/companies/[id]`
+- `GET/POST /api/interno/procedures`, `PUT/DELETE /api/interno/procedures/[id]`
+- `GET/POST /api/interno/users`, `PATCH /api/interno/users/[id]`
+- `GET/POST /api/interno/appointments`, `PATCH /api/interno/appointments/[id]`
+- `GET /api/interno/reports?type=billing|crm` — download CSV
+- `GET /api/beneficiario/providers`, `GET /api/beneficiario/slots`, `POST /api/beneficiario/appointments`
+
+**Serviços:** `patient-service`, `company-service`, `procedure-service`, `user-service`, `appointment-service`, `scheduling-service`, `pep-templates`.
+
+---
+
+## 11. KPIs do Dashboard Executivo
 
 | KPI | Fonte |
 |-----|-------|
@@ -168,17 +248,17 @@ Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% descon
 
 ---
 
-## 10. API REST (resumo)
+## 12. API REST (resumo)
 
 Base: `http://localhost:3000/api`
 
 **Auth:** `POST /auth/login` body `{ email, password, portal }` — portal: `prestador|interno|pj|beneficiario`
 
-**Prestador:** agenda, atendimentos, procedimentos, PEP
+**Prestador:** agenda, atendimentos, procedimentos, PEP (com `recordType`)
 
-**Interno:** dashboard, billing, invoices, patients/overview, crm, subscriptions, messages
+**Interno:** dashboard, billing, invoices, cadastros (patients/companies/procedures/users), appointments, reports, crm, subscriptions, messages, branding
 
-**Beneficiário:** overview (self-service)
+**Beneficiário:** overview, providers, slots, appointments (agendar), invoices/pay (Tier 1)
 
 **PJ:** overview (empresa do usuário)
 
@@ -186,36 +266,56 @@ OpenAPI completa: `public/openapi.yaml` — Swagger UI em `/api-docs.html`
 
 ---
 
-## 11. Arquivos-chave do código
+## 13. Arquivos-chave do código
 
 ```
 src/
 ├── proxy.ts                    # Proteção de rotas (Next 16)
 ├── lib/
 │   ├── session.ts              # Cookie HMAC
+│   ├── password.ts             # Hash scrypt (Tier 2)
 │   ├── api-auth.ts             # requireUser, requireBeneficiary
 │   ├── roles.ts                # PORTALS e ROLES
 │   ├── pricing.ts              # Pay Per Use + tenant scope
 │   ├── patient-overview.ts     # Cliente 360°
+│   ├── patient-service.ts      # CRUD beneficiários (Tier 2)
+│   ├── company-service.ts      # CRUD empresas (Tier 2)
+│   ├── procedure-service.ts    # CRUD procedimentos (Tier 2)
+│   ├── user-service.ts         # CRUD usuários (Tier 2)
+│   ├── appointment-service.ts  # Agenda (Tier 2)
+│   ├── scheduling-service.ts   # Slots self-service (Tier 2)
+│   ├── invoice-service.ts      # PIX, pagamento, bridge assinatura (Tier 1)
+│   ├── reminder-service.ts     # Lembretes automáticos (Tier 1)
+│   ├── pep-templates.ts        # Templates PEP (Tier 2)
+│   ├── reports/billing-report.ts # CSV (Tier 2)
 │   ├── beneficiary-overview.ts # Self-service
 │   ├── executive-dashboard.ts  # KPIs
 │   ├── timeline.ts             # Auditoria
 │   ├── subscription*.ts        # Recorrência
 │   ├── message*.ts             # Comunicação
-│   ├── payments/               # Motor cobrança (Strategy)
-│   └── communications/         # Motor comunicação (Strategy)
+│   ├── theme/                  # Design system + branding
+│   ├── payments/               # Motor cobrança + MockPixAdapter (Tier 1)
+│   └── communications/         # Motor comunicação + ConsoleAdapter (Tier 1)
 ├── app/
 │   ├── api/                    # Route Handlers
-│   ├── interno/                # Portal interno
+│   ├── interno/                # Portal interno (10+ rotas)
 │   ├── prestador/              # Portal prestador
 │   ├── pj/                     # Portal empresa
 │   └── beneficiario/           # Portal beneficiário
-└── components/                 # Views React cliente
+└── components/
+    ├── ui/                     # Design system (Button, Card, Badge…)
+    ├── layout/                 # PortalShell, TenantTheme, PageHeader
+    ├── CadastrosView.tsx       # Tier 2
+    ├── AppointmentsView.tsx    # Tier 2
+    ├── ReportsView.tsx         # Tier 2
+    └── …                       # BillingView, BrandingView, etc.
 ```
 
 ---
 
-## 12. Dados de demonstração (seed)
+## 14. Dados de demonstração (seed)
+
+**Tenants:** Clínica Bibi (teal) + VitaCare demo (white label azul)
 
 **Empresa ativa:** TechCorp Benefícios LTDA (desconto 15% consulta clínica)
 
@@ -228,19 +328,23 @@ src/
 
 **Comunicação:** 2 mensagens PENDENTE (WhatsApp João, e-mail Maria)
 
+**Prestador:** Dra. Helena — agenda do dia com atendimentos seed
+
 ---
 
-## 13. Limitações da POC
+## 15. Limitações da POC
 
-- Senhas em texto puro (seed) — usar hash em produção
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
-- Gateways de pagamento e comunicação: **somente contratos**, adapters não incluídos
-- Deploy Netlify **preparado** (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`); publicação manual quando cota/conta ok — não usar `netlify deploy --prod` sem autorização
+- Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
+- Deploy Netlify **preparado** (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`); publicação manual quando cota ok
+- Reset de senha por e-mail e MFA ainda não implementados
+- Slots de agendamento simplificados (sem bloqueio de férias/multi-unidade)
+- Domínio custom por tenant (white label DNS) — futuro Tier 3
 
 ---
 
-## 14. Documentação complementar
+## 16. Documentação complementar
 
 | Documento | Conteúdo |
 |-----------|----------|
@@ -249,15 +353,22 @@ src/
 | `docs/PAYMENTS.md` | Motor de cobrança Strategy |
 | `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |
 | `docs/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
+| `docs/DEPLOY_NETLIFY.md` | Deploy Netlify (preparado, sem publicar) |
 | `public/openapi.yaml` | Especificação API |
 | `AGENTS.md` | Instruções para agentes de IA |
 
 ---
 
-## 15. Perguntas frequentes (FAQ)
+## 17. Perguntas frequentes (FAQ)
 
 **Como faço login no portal interno?**
 → `/interno/login` com `faturamento@bibi.health` / `bibi123`. Após login, vai para `/interno/dashboard`.
+
+**Onde cadastro um novo beneficiário?**
+→ `/interno/cadastros` → aba Beneficiários (Tier 2).
+
+**Como o beneficiário agenda consulta sozinho?**
+→ `/beneficiario` → seção "Agendar consulta" → prestador, data, horário (Tier 2).
 
 **Onde vejo o consumo de um beneficiário?**
 → Portal Interno: Cliente 360° em `/interno/beneficiarios/[id]`. Beneficiário: `/beneficiario`.
@@ -265,26 +376,48 @@ src/
 **Como funciona o desconto corporativo?**
 → `PricingRule` com `multiplier` (ex.: 0.85 = 15% desconto) por `procedureId` + `companyId`.
 
+**Como faturar uma cobrança de assinatura?**
+→ `/interno/assinaturas` → Ver cobranças → **Faturar** (Tier 1).
+
+**Como marcar fatura como paga ou gerar PIX?**
+→ `/interno` (Faturamento) → botões PIX / Marcar paga (Tier 1). Beneficiário paga em `/beneficiario`.
+
 **Por que dispatch de mensagem falha?**
-→ Nenhum adapter registrado. Configure `COMMUNICATION_PROVIDER` e registre adapter (ver `docs/COMMUNICATIONS.md`).
+→ Configure `COMMUNICATION_PROVIDER=console` (POC) ou registre adapter real (SendGrid, etc.).
+
+**Como exportar relatórios?**
+→ `/interno/relatorios` → download CSV faturamento ou CRM (Tier 2).
+
+**Como usar templates no prontuário?**
+→ Prestador → atendimento → PEP → escolher tipo → **Usar template** (Tier 2).
 
 **Qual a diferença entre faturamento e dashboard?**
-→ `/interno` = operação (gerar faturas). `/interno/dashboard` = visão executiva (KPIs consolidados).
+→ `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
 
 ---
 
-## 16. Design system e white label
+## 18. Design system e white label
 
-- **Tokens CSS** em `src/app/globals.css` (`--brand-*`, `--surface-*`, `--status-*`).
-- **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`.
-- **Componentes UI** em `src/components/ui/` (`Button`, `Input`, `Card`, `Badge`, `Alert`, `NavTabs`).
+- **Tokens CSS** em `src/app/globals.css` (`--brand-*`, `--surface-*`, `--status-*`, dark mode).
+- **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`, `colorScheme`.
+- **Componentes UI** em `src/components/ui/` (`Button`, `Input`, `Card`, `Badge`, `Alert`, `NavTabs`, `StatusBadge`).
 - **Layout**: `PortalShell`, `PageHeader`, `TenantTheme` (injeta CSS variables por tenant/portal).
 - **Sessão**: `getSessionUser()` retorna `user.branding` após login.
 - Seed inclui tenant demo **VitaCare** (azul) além da Clínica Bibi (teal).
-- **Admin branding:** `/interno/branding` — CRUD visual, presets e upload de logo (Netlify Blobs em produção).
+- **Admin branding:** `/interno/branding` — CRUD visual, presets e upload de logo (Netlify Blobs).
 - Logos servidos em `/api/branding/logo/[tenantId]` com `Cache-Tag` para purge CDN.
-- **Tema escuro por tenant:** `colorScheme` (`light` | `dark` | `system`) em `/interno/branding`.
+- **Tema escuro por tenant:** `colorScheme` (`light` | `dark` | `system`).
 - Ver `docs/DESIGN_SYSTEM.md`.
+
+---
+
+## 19. Roadmap sugerido (Tier 3+)
+
+| Prioridade | Feature |
+|------------|---------|
+| Tier 3 | Portal PJ completo, RBAC granular, domínio custom white label |
+| Tier 3 | Webhooks, SSO/MFA, LGPD (consent/export) |
+| Estratégico | TISS/ANS, telemedicina, Postgres + jobs em produção |
 
 ---
 
