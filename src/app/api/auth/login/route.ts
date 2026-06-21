@@ -43,6 +43,13 @@ export async function POST(request: Request) {
     );
   }
 
+  if (portalConfig.role === "BENEFICIARIO" && !user.patientId) {
+    return NextResponse.json(
+      { error: "Conta sem beneficiário vinculado" },
+      { status: 403 },
+    );
+  }
+
   await createSession(user.id);
 
   await recordTimelineEvent({

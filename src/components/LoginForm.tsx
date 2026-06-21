@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 type Props = {
-  portal: "prestador" | "interno" | "pj";
+  portal: "prestador" | "interno" | "pj" | "beneficiario";
   title: string;
   subtitle: string;
   accent: string;

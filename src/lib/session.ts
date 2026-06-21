@@ -47,8 +47,10 @@ export type SessionUser = {
   role: string;
   tenantId: string;
   companyId: string | null;
+  patientId: string | null;
   tenantName: string;
   companyName: string | null;
+  patientName: string | null;
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -59,7 +61,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { tenant: true, company: true },
+    include: { tenant: true, company: true, patient: true },
   });
   if (!user) return null;
 
@@ -70,7 +72,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     role: user.role,
     tenantId: user.tenantId,
     companyId: user.companyId,
+    patientId: user.patientId,
     tenantName: user.tenant.name,
     companyName: user.company?.name ?? null,
+    patientName: user.patient?.name ?? null,
   };
 }
