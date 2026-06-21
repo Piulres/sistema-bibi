@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
 
 const dateOnly = (value: Date) =>
   value.toLocaleDateString("pt-BR", {
@@ -76,6 +77,8 @@ export async function createPatient(input: {
       birthDate: input.birthDate,
       phone: input.phone?.trim() || null,
       companyId: input.companyId ?? null,
+      consentAt: new Date(),
+      consentVersion: "v1-poc",
     },
     include: { company: { select: { name: true } } },
   });
@@ -87,6 +90,17 @@ export async function createPatient(input: {
     action: TIMELINE_ACTIONS.CREATED,
     description: `Beneficiário ${patient.name} cadastrado`,
     createdBy: input.createdBy,
+  });
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: "PATIENT_CREATED",
+    data: {
+      patientId: patient.id,
+      name: patient.name,
+      cpf: patient.cpf,
+      companyId: patient.companyId,
+    },
   });
 
   return { patient: mapPatient(patient) };

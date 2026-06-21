@@ -20,6 +20,8 @@ function fromDb(
     heroTo: string;
     platformLabel: string;
     colorScheme: string;
+    customDomain: string | null;
+    customDomainVerified: boolean;
   },
 ): TenantBrandingRecord {
   return {
@@ -33,6 +35,8 @@ function fromDb(
     heroTo: row.heroTo,
     platformLabel: row.platformLabel,
     colorScheme: normalizeColorScheme(row.colorScheme),
+    customDomain: row.customDomain,
+    customDomainVerified: row.customDomainVerified,
   };
 }
 

@@ -1,17 +1,12 @@
-import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/session";
 import { PORTALS } from "@/lib/roles";
 import PortalShell from "@/components/layout/PortalShell";
 import PageHeader from "@/components/layout/PageHeader";
 import InternoNav from "@/components/InternoNav";
 import ExecutiveDashboardView from "@/components/ExecutiveDashboardView";
+import { requireInternoPage } from "@/lib/interno-guard";
 
 export default async function ExecutiveDashboardPage() {
-  const user = await getSessionUser();
-  if (!user || user.role !== "INTERNO") {
-    redirect("/interno/login");
-  }
-
+  const user = await requireInternoPage("dashboard");
   const portal = PORTALS.interno;
 
   return (
@@ -26,7 +21,7 @@ export default async function ExecutiveDashboardPage() {
         title="Dashboard Executivo"
         description="Visão consolidada de receita, operação, CRM e atividade do tenant."
       />
-      <InternoNav active="dashboard" />
+      <InternoNav active="dashboard" permissions={user.internoPermissions} />
       <div className="mt-8">
         <ExecutiveDashboardView />
       </div>

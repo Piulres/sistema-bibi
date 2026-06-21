@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
 
 const dateTime = (value: Date) =>
   value.toLocaleString("pt-BR", {
@@ -153,6 +154,18 @@ export async function createAppointment(input: {
     action: TIMELINE_ACTIONS.CREATED,
     description: `Consulta agendada: ${patient.name} com ${provider.name} (${dateTime(appointment.scheduledAt)})`,
     createdBy: input.createdBy,
+  });
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: "APPOINTMENT_CREATED",
+    data: {
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      providerId: appointment.providerId,
+      status: appointment.status,
+      scheduledAt: appointment.scheduledAt.toISOString(),
+    },
   });
 
   return { appointment: mapAppointment(appointment) };

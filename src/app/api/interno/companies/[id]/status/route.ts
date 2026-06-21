@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   companyStatusLabel,
   contractActiveFromStatus,
@@ -11,6 +11,7 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
 
 /** Atualiza o status CRM de uma empresa (pipeline corporativo). */
 export async function PATCH(
@@ -18,7 +19,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/interno/companies/[id]/status">,
 ) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("crm");
     const { id } = await ctx.params;
     const body = (await request.json()) as { status?: string };
 
@@ -61,6 +62,18 @@ export async function PATCH(
       action: TIMELINE_ACTIONS.CONTRACT_CHANGED,
       description: `${company.name}: status alterado de ${previousLabel} para ${nextLabel}`,
       createdBy: user.id,
+    });
+
+    void dispatchWebhooks({
+      tenantId: user.tenantId,
+      event: "COMPANY_STATUS_CHANGED",
+      data: {
+        companyId: company.id,
+        name: company.name,
+        from: existing.status,
+        to: company.status,
+        contractActive: company.contractActive,
+      },
     });
 
     return NextResponse.json({

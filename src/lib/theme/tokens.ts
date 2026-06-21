@@ -11,6 +11,8 @@ export const DEFAULT_BRANDING = {
   heroTo: "#134e4a",
   platformLabel: "Sistema Bibi",
   colorScheme: "light" as ColorScheme,
+  customDomain: null,
+  customDomainVerified: false,
 } as const;
 
 export type BrandingTokens = {
@@ -23,4 +25,6 @@ export type BrandingTokens = {
   heroTo: string;
   platformLabel: string;
   colorScheme: ColorScheme;
+  customDomain: string | null;
+  customDomainVerified: boolean;
 };

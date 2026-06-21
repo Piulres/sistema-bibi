@@ -1,6 +1,10 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import { getSessionUser, type SessionUser } from "@/lib/session";
+import {
+  hasInternoPermission,
+  type InternoModule,
+} from "@/lib/interno-permissions";
 
 /** Erro de autorizacao usado para curto-circuitar handlers. */
 export class ApiAuthError extends Error {
@@ -22,6 +26,15 @@ export async function requireUser(roles?: string[]): Promise<SessionUser> {
   }
   if (roles && !roles.includes(user.role)) {
     throw new ApiAuthError(403, "Acesso negado para este portal");
+  }
+  return user;
+}
+
+/** Garante permissão de módulo no portal interno (RBAC granular). */
+export async function requireInternoModule(module: InternoModule): Promise<SessionUser> {
+  const user = await requireUser(["INTERNO"]);
+  if (!hasInternoPermission(user.role, user.internoProfile, module)) {
+    throw new ApiAuthError(403, "Sem permissão para este módulo");
   }
   return user;
 }

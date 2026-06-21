@@ -2,7 +2,7 @@
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 Última atualização: reflete os **8 épicos comerciais**, **Tier 1 (ciclo de receita)**,
-**Tier 2 (operação table stakes)**, **design system / white label** e preparação Netlify.
+**Tier 2 (operação table stakes)**, **Tier 3 (B2B, RBAC, integrações)**, **design system / white label** e preparação Netlify.
 
 ---
 
@@ -17,6 +17,7 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 **Branches / PRs em evolução:**
 - Tier 1 (receita): PR #17 — PIX, fatura de assinatura, lembretes
 - Tier 2 (operação): PR #18 — CRUD admin, agenda, relatórios, PEP estruturado
+- Tier 3 (B2B): PR em aberto — RBAC interno, webhooks, portal PJ, domínio custom, LGPD export
 
 ---
 
@@ -234,7 +235,30 @@ Alinha com iClinic/Feegow no dia a dia:
 
 ---
 
-## 11. KPIs do Dashboard Executivo
+## 11. Tier 3 — B2B, RBAC e integrações
+
+| Feature | Descrição |
+|---------|-----------|
+| RBAC interno | `internoProfile`: ADMIN, FATURAMENTO, RECEPCAO, READONLY — nav e APIs filtrados |
+| Webhooks outbound | CRUD em `/interno/integracoes` — eventos com HMAC SHA-256 |
+| Portal PJ completo | Alertas, assinaturas, MRR, export CSV (`/api/pj/reports`) |
+| Domínio custom | `TenantBranding.customDomain` + verificação manual (POC) |
+| LGPD light | `consentAt` no cadastro + export JSON (`/api/interno/patients/[id]/export`) |
+
+**Eventos webhook:** `INVOICE_ISSUED`, `APPOINTMENT_CREATED`, `COMPANY_STATUS_CHANGED`, `PATIENT_CREATED`
+
+**APIs principais:**
+- `GET/POST /api/interno/webhooks`, `PATCH/DELETE /api/interno/webhooks/[id]`
+- `GET /api/pj/overview` — overview enriquecido via `pj-portal-service`
+- `GET /api/pj/reports` — CSV corporativo
+- `GET /api/interno/patients/[id]/export` — JSON LGPD
+- `PUT /api/interno/branding` — inclui `customDomain` e `verifyCustomDomain`
+
+**Credencial demo RBAC:** `recepcao@bibi.health` / `bibi123` (perfil RECEPCAO — sem faturamento/branding)
+
+---
+
+## 12. KPIs do Dashboard Executivo
 
 | KPI | Fonte |
 |-----|-------|
@@ -260,7 +284,7 @@ Base: `http://localhost:3000/api`
 
 **Beneficiário:** overview, providers, slots, appointments (agendar), invoices/pay (Tier 1)
 
-**PJ:** overview (empresa do usuário)
+**PJ:** overview enriquecido, export CSV (`/api/pj/reports`)
 
 OpenAPI completa: `public/openapi.yaml` — Swagger UI em `/api-docs.html`
 
@@ -277,6 +301,12 @@ src/
 │   ├── api-auth.ts             # requireUser, requireBeneficiary
 │   ├── roles.ts                # PORTALS e ROLES
 │   ├── pricing.ts              # Pay Per Use + tenant scope
+│   ├── interno-permissions.ts  # RBAC portal interno (Tier 3)
+│   ├── interno-guard.ts        # Proteção páginas interno (Tier 3)
+│   ├── webhook-service.ts      # Webhooks B2B (Tier 3)
+│   ├── pj-portal-service.ts    # Portal PJ enriquecido (Tier 3)
+│   ├── patient-export.ts       # Export LGPD (Tier 3)
+│   ├── tenant-resolver.ts      # Domínio custom white label (Tier 3)
 │   ├── patient-overview.ts     # Cliente 360°
 │   ├── patient-service.ts      # CRUD beneficiários (Tier 2)
 │   ├── company-service.ts      # CRUD empresas (Tier 2)
@@ -308,7 +338,8 @@ src/
     ├── CadastrosView.tsx       # Tier 2
     ├── AppointmentsView.tsx    # Tier 2
     ├── ReportsView.tsx         # Tier 2
-    └── …                       # BillingView, BrandingView, etc.
+    ├── IntegracoesView.tsx     # Tier 3
+    └── …                       # BillingView, BrandingView, PjView, etc.
 ```
 
 ---
@@ -328,6 +359,10 @@ src/
 
 **Comunicação:** 2 mensagens PENDENTE (WhatsApp João, e-mail Maria)
 
+**Integrações:** webhook demo ERP TechCorp (`/interno/integracoes`)
+
+**RBAC:** usuário recepção `recepcao@bibi.health` (perfil RECEPCAO)
+
 **Prestador:** Dra. Helena — agenda do dia com atendimentos seed
 
 ---
@@ -340,7 +375,8 @@ src/
 - Deploy Netlify **preparado** (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`); publicação manual quando cota ok
 - Reset de senha por e-mail e MFA ainda não implementados
 - Slots de agendamento simplificados (sem bloqueio de férias/multi-unidade)
-- Domínio custom por tenant (white label DNS) — futuro Tier 3
+- SSO/MFA e adapters reais de webhook delivery log ainda não implementados
+- Verificação de domínio custom é manual na POC (sem challenge DNS automático)
 
 ---
 
@@ -391,6 +427,15 @@ src/
 **Como usar templates no prontuário?**
 → Prestador → atendimento → PEP → escolher tipo → **Usar template** (Tier 2).
 
+**Como exportar dados LGPD de um beneficiário?**
+→ Cliente 360° → link **Exportar dados (LGPD JSON)** ou `GET /api/interno/patients/[id]/export` (Tier 3).
+
+**Como configurar webhooks para parceiros B2B?**
+→ `/interno/integracoes` — cadastre URL, eventos e secret HMAC (Tier 3).
+
+**O que o usuário de recepção pode acessar?**
+→ Login com `recepcao@bibi.health` — dashboard, agenda, cadastros e comunicação (RBAC Tier 3).
+
 **Qual a diferença entre faturamento e dashboard?**
 → `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
 
@@ -399,7 +444,7 @@ src/
 ## 18. Design system e white label
 
 - **Tokens CSS** em `src/app/globals.css` (`--brand-*`, `--surface-*`, `--status-*`, dark mode).
-- **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`, `colorScheme`.
+- **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`, `colorScheme`, `customDomain`.
 - **Componentes UI** em `src/components/ui/` (`Button`, `Input`, `Card`, `Badge`, `Alert`, `NavTabs`, `StatusBadge`).
 - **Layout**: `PortalShell`, `PageHeader`, `TenantTheme` (injeta CSS variables por tenant/portal).
 - **Sessão**: `getSessionUser()` retorna `user.branding` após login.
@@ -411,13 +456,12 @@ src/
 
 ---
 
-## 19. Roadmap sugerido (Tier 3+)
+## 19. Roadmap sugerido (Tier 4+)
 
 | Prioridade | Feature |
 |------------|---------|
-| Tier 3 | Portal PJ completo, RBAC granular, domínio custom white label |
-| Tier 3 | Webhooks, SSO/MFA, LGPD (consent/export) |
-| Estratégico | TISS/ANS, telemedicina, Postgres + jobs em produção |
+| Tier 4 | SSO/MFA, TISS/ANS, telemedicina |
+| Estratégico | Postgres + jobs em produção, webhook retry/log |
 
 ---
 

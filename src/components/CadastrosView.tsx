@@ -38,7 +38,7 @@ export default function CadastrosView() {
     { id: string; code: string; name: string; category: string; basePriceLabel: string }[]
   >([]);
   const [users, setUsers] = useState<
-    { id: string; name: string; email: string; role: string }[]
+    { id: string; name: string; email: string; role: string; internoProfile: string | null }[]
   >([]);
 
   const [patientForm, setPatientForm] = useState({
@@ -60,6 +60,7 @@ export default function CadastrosView() {
     email: "",
     password: "bibi123",
     role: "PRESTADOR",
+    internoProfile: "",
     companyId: "",
     patientId: "",
   });
@@ -173,6 +174,7 @@ export default function CadastrosView() {
           ...userForm,
           companyId: userForm.companyId || null,
           patientId: userForm.patientId || null,
+          internoProfile: userForm.role === "INTERNO" ? userForm.internoProfile || null : null,
         }),
       });
       const data = await res.json();
@@ -184,6 +186,7 @@ export default function CadastrosView() {
           email: "",
           password: "bibi123",
           role: "PRESTADOR",
+          internoProfile: "",
           companyId: "",
           patientId: "",
         });
@@ -371,6 +374,21 @@ export default function CadastrosView() {
                   <option value="BENEFICIARIO">Beneficiário</option>
                 </select>
               </label>
+              {userForm.role === "INTERNO" && (
+                <label className="block text-sm">
+                  <span className="text-[var(--text-secondary)]">Perfil interno (RBAC)</span>
+                  <select
+                    className={fieldClass}
+                    value={userForm.internoProfile}
+                    onChange={(e) => setUserForm({ ...userForm, internoProfile: e.target.value })}
+                  >
+                    <option value="">Administrador (padrão)</option>
+                    <option value="FATURAMENTO">Faturamento</option>
+                    <option value="RECEPCAO">Recepção</option>
+                    <option value="READONLY">Somente leitura</option>
+                  </select>
+                </label>
+              )}
               {userForm.role === "PJ" && (
                 <label className="block text-sm">
                   <span className="text-[var(--text-secondary)]">Empresa</span>
@@ -402,7 +420,10 @@ export default function CadastrosView() {
               {users.map((u) => (
                 <li key={u.id} className="py-2 text-sm">
                   <p className="font-medium">{u.name}</p>
-                  <p className="text-[var(--text-muted)]">{u.email} · {u.role}</p>
+                  <p className="text-[var(--text-muted)]">
+                    {u.email} · {u.role}
+                    {u.internoProfile ? ` · ${u.internoProfile}` : ""}
+                  </p>
                 </li>
               ))}
             </ul>

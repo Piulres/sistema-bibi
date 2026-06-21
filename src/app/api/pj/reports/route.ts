@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
-import { getPjPortalOverview } from "@/lib/pj-portal-service";
+import { buildPjReportCsv } from "@/lib/pj-portal-service";
 
 export async function GET() {
   try {
@@ -9,12 +9,17 @@ export async function GET() {
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 400 });
     }
 
-    const overview = await getPjPortalOverview(user.companyId, user.tenantId);
-    if (!overview) {
+    const csv = await buildPjReportCsv(user.companyId, user.tenantId);
+    if (!csv) {
       return NextResponse.json({ error: "Empresa não encontrada" }, { status: 404 });
     }
 
-    return NextResponse.json(overview);
+    return new NextResponse(csv, {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": 'attachment; filename="bibi-pj-relatorio.csv"',
+      },
+    });
   } catch (error) {
     return authErrorResponse(error);
   }

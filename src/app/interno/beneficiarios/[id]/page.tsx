@@ -1,9 +1,8 @@
-import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/session";
 import { PORTALS } from "@/lib/roles";
 import PortalShell from "@/components/layout/PortalShell";
 import InternoNav from "@/components/InternoNav";
 import PatientOverviewView from "@/components/PatientOverviewView";
+import { requireInternoPage } from "@/lib/interno-guard";
 
 const RETURN_LABELS: Record<string, string> = {
   "/interno/dashboard": "Voltar ao dashboard",
@@ -15,6 +14,7 @@ const RETURN_LABELS: Record<string, string> = {
   "/interno/comunicacao": "Voltar à comunicação",
   "/interno/relatorios": "Voltar aos relatórios",
   "/interno/branding": "Voltar ao white label",
+  "/interno/integracoes": "Voltar às integrações",
 };
 
 export default async function PatientOverviewPage({
@@ -24,10 +24,7 @@ export default async function PatientOverviewPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ from?: string }>;
 }) {
-  const user = await getSessionUser();
-  if (!user || user.role !== "INTERNO") {
-    redirect("/interno/login");
-  }
+  const user = await requireInternoPage();
 
   const { id } = await params;
   const { from } = await searchParams;
@@ -44,7 +41,7 @@ export default async function PatientOverviewPage({
       userName={user.name}
       branding={user.branding}
     >
-      <InternoNav />
+      <InternoNav permissions={user.internoPermissions} />
       <div className="mt-8">
         <PatientOverviewView
           patientId={id}

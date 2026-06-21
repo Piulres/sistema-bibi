@@ -22,6 +22,8 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroTo: "#134e4a",
       platformLabel: "Powered by Sistema Bibi",
       colorScheme: "light",
+      customDomain: null,
+      customDomainVerified: false,
     },
   },
   {
@@ -38,6 +40,8 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroTo: "#1d4ed8",
       platformLabel: "Powered by Sistema Bibi",
       colorScheme: "dark",
+      customDomain: null,
+      customDomainVerified: false,
     },
   },
   {
@@ -54,6 +58,8 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroTo: "#5b21b6",
       platformLabel: "Powered by Sistema Bibi",
       colorScheme: "light",
+      customDomain: null,
+      customDomainVerified: false,
     },
   },
   {
@@ -70,6 +76,8 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroTo: "#047857",
       platformLabel: "Powered by Sistema Bibi",
       colorScheme: "system",
+      customDomain: null,
+      customDomainVerified: false,
     },
   },
 ];
