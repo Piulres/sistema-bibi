@@ -112,6 +112,7 @@ export async function getPatientOverview(
         include: { items: true, company: true },
         orderBy: { createdAt: "desc" },
       },
+      subscriptions: { select: { id: true } },
     },
   });
 
@@ -161,12 +162,14 @@ export async function getPatientOverview(
   );
   const recordIds = patient.medicalRecords.map((record) => record.id);
   const invoiceIds = patient.invoices.map((invoice) => invoice.id);
+  const subscriptionIds = patient.subscriptions.map((sub) => sub.id);
 
   const timeline = await getPatientTimelineEvents(patientId, tenantId, {
     appointmentIds,
     usageIds,
     recordIds,
     invoiceIds,
+    subscriptionIds,
   });
 
   return {

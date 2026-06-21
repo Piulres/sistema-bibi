@@ -10,6 +10,7 @@ export const TIMELINE_ENTITY_TYPES = {
   MEDICAL_RECORD: "MedicalRecord",
   INVOICE: "Invoice",
   COMPANY: "Company",
+  SUBSCRIPTION: "Subscription",
 } as const;
 
 /** Ações registradas na timeline. */
@@ -23,6 +24,7 @@ export const TIMELINE_ACTIONS = {
   INVOICE_ISSUED: "INVOICE_ISSUED",
   CHARGE_SENT: "CHARGE_SENT",
   CONTRACT_CHANGED: "CONTRACT_CHANGED",
+  SUBSCRIPTION_CHARGES_GENERATED: "SUBSCRIPTION_CHARGES_GENERATED",
 } as const;
 
 export type TimelineEntityType =
@@ -95,6 +97,7 @@ export async function getPatientTimelineEvents(
     usageIds: string[];
     recordIds: string[];
     invoiceIds: string[];
+    subscriptionIds: string[];
   },
 ): Promise<TimelineEventView[]> {
   const orFilters: Prisma.TimelineEventWhereInput[] = [
@@ -123,6 +126,12 @@ export async function getPatientTimelineEvents(
     orFilters.push({
       entityType: TIMELINE_ENTITY_TYPES.INVOICE,
       entityId: { in: relatedIds.invoiceIds },
+    });
+  }
+  if (relatedIds.subscriptionIds.length > 0) {
+    orFilters.push({
+      entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
+      entityId: { in: relatedIds.subscriptionIds },
     });
   }
 
