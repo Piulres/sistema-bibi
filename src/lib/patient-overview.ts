@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
+import { getPatientTimelineEvents, type TimelineEventView } from "@/lib/timeline";
 
 const dateTime = (value: Date) =>
   value.toLocaleString("pt-BR", {
@@ -78,6 +79,7 @@ export type PatientOverviewData = {
     company: string | null;
     items: { id: string; description: string; amount: number; amountLabel: string }[];
   }[];
+  timeline: TimelineEventView[];
 };
 
 /**
@@ -153,6 +155,20 @@ export async function getPatientOverview(
 
   const totalInvoiced = patient.invoices.reduce((sum, invoice) => sum + invoice.total, 0);
 
+  const appointmentIds = patient.appointments.map((appointment) => appointment.id);
+  const usageIds = patient.appointments.flatMap((appointment) =>
+    appointment.usages.map((usage) => usage.id),
+  );
+  const recordIds = patient.medicalRecords.map((record) => record.id);
+  const invoiceIds = patient.invoices.map((invoice) => invoice.id);
+
+  const timeline = await getPatientTimelineEvents(patientId, tenantId, {
+    appointmentIds,
+    usageIds,
+    recordIds,
+    invoiceIds,
+  });
+
   return {
     patient: {
       id: patient.id,
@@ -203,5 +219,6 @@ export async function getPatientOverview(
         amountLabel: formatBRL(item.amount),
       })),
     })),
+    timeline,
   };
 }

@@ -26,6 +26,7 @@ flowchart TB
       Auth["api-auth.ts<br/>(requireUser/role)"]
       Price["pricing.ts<br/>(precificação dinâmica)"]
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
+      Timeline["timeline.ts<br/>(auditoria universal)"]
       DB["db.ts (Prisma Client)"]
     end
   end
@@ -37,6 +38,7 @@ flowchart TB
   API --> Auth --> Sess
   API --> Price
   API --> Overview --> DB
+  API --> Timeline --> DB
   API --> DB --> SQLite
   Sess --> DB
 ```
@@ -74,6 +76,7 @@ erDiagram
 
   ProcedureUsage |o--|| InvoiceItem : "faturado como"
   Invoice ||--o{ InvoiceItem : "contém"
+  Tenant ||--o{ TimelineEvent : "audita"
 
   Tenant {
     string id PK
@@ -144,6 +147,16 @@ erDiagram
     float amount
     string invoiceId FK
     string usageId FK
+  }
+  TimelineEvent {
+    string id PK
+    string tenantId FK
+    string entityType
+    string entityId
+    string action
+    string description
+    datetime createdAt
+    string createdBy "nullable"
   }
 ```
 
@@ -240,7 +253,45 @@ flowchart LR
 
 ---
 
-## 7. Documentação da API
+## 7. Timeline Universal (Épico 2)
+
+Sistema de auditoria de eventos com entidade `TimelineEvent` e service centralizado.
+
+```mermaid
+flowchart LR
+  API["Route Handlers<br/>(mutações)"] --> Svc["recordTimelineEvent()"]
+  Svc --> TE[("TimelineEvent")]
+  Overview["getPatientOverview()"] --> Query["getPatientTimelineEvents()"]
+  Query --> TE
+  View["PatientOverviewView"] --> TimelineUI["Timeline visual"]
+```
+
+**Eventos registrados automaticamente:**
+- `LOGIN` — autenticação
+- `UPDATED` / `APPOINTMENT_COMPLETED` — status de atendimento
+- `PROCEDURE_REGISTERED` — Pay Per Use
+- `MEDICAL_RECORD_CREATED` — PEP
+- `INVOICE_ISSUED` — faturamento
+- `CREATED` — seed e futuros cadastros
+
+**Arquivos:**
+- `prisma/schema.prisma` — model `TimelineEvent`
+- `src/lib/timeline.ts` — `recordTimelineEvent`, `getPatientTimelineEvents`
+- Hooks nos handlers de login, atendimento, procedimentos, PEP e faturas
+
+### Checklist de homologação (Épico 2)
+
+- [x] Model `TimelineEvent` criado (compatível SQLite/PostgreSQL)
+- [x] Service centralizado sem acoplamento à UI
+- [x] Eventos automáticos nos fluxos existentes
+- [x] Timeline visível no Cliente 360°
+- [x] Seed com eventos de demonstração (João/Maria)
+- [x] OpenAPI e ARQUITETURA atualizados
+- [x] Build passando
+
+---
+
+## 8. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

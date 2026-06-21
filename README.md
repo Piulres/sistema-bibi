@@ -158,6 +158,7 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | `ProcedureUsage` | **Uso efetivo de procedimento — núcleo do Pay Per Use** (preço congelado). |
 | `MedicalRecord` | Prontuário eletrônico (PEP). |
 | `Invoice` / `InvoiceItem` | Fatura Pay Per Use e seus itens. |
+| `TimelineEvent` | Auditoria universal de eventos (Timeline). |
 
 > SQLite não suporta enums no Prisma; os campos `role`, `status` e `category` são
 > `String` com valores documentados no schema.
@@ -252,7 +253,7 @@ sistema-bibi/
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview
+│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, timeline
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md

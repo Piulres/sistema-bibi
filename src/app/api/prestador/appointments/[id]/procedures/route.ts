@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { computePrice, formatBRL } from "@/lib/pricing";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 /**
  * Registra o uso de um procedimento no agendamento (Pay Per Use).
@@ -37,6 +42,15 @@ export async function POST(
         priceCharged: price,
       },
       include: { procedure: true },
+    });
+
+    await recordTimelineEvent({
+      tenantId: appointment.tenantId,
+      entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
+      entityId: usage.id,
+      action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
+      description: `${usage.procedure.name} registrado para ${appointment.patient.name} (${formatBRL(usage.priceCharged)})`,
+      createdBy: user.id,
     });
 
     return NextResponse.json({

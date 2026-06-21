@@ -229,6 +229,43 @@ components:
                     description: { type: string }
                     amount: { type: number }
                     amountLabel: { type: string }
+        timeline:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              entityType: { type: string }
+              entityId: { type: string }
+              action:
+                type: string
+                enum:
+                  - LOGIN
+                  - CREATED
+                  - UPDATED
+                  - APPOINTMENT_COMPLETED
+                  - PROCEDURE_REGISTERED
+                  - MEDICAL_RECORD_CREATED
+                  - INVOICE_ISSUED
+                  - CHARGE_SENT
+                  - CONTRACT_CHANGED
+              description: { type: string }
+              createdAt: { type: string, format: date-time }
+              createdAtLabel: { type: string }
+              createdBy: { type: string, nullable: true }
+              actorName: { type: string, nullable: true }
+    TimelineEvent:
+      type: object
+      description: Evento de auditoria universal do sistema.
+      properties:
+        id: { type: string }
+        tenantId: { type: string }
+        entityType: { type: string }
+        entityId: { type: string }
+        action: { type: string }
+        description: { type: string }
+        createdAt: { type: string, format: date-time }
+        createdBy: { type: string, nullable: true }
 
 security:
   - sessionCookie: []
