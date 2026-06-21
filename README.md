@@ -99,6 +99,7 @@ Base local: **`http://localhost:3000`**
 | `/prestador` | Dashboard do prestador (agenda do dia) | `PRESTADOR` |
 | `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP) | `PRESTADOR` |
 | `/interno/login` | Login do **Portal Interno** | Público |
+| `/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados do tenant | `INTERNO` |
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
 | `/interno/beneficiarios/{id}` | **Cliente 360°** — visão consolidada do beneficiário | `INTERNO` |
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
@@ -212,6 +213,7 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
+| `GET` | `/api/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados (receita, CRM, operação). |
 | `GET` | `/api/interno/billing` | Procedimentos pendentes (agrupados) e faturas emitidas. |
 | `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°** consolidada de um beneficiário. |
 | `GET` | `/api/interno/crm/pipeline` | Pipeline CRM — empresas agrupadas por status. |
@@ -277,14 +279,14 @@ sistema-bibi/
 │   │   │   ├── pj/          # overview
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
-│   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id], /interno/crm, /interno/assinaturas, /interno/comunicacao
+│   │   ├── interno/         # /interno, /interno/dashboard, /interno/login, ...
 │   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, beneficiary-overview, timeline, payments, subscription, communications, message-service
+│   ├── lib/                 # db, sessão, roles, ..., executive-dashboard
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
