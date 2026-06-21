@@ -1,0 +1,449 @@
+openapi: 3.0.3
+info:
+  title: Sistema Bibi — API
+  version: 0.1.0
+  description: >
+    API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, com três portais
+    segregados por `role` (PRESTADOR, INTERNO, PJ) e faturamento Pay Per Use.
+
+    Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
+    HMAC-SHA256, obtido em `POST /api/auth/login`.
+servers:
+  - url: http://localhost:3000
+    description: Desenvolvimento local
+
+tags:
+  - name: Auth
+    description: Autenticação e sessão
+  - name: Prestador
+    description: Portal do Prestador (role PRESTADOR)
+  - name: Interno
+    description: Portal Interno — faturamento (role INTERNO)
+  - name: PJ
+    description: Portal da Empresa (role PJ)
+  - name: Catálogo
+    description: Catálogo de procedimentos
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: bibi_session
+  schemas:
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Não autenticado
+    LoginRequest:
+      type: object
+      required: [email, password, portal]
+      properties:
+        email:
+          type: string
+          format: email
+          example: dra.helena@bibi.health
+        password:
+          type: string
+          example: bibi123
+        portal:
+          type: string
+          enum: [prestador, interno, pj]
+          example: prestador
+    LoginResponse:
+      type: object
+      properties:
+        user:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            role: { type: string, enum: [PRESTADOR, INTERNO, PJ] }
+        redirectTo:
+          type: string
+          example: /prestador
+    SessionUser:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        email: { type: string }
+        role: { type: string, enum: [PRESTADOR, INTERNO, PJ] }
+        tenantId: { type: string }
+        companyId: { type: string, nullable: true }
+        tenantName: { type: string }
+        companyName: { type: string, nullable: true }
+    AgendaItem:
+      type: object
+      properties:
+        id: { type: string }
+        scheduledAt: { type: string, format: date-time }
+        status:
+          type: string
+          enum: [AGENDADO, CONFIRMADO, REALIZADO, FALTOU, CANCELADO]
+        reason: { type: string, nullable: true }
+        patient:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            company: { type: string, nullable: true }
+        proceduresCount: { type: integer }
+    Usage:
+      type: object
+      properties:
+        id: { type: string }
+        procedure: { type: string }
+        category: { type: string, enum: [CONSULTA, EXAME] }
+        priceCharged: { type: number }
+        priceLabel: { type: string, example: "R$ 220,00" }
+        billed: { type: boolean }
+    AppointmentDetail:
+      type: object
+      properties:
+        appointment:
+          type: object
+          properties:
+            id: { type: string }
+            scheduledAt: { type: string, format: date-time }
+            status: { type: string }
+            reason: { type: string, nullable: true }
+        patient:
+          type: object
+          properties:
+            id: { type: string }
+            name: { type: string }
+            cpf: { type: string }
+            company: { type: string, nullable: true }
+            companyId: { type: string, nullable: true }
+        usages:
+          type: array
+          items: { $ref: '#/components/schemas/Usage' }
+        records:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              content: { type: string }
+              createdAt: { type: string, format: date-time }
+    Procedure:
+      type: object
+      properties:
+        id: { type: string }
+        code: { type: string }
+        name: { type: string }
+        category: { type: string, enum: [CONSULTA, EXAME] }
+        basePrice: { type: number }
+        basePriceLabel: { type: string }
+
+security:
+  - sessionCookie: []
+
+paths:
+  /api/auth/login:
+    post:
+      tags: [Auth]
+      summary: Autentica e cria a sessão
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Login bem-sucedido (define o cookie de sessão)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/LoginResponse' }
+        '400': { description: Dados inválidos, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '401': { description: E-mail ou senha incorretos, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+        '403': { description: Conta sem acesso ao portal, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+  /api/auth/logout:
+    post:
+      tags: [Auth]
+      summary: Encerra a sessão
+      responses:
+        '200': { description: OK }
+  /api/auth/me:
+    get:
+      tags: [Auth]
+      summary: Usuário da sessão atual
+      responses:
+        '200':
+          description: Usuário autenticado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user: { $ref: '#/components/schemas/SessionUser' }
+        '401': { description: Não autenticado, content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } } }
+
+  /api/prestador/agenda:
+    get:
+      tags: [Prestador]
+      summary: Agenda do dia do prestador logado
+      responses:
+        '200':
+          description: Lista de agendamentos de hoje
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  appointments:
+                    type: array
+                    items: { $ref: '#/components/schemas/AgendaItem' }
+        '401': { description: Não autenticado }
+        '403': { description: Acesso negado (role != PRESTADOR) }
+
+  /api/prestador/appointments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Prestador]
+      summary: Detalhe do atendimento (procedimentos + prontuário)
+      responses:
+        '200':
+          description: Detalhe do atendimento
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AppointmentDetail' }
+        '404': { description: Agendamento não encontrado }
+    patch:
+      tags: [Prestador]
+      summary: Atualiza o status do atendimento
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [AGENDADO, CONFIRMADO, REALIZADO, FALTOU, CANCELADO]
+      responses:
+        '200':
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok: { type: boolean }
+                  status: { type: string }
+        '400': { description: Status inválido }
+        '404': { description: Agendamento não encontrado }
+
+  /api/prestador/appointments/{id}/procedures:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Prestador]
+      summary: Registra um procedimento utilizado (Pay Per Use)
+      description: >
+        O preço é calculado com a precificação dinâmica (regras por empresa) e
+        congelado no momento do uso.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [procedureId]
+              properties:
+                procedureId: { type: string }
+      responses:
+        '200':
+          description: Procedimento registrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  usage: { $ref: '#/components/schemas/Usage' }
+        '400': { description: Procedimento não informado }
+        '404': { description: Agendamento não encontrado }
+
+  /api/prestador/records:
+    post:
+      tags: [Prestador]
+      summary: Adiciona uma anotação ao prontuário (PEP)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patientId, content]
+              properties:
+                patientId: { type: string }
+                appointmentId: { type: string, nullable: true }
+                content: { type: string }
+      responses:
+        '200':
+          description: Anotação criada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  record:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      content: { type: string }
+                      createdAt: { type: string, format: date-time }
+        '400': { description: Dados inválidos }
+
+  /api/procedures:
+    get:
+      tags: [Catálogo]
+      summary: Catálogo de procedimentos do tenant
+      description: Acessível pelos roles PRESTADOR e INTERNO.
+      responses:
+        '200':
+          description: Lista de procedimentos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  procedures:
+                    type: array
+                    items: { $ref: '#/components/schemas/Procedure' }
+
+  /api/interno/billing:
+    get:
+      tags: [Interno]
+      summary: Painel de faturamento (pendentes + faturas)
+      responses:
+        '200':
+          description: Procedimentos pendentes agrupados por paciente e faturas emitidas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pending:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        patientId: { type: string }
+                        patientName: { type: string }
+                        company: { type: string, nullable: true }
+                        total: { type: number }
+                        totalLabel: { type: string }
+                        items:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id: { type: string }
+                              procedure: { type: string }
+                              priceLabel: { type: string }
+                  invoices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        patientName: { type: string }
+                        company: { type: string, nullable: true }
+                        total: { type: number }
+                        totalLabel: { type: string }
+                        status: { type: string }
+                        itemsCount: { type: integer }
+                        createdAt: { type: string, format: date-time }
+        '403': { description: Acesso negado (role != INTERNO) }
+
+  /api/interno/invoices:
+    post:
+      tags: [Interno]
+      summary: Gera a fatura Pay Per Use de um paciente
+      description: Agrega todos os procedimentos não faturados do paciente e os marca como faturados.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patientId]
+              properties:
+                patientId: { type: string }
+      responses:
+        '200':
+          description: Fatura gerada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  invoice:
+                    type: object
+                    properties:
+                      id: { type: string }
+                      total: { type: number }
+                      totalLabel: { type: string }
+                      status: { type: string }
+                      itemsCount: { type: integer }
+        '400': { description: Sem procedimentos pendentes ou paciente não informado }
+        '404': { description: Paciente não encontrado }
+
+  /api/pj/overview:
+    get:
+      tags: [PJ]
+      summary: Visão da empresa (contrato, beneficiários e faturas)
+      responses:
+        '200':
+          description: Dados consolidados da empresa do usuário
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  company:
+                    type: object
+                    properties:
+                      name: { type: string }
+                      cnpj: { type: string }
+                      contractActive: { type: boolean }
+                      beneficiariesCount: { type: integer }
+                      totalConsumed: { type: number }
+                      totalConsumedLabel: { type: string }
+                  beneficiaries:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        cpf: { type: string }
+                        usageCount: { type: integer }
+                        consumed: { type: number }
+                        consumedLabel: { type: string }
+                  invoices:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        total: { type: number }
+                        totalLabel: { type: string }
+                        status: { type: string }
+                        createdAt: { type: string, format: date-time }
+        '400': { description: Usuário sem empresa vinculada }
+        '403': { description: Acesso negado (role != PJ) }

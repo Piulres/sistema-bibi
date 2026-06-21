@@ -21,6 +21,7 @@
 11. [Scripts disponíveis](#11-scripts-disponíveis)
 12. [Segurança e LGPD](#12-segurança-e-lgpd)
 13. [Notas técnicas e limitações da POC](#13-notas-técnicas-e-limitações-da-poc)
+14. [Documentação adicional](#14-documentação-adicional)
 
 ---
 
@@ -207,6 +208,14 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 |--------|----------|-----------|
 | `GET` | `/api/pj/overview` | Contrato, beneficiários e faturas da empresa do usuário. |
 
+### Documentação interativa (Swagger UI)
+
+Com o servidor rodando, explore e teste a API direto do navegador:
+
+- **Swagger UI:** http://localhost:3000/api-docs.html
+- **Especificação OpenAPI 3.0 (YAML):** http://localhost:3000/openapi.yaml
+  (fonte em [`public/openapi.yaml`](public/openapi.yaml))
+
 ### Exemplo com `curl`
 
 ```bash
@@ -282,6 +291,13 @@ sistema-bibi/
   `.env` são *gitignored*.
 - POC sem testes automatizados e sem hashing de senha — itens recomendados para a
   evolução do produto.
+
+## 14. Documentação adicional
+
+- **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
+  [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
+- **API interativa (Swagger UI):** http://localhost:3000/api-docs.html
+- **Especificação OpenAPI:** [`public/openapi.yaml`](public/openapi.yaml)
 
 ---
 
