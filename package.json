@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "build:netlify": "npm run db:push && npm run db:seed && npm run build",
+    "netlify:build": "npm run build:netlify",
+    "netlify:dev": "netlify dev",
     "start": "next start",
     "lint": "eslint",
     "postinstall": "prisma generate",

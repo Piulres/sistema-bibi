@@ -1,14 +1,21 @@
-# Deploy do Sistema Bibi (Next.js 16 + Prisma/SQLite POC)
-# O build popula o SQLite com os dados de demonstracao antes do next build.
+# Sistema Bibi — Netlify (Next.js 16 + Prisma/SQLite POC)
+#
+# STATUS: preparado para deploy, mas NÃO publicar até revisar credenciais e limites da conta.
+# Build local (sem publicar): npm run netlify:build
+# Dev com emulacao Netlify:    npm run netlify:dev
+# Publicar (manual, quando ok): npx netlify deploy --prod
 
 [build]
   command = "npm run build:netlify"
+  # Next.js 16: NAO definir publish — o runtime @netlify/plugin-nextjs gerencia o output.
 
 [build.environment]
   NODE_VERSION = "22"
-  DATABASE_URL = "file:./prisma/dev.db"
-  # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables)
-  # para producao; o valor abaixo e apenas fallback da POC.
+  # Path relativo ao schema Prisma (prisma/schema.prisma) → arquivo prisma/dev.db
+  DATABASE_URL = "file:./dev.db"
+  NETLIFY = "true"
+  # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables).
+  # O valor abaixo e apenas fallback da POC — troque antes de ir a producao.
   SESSION_SECRET = "bibi-poc-netlify-secret-change-me"
 
 [context.production.environment]
@@ -16,3 +23,22 @@
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"
+
+# Emulacao local: netlify dev encaminha :8888 → next dev :3000
+[dev]
+  command = "npm run dev"
+  targetPort = 3000
+  port = 8888
+  framework = "#custom"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/api/branding/logo/*"
+  [headers.values]
+    Cache-Control = "public, max-age=3600, stale-while-revalidate=86400"

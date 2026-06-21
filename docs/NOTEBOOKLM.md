@@ -236,7 +236,7 @@ src/
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Gateways de pagamento e comunicação: **somente contratos**, adapters não incluídos
-- Deploy Netlify preparado; créditos podem limitar deploy cloud
+- Deploy Netlify **preparado** (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`); publicação manual quando cota/conta ok — não usar `netlify deploy --prod` sem autorização
 
 ---
 
