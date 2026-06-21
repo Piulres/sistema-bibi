@@ -252,6 +252,9 @@ components:
                   - CHARGE_SENT
                   - CONTRACT_CHANGED
                   - SUBSCRIPTION_CHARGES_GENERATED
+                  - MESSAGE_QUEUED
+                  - MESSAGE_SENT
+                  - MESSAGE_FAILED
               description: { type: string }
               createdAt: { type: string, format: date-time }
               createdAtLabel: { type: string }
@@ -307,6 +310,32 @@ components:
           type: string
           enum: [PENDENTE, FATURADA, CANCELADA]
         invoiceId: { type: string, nullable: true }
+    MessageView:
+      type: object
+      properties:
+        id: { type: string }
+        channel:
+          type: string
+          enum: [EMAIL, SMS, WHATSAPP]
+        channelLabel: { type: string }
+        template:
+          type: string
+          enum: [APPOINTMENT_REMINDER, INVOICE_DUE, SUBSCRIPTION_DUE, GENERIC]
+        templateLabel: { type: string }
+        subject: { type: string, nullable: true }
+        body: { type: string }
+        status:
+          type: string
+          enum: [PENDENTE, ENVIADA, FALHA, CANCELADA]
+        statusLabel: { type: string }
+        externalId: { type: string, nullable: true }
+        sentAt: { type: string, format: date-time, nullable: true }
+        sentAtLabel: { type: string, nullable: true }
+        createdAt: { type: string, format: date-time }
+        createdAtLabel: { type: string }
+        patientId: { type: string }
+        patientName: { type: string }
+        patientPhone: { type: string, nullable: true }
     CompanyPipelineCard:
       type: object
       properties:
@@ -808,6 +837,147 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/SubscriptionChargeView' }
         '404': { description: Assinatura não encontrada }
+
+  /api/interno/messages:
+    get:
+      tags: [Interno]
+      summary: Fila de comunicações do tenant
+      responses:
+        '200':
+          description: Mensagens, beneficiários e status do provider
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  messages:
+                    type: array
+                    items: { $ref: '#/components/schemas/MessageView' }
+                  patients:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+                        phone: { type: string, nullable: true }
+                  providerConfigured: { type: string, nullable: true }
+        '403': { description: Acesso negado (role != INTERNO) }
+    post:
+      tags: [Interno]
+      summary: Enfileira uma comunicação outbound
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patientId, channel, template, body]
+              properties:
+                patientId: { type: string }
+                channel:
+                  type: string
+                  enum: [EMAIL, SMS, WHATSAPP]
+                template:
+                  type: string
+                  enum: [APPOINTMENT_REMINDER, INVOICE_DUE, SUBSCRIPTION_DUE, GENERIC]
+                subject: { type: string, nullable: true }
+                body: { type: string }
+      responses:
+        '200':
+          description: Mensagem enfileirada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { $ref: '#/components/schemas/MessageView' }
+        '400': { description: Dados inválidos }
+        '404': { description: Beneficiário não encontrado }
+
+  /api/interno/messages/template:
+    get:
+      tags: [Interno]
+      summary: Sugere assunto e corpo para um template
+      parameters:
+        - name: patientId
+          in: query
+          required: true
+          schema: { type: string }
+        - name: template
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [APPOINTMENT_REMINDER, INVOICE_DUE, SUBSCRIPTION_DUE, GENERIC]
+      responses:
+        '200':
+          description: Sugestão de texto
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestion:
+                    type: object
+                    properties:
+                      subject: { type: string, nullable: true }
+                      body: { type: string }
+        '400': { description: Parâmetros inválidos }
+        '404': { description: Beneficiário não encontrado }
+
+  /api/interno/messages/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Cancela mensagem pendente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [action]
+              properties:
+                action:
+                  type: string
+                  enum: [cancel]
+      responses:
+        '200':
+          description: Mensagem cancelada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { $ref: '#/components/schemas/MessageView' }
+        '400': { description: Ação inválida ou status incorreto }
+        '404': { description: Mensagem não encontrada }
+
+  /api/interno/messages/{id}/dispatch:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Despacha mensagem via provider configurado
+      responses:
+        '200':
+          description: Mensagem enviada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: { $ref: '#/components/schemas/MessageView' }
+        '400': { description: Provider não configurado ou mensagem inválida }
+        '404': { description: Mensagem não encontrada }
 
   /api/beneficiario/overview:
     get:

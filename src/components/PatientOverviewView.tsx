@@ -84,6 +84,9 @@ const actionClass: Record<string, string> = {
   CHARGE_SENT: "bg-orange-100 text-orange-700",
   CONTRACT_CHANGED: "bg-amber-100 text-amber-700",
   SUBSCRIPTION_CHARGES_GENERATED: "bg-cyan-100 text-cyan-700",
+  MESSAGE_QUEUED: "bg-sky-100 text-sky-700",
+  MESSAGE_SENT: "bg-teal-100 text-teal-700",
+  MESSAGE_FAILED: "bg-red-100 text-red-700",
 };
 
 function ActionBadge({ value }: { value: string }) {

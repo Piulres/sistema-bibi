@@ -16,6 +16,7 @@ function todayAt(hour: number, minute = 0): Date {
 async function main() {
   console.log("Limpando dados existentes...");
   await prisma.timelineEvent.deleteMany();
+  await prisma.message.deleteMany();
   await prisma.subscriptionCharge.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.invoiceItem.deleteMany();
@@ -426,6 +427,52 @@ async function main() {
       entityId: subPedro.id,
       action: TIMELINE_ACTIONS.CREATED,
       description: "Assinatura Mensal criada para Pedro Almeida",
+      createdBy: interno.id,
+    },
+  });
+
+  console.log("Criando fila de comunicacoes (Comunicacao)...");
+  const msgJoao = await prisma.message.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: joao.id,
+      channel: "WHATSAPP",
+      template: "APPOINTMENT_REMINDER",
+      body: "Olá João Pereira, lembramos sua consulta agendada para hoje às 09:00. Em caso de impossibilidade, entre em contato conosco.",
+      status: "PENDENTE",
+      createdBy: interno.id,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.MESSAGE,
+      entityId: msgJoao.id,
+      action: TIMELINE_ACTIONS.MESSAGE_QUEUED,
+      description: "WhatsApp enfileirado para João Pereira (Lembrete de consulta)",
+      createdBy: interno.id,
+    },
+  });
+
+  const msgMaria = await prisma.message.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: maria.id,
+      channel: "EMAIL",
+      template: "SUBSCRIPTION_DUE",
+      subject: "Cobrança recorrente — Bibi Saúde",
+      body: "Olá Maria Souza, sua assinatura possui cobrança pendente de R$ 249,90. Regularize para manter o plano ativo.",
+      status: "PENDENTE",
+      createdBy: interno.id,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.MESSAGE,
+      entityId: msgMaria.id,
+      action: TIMELINE_ACTIONS.MESSAGE_QUEUED,
+      description: "E-mail enfileirado para Maria Souza (Cobrança recorrente)",
       createdBy: interno.id,
     },
   });
