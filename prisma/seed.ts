@@ -29,6 +29,7 @@ async function main() {
   await prisma.timelineEvent.deleteMany();
   await prisma.message.deleteMany();
   await prisma.webhookEndpoint.deleteMany();
+  await prisma.webhookDelivery.deleteMany();
   await prisma.subscriptionCharge.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.invoiceItem.deleteMany();
@@ -182,12 +183,12 @@ async function main() {
   });
   console.log("Criando catalogo de procedimentos...");
   const procData = [
-    { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 180 },
-    { code: "CON-CAR", name: "Consulta Cardiologia", category: "CONSULTA", basePrice: 250 },
-    { code: "CON-DER", name: "Consulta Dermatologia", category: "CONSULTA", basePrice: 220 },
-    { code: "EXA-HEM", name: "Hemograma Completo", category: "EXAME", basePrice: 45 },
-    { code: "EXA-ECG", name: "Eletrocardiograma", category: "EXAME", basePrice: 120 },
-    { code: "EXA-USG", name: "Ultrassonografia Abdominal", category: "EXAME", basePrice: 190 },
+    { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 180, tissCode: "10101012" },
+    { code: "CON-CAR", name: "Consulta Cardiologia", category: "CONSULTA", basePrice: 250, tissCode: "10101039" },
+    { code: "CON-DER", name: "Consulta Dermatologia", category: "CONSULTA", basePrice: 220, tissCode: "10101047" },
+    { code: "EXA-HEM", name: "Hemograma Completo", category: "EXAME", basePrice: 45, tissCode: "40304361" },
+    { code: "EXA-ECG", name: "Eletrocardiograma", category: "EXAME", basePrice: 120, tissCode: "40101010" },
+    { code: "EXA-USG", name: "Ultrassonografia Abdominal", category: "EXAME", basePrice: 190, tissCode: "40901106" },
   ];
   const procedures: Record<string, { id: string; basePrice: number; name: string }> = {};
   for (const p of procData) {
@@ -299,7 +300,9 @@ async function main() {
     data: {
       scheduledAt: todayAt(10, 30),
       status: "AGENDADO",
-      reason: "Check-up anual",
+      modality: "TELE",
+      telemedicineUrl: "https://meet.bibi.health/room/seed-tele-maria",
+      reason: "Check-up anual (telemedicina)",
       tenantId: tenant.id,
       patientId: maria.id,
       providerId: prestador.id,
@@ -606,6 +609,7 @@ async function main() {
   console.log("  Recepção     -> /interno/login       : recepcao@bibi.health / bibi123 (RBAC limitado)");
   console.log("  Empresa PJ   -> /pj/login            : rh@techcorp.com / bibi123");
   console.log("  Beneficiario -> /beneficiario/login  : joao.pereira@email.com / bibi123");
+  console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
 }
 
 main()

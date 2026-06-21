@@ -12,6 +12,7 @@ export const WEBHOOK_EVENTS = [
 export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number];
 
 const EVENT_SET = new Set<string>(WEBHOOK_EVENTS);
+const MAX_ATTEMPTS = 5;
 
 export function isWebhookEvent(value: string): value is WebhookEvent {
   return EVENT_SET.has(value);
@@ -34,7 +35,82 @@ export type WebhookPayload = {
   data: Record<string, unknown>;
 };
 
-/** Dispara webhooks ativos do tenant para o evento (fire-and-forget). */
+function retryDelayMs(attempt: number): number {
+  return Math.min(60_000 * 2 ** (attempt - 1), 15 * 60_000);
+}
+
+async function deliverToEndpoint(input: {
+  endpoint: { id: string; url: string; secret: string | null; tenantId: string };
+  event: WebhookEvent;
+  payload: WebhookPayload;
+  deliveryId?: string;
+  attempt?: number;
+}): Promise<{ ok: boolean; httpStatus?: number; errorMessage?: string }> {
+  const body = JSON.stringify(input.payload);
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "X-Bibi-Event": input.event,
+  };
+
+  if (input.endpoint.secret) {
+    headers["X-Bibi-Signature"] = crypto
+      .createHmac("sha256", input.endpoint.secret)
+      .update(body)
+      .digest("hex");
+  }
+
+  try {
+    const res = await fetch(input.endpoint.url, {
+      method: "POST",
+      headers,
+      body,
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      return { ok: false, httpStatus: res.status, errorMessage: `HTTP ${res.status}` };
+    }
+    return { ok: true, httpStatus: res.status };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Falha de rede";
+    return { ok: false, errorMessage: message };
+  }
+}
+
+async function recordDeliveryResult(input: {
+  deliveryId: string;
+  ok: boolean;
+  httpStatus?: number;
+  errorMessage?: string;
+  attempt: number;
+}) {
+  if (input.ok) {
+    await prisma.webhookDelivery.update({
+      where: { id: input.deliveryId },
+      data: {
+        status: "SUCCESS",
+        httpStatus: input.httpStatus ?? null,
+        errorMessage: null,
+        deliveredAt: new Date(),
+        nextRetryAt: null,
+      },
+    });
+    return;
+  }
+
+  const shouldRetry = input.attempt < MAX_ATTEMPTS;
+  await prisma.webhookDelivery.update({
+    where: { id: input.deliveryId },
+    data: {
+      status: shouldRetry ? "PENDING" : "FAILED",
+      httpStatus: input.httpStatus ?? null,
+      errorMessage: input.errorMessage ?? "Erro desconhecido",
+      attempt: input.attempt,
+      nextRetryAt: shouldRetry ? new Date(Date.now() + retryDelayMs(input.attempt)) : null,
+    },
+  });
+}
+
+/** Dispara webhooks ativos do tenant para o evento com log e retry. */
 export async function dispatchWebhooks(input: {
   tenantId: string;
   event: WebhookEvent;
@@ -51,41 +127,162 @@ export async function dispatchWebhooks(input: {
     data: input.data,
   };
 
-  const body = JSON.stringify(payload);
-
   await Promise.all(
     endpoints.map(async (endpoint) => {
       const events = parseWebhookEvents(endpoint.events);
       if (!events.includes(input.event)) return;
 
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-        "X-Bibi-Event": input.event,
-      };
+      const delivery = await prisma.webhookDelivery.create({
+        data: {
+          tenantId: input.tenantId,
+          webhookId: endpoint.id,
+          event: input.event,
+          payload: JSON.stringify(payload),
+          status: "PENDING",
+          attempt: 1,
+          maxAttempts: MAX_ATTEMPTS,
+        },
+      });
 
-      if (endpoint.secret) {
-        const signature = crypto
-          .createHmac("sha256", endpoint.secret)
-          .update(body)
-          .digest("hex");
-        headers["X-Bibi-Signature"] = signature;
-      }
+      const result = await deliverToEndpoint({
+        endpoint,
+        event: input.event,
+        payload,
+        deliveryId: delivery.id,
+        attempt: 1,
+      });
 
-      try {
-        const res = await fetch(endpoint.url, {
-          method: "POST",
-          headers,
-          body,
-          signal: AbortSignal.timeout(8000),
-        });
-        if (!res.ok) {
-          console.warn(`[webhook] ${endpoint.url} → HTTP ${res.status}`);
-        }
-      } catch (error) {
-        console.warn(`[webhook] falha ${endpoint.url}:`, error);
-      }
+      await recordDeliveryResult({
+        deliveryId: delivery.id,
+        ok: result.ok,
+        httpStatus: result.httpStatus,
+        errorMessage: result.errorMessage,
+        attempt: 1,
+      });
     }),
   );
+}
+
+export type WebhookDeliveryView = {
+  id: string;
+  webhookLabel: string;
+  event: string;
+  status: string;
+  httpStatus: number | null;
+  errorMessage: string | null;
+  attempt: number;
+  maxAttempts: number;
+  nextRetryAt: string | null;
+  createdAt: string;
+  deliveredAt: string | null;
+};
+
+export async function listWebhookDeliveries(
+  tenantId: string,
+  limit = 50,
+): Promise<WebhookDeliveryView[]> {
+  const rows = await prisma.webhookDelivery.findMany({
+    where: { tenantId },
+    include: { webhook: { select: { label: true } } },
+    orderBy: { createdAt: "desc" },
+    take: limit,
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    webhookLabel: row.webhook.label,
+    event: row.event,
+    status: row.status,
+    httpStatus: row.httpStatus,
+    errorMessage: row.errorMessage,
+    attempt: row.attempt,
+    maxAttempts: row.maxAttempts,
+    nextRetryAt: row.nextRetryAt?.toISOString() ?? null,
+    createdAt: row.createdAt.toISOString(),
+    deliveredAt: row.deliveredAt?.toISOString() ?? null,
+  }));
+}
+
+export async function retryWebhookDelivery(tenantId: string, deliveryId: string) {
+  const delivery = await prisma.webhookDelivery.findFirst({
+    where: { id: deliveryId, tenantId },
+    include: { webhook: true },
+  });
+  if (!delivery) return null;
+  if (delivery.status === "SUCCESS") {
+    return { error: "Entrega já concluída com sucesso" as const };
+  }
+
+  const payload = JSON.parse(delivery.payload) as WebhookPayload;
+  const nextAttempt = delivery.attempt + 1;
+  if (nextAttempt > delivery.maxAttempts) {
+    return { error: "Número máximo de tentativas atingido" as const };
+  }
+
+  const result = await deliverToEndpoint({
+    endpoint: delivery.webhook,
+    event: delivery.event as WebhookEvent,
+    payload,
+    attempt: nextAttempt,
+  });
+
+  await prisma.webhookDelivery.update({
+    where: { id: delivery.id },
+    data: { attempt: nextAttempt },
+  });
+
+  await recordDeliveryResult({
+    deliveryId: delivery.id,
+    ok: result.ok,
+    httpStatus: result.httpStatus,
+    errorMessage: result.errorMessage,
+    attempt: nextAttempt,
+  });
+
+  return { ok: true as const };
+}
+
+/** Processa fila de retries (cron). */
+export async function processWebhookRetries(): Promise<{ processed: number; succeeded: number }> {
+  const now = new Date();
+  const pending = await prisma.webhookDelivery.findMany({
+    where: {
+      status: "PENDING",
+      nextRetryAt: { lte: now },
+      attempt: { lt: MAX_ATTEMPTS },
+    },
+    include: { webhook: true },
+    take: 20,
+  });
+
+  let succeeded = 0;
+  for (const delivery of pending) {
+    const payload = JSON.parse(delivery.payload) as WebhookPayload;
+    const nextAttempt = delivery.attempt + 1;
+    const result = await deliverToEndpoint({
+      endpoint: delivery.webhook,
+      event: delivery.event as WebhookEvent,
+      payload,
+      attempt: nextAttempt,
+    });
+
+    await prisma.webhookDelivery.update({
+      where: { id: delivery.id },
+      data: { attempt: nextAttempt },
+    });
+
+    await recordDeliveryResult({
+      deliveryId: delivery.id,
+      ok: result.ok,
+      httpStatus: result.httpStatus,
+      errorMessage: result.errorMessage,
+      attempt: nextAttempt,
+    });
+
+    if (result.ok) succeeded++;
+  }
+
+  return { processed: pending.length, succeeded };
 }
 
 export type WebhookView = {

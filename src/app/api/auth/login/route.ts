@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/session";
 import { PORTALS, type PortalKey } from "@/lib/roles";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
+import { createMfaChallengeToken } from "@/lib/mfa";
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string; portal?: string };
@@ -49,6 +50,13 @@ export async function POST(request: Request) {
       { error: "Conta sem beneficiário vinculado" },
       { status: 403 },
     );
+  }
+
+  if (user.mfaEnabled && user.mfaSecret) {
+    return NextResponse.json({
+      mfaRequired: true,
+      mfaToken: createMfaChallengeToken(user.id, portal),
+    });
   }
 
   await createSession(user.id);

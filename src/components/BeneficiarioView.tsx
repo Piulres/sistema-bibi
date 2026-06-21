@@ -32,6 +32,8 @@ type Overview = {
     id: string;
     scheduledAtLabel: string;
     status: string;
+    modality: string;
+    telemedicineUrl: string | null;
     reason: string | null;
     providerName: string;
     usagesCount: number;
@@ -96,6 +98,7 @@ export default function BeneficiarioView() {
     date: new Date().toISOString().slice(0, 10),
     slot: "",
     reason: "Consulta de rotina",
+    modality: "PRESENCIAL",
   });
 
   const reloadOverview = async () => {
@@ -157,6 +160,7 @@ export default function BeneficiarioView() {
           providerId: scheduleForm.providerId,
           scheduledAt: scheduleForm.slot,
           reason: scheduleForm.reason,
+          modality: scheduleForm.modality,
         }),
       });
       const data = await res.json();
@@ -226,6 +230,17 @@ export default function BeneficiarioView() {
               ))}
             </select>
           </label>
+          <label className="block text-sm">
+            <span className="text-[var(--text-secondary)]">Modalidade</span>
+            <select
+              className="mt-1 w-full rounded border px-3 py-2"
+              value={scheduleForm.modality}
+              onChange={(e) => setScheduleForm({ ...scheduleForm, modality: e.target.value })}
+            >
+              <option value="PRESENCIAL">Presencial</option>
+              <option value="TELE">Telemedicina</option>
+            </select>
+          </label>
           <div className="flex items-end">
             <Button type="submit" variant="portal" disabled={busy === "book" || !scheduleForm.slot}>
               {busy === "book" ? "Agendando..." : "Agendar"}
@@ -291,6 +306,7 @@ export default function BeneficiarioView() {
                   <th className="px-4 py-2 font-medium">Data</th>
                   <th className="px-4 py-2 font-medium">Prestador</th>
                   <th className="px-4 py-2 font-medium">Status</th>
+                  <th className="px-4 py-2 font-medium">Modalidade</th>
                   <th className="px-4 py-2 font-medium">Motivo</th>
                 </tr>
               </thead>
@@ -301,6 +317,19 @@ export default function BeneficiarioView() {
                     <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.providerName}</td>
                     <td className="px-4 py-2">
                       <StatusBadge value={appointment.status} map="appointment" />
+                    </td>
+                    <td className="px-4 py-2 text-[var(--text-muted)]">
+                      {appointment.modality === "TELE" ? (
+                        appointment.telemedicineUrl ? (
+                          <a href={appointment.telemedicineUrl} target="_blank" rel="noreferrer" className="text-[var(--portal-accent)] hover:underline">
+                            Tele · entrar
+                          </a>
+                        ) : (
+                          "Telemedicina"
+                        )
+                      ) : (
+                        "Presencial"
+                      )}
                     </td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
                   </tr>

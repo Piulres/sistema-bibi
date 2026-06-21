@@ -39,6 +39,19 @@ export default function IntegracoesView() {
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [webhooks, setWebhooks] = useState<WebhookRow[]>([]);
+  const [deliveries, setDeliveries] = useState<
+    {
+      id: string;
+      webhookLabel: string;
+      event: string;
+      status: string;
+      httpStatus: number | null;
+      errorMessage: string | null;
+      attempt: number;
+      maxAttempts: number;
+      createdAt: string;
+    }[]
+  >([]);
   const [events, setEvents] = useState<WebhookEvent[]>([]);
   const [form, setForm] = useState({
     label: "",
@@ -48,13 +61,18 @@ export default function IntegracoesView() {
   });
 
   const load = useCallback(async () => {
-    const res = await fetch("/api/interno/webhooks");
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error ?? "Erro ao carregar webhooks");
+    const [hooksRes, deliveriesRes] = await Promise.all([
+      fetch("/api/interno/webhooks"),
+      fetch("/api/interno/webhooks/deliveries"),
+    ]);
+    const hooksData = await hooksRes.json();
+    const deliveriesData = await deliveriesRes.json();
+    if (!hooksRes.ok) {
+      setError(hooksData.error ?? "Erro ao carregar webhooks");
     } else {
-      setWebhooks(data.webhooks ?? []);
-      setEvents(data.events ?? []);
+      setWebhooks(hooksData.webhooks ?? []);
+      setEvents(hooksData.events ?? []);
+      setDeliveries(deliveriesData.deliveries ?? []);
       setError(null);
     }
     setLoading(false);
@@ -125,6 +143,19 @@ export default function IntegracoesView() {
       const res = await fetch(`/api/interno/webhooks/${id}`, { method: "DELETE" });
       if (res.ok) {
         setMsg("Webhook removido");
+        await load();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function retryDelivery(id: string) {
+    setBusy(`retry-${id}`);
+    try {
+      const res = await fetch(`/api/interno/webhooks/deliveries/${id}/retry`, { method: "POST" });
+      if (res.ok) {
+        setMsg("Retry executado");
         await load();
       }
     } finally {
@@ -235,6 +266,46 @@ export default function IntegracoesView() {
                     Excluir
                   </Button>
                 </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      <Card>
+        <SectionHeader
+          title="Log de entregas"
+          description="Histórico com retry automático (backoff exponencial) e reenvio manual."
+        />
+        {deliveries.length === 0 ? (
+          <EmptyState message="Nenhuma entrega registrada ainda." />
+        ) : (
+          <ul className="mt-4 divide-y divide-[var(--border-default)]">
+            {deliveries.map((d) => (
+              <li key={d.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-[var(--text-primary)]">
+                    {EVENT_LABELS[d.event as WebhookEvent] ?? d.event} · {d.webhookLabel}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {new Date(d.createdAt).toLocaleString("pt-BR")} · {d.status}
+                    {d.httpStatus ? ` · HTTP ${d.httpStatus}` : ""}
+                    {d.errorMessage ? ` · ${d.errorMessage}` : ""}
+                  </p>
+                  <p className="text-xs text-[var(--text-muted)]">
+                    Tentativa {d.attempt}/{d.maxAttempts}
+                  </p>
+                </div>
+                {d.status !== "SUCCESS" && (
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    disabled={busy === `retry-${d.id}`}
+                    onClick={() => retryDelivery(d.id)}
+                  >
+                    Reenviar
+                  </Button>
+                )}
               </li>
             ))}
           </ul>

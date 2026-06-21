@@ -45,6 +45,8 @@ export type PatientOverviewData = {
     scheduledAt: string;
     scheduledAtLabel: string;
     status: string;
+    modality: string;
+    telemedicineUrl: string | null;
     reason: string | null;
     providerName: string;
     usagesCount: number;
@@ -126,6 +128,8 @@ export async function getPatientOverview(
     scheduledAt: appointment.scheduledAt.toISOString(),
     scheduledAtLabel: dateTime(appointment.scheduledAt),
     status: appointment.status,
+    modality: appointment.modality,
+    telemedicineUrl: appointment.telemedicineUrl,
     reason: appointment.reason,
     providerName: appointment.provider.name,
     usagesCount: appointment.usages.length,

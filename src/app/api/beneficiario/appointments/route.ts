@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { bookBeneficiaryAppointment } from "@/lib/scheduling-service";
+import { isAppointmentModality } from "@/lib/telemedicine";
 
 export async function POST(request: Request) {
   try {
@@ -14,10 +15,15 @@ export async function POST(request: Request) {
       providerId?: string;
       scheduledAt?: string;
       reason?: string | null;
+      modality?: string;
     };
 
     if (!body.providerId || !body.scheduledAt) {
       return NextResponse.json({ error: "Informe prestador e horário" }, { status: 400 });
+    }
+
+    if (body.modality && !isAppointmentModality(body.modality)) {
+      return NextResponse.json({ error: "Modalidade inválida" }, { status: 400 });
     }
 
     const result = await bookBeneficiaryAppointment({
@@ -26,6 +32,7 @@ export async function POST(request: Request) {
       providerId: body.providerId,
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
+      modality: body.modality,
       createdBy: user.id,
     });
 
