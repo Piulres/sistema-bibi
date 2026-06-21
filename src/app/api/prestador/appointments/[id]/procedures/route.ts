@@ -1,0 +1,54 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { computePrice, formatBRL } from "@/lib/pricing";
+
+/**
+ * Registra o uso de um procedimento no agendamento (Pay Per Use).
+ * O preco e calculado com a precificacao dinamica e congelado no uso.
+ */
+export async function POST(
+  request: Request,
+  ctx: RouteContext<"/api/prestador/appointments/[id]/procedures">,
+) {
+  try {
+    const user = await requireUser(["PRESTADOR"]);
+    const { id } = await ctx.params;
+    const body = (await request.json()) as { procedureId?: string };
+
+    if (!body.procedureId) {
+      return NextResponse.json({ error: "Informe o procedimento" }, { status: 400 });
+    }
+
+    const appointment = await prisma.appointment.findFirst({
+      where: { id, providerId: user.id },
+      include: { patient: true },
+    });
+    if (!appointment) {
+      return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
+    }
+
+    const { price } = await computePrice(body.procedureId, appointment.patient.companyId);
+
+    const usage = await prisma.procedureUsage.create({
+      data: {
+        appointmentId: appointment.id,
+        procedureId: body.procedureId,
+        priceCharged: price,
+      },
+      include: { procedure: true },
+    });
+
+    return NextResponse.json({
+      usage: {
+        id: usage.id,
+        procedure: usage.procedure.name,
+        category: usage.procedure.category,
+        priceCharged: usage.priceCharged,
+        priceLabel: formatBRL(usage.priceCharged),
+      },
+    });
+  } catch (error) {
+    return authErrorResponse(error);
+  }
+}

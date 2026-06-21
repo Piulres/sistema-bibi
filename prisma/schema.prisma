@@ -1,0 +1,210 @@
+// Sistema Bibi - HealthTech SaaS (POC)
+// Modelo inspirado na ERPMed/Centtralmed: multi-tenancy, Pay Per Use,
+// gestao de beneficiarios e faturamento de procedimentos.
+//
+// Nota: SQLite nao suporta enums no Prisma; usamos String com valores
+// documentados nos comentarios de cada campo.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+/// Cliente do SaaS (clinica ou hospital). Base da segregacao multi-tenant.
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  cnpj      String   @unique
+  createdAt DateTime @default(now())
+
+  users        User[]
+  companies    Company[]
+  patients     Patient[]
+  procedures   Procedure[]
+  appointments Appointment[]
+  invoices     Invoice[]
+}
+
+/// Usuario do sistema. role define o portal de acesso.
+/// role: PRESTADOR | INTERNO | PJ
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  // POC: senha em texto puro apenas para demonstracao. Em producao usar hash (ex. bcrypt/argon2).
+  password  String
+  name      String
+  role      String
+  createdAt DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  // Vinculo opcional com empresa (para usuarios do Portal PJ).
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  appointments   Appointment[]   @relation("ProviderAppointments")
+  medicalRecords MedicalRecord[] @relation("ProviderRecords")
+}
+
+/// Empresa contratante (Pessoa Juridica) - Portal PJ.
+model Company {
+  id             String   @id @default(cuid())
+  name           String
+  cnpj           String   @unique
+  contractActive Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  users        User[]
+  patients     Patient[]
+  pricingRules PricingRule[]
+  invoices     Invoice[]
+}
+
+/// Beneficiario / paciente. Pode ser individual ou vinculado a uma empresa (PJ).
+model Patient {
+  id        String   @id @default(cuid())
+  name      String
+  cpf       String   @unique
+  birthDate DateTime
+  phone     String?
+  createdAt DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  invoices       Invoice[]
+}
+
+/// Catalogo de procedimentos (consultas e exames) com preco base.
+/// category: CONSULTA | EXAME
+model Procedure {
+  id        String   @id @default(cuid())
+  code      String
+  name      String
+  category  String
+  basePrice Float
+  createdAt DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  pricingRules PricingRule[]
+  usages       ProcedureUsage[]
+
+  @@unique([tenantId, code])
+}
+
+/// Precificacao dinamica: ajusta o preco base por empresa (ex.: desconto corporativo).
+model PricingRule {
+  id          String  @id @default(cuid())
+  description String
+  // Multiplicador aplicado ao preco base (ex.: 0.8 = 20% de desconto).
+  multiplier  Float   @default(1.0)
+
+  procedureId String
+  procedure   Procedure @relation(fields: [procedureId], references: [id])
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+}
+
+/// Agendamento (Agenda Inteligente).
+/// status: AGENDADO | CONFIRMADO | REALIZADO | FALTOU | CANCELADO
+model Appointment {
+  id          String   @id @default(cuid())
+  scheduledAt DateTime
+  status      String   @default("AGENDADO")
+  reason      String?
+  createdAt   DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  providerId String
+  provider   User   @relation("ProviderAppointments", fields: [providerId], references: [id])
+
+  usages         ProcedureUsage[]
+  medicalRecords MedicalRecord[]
+}
+
+/// Uso efetivo de procedimento (nucleo do Pay Per Use).
+/// Registra o preco cobrado no momento do uso (snapshot), garantindo
+/// transparencia previa e previsibilidade financeira.
+model ProcedureUsage {
+  id          String   @id @default(cuid())
+  priceCharged Float
+  performedAt DateTime @default(now())
+  billed      Boolean  @default(false)
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  procedureId String
+  procedure   Procedure @relation(fields: [procedureId], references: [id])
+
+  invoiceItem InvoiceItem?
+}
+
+/// Prontuario Eletronico do Paciente (PEP).
+model MedicalRecord {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  providerId String
+  provider   User   @relation("ProviderRecords", fields: [providerId], references: [id])
+
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+}
+
+/// Fatura Pay Per Use - agrega os procedimentos efetivamente utilizados.
+/// status: ABERTA | FECHADA | PAGA
+model Invoice {
+  id        String   @id @default(cuid())
+  total     Float    @default(0)
+  status    String   @default("FECHADA")
+  createdAt DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  items InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String @id @default(cuid())
+  description String
+  amount      Float
+
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  usageId String         @unique
+  usage   ProcedureUsage @relation(fields: [usageId], references: [id])
+}
