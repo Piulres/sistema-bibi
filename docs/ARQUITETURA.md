@@ -27,6 +27,7 @@ flowchart TB
       Price["pricing.ts<br/>(precificação dinâmica)"]
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
       Timeline["timeline.ts<br/>(auditoria universal)"]
+      Payments["payments/*<br/>(motor de cobrança)"]
       DB["db.ts (Prisma Client)"]
     end
   end
@@ -39,6 +40,7 @@ flowchart TB
   API --> Price
   API --> Overview --> DB
   API --> Timeline --> DB
+  API -.->|futuro| Payments
   API --> DB --> SQLite
   Sess --> DB
 ```
@@ -328,7 +330,59 @@ flowchart LR
 
 ---
 
-## 10. Documentação da API
+## 10. Motor de Cobrança (Épico 4)
+
+Contratos Strategy para PIX, boleto e cartão — **sem integração fake**.
+
+```mermaid
+classDiagram
+  class PaymentProvider {
+    <<interface>>
+    +gatewayId
+    +supportedMethods
+    +createCharge()
+    +getCharge()
+    +cancelCharge()
+  }
+  class PixProvider {
+    <<interface>>
+    +createPixCharge()
+  }
+  class BoletoProvider {
+    <<interface>>
+    +createBoletoCharge()
+  }
+  class CardProvider {
+    <<interface>>
+    +createCardCharge()
+  }
+  class PaymentGatewayRegistry {
+    +register()
+    +getPixProvider()
+    +getBoletoProvider()
+    +getCardProvider()
+  }
+  PaymentProvider <|-- PixProvider
+  PaymentProvider <|-- BoletoProvider
+  PaymentProvider <|-- CardProvider
+  PaymentGatewayRegistry --> PaymentProvider
+```
+
+Detalhes: [`docs/PAYMENTS.md`](PAYMENTS.md)
+
+### Checklist de homologação (Épico 4)
+
+- [x] Interfaces `PaymentProvider`, `PixProvider`, `BoletoProvider`, `CardProvider`
+- [x] `PaymentGatewayRegistry` (Strategy) + `charge-service` (fachada)
+- [x] Tipos `ChargeReference` vinculados a `invoiceId`
+- [x] Erro explícito quando gateway não configurado
+- [x] Documentação de adapters Asaas / Efí / Inter
+- [x] Nenhuma implementação fake
+- [x] Build passando
+
+---
+
+## 11. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
