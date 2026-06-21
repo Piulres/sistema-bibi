@@ -2,6 +2,11 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
+import {
+  buildTelemedicineUrl,
+  isAppointmentModality,
+  type AppointmentModality,
+} from "@/lib/telemedicine";
 
 const dateTime = (value: Date) =>
   value.toLocaleString("pt-BR", {
@@ -29,6 +34,8 @@ export type AppointmentView = {
   scheduledAt: string;
   scheduledAtLabel: string;
   status: string;
+  modality: string;
+  telemedicineUrl: string | null;
   reason: string | null;
   patientId: string;
   patientName: string;
@@ -41,6 +48,8 @@ function mapAppointment(a: {
   id: string;
   scheduledAt: Date;
   status: string;
+  modality: string;
+  telemedicineUrl: string | null;
   reason: string | null;
   patientId: string;
   providerId: string;
@@ -52,6 +61,8 @@ function mapAppointment(a: {
     scheduledAt: a.scheduledAt.toISOString(),
     scheduledAtLabel: dateTime(a.scheduledAt),
     status: a.status,
+    modality: a.modality,
+    telemedicineUrl: a.telemedicineUrl,
     reason: a.reason,
     patientId: a.patientId,
     patientName: a.patient.name,
@@ -110,6 +121,7 @@ export async function createAppointment(input: {
   scheduledAt: Date;
   reason?: string | null;
   status?: string;
+  modality?: string;
   createdBy: string;
 }) {
   const patient = await prisma.patient.findFirst({
@@ -132,6 +144,9 @@ export async function createAppointment(input: {
   });
   if (conflict) return { error: "Horário indisponível para este prestador" as const };
 
+  const modality: AppointmentModality =
+    input.modality && isAppointmentModality(input.modality) ? input.modality : "PRESENCIAL";
+
   const appointment = await prisma.appointment.create({
     data: {
       tenantId: input.tenantId,
@@ -140,6 +155,8 @@ export async function createAppointment(input: {
       scheduledAt: input.scheduledAt,
       reason: input.reason?.trim() || null,
       status: input.status ?? "AGENDADO",
+      modality,
+      telemedicineUrl: null,
     },
     include: {
       patient: { include: { company: true } },
@@ -147,12 +164,25 @@ export async function createAppointment(input: {
     },
   });
 
+  let finalAppointment = appointment;
+  if (modality === "TELE") {
+    const teleUrl = buildTelemedicineUrl(appointment.id);
+    finalAppointment = await prisma.appointment.update({
+      where: { id: appointment.id },
+      data: { telemedicineUrl: teleUrl },
+      include: {
+        patient: { include: { company: true } },
+        provider: { select: { name: true } },
+      },
+    });
+  }
+
   await recordTimelineEvent({
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
-    entityId: appointment.id,
+    entityId: finalAppointment.id,
     action: TIMELINE_ACTIONS.CREATED,
-    description: `Consulta agendada: ${patient.name} com ${provider.name} (${dateTime(appointment.scheduledAt)})`,
+    description: `Consulta agendada: ${patient.name} com ${provider.name} (${dateTime(finalAppointment.scheduledAt)})`,
     createdBy: input.createdBy,
   });
 
@@ -160,15 +190,17 @@ export async function createAppointment(input: {
     tenantId: input.tenantId,
     event: "APPOINTMENT_CREATED",
     data: {
-      appointmentId: appointment.id,
-      patientId: appointment.patientId,
-      providerId: appointment.providerId,
-      status: appointment.status,
-      scheduledAt: appointment.scheduledAt.toISOString(),
+      appointmentId: finalAppointment.id,
+      patientId: finalAppointment.patientId,
+      providerId: finalAppointment.providerId,
+      status: finalAppointment.status,
+      modality: finalAppointment.modality,
+      telemedicineUrl: finalAppointment.telemedicineUrl,
+      scheduledAt: finalAppointment.scheduledAt.toISOString(),
     },
   });
 
-  return { appointment: mapAppointment(appointment) };
+  return { appointment: mapAppointment(finalAppointment) };
 }
 
 export async function updateAppointment(input: {

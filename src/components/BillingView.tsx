@@ -251,7 +251,7 @@ export default function BillingView() {
                 <th className="px-4 py-2 font-medium">Itens</th>
                 <th className="px-4 py-2 font-medium">Status</th>
                 <th className="px-4 py-2 text-right font-medium">Total</th>
-                <th className="px-4 py-2 text-right font-medium">Ações</th>
+                <th className="px-4 py-2 text-right font-medium">TISS</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-default)]">
@@ -275,29 +275,14 @@ export default function BillingView() {
                   <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
                     {inv.totalLabel}
                   </td>
-                  <td className="px-4 py-2">
-                    <div className="flex flex-wrap justify-end gap-2">
-                      {inv.status === "FECHADA" && (
-                        <>
-                          <Button
-                            variant="secondary"
-                            size="sm"
-                            disabled={!gatewayConfigured || busy === `pix-${inv.id}`}
-                            onClick={() => generatePix(inv.id)}
-                          >
-                            {busy === `pix-${inv.id}` ? "..." : "PIX"}
-                          </Button>
-                          <Button
-                            variant="portal"
-                            size="sm"
-                            disabled={busy === `pay-${inv.id}`}
-                            onClick={() => markPaid(inv.id)}
-                          >
-                            {busy === `pay-${inv.id}` ? "..." : "Marcar paga"}
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                  <td className="px-4 py-2 text-right">
+                    <a
+                      href={`/api/interno/invoices/${inv.id}/tiss`}
+                      download
+                      className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                    >
+                      XML
+                    </a>
                   </td>
                 </tr>
               ))}

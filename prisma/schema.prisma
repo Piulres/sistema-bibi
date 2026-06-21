@@ -70,6 +70,9 @@ model User {
   role      String
   /// Perfil granular do portal interno: ADMIN | FATURAMENTO | RECEPCAO | READONLY (null = ADMIN)
   internoProfile String?
+  /// MFA TOTP (Tier 4) — secret base32; habilitado quando mfaEnabled=true
+  mfaEnabled Boolean @default(false)
+  mfaSecret  String?
   createdAt DateTime @default(now())
 
   tenantId String
@@ -141,6 +144,8 @@ model Procedure {
   name      String
   category  String
   basePrice Float
+  /// Código TUSS/ANS para guia TISS (Tier 4)
+  tissCode  String?
   createdAt DateTime @default(now())
 
   tenantId String
@@ -168,10 +173,14 @@ model PricingRule {
 
 /// Agendamento (Agenda Inteligente).
 /// status: AGENDADO | CONFIRMADO | REALIZADO | FALTOU | CANCELADO
+/// modality: PRESENCIAL | TELE
 model Appointment {
   id          String   @id @default(cuid())
   scheduledAt DateTime
   status      String   @default("AGENDADO")
+  modality    String   @default("PRESENCIAL")
+  /// Link da sala de telemedicina (gerado automaticamente quando modality=TELE)
+  telemedicineUrl String?
   reason      String?
   createdAt   DateTime @default(now())
 
@@ -385,5 +394,29 @@ model WebhookEndpoint {
   active    Boolean  @default(true)
   createdAt DateTime @default(now())
 
+  deliveries WebhookDelivery[]
+
   @@index([tenantId])
+}
+
+/// Log de entrega de webhook com suporte a retry (Tier 4).
+/// status: SUCCESS | FAILED | PENDING
+model WebhookDelivery {
+  id           String   @id @default(cuid())
+  tenantId     String
+  webhookId    String
+  webhook      WebhookEndpoint @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  event        String
+  payload      String
+  status       String   @default("PENDING")
+  httpStatus   Int?
+  errorMessage String?
+  attempt      Int      @default(1)
+  maxAttempts  Int      @default(5)
+  nextRetryAt  DateTime?
+  createdAt    DateTime @default(now())
+  deliveredAt  DateTime?
+
+  @@index([tenantId, status, nextRetryAt])
+  @@index([webhookId, createdAt])
 }

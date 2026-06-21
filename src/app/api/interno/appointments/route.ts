@@ -6,6 +6,7 @@ import {
   listAppointments,
   listProviders,
 } from "@/lib/appointment-service";
+import { isAppointmentModality } from "@/lib/telemedicine";
 import { listPatients } from "@/lib/patient-service";
 
 export async function GET(request: Request) {
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
       scheduledAt?: string;
       reason?: string | null;
       status?: string;
+      modality?: string;
     };
 
     if (!body.patientId || !body.providerId || !body.scheduledAt) {
@@ -54,6 +56,9 @@ export async function POST(request: Request) {
     if (body.status && !isAppointmentStatus(body.status)) {
       return NextResponse.json({ error: "Status inválido" }, { status: 400 });
     }
+    if (body.modality && !isAppointmentModality(body.modality)) {
+      return NextResponse.json({ error: "Modalidade inválida" }, { status: 400 });
+    }
 
     const result = await createAppointment({
       tenantId: user.tenantId,
@@ -62,6 +67,7 @@ export async function POST(request: Request) {
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
       status: body.status,
+      modality: body.modality,
       createdBy: user.id,
     });
 

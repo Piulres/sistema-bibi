@@ -13,6 +13,7 @@ const allTabs: NavTab[] = [
   { href: "/interno/relatorios", label: "Relatórios", key: "relatorios" },
   { href: "/interno/branding", label: "White Label", key: "branding" },
   { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
+  { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
 ];
 
 export default function InternoNav({

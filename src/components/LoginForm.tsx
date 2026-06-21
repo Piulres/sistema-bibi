@@ -32,6 +32,8 @@ export default function LoginForm({
   const router = useRouter();
   const [email, setEmail] = useState(demoEmail);
   const [password, setPassword] = useState(demoPassword);
+  const [mfaToken, setMfaToken] = useState<string | null>(null);
+  const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const portalTheme = PORTAL_THEMES[portal];
@@ -49,6 +51,35 @@ export default function LoginForm({
       const data = await res.json();
       if (!res.ok) {
         setError(data.error ?? "Falha no login");
+        return;
+      }
+      if (data.mfaRequired && data.mfaToken) {
+        setMfaToken(data.mfaToken);
+        return;
+      }
+      router.push(data.redirectTo);
+      router.refresh();
+    } catch {
+      setError("Erro de conexão");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleMfaSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!mfaToken) return;
+    setError(null);
+    setLoading(true);
+    try {
+      const res = await fetch("/api/auth/mfa/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mfaToken, code: mfaCode }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Código inválido");
         return;
       }
       router.push(data.redirectTo);
@@ -97,35 +128,69 @@ export default function LoginForm({
             <h1 className="mt-4 text-2xl font-bold text-[var(--text-primary)]">{title}</h1>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              <Input
-                label="E-mail"
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-              <Input
-                label="Senha"
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+            {!mfaToken ? (
+              <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <Input
+                  label="E-mail"
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <Input
+                  label="Senha"
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
 
-              {error && <Alert tone="danger">{error}</Alert>}
+                {error && <Alert tone="danger">{error}</Alert>}
 
-              <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Entrando..." : "Entrar"}
-              </Button>
-            </form>
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Entrando..." : "Entrar"}
+                </Button>
+              </form>
+            ) : (
+              <form onSubmit={handleMfaSubmit} className="mt-6 space-y-4">
+                <p className="text-sm text-[var(--text-secondary)]">
+                  Informe o código de 6 dígitos do seu autenticador.
+                </p>
+                <Input
+                  label="Código MFA"
+                  id="mfaCode"
+                  value={mfaCode}
+                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                  inputMode="numeric"
+                  required
+                />
+                {error && <Alert tone="danger">{error}</Alert>}
+                <Button type="submit" disabled={loading} className="w-full">
+                  {loading ? "Verificando..." : "Confirmar código"}
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="w-full"
+                  onClick={() => {
+                    setMfaToken(null);
+                    setMfaCode("");
+                    setError(null);
+                  }}
+                >
+                  Voltar
+                </Button>
+              </form>
+            )}
 
-            <p className="mt-4 rounded-[var(--radius-button)] bg-[var(--surface-muted)] px-3 py-2 text-xs text-[var(--text-muted)]">
-              Demo: <span className="font-mono">{demoEmail}</span> / senha{" "}
-              <span className="font-mono">{demoPassword}</span>
-            </p>
+            {!mfaToken && (
+              <p className="mt-4 rounded-[var(--radius-button)] bg-[var(--surface-muted)] px-3 py-2 text-xs text-[var(--text-muted)]">
+                Demo: <span className="font-mono">{demoEmail}</span> / senha{" "}
+                <span className="font-mono">{demoPassword}</span>
+              </p>
+            )}
             <p className="mt-2 text-center text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
               {portalTheme.label} · {branding.platformLabel}
             </p>

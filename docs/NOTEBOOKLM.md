@@ -17,7 +17,8 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 **Branches / PRs em evolução:**
 - Tier 1 (receita): PR #17 — PIX, fatura de assinatura, lembretes
 - Tier 2 (operação): PR #18 — CRUD admin, agenda, relatórios, PEP estruturado
-- Tier 3 (B2B): PR em aberto — RBAC interno, webhooks, portal PJ, domínio custom, LGPD export
+- Tier 3 (B2B): PR #19 — RBAC, webhooks, portal PJ, LGPD, domínio custom
+- Tier 4 (enterprise): PR em aberto — MFA, TISS, telemedicina, webhook retry/log
 
 ---
 
@@ -373,9 +374,8 @@ src/
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
 - Deploy Netlify **preparado** (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`); publicação manual quando cota ok
-- Reset de senha por e-mail e MFA ainda não implementados
-- Slots de agendamento simplificados (sem bloqueio de férias/multi-unidade)
-- SSO/MFA e adapters reais de webhook delivery log ainda não implementados
+- SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
+- Validação XSD TISS completa pendente (export XML mock — Tier 4)
 - Verificação de domínio custom é manual na POC (sem challenge DNS automático)
 
 ---
@@ -456,12 +456,29 @@ src/
 
 ---
 
-## 19. Roadmap sugerido (Tier 4+)
+## 19. Tier 4 — Enterprise (MFA, TISS, telemedicina, webhook retry)
+
+| Feature | Descrição |
+|---------|-----------|
+| MFA TOTP | `/interno/seguranca` — setup/enable/disable; login em 2 etapas |
+| Webhook log + retry | Log de entregas, backoff exponencial, cron `POST /api/cron/webhooks` |
+| Telemedicina | `modality` PRESENCIAL/TELE + link mock da sala virtual |
+| Guia TISS/ANS | Export XML simplificado por fatura (`GET /api/interno/invoices/[id]/tiss`) |
+
+**APIs principais:**
+- `GET/POST /api/auth/mfa/setup`, `POST /api/auth/mfa/verify`
+- `GET /api/interno/webhooks/deliveries`, `POST .../deliveries/[id]/retry`
+- `POST /api/cron/webhooks` (header `x-cron-secret`)
+- `GET /api/interno/invoices/[id]/tiss`
+
+---
+
+## 20. Roadmap sugerido (Tier 5+)
 
 | Prioridade | Feature |
 |------------|---------|
-| Tier 4 | SSO/MFA, TISS/ANS, telemedicina |
-| Estratégico | Postgres + jobs em produção, webhook retry/log |
+| Tier 5 | SSO OAuth/SAML, Postgres produção, TISS validação XSD |
+| Estratégico | Telemedicina integrada (Twilio/Whereby), ANS operadora |
 
 ---
 

@@ -69,6 +69,7 @@ export async function bookBeneficiaryAppointment(input: {
   providerId: string;
   scheduledAt: Date;
   reason?: string | null;
+  modality?: string;
   createdBy: string;
 }) {
   const slotDate = startOfDay(input.scheduledAt);
@@ -89,6 +90,7 @@ export async function bookBeneficiaryAppointment(input: {
     providerId: input.providerId,
     scheduledAt: input.scheduledAt,
     reason: input.reason,
+    modality: input.modality,
     status: "AGENDADO",
     createdBy: input.createdBy,
   });

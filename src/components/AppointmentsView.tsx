@@ -13,6 +13,8 @@ type Appointment = {
   id: string;
   scheduledAtLabel: string;
   status: string;
+  modality: string;
+  telemedicineUrl: string | null;
   patientName: string;
   providerName: string;
   reason: string | null;
@@ -35,6 +37,7 @@ export default function AppointmentsView() {
     time: "09:00",
     reason: "Consulta",
     status: "CONFIRMADO",
+    modality: "PRESENCIAL",
   });
 
   const load = useCallback(async () => {
@@ -77,6 +80,7 @@ export default function AppointmentsView() {
           scheduledAt,
           reason: form.reason,
           status: form.status,
+          modality: form.modality,
         }),
       });
       const data = await res.json();
@@ -139,6 +143,13 @@ export default function AppointmentsView() {
               ))}
             </select>
           </label>
+          <label className="block text-sm">
+            <span className="text-[var(--text-secondary)]">Modalidade</span>
+            <select className="mt-1 w-full rounded border px-3 py-2" value={form.modality} onChange={(e) => setForm({ ...form, modality: e.target.value })}>
+              <option value="PRESENCIAL">Presencial</option>
+              <option value="TELE">Telemedicina</option>
+            </select>
+          </label>
           <label className="block text-sm sm:col-span-2">
             <span className="text-[var(--text-secondary)]">Motivo</span>
             <input className="mt-1 w-full rounded border px-3 py-2" value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} />
@@ -164,7 +175,13 @@ export default function AppointmentsView() {
                     <p className="font-semibold">{a.scheduledAtLabel}</p>
                     <p className="text-sm text-[var(--text-muted)]">
                       {a.patientName} · {a.providerName}
+                      {a.modality === "TELE" ? " · Telemedicina" : ""}
                     </p>
+                    {a.telemedicineUrl && (
+                      <a href={a.telemedicineUrl} target="_blank" rel="noreferrer" className="text-sm text-[var(--portal-accent)] hover:underline">
+                        Entrar na sala virtual
+                      </a>
+                    )}
                     {a.reason && <p className="text-sm text-[var(--text-secondary)]">{a.reason}</p>}
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
