@@ -223,7 +223,7 @@ export default function SubscriptionsView() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <Link
-                      href={`/interno/beneficiarios/${sub.patientId}`}
+                      href={`/interno/beneficiarios/${sub.patientId}?from=/interno/assinaturas`}
                       className="font-semibold text-indigo-700 hover:underline"
                     >
                       {sub.patientName}

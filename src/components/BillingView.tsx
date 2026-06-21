@@ -102,7 +102,7 @@ export default function BillingView() {
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <Link
-                    href={`/interno/beneficiarios/${g.patientId}`}
+                    href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
                     className="font-semibold text-indigo-700 hover:text-indigo-600 hover:underline"
                   >
                     {g.patientName}
@@ -111,7 +111,7 @@ export default function BillingView() {
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
                   <Link
-                    href={`/interno/beneficiarios/${g.patientId}`}
+                    href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
                     className="rounded-lg border border-indigo-200 px-3 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-50"
                   >
                     Cliente 360°
@@ -162,7 +162,7 @@ export default function BillingView() {
                 <tr key={inv.id}>
                   <td className="px-4 py-2">
                     <Link
-                      href={`/interno/beneficiarios/${inv.patientId}`}
+                      href={`/interno/beneficiarios/${inv.patientId}?from=/interno`}
                       className="font-medium text-indigo-700 hover:text-indigo-600 hover:underline"
                     >
                       {inv.patientName}

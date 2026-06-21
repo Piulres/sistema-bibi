@@ -13,8 +13,9 @@ flowchart TB
   subgraph Cliente["Navegador (Mobile-first)"]
     Land["Landing /"]
     PortP["Portal Prestador<br/>/login · /prestador"]
-    PortI["Portal Interno<br/>/interno/login · /interno<br/>/interno/beneficiarios/[id]"]
+    PortI["Portal Interno<br/>/interno/login · /interno/dashboard<br/>/interno · /interno/crm · /interno/assinaturas<br/>/interno/comunicacao · /interno/beneficiarios/[id]"]
     PortPJ["Portal Empresa (PJ)<br/>/pj/login · /pj"]
+    PortBen["Portal Beneficiário<br/>/beneficiario/login · /beneficiario"]
   end
 
   subgraph Next["Next.js 16 (App Router)"]
@@ -28,6 +29,8 @@ flowchart TB
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
       Timeline["timeline.ts<br/>(auditoria universal)"]
       Payments["payments/*<br/>(motor de cobrança)"]
+      Comms["communications/*<br/>message-service"]
+      Dashboard["executive-dashboard.ts"]
       DB["db.ts (Prisma Client)"]
     end
   end

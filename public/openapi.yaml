@@ -3,7 +3,7 @@ info:
   title: Sistema Bibi — API
   version: 0.1.0
   description: >
-    API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, com três portais
+    API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, com quatro portais
     segregados por `role` (PRESTADOR, INTERNO, PJ, BENEFICIARIO) e faturamento Pay Per Use.
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
@@ -77,6 +77,8 @@ components:
         companyId: { type: string, nullable: true }
         tenantName: { type: string }
         companyName: { type: string, nullable: true }
+        patientId: { type: string, nullable: true }
+        patientName: { type: string, nullable: true }
     AgendaItem:
       type: object
       properties:
@@ -627,7 +629,6 @@ paths:
                     items:
                       type: object
                       properties:
-                        patientId: { type: string }
                         patientId: { type: string }
                         patientName: { type: string }
                         company: { type: string, nullable: true }

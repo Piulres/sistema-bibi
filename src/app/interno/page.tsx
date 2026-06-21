@@ -4,7 +4,7 @@ import PortalHeader from "@/components/PortalHeader";
 import InternoNav from "@/components/InternoNav";
 import BillingView from "@/components/BillingView";
 
-export default async function InternoDashboard() {
+export default async function InternoBillingPage() {
   const user = await getSessionUser();
   if (!user || user.role !== "INTERNO") {
     redirect("/interno/login");

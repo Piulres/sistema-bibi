@@ -31,6 +31,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Paciente não encontrado" }, { status: 404 });
     }
 
+    if (body.appointmentId) {
+      const appointment = await prisma.appointment.findFirst({
+        where: {
+          id: body.appointmentId,
+          patientId: body.patientId,
+          providerId: user.id,
+          tenantId: user.tenantId,
+        },
+      });
+      if (!appointment) {
+        return NextResponse.json({ error: "Atendimento não encontrado" }, { status: 404 });
+      }
+    }
+
     const record = await prisma.medicalRecord.create({
       data: {
         patientId: body.patientId,

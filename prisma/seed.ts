@@ -6,6 +6,15 @@ import {
 
 const prisma = new PrismaClient();
 
+/** Primeiro dia do mês daqui a N meses. */
+function firstDayOfMonthFromNow(monthsAhead: number): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setDate(1);
+  d.setMonth(d.getMonth() + monthsAhead);
+  return d;
+}
+
 /** Retorna uma data de hoje com a hora informada (horario local). */
 function todayAt(hour: number, minute = 0): Date {
   const d = new Date();
@@ -350,9 +359,9 @@ async function main() {
     },
   });
   const joaoDueDates = [
-    new Date("2025-06-01"),
-    new Date("2025-07-01"),
-    new Date("2025-08-01"),
+    firstDayOfMonthFromNow(0),
+    firstDayOfMonthFromNow(1),
+    firstDayOfMonthFromNow(2),
   ];
   for (const dueDate of joaoDueDates) {
     await prisma.subscriptionCharge.create({
@@ -401,7 +410,7 @@ async function main() {
   await prisma.subscriptionCharge.create({
     data: {
       subscriptionId: subMaria.id,
-      dueDate: new Date("2025-09-01"),
+      dueDate: firstDayOfMonthFromNow(2),
       amount: 249.9,
       status: "PENDENTE",
     },
@@ -427,6 +436,54 @@ async function main() {
       entityId: subPedro.id,
       action: TIMELINE_ACTIONS.CREATED,
       description: "Assinatura Mensal criada para Pedro Almeida",
+      createdBy: interno.id,
+    },
+  });
+
+  console.log("Criando fatura historica demo (Pedro)...");
+  const agPedroPast = await prisma.appointment.create({
+    data: {
+      scheduledAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      status: "REALIZADO",
+      reason: "Avaliação dermatológica",
+      tenantId: tenant.id,
+      patientId: pedro.id,
+      providerId: prestador.id,
+    },
+  });
+  const usagePedro = await prisma.procedureUsage.create({
+    data: {
+      appointmentId: agPedroPast.id,
+      procedureId: procedures["CON-DER"].id,
+      priceCharged: procedures["CON-DER"].basePrice,
+      billed: true,
+    },
+  });
+  const invPedro = await prisma.invoice.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: pedro.id,
+      companyId: null,
+      total: procedures["CON-DER"].basePrice,
+      status: "PAGA",
+      items: {
+        create: [
+          {
+            description: procedures["CON-DER"].name,
+            amount: procedures["CON-DER"].basePrice,
+            usageId: usagePedro.id,
+          },
+        ],
+      },
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.INVOICE,
+      entityId: invPedro.id,
+      action: TIMELINE_ACTIONS.INVOICE_ISSUED,
+      description: `Fatura Pay Per Use emitida para Pedro Almeida (R$ 220,00)`,
       createdBy: interno.id,
     },
   });

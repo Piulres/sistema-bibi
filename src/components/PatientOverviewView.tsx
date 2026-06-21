@@ -109,7 +109,15 @@ function Badge({ value }: { value: string }) {
   );
 }
 
-export default function PatientOverviewView({ patientId }: { patientId: string }) {
+export default function PatientOverviewView({
+  patientId,
+  returnTo = "/interno",
+  returnLabel = "Voltar ao faturamento",
+}: {
+  patientId: string;
+  returnTo?: string;
+  returnLabel?: string;
+}) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -141,10 +149,10 @@ export default function PatientOverviewView({ patientId }: { patientId: string }
     <div className="space-y-8">
       <div>
         <Link
-          href="/interno"
+          href={returnTo}
           className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
         >
-          ← Voltar ao faturamento
+          ← {returnLabel}
         </Link>
         <h1 className="mt-3 text-2xl font-bold text-slate-900">Cliente 360°</h1>
         <p className="mt-1 text-slate-600">

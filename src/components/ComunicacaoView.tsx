@@ -250,7 +250,7 @@ export default function ComunicacaoView() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <Link
-                      href={`/interno/beneficiarios/${message.patientId}`}
+                      href={`/interno/beneficiarios/${message.patientId}?from=/interno/comunicacao`}
                       className="font-semibold text-indigo-700 hover:underline"
                     >
                       {message.patientName}
