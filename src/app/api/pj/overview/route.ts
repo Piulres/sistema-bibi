@@ -14,8 +14,8 @@ export async function GET() {
       return NextResponse.json({ error: "Usuário sem empresa vinculada" }, { status: 400 });
     }
 
-    const company = await prisma.company.findUnique({
-      where: { id: user.companyId },
+    const company = await prisma.company.findFirst({
+      where: { id: user.companyId, tenantId: user.tenantId },
       include: {
         patients: {
           include: {

@@ -11,7 +11,7 @@ const portals = [
   {
     href: "/interno/login",
     label: "Portal Interno",
-    desc: "Faturamento Pay Per Use e administração.",
+    desc: "Dashboard executivo, faturamento, CRM, recorrência e comunicação.",
     accent: "from-indigo-500 to-blue-600",
     icon: "💼",
   },

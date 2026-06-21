@@ -19,7 +19,7 @@ export const PORTALS = {
     role: ROLES.INTERNO,
     label: "Portal Interno",
     loginPath: "/interno/login",
-    dashboardPath: "/interno",
+    dashboardPath: "/interno/dashboard",
   },
   pj: {
     role: ROLES.PJ,

@@ -26,14 +26,18 @@ export async function POST(
     }
 
     const appointment = await prisma.appointment.findFirst({
-      where: { id, providerId: user.id },
+      where: { id, providerId: user.id, tenantId: user.tenantId },
       include: { patient: true },
     });
     if (!appointment) {
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
     }
 
-    const { price } = await computePrice(body.procedureId, appointment.patient.companyId);
+    const { price } = await computePrice(
+      body.procedureId,
+      appointment.patient.companyId,
+      user.tenantId,
+    );
 
     const usage = await prisma.procedureUsage.create({
       data: {

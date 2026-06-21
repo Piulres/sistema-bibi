@@ -199,7 +199,7 @@ export default function ExecutiveDashboardView() {
                   <tr key={row.patientId}>
                     <td className="px-4 py-2">
                       <Link
-                        href={`/interno/beneficiarios/${row.patientId}`}
+                        href={`/interno/beneficiarios/${row.patientId}?from=/interno/dashboard`}
                         className="font-medium text-indigo-700 hover:underline"
                       >
                         {row.patientName}

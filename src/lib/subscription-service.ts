@@ -120,11 +120,20 @@ export async function createSubscription(input: {
   });
   if (!patient) return null;
 
+  let companyId = input.companyId ?? patient.companyId;
+  if (input.companyId) {
+    const company = await prisma.company.findFirst({
+      where: { id: input.companyId, tenantId: input.tenantId },
+    });
+    if (!company) return null;
+    companyId = company.id;
+  }
+
   const subscription = await prisma.subscription.create({
     data: {
       tenantId: input.tenantId,
       patientId: input.patientId,
-      companyId: input.companyId ?? patient.companyId,
+      companyId,
       status: input.status,
       billingCycle: input.billingCycle,
       startDate: input.startDate,

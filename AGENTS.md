@@ -9,7 +9,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ### O que é o Sistema Bibi
 POC de plataforma SaaS HealthTech (multi-tenant) com quatro portais segregados por
 `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
-`/interno`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
+`/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
 (`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
 **Pay Per Use** (cobra apenas procedimentos efetivamente usados, com precificação
 dinâmica por empresa).

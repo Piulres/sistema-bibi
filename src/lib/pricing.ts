@@ -8,10 +8,11 @@ import { prisma } from "@/lib/db";
 export async function computePrice(
   procedureId: string,
   companyId: string | null,
+  tenantId?: string,
 ): Promise<{ basePrice: number; multiplier: number; price: number }> {
-  const procedure = await prisma.procedure.findUnique({
-    where: { id: procedureId },
-  });
+  const procedure = tenantId
+    ? await prisma.procedure.findFirst({ where: { id: procedureId, tenantId } })
+    : await prisma.procedure.findUnique({ where: { id: procedureId } });
   if (!procedure) {
     throw new Error("Procedimento não encontrado");
   }

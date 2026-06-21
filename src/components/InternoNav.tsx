@@ -11,7 +11,7 @@ const links = [
 export default function InternoNav({
   active,
 }: {
-  active: "dashboard" | "billing" | "crm" | "subscriptions" | "comunicacao";
+  active?: "dashboard" | "billing" | "crm" | "subscriptions" | "comunicacao";
 }) {
   return (
     <nav className="mt-6 flex gap-2 overflow-x-auto border-b border-slate-200">

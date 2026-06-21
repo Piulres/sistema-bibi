@@ -36,7 +36,7 @@ de valores e faturamento sem perdas de informação.
 | Portal | Público | Foco |
 |--------|---------|------|
 | **Portal do Prestador** | Médicos / profissionais de saúde | Agenda inteligente e prontuário eletrônico (PEP) |
-| **Portal Interno** | Equipe administrativa | Faturamento Pay Per Use e administração |
+| **Portal Interno** | Equipe administrativa | Dashboard executivo, faturamento, CRM, recorrência e comunicação |
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
 | **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
 
@@ -194,7 +194,7 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `POST` | `/api/auth/login` | Login. Body: `{ email, password, portal }` (portal: `prestador`\|`interno`\|`pj`). |
+| `POST` | `/api/auth/login` | Login. Body: `{ email, password, portal }` (portal: `prestador`\|`interno`\|`pj`\|`beneficiario`). |
 | `POST` | `/api/auth/logout` | Encerra a sessão. |
 | `GET` | `/api/auth/me` | Retorna o usuário da sessão atual. |
 
@@ -336,6 +336,8 @@ sistema-bibi/
   [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
 - **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):
   [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
+- **Base de conhecimento (NotebookLM / RAG):**
+  [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
 - **API interativa (Swagger UI):** http://localhost:3000/api-docs.html
 - **Especificação OpenAPI:** [`public/openapi.yaml`](public/openapi.yaml)
 
