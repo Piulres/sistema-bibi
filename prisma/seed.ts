@@ -16,6 +16,8 @@ function todayAt(hour: number, minute = 0): Date {
 async function main() {
   console.log("Limpando dados existentes...");
   await prisma.timelineEvent.deleteMany();
+  await prisma.subscriptionCharge.deleteMany();
+  await prisma.subscription.deleteMany();
   await prisma.invoiceItem.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.procedureUsage.deleteMany();
@@ -99,7 +101,7 @@ async function main() {
       tenantId: tenant.id,
     },
   });
-  await prisma.user.create({
+  const interno = await prisma.user.create({
     data: {
       email: "faturamento@bibi.health",
       password: "bibi123",
@@ -311,6 +313,111 @@ async function main() {
       action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
       description: "Hemograma Completo registrado para Maria Souza (R$ 45,00)",
       createdBy: prestador.id,
+    },
+  });
+
+  console.log("Criando assinaturas recorrentes (Recorrência)...");
+  const subJoao = await prisma.subscription.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: joao.id,
+      companyId: company.id,
+      status: "ATIVA",
+      billingCycle: "MENSAL",
+      startDate: new Date("2025-01-01"),
+      amount: 89.9,
+      description: "Plano corporativo TechCorp — telemedicina",
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
+      entityId: subJoao.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Assinatura Mensal criada para João Pereira",
+      createdBy: interno.id,
+    },
+  });
+  const joaoDueDates = [
+    new Date("2025-06-01"),
+    new Date("2025-07-01"),
+    new Date("2025-08-01"),
+  ];
+  for (const dueDate of joaoDueDates) {
+    await prisma.subscriptionCharge.create({
+      data: {
+        subscriptionId: subJoao.id,
+        dueDate,
+        amount: 89.9,
+        status: "PENDENTE",
+      },
+    });
+  }
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
+      entityId: subJoao.id,
+      action: TIMELINE_ACTIONS.SUBSCRIPTION_CHARGES_GENERATED,
+      description:
+        "3 cobrança(s) futura(s) geradas para João Pereira (R$ 89,90/mensal)",
+      createdBy: interno.id,
+    },
+  });
+
+  const subMaria = await prisma.subscription.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: maria.id,
+      companyId: company.id,
+      status: "ATIVA",
+      billingCycle: "TRIMESTRAL",
+      startDate: new Date("2025-03-01"),
+      amount: 249.9,
+      description: "Check-up trimestral corporativo",
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
+      entityId: subMaria.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Assinatura Trimestral criada para Maria Souza",
+      createdBy: interno.id,
+    },
+  });
+  await prisma.subscriptionCharge.create({
+    data: {
+      subscriptionId: subMaria.id,
+      dueDate: new Date("2025-09-01"),
+      amount: 249.9,
+      status: "PENDENTE",
+    },
+  });
+
+  const subPedro = await prisma.subscription.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: pedro.id,
+      companyId: null,
+      status: "SUSPENSA",
+      billingCycle: "MENSAL",
+      startDate: new Date("2024-06-01"),
+      endDate: new Date("2025-12-31"),
+      amount: 59.9,
+      description: "Plano particular — suspenso por inadimplência",
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
+      entityId: subPedro.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Assinatura Mensal criada para Pedro Almeida",
+      createdBy: interno.id,
     },
   });
 

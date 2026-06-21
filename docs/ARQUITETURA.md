@@ -382,7 +382,46 @@ Detalhes: [`docs/PAYMENTS.md`](PAYMENTS.md)
 
 ---
 
-## 11. Documentação da API
+## 11. Recorrência (Épico 5)
+
+Assinaturas recorrentes vinculadas a beneficiário e/ou empresa, com geração
+programada de cobranças futuras (`SubscriptionCharge`) que podem ser faturadas
+posteriormente via Pay Per Use ou motor de cobrança (Épico 4).
+
+```mermaid
+flowchart LR
+  subgraph cadastro
+    A[Interno cria Subscription] --> B[Timeline CREATED]
+  end
+  subgraph cobranca
+    C[Gerar cobranças] --> D[SubscriptionCharge PENDENTE]
+    D --> E[Timeline SUBSCRIPTION_CHARGES_GENERATED]
+    E --> F[Faturamento futuro / Invoice]
+  end
+  cadastro --> cobranca
+```
+
+| Camada | Arquivo | Responsabilidade |
+|--------|---------|------------------|
+| Schema | `prisma/schema.prisma` | `Subscription`, `SubscriptionCharge` |
+| Domínio | `src/lib/subscription.ts` | Ciclos, status, `computeUpcomingDueDates()` |
+| Serviço | `src/lib/subscription-service.ts` | CRUD, geração de cobranças, timeline |
+| API | `src/app/api/interno/subscriptions/**` | Endpoints REST (role `INTERNO`) |
+| UI | `src/components/SubscriptionsView.tsx` | Portal `/interno/assinaturas` |
+
+### Checklist de homologação (Épico 5)
+
+- [x] Modelos `Subscription` e `SubscriptionCharge` no Prisma
+- [x] Ciclos MENSAL / TRIMESTRAL / SEMESTRAL / ANUAL
+- [x] Geração de cobranças futuras com horizonte configurável
+- [x] Integração com Timeline (`SUBSCRIPTION`, `SUBSCRIPTION_CHARGES_GENERATED`)
+- [x] Visível no Cliente 360° (timeline do beneficiário)
+- [x] Seed com assinaturas demo (João, Maria, Pedro)
+- [x] Build passando
+
+---
+
+## 12. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

@@ -249,6 +249,7 @@ components:
                   - INVOICE_ISSUED
                   - CHARGE_SENT
                   - CONTRACT_CHANGED
+                  - SUBSCRIPTION_CHARGES_GENERATED
               description: { type: string }
               createdAt: { type: string, format: date-time }
               createdAtLabel: { type: string }
@@ -266,6 +267,44 @@ components:
         description: { type: string }
         createdAt: { type: string, format: date-time }
         createdBy: { type: string, nullable: true }
+    SubscriptionView:
+      type: object
+      properties:
+        id: { type: string }
+        status:
+          type: string
+          enum: [ATIVA, SUSPENSA, CANCELADA]
+        statusLabel: { type: string }
+        billingCycle:
+          type: string
+          enum: [MENSAL, TRIMESTRAL, SEMESTRAL, ANUAL]
+        billingCycleLabel: { type: string }
+        startDate: { type: string, format: date-time }
+        startDateLabel: { type: string }
+        endDate: { type: string, format: date-time, nullable: true }
+        endDateLabel: { type: string, nullable: true }
+        amount: { type: number }
+        amountLabel: { type: string }
+        description: { type: string, nullable: true }
+        patientId: { type: string }
+        patientName: { type: string }
+        companyId: { type: string, nullable: true }
+        companyName: { type: string, nullable: true }
+        pendingCharges: { type: integer }
+        nextDueDate: { type: string, format: date-time, nullable: true }
+        nextDueDateLabel: { type: string, nullable: true }
+    SubscriptionChargeView:
+      type: object
+      properties:
+        id: { type: string }
+        dueDate: { type: string, format: date-time }
+        dueDateLabel: { type: string }
+        amount: { type: number }
+        amountLabel: { type: string }
+        status:
+          type: string
+          enum: [PENDENTE, FATURADA, CANCELADA]
+        invoiceId: { type: string, nullable: true }
     CompanyPipelineCard:
       type: object
       properties:
@@ -632,6 +671,141 @@ paths:
                   company: { $ref: '#/components/schemas/CompanyPipelineCard' }
         '400': { description: Status inválido }
         '404': { description: Empresa não encontrada }
+
+  /api/interno/subscriptions:
+    get:
+      tags: [Interno]
+      summary: Lista assinaturas recorrentes do tenant
+      responses:
+        '200':
+          description: Assinaturas e beneficiários disponíveis para cadastro
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscriptions:
+                    type: array
+                    items: { $ref: '#/components/schemas/SubscriptionView' }
+                  patients:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id: { type: string }
+                        name: { type: string }
+        '403': { description: Acesso negado (role != INTERNO) }
+    post:
+      tags: [Interno]
+      summary: Cria uma assinatura recorrente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patientId, billingCycle, startDate, amount]
+              properties:
+                patientId: { type: string }
+                companyId: { type: string, nullable: true }
+                status:
+                  type: string
+                  enum: [ATIVA, SUSPENSA, CANCELADA]
+                  default: ATIVA
+                billingCycle:
+                  type: string
+                  enum: [MENSAL, TRIMESTRAL, SEMESTRAL, ANUAL]
+                startDate: { type: string, format: date-time }
+                endDate: { type: string, format: date-time, nullable: true }
+                amount: { type: number, minimum: 0.01 }
+                description: { type: string, nullable: true }
+      responses:
+        '200':
+          description: Assinatura criada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription: { $ref: '#/components/schemas/SubscriptionView' }
+        '400': { description: Dados inválidos }
+        '404': { description: Beneficiário não encontrado }
+
+  /api/interno/subscriptions/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza status de uma assinatura
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [ATIVA, SUSPENSA, CANCELADA]
+      responses:
+        '200':
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription: { $ref: '#/components/schemas/SubscriptionView' }
+        '400': { description: Status inválido }
+        '404': { description: Assinatura não encontrada }
+
+  /api/interno/subscriptions/{id}/generate-charges:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Gera cobranças futuras pendentes de uma assinatura ativa
+      responses:
+        '200':
+          description: Cobranças geradas
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  subscription: { $ref: '#/components/schemas/SubscriptionView' }
+                  generatedCount: { type: integer }
+        '400': { description: Assinatura inativa ou sem cobranças a gerar }
+        '404': { description: Assinatura não encontrada }
+
+  /api/interno/subscriptions/{id}/charges:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Interno]
+      summary: Lista cobranças de uma assinatura
+      responses:
+        '200':
+          description: Cobranças da assinatura
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  charges:
+                    type: array
+                    items: { $ref: '#/components/schemas/SubscriptionChargeView' }
+        '404': { description: Assinatura não encontrada }
 
   /api/pj/overview:
     get:

@@ -101,6 +101,7 @@ Base local: **`http://localhost:3000`**
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
 | `/interno/beneficiarios/{id}` | **Cliente 360°** — visão consolidada do beneficiário | `INTERNO` |
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
+| `/interno/assinaturas` | **Recorrência** — assinaturas e cobranças futuras | `INTERNO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
 | `/pj` | Dashboard corporativo (beneficiários e faturas) | `PJ` |
 
@@ -159,6 +160,8 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | `ProcedureUsage` | **Uso efetivo de procedimento — núcleo do Pay Per Use** (preço congelado). |
 | `MedicalRecord` | Prontuário eletrônico (PEP). |
 | `Invoice` / `InvoiceItem` | Fatura Pay Per Use e seus itens. |
+| `Subscription` | Assinatura recorrente (ciclo + valor por beneficiário/empresa). |
+| `SubscriptionCharge` | Cobrança futura gerada a partir de uma assinatura. |
 | `TimelineEvent` | Auditoria universal de eventos (Timeline). |
 
 > SQLite não suporta enums no Prisma; os campos `role`, `status` e `category` são
@@ -206,6 +209,11 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°** consolidada de um beneficiário. |
 | `GET` | `/api/interno/crm/pipeline` | Pipeline CRM — empresas agrupadas por status. |
 | `PATCH` | `/api/interno/companies/{id}/status` | Atualiza status CRM da empresa. Body: `{ status }`. |
+| `GET` | `/api/interno/subscriptions` | Lista assinaturas e beneficiários do tenant. |
+| `POST` | `/api/interno/subscriptions` | Cria assinatura. Body: `{ patientId, billingCycle, startDate, amount, ... }`. |
+| `PATCH` | `/api/interno/subscriptions/{id}` | Atualiza status da assinatura. Body: `{ status }`. |
+| `POST` | `/api/interno/subscriptions/{id}/generate-charges` | Gera cobranças futuras pendentes. |
+| `GET` | `/api/interno/subscriptions/{id}/charges` | Lista cobranças de uma assinatura. |
 | `POST` | `/api/interno/invoices` | Gera a fatura Pay Per Use de um paciente. Body: `{ patientId }`. |
 
 ### Portal da Empresa (`role: PJ`)
@@ -246,17 +254,17 @@ sistema-bibi/
 │   │   ├── api/             # Route Handlers (backend)
 │   │   │   ├── auth/        # login, logout, me
 │   │   │   ├── prestador/   # agenda, atendimentos, procedimentos, PEP
-│   │   │   ├── interno/     # billing, invoices
+│   │   │   ├── interno/     # billing, invoices, crm, subscriptions
 │   │   │   ├── pj/          # overview
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
-│   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id]
+│   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id], /interno/crm, /interno/assinaturas
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, timeline, payments
+│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, timeline, payments, subscription
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md

@@ -27,6 +27,7 @@ model Tenant {
   procedures   Procedure[]
   appointments Appointment[]
   invoices     Invoice[]
+  subscriptions Subscription[]
   timelineEvents TimelineEvent[]
 }
 
@@ -69,6 +70,7 @@ model Company {
   patients     Patient[]
   pricingRules PricingRule[]
   invoices     Invoice[]
+  subscriptions Subscription[]
 }
 
 /// Beneficiario / paciente. Pode ser individual ou vinculado a uma empresa (PJ).
@@ -89,6 +91,7 @@ model Patient {
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
   invoices       Invoice[]
+  subscriptions  Subscription[]
 }
 
 /// Catalogo de procedimentos (consultas e exames) com preco base.
@@ -198,6 +201,7 @@ model Invoice {
   company   Company? @relation(fields: [companyId], references: [id])
 
   items InvoiceItem[]
+  subscriptionCharges SubscriptionCharge[]
 }
 
 model InvoiceItem {
@@ -230,4 +234,46 @@ model TimelineEvent {
 
   @@index([tenantId, createdAt])
   @@index([entityType, entityId])
+}
+
+/// Assinatura recorrente vinculada a beneficiario e/ou empresa.
+/// status: ATIVA | SUSPENSA | CANCELADA
+/// billingCycle: MENSAL | TRIMESTRAL | SEMESTRAL | ANUAL
+model Subscription {
+  id           String    @id @default(cuid())
+  status       String    @default("ATIVA")
+  billingCycle String
+  startDate    DateTime
+  endDate      DateTime?
+  /// Valor cobrado a cada ciclo (recorrencia).
+  amount       Float     @default(0)
+  description  String?
+  createdAt    DateTime  @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  charges SubscriptionCharge[]
+}
+
+/// Cobranca futura gerada a partir de uma assinatura.
+/// status: PENDENTE | FATURADA | CANCELADA
+model SubscriptionCharge {
+  id        String   @id @default(cuid())
+  dueDate   DateTime
+  amount    Float
+  status    String   @default("PENDENTE")
+  createdAt DateTime @default(now())
+
+  subscriptionId String
+  subscription   Subscription @relation(fields: [subscriptionId], references: [id])
+
+  invoiceId String?
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id])
 }
