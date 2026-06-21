@@ -94,6 +94,7 @@ erDiagram
     string id PK
     string name
     string cnpj
+    string status "LEAD|PROPOSTA|NEGOCIACAO|ATIVO|INADIMPLENTE|CANCELADO"
     boolean contractActive
   }
   Patient {
@@ -291,7 +292,43 @@ flowchart LR
 
 ---
 
-## 8. Documentação da API
+## 9. CRM Corporativo (Épico 3)
+
+Evolução de `Company` com campo `status` e pipeline visual no Portal Interno.
+
+```mermaid
+flowchart LR
+  Interno["/interno/crm"] --> View["CrmPipelineView"]
+  View --> GET["GET /api/interno/crm/pipeline"]
+  View --> PATCH["PATCH /api/interno/companies/{id}/status"]
+  PATCH --> CRM["company-crm.ts"]
+  PATCH --> TL["recordTimelineEvent<br/>CONTRACT_CHANGED"]
+  GET --> Pipe["company-pipeline.ts"]
+  Pipe --> DB[("Company")]
+```
+
+**Status do pipeline:** LEAD → PROPOSTA → NEGOCIACAO → ATIVO → INADIMPLENTE → CANCELADO
+
+**Arquivos:**
+- `src/lib/company-crm.ts` — constantes e regras de status
+- `src/lib/company-pipeline.ts` — consulta agrupada por etapa
+- `src/components/CrmPipelineView.tsx` — kanban horizontal (mobile-first)
+- `src/components/InternoNav.tsx` — navegação Faturamento / CRM
+
+### Checklist de homologação (Épico 3)
+
+- [x] Campo `Company.status` sem tabela paralela
+- [x] `contractActive` sincronizado com status (compat. Portal PJ)
+- [x] Pipeline visual com 6 colunas
+- [x] Mover empresa entre etapas via PATCH
+- [x] Evento `CONTRACT_CHANGED` na timeline
+- [x] Seed com empresas em múltiplas etapas
+- [x] OpenAPI, README e ARQUITETURA atualizados
+- [x] Build passando
+
+---
+
+## 10. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

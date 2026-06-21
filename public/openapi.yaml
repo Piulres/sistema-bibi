@@ -266,6 +266,20 @@ components:
         description: { type: string }
         createdAt: { type: string, format: date-time }
         createdBy: { type: string, nullable: true }
+    CompanyPipelineCard:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        cnpj: { type: string }
+        status:
+          type: string
+          enum: [LEAD, PROPOSTA, NEGOCIACAO, ATIVO, INADIMPLENTE, CANCELADO]
+        statusLabel: { type: string }
+        contractActive: { type: boolean }
+        beneficiariesCount: { type: integer }
+        invoicesCount: { type: integer }
+        createdAt: { type: string, format: date-time }
 
 security:
   - sessionCookie: []
@@ -557,6 +571,68 @@ paths:
         '403': { description: Acesso negado (role != INTERNO) }
         '404': { description: Beneficiário não encontrado }
 
+  /api/interno/crm/pipeline:
+    get:
+      tags: [Interno]
+      summary: Pipeline CRM corporativo
+      description: Empresas do tenant agrupadas por status (LEAD a CANCELADO).
+      responses:
+        '200':
+          description: Pipeline com empresas por coluna
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statuses:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        value: { type: string }
+                        label: { type: string }
+                  companies:
+                    type: array
+                    items: { $ref: '#/components/schemas/CompanyPipelineCard' }
+                  pipeline:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items: { $ref: '#/components/schemas/CompanyPipelineCard' }
+        '403': { description: Acesso negado (role != INTERNO) }
+
+  /api/interno/companies/{id}/status:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza status CRM de uma empresa
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [LEAD, PROPOSTA, NEGOCIACAO, ATIVO, INADIMPLENTE, CANCELADO]
+      responses:
+        '200':
+          description: Status atualizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  company: { $ref: '#/components/schemas/CompanyPipelineCard' }
+        '400': { description: Status inválido }
+        '404': { description: Empresa não encontrada }
+
   /api/pj/overview:
     get:
       tags: [PJ]
@@ -574,6 +650,9 @@ paths:
                     properties:
                       name: { type: string }
                       cnpj: { type: string }
+                      status:
+                        type: string
+                        enum: [LEAD, PROPOSTA, NEGOCIACAO, ATIVO, INADIMPLENTE, CANCELADO]
                       contractActive: { type: boolean }
                       beneficiariesCount: { type: integer }
                       totalConsumed: { type: number }

@@ -100,6 +100,7 @@ Base local: **`http://localhost:3000`**
 | `/interno/login` | Login do **Portal Interno** | Público |
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
 | `/interno/beneficiarios/{id}` | **Cliente 360°** — visão consolidada do beneficiário | `INTERNO` |
+| `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
 | `/pj` | Dashboard corporativo (beneficiários e faturas) | `PJ` |
 
@@ -203,6 +204,8 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 |--------|----------|-----------|
 | `GET` | `/api/interno/billing` | Procedimentos pendentes (agrupados) e faturas emitidas. |
 | `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°** consolidada de um beneficiário. |
+| `GET` | `/api/interno/crm/pipeline` | Pipeline CRM — empresas agrupadas por status. |
+| `PATCH` | `/api/interno/companies/{id}/status` | Atualiza status CRM da empresa. Body: `{ status }`. |
 | `POST` | `/api/interno/invoices` | Gera a fatura Pay Per Use de um paciente. Body: `{ patientId }`. |
 
 ### Portal da Empresa (`role: PJ`)

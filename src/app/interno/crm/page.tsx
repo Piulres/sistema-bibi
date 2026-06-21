@@ -2,9 +2,9 @@ import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
 import PortalHeader from "@/components/PortalHeader";
 import InternoNav from "@/components/InternoNav";
-import BillingView from "@/components/BillingView";
+import CrmPipelineView from "@/components/CrmPipelineView";
 
-export default async function InternoDashboard() {
+export default async function InternoCrmPage() {
   const user = await getSessionUser();
   if (!user || user.role !== "INTERNO") {
     redirect("/interno/login");
@@ -18,14 +18,14 @@ export default async function InternoDashboard() {
         userName={user.name}
         loginPath="/interno/login"
       />
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <h1 className="text-2xl font-bold text-slate-900">Faturamento</h1>
+      <main className="mx-auto max-w-7xl px-6 py-8">
+        <h1 className="text-2xl font-bold text-slate-900">CRM Corporativo</h1>
         <p className="mt-1 text-slate-600">
-          Controle financeiro e geração de faturas Pay Per Use.
+          Pipeline de empresas contratantes — do lead ao contrato ativo.
         </p>
-        <InternoNav active="billing" />
+        <InternoNav active="crm" />
         <div className="mt-8">
-          <BillingView />
+          <CrmPipelineView />
         </div>
       </main>
     </div>
