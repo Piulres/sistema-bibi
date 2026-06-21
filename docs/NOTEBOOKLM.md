@@ -14,11 +14,7 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
 
-**Branches / PRs em evolução:**
-- Tier 1 (receita): PR #17 — PIX, fatura de assinatura, lembretes
-- Tier 2 (operação): PR #18 — CRUD admin, agenda, relatórios, PEP estruturado
-- Tier 3 (B2B): PR #19 — RBAC, webhooks, portal PJ, LGPD, domínio custom
-- Tier 4 (enterprise): PR em aberto — MFA, TISS, telemedicina, webhook retry/log
+**Branches / PRs mergeados em `main`:** #1–#20 (scaffold → Tier 4 enterprise). Ver seção 19.
 
 ---
 
