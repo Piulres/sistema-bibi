@@ -3,6 +3,7 @@ import type { BoletoChargeRequest, BoletoChargeResult } from "@/lib/payments/typ
 import type { CardChargeRequest, CardChargeResult } from "@/lib/payments/types";
 import type { PixChargeRequest, PixChargeResult } from "@/lib/payments/types";
 import type { PaymentGatewayId } from "@/lib/payments/types";
+import "@/lib/payments/bootstrap";
 import { paymentGateway } from "@/lib/payments/payment-gateway";
 
 /**

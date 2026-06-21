@@ -1,5 +1,5 @@
 /** Gateways de pagamento previstos para integração futura. */
-export const PAYMENT_GATEWAY_IDS = ["asaas", "efi", "inter"] as const;
+export const PAYMENT_GATEWAY_IDS = ["mock", "asaas", "efi", "inter"] as const;
 
 export type PaymentGatewayId = (typeof PAYMENT_GATEWAY_IDS)[number];
 

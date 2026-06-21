@@ -394,7 +394,19 @@ export default function BeneficiarioView() {
                     <p className="font-semibold text-[var(--text-primary)]">{invoice.totalLabel}</p>
                     <p className="text-sm text-[var(--text-muted)]">{invoice.createdAtLabel}</p>
                   </div>
-                  <StatusBadge value={invoice.status} map="invoice" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge value={invoice.status} map="invoice" />
+                    {invoice.status === "FECHADA" && (
+                      <Button
+                        variant="portal"
+                        size="sm"
+                        disabled={busy === `pix-${invoice.id}`}
+                        onClick={() => payWithPix(invoice.id)}
+                      >
+                        {busy === `pix-${invoice.id}` ? "..." : "Pagar com PIX"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-slate-100">
                   {invoice.items.map((item) => (
