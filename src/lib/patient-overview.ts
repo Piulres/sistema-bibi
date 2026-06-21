@@ -64,6 +64,8 @@ export type PatientOverviewData = {
   medicalRecords: {
     id: string;
     content: string;
+    recordType: string;
+    title: string | null;
     createdAt: string;
     createdAtLabel: string;
     providerName: string;
@@ -203,6 +205,8 @@ export async function getPatientOverview(
     medicalRecords: patient.medicalRecords.map((record) => ({
       id: record.id,
       content: record.content,
+      recordType: record.recordType,
+      title: record.title,
       createdAt: record.createdAt.toISOString(),
       createdAtLabel: dateTime(record.createdAt),
       providerName: record.provider.name,

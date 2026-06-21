@@ -1,0 +1,152 @@
+import "server-only";
+import { prisma } from "@/lib/db";
+import { hashPassword } from "@/lib/password";
+import { ROLES } from "@/lib/roles";
+import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
+
+export const ASSIGNABLE_ROLES = [
+  ROLES.PRESTADOR,
+  ROLES.INTERNO,
+  ROLES.PJ,
+  ROLES.BENEFICIARIO,
+] as const;
+
+export function isAssignableRole(value: string): boolean {
+  return (ASSIGNABLE_ROLES as readonly string[]).includes(value);
+}
+
+export type UserListView = {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  companyId: string | null;
+  patientId: string | null;
+};
+
+function mapUser(u: {
+  id: string;
+  email: string;
+  name: string;
+  role: string;
+  companyId: string | null;
+  patientId: string | null;
+}): UserListView {
+  return {
+    id: u.id,
+    email: u.email,
+    name: u.name,
+    role: u.role,
+    companyId: u.companyId,
+    patientId: u.patientId,
+  };
+}
+
+export async function listUsers(tenantId: string): Promise<UserListView[]> {
+  const rows = await prisma.user.findMany({
+    where: { tenantId },
+    orderBy: { name: "asc" },
+  });
+  return rows.map(mapUser);
+}
+
+export async function createUser(input: {
+  tenantId: string;
+  email: string;
+  password: string;
+  name: string;
+  role: string;
+  companyId?: string | null;
+  patientId?: string | null;
+  createdBy: string;
+}) {
+  if (!isAssignableRole(input.role)) {
+    return { error: "Perfil inválido" as const };
+  }
+
+  const email = input.email.toLowerCase().trim();
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) return { error: "E-mail já cadastrado" as const };
+
+  if (input.role === ROLES.PJ && !input.companyId) {
+    return { error: "Usuário PJ precisa de empresa vinculada" as const };
+  }
+  if (input.role === ROLES.BENEFICIARIO && !input.patientId) {
+    return { error: "Usuário beneficiário precisa de paciente vinculado" as const };
+  }
+
+  const user = await prisma.user.create({
+    data: {
+      tenantId: input.tenantId,
+      email,
+      password: hashPassword(input.password),
+      name: input.name.trim(),
+      role: input.role,
+      companyId: input.companyId ?? null,
+      patientId: input.patientId ?? null,
+    },
+  });
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.USER,
+    entityId: user.id,
+    action: TIMELINE_ACTIONS.CREATED,
+    description: `Usuário ${user.name} (${user.role}) criado`,
+    createdBy: input.createdBy,
+  });
+
+  return { user: mapUser(user) };
+}
+
+export async function updateUser(input: {
+  tenantId: string;
+  userId: string;
+  email?: string;
+  password?: string;
+  name?: string;
+  role?: string;
+  companyId?: string | null;
+  patientId?: string | null;
+  createdBy: string;
+}) {
+  const existing = await prisma.user.findFirst({
+    where: { id: input.userId, tenantId: input.tenantId },
+  });
+  if (!existing) return null;
+
+  if (input.role && !isAssignableRole(input.role)) {
+    return { error: "Perfil inválido" as const };
+  }
+
+  if (input.email) {
+    const email = input.email.toLowerCase().trim();
+    const dup = await prisma.user.findFirst({
+      where: { email, NOT: { id: existing.id } },
+    });
+    if (dup) return { error: "E-mail já cadastrado" as const };
+  }
+
+  const user = await prisma.user.update({
+    where: { id: existing.id },
+    data: {
+      email: input.email?.toLowerCase().trim(),
+      password: input.password ? hashPassword(input.password) : undefined,
+      name: input.name?.trim(),
+      role: input.role,
+      companyId: input.companyId === undefined ? undefined : input.companyId,
+      patientId: input.patientId === undefined ? undefined : input.patientId,
+    },
+  });
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.USER,
+    entityId: user.id,
+    action: TIMELINE_ACTIONS.UPDATED,
+    description: `Usuário ${user.name} atualizado`,
+    createdBy: input.createdBy,
+  });
+
+  return { user: mapUser(user) };
+}

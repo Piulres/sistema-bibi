@@ -3,8 +3,10 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "../src/lib/timeline";
+import { hashPassword } from "../src/lib/password";
 
 const prisma = new PrismaClient();
+const DEMO_PASSWORD = hashPassword("bibi123");
 
 /** Primeiro dia do mês daqui a N meses. */
 function firstDayOfMonthFromNow(monthsAhead: number): Date {
@@ -141,7 +143,7 @@ async function main() {
   const prestador = await prisma.user.create({
     data: {
       email: "dra.helena@bibi.health",
-      password: "bibi123",
+      password: DEMO_PASSWORD,
       name: "Dra. Helena Martins",
       role: "PRESTADOR",
       tenantId: tenant.id,
@@ -150,7 +152,7 @@ async function main() {
   const interno = await prisma.user.create({
     data: {
       email: "faturamento@bibi.health",
-      password: "bibi123",
+      password: DEMO_PASSWORD,
       name: "Carlos Faturamento",
       role: "INTERNO",
       tenantId: tenant.id,
@@ -159,7 +161,7 @@ async function main() {
   await prisma.user.create({
     data: {
       email: "rh@techcorp.com",
-      password: "bibi123",
+      password: DEMO_PASSWORD,
       name: "Ana RH (TechCorp)",
       role: "PJ",
       tenantId: tenant.id,
@@ -218,7 +220,7 @@ async function main() {
   await prisma.user.create({
     data: {
       email: "joao.pereira@email.com",
-      password: "bibi123",
+      password: DEMO_PASSWORD,
       name: "João Pereira",
       role: "BENEFICIARIO",
       tenantId: tenant.id,

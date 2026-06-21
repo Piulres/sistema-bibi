@@ -7,6 +7,11 @@ import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
+import {
+  buildPepTemplate,
+  PEP_RECORD_TYPES,
+  type PepRecordType,
+} from "@/lib/pep-templates";
 import LoadingState from "@/components/ui/LoadingState";
 
 type Usage = {
@@ -17,7 +22,13 @@ type Usage = {
   priceLabel: string;
   billed: boolean;
 };
-type RecordItem = { id: string; content: string; createdAt: string };
+type RecordItem = {
+  id: string;
+  content: string;
+  createdAt: string;
+  recordType?: string;
+  title?: string | null;
+};
 type Detail = {
   appointment: { id: string; scheduledAt: string; status: string; reason: string | null };
   patient: { id: string; name: string; cpf: string; company: string | null };
@@ -42,6 +53,8 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [selectedProc, setSelectedProc] = useState("");
   const [note, setNote] = useState("");
+  const [recordType, setRecordType] = useState<PepRecordType>("EVOLUCAO");
+  const [recordTitle, setRecordTitle] = useState("");
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -113,12 +126,15 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           patientId: detail.patient.id,
           appointmentId,
           content: note,
+          recordType,
+          title: recordTitle || null,
         }),
       });
       const data = await res.json();
       if (!res.ok) setMsg(data.error ?? "Erro ao salvar anotação");
       else {
         setNote("");
+        setRecordTitle("");
         await load();
       }
     } finally {
@@ -234,6 +250,40 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
 
         <Card padding="lg">
           <SectionHeader title="Prontuário Eletrônico (PEP)" />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <select
+              value={recordType}
+              onChange={(e) => setRecordType(e.target.value as PepRecordType)}
+              className={fieldClass}
+            >
+              {PEP_RECORD_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const tpl = buildPepTemplate(recordType, {
+                  patientName: detail.patient.name,
+                  appointmentDate: new Date(detail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+                });
+                setRecordTitle(tpl.title);
+                setNote(tpl.content);
+              }}
+            >
+              Usar template
+            </Button>
+          </div>
+          <input
+            value={recordTitle}
+            onChange={(e) => setRecordTitle(e.target.value)}
+            placeholder="Título do registro (opcional)"
+            className={`mt-3 ${fieldClass}`}
+          />
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
@@ -248,6 +298,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           <ul className="mt-4 space-y-3">
             {detail.records.map((r) => (
               <li key={r.id} className="rounded-[var(--radius-button)] bg-[var(--surface-muted)] p-3">
+                {r.title && <p className="text-xs font-semibold text-[var(--portal-accent)]">{r.title}</p>}
                 <p className="text-sm text-[var(--text-secondary)]">{r.content}</p>
                 <p className="mt-1 text-xs text-[var(--text-muted)]">
                   {new Date(r.createdAt).toLocaleString("pt-BR")}
