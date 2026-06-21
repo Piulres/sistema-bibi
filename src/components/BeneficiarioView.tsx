@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
 
 type Overview = {
   patient: {
@@ -84,6 +85,19 @@ export default function BeneficiarioView() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [pixState, setPixState] = useState<{
+    invoiceId: string;
+    paymentId: string;
+    pixCopyPaste: string;
+  } | null>(null);
+
+  const reload = async () => {
+    const res = await fetch("/api/beneficiario/overview");
+    const data = await res.json();
+    if (res.ok) setOverview(data.overview);
+  };
 
   useEffect(() => {
     let active = true;
@@ -100,6 +114,47 @@ export default function BeneficiarioView() {
     };
   }, []);
 
+  async function payWithPix(invoiceId: string) {
+    setBusy(`pix-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao gerar PIX");
+      else {
+        setPixState({
+          invoiceId,
+          paymentId: data.payment.id,
+          pixCopyPaste: data.pixCopyPaste ?? data.payment.pixCopyPaste,
+        });
+        setMsg("PIX gerado — copie o código e confirme após pagar");
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function confirmPix(invoiceId: string, paymentId: string) {
+    setBusy(`confirm-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentId }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao confirmar pagamento");
+      else {
+        setMsg("Pagamento confirmado. Obrigado!");
+        setPixState(null);
+        await reload();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
   if (loading) return <LoadingState message="Carregando seu painel..." />;
   if (error || !overview) {
     return <Alert tone="danger">{error ?? "Dados indisponíveis"}</Alert>;
@@ -110,6 +165,28 @@ export default function BeneficiarioView() {
 
   return (
     <div className="space-y-8">
+      {msg && <Alert tone="info">{msg}</Alert>}
+
+      {pixState && (
+        <Alert tone="info">
+          <p className="font-medium">Pague via PIX</p>
+          <p className="mt-2 break-all font-mono text-xs">{pixState.pixCopyPaste}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              variant="portal"
+              size="sm"
+              disabled={busy === `confirm-${pixState.invoiceId}`}
+              onClick={() => confirmPix(pixState.invoiceId, pixState.paymentId)}
+            >
+              {busy === `confirm-${pixState.invoiceId}` ? "Confirmando..." : "Já paguei — confirmar"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setPixState(null)}>
+              Fechar
+            </Button>
+          </div>
+        </Alert>
+      )}
+
       <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">CPF {patient.cpf}</p>
@@ -241,7 +318,19 @@ export default function BeneficiarioView() {
                     <p className="font-semibold text-[var(--text-primary)]">{invoice.totalLabel}</p>
                     <p className="text-sm text-[var(--text-muted)]">{invoice.createdAtLabel}</p>
                   </div>
-                  <StatusBadge value={invoice.status} map="invoice" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge value={invoice.status} map="invoice" />
+                    {invoice.status === "FECHADA" && (
+                      <Button
+                        variant="portal"
+                        size="sm"
+                        disabled={busy === `pix-${invoice.id}`}
+                        onClick={() => payWithPix(invoice.id)}
+                      >
+                        {busy === `pix-${invoice.id}` ? "..." : "Pagar com PIX"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-slate-100">
                   {invoice.items.map((item) => (

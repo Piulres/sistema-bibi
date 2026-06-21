@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
+import { isPaymentGatewayConfigured } from "@/lib/payments/charge-service";
 
 /**
  * Painel de faturamento: procedimentos utilizados ainda nao faturados,
@@ -71,6 +72,7 @@ export async function GET() {
         itemsCount: inv.items.length,
         createdAt: inv.createdAt,
       })),
+      paymentGatewayConfigured: isPaymentGatewayConfigured(),
     });
   } catch (error) {
     return authErrorResponse(error);

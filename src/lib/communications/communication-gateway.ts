@@ -31,15 +31,26 @@ export class CommunicationGatewayRegistry {
   }
 
   getProvider(providerId?: CommunicationProviderId): NotificationProvider {
-    const id = providerId ?? resolveDefaultProviderId();
-    if (!id) {
-      throw new CommunicationProviderNotConfiguredError("none", "ANY");
+    if (providerId) {
+      const explicit = this.byProvider.get(providerId);
+      if (!explicit) {
+        throw new CommunicationProviderNotConfiguredError(providerId, "ANY");
+      }
+      return explicit;
     }
-    const provider = this.byProvider.get(id);
-    if (!provider) {
-      throw new CommunicationProviderNotConfiguredError(id, "ANY");
+
+    const configured = resolveDefaultProviderId();
+    if (configured) {
+      const provider = this.byProvider.get(configured);
+      if (provider) return provider;
     }
-    return provider;
+
+    const registered = this.listRegisteredProviders();
+    if (registered.length === 1) {
+      return this.byProvider.get(registered[0])!;
+    }
+
+    throw new CommunicationProviderNotConfiguredError("none", "ANY");
   }
 
   getEmailProvider(providerId?: CommunicationProviderId): EmailProvider {
