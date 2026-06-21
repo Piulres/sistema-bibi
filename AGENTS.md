@@ -7,12 +7,16 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Cursor Cloud specific instructions
 
 ### O que é o Sistema Bibi
-POC de plataforma SaaS HealthTech (multi-tenant) com quatro portais segregados por
+POC de plataforma SaaS HealthTech (multi-tenant) com **quatro portais** segregados por
 `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
 (`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
 **Pay Per Use** (cobra apenas procedimentos efetivamente usados, com precificação
 dinâmica por empresa).
+
+**Tiers mergeados (PRs #17–#20):** ciclo de receita (PIX mock), operação (CRUD,
+agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
+(MFA TOTP, telemedicina, TISS XML, webhook retry).
 
 ### Stack e como rodar
 - **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4**, **Prisma 6 + SQLite**.
@@ -24,10 +28,21 @@ dinâmica por empresa).
 - O `postinstall` roda `prisma generate` automaticamente no `npm install`.
 
 ### Credenciais de demonstração (criadas pelo seed)
-- Prestador: `dra.helena@bibi.health` / `bibi123`
-- Interno:   `faturamento@bibi.health` / `bibi123`
-- Empresa PJ: `rh@techcorp.com` / `bibi123`
-- Beneficiário: `joao.pereira@email.com` / `bibi123`
+Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
+
+| Portal | E-mail |
+|--------|--------|
+| Prestador | `dra.helena@bibi.health` |
+| Interno (admin) | `faturamento@bibi.health` |
+| Interno (recepção / RBAC) | `recepcao@bibi.health` |
+| Empresa PJ | `rh@techcorp.com` |
+| Beneficiário | `joao.pereira@email.com` |
+
+### Variáveis de ambiente relevantes (`.env.example`)
+- `PAYMENT_GATEWAY=mock` — adapter PIX POC (`MockPixAdapter`)
+- `COMMUNICATION_PROVIDER=console` — e-mail no console (`ConsoleEmailAdapter`)
+- `CRON_SECRET` — protege `POST /api/cron/reminders` e `/api/cron/webhooks`
+- `TELEMEDICINE_BASE_URL` — base das salas virtuais mock
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
@@ -36,15 +51,17 @@ dinâmica por empresa).
 - **Middleware virou "Proxy" no Next 16**: a proteção de rotas está em `src/proxy.ts`
   (não existe `middleware.ts`). Ele só faz checagem otimista do cookie; a validação
   real (assinatura HMAC + `role`) acontece no servidor (`src/lib/session.ts`).
+- **RBAC interno:** `User.internoProfile` (`ADMIN`, `FATURAMENTO`, `RECEPCAO`, `READONLY`)
+  filtra nav e APIs via `interno-permissions.ts` / `interno-guard.ts`.
 - `params`/`searchParams`/`cookies()` são **assíncronos** (use `await`).
 - ESLint v9 (flat config) trata `react-hooks/set-state-in-effect` como **erro**:
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
-- Senhas estão em texto puro **apenas para a POC** (ver `prisma/seed.ts`).
-- **Netlify:** config em `netlify.toml`; build com `npm run netlify:build`; **não publicar**
-  até revisar `docs/DEPLOY_NETLIFY.md` e env vars no painel. Site linkado na CLI pode
-  retornar `503 usage_exceeded` se a cota estiver esgotada.
-- **Design system / white label**: tokens em `src/app/globals.css`, primitivos em
+- **Netlify:** config em `netlify.toml`; build com `npm run netlify:build`; ver
+  `docs/DEPLOY_NETLIFY.md`. Site linkado na CLI pode retornar `503 usage_exceeded`
+  se a cota estiver esgotada.
+- **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
+- **Documentação completa:** `README.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/ARQUITETURA.md`.

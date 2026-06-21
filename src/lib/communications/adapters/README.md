@@ -1,8 +1,18 @@
-# Adapters de Comunicacao
+# Adapters de Comunicação
 
-Implementacoes concretas dos contratos em `src/lib/communications/`.
+Implementações concretas dos contratos em `src/lib/communications/`.
 
-| Provider | Env | Canais | Documentacao |
+## Adapter POC incluído
+
+| Adapter | Env | Canais | Descrição |
+|---------|-----|--------|-----------|
+| **ConsoleEmailAdapter** | `COMMUNICATION_PROVIDER=console` | EMAIL | Loga e-mail no stdout do servidor |
+
+Registrado automaticamente quando `COMMUNICATION_PROVIDER=console`.
+
+## Provedores previstos (produção)
+
+| Provider | Env | Canais | Documentação |
 |----------|-----|--------|--------------|
 | **SendGrid** | `COMMUNICATION_PROVIDER=sendgrid` | EMAIL | [SendGrid API](https://docs.sendgrid.com/) |
 | **Twilio** | `COMMUNICATION_PROVIDER=twilio` | SMS, WHATSAPP | [Twilio Messaging](https://www.twilio.com/docs/messaging) |
@@ -17,4 +27,12 @@ import { sendgridAdapter } from "./sendgrid";
 communicationGateway.register(sendgridAdapter);
 ```
 
-Nenhum adapter esta incluido nesta POC — o registry lanca `CommunicationProviderNotConfiguredError` ate que um seja registrado.
+## Variáveis de ambiente
+
+```env
+COMMUNICATION_PROVIDER=console   # console (POC) | sendgrid | twilio | meta
+SENDGRID_API_KEY=
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+META_WHATSAPP_TOKEN=
+```

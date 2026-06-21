@@ -14,7 +14,7 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
 
-**Branches / PRs mergeados em `main`:** #1–#20 (scaffold → Tier 4 enterprise). Ver seção 19.
+**Branches / PRs mergeados em `main`:** #1–#20 (scaffold → Tier 4 enterprise). PR #21 corrige build (PIX beneficiário + TISS). Ver seção 21.
 
 ---
 
@@ -32,7 +32,8 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 | Portal | E-mail |
 |--------|--------|
 | Prestador | `dra.helena@bibi.health` |
-| Interno | `faturamento@bibi.health` |
+| Interno (admin) | `faturamento@bibi.health` |
+| Interno (recepção) | `recepcao@bibi.health` |
 | PJ | `rh@techcorp.com` |
 | Beneficiário | `joao.pereira@email.com` |
 
@@ -55,7 +56,8 @@ Variáveis `.env`:
 | `SESSION_SECRET` | HMAC do cookie de sessão |
 | `PAYMENT_GATEWAY` | `mock` (POC) ou `asaas`/`efi`/`inter` — Tier 1 |
 | `COMMUNICATION_PROVIDER` | `console` (POC) ou `sendgrid`/`twilio`/`meta` — Tier 1 |
-| `CRON_SECRET` | Protege `POST /api/cron/reminders` — Tier 1 |
+| `CRON_SECRET` | Protege `POST /api/cron/reminders` e `/api/cron/webhooks` |
+| `TELEMEDICINE_BASE_URL` | Base das salas virtuais mock — Tier 4 |
 
 Scripts úteis: `npm run db:reset`, `npm run netlify:build`, `npm run lint`.
 
@@ -86,7 +88,7 @@ Entidades principais:
 | `Patient` | Beneficiário/paciente |
 | `Procedure` | Catálogo (CONSULTA/EXAME) com preço base |
 | `PricingRule` | Multiplicador por empresa (precificação dinâmica) |
-| `Appointment` | Agendamento (status: AGENDADO → REALIZADO/CANCELADO) |
+| `Appointment` | Agendamento; `modality` PRESENCIAL/TELE + telemedicina |
 | `ProcedureUsage` | **Núcleo Pay Per Use** — preço congelado no uso |
 | `MedicalRecord` | PEP — `recordType`, `title`, `content` (Tier 2) |
 | `Invoice` / `InvoiceItem` | Fatura; item pode ser Pay Per Use (`usageId`) ou assinatura (`subscriptionChargeId`) — Tier 1 |
@@ -94,6 +96,7 @@ Entidades principais:
 | `Subscription` / `SubscriptionCharge` | Recorrência (PENDENTE/FATURADA/CANCELADA) |
 | `Message` | Comunicação outbound (EMAIL/SMS/WHATSAPP) |
 | `TimelineEvent` | Auditoria universal |
+| `WebhookEndpoint` / `WebhookDelivery` | Webhooks B2B + log/retry — Tier 3/4 |
 
 SQLite não suporta enums Prisma — `role`, `status`, `category` são `String`.
 
@@ -127,8 +130,10 @@ Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% descon
 | `/interno/assinaturas` | Recorrência (+ faturar cobrança — Tier 1) | 5 / T1 |
 | `/interno/comunicacao` | Fila de mensagens (+ lembretes automáticos — Tier 1) | 7 / T1 |
 | `/interno/relatorios` | Exportação CSV (faturamento, CRM) | T2 |
-| `/interno/branding` | White label (cores, logo, tema escuro) | design |
+| `/interno/branding` | White label (cores, logo, tema escuro, domínio custom) | design / T3 |
 | `/interno/beneficiarios/[id]` | Cliente 360° | 1 |
+| `/interno/integracoes` | Webhooks B2B + log de entregas | T3 / T4 |
+| `/interno/seguranca` | MFA TOTP | T4 |
 
 ---
 
@@ -269,7 +274,7 @@ Alinha com iClinic/Feegow no dia a dia:
 
 ---
 
-## 12. API REST (resumo)
+## 13. API REST (resumo)
 
 Base: `http://localhost:3000/api`
 
@@ -287,7 +292,7 @@ OpenAPI completa: `public/openapi.yaml` — Swagger UI em `/api-docs.html`
 
 ---
 
-## 13. Arquivos-chave do código
+## 14. Arquivos-chave do código
 
 ```
 src/
@@ -341,7 +346,7 @@ src/
 
 ---
 
-## 14. Dados de demonstração (seed)
+## 15. Dados de demonstração (seed)
 
 **Tenants:** Clínica Bibi (teal) + VitaCare demo (white label azul)
 
@@ -364,7 +369,7 @@ src/
 
 ---
 
-## 15. Limitações da POC
+## 16. Limitações da POC
 
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
@@ -376,7 +381,7 @@ src/
 
 ---
 
-## 16. Documentação complementar
+## 17. Documentação complementar
 
 | Documento | Conteúdo |
 |-----------|----------|
@@ -391,7 +396,7 @@ src/
 
 ---
 
-## 17. Perguntas frequentes (FAQ)
+## 18. Perguntas frequentes (FAQ)
 
 **Como faço login no portal interno?**
 → `/interno/login` com `faturamento@bibi.health` / `bibi123`. Após login, vai para `/interno/dashboard`.
@@ -437,7 +442,7 @@ src/
 
 ---
 
-## 18. Design system e white label
+## 19. Design system e white label
 
 - **Tokens CSS** em `src/app/globals.css` (`--brand-*`, `--surface-*`, `--status-*`, dark mode).
 - **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`, `colorScheme`, `customDomain`.
@@ -452,7 +457,7 @@ src/
 
 ---
 
-## 19. Tier 4 — Enterprise (MFA, TISS, telemedicina, webhook retry)
+## 20. Tier 4 — Enterprise (MFA, TISS, telemedicina, webhook retry)
 
 | Feature | Descrição |
 |---------|-----------|
@@ -469,7 +474,7 @@ src/
 
 ---
 
-## 20. Roadmap sugerido (Tier 5+)
+## 21. Roadmap sugerido (Tier 5+)
 
 | Prioridade | Feature |
 |------------|---------|

@@ -1,10 +1,11 @@
 openapi: 3.0.3
 info:
   title: Sistema Bibi — API
-  version: 0.1.0
+  version: 0.2.0
   description: >
-    API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, com quatro portais
-    segregados por `role` (PRESTADOR, INTERNO, PJ, BENEFICIARIO) e faturamento Pay Per Use.
+    API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, quatro portais
+    segregados por `role`, faturamento Pay Per Use, Tiers 1–4 (PIX, CRUD, RBAC,
+    MFA, webhooks, TISS, telemedicina).
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
     HMAC-SHA256, obtido em `POST /api/auth/login`.
@@ -25,6 +26,10 @@ tags:
     description: Portal do Beneficiário — self-service (role BENEFICIARIO)
   - name: Catálogo
     description: Catálogo de procedimentos
+  - name: Cron
+    description: Jobs agendados (header x-cron-secret)
+  - name: MFA
+    description: Autenticação em dois fatores (INTERNO)
 
 components:
   securitySchemes:
@@ -1220,3 +1225,393 @@ paths:
                         createdAt: { type: string, format: date-time }
         '400': { description: Usuário sem empresa vinculada }
         '403': { description: Acesso negado (role != PJ) }
+
+  /api/pj/reports:
+    get:
+      tags: [PJ]
+      summary: Export CSV corporativo (consumo, faturas, assinaturas)
+      responses:
+        '200': { description: Arquivo CSV }
+        '403': { description: Acesso negado }
+
+  /api/auth/mfa/setup:
+    get:
+      tags: [MFA]
+      summary: Gera secret TOTP e URI para QR code
+      responses:
+        '200': { description: Secret e otpauth URI }
+        '403': { description: Apenas INTERNO }
+    post:
+      tags: [MFA]
+      summary: Habilita MFA após validar código
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code]
+              properties:
+                code: { type: string }
+      responses:
+        '200': { description: MFA habilitado }
+
+  /api/auth/mfa/verify:
+    post:
+      tags: [MFA]
+      summary: Segunda etapa do login quando MFA está ativo
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mfaToken, code]
+              properties:
+                mfaToken: { type: string }
+                code: { type: string }
+      responses:
+        '200': { description: Sessão criada }
+        '401': { description: Código inválido }
+
+  /api/interno/patients:
+    get:
+      tags: [Interno]
+      summary: Lista beneficiários do tenant
+      responses:
+        '200': { description: Lista de pacientes }
+    post:
+      tags: [Interno]
+      summary: Cria beneficiário
+      responses:
+        '200': { description: Paciente criado }
+
+  /api/interno/patients/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza beneficiário
+      responses:
+        '200': { description: Paciente atualizado }
+
+  /api/interno/patients/{id}/export:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Interno]
+      summary: Export JSON LGPD do beneficiário
+      responses:
+        '200': { description: JSON com dados pessoais e histórico }
+
+  /api/interno/companies:
+    get:
+      tags: [Interno]
+      summary: Lista empresas do tenant
+      responses:
+        '200': { description: Lista de empresas }
+    post:
+      tags: [Interno]
+      summary: Cria empresa
+      responses:
+        '200': { description: Empresa criada }
+
+  /api/interno/companies/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza dados da empresa
+      responses:
+        '200': { description: Empresa atualizada }
+
+  /api/interno/procedures:
+    get:
+      tags: [Interno]
+      summary: Lista procedimentos do tenant
+      responses:
+        '200': { description: Catálogo }
+    post:
+      tags: [Interno]
+      summary: Cria procedimento
+      responses:
+        '200': { description: Procedimento criado }
+
+  /api/interno/procedures/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    put:
+      tags: [Interno]
+      summary: Atualiza procedimento
+      responses:
+        '200': { description: Procedimento atualizado }
+    delete:
+      tags: [Interno]
+      summary: Remove procedimento
+      responses:
+        '200': { description: Procedimento removido }
+
+  /api/interno/users:
+    get:
+      tags: [Interno]
+      summary: Lista usuários do tenant
+      responses:
+        '200': { description: Lista de usuários }
+    post:
+      tags: [Interno]
+      summary: Cria usuário (prestador/interno)
+      responses:
+        '200': { description: Usuário criado }
+
+  /api/interno/users/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza usuário
+      responses:
+        '200': { description: Usuário atualizado }
+
+  /api/interno/appointments:
+    get:
+      tags: [Interno]
+      summary: Lista agendamentos (filtros opcionais)
+      responses:
+        '200': { description: Agendamentos }
+    post:
+      tags: [Interno]
+      summary: Cria agendamento
+      responses:
+        '200': { description: Agendamento criado }
+
+  /api/interno/appointments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza status ou modalidade do agendamento
+      responses:
+        '200': { description: Agendamento atualizado }
+
+  /api/interno/reports:
+    get:
+      tags: [Interno]
+      summary: Export CSV (faturamento ou CRM)
+      parameters:
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [billing, crm]
+      responses:
+        '200': { description: Arquivo CSV }
+
+  /api/interno/invoices/{id}/pay:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Marca fatura como PAGA (manual)
+      responses:
+        '200': { description: Fatura paga }
+
+  /api/interno/invoices/{id}/pix:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Gera cobrança PIX mock
+      responses:
+        '200': { description: Dados PIX (QR + copia-e-cola) }
+
+  /api/interno/invoices/{id}/confirm-pix:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Confirma pagamento PIX pendente
+      responses:
+        '200': { description: Pagamento confirmado }
+
+  /api/interno/invoices/{id}/tiss:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Interno]
+      summary: Exporta guia TISS/ANS em XML
+      responses:
+        '200': { description: XML TISS simplificado }
+
+  /api/interno/subscriptions/charges/{chargeId}/invoice:
+    parameters:
+      - name: chargeId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Converte cobrança de assinatura em fatura
+      responses:
+        '200': { description: Fatura gerada }
+
+  /api/interno/reminders:
+    post:
+      tags: [Interno]
+      summary: Dispara lembretes automáticos e enfileira mensagens
+      responses:
+        '200': { description: Lembretes processados }
+
+  /api/interno/webhooks:
+    get:
+      tags: [Interno]
+      summary: Lista webhooks B2B do tenant
+      responses:
+        '200': { description: Endpoints configurados }
+    post:
+      tags: [Interno]
+      summary: Cadastra webhook outbound
+      responses:
+        '200': { description: Webhook criado }
+
+  /api/interno/webhooks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    patch:
+      tags: [Interno]
+      summary: Atualiza webhook
+      responses:
+        '200': { description: Webhook atualizado }
+    delete:
+      tags: [Interno]
+      summary: Remove webhook
+      responses:
+        '200': { description: Webhook removido }
+
+  /api/interno/webhooks/deliveries:
+    get:
+      tags: [Interno]
+      summary: Log de entregas de webhooks
+      responses:
+        '200': { description: Lista de entregas }
+
+  /api/interno/webhooks/deliveries/{id}/retry:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Interno]
+      summary: Retry manual de entrega falha
+      responses:
+        '200': { description: Retry enfileirado }
+
+  /api/beneficiario/providers:
+    get:
+      tags: [Beneficiário]
+      summary: Prestadores disponíveis para agendamento
+      responses:
+        '200': { description: Lista de prestadores }
+
+  /api/beneficiario/slots:
+    get:
+      tags: [Beneficiário]
+      summary: Slots de 30 min para agendamento
+      parameters:
+        - name: providerId
+          in: query
+          required: true
+          schema: { type: string }
+        - name: date
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        '200': { description: Horários disponíveis }
+
+  /api/beneficiario/appointments:
+    post:
+      tags: [Beneficiário]
+      summary: Agenda consulta self-service
+      responses:
+        '200': { description: Consulta agendada }
+
+  /api/beneficiario/invoices/{id}/pay:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Beneficiário]
+      summary: Gera PIX para fatura do beneficiário
+      responses:
+        '200': { description: Dados PIX }
+    patch:
+      tags: [Beneficiário]
+      summary: Confirma pagamento PIX
+      responses:
+        '200': { description: Pagamento confirmado }
+
+  /api/cron/reminders:
+    post:
+      tags: [Cron]
+      summary: Job de lembretes automáticos
+      security: []
+      parameters:
+        - name: x-cron-secret
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Job executado }
+        '401': { description: Secret inválido }
+
+  /api/cron/webhooks:
+    post:
+      tags: [Cron]
+      summary: Job de retry de webhooks com backoff
+      security: []
+      parameters:
+        - name: x-cron-secret
+          in: header
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Retries processados }
+        '401': { description: Secret inválido }

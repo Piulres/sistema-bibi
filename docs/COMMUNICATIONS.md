@@ -1,16 +1,17 @@
 # Motor de Comunicação — Arquitetura
 
-Documento de referência do **Épico 7**. Define contratos Strategy para e-mail, SMS e WhatsApp, com fila interna de mensagens e sem integração ativa.
+Documento de referência do **Épico 7** e **Tier 1** (dispatch POC + lembretes automáticos).
 
 ---
 
 ## Visão geral
 
 ```
-Operador (Interno)
+Operador (Interno) / Cron
         │
         ▼
   message-service.ts         ← fila + CRUD + timeline
+  reminder-service.ts        ← lembretes automáticos (Tier 1)
         │
         ├─► Message (SQLite)   status: PENDENTE → ENVIADA | FALHA
         │
@@ -18,7 +19,7 @@ Operador (Interno)
   notification-service.ts    ← fachada de dispatch
         │
         ▼
-  CommunicationGatewayRegistry ← seleciona Strategy
+  CommunicationGatewayRegistry ← COMMUNICATION_PROVIDER
         │
    ┌────┴────┬──────────────┐
    ▼         ▼              ▼
@@ -26,7 +27,9 @@ EmailProvider SmsProvider WhatsAppProvider   (interfaces)
    │         │              │
    └────┬────┴──────────────┘
         ▼
-  adapters/ (SendGrid | Twilio | Meta)   ← implementação futura
+  adapters/
+   ├── console-email-adapter.ts  ← POC (COMMUNICATION_PROVIDER=console)
+   └── (SendGrid | Twilio | Meta) ← produção futura
 ```
 
 ## Strategy Pattern
@@ -41,17 +44,30 @@ EmailProvider SmsProvider WhatsAppProvider   (interfaces)
 | Registry | `communication-gateway.ts` | Registro e resolução de adapters |
 | Fachada | `notification-service.ts` | API interna para dispatch |
 | Negócio | `message-service.ts` | Fila, templates, timeline |
+| Lembretes | `reminder-service.ts` | Consultas 24h, fatura, assinatura |
 | Erros | `errors.ts` | `CommunicationProviderNotConfiguredError` |
 
 ## Fluxo (Fila → Dispatch)
 
 1. Operador compõe mensagem no Portal Interno (`/interno/comunicacao`).
 2. `queueMessage()` persiste `Message` com status **PENDENTE** e registra `MESSAGE_QUEUED` na Timeline.
-3. Operador clica **Despachar** → `dispatchMessage()` chama `sendEmail()` / `sendSms()` / `sendWhatsApp()`.
-4. Com adapter registrado: status **ENVIADA**, `externalId`, `MESSAGE_SENT`.
-5. Sem adapter: retorna erro explícito (nenhuma implementação fake).
+3. Operador clica **Despachar** → `dispatchMessage()` chama provider configurado.
+4. Com `COMMUNICATION_PROVIDER=console`: e-mail logado no servidor; status **ENVIADA**.
+5. Sem adapter: `CommunicationProviderNotConfiguredError`.
 
-## Templates previstos
+## Lembretes automáticos (Tier 1)
+
+| Gatilho | Template | Antecedência |
+|---------|----------|--------------|
+| Consulta agendada | `APPOINTMENT_REMINDER` | 24 horas |
+| Pay Per Use pendente | `INVOICE_DUE` | conforme regra |
+| Cobrança de assinatura | `SUBSCRIPTION_DUE` | 3 dias |
+
+**Endpoints:**
+- `POST /api/interno/reminders` — dispara lembretes + auto-dispatch (INTERNO)
+- `POST /api/cron/reminders` — job agendado (header `x-cron-secret`)
+
+## Templates
 
 | Template | Uso |
 |----------|-----|
@@ -60,13 +76,31 @@ EmailProvider SmsProvider WhatsAppProvider   (interfaces)
 | `SUBSCRIPTION_DUE` | Cobrança recorrente pendente |
 | `GENERIC` | Texto livre |
 
-## Provedores previstos
+## Adapter POC: ConsoleEmailAdapter
 
-- **SendGrid** — `COMMUNICATION_PROVIDER=sendgrid` (e-mail)
-- **Twilio** — `COMMUNICATION_PROVIDER=twilio` (SMS + WhatsApp)
-- **Meta** — `COMMUNICATION_PROVIDER=meta` (WhatsApp Business)
+Ativo quando `COMMUNICATION_PROVIDER=console`.
 
-Sem adapter registrado, o registry lança `CommunicationProviderNotConfiguredError`.
+- Imprime e-mail no stdout do servidor (dev/demo).
+- Permite validar fila, dispatch e timeline sem credenciais externas.
+- SMS/WhatsApp ainda exigem adapter real (Twilio/Meta).
+
+## Provedores previstos (produção)
+
+| Provider | Env | Canais |
+|----------|-----|--------|
+| **SendGrid** | `COMMUNICATION_PROVIDER=sendgrid` | EMAIL |
+| **Twilio** | `COMMUNICATION_PROVIDER=twilio` | SMS, WHATSAPP |
+| **Meta** | `COMMUNICATION_PROVIDER=meta` | WHATSAPP |
+
+## Variáveis de ambiente
+
+```env
+COMMUNICATION_PROVIDER=console   # console | sendgrid | twilio | meta
+SENDGRID_API_KEY=
+TWILIO_ACCOUNT_SID=
+TWILIO_AUTH_TOKEN=
+META_WHATSAPP_TOKEN=
+```
 
 ## Compatibilidade PostgreSQL
 
