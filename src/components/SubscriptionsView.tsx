@@ -30,6 +30,7 @@ type Charge = {
   dueDateLabel: string;
   amountLabel: string;
   status: string;
+  invoiceId: string | null;
 };
 
 export default function SubscriptionsView() {
@@ -139,6 +140,25 @@ export default function SubscriptionsView() {
     const res = await fetch(`/api/interno/subscriptions/${id}/charges`);
     const data = await res.json();
     setCharges(data.charges ?? []);
+  }
+
+  async function invoiceCharge(chargeId: string, patientName: string) {
+    setBusy(`inv-${chargeId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/interno/subscriptions/charges/${chargeId}/invoice`, {
+        method: "POST",
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao faturar cobrança");
+      else {
+        setMsg(`Fatura emitida para ${patientName}: ${data.invoice.totalLabel}`);
+        await load();
+        if (expanded) await loadCharges(expanded);
+      }
+    } finally {
+      setBusy(null);
+    }
   }
 
   if (loading) return <LoadingState message="Carregando assinaturas..." />;
@@ -267,11 +287,23 @@ export default function SubscriptionsView() {
                       <li className="py-2 text-sm text-[var(--text-muted)]">Nenhuma cobrança gerada.</li>
                     )}
                     {charges.map((charge) => (
-                      <li key={charge.id} className="flex justify-between py-2 text-sm">
+                      <li key={charge.id} className="flex flex-wrap items-center justify-between gap-2 py-2 text-sm">
                         <span className="text-[var(--text-secondary)]">{charge.dueDateLabel}</span>
-                        <span className="text-[var(--text-muted)]">
-                          {charge.amountLabel} · {charge.status}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="text-[var(--text-muted)]">
+                            {charge.amountLabel} · {charge.status}
+                          </span>
+                          {charge.status === "PENDENTE" && !charge.invoiceId && (
+                            <Button
+                              variant="portal"
+                              size="sm"
+                              disabled={busy === `inv-${charge.id}`}
+                              onClick={() => invoiceCharge(charge.id, sub.patientName)}
+                            >
+                              {busy === `inv-${charge.id}` ? "..." : "Faturar"}
+                            </Button>
+                          )}
+                        </div>
                       </li>
                     ))}
                   </ul>

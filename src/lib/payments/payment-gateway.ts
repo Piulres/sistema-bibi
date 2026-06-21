@@ -31,15 +31,26 @@ export class PaymentGatewayRegistry {
   }
 
   getProvider(gatewayId?: PaymentGatewayId): PaymentProvider {
-    const id = gatewayId ?? resolveDefaultGatewayId();
-    if (!id) {
-      throw new PaymentProviderNotConfiguredError("none", "ANY");
+    if (gatewayId) {
+      const explicit = this.byGateway.get(gatewayId);
+      if (!explicit) {
+        throw new PaymentProviderNotConfiguredError(gatewayId, "ANY");
+      }
+      return explicit;
     }
-    const provider = this.byGateway.get(id);
-    if (!provider) {
-      throw new PaymentProviderNotConfiguredError(id, "ANY");
+
+    const configured = resolveDefaultGatewayId();
+    if (configured) {
+      const provider = this.byGateway.get(configured);
+      if (provider) return provider;
     }
-    return provider;
+
+    const registered = this.listRegisteredGateways();
+    if (registered.length === 1) {
+      return this.byGateway.get(registered[0])!;
+    }
+
+    throw new PaymentProviderNotConfiguredError("none", "ANY");
   }
 
   getPixProvider(gatewayId?: PaymentGatewayId): PixProvider {

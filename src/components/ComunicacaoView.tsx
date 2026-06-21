@@ -141,17 +141,51 @@ export default function ComunicacaoView() {
     }
   }
 
+  async function runReminders() {
+    setBusy("reminders");
+    setMsg(null);
+    try {
+      const res = await fetch("/api/interno/reminders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ autoDispatch: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao gerar lembretes");
+      else {
+        const r = data.result;
+        setMsg(
+          `Lembretes: ${r.appointments} consulta(s), ${r.subscriptionCharges} assinatura(s), ${r.invoiceDue} fatura(s) — ${r.dispatched} enviado(s)`,
+        );
+        await load();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
   if (loading) return <LoadingState message="Carregando comunicações..." />;
 
   return (
     <div className="space-y-8">
       {!providerConfigured && (
         <Alert tone="warning">
-          Nenhum provedor de comunicação configurado (<code>COMMUNICATION_PROVIDER</code>).
-          Mensagens podem ser enfileiradas; o dispatch exige adapter (SendGrid, Twilio ou Meta).
-          Veja <code>docs/COMMUNICATIONS.md</code>.
+          Nenhum provedor de comunicação configurado. Defina COMMUNICATION_PROVIDER=console no .env
+          para dispatch em modo POC.
         </Alert>
       )}
+
+      <Card>
+        <SectionHeader
+          title="Automação de lembretes"
+          description="Enfileira lembretes de consulta (24h), cobranças de assinatura (3 dias) e procedimentos pendentes."
+        />
+        <div className="mt-4">
+          <Button variant="portal" disabled={busy === "reminders"} onClick={runReminders}>
+            {busy === "reminders" ? "Processando..." : "Gerar lembretes automáticos"}
+          </Button>
+        </div>
+      </Card>
 
       {msg && <Alert tone="info">{msg}</Alert>}
 

@@ -5,8 +5,6 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
-import SectionHeader from "@/components/ui/SectionHeader";
 
 type Overview = {
   patient: {
@@ -89,16 +87,13 @@ export default function BeneficiarioView() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
-  const [providers, setProviders] = useState<{ id: string; name: string }[]>([]);
-  const [slots, setSlots] = useState<{ start: string; label: string }[]>([]);
-  const [scheduleForm, setScheduleForm] = useState({
-    providerId: "",
-    date: new Date().toISOString().slice(0, 10),
-    slot: "",
-    reason: "Consulta de rotina",
-  });
+  const [pixState, setPixState] = useState<{
+    invoiceId: string;
+    paymentId: string;
+    pixCopyPaste: string;
+  } | null>(null);
 
-  const reloadOverview = async () => {
+  const reload = async () => {
     const res = await fetch("/api/beneficiario/overview");
     const data = await res.json();
     if (res.ok) setOverview(data.overview);
@@ -124,46 +119,41 @@ export default function BeneficiarioView() {
     };
   }, []);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      if (!scheduleForm.providerId || !scheduleForm.date) {
-        if (active) setSlots([]);
-        return;
-      }
-      const res = await fetch(
-        `/api/beneficiario/slots?providerId=${scheduleForm.providerId}&date=${scheduleForm.date}`,
-      );
-      const data = await res.json();
-      if (!active) return;
-      setSlots(data.slots ?? []);
-      setScheduleForm((prev) => ({ ...prev, slot: "" }));
-    })();
-    return () => {
-      active = false;
-    };
-  }, [scheduleForm.providerId, scheduleForm.date]);
-
-  async function bookAppointment(e: React.FormEvent) {
-    e.preventDefault();
-    if (!scheduleForm.slot) return;
-    setBusy("book");
+  async function payWithPix(invoiceId: string) {
+    setBusy(`pix-${invoiceId}`);
     setMsg(null);
     try {
-      const res = await fetch("/api/beneficiario/appointments", {
-        method: "POST",
+      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao gerar PIX");
+      else {
+        setPixState({
+          invoiceId,
+          paymentId: data.payment.id,
+          pixCopyPaste: data.pixCopyPaste ?? data.payment.pixCopyPaste,
+        });
+        setMsg("PIX gerado — copie o código e confirme após pagar");
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function confirmPix(invoiceId: string, paymentId: string) {
+    setBusy(`confirm-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          providerId: scheduleForm.providerId,
-          scheduledAt: scheduleForm.slot,
-          reason: scheduleForm.reason,
-        }),
+        body: JSON.stringify({ paymentId }),
       });
       const data = await res.json();
-      if (!res.ok) setMsg(data.error ?? "Erro ao agendar");
+      if (!res.ok) setMsg(data.error ?? "Erro ao confirmar pagamento");
       else {
-        setMsg("Consulta agendada! Aguarde confirmação da clínica.");
-        await reloadOverview();
+        setMsg("Pagamento confirmado. Obrigado!");
+        setPixState(null);
+        await reload();
       }
     } finally {
       setBusy(null);
@@ -182,57 +172,25 @@ export default function BeneficiarioView() {
     <div className="space-y-8">
       {msg && <Alert tone="info">{msg}</Alert>}
 
-      <Card>
-        <SectionHeader
-          title="Agendar consulta"
-          description="Escolha prestador, data e horário disponível. A clínica confirma o agendamento."
-        />
-        <form onSubmit={bookAppointment} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <label className="block text-sm">
-            <span className="text-[var(--text-secondary)]">Prestador</span>
-            <select
-              required
-              className="mt-1 w-full rounded border px-3 py-2"
-              value={scheduleForm.providerId}
-              onChange={(e) => setScheduleForm({ ...scheduleForm, providerId: e.target.value })}
+      {pixState && (
+        <Alert tone="info">
+          <p className="font-medium">Pague via PIX</p>
+          <p className="mt-2 break-all font-mono text-xs">{pixState.pixCopyPaste}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              variant="portal"
+              size="sm"
+              disabled={busy === `confirm-${pixState.invoiceId}`}
+              onClick={() => confirmPix(pixState.invoiceId, pixState.paymentId)}
             >
-              <option value="">Selecione...</option>
-              {providers.map((p) => (
-                <option key={p.id} value={p.id}>{p.name}</option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm">
-            <span className="text-[var(--text-secondary)]">Data</span>
-            <input
-              required
-              type="date"
-              className="mt-1 w-full rounded border px-3 py-2"
-              value={scheduleForm.date}
-              onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })}
-            />
-          </label>
-          <label className="block text-sm">
-            <span className="text-[var(--text-secondary)]">Horário</span>
-            <select
-              required
-              className="mt-1 w-full rounded border px-3 py-2"
-              value={scheduleForm.slot}
-              onChange={(e) => setScheduleForm({ ...scheduleForm, slot: e.target.value })}
-            >
-              <option value="">{slots.length ? "Selecione..." : "Sem horários"}</option>
-              {slots.map((s) => (
-                <option key={s.start} value={s.start}>{s.label}</option>
-              ))}
-            </select>
-          </label>
-          <div className="flex items-end">
-            <Button type="submit" variant="portal" disabled={busy === "book" || !scheduleForm.slot}>
-              {busy === "book" ? "Agendando..." : "Agendar"}
+              {busy === `confirm-${pixState.invoiceId}` ? "Confirmando..." : "Já paguei — confirmar"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setPixState(null)}>
+              Fechar
             </Button>
           </div>
-        </form>
-      </Card>
+        </Alert>
+      )}
 
       <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
@@ -365,7 +323,19 @@ export default function BeneficiarioView() {
                     <p className="font-semibold text-[var(--text-primary)]">{invoice.totalLabel}</p>
                     <p className="text-sm text-[var(--text-muted)]">{invoice.createdAtLabel}</p>
                   </div>
-                  <StatusBadge value={invoice.status} map="invoice" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge value={invoice.status} map="invoice" />
+                    {invoice.status === "FECHADA" && (
+                      <Button
+                        variant="portal"
+                        size="sm"
+                        disabled={busy === `pix-${invoice.id}`}
+                        onClick={() => payWithPix(invoice.id)}
+                      >
+                        {busy === `pix-${invoice.id}` ? "..." : "Pagar com PIX"}
+                      </Button>
+                    )}
+                  </div>
                 </div>
                 <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-slate-100">
                   {invoice.items.map((item) => (

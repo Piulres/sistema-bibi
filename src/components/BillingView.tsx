@@ -30,18 +30,27 @@ type Invoice = {
   createdAt: string;
 };
 
+type PixState = {
+  invoiceId: string;
+  paymentId: string;
+  pixCopyPaste: string;
+};
+
 export default function BillingView() {
   const [pending, setPending] = useState<PendingGroup[]>([]);
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [pixState, setPixState] = useState<PixState | null>(null);
+  const [gatewayConfigured, setGatewayConfigured] = useState(false);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/interno/billing");
     const data = await res.json();
     setPending(data.pending ?? []);
     setInvoices(data.invoices ?? []);
+    setGatewayConfigured(Boolean(data.paymentGatewayConfigured));
     setLoading(false);
   }, []);
 
@@ -53,6 +62,7 @@ export default function BillingView() {
       if (!active) return;
       setPending(data.pending ?? []);
       setInvoices(data.invoices ?? []);
+      setGatewayConfigured(Boolean(data.paymentGatewayConfigured));
       setLoading(false);
     })();
     return () => {
@@ -78,11 +88,99 @@ export default function BillingView() {
     }
   }
 
+  async function markPaid(invoiceId: string) {
+    setBusy(`pay-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/interno/invoices/${invoiceId}/pay`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method: "MANUAL" }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao marcar como paga");
+      else {
+        setMsg("Fatura marcada como paga");
+        setPixState(null);
+        await load();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function generatePix(invoiceId: string) {
+    setBusy(`pix-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/interno/invoices/${invoiceId}/pix`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao gerar PIX");
+      else {
+        setPixState({
+          invoiceId,
+          paymentId: data.payment.id,
+          pixCopyPaste: data.pixCopyPaste ?? data.payment.pixCopyPaste,
+        });
+        setMsg("Cobrança PIX gerada — copie o código ou confirme o pagamento");
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function confirmPix(invoiceId: string, paymentId: string) {
+    setBusy(`confirm-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/interno/invoices/${invoiceId}/confirm-pix`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentId }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao confirmar PIX");
+      else {
+        setMsg("Pagamento PIX confirmado");
+        setPixState(null);
+        await load();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
   if (loading) return <LoadingState message="Carregando faturamento..." />;
 
   return (
     <div className="space-y-8">
       {msg && <Alert tone="info">{msg}</Alert>}
+
+      {pixState && (
+        <Alert tone="info">
+          <p className="font-medium">PIX gerado</p>
+          <p className="mt-2 break-all font-mono text-xs">{pixState.pixCopyPaste}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              variant="portal"
+              size="sm"
+              disabled={busy === `confirm-${pixState.invoiceId}`}
+              onClick={() => confirmPix(pixState.invoiceId, pixState.paymentId)}
+            >
+              {busy === `confirm-${pixState.invoiceId}` ? "Confirmando..." : "Confirmar pagamento PIX"}
+            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setPixState(null)}>
+              Fechar
+            </Button>
+          </div>
+        </Alert>
+      )}
+
+      {!gatewayConfigured && (
+        <Alert tone="warning">
+          Gateway de pagamento não configurado. Defina PAYMENT_GATEWAY=mock no .env para habilitar PIX.
+        </Alert>
+      )}
 
       <section>
         <SectionHeader
@@ -153,6 +251,7 @@ export default function BillingView() {
                 <th className="px-4 py-2 font-medium">Itens</th>
                 <th className="px-4 py-2 font-medium">Status</th>
                 <th className="px-4 py-2 text-right font-medium">Total</th>
+                <th className="px-4 py-2 text-right font-medium">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-default)]">
@@ -175,6 +274,30 @@ export default function BillingView() {
                   </td>
                   <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
                     {inv.totalLabel}
+                  </td>
+                  <td className="px-4 py-2">
+                    <div className="flex flex-wrap justify-end gap-2">
+                      {inv.status === "FECHADA" && (
+                        <>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            disabled={!gatewayConfigured || busy === `pix-${inv.id}`}
+                            onClick={() => generatePix(inv.id)}
+                          >
+                            {busy === `pix-${inv.id}` ? "..." : "PIX"}
+                          </Button>
+                          <Button
+                            variant="portal"
+                            size="sm"
+                            disabled={busy === `pay-${inv.id}`}
+                            onClick={() => markPaid(inv.id)}
+                          >
+                            {busy === `pay-${inv.id}` ? "..." : "Marcar paga"}
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

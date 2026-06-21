@@ -1,4 +1,5 @@
 import "server-only";
+import "@/lib/communications/bootstrap";
 import { communicationGateway } from "@/lib/communications/communication-gateway";
 import type { CommunicationProviderId } from "@/lib/communications/types";
 import type { SendMessageRequest, SendMessageResult } from "@/lib/communications/types";
