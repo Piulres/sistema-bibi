@@ -51,3 +51,5 @@ INTER_CLIENT_CERT=
 - **PCI** — nunca trafegar PAN; usar tokenização do gateway (`cardToken`).
 - **Pay Per Use** — cobranças referenciam `invoiceId` via `ChargeReference`.
 - **Histórico** — persistir em `Payment` (Prisma) após criar cobrança.
+
+Ver fluxos: [`docs/FLUXOS.md`](../../../docs/FLUXOS.md) §4.1 e §7.

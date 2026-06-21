@@ -192,6 +192,9 @@ Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redire
 
 ### 4.1 Faturamento (`BillingView`)
 
+**UI:** tabela de faturas emitidas com colunas Total, TISS (download XML) e **Ações**
+(botões **PIX** e **Marcar paga** quando `status ≠ PAGA` e gateway configurado).
+
 | Ação | API | Transição de estado |
 |------|-----|---------------------|
 | Listar | `GET /api/interno/billing` | — |

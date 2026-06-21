@@ -14,9 +14,9 @@ POC de plataforma SaaS HealthTech (multi-tenant) com **quatro portais** segregad
 **Pay Per Use** (cobra apenas procedimentos efetivamente usados, com precificação
 dinâmica por empresa).
 
-**Tiers mergeados (PRs #17–#20):** ciclo de receita (PIX mock), operação (CRUD,
+**Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
-(MFA TOTP, telemedicina, TISS XML, webhook retry).
+(MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
 
 ### Stack e como rodar
 - **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4**, **Prisma 6 + SQLite**.
@@ -64,4 +64,5 @@ Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
-- **Documentação completa:** `README.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/ARQUITETURA.md`.
+- **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos de usuário),
+  `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`.

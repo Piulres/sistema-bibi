@@ -162,6 +162,8 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
    e export CSV. **Webhooks B2B** disparam em eventos-chave (Tier 3).
 7. **Beneficiário** agenda consultas, acompanha consumo e paga faturas em self-service.
 
+Diagrama completo com sequência cross-portal: [`docs/FLUXOS.md`](docs/FLUXOS.md) §7.
+
 Exemplo de precificação dinâmica do seed: a Consulta Clínica (base R$ 180,00)
 para um beneficiário da **TechCorp** é cobrada por **R$ 153,00** (desconto
 corporativo de 15%).

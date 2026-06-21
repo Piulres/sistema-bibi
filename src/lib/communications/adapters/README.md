@@ -36,3 +36,5 @@ TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 META_WHATSAPP_TOKEN=
 ```
+
+Ver fluxos: [`docs/FLUXOS.md`](../../../docs/FLUXOS.md) §4.6 e §8.2.

@@ -106,3 +106,10 @@ INTER_CLIENT_CERT=
 ## Compatibilidade PostgreSQL
 
 Entidade `Payment` e contratos TypeScript são compatíveis com migração para Postgres (Netlify Database).
+
+---
+
+## Ver também
+
+- [`FLUXOS.md`](FLUXOS.md) — seções 4.1 (faturamento interno), 6 (PIX beneficiário) e 7 (Pay Per Use E2E)
+- [`ARQUITETURA.md`](ARQUITETURA.md) — Épico 4 e Tier 1

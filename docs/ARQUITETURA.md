@@ -4,6 +4,9 @@ Documento técnico com os diagramas de arquitetura, modelo de dados (ER) e os
 principais fluxos do sistema. Os diagramas usam [Mermaid](https://mermaid.js.org/)
 e são renderizados automaticamente no GitHub.
 
+> **Fluxos de usuário detalhados** (todos os portais, RBAC, máquinas de estado):
+> [`FLUXOS.md`](FLUXOS.md)
+
 ---
 
 ## 1. Visão de componentes
