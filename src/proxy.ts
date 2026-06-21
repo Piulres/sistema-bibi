@@ -17,6 +17,11 @@ export function proxy(request: NextRequest) {
     { prefix: "/prestador", isLogin: () => false, loginPath: "/login" },
     { prefix: "/interno", isLogin: (p) => p === "/interno/login", loginPath: "/interno/login" },
     { prefix: "/pj", isLogin: (p) => p === "/pj/login", loginPath: "/pj/login" },
+    {
+      prefix: "/beneficiario",
+      isLogin: (p) => p === "/beneficiario/login",
+      loginPath: "/beneficiario/login",
+    },
   ];
 
   for (const rule of rules) {
@@ -33,5 +38,10 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/prestador/:path*", "/interno/:path*", "/pj/:path*"],
+  matcher: [
+    "/prestador/:path*",
+    "/interno/:path*",
+    "/pj/:path*",
+    "/beneficiario/:path*",
+  ],
 };

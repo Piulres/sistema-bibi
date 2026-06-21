@@ -212,6 +212,7 @@ flowchart LR
   R -->|PRESTADOR| A["/prestador/*<br/>agenda, atendimento, PEP"]
   R -->|INTERNO| B["/interno/*<br/>faturamento · Cliente 360°"]
   R -->|PJ| C["/pj/*<br/>contratos, beneficiários"]
+  R -->|BENEFICIARIO| E["/beneficiario/*<br/>self-service"]
   R -.->|role incorreto| D["403 / redirect ao login"]
 ```
 
@@ -421,7 +422,43 @@ flowchart LR
 
 ---
 
-## 12. Documentação da API
+## 12. Portal Beneficiário (Épico 6)
+
+Quarto portal segregado por `role: BENEFICIARIO`. O usuário é vinculado a um
+`Patient` via `User.patientId` (mesmo padrão de `User.companyId` no PJ).
+
+```mermaid
+flowchart LR
+  Login["/beneficiario/login"] --> Session["Sessão + patientId"]
+  Session --> API["GET /api/beneficiario/overview"]
+  API --> Svc["getBeneficiaryOverview()"]
+  Svc --> PO["getPatientOverview()"]
+  Svc --> Sub["subscriptions do patientId"]
+  PO --> View["BeneficiarioView"]
+  Sub --> View
+```
+
+| Camada | Arquivo | Responsabilidade |
+|--------|---------|------------------|
+| Schema | `prisma/schema.prisma` | `User.patientId` → `Patient` |
+| Serviço | `src/lib/beneficiary-overview.ts` | Reutiliza Cliente 360° + assinaturas |
+| API | `src/app/api/beneficiario/overview/route.ts` | Escopo fixo em `user.patientId` |
+| UI | `src/components/BeneficiarioView.tsx` | Self-service read-only |
+| Auth | `requireBeneficiary()` em `api-auth.ts` | Impede IDOR |
+
+### Checklist de homologação (Épico 6)
+
+- [x] Role `BENEFICIARIO` + portal em `roles.ts` e `proxy.ts`
+- [x] `User.patientId` no schema e sessão
+- [x] API self-service sem expor IDs arbitrários
+- [x] Reutilização de `getPatientOverview()` (sem duplicar queries)
+- [x] Seed: `joao.pereira@email.com` vinculado a João Pereira
+- [x] Landing page com 4º portal
+- [x] Build passando
+
+---
+
+## 13. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

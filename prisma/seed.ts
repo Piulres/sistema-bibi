@@ -91,7 +91,7 @@ async function main() {
     },
   });
 
-  console.log("Criando usuarios dos tres portais...");
+  console.log("Criando usuarios dos quatro portais...");
   const prestador = await prisma.user.create({
     data: {
       email: "dra.helena@bibi.health",
@@ -120,7 +120,6 @@ async function main() {
       companyId: company.id,
     },
   });
-
   console.log("Criando catalogo de procedimentos...");
   const procData = [
     { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 180 },
@@ -168,6 +167,16 @@ async function main() {
       action: TIMELINE_ACTIONS.CREATED,
       description: "Beneficiário João Pereira cadastrado",
       createdBy: prestador.id,
+    },
+  });
+  await prisma.user.create({
+    data: {
+      email: "joao.pereira@email.com",
+      password: "bibi123",
+      name: "João Pereira",
+      role: "BENEFICIARIO",
+      tenantId: tenant.id,
+      patientId: joao.id,
     },
   });
   const maria = await prisma.patient.create({
@@ -423,9 +432,10 @@ async function main() {
 
   console.log("Seed concluido com sucesso.");
   console.log("\nCredenciais de acesso (POC):");
-  console.log("  Prestador  -> /login          : dra.helena@bibi.health / bibi123");
-  console.log("  Interno    -> /interno/login   : faturamento@bibi.health / bibi123");
-  console.log("  Empresa PJ -> /pj/login        : rh@techcorp.com / bibi123");
+  console.log("  Prestador    -> /login              : dra.helena@bibi.health / bibi123");
+  console.log("  Interno      -> /interno/login       : faturamento@bibi.health / bibi123");
+  console.log("  Empresa PJ   -> /pj/login            : rh@techcorp.com / bibi123");
+  console.log("  Beneficiario -> /beneficiario/login  : joao.pereira@email.com / bibi123");
 }
 
 main()

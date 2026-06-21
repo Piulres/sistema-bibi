@@ -26,6 +26,15 @@ export async function requireUser(roles?: string[]): Promise<SessionUser> {
   return user;
 }
 
+/** Garante sessão de beneficiário com patientId vinculado. */
+export async function requireBeneficiary(): Promise<SessionUser & { patientId: string }> {
+  const user = await requireUser(["BENEFICIARIO"]);
+  if (!user.patientId) {
+    throw new ApiAuthError(403, "Conta sem beneficiário vinculado");
+  }
+  return { ...user, patientId: user.patientId };
+}
+
 export function authErrorResponse(error: unknown): NextResponse {
   if (error instanceof ApiAuthError) {
     return NextResponse.json({ error: error.message }, { status: error.status });

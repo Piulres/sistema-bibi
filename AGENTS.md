@@ -7,9 +7,10 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Cursor Cloud specific instructions
 
 ### O que é o Sistema Bibi
-POC de plataforma SaaS HealthTech (multi-tenant) com três portais segregados por
+POC de plataforma SaaS HealthTech (multi-tenant) com quatro portais segregados por
 `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
-`/interno`) e **Empresa/PJ** (`/pj/login` → `/pj`). Núcleo de negócio: faturamento
+`/interno`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
+(`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
 **Pay Per Use** (cobra apenas procedimentos efetivamente usados, com precificação
 dinâmica por empresa).
 
@@ -26,6 +27,7 @@ dinâmica por empresa).
 - Prestador: `dra.helena@bibi.health` / `bibi123`
 - Interno:   `faturamento@bibi.health` / `bibi123`
 - Empresa PJ: `rh@techcorp.com` / `bibi123`
+- Beneficiário: `joao.pereira@email.com` / `bibi123`
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver

@@ -2,6 +2,7 @@ export const ROLES = {
   PRESTADOR: "PRESTADOR",
   INTERNO: "INTERNO",
   PJ: "PJ",
+  BENEFICIARIO: "BENEFICIARIO",
 } as const;
 
 export type Role = (typeof ROLES)[keyof typeof ROLES];
@@ -25,6 +26,12 @@ export const PORTALS = {
     label: "Portal da Empresa (PJ)",
     loginPath: "/pj/login",
     dashboardPath: "/pj",
+  },
+  beneficiario: {
+    role: ROLES.BENEFICIARIO,
+    label: "Portal do Beneficiário",
+    loginPath: "/beneficiario/login",
+    dashboardPath: "/beneficiario",
   },
 } as const;
 

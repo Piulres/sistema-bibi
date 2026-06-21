@@ -22,6 +22,13 @@ const portals = [
     accent: "from-fuchsia-500 to-purple-600",
     icon: "🏢",
   },
+  {
+    href: "/beneficiario/login",
+    label: "Portal do Beneficiário",
+    desc: "Agenda, consumo Pay Per Use, faturas e assinatura.",
+    accent: "from-teal-500 to-cyan-600",
+    icon: "👤",
+  },
 ];
 
 const pillars = [
@@ -60,7 +67,7 @@ export default function Home() {
         <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
           Selecione seu portal
         </h2>
-        <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {portals.map((p) => (
             <Link
               key={p.href}

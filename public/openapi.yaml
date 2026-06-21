@@ -4,7 +4,7 @@ info:
   version: 0.1.0
   description: >
     API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, com três portais
-    segregados por `role` (PRESTADOR, INTERNO, PJ) e faturamento Pay Per Use.
+    segregados por `role` (PRESTADOR, INTERNO, PJ, BENEFICIARIO) e faturamento Pay Per Use.
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
     HMAC-SHA256, obtido em `POST /api/auth/login`.
@@ -21,6 +21,8 @@ tags:
     description: Portal Interno — faturamento (role INTERNO)
   - name: PJ
     description: Portal da Empresa (role PJ)
+  - name: Beneficiário
+    description: Portal do Beneficiário — self-service (role BENEFICIARIO)
   - name: Catálogo
     description: Catálogo de procedimentos
 
@@ -50,7 +52,7 @@ components:
           example: bibi123
         portal:
           type: string
-          enum: [prestador, interno, pj]
+          enum: [prestador, interno, pj, beneficiario]
           example: prestador
     LoginResponse:
       type: object
@@ -60,7 +62,7 @@ components:
           properties:
             id: { type: string }
             name: { type: string }
-            role: { type: string, enum: [PRESTADOR, INTERNO, PJ] }
+            role: { type: string, enum: [PRESTADOR, INTERNO, PJ, BENEFICIARIO] }
         redirectTo:
           type: string
           example: /prestador
@@ -70,7 +72,7 @@ components:
         id: { type: string }
         name: { type: string }
         email: { type: string }
-        role: { type: string, enum: [PRESTADOR, INTERNO, PJ] }
+        role: { type: string, enum: [PRESTADOR, INTERNO, PJ, BENEFICIARIO] }
         tenantId: { type: string }
         companyId: { type: string, nullable: true }
         tenantName: { type: string }
@@ -806,6 +808,35 @@ paths:
                     type: array
                     items: { $ref: '#/components/schemas/SubscriptionChargeView' }
         '404': { description: Assinatura não encontrada }
+
+  /api/beneficiario/overview:
+    get:
+      tags: [Beneficiário]
+      summary: Visão self-service do beneficiário logado
+      description: >
+        Retorna agenda, consumo Pay Per Use, faturas, assinatura e prontuário
+        do beneficiário vinculado à sessão (`user.patientId`). Somente leitura.
+      responses:
+        '200':
+          description: Overview consolidado do beneficiário
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overview:
+                    allOf:
+                      - { $ref: '#/components/schemas/PatientOverview' }
+                      - type: object
+                        properties:
+                          subscriptions:
+                            type: array
+                            items: { $ref: '#/components/schemas/SubscriptionView' }
+                          nextAppointment:
+                            type: object
+                            nullable: true
+        '403': { description: Acesso negado ou conta sem beneficiário vinculado }
+        '404': { description: Beneficiário não encontrado }
 
   /api/pj/overview:
     get:

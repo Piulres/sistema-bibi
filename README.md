@@ -28,7 +28,7 @@
 ## 1. Visão geral
 
 O Sistema Bibi é uma plataforma multi-tenant (cada clínica/hospital é um *tenant*)
-com **três portais segregados** por perfil de acesso. O objetivo da POC é
+com **quatro portais segregados** por perfil de acesso. O objetivo da POC é
 demonstrar o modelo de negócio **Pay Per Use**: o beneficiário paga apenas pelos
 serviços (consultas e exames) efetivamente utilizados, com transparência prévia
 de valores e faturamento sem perdas de informação.
@@ -38,6 +38,7 @@ de valores e faturamento sem perdas de informação.
 | **Portal do Prestador** | Médicos / profissionais de saúde | Agenda inteligente e prontuário eletrônico (PEP) |
 | **Portal Interno** | Equipe administrativa | Faturamento Pay Per Use e administração |
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
+| **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
 
 ## 2. Pilares de negócio
 
@@ -102,6 +103,8 @@ Base local: **`http://localhost:3000`**
 | `/interno/beneficiarios/{id}` | **Cliente 360°** — visão consolidada do beneficiário | `INTERNO` |
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
 | `/interno/assinaturas` | **Recorrência** — assinaturas e cobranças futuras | `INTERNO` |
+| `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
+| `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
 | `/pj` | Dashboard corporativo (beneficiários e faturas) | `PJ` |
 
@@ -113,6 +116,7 @@ Base local: **`http://localhost:3000`**
 - Landing: http://localhost:3000/
 - Prestador: http://localhost:3000/login
 - Interno: http://localhost:3000/interno/login
+- Beneficiário: http://localhost:3000/beneficiario/login
 - Empresa (PJ): http://localhost:3000/pj/login
 
 ## 6. Credenciais de demonstração
@@ -124,6 +128,7 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Prestador | `/login` | `dra.helena@bibi.health` | `bibi123` |
 | Interno | `/interno/login` | `faturamento@bibi.health` | `bibi123` |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
+| Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
@@ -151,7 +156,7 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | Modelo | Descrição |
 |--------|-----------|
 | `Tenant` | Cliente do SaaS (clínica/hospital). Base do multi-tenancy. |
-| `User` | Usuário do sistema; `role` define o portal (`PRESTADOR`/`INTERNO`/`PJ`). |
+| `User` | Usuário do sistema; `role` define o portal (`PRESTADOR`/`INTERNO`/`PJ`/`BENEFICIARIO`). |
 | `Company` | Empresa contratante (PJ). |
 | `Patient` | Beneficiário/paciente (individual ou vinculado a uma empresa). |
 | `Procedure` | Catálogo de procedimentos (consultas/exames) com preço base. |
@@ -216,6 +221,12 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `GET` | `/api/interno/subscriptions/{id}/charges` | Lista cobranças de uma assinatura. |
 | `POST` | `/api/interno/invoices` | Gera a fatura Pay Per Use de um paciente. Body: `{ patientId }`. |
 
+### Portal do Beneficiário (`role: BENEFICIARIO`)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `GET` | `/api/beneficiario/overview` | Self-service: agenda, consumo, faturas, assinatura e prontuário próprio. |
+
 ### Portal da Empresa (`role: PJ`)
 
 | Método | Endpoint | Descrição |
@@ -255,16 +266,18 @@ sistema-bibi/
 │   │   │   ├── auth/        # login, logout, me
 │   │   │   ├── prestador/   # agenda, atendimentos, procedimentos, PEP
 │   │   │   ├── interno/     # billing, invoices, crm, subscriptions
+│   │   │   ├── beneficiario/  # overview self-service
 │   │   │   ├── pj/          # overview
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
 │   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id], /interno/crm, /interno/assinaturas
+│   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, timeline, payments, subscription
+│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, beneficiary-overview, timeline, payments, subscription
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md

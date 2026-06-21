@@ -32,7 +32,7 @@ model Tenant {
 }
 
 /// Usuario do sistema. role define o portal de acesso.
-/// role: PRESTADOR | INTERNO | PJ
+/// role: PRESTADOR | INTERNO | PJ | BENEFICIARIO
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -48,6 +48,10 @@ model User {
   // Vinculo opcional com empresa (para usuarios do Portal PJ).
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
+
+  // Vinculo opcional com beneficiario (Portal Beneficiario).
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
 
   appointments   Appointment[]   @relation("ProviderAppointments")
   medicalRecords MedicalRecord[] @relation("ProviderRecords")
@@ -88,6 +92,7 @@ model Patient {
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
 
+  users          User[]
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
   invoices       Invoice[]
