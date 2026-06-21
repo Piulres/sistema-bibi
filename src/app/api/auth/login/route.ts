@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { verifyPassword } from "@/lib/password";
 import { prisma } from "@/lib/db";
 import { createSession } from "@/lib/session";
 import { PORTALS, type PortalKey } from "@/lib/roles";
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     where: { email: email.toLowerCase().trim() },
   });
 
-  if (!user || user.password !== password) {
+  if (!user || !verifyPassword(password, user.password)) {
     return NextResponse.json(
       { error: "E-mail ou senha incorretos" },
       { status: 401 },

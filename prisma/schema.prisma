@@ -60,7 +60,7 @@ model TenantBranding {
 model User {
   id        String   @id @default(cuid())
   email     String   @unique
-  // POC: senha em texto puro apenas para demonstracao. Em producao usar hash (ex. bcrypt/argon2).
+  // Senha com hash scrypt (ver src/lib/password.ts). Seed usa hashPassword().
   password  String
   name      String
   role      String
@@ -198,10 +198,13 @@ model ProcedureUsage {
 }
 
 /// Prontuario Eletronico do Paciente (PEP).
+/// recordType: EVOLUCAO | ANAMNESE | RECEITA | ATESTADO
 model MedicalRecord {
-  id        String   @id @default(cuid())
-  content   String
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  recordType String   @default("EVOLUCAO")
+  title      String?
+  content    String
+  createdAt  DateTime @default(now())
 
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])

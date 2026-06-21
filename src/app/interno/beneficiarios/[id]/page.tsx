@@ -8,9 +8,12 @@ import PatientOverviewView from "@/components/PatientOverviewView";
 const RETURN_LABELS: Record<string, string> = {
   "/interno/dashboard": "Voltar ao dashboard",
   "/interno": "Voltar ao faturamento",
+  "/interno/cadastros": "Voltar aos cadastros",
+  "/interno/agenda": "Voltar à agenda",
   "/interno/crm": "Voltar ao CRM",
   "/interno/assinaturas": "Voltar à recorrência",
   "/interno/comunicacao": "Voltar à comunicação",
+  "/interno/relatorios": "Voltar aos relatórios",
   "/interno/branding": "Voltar ao white label",
 };
 

@@ -6,6 +6,7 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { isPepRecordType } from "@/lib/pep-templates";
 
 /** Adiciona uma anotacao ao prontuario (PEP) do paciente. */
 export async function POST(request: Request) {
@@ -15,6 +16,8 @@ export async function POST(request: Request) {
       patientId?: string;
       appointmentId?: string;
       content?: string;
+      recordType?: string;
+      title?: string | null;
     };
 
     if (!body.patientId || !body.content?.trim()) {
@@ -45,11 +48,16 @@ export async function POST(request: Request) {
       }
     }
 
+    const recordType =
+      body.recordType && isPepRecordType(body.recordType) ? body.recordType : "EVOLUCAO";
+
     const record = await prisma.medicalRecord.create({
       data: {
         patientId: body.patientId,
         appointmentId: body.appointmentId ?? null,
         providerId: user.id,
+        recordType,
+        title: body.title?.trim() || null,
         content: body.content.trim(),
       },
     });
