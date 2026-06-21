@@ -662,6 +662,23 @@ paths:
           description: Logo atualizado
         '400': { description: Arquivo inválido }
 
+  /api/branding/logo/{tenantId}:
+    get:
+      tags: [Interno]
+      summary: Serve logo público do tenant (Blobs ou filesystem)
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Imagem do logo
+          content:
+            image/*:
+              schema: { type: string, format: binary }
+        '404': { description: Logo não encontrado }
+
   /api/interno/dashboard:
     get:
       tags: [Interno]

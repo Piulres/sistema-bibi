@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
-import { validateLogoUrl } from "@/lib/theme/branding-validation";
+import { saveTenantLogo } from "@/lib/storage/tenant-logo";
 
 const MAX_BYTES = 200_000;
 const ALLOWED_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
 
-/** Upload de logo (POC): converte para data URL e persiste em TenantBranding.logoUrl. */
+/** Upload de logo — Netlify Blobs em produção; filesystem local em dev. */
 export async function POST(request: Request) {
   try {
     const user = await requireUser(["INTERNO"]);
@@ -32,25 +32,21 @@ export async function POST(request: Request) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const dataUrl = `data:${file.type};base64,${buffer.toString("base64")}`;
-
-    const logoError = validateLogoUrl(dataUrl);
-    if (logoError) {
-      return NextResponse.json({ error: logoError }, { status: 400 });
-    }
+    const logoUrl = await saveTenantLogo(user.tenantId, buffer, file.type);
 
     const branding = await prisma.tenantBranding.upsert({
       where: { tenantId: user.tenantId },
       create: {
         tenantId: user.tenantId,
         displayName: user.tenantName,
-        logoUrl: dataUrl,
+        logoUrl,
       },
-      update: { logoUrl: dataUrl },
+      update: { logoUrl },
     });
 
     return NextResponse.json({
       logoUrl: branding.logoUrl,
+      storage: logoUrl.startsWith("/api/") ? "blob-or-local" : "inline",
       message: "Logo atualizado",
     });
   } catch (error) {

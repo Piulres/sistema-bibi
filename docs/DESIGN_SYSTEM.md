@@ -111,9 +111,15 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 |----------|--------|-----------|
 | `/api/interno/branding` | GET | Retorna branding do tenant logado |
 | `/api/interno/branding` | PUT | Upsert de identidade visual |
-| `/api/interno/branding/logo` | POST | Upload de logo (multipart, máx. 200KB → data URL) |
+| `/api/interno/branding/logo` | POST | Upload de logo (Netlify Blobs ou disco local em dev) |
+| `/api/branding/logo/[tenantId]` | GET | Serve logo público do tenant |
 
 **Presets** disponíveis em `src/lib/theme/presets.ts` (Bibi, VitaCare, Amethyst, Forest).
+
+**Storage de logo** (`src/lib/storage/tenant-logo.ts`):
+- **Netlify (produção):** store `bibi-tenant-logos` via `@netlify/blobs`
+- **Dev local:** fallback em `public/tenant-logos/` (gitignored)
+- URL persistida: `/api/branding/logo/{tenantId}?v=...`
 
 **Validação** em `src/lib/theme/branding-validation.ts` (cores hex, URL/data URL do logo).
 
@@ -127,6 +133,5 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 
 ## Próximos passos sugeridos
 
-- Upload de logo para Netlify Blobs (em produção)
-- Migrar views restantes (`AgendaView`, `AtendimentoView`, etc.)
 - Modo escuro por tenant (opcional)
+- CDN/cache tags para purge de logo após troca

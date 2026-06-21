@@ -186,7 +186,7 @@ export default function BrandingView() {
         <Card>
           <SectionHeader
             title="Logo"
-            description="URL pública ou upload (PNG/JPG/WebP/SVG, máx. 200KB)."
+            description="URL pública ou upload (PNG/JPG/WebP/SVG, máx. 200KB). Em produção Netlify usa Blobs; localmente grava em disco."
           />
           <div className="mt-4 space-y-4">
             <Input

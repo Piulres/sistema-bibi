@@ -30,6 +30,7 @@ export function validateLogoUrl(value: string | null | undefined): string | null
     if (url.length > 300_000) return "Logo em base64 excede o limite de 300KB";
     return null;
   }
+  if (url.startsWith("/api/branding/logo/")) return null;
   try {
     const parsed = new URL(url);
     if (!["http:", "https:"].includes(parsed.protocol)) {
