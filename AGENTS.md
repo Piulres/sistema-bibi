@@ -23,9 +23,13 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 - Comandos padrão estão em `package.json`: `npm run dev`, `npm run build`, `npm run lint`.
 - Banco local (Prisma + SQLite): primeiro setup em uma VM nova exige criar o `.env`
   e popular o banco (o `dev.db` e o `.env` são gitignored, então **não** vêm no checkout):
-  - `cp .env.example .env` (se `.env` não existir)
-  - `npm run db:reset` (faz `prisma db push --force-reset` + seed) ou `npm run db:push && npm run db:seed`
+ - `cp .env.example .env` (se `.env` não existir)
+ - `npm run db:reset` (faz `prisma db push --force-reset` + seed) ou `npm run db:push && npm run db:seed`
 - O `postinstall` roda `prisma generate` automaticamente no `npm install`.
+- **Agentes (Cursor): `npm run db:reset` é BLOQUEADO** — qualquer comando Prisma
+ destrutivo (`--force-reset`/`migrate`) dispara um prompt de consentimento e aborta.
+ Em VM nova use o caminho não destrutivo `npm run db:push && npm run db:seed`
+ (o `.env` e o `dev.db` ficam no snapshot da VM, então isso é só no primeiro setup).
 
 ### Credenciais de demonstração (criadas pelo seed)
 Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
