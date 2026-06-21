@@ -1,4 +1,5 @@
 import type { BrandingTokens } from "@/lib/theme/tokens";
+import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 
 const HEX_COLOR = /^#[0-9A-Fa-f]{6}$/;
 
@@ -11,6 +12,7 @@ export type BrandingInput = {
   heroFrom: string;
   heroTo: string;
   platformLabel: string;
+  colorScheme?: string;
 };
 
 export function isHexColor(value: string): boolean {
@@ -64,6 +66,10 @@ export function validateBrandingInput(input: BrandingInput): string | null {
     return "Tagline muito longa (máx. 240 caracteres)";
   }
 
+  if (input.colorScheme && !["light", "dark", "system"].includes(input.colorScheme)) {
+    return "Tema deve ser light, dark ou system";
+  }
+
   return null;
 }
 
@@ -77,5 +83,6 @@ export function sanitizeBrandingInput(input: BrandingInput): BrandingTokens {
     heroFrom: normalizeHexColor(input.heroFrom)!,
     heroTo: normalizeHexColor(input.heroTo)!,
     platformLabel: input.platformLabel.trim(),
+    colorScheme: normalizeColorScheme(input.colorScheme),
   };
 }

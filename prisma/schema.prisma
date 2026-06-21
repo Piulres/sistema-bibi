@@ -49,6 +49,8 @@ model TenantBranding {
   heroTo         String @default("#134e4a")
   /// Nome da plataforma quando exibido como produto white-label (ex. "Powered by Bibi").
   platformLabel  String @default("Sistema Bibi")
+  /// colorScheme: light | dark | system
+  colorScheme    String @default("light")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }

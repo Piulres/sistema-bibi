@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
+import { COLOR_SCHEMES, type ColorScheme } from "@/lib/theme/color-scheme";
 import { BRANDING_PRESETS } from "@/lib/theme/presets";
 import { brandingToCssVars } from "@/lib/theme/css-vars";
 import Card from "@/components/ui/Card";
@@ -180,6 +181,24 @@ export default function BrandingView() {
               hint='Ex.: "Powered by Sistema Bibi"'
               required
             />
+            <label className="block text-sm">
+              <span className="font-medium text-[var(--text-secondary)]">Tema da interface</span>
+              <select
+                value={form.colorScheme}
+                onChange={(e) => updateField("colorScheme", e.target.value as ColorScheme)}
+                className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)]"
+              >
+                {COLOR_SCHEMES.map((scheme) => (
+                  <option key={scheme} value={scheme}>
+                    {scheme === "light"
+                      ? "Claro"
+                      : scheme === "dark"
+                        ? "Escuro"
+                        : "Sistema (preferência do dispositivo)"}
+                  </option>
+                ))}
+              </select>
+            </label>
           </div>
         </Card>
 
@@ -252,8 +271,12 @@ export default function BrandingView() {
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
             Pré-visualização
           </p>
-          <div className="mt-3 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)]">
-            <div className="p-3 text-[var(--text-inverse)]" style={previewStyle}>
+          <div
+            className="mt-3 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)]"
+            data-theme={form.colorScheme}
+            style={previewStyle}
+          >
+            <div className="p-3 text-[var(--text-inverse)]">
               <div
                 className="rounded-lg px-4 py-6"
                 style={{

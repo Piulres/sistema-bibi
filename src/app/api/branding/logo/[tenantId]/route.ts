@@ -15,6 +15,8 @@ export async function GET(_request: Request, { params }: Params) {
     headers: {
       "Content-Type": logo.contentType,
       "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
+      "Netlify-CDN-Cache-Control": "public, durable, max-age=3600, must-revalidate",
+      "Cache-Tag": `tenant-logo-${tenantId}`,
     },
   });
 }

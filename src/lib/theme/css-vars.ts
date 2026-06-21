@@ -13,3 +13,8 @@ export function brandingToCssVars(
     ...extra,
   };
 }
+
+/** Atributo data-theme para TenantTheme (light | dark | system). */
+export function brandingThemeAttribute(branding: BrandingTokens): string {
+  return branding.colorScheme ?? "light";
+}

@@ -21,12 +21,13 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroFrom: "#0f172a",
       heroTo: "#134e4a",
       platformLabel: "Powered by Sistema Bibi",
+      colorScheme: "light",
     },
   },
   {
     id: "vitacare",
     label: "VitaCare",
-    description: "Azul — demo white label corporativo",
+    description: "Azul escuro — demo white label corporativo",
     tokens: {
       displayName: "VitaCare",
       tagline: "Saúde corporativa sob medida",
@@ -36,6 +37,7 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroFrom: "#1e3a8a",
       heroTo: "#1d4ed8",
       platformLabel: "Powered by Sistema Bibi",
+      colorScheme: "dark",
     },
   },
   {
@@ -51,6 +53,7 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroFrom: "#2e1065",
       heroTo: "#5b21b6",
       platformLabel: "Powered by Sistema Bibi",
+      colorScheme: "light",
     },
   },
   {
@@ -66,6 +69,7 @@ export const BRANDING_PRESETS: BrandingPreset[] = [
       heroFrom: "#064e3b",
       heroTo: "#047857",
       platformLabel: "Powered by Sistema Bibi",
+      colorScheme: "system",
     },
   },
 ];

@@ -108,26 +108,26 @@ export default function PatientOverviewView({
       <div>
         <Link
           href={returnTo}
-          className="text-sm font-medium text-indigo-600 hover:text-indigo-500"
+          className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
         >
           ← {returnLabel}
         </Link>
-        <h1 className="mt-3 text-2xl font-bold text-slate-900">Cliente 360°</h1>
-        <p className="mt-1 text-slate-600">
+        <h1 className="mt-3 text-2xl font-bold text-[var(--text-primary)]">Cliente 360°</h1>
+        <p className="mt-1 text-[var(--text-muted)]">
           Visão consolidada do beneficiário — dados, atendimentos, procedimentos e faturamento.
         </p>
       </div>
 
-      <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+      <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold text-slate-900">{patient.name}</h2>
-            <p className="mt-1 text-sm text-slate-500">CPF {patient.cpf}</p>
-            <p className="text-sm text-slate-500">
+            <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">CPF {patient.cpf}</p>
+            <p className="text-sm text-[var(--text-muted)]">
               Nascimento: {patient.birthDateLabel}
               {patient.phone ? ` · Tel. ${patient.phone}` : ""}
             </p>
-            <p className="mt-2 text-sm text-slate-600">
+            <p className="mt-2 text-sm text-[var(--text-muted)]">
               {patient.company ? (
                 <>
                   Empresa: <span className="font-medium">{patient.company.name}</span> (CNPJ{" "}
@@ -138,48 +138,48 @@ export default function PatientOverviewView({
               )}
             </p>
           </div>
-          <p className="text-xs text-slate-400">Cadastro em {patient.createdAtLabel}</p>
+          <p className="text-xs text-[var(--text-muted)]">Cadastro em {patient.createdAtLabel}</p>
         </div>
       </section>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Atendimentos</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{summary.totalAppointments}</p>
+        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
+          <p className="text-sm text-[var(--text-muted)]">Atendimentos</p>
+          <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">{summary.totalAppointments}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Procedimentos (Pay Per Use)</p>
-          <p className="mt-1 text-2xl font-bold text-slate-900">{summary.totalUsages}</p>
+        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
+          <p className="text-sm text-[var(--text-muted)]">Procedimentos (Pay Per Use)</p>
+          <p className="mt-1 text-2xl font-bold text-[var(--text-primary)]">{summary.totalUsages}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Pendente de faturamento</p>
+        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
+          <p className="text-sm text-[var(--text-muted)]">Pendente de faturamento</p>
           <p className="mt-1 text-2xl font-bold text-amber-700">{summary.pendingAmountLabel}</p>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Total faturado</p>
-          <p className="mt-1 text-2xl font-bold text-indigo-700">{summary.totalInvoicedLabel}</p>
+        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
+          <p className="text-sm text-[var(--text-muted)]">Total faturado</p>
+          <p className="mt-1 text-2xl font-bold text-[var(--portal-accent)]">{summary.totalInvoicedLabel}</p>
         </div>
       </div>
 
       <section>
-        <h3 className="text-lg font-semibold text-slate-900">Timeline universal</h3>
-        <p className="mt-1 text-sm text-slate-500">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Timeline universal</h3>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
           Histórico auditável de eventos relacionados a este beneficiário.
         </p>
         {overview.timeline.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhum evento registrado.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum evento registrado.</p>
         ) : (
-          <ol className="relative mt-4 space-y-0 border-l border-indigo-200 pl-6">
+          <ol className="relative mt-4 space-y-0 border-l border-[var(--border-default)] pl-6">
             {overview.timeline.map((event) => (
               <li key={event.id} className="relative pb-6 last:pb-0">
-                <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-indigo-500 ring-2 ring-indigo-100" />
-                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-[var(--surface-card)] bg-[var(--portal-accent)] ring-2 ring-[var(--surface-muted)]" />
+                <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge value={event.action} map="timeline" />
-                    <span className="text-xs text-slate-400">{event.createdAtLabel}</span>
+                    <span className="text-xs text-[var(--text-muted)]">{event.createdAtLabel}</span>
                   </div>
-                  <p className="mt-2 text-sm text-slate-800">{event.description}</p>
-                  <p className="mt-1 text-xs text-slate-500">
+                  <p className="mt-2 text-sm text-[var(--text-secondary)]">{event.description}</p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
                     {event.actorName ?? "Sistema"} · {event.entityType}
                   </p>
                 </div>
@@ -190,13 +190,13 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-slate-900">Atendimentos</h3>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Atendimentos</h3>
         {overview.appointments.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhum atendimento registrado.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum atendimento registrado.</p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500">
+              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Data</th>
                   <th className="px-4 py-2 font-medium">Prestador</th>
@@ -205,16 +205,16 @@ export default function PatientOverviewView({
                   <th className="px-4 py-2 text-right font-medium">Procedimentos</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[var(--border-default)]">
                 {overview.appointments.map((appointment) => (
                   <tr key={appointment.id}>
-                    <td className="px-4 py-2 text-slate-800">{appointment.scheduledAtLabel}</td>
-                    <td className="px-4 py-2 text-slate-600">{appointment.providerName}</td>
+                    <td className="px-4 py-2 text-[var(--text-secondary)]">{appointment.scheduledAtLabel}</td>
+                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.providerName}</td>
                     <td className="px-4 py-2">
                       <StatusBadge value={appointment.status} map="appointment" />
                     </td>
-                    <td className="px-4 py-2 text-slate-500">{appointment.reason ?? "—"}</td>
-                    <td className="px-4 py-2 text-right text-slate-700">{appointment.usagesCount}</td>
+                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
+                    <td className="px-4 py-2 text-right text-[var(--text-secondary)]">{appointment.usagesCount}</td>
                   </tr>
                 ))}
               </tbody>
@@ -224,13 +224,13 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-slate-900">Procedimentos realizados</h3>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h3>
         {overview.usages.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhum procedimento registrado.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500">
+              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Procedimento</th>
                   <th className="px-4 py-2 font-medium">Atendimento</th>
@@ -239,19 +239,19 @@ export default function PatientOverviewView({
                   <th className="px-4 py-2 text-right font-medium">Valor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[var(--border-default)]">
                 {overview.usages.map((usage) => (
                   <tr key={usage.id}>
                     <td className="px-4 py-2">
-                      <p className="font-medium text-slate-800">{usage.procedure}</p>
-                      <p className="text-xs text-slate-400">{usage.category}</p>
+                      <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
+                      <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
                     </td>
-                    <td className="px-4 py-2 text-slate-600">{usage.appointmentDateLabel}</td>
-                    <td className="px-4 py-2 text-slate-600">{usage.performedAtLabel}</td>
+                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.appointmentDateLabel}</td>
+                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
                     <td className="px-4 py-2">
                       <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
                     </td>
-                    <td className="px-4 py-2 text-right font-semibold text-slate-900">{usage.priceLabel}</td>
+                    <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">{usage.priceLabel}</td>
                   </tr>
                 ))}
               </tbody>
@@ -261,28 +261,28 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-slate-900">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">
           Prontuário eletrônico ({summary.totalRecords})
         </h3>
         {overview.medicalRecords.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhuma anotação clínica.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma anotação clínica.</p>
         ) : (
           <div className="mt-3 space-y-3">
             {overview.medicalRecords.map((record) => (
               <article
                 key={record.id}
-                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm"
+                className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm"
               >
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
                   <span>{record.providerName}</span>
                   <span>{record.createdAtLabel}</span>
                 </div>
                 {record.appointmentDateLabel && (
-                  <p className="mt-1 text-xs text-slate-400">
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
                     Atendimento: {record.appointmentDateLabel}
                   </p>
                 )}
-                <p className="mt-2 whitespace-pre-wrap text-sm text-slate-700">{record.content}</p>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--text-secondary)]">{record.content}</p>
               </article>
             ))}
           </div>
@@ -290,30 +290,30 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-slate-900">Faturas</h3>
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Faturas</h3>
         {overview.invoices.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhuma fatura emitida.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma fatura emitida.</p>
         ) : (
           <div className="mt-3 space-y-4">
             {overview.invoices.map((invoice) => (
               <div
                 key={invoice.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm"
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="font-semibold text-slate-900">{invoice.totalLabel}</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="font-semibold text-[var(--text-primary)]">{invoice.totalLabel}</p>
+                    <p className="text-sm text-[var(--text-muted)]">
                       {invoice.createdAtLabel} · {invoice.company ?? "Particular"}
                     </p>
                   </div>
                   <StatusBadge value={invoice.status} map="invoice" />
                 </div>
-                <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
+                <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-[var(--border-default)]">
                   {invoice.items.map((item) => (
                     <li key={item.id} className="flex justify-between py-2 text-sm">
-                      <span className="text-slate-700">{item.description}</span>
-                      <span className="text-slate-500">{item.amountLabel}</span>
+                      <span className="text-[var(--text-secondary)]">{item.description}</span>
+                      <span className="text-[var(--text-muted)]">{item.amountLabel}</span>
                     </li>
                   ))}
                 </ul>

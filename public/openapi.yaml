@@ -91,6 +91,9 @@ components:
             heroFrom: { type: string }
             heroTo: { type: string }
             platformLabel: { type: string }
+            colorScheme:
+              type: string
+              enum: [light, dark, system]
     BrandingTokens:
       type: object
       properties:
@@ -102,6 +105,9 @@ components:
         heroFrom: { type: string }
         heroTo: { type: string }
         platformLabel: { type: string }
+        colorScheme:
+          type: string
+          enum: [light, dark, system]
     AgendaItem:
       type: object
       properties:

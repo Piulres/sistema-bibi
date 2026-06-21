@@ -120,6 +120,9 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 - **Netlify (produção):** store `bibi-tenant-logos` via `@netlify/blobs`
 - **Dev local:** fallback em `public/tenant-logos/` (gitignored)
 - URL persistida: `/api/branding/logo/{tenantId}?v=...`
+- Headers: `Cache-Tag: tenant-logo-{tenantId}` para purge on-demand
+
+**Tema escuro (`colorScheme`):** `light` | `dark` | `system` — aplicado via `data-theme` em `TenantTheme`. Superfícies e status adaptam-se em `globals.css`.
 
 **Validação** em `src/lib/theme/branding-validation.ts` (cores hex, URL/data URL do logo).
 
@@ -133,5 +136,5 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 
 ## Próximos passos sugeridos
 
-- Modo escuro por tenant (opcional)
-- CDN/cache tags para purge de logo após troca
+- Purge de cache CDN via `Cache-Tag: tenant-logo-{tenantId}` após troca de logo (Netlify)
+- Temas escuros com paleta de superfície customizável por tenant (além de light/dark/system)
