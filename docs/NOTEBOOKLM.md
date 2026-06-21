@@ -386,6 +386,7 @@ src/
 | Documento | Conteúdo |
 |-----------|----------|
 | `README.md` | Guia completo, URLs, scripts |
+| `docs/FLUXOS.md` | Fluxos de usuário e negócio (todos os portais) |
 | `docs/ARQUITETURA.md` | Diagramas Mermaid, épicos, checklists |
 | `docs/PAYMENTS.md` | Motor de cobrança Strategy |
 | `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |

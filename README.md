@@ -389,6 +389,8 @@ sistema-bibi/
 
 ## 14. Documentação adicional
 
+- **Fluxos de usuário e negócio (com diagramas Mermaid):**
+  [`docs/FLUXOS.md`](docs/FLUXOS.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
   [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 - **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
