@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 /**
  * Gera uma fatura Pay Per Use para um paciente, agregando todos os
@@ -63,6 +68,18 @@ export async function POST(request: Request) {
         where: { id: { in: usages.map((u) => u.id) } },
         data: { billed: true },
       });
+
+      await recordTimelineEvent(
+        {
+          tenantId: user.tenantId,
+          entityType: TIMELINE_ENTITY_TYPES.INVOICE,
+          entityId: created.id,
+          action: TIMELINE_ACTIONS.INVOICE_ISSUED,
+          description: `Fatura Pay Per Use emitida para ${patient.name} (${formatBRL(created.total)})`,
+          createdBy: user.id,
+        },
+        tx,
+      );
 
       return created;
     });

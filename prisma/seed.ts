@@ -1,4 +1,8 @@
 import { PrismaClient } from "@prisma/client";
+import {
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "../src/lib/timeline";
 
 const prisma = new PrismaClient();
 
@@ -11,6 +15,7 @@ function todayAt(hour: number, minute = 0): Date {
 
 async function main() {
   console.log("Limpando dados existentes...");
+  await prisma.timelineEvent.deleteMany();
   await prisma.invoiceItem.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.procedureUsage.deleteMany();
@@ -107,6 +112,16 @@ async function main() {
       companyId: company.id,
     },
   });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.PATIENT,
+      entityId: joao.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Beneficiário João Pereira cadastrado",
+      createdBy: prestador.id,
+    },
+  });
   const maria = await prisma.patient.create({
     data: {
       name: "Maria Souza",
@@ -115,6 +130,16 @@ async function main() {
       phone: "(11) 97777-2222",
       tenantId: tenant.id,
       companyId: company.id,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.PATIENT,
+      entityId: maria.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Beneficiário Maria Souza cadastrado",
+      createdBy: prestador.id,
     },
   });
   const pedro = await prisma.patient.create({
@@ -139,6 +164,16 @@ async function main() {
       providerId: prestador.id,
     },
   });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
+      entityId: ag1.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Agendamento criado para João Pereira",
+      createdBy: prestador.id,
+    },
+  });
   const ag2 = await prisma.appointment.create({
     data: {
       scheduledAt: todayAt(10, 30),
@@ -161,22 +196,41 @@ async function main() {
   });
 
   console.log("Registrando uso de procedimentos (Pay Per Use) e prontuario...");
-  // Joao (corporativo): consulta clinica com desconto + ECG.
-  await prisma.procedureUsage.create({
+  const usageJoaoConsulta = await prisma.procedureUsage.create({
     data: {
       appointmentId: ag1.id,
       procedureId: procedures["CON-CLM"].id,
       priceCharged: procedures["CON-CLM"].basePrice * 0.85,
     },
   });
-  await prisma.procedureUsage.create({
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
+      entityId: usageJoaoConsulta.id,
+      action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
+      description: "Consulta Clínica Médica registrada para João Pereira (R$ 153,00)",
+      createdBy: prestador.id,
+    },
+  });
+  const usageJoaoEcg = await prisma.procedureUsage.create({
     data: {
       appointmentId: ag1.id,
       procedureId: procedures["EXA-ECG"].id,
       priceCharged: procedures["EXA-ECG"].basePrice,
     },
   });
-  await prisma.medicalRecord.create({
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
+      entityId: usageJoaoEcg.id,
+      action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
+      description: "Eletrocardiograma registrado para João Pereira (R$ 120,00)",
+      createdBy: prestador.id,
+    },
+  });
+  const recordJoao = await prisma.medicalRecord.create({
     data: {
       content:
         "Paciente refere melhora da dor torácica após ajuste medicamentoso. ECG sem alterações agudas. Mantida conduta.",
@@ -185,13 +239,32 @@ async function main() {
       appointmentId: ag1.id,
     },
   });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.MEDICAL_RECORD,
+      entityId: recordJoao.id,
+      action: TIMELINE_ACTIONS.MEDICAL_RECORD_CREATED,
+      description: "Anotação clínica registrada no prontuário de João Pereira",
+      createdBy: prestador.id,
+    },
+  });
 
-  // Maria (corporativo): hemograma realizado.
-  await prisma.procedureUsage.create({
+  const usageMaria = await prisma.procedureUsage.create({
     data: {
       appointmentId: ag2.id,
       procedureId: procedures["EXA-HEM"].id,
       priceCharged: procedures["EXA-HEM"].basePrice,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
+      entityId: usageMaria.id,
+      action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
+      description: "Hemograma Completo registrado para Maria Souza (R$ 45,00)",
+      createdBy: prestador.id,
     },
   });
 

@@ -52,6 +52,14 @@ type Overview = {
     company: string | null;
     items: { id: string; description: string; amountLabel: string }[];
   }[];
+  timeline: {
+    id: string;
+    entityType: string;
+    action: string;
+    description: string;
+    createdAtLabel: string;
+    actorName: string | null;
+  }[];
 };
 
 const statusClass: Record<string, string> = {
@@ -64,6 +72,28 @@ const statusClass: Record<string, string> = {
   PAGA: "bg-emerald-100 text-emerald-700",
   ABERTA: "bg-amber-100 text-amber-700",
 };
+
+const actionClass: Record<string, string> = {
+  LOGIN: "bg-violet-100 text-violet-700",
+  CREATED: "bg-sky-100 text-sky-700",
+  UPDATED: "bg-slate-100 text-slate-700",
+  APPOINTMENT_COMPLETED: "bg-emerald-100 text-emerald-700",
+  PROCEDURE_REGISTERED: "bg-indigo-100 text-indigo-700",
+  MEDICAL_RECORD_CREATED: "bg-teal-100 text-teal-700",
+  INVOICE_ISSUED: "bg-fuchsia-100 text-fuchsia-700",
+  CHARGE_SENT: "bg-orange-100 text-orange-700",
+  CONTRACT_CHANGED: "bg-amber-100 text-amber-700",
+};
+
+function ActionBadge({ value }: { value: string }) {
+  return (
+    <span
+      className={`rounded-full px-2 py-0.5 text-xs font-medium ${actionClass[value] ?? "bg-slate-100 text-slate-700"}`}
+    >
+      {value.replaceAll("_", " ")}
+    </span>
+  );
+}
 
 function Badge({ value }: { value: string }) {
   return (
@@ -160,6 +190,34 @@ export default function PatientOverviewView({ patientId }: { patientId: string }
           <p className="mt-1 text-2xl font-bold text-indigo-700">{summary.totalInvoicedLabel}</p>
         </div>
       </div>
+
+      <section>
+        <h3 className="text-lg font-semibold text-slate-900">Timeline universal</h3>
+        <p className="mt-1 text-sm text-slate-500">
+          Histórico auditável de eventos relacionados a este beneficiário.
+        </p>
+        {overview.timeline.length === 0 ? (
+          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhum evento registrado.</p>
+        ) : (
+          <ol className="relative mt-4 space-y-0 border-l border-indigo-200 pl-6">
+            {overview.timeline.map((event) => (
+              <li key={event.id} className="relative pb-6 last:pb-0">
+                <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-indigo-500 ring-2 ring-indigo-100" />
+                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <ActionBadge value={event.action} />
+                    <span className="text-xs text-slate-400">{event.createdAtLabel}</span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-800">{event.description}</p>
+                  <p className="mt-1 text-xs text-slate-500">
+                    {event.actorName ?? "Sistema"} · {event.entityType}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
 
       <section>
         <h3 className="text-lg font-semibold text-slate-900">Atendimentos</h3>

@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 /** Detalhe de um agendamento: paciente, procedimentos usados e prontuario. */
 export async function GET(
@@ -75,6 +80,7 @@ export async function PATCH(
 
     const existing = await prisma.appointment.findFirst({
       where: { id, providerId: user.id },
+      include: { patient: { select: { name: true } } },
     });
     if (!existing) {
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
@@ -84,6 +90,26 @@ export async function PATCH(
       where: { id },
       data: { status: body.status },
     });
+
+    await recordTimelineEvent({
+      tenantId: existing.tenantId,
+      entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
+      entityId: existing.id,
+      action: TIMELINE_ACTIONS.UPDATED,
+      description: `Status do atendimento de ${existing.patient.name} alterado para ${body.status}`,
+      createdBy: user.id,
+    });
+
+    if (body.status === "REALIZADO") {
+      await recordTimelineEvent({
+        tenantId: existing.tenantId,
+        entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
+        entityId: existing.id,
+        action: TIMELINE_ACTIONS.APPOINTMENT_COMPLETED,
+        description: `Atendimento de ${existing.patient.name} realizado`,
+        createdBy: user.id,
+      });
+    }
 
     return NextResponse.json({ ok: true, status: body.status });
   } catch (error) {
