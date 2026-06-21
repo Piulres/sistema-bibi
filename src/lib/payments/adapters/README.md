@@ -1,8 +1,16 @@
-# Adapters de pagamento (integração futura)
+# Adapters de pagamento
 
-Este diretório receberá as implementações concretas dos contratos em `src/lib/payments/`.
+Implementações concretas dos contratos em `src/lib/payments/`.
 
-## Gateways previstos
+## Adapter POC incluído
+
+| Adapter | Env | Descrição |
+|---------|-----|-----------|
+| **MockPixAdapter** | `PAYMENT_GATEWAY=mock` | Gera QR/copia-e-cola fictícios; confirmação manual via API/UI |
+
+Registrado automaticamente em `src/lib/payments/index.ts` quando `PAYMENT_GATEWAY=mock`.
+
+## Gateways previstos (produção)
 
 | Gateway | ID | Documentação |
 |---------|-----|--------------|
@@ -27,10 +35,10 @@ import { AsaasPaymentAdapter } from "./asaas-payment-adapter";
 paymentGateway.register(new AsaasPaymentAdapter());
 ```
 
-## Variáveis de ambiente (futuro)
+## Variáveis de ambiente
 
 ```env
-PAYMENT_GATEWAY=asaas
+PAYMENT_GATEWAY=mock          # mock (POC) | asaas | efi | inter
 ASAAS_API_KEY=
 EFI_CLIENT_ID=
 EFI_CLIENT_SECRET=
@@ -40,6 +48,6 @@ INTER_CLIENT_CERT=
 
 ## Regras
 
-- **Sem implementação fake** — adapters só entram quando a integração real estiver pronta.
 - **PCI** — nunca trafegar PAN; usar tokenização do gateway (`cardToken`).
 - **Pay Per Use** — cobranças referenciam `invoiceId` via `ChargeReference`.
+- **Histórico** — persistir em `Payment` (Prisma) após criar cobrança.

@@ -13,7 +13,7 @@ flowchart TB
   subgraph Cliente["Navegador (Mobile-first)"]
     Land["Landing /"]
     PortP["Portal Prestador<br/>/login · /prestador"]
-    PortI["Portal Interno<br/>/interno/login · /interno/dashboard<br/>/interno · /interno/crm · /interno/assinaturas<br/>/interno/comunicacao · /interno/beneficiarios/[id]"]
+    PortI["Portal Interno<br/>/interno/login · /interno/dashboard<br/>/interno · cadastros · agenda · crm<br/>/interno/assinaturas · comunicacao · relatorios<br/>/interno/branding · integracoes · seguranca"]
     PortPJ["Portal Empresa (PJ)<br/>/pj/login · /pj"]
     PortBen["Portal Beneficiário<br/>/beneficiario/login · /beneficiario"]
   end
@@ -28,8 +28,11 @@ flowchart TB
       Price["pricing.ts<br/>(precificação dinâmica)"]
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
       Timeline["timeline.ts<br/>(auditoria universal)"]
-      Payments["payments/*<br/>(motor de cobrança)"]
-      Comms["communications/*<br/>message-service"]
+      Payments["payments/* + invoice-service<br/>(PIX mock Tier 1)"]
+      Comms["communications/* + reminder-service<br/>(console adapter Tier 1)"]
+      Webhooks["webhook-service.ts<br/>(B2B + retry Tier 3/4)"]
+      RBAC["interno-permissions.ts<br/>(RBAC Tier 3)"]
+      MFA["mfa.ts · tiss-service.ts<br/>(Tier 4)"]
       Dashboard["executive-dashboard.ts"]
       DB["db.ts (Prisma Client)"]
     end
@@ -43,7 +46,11 @@ flowchart TB
   API --> Price
   API --> Overview --> DB
   API --> Timeline --> DB
-  API -.->|futuro| Payments
+  API --> Payments
+  API --> Comms
+  API --> Webhooks
+  API --> RBAC
+  API --> MFA
   API --> DB --> SQLite
   Sess --> DB
 ```
@@ -79,9 +86,15 @@ erDiagram
   Appointment ||--o{ ProcedureUsage : "registra (Pay Per Use)"
   Appointment ||--o{ MedicalRecord : "gera"
 
-  ProcedureUsage |o--|| InvoiceItem : "faturado como"
+  ProcedureUsage |o--o| InvoiceItem : "faturado como"
   Invoice ||--o{ InvoiceItem : "contém"
   Tenant ||--o{ TimelineEvent : "audita"
+  Tenant ||--o{ WebhookEndpoint : possui
+  Tenant ||--o| TenantBranding : branding
+
+  WebhookEndpoint ||--o{ WebhookDelivery : entregas
+
+  Invoice ||--o{ Payment : pagamentos
 
   Tenant {
     string id PK
@@ -91,9 +104,12 @@ erDiagram
   User {
     string id PK
     string email
-    string role "PRESTADOR|INTERNO|PJ"
+    string role "PRESTADOR|INTERNO|PJ|BENEFICIARIO"
+    string internoProfile "ADMIN|FATURAMENTO|RECEPCAO|READONLY"
+    boolean mfaEnabled
     string tenantId FK
     string companyId FK "nullable"
+    string patientId FK "nullable"
   }
   Company {
     string id PK
@@ -106,12 +122,14 @@ erDiagram
     string id PK
     string name
     string cpf
+    datetime consentAt "LGPD"
     string companyId FK "nullable"
   }
   Procedure {
     string id PK
     string code
     string category "CONSULTA|EXAME"
+    string tissCode "nullable"
     float basePrice
   }
   PricingRule {
@@ -124,6 +142,8 @@ erDiagram
     string id PK
     datetime scheduledAt
     string status "AGENDADO|CONFIRMADO|REALIZADO|FALTOU|CANCELADO"
+    string modality "PRESENCIAL|TELE"
+    string telemedicineUrl "nullable"
     string patientId FK
     string providerId FK
   }
@@ -136,6 +156,7 @@ erDiagram
   }
   MedicalRecord {
     string id PK
+    string recordType "EVOLUCAO|ANAMNESE|RECEITA|ATESTADO"
     string content
     string patientId FK
     string providerId FK
@@ -152,7 +173,27 @@ erDiagram
     string description
     float amount
     string invoiceId FK
-    string usageId FK
+    string usageId FK "nullable"
+    string subscriptionChargeId FK "nullable"
+  }
+  Payment {
+    string id PK
+    string method "PIX|MANUAL"
+    string status "PENDING|CONFIRMED"
+    float amount
+    string invoiceId FK
+  }
+  WebhookEndpoint {
+    string id PK
+    string url
+    string events "JSON array"
+    boolean active
+  }
+  WebhookDelivery {
+    string id PK
+    string status "SUCCESS|FAILED|PENDING"
+    int attempt
+    datetime nextRetryAt
   }
   TimelineEvent {
     string id PK
@@ -213,7 +254,7 @@ sequenceDiagram
 flowchart LR
   R{role da sessão}
   R -->|PRESTADOR| A["/prestador/*<br/>agenda, atendimento, PEP"]
-  R -->|INTERNO| B["/interno/*<br/>faturamento · Cliente 360°"]
+  R -->|INTERNO| B["/interno/*<br/>RBAC por internoProfile"]
   R -->|PJ| C["/pj/*<br/>contratos, beneficiários"]
   R -->|BENEFICIARIO| E["/beneficiario/*<br/>self-service"]
   R -.->|role incorreto| D["403 / redirect ao login"]
@@ -336,7 +377,8 @@ flowchart LR
 
 ## 10. Motor de Cobrança (Épico 4)
 
-Contratos Strategy para PIX, boleto e cartão — **sem integração fake**.
+Contratos Strategy para PIX, boleto e cartão. **Tier 1** implementa `MockPixAdapter`,
+modelo `Payment` e `invoice-service.ts` (PIX, marcar PAGA, bridge assinatura).
 
 ```mermaid
 classDiagram
@@ -381,7 +423,8 @@ Detalhes: [`docs/PAYMENTS.md`](PAYMENTS.md)
 - [x] Tipos `ChargeReference` vinculados a `invoiceId`
 - [x] Erro explícito quando gateway não configurado
 - [x] Documentação de adapters Asaas / Efí / Inter
-- [x] Nenhuma implementação fake
+- [x] **MockPixAdapter** POC (`PAYMENT_GATEWAY=mock`) + modelo `Payment`
+- [x] Endpoints PIX e marcar PAGA (interno + beneficiário)
 - [x] Build passando
 
 ---
@@ -463,8 +506,8 @@ flowchart LR
 
 ## 13. Comunicação (Épico 7)
 
-Fila de mensagens outbound (e-mail, SMS, WhatsApp) com contratos Strategy e
-integração à Timeline — **sem adapter fake**.
+Fila de mensagens outbound (e-mail, SMS, WhatsApp) com contratos Strategy,
+**ConsoleEmailAdapter** POC e lembretes automáticos (`reminder-service`).
 
 Detalhes: [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md)
 
@@ -477,7 +520,57 @@ Detalhes: [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md)
 - [x] Timeline (`MESSAGE_QUEUED`, `MESSAGE_SENT`, `MESSAGE_FAILED`)
 - [x] Portal `/interno/comunicacao`
 - [x] Seed com mensagens demo enfileiradas
+- [x] **ConsoleEmailAdapter** + cron lembretes (`/api/cron/reminders`)
 - [x] Build passando
+
+---
+
+## 14. Tier 1 — Ciclo de receita
+
+Bridge assinatura → fatura, PIX mock, marcar PAGA, lembretes automáticos.
+
+| Camada | Arquivo |
+|--------|---------|
+| Serviço | `src/lib/invoice-service.ts` |
+| Adapter | `src/lib/payments/adapters/mock-pix-adapter.ts` |
+| Lembretes | `src/lib/reminder-service.ts` |
+| UI | `BillingView`, `BeneficiarioView`, `SubscriptionsView` |
+
+---
+
+## 17. Tier 2 — Operação
+
+CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estruturado, hash scrypt.
+
+| Rota UI | Serviço |
+|---------|---------|
+| `/interno/cadastros` | `patient-service`, `company-service`, `procedure-service`, `user-service` |
+| `/interno/agenda` | `appointment-service` |
+| `/interno/relatorios` | `reports/billing-report.ts` |
+| `/beneficiario` (agendar) | `scheduling-service` |
+
+---
+
+## 18. Tier 3 — B2B, RBAC, LGPD
+
+| Feature | Arquivos |
+|---------|----------|
+| RBAC | `interno-permissions.ts`, `interno-guard.ts` |
+| Webhooks | `webhook-service.ts`, `IntegracoesView.tsx` |
+| Portal PJ | `pj-portal-service.ts`, `PjView.tsx` |
+| LGPD | `patient-export.ts`, export JSON |
+| Domínio custom | `tenant-resolver.ts`, `TenantBranding.customDomain` |
+
+---
+
+## 19. Tier 4 — Enterprise
+
+| Feature | Arquivos |
+|---------|----------|
+| MFA TOTP | `mfa.ts`, `/interno/seguranca`, `SecurityView.tsx` |
+| Telemedicina | `telemedicine.ts`, `Appointment.modality` |
+| TISS XML | `tiss-service.ts`, `GET /api/interno/invoices/[id]/tiss` |
+| Webhook retry | `WebhookDelivery`, cron `/api/cron/webhooks` |
 
 ---
 
@@ -515,7 +608,7 @@ flowchart LR
 
 ---
 
-## 16. Documentação da API
+## 20. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

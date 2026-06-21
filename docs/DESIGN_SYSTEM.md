@@ -22,6 +22,9 @@ model TenantBranding {
   heroFrom       String   // gradiente do hero
   heroTo         String
   platformLabel  String   // ex. "Powered by Sistema Bibi"
+  colorScheme    String   // light | dark | system
+  customDomain   String?  // ex. saude.cliente.com.br (Tier 3)
+  customDomainVerified Boolean
 }
 ```
 
@@ -124,6 +127,8 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 
 **Tema escuro (`colorScheme`):** `light` | `dark` | `system` — aplicado via `data-theme` em `TenantTheme`. Superfícies e status adaptam-se em `globals.css`.
 
+**Domínio customizado (`customDomain`):** configurável em `/interno/branding` (Tier 3). Resolução via `src/lib/tenant-resolver.ts`; verificação manual na POC (sem challenge DNS automático).
+
 **Validação** em `src/lib/theme/branding-validation.ts` (cores hex, URL/data URL do logo).
 
 ## Componentes auxiliares
@@ -137,4 +142,5 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 ## Próximos passos sugeridos
 
 - Purge de cache CDN via `Cache-Tag: tenant-logo-{tenantId}` após troca de logo (Netlify)
-- Temas escuros com paleta de superfície customizável por tenant (além de light/dark/system)
+- Verificação automática de domínio custom (DNS TXT/CNAME)
+- Paleta de superfície customizável por tenant (além de light/dark/system)

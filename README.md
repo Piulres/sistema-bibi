@@ -81,9 +81,13 @@ npm run dev            # inicia o servidor de desenvolvimento
 
 A aplicação sobe em **http://localhost:3000**.
 
-> Variáveis de ambiente (`.env`):
+> Variáveis de ambiente (`.env` — ver `.env.example`):
 > - `DATABASE_URL` — caminho do SQLite (padrão `file:./dev.db`).
 > - `SESSION_SECRET` — segredo usado para assinar o cookie de sessão.
+> - `PAYMENT_GATEWAY` — `mock` (POC) ou `asaas`/`efi`/`inter` (adapters reais).
+> - `COMMUNICATION_PROVIDER` — `console` (POC) ou `sendgrid`/`twilio`/`meta`.
+> - `CRON_SECRET` — protege jobs `POST /api/cron/reminders` e `/api/cron/webhooks`.
+> - `TELEMEDICINE_BASE_URL` — URL base das salas virtuais mock (telemedicina).
 
 ## 5. URLs de teste
 
@@ -105,6 +109,12 @@ Base local: **`http://localhost:3000`**
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
 | `/interno/assinaturas` | **Recorrência** — assinaturas e cobranças futuras | `INTERNO` |
 | `/interno/comunicacao` | **Comunicação** — fila de e-mail, SMS e WhatsApp | `INTERNO` |
+| `/interno/cadastros` | **Cadastros** — beneficiários, empresas, procedimentos, usuários | `INTERNO` |
+| `/interno/agenda` | **Agenda** — criar e gerenciar agendamentos | `INTERNO` |
+| `/interno/relatorios` | **Relatórios** — exportação CSV (faturamento, CRM) | `INTERNO` |
+| `/interno/branding` | **White label** — cores, logo, tema, domínio custom | `INTERNO` |
+| `/interno/integracoes` | **Integrações B2B** — webhooks outbound e log de entregas | `INTERNO` |
+| `/interno/seguranca` | **Segurança** — MFA TOTP para usuários internos | `INTERNO` |
 | `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
 | `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
@@ -123,12 +133,14 @@ Base local: **`http://localhost:3000`**
 
 ## 6. Credenciais de demonstração
 
-Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`**.
+Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`**
+(armazenada com hash **scrypt** — ver `src/lib/password.ts`).
 
 | Portal | URL de login | E-mail | Senha |
 |--------|--------------|--------|-------|
 | Prestador | `/login` | `dra.helena@bibi.health` | `bibi123` |
-| Interno | `/interno/login` | `faturamento@bibi.health` | `bibi123` |
+| Interno (admin) | `/interno/login` | `faturamento@bibi.health` | `bibi123` |
+| Interno (recepção) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
 
@@ -144,8 +156,11 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
    como **REALIZADO**.
 4. **Interno** faz login em `/interno/login`, vê os **procedimentos pendentes de
    faturamento** agrupados por beneficiário e **gera a fatura** (Pay Per Use).
-5. **Empresa (PJ)** acompanha em `/pj` o **consumo dos beneficiários** e as
-   **faturas** emitidas para a empresa.
+5. **Cobrança (Tier 1):** gera **PIX mock**, marca fatura **PAGA** ou o **beneficiário**
+   paga em `/beneficiario`. Cobranças de **assinatura** podem virar fatura via bridge.
+6. **Empresa (PJ)** acompanha em `/pj` o **consumo dos beneficiários**, assinaturas
+   e export CSV. **Webhooks B2B** disparam em eventos-chave (Tier 3).
+7. **Beneficiário** agenda consultas, acompanha consumo e paga faturas em self-service.
 
 Exemplo de precificação dinâmica do seed: a Consulta Clínica (base R$ 180,00)
 para um beneficiário da **TechCorp** é cobrada por **R$ 153,00** (desconto
@@ -158,19 +173,22 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | Modelo | Descrição |
 |--------|-----------|
 | `Tenant` | Cliente do SaaS (clínica/hospital). Base do multi-tenancy. |
-| `User` | Usuário do sistema; `role` define o portal (`PRESTADOR`/`INTERNO`/`PJ`/`BENEFICIARIO`). |
+| `TenantBranding` | White label: cores, logo, `colorScheme`, `customDomain`. |
+| `User` | Usuário; `role` define o portal; `internoProfile` (RBAC); MFA TOTP. |
 | `Company` | Empresa contratante (PJ). |
-| `Patient` | Beneficiário/paciente (individual ou vinculado a uma empresa). |
-| `Procedure` | Catálogo de procedimentos (consultas/exames) com preço base. |
+| `Patient` | Beneficiário/paciente; `consentAt` (LGPD). |
+| `Procedure` | Catálogo de procedimentos com preço base e `tissCode` (TISS). |
 | `PricingRule` | Precificação dinâmica (multiplicador por empresa). |
-| `Appointment` | Agendamento (agenda inteligente). |
+| `Appointment` | Agendamento; `modality` PRESENCIAL/TELE + `telemedicineUrl`. |
 | `ProcedureUsage` | **Uso efetivo de procedimento — núcleo do Pay Per Use** (preço congelado). |
-| `MedicalRecord` | Prontuário eletrônico (PEP). |
-| `Invoice` / `InvoiceItem` | Fatura Pay Per Use e seus itens. |
+| `MedicalRecord` | Prontuário eletrônico (PEP) com `recordType` e templates. |
+| `Invoice` / `InvoiceItem` | Fatura; item via `usageId` (Pay Per Use) ou `subscriptionChargeId`. |
+| `Payment` | Histórico de pagamento (PIX pendente/confirmado, manual). |
 | `Subscription` | Assinatura recorrente (ciclo + valor por beneficiário/empresa). |
 | `SubscriptionCharge` | Cobrança futura gerada a partir de uma assinatura. |
 | `Message` | Comunicação outbound enfileirada ou enviada (e-mail, SMS, WhatsApp). |
 | `TimelineEvent` | Auditoria universal de eventos (Timeline). |
+| `WebhookEndpoint` / `WebhookDelivery` | Webhooks B2B outbound com log e retry. |
 
 > SQLite não suporta enums no Prisma; os campos `role`, `status` e `category` são
 > `String` com valores documentados no schema.
@@ -194,9 +212,12 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `POST` | `/api/auth/login` | Login. Body: `{ email, password, portal }` (portal: `prestador`\|`interno`\|`pj`\|`beneficiario`). |
+| `POST` | `/api/auth/login` | Login. Body: `{ email, password, portal }`. Suporta MFA em 2 etapas. |
 | `POST` | `/api/auth/logout` | Encerra a sessão. |
 | `GET` | `/api/auth/me` | Retorna o usuário da sessão atual. |
+| `GET` | `/api/auth/mfa/setup` | Gera secret TOTP e QR (INTERNO). |
+| `POST` | `/api/auth/mfa/setup` | Habilita MFA após validar código. |
+| `POST` | `/api/auth/mfa/verify` | Segunda etapa do login quando MFA ativo. |
 
 ### Portal do Prestador (`role: PRESTADOR`)
 
@@ -206,41 +227,71 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `GET` | `/api/prestador/appointments/{id}` | Detalhe do atendimento (procedimentos + PEP). |
 | `PATCH` | `/api/prestador/appointments/{id}` | Atualiza o status. Body: `{ status }`. |
 | `POST` | `/api/prestador/appointments/{id}/procedures` | Registra um procedimento (Pay Per Use). Body: `{ procedureId }`. |
-| `POST` | `/api/prestador/records` | Adiciona anotação ao PEP. Body: `{ patientId, appointmentId?, content }`. |
+| `POST` | `/api/prestador/records` | Adiciona anotação ao PEP. Body: `{ patientId, appointmentId?, content, recordType?, title? }`. |
 | `GET` | `/api/procedures` | Catálogo de procedimentos (também acessível ao `INTERNO`). |
 
 ### Portal Interno (`role: INTERNO`)
 
+> Rotas sensíveis respeitam **RBAC** via `internoProfile` (ADMIN, FATURAMENTO, RECEPCAO, READONLY).
+
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados (receita, CRM, operação). |
-| `GET` | `/api/interno/billing` | Procedimentos pendentes (agrupados) e faturas emitidas. |
-| `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°** consolidada de um beneficiário. |
-| `GET` | `/api/interno/crm/pipeline` | Pipeline CRM — empresas agrupadas por status. |
-| `PATCH` | `/api/interno/companies/{id}/status` | Atualiza status CRM da empresa. Body: `{ status }`. |
-| `GET` | `/api/interno/subscriptions` | Lista assinaturas e beneficiários do tenant. |
-| `POST` | `/api/interno/subscriptions` | Cria assinatura. Body: `{ patientId, billingCycle, startDate, amount, ... }`. |
-| `PATCH` | `/api/interno/subscriptions/{id}` | Atualiza status da assinatura. Body: `{ status }`. |
-| `POST` | `/api/interno/subscriptions/{id}/generate-charges` | Gera cobranças futuras pendentes. |
-| `GET` | `/api/interno/subscriptions/{id}/charges` | Lista cobranças de uma assinatura. |
-| `GET` | `/api/interno/messages` | Fila de comunicações e beneficiários. |
-| `POST` | `/api/interno/messages` | Enfileira mensagem. Body: `{ patientId, channel, template, body, ... }`. |
-| `POST` | `/api/interno/messages/{id}/dispatch` | Despacha mensagem via provider configurado. |
-| `PATCH` | `/api/interno/messages/{id}` | Cancela mensagem pendente. Body: `{ action: "cancel" }`. |
-| `GET` | `/api/interno/messages/template` | Sugere texto para template (`patientId`, `template`). |
-| `POST` | `/api/interno/invoices` | Gera a fatura Pay Per Use de um paciente. Body: `{ patientId }`. |
+| `GET` | `/api/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados. |
+| `GET` | `/api/interno/billing` | Procedimentos pendentes e faturas emitidas. |
+| `POST` | `/api/interno/invoices` | Gera fatura Pay Per Use. Body: `{ patientId }`. |
+| `POST` | `/api/interno/invoices/{id}/pay` | Marca fatura como PAGA (manual). |
+| `POST` | `/api/interno/invoices/{id}/pix` | Gera cobrança PIX mock. |
+| `POST` | `/api/interno/invoices/{id}/confirm-pix` | Confirma pagamento PIX pendente. |
+| `GET` | `/api/interno/invoices/{id}/tiss` | Exporta guia TISS/ANS em XML. |
+| `GET` | `/api/interno/patients` | Lista beneficiários. |
+| `POST` | `/api/interno/patients` | Cria beneficiário. |
+| `PATCH` | `/api/interno/patients/{id}` | Atualiza beneficiário. |
+| `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°**. |
+| `GET` | `/api/interno/patients/{id}/export` | Export JSON LGPD. |
+| `GET/POST` | `/api/interno/companies` | CRUD empresas. |
+| `PATCH` | `/api/interno/companies/{id}` | Atualiza empresa. |
+| `GET/POST` | `/api/interno/procedures` | CRUD procedimentos. |
+| `PUT/DELETE` | `/api/interno/procedures/{id}` | Atualiza/remove procedimento. |
+| `GET/POST` | `/api/interno/users` | CRUD usuários internos/prestadores. |
+| `PATCH` | `/api/interno/users/{id}` | Atualiza usuário. |
+| `GET/POST` | `/api/interno/appointments` | Agenda interna. |
+| `PATCH` | `/api/interno/appointments/{id}` | Altera status/modalidade. |
+| `GET` | `/api/interno/reports?type=billing\|crm` | Download CSV. |
+| `GET` | `/api/interno/crm/pipeline` | Pipeline CRM. |
+| `PATCH` | `/api/interno/companies/{id}/status` | Atualiza status CRM. |
+| `GET/POST` | `/api/interno/subscriptions` | Assinaturas recorrentes. |
+| `POST` | `/api/interno/subscriptions/charges/{chargeId}/invoice` | Bridge cobrança → fatura. |
+| `GET/POST` | `/api/interno/messages` | Fila de comunicação. |
+| `POST` | `/api/interno/reminders` | Lembretes automáticos + dispatch. |
+| `GET/PUT` | `/api/interno/branding` | White label do tenant. |
+| `GET/POST` | `/api/interno/webhooks` | Webhooks B2B. |
+| `GET` | `/api/interno/webhooks/deliveries` | Log de entregas. |
+| `POST` | `/api/interno/webhooks/deliveries/{id}/retry` | Retry manual. |
+
+### Jobs agendados (cron)
+
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| `POST` | `/api/cron/reminders` | Lembretes de consulta/fatura/assinatura. Header: `x-cron-secret`. |
+| `POST` | `/api/cron/webhooks` | Retry de webhooks com backoff. Header: `x-cron-secret`. |
 
 ### Portal do Beneficiário (`role: BENEFICIARIO`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/beneficiario/overview` | Self-service: agenda, consumo, faturas, assinatura e prontuário próprio. |
+| `GET` | `/api/beneficiario/overview` | Self-service: agenda, consumo, faturas, assinatura e PEP. |
+| `GET` | `/api/beneficiario/providers` | Prestadores disponíveis para agendamento. |
+| `GET` | `/api/beneficiario/slots` | Slots de 30 min (query: `providerId`, `date`). |
+| `POST` | `/api/beneficiario/appointments` | Agenda consulta self-service. |
+| `POST` | `/api/beneficiario/invoices/{id}/pay` | Gera PIX para fatura. |
+| `PATCH` | `/api/beneficiario/invoices/{id}/pay` | Confirma pagamento PIX. |
 
 ### Portal da Empresa (`role: PJ`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/pj/overview` | Contrato, beneficiários e faturas da empresa do usuário. |
+| `GET` | `/api/pj/overview` | Contrato, beneficiários, faturas, alertas e MRR. |
+| `GET` | `/api/pj/reports` | Export CSV corporativo. |
 
 ### Documentação interativa (Swagger UI)
 
@@ -272,21 +323,22 @@ sistema-bibi/
 ├── src/
 │   ├── app/
 │   │   ├── api/             # Route Handlers (backend)
-│   │   │   ├── auth/        # login, logout, me
+│   │   │   ├── auth/        # login, logout, me, MFA
 │   │   │   ├── prestador/   # agenda, atendimentos, procedimentos, PEP
-│   │   │   ├── interno/     # billing, invoices, crm, subscriptions
-│   │   │   ├── beneficiario/  # overview self-service
-│   │   │   ├── pj/          # overview
+│   │   │   ├── interno/     # billing, cadastros, agenda, webhooks, TISS…
+│   │   │   ├── beneficiario/  # overview, agendamento, PIX
+│   │   │   ├── pj/          # overview, reports
+│   │   │   ├── cron/        # reminders, webhooks retry
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
-│   │   ├── interno/         # /interno, /interno/dashboard, /interno/login, ...
+│   │   ├── interno/         # dashboard, faturamento, cadastros, integrações…
 │   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, ..., executive-dashboard
+│   ├── lib/                 # db, sessão, invoice-service, webhooks, MFA…
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
@@ -310,13 +362,15 @@ sistema-bibi/
 
 - Sessão por **cookie httpOnly** assinado com **HMAC-SHA256** (`SESSION_SECRET`),
   com comparação em tempo constante na verificação.
-- **Segregação por `role`**: cada portal valida o perfil tanto no `proxy.ts`
-  (checagem otimista) quanto no servidor (validação real em cada handler/página).
+- **Segregação por `role` e RBAC interno** (`internoProfile`): cada portal valida
+  o perfil no `proxy.ts` (checagem otimista) e no servidor (HMAC + permissões).
+- **MFA TOTP** opcional para usuários internos (`/interno/seguranca`).
+- **LGPD light:** consentimento no cadastro + export JSON por beneficiário.
 - Dados sensíveis (prontuário, beneficiários) ficam isolados por `tenant`.
 
-> ⚠️ **POC**: as senhas estão em texto puro apenas para demonstração
-> (ver `prisma/seed.ts`). Em produção, use hash (bcrypt/argon2), HTTPS,
-> criptografia de dados em repouso e auditoria de acesso.
+> ⚠️ **POC**: senhas com hash **scrypt** no seed e novos usuários; adapters de
+> pagamento/comunicação usam **mock/console** para demonstração. Em produção:
+> HTTPS, Postgres, gateways reais, auditoria de acesso e validação XSD TISS.
 
 ## 13. Notas técnicas e limitações da POC
 
@@ -327,10 +381,11 @@ sistema-bibi/
 - `params`, `searchParams` e `cookies()` são **assíncronos** (use `await`).
 - Banco **SQLite** local para facilitar o desenvolvimento; o arquivo `dev.db` e o
   `.env` são *gitignored*.
-- POC sem testes automatizados e sem hashing de senha — itens recomendados para a
-  evolução do produto.
+- POC sem testes automatizados — recomendados para evolução do produto.
+- **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
 - **Netlify preparado, não publicado** — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
   Build local: `npm run netlify:build`. Publicação manual quando a conta estiver ok.
+- **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
 
 ## 14. Documentação adicional
 
@@ -340,6 +395,7 @@ sistema-bibi/
   [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
 - **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):
   [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
+- **Design system e white label:** [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
 - **Base de conhecimento (NotebookLM / RAG):**
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
 - **Deploy Netlify (preparado, sem publicar):**

@@ -14,6 +14,7 @@ Guia para publicar a POC quando a conta e o ambiente estiverem prontos.
 | `src/lib/db.ts` | Copia SQLite seedado para `/tmp` em serverless |
 | `next.config.ts` | Inclui `prisma/**` no bundle serverless |
 | `@netlify/blobs` | Logos white-label em produção |
+| Cron endpoints | `/api/cron/reminders`, `/api/cron/webhooks` (protegidos por `CRON_SECRET`) |
 | Site CLI (opcional) | Projeto `sistema-bibi-2` pode estar linkado localmente |
 
 ---
@@ -22,8 +23,9 @@ Guia para publicar a POC quando a conta e o ambiente estiverem prontos.
 
 1. **Créditos / plano Netlify** — se o site retornar `503 usage_exceeded`, aguarde reset ou upgrade.
 2. **`SESSION_SECRET`** — defina no painel (Site settings → Environment variables), **não** use o fallback do `netlify.toml`.
-3. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
-4. **Git** — conectar o repo no painel só quando quiser deploys automáticos.
+3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
+4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
+5. **Git** — conectar o repo no painel só quando quiser deploys automáticos.
 
 ---
 
@@ -33,13 +35,14 @@ Guia para publicar a POC quando a conta e o ambiente estiverem prontos.
 |----------|-------------|----------------|
 | `DATABASE_URL` | Sim (build) | `file:./dev.db` (path relativo ao schema Prisma) |
 | `SESSION_SECRET` | Sim | string longa aleatória (≥ 32 chars) |
+| `CRON_SECRET` | Sim (cron) | string longa aleatória para jobs agendados |
+| `PAYMENT_GATEWAY` | Não | `mock` (POC) ou `asaas`/`efi`/`inter` |
+| `COMMUNICATION_PROVIDER` | Não | `console` (POC) ou `sendgrid`/`twilio`/`meta` |
+| `TELEMEDICINE_BASE_URL` | Não | URL base das salas virtuais mock |
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 
-Opcionais (motores reais):
-
-- `PAYMENT_GATEWAY`, credenciais em `docs/PAYMENTS.md`
-- `COMMUNICATION_PROVIDER`, credenciais em `docs/COMMUNICATIONS.md`
+Credenciais de gateways reais: ver `docs/PAYMENTS.md` e `docs/COMMUNICATIONS.md`.
 
 ---
 
@@ -82,11 +85,23 @@ npx netlify deploy --prod
 
 ---
 
+## Jobs agendados (cron)
+
+Configure scheduled functions ou serviço externo para chamar:
+
+| Endpoint | Header | Função |
+|----------|--------|--------|
+| `POST /api/cron/reminders` | `x-cron-secret: $CRON_SECRET` | Lembretes de consulta/fatura/assinatura |
+| `POST /api/cron/webhooks` | `x-cron-secret: $CRON_SECRET` | Retry de webhooks com backoff |
+
+---
+
 ## Limitações conhecidas da POC na Netlify
 
 - **SQLite** copiado para `/tmp` a cada cold start — escrita persiste só na mesma instância Lambda.
 - **Seed no build** — cada deploy recria dados demo (intencional para POC).
 - **Logos** — `@netlify/blobs` em produção; filesystem local em `next dev` puro.
+- **MFA / webhooks / PIX** — funcionam na POC, mas dependem do SQLite efêmero.
 
 ---
 
@@ -98,6 +113,7 @@ npx netlify deploy --prod
 | `prisma/prisma/dev.db` | `DATABASE_URL` errado | Use `file:./dev.db` (relativo ao schema) |
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
+| Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
 
 ---
 
@@ -105,5 +121,6 @@ npx netlify deploy --prod
 
 1. Migrar Prisma → Postgres ([Netlify Database](https://docs.netlify.com/database/))
 2. Remover seed do build de produção
-3. Hash de senhas + secrets só no painel Netlify
+3. Gateways reais (Asaas, SendGrid) com secrets só no painel
 4. Purge CDN de logos via `Cache-Tag: tenant-logo-{tenantId}`
+5. SSO OAuth/SAML (Tier 5)
