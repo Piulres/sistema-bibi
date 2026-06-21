@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import PortalHeader from "@/components/PortalHeader";
+import { PORTALS } from "@/lib/roles";
+import PortalShell from "@/components/layout/PortalShell";
+import PageHeader from "@/components/layout/PageHeader";
 import InternoNav from "@/components/InternoNav";
 import SubscriptionsView from "@/components/SubscriptionsView";
 
@@ -10,24 +12,24 @@ export default async function InternoSubscriptionsPage() {
     redirect("/interno/login");
   }
 
+  const portal = PORTALS.interno;
+
   return (
-    <div className="flex-1">
-      <PortalHeader
-        portalLabel="Portal Interno"
-        tenantName={user.tenantName}
-        userName={user.name}
-        loginPath="/interno/login"
+    <PortalShell
+      portal="interno"
+      portalLabel={portal.label}
+      loginPath={portal.loginPath}
+      userName={user.name}
+      branding={user.branding}
+    >
+      <PageHeader
+        title="Recorrência"
+        description="Assinaturas e geração automática de cobranças futuras."
       />
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <h1 className="text-2xl font-bold text-slate-900">Recorrência</h1>
-        <p className="mt-1 text-slate-600">
-          Assinaturas e geração automática de cobranças futuras.
-        </p>
-        <InternoNav active="subscriptions" />
-        <div className="mt-8">
-          <SubscriptionsView />
-        </div>
-      </main>
-    </div>
+      <InternoNav active="subscriptions" />
+      <div className="mt-8">
+        <SubscriptionsView />
+      </div>
+    </PortalShell>
   );
 }

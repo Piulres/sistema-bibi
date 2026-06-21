@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import PortalHeader from "@/components/PortalHeader";
+import { PORTALS } from "@/lib/roles";
+import PortalShell from "@/components/layout/PortalShell";
+import PageHeader from "@/components/layout/PageHeader";
 import InternoNav from "@/components/InternoNav";
 import CrmPipelineView from "@/components/CrmPipelineView";
 
@@ -10,24 +12,24 @@ export default async function InternoCrmPage() {
     redirect("/interno/login");
   }
 
+  const portal = PORTALS.interno;
+
   return (
-    <div className="flex-1">
-      <PortalHeader
-        portalLabel="Portal Interno"
-        tenantName={user.tenantName}
-        userName={user.name}
-        loginPath="/interno/login"
+    <PortalShell
+      portal="interno"
+      portalLabel={portal.label}
+      loginPath={portal.loginPath}
+      userName={user.name}
+      branding={user.branding}
+    >
+      <PageHeader
+        title="CRM Corporativo"
+        description="Pipeline de empresas contratantes — do lead ao contrato ativo."
       />
-      <main className="mx-auto max-w-7xl px-6 py-8">
-        <h1 className="text-2xl font-bold text-slate-900">CRM Corporativo</h1>
-        <p className="mt-1 text-slate-600">
-          Pipeline de empresas contratantes — do lead ao contrato ativo.
-        </p>
-        <InternoNav active="crm" />
-        <div className="mt-8">
-          <CrmPipelineView />
-        </div>
-      </main>
-    </div>
+      <InternoNav active="crm" />
+      <div className="mt-8">
+        <CrmPipelineView />
+      </div>
+    </PortalShell>
   );
 }

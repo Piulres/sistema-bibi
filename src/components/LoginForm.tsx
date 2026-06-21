@@ -3,29 +3,38 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import type { BrandingTokens } from "@/lib/theme/tokens";
+import type { PortalKey } from "@/lib/roles";
+import { PORTAL_THEMES } from "@/lib/theme/portals";
+import TenantTheme from "@/components/layout/TenantTheme";
+import Card from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
 
 type Props = {
-  portal: "prestador" | "interno" | "pj" | "beneficiario";
+  portal: PortalKey;
   title: string;
   subtitle: string;
-  accent: string;
   demoEmail: string;
   demoPassword: string;
+  branding: BrandingTokens;
 };
 
 export default function LoginForm({
   portal,
   title,
   subtitle,
-  accent,
   demoEmail,
   demoPassword,
+  branding,
 }: Props) {
   const router = useRouter();
   const [email, setEmail] = useState(demoEmail);
   const [password, setPassword] = useState(demoPassword);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const portalTheme = PORTAL_THEMES[portal];
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -52,65 +61,77 @@ export default function LoginForm({
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md">
-        <Link href="/" className="text-sm text-slate-500 hover:text-slate-800">
-          ← Voltar
-        </Link>
-        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <div className={`h-1.5 w-12 rounded-full bg-gradient-to-r ${accent}`} />
-          <h1 className="mt-4 text-2xl font-bold text-slate-900">{title}</h1>
-          <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
+    <TenantTheme branding={branding} portal={portal} className="flex flex-1 flex-col">
+      <main className="flex flex-1 items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          <Link
+            href="/"
+            className="text-sm text-[var(--text-muted)] transition hover:text-[var(--text-primary)]"
+          >
+            ← Voltar
+          </Link>
+          <Card padding="lg" className="mt-4">
+            <div className="flex items-center gap-3">
+              {branding.logoUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={branding.logoUrl}
+                  alt=""
+                  className="h-10 w-10 rounded-lg object-contain"
+                />
+              ) : (
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)] ds-gradient-portal"
+                  aria-hidden
+                >
+                  {branding.displayName.charAt(0)}
+                </div>
+              )}
+              <div>
+                <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+                  {branding.displayName}
+                </p>
+                <div className="mt-1 h-1 w-12 rounded-full ds-gradient-portal" />
+              </div>
+            </div>
+            <h1 className="mt-4 text-2xl font-bold text-[var(--text-primary)]">{title}</h1>
+            <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700" htmlFor="email">
-                E-mail
-              </label>
-              <input
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <Input
+                label="E-mail"
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
                 required
               />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-slate-700" htmlFor="password">
-                Senha
-              </label>
-              <input
+              <Input
+                label="Senha"
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-slate-900 focus:border-teal-500 focus:outline-none focus:ring-2 focus:ring-teal-200"
                 required
               />
-            </div>
 
-            {error && (
-              <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
-                {error}
-              </p>
-            )}
+              {error && <Alert tone="danger">{error}</Alert>}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-slate-900 px-4 py-2.5 font-semibold text-white transition hover:bg-slate-700 disabled:opacity-60"
-            >
-              {loading ? "Entrando..." : "Entrar"}
-            </button>
-          </form>
+              <Button type="submit" disabled={loading} className="w-full">
+                {loading ? "Entrando..." : "Entrar"}
+              </Button>
+            </form>
 
-          <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
-            Demo: <span className="font-mono">{demoEmail}</span> / senha{" "}
-            <span className="font-mono">{demoPassword}</span>
-          </p>
+            <p className="mt-4 rounded-[var(--radius-button)] bg-[var(--surface-muted)] px-3 py-2 text-xs text-[var(--text-muted)]">
+              Demo: <span className="font-mono">{demoEmail}</span> / senha{" "}
+              <span className="font-mono">{demoPassword}</span>
+            </p>
+            <p className="mt-2 text-center text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+              {portalTheme.label} · {branding.platformLabel}
+            </p>
+          </Card>
         </div>
-      </div>
-    </main>
+      </main>
+    </TenantTheme>
   );
 }

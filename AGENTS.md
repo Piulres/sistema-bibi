@@ -42,3 +42,6 @@ dinâmica por empresa).
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
 - Senhas estão em texto puro **apenas para a POC** (ver `prisma/seed.ts`).
+- **Design system / white label**: tokens em `src/app/globals.css`, primitivos em
+  `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
+  Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.

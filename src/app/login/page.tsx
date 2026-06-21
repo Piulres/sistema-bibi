@@ -1,14 +1,17 @@
 import LoginForm from "@/components/LoginForm";
+import { getPlatformBranding } from "@/lib/theme/branding";
 
-export default function PrestadorLoginPage() {
+export default async function PrestadorLoginPage() {
+  const branding = await getPlatformBranding();
+
   return (
     <LoginForm
       portal="prestador"
       title="Portal do Prestador"
       subtitle="Acesso a agenda e prontuário eletrônico."
-      accent="from-teal-500 to-emerald-600"
       demoEmail="dra.helena@bibi.health"
       demoPassword="bibi123"
+      branding={branding}
     />
   );
 }

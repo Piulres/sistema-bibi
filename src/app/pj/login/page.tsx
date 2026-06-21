@@ -1,14 +1,17 @@
 import LoginForm from "@/components/LoginForm";
+import { getPlatformBranding } from "@/lib/theme/branding";
 
-export default function PjLoginPage() {
+export default async function PjLoginPage() {
+  const branding = await getPlatformBranding();
+
   return (
     <LoginForm
       portal="pj"
       title="Portal da Empresa (PJ)"
       subtitle="Gestão de contratos e beneficiários corporativos."
-      accent="from-fuchsia-500 to-purple-600"
       demoEmail="rh@techcorp.com"
       demoPassword="bibi123"
+      branding={branding}
     />
   );
 }

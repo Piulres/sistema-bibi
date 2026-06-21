@@ -30,6 +30,27 @@ model Tenant {
   subscriptions Subscription[]
   timelineEvents TimelineEvent[]
   messages       Message[]
+  branding       TenantBranding?
+}
+
+/// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
+model TenantBranding {
+  id           String  @id @default(cuid())
+  tenantId     String  @unique
+  tenant       Tenant  @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  /// Nome comercial exibido na UI (pode diferir de Tenant.name).
+  displayName  String
+  tagline      String?
+  logoUrl      String?
+  /// Cores em hex (#RRGGBB). Injetadas como CSS variables em runtime.
+  primaryColor   String @default("#0d9488")
+  accentColor    String @default("#14b8a6")
+  heroFrom       String @default("#0f172a")
+  heroTo         String @default("#134e4a")
+  /// Nome da plataforma quando exibido como produto white-label (ex. "Powered by Bibi").
+  platformLabel  String @default("Sistema Bibi")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 /// Usuario do sistema. role define o portal de acesso.

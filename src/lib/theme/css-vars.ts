@@ -1,0 +1,15 @@
+import type { BrandingTokens } from "@/lib/theme/tokens";
+
+/** Converte branding em CSS custom properties para injecao runtime. */
+export function brandingToCssVars(
+  branding: BrandingTokens,
+  extra?: Record<string, string>,
+): Record<string, string> {
+  return {
+    "--brand-primary": branding.primaryColor,
+    "--brand-accent": branding.accentColor,
+    "--brand-hero-from": branding.heroFrom,
+    "--brand-hero-to": branding.heroTo,
+    ...extra,
+  };
+}

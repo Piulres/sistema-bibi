@@ -248,6 +248,7 @@ src/
 | `docs/ARQUITETURA.md` | Diagramas Mermaid, épicos, checklists |
 | `docs/PAYMENTS.md` | Motor de cobrança Strategy |
 | `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |
+| `docs/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
 | `public/openapi.yaml` | Especificação API |
 | `AGENTS.md` | Instruções para agentes de IA |
 
@@ -269,6 +270,18 @@ src/
 
 **Qual a diferença entre faturamento e dashboard?**
 → `/interno` = operação (gerar faturas). `/interno/dashboard` = visão executiva (KPIs consolidados).
+
+---
+
+## 16. Design system e white label
+
+- **Tokens CSS** em `src/app/globals.css` (`--brand-*`, `--surface-*`, `--status-*`).
+- **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`.
+- **Componentes UI** em `src/components/ui/` (`Button`, `Input`, `Card`, `Badge`, `Alert`, `NavTabs`).
+- **Layout**: `PortalShell`, `PageHeader`, `TenantTheme` (injeta CSS variables por tenant/portal).
+- **Sessão**: `getSessionUser()` retorna `user.branding` após login.
+- Seed inclui tenant demo **VitaCare** (azul) além da Clínica Bibi (teal).
+- Ver `docs/DESIGN_SYSTEM.md`.
 
 ---
 
