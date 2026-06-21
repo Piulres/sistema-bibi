@@ -85,12 +85,19 @@ type Overview = {
   }[];
 };
 
+type PixState = {
+  invoiceId: string;
+  paymentId: string;
+  pixCopyPaste: string;
+};
+
 export default function BeneficiarioView() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
+  const [pixState, setPixState] = useState<PixState | null>(null);
   const [providers, setProviders] = useState<{ id: string; name: string }[]>([]);
   const [slots, setSlots] = useState<{ start: string; label: string }[]>([]);
   const [scheduleForm, setScheduleForm] = useState({
@@ -174,6 +181,47 @@ export default function BeneficiarioView() {
     }
   }
 
+  async function payWithPix(invoiceId: string) {
+    setBusy(`pix-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao gerar PIX");
+      else {
+        setPixState({
+          invoiceId,
+          paymentId: data.payment.id,
+          pixCopyPaste: data.pixCopyPaste ?? data.payment.pixCopyPaste ?? "",
+        });
+        setMsg("Cobrança PIX gerada — copie o código abaixo");
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function confirmPix(invoiceId: string, paymentId: string) {
+    setBusy(`confirm-${invoiceId}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentId }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao confirmar PIX");
+      else {
+        setMsg("Pagamento PIX confirmado");
+        setPixState(null);
+        await reloadOverview();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
   if (loading) return <LoadingState message="Carregando seu painel..." />;
   if (error || !overview) {
     return <Alert tone="danger">{error ?? "Dados indisponíveis"}</Alert>;
@@ -185,6 +233,21 @@ export default function BeneficiarioView() {
   return (
     <div className="space-y-8">
       {msg && <Alert tone="info">{msg}</Alert>}
+      {pixState && (
+        <Alert tone="info">
+          <p className="font-medium">PIX gerado</p>
+          <p className="mt-2 break-all font-mono text-xs">{pixState.pixCopyPaste}</p>
+          <Button
+            className="mt-3"
+            variant="portal"
+            size="sm"
+            disabled={busy === `confirm-${pixState.invoiceId}`}
+            onClick={() => confirmPix(pixState.invoiceId, pixState.paymentId)}
+          >
+            {busy === `confirm-${pixState.invoiceId}` ? "Confirmando..." : "Confirmar pagamento PIX"}
+          </Button>
+        </Alert>
+      )}
 
       <Card>
         <SectionHeader

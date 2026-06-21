@@ -35,14 +35,18 @@ export async function buildTissGuideXml(tenantId: string, invoiceId: string): Pr
   const guiaDate = invoice.createdAt.toISOString().slice(0, 10);
   const itemsXml = invoice.items
     .map((item, index) => {
-      const proc = item.usage.procedure;
-      const tissCode = proc.tissCode ?? proc.code;
+      const proc = item.usage?.procedure;
+      const tissCode = proc?.tissCode ?? proc?.code ?? "00000000";
+      const performedAt =
+        item.usage?.performedAt.toISOString().slice(0, 10) ?? guiaDate;
+      const providerName =
+        item.usage?.appointment.provider.name ?? invoice.tenant.name;
       return `    <procedimento sequencial="${index + 1}">
       <codigo_tuss>${escapeXml(tissCode)}</codigo_tuss>
       <descricao>${escapeXml(item.description)}</descricao>
       <valor>${item.amount.toFixed(2)}</valor>
-      <data_realizacao>${item.usage.performedAt.toISOString().slice(0, 10)}</data_realizacao>
-      <prestador>${escapeXml(item.usage.appointment.provider.name)}</prestador>
+      <data_realizacao>${performedAt}</data_realizacao>
+      <prestador>${escapeXml(providerName)}</prestador>
     </procedimento>`;
     })
     .join("\n");
