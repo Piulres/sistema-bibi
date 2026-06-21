@@ -3,6 +3,8 @@
 Guia para publicar a POC quando a conta e o ambiente estiverem prontos.
 **O repositório já inclui `netlify.toml` e scripts de build — não é necessário publicar agora.**
 
+Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.md) · [`ARQUITETURA.md`](ARQUITETURA.md)
+
 ---
 
 ## O que já está preparado

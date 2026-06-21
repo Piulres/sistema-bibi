@@ -9,6 +9,11 @@ info:
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
     HMAC-SHA256, obtido em `POST /api/auth/login`.
+
+    Fluxos de usuário: docs/FLUXOS.md · Arquitetura: docs/ARQUITETURA.md
+externalDocs:
+  description: Fluxos do sistema (Mermaid)
+  url: /docs/FLUXOS.md
 servers:
   - url: http://localhost:3000
     description: Desenvolvimento local

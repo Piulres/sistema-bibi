@@ -2,6 +2,8 @@
 
 Plataforma visual unificada com identidade configurável por tenant (white label).
 
+> Fluxos de administração de branding: [`FLUXOS.md`](FLUXOS.md) §4 (módulo `branding`).
+
 ## Visão geral
 
 O design system separa três camadas:

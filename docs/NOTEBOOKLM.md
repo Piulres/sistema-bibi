@@ -1,8 +1,8 @@
 # Sistema Bibi — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
-Última atualização: reflete os **8 épicos comerciais**, **Tier 1 (ciclo de receita)**,
-**Tier 2 (operação table stakes)**, **Tier 3 (B2B, RBAC, integrações)**, **design system / white label** e preparação Netlify.
+Última atualização: reflete os **8 épicos comerciais**, **Tiers 1–4**, **design system / white label**,
+preparação Netlify e **fluxos completos** documentados em [`FLUXOS.md`](FLUXOS.md).
 
 ---
 
@@ -14,7 +14,8 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
 
-**Branches / PRs mergeados em `main`:** #1–#20 (scaffold → Tier 4 enterprise). PR #21 corrige build (PIX beneficiário + TISS). Ver seção 21.
+**PRs mergeados em `main`:** #1–#23 (scaffold → Tier 4 + docs + fix PIX faturamento interno).
+Mapa de fluxos: [`docs/FLUXOS.md`](FLUXOS.md). Ver seção 21 (roadmap).
 
 ---
 
@@ -386,6 +387,7 @@ src/
 | Documento | Conteúdo |
 |-----------|----------|
 | `README.md` | Guia completo, URLs, scripts |
+| `docs/FLUXOS.md` | Fluxos de usuário e negócio (todos os portais) |
 | `docs/ARQUITETURA.md` | Diagramas Mermaid, épicos, checklists |
 | `docs/PAYMENTS.md` | Motor de cobrança Strategy |
 | `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |
@@ -417,7 +419,10 @@ src/
 → `/interno/assinaturas` → Ver cobranças → **Faturar** (Tier 1).
 
 **Como marcar fatura como paga ou gerar PIX?**
-→ `/interno` (Faturamento) → botões PIX / Marcar paga (Tier 1). Beneficiário paga em `/beneficiario`.
+→ `/interno` (Faturamento) → coluna **Ações** na tabela de faturas: botões **PIX** e **Marcar paga** (Tier 1). Beneficiário paga em `/beneficiario`.
+
+**Onde está o fluxo completo do sistema?**
+→ [`docs/FLUXOS.md`](FLUXOS.md) — diagramas Mermaid, RBAC, máquinas de estado e Pay Per Use E2E.
 
 **Por que dispatch de mensagem falha?**
 → Configure `COMMUNICATION_PROVIDER=console` (POC) ou registre adapter real (SendGrid, etc.).
