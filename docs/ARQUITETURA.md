@@ -611,6 +611,7 @@ flowchart LR
 ## 20. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
+Fluxos de usuário detalhados: [`FLUXOS.md`](FLUXOS.md).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
 
 - **Swagger UI:** http://localhost:3000/api-docs.html
