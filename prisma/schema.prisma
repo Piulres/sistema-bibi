@@ -29,6 +29,7 @@ model Tenant {
   invoices     Invoice[]
   subscriptions Subscription[]
   timelineEvents TimelineEvent[]
+  messages       Message[]
 }
 
 /// Usuario do sistema. role define o portal de acesso.
@@ -97,6 +98,7 @@ model Patient {
   medicalRecords MedicalRecord[]
   invoices       Invoice[]
   subscriptions  Subscription[]
+  messages       Message[]
 }
 
 /// Catalogo de procedimentos (consultas e exames) com preco base.
@@ -281,4 +283,28 @@ model SubscriptionCharge {
 
   invoiceId String?
   invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+}
+
+/// Comunicacao outbound (email, SMS, WhatsApp) enfileirada ou enviada.
+/// channel: EMAIL | SMS | WHATSAPP
+/// template: APPOINTMENT_REMINDER | INVOICE_DUE | SUBSCRIPTION_DUE | GENERIC
+/// status: PENDENTE | ENVIADA | FALHA | CANCELADA
+model Message {
+  id         String    @id @default(cuid())
+  channel    String
+  template   String    @default("GENERIC")
+  subject    String?
+  body       String
+  status     String    @default("PENDENTE")
+  externalId String?
+  sentAt     DateTime?
+  createdAt  DateTime  @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id])
+
+  createdBy String?
 }

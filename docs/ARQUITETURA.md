@@ -458,7 +458,27 @@ flowchart LR
 
 ---
 
-## 13. Documentação da API
+## 13. Comunicação (Épico 7)
+
+Fila de mensagens outbound (e-mail, SMS, WhatsApp) com contratos Strategy e
+integração à Timeline — **sem adapter fake**.
+
+Detalhes: [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md)
+
+### Checklist de homologação (Épico 7)
+
+- [x] Modelo `Message` no Prisma (PENDENTE → ENVIADA | FALHA | CANCELADA)
+- [x] Interfaces `EmailProvider`, `SmsProvider`, `WhatsAppProvider`
+- [x] `CommunicationGatewayRegistry` + `notification-service`
+- [x] `message-service` com fila, templates e dispatch
+- [x] Timeline (`MESSAGE_QUEUED`, `MESSAGE_SENT`, `MESSAGE_FAILED`)
+- [x] Portal `/interno/comunicacao`
+- [x] Seed com mensagens demo enfileiradas
+- [x] Build passando
+
+---
+
+## 14. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

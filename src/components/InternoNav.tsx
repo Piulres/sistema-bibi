@@ -4,12 +4,13 @@ const links = [
   { href: "/interno", label: "Faturamento", key: "billing" as const },
   { href: "/interno/crm", label: "CRM Corporativo", key: "crm" as const },
   { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" as const },
+  { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" as const },
 ];
 
 export default function InternoNav({
   active,
 }: {
-  active: "billing" | "crm" | "subscriptions";
+  active: "billing" | "crm" | "subscriptions" | "comunicacao";
 }) {
   return (
     <nav className="mt-6 flex gap-2 overflow-x-auto border-b border-slate-200">

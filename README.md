@@ -103,6 +103,7 @@ Base local: **`http://localhost:3000`**
 | `/interno/beneficiarios/{id}` | **Cliente 360°** — visão consolidada do beneficiário | `INTERNO` |
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
 | `/interno/assinaturas` | **Recorrência** — assinaturas e cobranças futuras | `INTERNO` |
+| `/interno/comunicacao` | **Comunicação** — fila de e-mail, SMS e WhatsApp | `INTERNO` |
 | `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
 | `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
@@ -167,6 +168,7 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | `Invoice` / `InvoiceItem` | Fatura Pay Per Use e seus itens. |
 | `Subscription` | Assinatura recorrente (ciclo + valor por beneficiário/empresa). |
 | `SubscriptionCharge` | Cobrança futura gerada a partir de uma assinatura. |
+| `Message` | Comunicação outbound enfileirada ou enviada (e-mail, SMS, WhatsApp). |
 | `TimelineEvent` | Auditoria universal de eventos (Timeline). |
 
 > SQLite não suporta enums no Prisma; os campos `role`, `status` e `category` são
@@ -219,6 +221,11 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `PATCH` | `/api/interno/subscriptions/{id}` | Atualiza status da assinatura. Body: `{ status }`. |
 | `POST` | `/api/interno/subscriptions/{id}/generate-charges` | Gera cobranças futuras pendentes. |
 | `GET` | `/api/interno/subscriptions/{id}/charges` | Lista cobranças de uma assinatura. |
+| `GET` | `/api/interno/messages` | Fila de comunicações e beneficiários. |
+| `POST` | `/api/interno/messages` | Enfileira mensagem. Body: `{ patientId, channel, template, body, ... }`. |
+| `POST` | `/api/interno/messages/{id}/dispatch` | Despacha mensagem via provider configurado. |
+| `PATCH` | `/api/interno/messages/{id}` | Cancela mensagem pendente. Body: `{ action: "cancel" }`. |
+| `GET` | `/api/interno/messages/template` | Sugere texto para template (`patientId`, `template`). |
 | `POST` | `/api/interno/invoices` | Gera a fatura Pay Per Use de um paciente. Body: `{ patientId }`. |
 
 ### Portal do Beneficiário (`role: BENEFICIARIO`)
@@ -270,14 +277,14 @@ sistema-bibi/
 │   │   │   ├── pj/          # overview
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
-│   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id], /interno/crm, /interno/assinaturas
+│   │   ├── interno/         # /interno, /interno/login, /interno/beneficiarios/[id], /interno/crm, /interno/assinaturas, /interno/comunicacao
 │   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, beneficiary-overview, timeline, payments, subscription
+│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, beneficiary-overview, timeline, payments, subscription, communications, message-service
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
@@ -325,6 +332,8 @@ sistema-bibi/
   [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 - **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
   [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
+- **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):
+  [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
 - **API interativa (Swagger UI):** http://localhost:3000/api-docs.html
 - **Especificação OpenAPI:** [`public/openapi.yaml`](public/openapi.yaml)
 
