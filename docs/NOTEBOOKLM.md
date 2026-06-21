@@ -83,7 +83,7 @@ Entidades principais:
 |--------|-----------|
 | `Tenant` | Clínica/hospital (SaaS) |
 | `TenantBranding` | White label: cores, logo, `colorScheme`, `displayName` |
-| `User` | Login; `role` + opcional `companyId` (PJ) ou `patientId` (Beneficiário) |
+| `User` | Login; `role`, `internoProfile` (RBAC), MFA; `companyId`/`patientId` |
 | `Company` | Empresa contratante; status CRM (LEAD → CANCELADO) |
 | `Patient` | Beneficiário/paciente |
 | `Procedure` | Catálogo (CONSULTA/EXAME) com preço base |
@@ -436,6 +436,15 @@ src/
 
 **O que o usuário de recepção pode acessar?**
 → Login com `recepcao@bibi.health` — dashboard, agenda, cadastros e comunicação (RBAC Tier 3).
+
+**Como habilitar MFA no portal interno?**
+→ `/interno/seguranca` — escaneie QR TOTP, valide código e habilite (Tier 4).
+
+**Como exportar guia TISS de uma fatura?**
+→ Faturamento → botão TISS ou `GET /api/interno/invoices/[id]/tiss` (Tier 4).
+
+**Como funciona telemedicina na agenda?**
+→ Agendamento com `modality=TELE` gera link mock (`TELEMEDICINE_BASE_URL`) visível em prestador/beneficiário (Tier 4).
 
 **Qual a diferença entre faturamento e dashboard?**
 → `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
