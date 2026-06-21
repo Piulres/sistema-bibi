@@ -53,10 +53,12 @@ model User {
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
+/// status: LEAD | PROPOSTA | NEGOCIACAO | ATIVO | INADIMPLENTE | CANCELADO
 model Company {
   id             String   @id @default(cuid())
   name           String
   cnpj           String   @unique
+  status         String   @default("ATIVO")
   contractActive Boolean  @default(true)
   createdAt      DateTime @default(now())
 

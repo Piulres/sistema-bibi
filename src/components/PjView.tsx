@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 type Company = {
   name: string;
   cnpj: string;
+  status: string;
   contractActive: boolean;
   beneficiariesCount: number;
   totalConsumedLabel: string;
@@ -46,10 +47,10 @@ export default function PjView() {
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Contrato</p>
-          <p className="mt-1 text-lg font-semibold text-slate-900">
-            {company.contractActive ? "Ativo" : "Inativo"}
+          <p className="mt-1 text-lg font-semibold text-slate-900">{company.status}</p>
+          <p className="text-xs text-slate-400">
+            {company.contractActive ? "Operacional" : "Inoperante"} · CNPJ {company.cnpj}
           </p>
-          <p className="text-xs text-slate-400">CNPJ {company.cnpj}</p>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-sm text-slate-500">Beneficiários</p>

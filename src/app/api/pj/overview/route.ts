@@ -53,6 +53,7 @@ export async function GET() {
       company: {
         name: company.name,
         cnpj: company.cnpj,
+        status: company.status,
         contractActive: company.contractActive,
         beneficiariesCount: company.patients.length,
         totalConsumed,

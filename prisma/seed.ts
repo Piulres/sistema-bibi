@@ -33,12 +33,58 @@ async function main() {
     data: { name: "Clínica Bibi Saúde", cnpj: "12.345.678/0001-90" },
   });
 
-  console.log("Criando empresa (PJ)...");
+  console.log("Criando empresas (PJ) e pipeline CRM...");
   const company = await prisma.company.create({
     data: {
       name: "TechCorp Benefícios LTDA",
       cnpj: "98.765.432/0001-10",
+      status: "ATIVO",
       contractActive: true,
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.company.create({
+    data: {
+      name: "NovaLog Transportes SA",
+      cnpj: "11.222.333/0001-44",
+      status: "NEGOCIACAO",
+      contractActive: false,
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.company.create({
+    data: {
+      name: "BetaStart Tecnologia",
+      cnpj: "22.333.444/0001-55",
+      status: "LEAD",
+      contractActive: false,
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.company.create({
+    data: {
+      name: "VelozCom Varejo",
+      cnpj: "33.444.555/0001-66",
+      status: "INADIMPLENTE",
+      contractActive: true,
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.company.create({
+    data: {
+      name: "OldCorp Encerrada",
+      cnpj: "44.555.666/0001-77",
+      status: "CANCELADO",
+      contractActive: false,
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.company.create({
+    data: {
+      name: "PropostaMed Clínicas",
+      cnpj: "55.666.777/0001-88",
+      status: "PROPOSTA",
+      contractActive: false,
       tenantId: tenant.id,
     },
   });
