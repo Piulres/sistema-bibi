@@ -1,0 +1,18 @@
+# Deploy do Sistema Bibi (Next.js 16 + Prisma/SQLite POC)
+# O build popula o SQLite com os dados de demonstracao antes do next build.
+
+[build]
+  command = "npm run build:netlify"
+
+[build.environment]
+  NODE_VERSION = "22"
+  DATABASE_URL = "file:./prisma/dev.db"
+  # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables)
+  # para producao; o valor abaixo e apenas fallback da POC.
+  SESSION_SECRET = "bibi-poc-netlify-secret-change-me"
+
+[context.production.environment]
+  NODE_ENV = "production"
+
+[context.deploy-preview.environment]
+  NODE_ENV = "production"
