@@ -1,0 +1,77 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { formatBRL } from "@/lib/pricing";
+
+/**
+ * Painel de faturamento: procedimentos utilizados ainda nao faturados,
+ * agrupados por paciente, e faturas ja emitidas.
+ */
+export async function GET() {
+  try {
+    const user = await requireUser(["INTERNO"]);
+
+    const pendingUsages = await prisma.procedureUsage.findMany({
+      where: {
+        billed: false,
+        appointment: { tenantId: user.tenantId },
+      },
+      include: {
+        procedure: true,
+        appointment: { include: { patient: { include: { company: true } } } },
+      },
+      orderBy: { performedAt: "asc" },
+    });
+
+    // Agrupa por paciente.
+    const groups = new Map<
+      string,
+      {
+        patientId: string;
+        patientName: string;
+        company: string | null;
+        total: number;
+        items: { id: string; procedure: string; priceLabel: string }[];
+      }
+    >();
+
+    for (const u of pendingUsages) {
+      const patient = u.appointment.patient;
+      const g = groups.get(patient.id) ?? {
+        patientId: patient.id,
+        patientName: patient.name,
+        company: patient.company?.name ?? null,
+        total: 0,
+        items: [],
+      };
+      g.total += u.priceCharged;
+      g.items.push({ id: u.id, procedure: u.procedure.name, priceLabel: formatBRL(u.priceCharged) });
+      groups.set(patient.id, g);
+    }
+
+    const invoices = await prisma.invoice.findMany({
+      where: { tenantId: user.tenantId },
+      include: { patient: true, company: true, items: true },
+      orderBy: { createdAt: "desc" },
+    });
+
+    return NextResponse.json({
+      pending: Array.from(groups.values()).map((g) => ({
+        ...g,
+        totalLabel: formatBRL(g.total),
+      })),
+      invoices: invoices.map((inv) => ({
+        id: inv.id,
+        patientName: inv.patient.name,
+        company: inv.company?.name ?? null,
+        total: inv.total,
+        totalLabel: formatBRL(inv.total),
+        status: inv.status,
+        itemsCount: inv.items.length,
+        createdAt: inv.createdAt,
+      })),
+    });
+  } catch (error) {
+    return authErrorResponse(error);
+  }
+}
