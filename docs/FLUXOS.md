@@ -4,7 +4,8 @@ Documentação de **todos os fluxos de usuário e de negócio**, derivada do có
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
 Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
-ver [`ARQUITETURA.md`](ARQUITETURA.md).
+ver [`ARQUITETURA.md`](ARQUITETURA.md). Para posicionamento vs mercado,
+ver [`BENCHMARK.md`](BENCHMARK.md).
 
 ---
 
