@@ -1,6 +1,7 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import { DEFAULT_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
+import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 import { brandingToCssVars } from "@/lib/theme/css-vars";
 
 export { brandingToCssVars };
@@ -18,6 +19,7 @@ function fromDb(
     heroFrom: string;
     heroTo: string;
     platformLabel: string;
+    colorScheme: string;
   },
 ): TenantBrandingRecord {
   return {
@@ -30,6 +32,7 @@ function fromDb(
     heroFrom: row.heroFrom,
     heroTo: row.heroTo,
     platformLabel: row.platformLabel,
+    colorScheme: normalizeColorScheme(row.colorScheme),
   };
 }
 

@@ -1,3 +1,5 @@
+import type { ColorScheme } from "@/lib/theme/color-scheme";
+
 /** Tokens padrao da plataforma Bibi (fallback quando tenant nao tem branding). */
 export const DEFAULT_BRANDING = {
   displayName: "Sistema Bibi",
@@ -8,6 +10,7 @@ export const DEFAULT_BRANDING = {
   heroFrom: "#0f172a",
   heroTo: "#134e4a",
   platformLabel: "Sistema Bibi",
+  colorScheme: "light" as ColorScheme,
 } as const;
 
 export type BrandingTokens = {
@@ -19,4 +22,5 @@ export type BrandingTokens = {
   heroFrom: string;
   heroTo: string;
   platformLabel: string;
+  colorScheme: ColorScheme;
 };

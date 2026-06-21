@@ -46,6 +46,7 @@ export async function PUT(request: Request) {
         heroFrom: branding.heroFrom,
         heroTo: branding.heroTo,
         platformLabel: branding.platformLabel,
+        colorScheme: branding.colorScheme,
       },
       message: "Identidade visual atualizada",
     });

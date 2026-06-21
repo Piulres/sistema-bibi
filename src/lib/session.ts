@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/db";
 import { DEFAULT_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
+import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 
 const COOKIE_NAME = "bibi_session";
 const SECRET = process.env.SESSION_SECRET ?? "bibi-poc-dev-secret-change-me";
@@ -78,6 +79,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
         heroFrom: brandingRow.heroFrom,
         heroTo: brandingRow.heroTo,
         platformLabel: brandingRow.platformLabel,
+        colorScheme: normalizeColorScheme(brandingRow.colorScheme),
       }
     : { ...DEFAULT_BRANDING, displayName: user.tenant.name };
 

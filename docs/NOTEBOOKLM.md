@@ -282,7 +282,8 @@ src/
 - **Sessão**: `getSessionUser()` retorna `user.branding` após login.
 - Seed inclui tenant demo **VitaCare** (azul) além da Clínica Bibi (teal).
 - **Admin branding:** `/interno/branding` — CRUD visual, presets e upload de logo (Netlify Blobs em produção).
-- Logos servidos em `/api/branding/logo/[tenantId]`.
+- Logos servidos em `/api/branding/logo/[tenantId]` com `Cache-Tag` para purge CDN.
+- **Tema escuro por tenant:** `colorScheme` (`light` | `dark` | `system`) em `/interno/branding`.
 - Ver `docs/DESIGN_SYSTEM.md`.
 
 ---
