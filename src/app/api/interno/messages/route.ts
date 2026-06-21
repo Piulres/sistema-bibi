@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { isCommunicationProviderConfigured } from "@/lib/communications/notification-service";
 import {
   listMessages,
   listPatientsForMessaging,
@@ -12,7 +13,9 @@ export async function GET() {
     const user = await requireUser(["INTERNO"]);
     const messages = await listMessages(user.tenantId);
     const patients = await listPatientsForMessaging(user.tenantId);
-    const providerConfigured = process.env.COMMUNICATION_PROVIDER?.trim() ?? null;
+    const providerConfigured = isCommunicationProviderConfigured()
+      ? process.env.COMMUNICATION_PROVIDER?.trim() || "console (dev)"
+      : null;
 
     return NextResponse.json({ messages, patients, providerConfigured });
   } catch (error) {

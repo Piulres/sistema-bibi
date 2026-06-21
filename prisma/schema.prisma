@@ -244,6 +244,7 @@ model Invoice {
 
   items InvoiceItem[]
   subscriptionCharges SubscriptionCharge[]
+  payments Payment[]
 }
 
 model InvoiceItem {
@@ -254,8 +255,33 @@ model InvoiceItem {
   invoiceId String
   invoice   Invoice @relation(fields: [invoiceId], references: [id])
 
-  usageId String         @unique
-  usage   ProcedureUsage @relation(fields: [usageId], references: [id])
+  usageId String?         @unique
+  usage   ProcedureUsage? @relation(fields: [usageId], references: [id])
+
+  subscriptionChargeId String?             @unique
+  subscriptionCharge   SubscriptionCharge? @relation(fields: [subscriptionChargeId], references: [id])
+}
+
+/// Registro de pagamento vinculado a uma fatura (PIX, manual, etc.).
+/// status: PENDING | CONFIRMED | FAILED | CANCELLED
+model Payment {
+  id            String    @id @default(cuid())
+  invoiceId     String
+  invoice       Invoice   @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  method        String
+  amount        Float
+  status        String    @default("PENDING")
+  gatewayId     String?
+  externalId    String?
+  pixCopyPaste  String?
+  qrCodePayload String?
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  createdBy     String?
+  metadata      String?
+
+  @@index([invoiceId])
+  @@index([externalId])
 }
 
 /// Auditoria universal de eventos do sistema (Timeline).
@@ -318,6 +344,8 @@ model SubscriptionCharge {
 
   invoiceId String?
   invoice   Invoice? @relation(fields: [invoiceId], references: [id])
+
+  invoiceItem InvoiceItem?
 }
 
 /// Comunicacao outbound (email, SMS, WhatsApp) enfileirada ou enviada.

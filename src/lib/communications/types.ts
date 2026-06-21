@@ -1,5 +1,5 @@
 /** Provedores de comunicacao previstos para integracao futura. */
-export const COMMUNICATION_PROVIDER_IDS = ["sendgrid", "twilio", "meta"] as const;
+export const COMMUNICATION_PROVIDER_IDS = ["console", "sendgrid", "twilio", "meta"] as const;
 
 export type CommunicationProviderId = (typeof COMMUNICATION_PROVIDER_IDS)[number];
 
