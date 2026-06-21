@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
 type PendingItem = { id: string; procedure: string; priceLabel: string };
@@ -13,6 +14,7 @@ type PendingGroup = {
 };
 type Invoice = {
   id: string;
+  patientId: string;
   patientName: string;
   company: string | null;
   totalLabel: string;
@@ -99,10 +101,21 @@ export default function BillingView() {
             >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-slate-900">{g.patientName}</p>
+                  <Link
+                    href={`/interno/beneficiarios/${g.patientId}`}
+                    className="font-semibold text-indigo-700 hover:text-indigo-600 hover:underline"
+                  >
+                    {g.patientName}
+                  </Link>
                   <p className="text-sm text-slate-500">{g.company ?? "Particular"}</p>
                 </div>
-                <div className="flex items-center gap-4">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Link
+                    href={`/interno/beneficiarios/${g.patientId}`}
+                    className="rounded-lg border border-indigo-200 px-3 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-50"
+                  >
+                    Cliente 360°
+                  </Link>
                   <span className="text-lg font-bold text-indigo-700">{g.totalLabel}</span>
                   <button
                     onClick={() => generateInvoice(g.patientId, g.patientName)}
@@ -147,7 +160,14 @@ export default function BillingView() {
             <tbody className="divide-y divide-slate-100">
               {invoices.map((inv) => (
                 <tr key={inv.id}>
-                  <td className="px-4 py-2 text-slate-800">{inv.patientName}</td>
+                  <td className="px-4 py-2">
+                    <Link
+                      href={`/interno/beneficiarios/${inv.patientId}`}
+                      className="font-medium text-indigo-700 hover:text-indigo-600 hover:underline"
+                    >
+                      {inv.patientName}
+                    </Link>
+                  </td>
                   <td className="px-4 py-2 text-slate-500">{inv.company ?? "Particular"}</td>
                   <td className="px-4 py-2 text-slate-500">{inv.itemsCount}</td>
                   <td className="px-4 py-2">
