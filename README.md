@@ -302,7 +302,9 @@ sistema-bibi/
 | `npm run lint` | ESLint. |
 | `npm run db:push` | Sincroniza o schema com o banco SQLite. |
 | `npm run db:seed` | Popula o banco com os dados de demonstração. |
-| `npm run db:reset` | Recria o banco (force-reset) e roda o seed. |
+| `npm run build:netlify` | Pipeline de build da Netlify (`db:push` + seed + `next build`). |
+| `npm run netlify:build` | Alias de `build:netlify` — validar localmente sem publicar. |
+| `npm run netlify:dev` | `netlify dev` — emula Netlify na porta 8888. |
 
 ## 12. Segurança e LGPD
 
@@ -327,6 +329,8 @@ sistema-bibi/
   `.env` são *gitignored*.
 - POC sem testes automatizados e sem hashing de senha — itens recomendados para a
   evolução do produto.
+- **Netlify preparado, não publicado** — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
+  Build local: `npm run netlify:build`. Publicação manual quando a conta estiver ok.
 
 ## 14. Documentação adicional
 
@@ -338,6 +342,8 @@ sistema-bibi/
   [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
 - **Base de conhecimento (NotebookLM / RAG):**
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
+- **Deploy Netlify (preparado, sem publicar):**
+  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)
 - **API interativa (Swagger UI):** http://localhost:3000/api-docs.html
 - **Especificação OpenAPI:** [`public/openapi.yaml`](public/openapi.yaml)
 
