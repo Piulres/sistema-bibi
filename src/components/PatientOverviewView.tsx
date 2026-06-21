@@ -2,6 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import StatusBadge from "@/components/ui/StatusBadge";
+import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
 
 type Overview = {
   patient: {
@@ -62,53 +65,6 @@ type Overview = {
   }[];
 };
 
-const statusClass: Record<string, string> = {
-  AGENDADO: "bg-slate-100 text-slate-700",
-  CONFIRMADO: "bg-blue-100 text-blue-700",
-  REALIZADO: "bg-emerald-100 text-emerald-700",
-  FALTOU: "bg-amber-100 text-amber-700",
-  CANCELADO: "bg-red-100 text-red-700",
-  FECHADA: "bg-indigo-100 text-indigo-700",
-  PAGA: "bg-emerald-100 text-emerald-700",
-  ABERTA: "bg-amber-100 text-amber-700",
-};
-
-const actionClass: Record<string, string> = {
-  LOGIN: "bg-violet-100 text-violet-700",
-  CREATED: "bg-sky-100 text-sky-700",
-  UPDATED: "bg-slate-100 text-slate-700",
-  APPOINTMENT_COMPLETED: "bg-emerald-100 text-emerald-700",
-  PROCEDURE_REGISTERED: "bg-indigo-100 text-indigo-700",
-  MEDICAL_RECORD_CREATED: "bg-teal-100 text-teal-700",
-  INVOICE_ISSUED: "bg-fuchsia-100 text-fuchsia-700",
-  CHARGE_SENT: "bg-orange-100 text-orange-700",
-  CONTRACT_CHANGED: "bg-amber-100 text-amber-700",
-  SUBSCRIPTION_CHARGES_GENERATED: "bg-cyan-100 text-cyan-700",
-  MESSAGE_QUEUED: "bg-sky-100 text-sky-700",
-  MESSAGE_SENT: "bg-teal-100 text-teal-700",
-  MESSAGE_FAILED: "bg-red-100 text-red-700",
-};
-
-function ActionBadge({ value }: { value: string }) {
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-xs font-medium ${actionClass[value] ?? "bg-slate-100 text-slate-700"}`}
-    >
-      {value.replaceAll("_", " ")}
-    </span>
-  );
-}
-
-function Badge({ value }: { value: string }) {
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusClass[value] ?? "bg-slate-100 text-slate-700"}`}
-    >
-      {value}
-    </span>
-  );
-}
-
 export default function PatientOverviewView({
   patientId,
   returnTo = "/interno",
@@ -140,8 +96,10 @@ export default function PatientOverviewView({
     };
   }, [patientId]);
 
-  if (loading) return <p className="text-slate-500">Carregando Cliente 360°...</p>;
-  if (error || !overview) return <p className="text-red-600">{error ?? "Beneficiário não encontrado"}</p>;
+  if (loading) return <LoadingState message="Carregando Cliente 360°..." />;
+  if (error || !overview) {
+    return <Alert tone="danger">{error ?? "Beneficiário não encontrado"}</Alert>;
+  }
 
   const { patient, summary } = overview;
 
@@ -217,7 +175,7 @@ export default function PatientOverviewView({
                 <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-indigo-500 ring-2 ring-indigo-100" />
                 <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                   <div className="flex flex-wrap items-center gap-2">
-                    <ActionBadge value={event.action} />
+                    <StatusBadge value={event.action} map="timeline" />
                     <span className="text-xs text-slate-400">{event.createdAtLabel}</span>
                   </div>
                   <p className="mt-2 text-sm text-slate-800">{event.description}</p>
@@ -253,7 +211,7 @@ export default function PatientOverviewView({
                     <td className="px-4 py-2 text-slate-800">{appointment.scheduledAtLabel}</td>
                     <td className="px-4 py-2 text-slate-600">{appointment.providerName}</td>
                     <td className="px-4 py-2">
-                      <Badge value={appointment.status} />
+                      <StatusBadge value={appointment.status} map="appointment" />
                     </td>
                     <td className="px-4 py-2 text-slate-500">{appointment.reason ?? "—"}</td>
                     <td className="px-4 py-2 text-right text-slate-700">{appointment.usagesCount}</td>
@@ -291,7 +249,7 @@ export default function PatientOverviewView({
                     <td className="px-4 py-2 text-slate-600">{usage.appointmentDateLabel}</td>
                     <td className="px-4 py-2 text-slate-600">{usage.performedAtLabel}</td>
                     <td className="px-4 py-2">
-                      <Badge value={usage.billed ? "PAGA" : "ABERTA"} />
+                      <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
                     </td>
                     <td className="px-4 py-2 text-right font-semibold text-slate-900">{usage.priceLabel}</td>
                   </tr>
@@ -349,7 +307,7 @@ export default function PatientOverviewView({
                       {invoice.createdAtLabel} · {invoice.company ?? "Particular"}
                     </p>
                   </div>
-                  <Badge value={invoice.status} />
+                  <StatusBadge value={invoice.status} map="invoice" />
                 </div>
                 <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
                   {invoice.items.map((item) => (

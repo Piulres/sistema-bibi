@@ -11,6 +11,7 @@ const RETURN_LABELS: Record<string, string> = {
   "/interno/crm": "Voltar ao CRM",
   "/interno/assinaturas": "Voltar à recorrência",
   "/interno/comunicacao": "Voltar à comunicação",
+  "/interno/branding": "Voltar ao white label",
 };
 
 export default async function PatientOverviewPage({

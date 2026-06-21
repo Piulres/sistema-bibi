@@ -17,6 +17,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@netlify/blobs": "^10.7.9",
     "@prisma/client": "6",
     "next": "16.2.9",
     "react": "19.2.4",

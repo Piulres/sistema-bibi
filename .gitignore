@@ -44,6 +44,9 @@ yarn-error.log*
 # netlify
 .netlify
 
+# tenant logo uploads (local dev fallback)
+/public/tenant-logos/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

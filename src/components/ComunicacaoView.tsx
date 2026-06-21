@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
+import LoadingState from "@/components/ui/LoadingState";
+import SectionHeader from "@/components/ui/SectionHeader";
+import EmptyState from "@/components/ui/EmptyState";
 
 type Message = {
   id: string;
@@ -135,30 +141,28 @@ export default function ComunicacaoView() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Carregando comunicações...</p>;
+  if (loading) return <LoadingState message="Carregando comunicações..." />;
 
   return (
     <div className="space-y-8">
       {!providerConfigured && (
-        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <Alert tone="warning">
           Nenhum provedor de comunicação configurado (<code>COMMUNICATION_PROVIDER</code>).
           Mensagens podem ser enfileiradas; o dispatch exige adapter (SendGrid, Twilio ou Meta).
           Veja <code>docs/COMMUNICATIONS.md</code>.
-        </p>
+        </Alert>
       )}
 
-      {msg && (
-        <p className="rounded-lg bg-indigo-50 px-4 py-2 text-sm text-indigo-800">{msg}</p>
-      )}
+      {msg && <Alert tone="info">{msg}</Alert>}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Nova comunicação</h2>
+      <Card>
+        <SectionHeader title="Nova comunicação" />
         <form onSubmit={queueMessage} className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="text-slate-600">Beneficiário</span>
+            <span className="text-[var(--text-secondary)]">Beneficiário</span>
             <select
               required
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
               value={form.patientId}
               onChange={(e) => {
                 const patientId = e.target.value;
@@ -176,9 +180,9 @@ export default function ComunicacaoView() {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="text-slate-600">Canal</span>
+            <span className="text-[var(--text-secondary)]">Canal</span>
             <select
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
               value={form.channel}
               onChange={(e) => setForm({ ...form, channel: e.target.value })}
             >
@@ -188,9 +192,9 @@ export default function ComunicacaoView() {
             </select>
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="text-slate-600">Template</span>
+            <span className="text-[var(--text-secondary)]">Template</span>
             <select
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
               value={form.template}
               onChange={(e) => {
                 const template = e.target.value;
@@ -206,56 +210,49 @@ export default function ComunicacaoView() {
           </label>
           {form.channel === "EMAIL" && (
             <label className="block text-sm sm:col-span-2">
-              <span className="text-slate-600">Assunto</span>
+              <span className="text-[var(--text-secondary)]">Assunto</span>
               <input
-                className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+                className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] px-3 py-2"
                 value={form.subject}
                 onChange={(e) => setForm({ ...form, subject: e.target.value })}
               />
             </label>
           )}
           <label className="block text-sm sm:col-span-2">
-            <span className="text-slate-600">Mensagem</span>
+            <span className="text-[var(--text-secondary)]">Mensagem</span>
             <textarea
               required
               rows={4}
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] px-3 py-2"
               value={form.body}
               onChange={(e) => setForm({ ...form, body: e.target.value })}
             />
           </label>
           <div className="sm:col-span-2">
-            <button
-              type="submit"
-              disabled={busy === "create"}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-            >
+            <Button type="submit" variant="portal" disabled={busy === "create"}>
               {busy === "create" ? "Enfileirando..." : "Enfileirar mensagem"}
-            </button>
+            </Button>
           </div>
         </form>
-      </section>
+      </Card>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Fila de comunicações</h2>
+        <SectionHeader title="Fila de comunicações" />
         {messages.length === 0 ? (
-          <p className="mt-4 rounded-lg bg-white p-4 text-slate-500">Nenhuma mensagem registrada.</p>
+          <EmptyState message="Nenhuma mensagem registrada." />
         ) : (
           <div className="mt-4 space-y-4">
             {messages.map((message) => (
-              <article
-                key={message.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
+              <Card key={message.id}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <Link
                       href={`/interno/beneficiarios/${message.patientId}?from=/interno/comunicacao`}
-                      className="font-semibold text-indigo-700 hover:underline"
+                      className="font-semibold text-[var(--portal-accent)] hover:underline"
                     >
                       {message.patientName}
                     </Link>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-[var(--text-muted)]">
                       {message.channelLabel} · {message.templateLabel} · {message.statusLabel}
                     </p>
                     {message.subject && (
@@ -270,27 +267,29 @@ export default function ComunicacaoView() {
                   <div className="flex flex-wrap gap-2">
                     {message.status === "PENDENTE" && (
                       <>
-                        <button
+                        <Button
                           type="button"
+                          variant="secondary"
+                          size="sm"
                           disabled={busy === `dispatch-${message.id}`}
                           onClick={() => dispatchMessage(message.id, message.patientName)}
-                          className="rounded-lg border border-indigo-200 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
                         >
                           {busy === `dispatch-${message.id}` ? "Enviando..." : "Despachar"}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           type="button"
+                          variant="ghost"
+                          size="sm"
                           disabled={busy === `cancel-${message.id}`}
                           onClick={() => cancelMessage(message.id)}
-                          className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 disabled:opacity-50"
                         >
                           Cancelar
-                        </button>
+                        </Button>
                       </>
                     )}
                   </div>
                 </div>
-              </article>
+              </Card>
             ))}
           </div>
         )}

@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import StatusBadge from "@/components/ui/StatusBadge";
+import SectionHeader from "@/components/ui/SectionHeader";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
 
 type Company = {
   name: string;
@@ -39,38 +45,40 @@ export default function PjView() {
       .catch(() => setError("Falha ao carregar dados da empresa"));
   }, []);
 
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!company) return <p className="text-slate-500">Carregando...</p>;
+  if (error) return <Alert tone="danger">{error}</Alert>;
+  if (!company) return <LoadingState message="Carregando dados da empresa..." />;
 
   return (
     <div className="space-y-8">
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Contrato</p>
-          <p className="mt-1 text-lg font-semibold text-slate-900">{company.status}</p>
-          <p className="text-xs text-slate-400">
+        <Card>
+          <p className="text-sm text-[var(--text-muted)]">Contrato</p>
+          <div className="mt-2">
+            <StatusBadge value={company.status} map="company" />
+          </div>
+          <p className="mt-2 text-xs text-[var(--text-muted)]">
             {company.contractActive ? "Operacional" : "Inoperante"} · CNPJ {company.cnpj}
           </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Beneficiários</p>
-          <p className="mt-1 text-lg font-semibold text-slate-900">
+        </Card>
+        <Card>
+          <p className="text-sm text-[var(--text-muted)]">Beneficiários</p>
+          <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
             {company.beneficiariesCount}
           </p>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <p className="text-sm text-slate-500">Consumo total (Pay Per Use)</p>
-          <p className="mt-1 text-lg font-semibold text-fuchsia-700">
+        </Card>
+        <Card>
+          <p className="text-sm text-[var(--text-muted)]">Consumo total (Pay Per Use)</p>
+          <p className="mt-1 text-lg font-semibold text-[var(--portal-accent)]">
             {company.totalConsumedLabel}
           </p>
-        </div>
+        </Card>
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Beneficiários</h2>
-        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <SectionHeader title="Beneficiários" />
+        <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-500">
+            <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
               <tr>
                 <th className="px-4 py-2 font-medium">Nome</th>
                 <th className="px-4 py-2 font-medium">CPF</th>
@@ -78,13 +86,13 @@ export default function PjView() {
                 <th className="px-4 py-2 text-right font-medium">Consumo</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[var(--border-default)]">
               {beneficiaries.map((b) => (
                 <tr key={b.id}>
-                  <td className="px-4 py-2 text-slate-800">{b.name}</td>
-                  <td className="px-4 py-2 text-slate-500">{b.cpf}</td>
-                  <td className="px-4 py-2 text-slate-500">{b.usageCount}</td>
-                  <td className="px-4 py-2 text-right font-semibold text-slate-900">
+                  <td className="px-4 py-2 text-[var(--text-secondary)]">{b.name}</td>
+                  <td className="px-4 py-2 text-[var(--text-muted)]">{b.cpf}</td>
+                  <td className="px-4 py-2 text-[var(--text-muted)]">{b.usageCount}</td>
+                  <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
                     {b.consumedLabel}
                   </td>
                 </tr>
@@ -95,26 +103,19 @@ export default function PjView() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Faturas da empresa</h2>
+        <SectionHeader title="Faturas da empresa" />
         {invoices.length === 0 ? (
-          <p className="mt-4 rounded-lg bg-white p-4 text-slate-500">
-            Nenhuma fatura emitida ainda.
-          </p>
+          <EmptyState message="Nenhuma fatura emitida ainda." />
         ) : (
           <ul className="mt-4 space-y-2">
             {invoices.map((inv) => (
-              <li
-                key={inv.id}
-                className="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm"
-              >
-                <span className="text-sm text-slate-600">
+              <Card key={inv.id} padding="sm" className="flex items-center justify-between">
+                <span className="text-sm text-[var(--text-secondary)]">
                   {new Date(inv.createdAt).toLocaleDateString("pt-BR")} ·{" "}
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                    {inv.status}
-                  </span>
+                  <StatusBadge value={inv.status} map="invoice" />
                 </span>
-                <span className="font-semibold text-slate-900">{inv.totalLabel}</span>
-              </li>
+                <span className="font-semibold text-[var(--text-primary)]">{inv.totalLabel}</span>
+              </Card>
             ))}
           </ul>
         )}

@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Card from "@/components/ui/Card";
+import StatusBadge from "@/components/ui/StatusBadge";
+import SectionHeader from "@/components/ui/SectionHeader";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
 
 type Appt = {
   id: string;
@@ -10,14 +16,6 @@ type Appt = {
   reason: string | null;
   patient: { id: string; name: string; company: string | null };
   proceduresCount: number;
-};
-
-const statusStyle: Record<string, string> = {
-  AGENDADO: "bg-slate-100 text-slate-700",
-  CONFIRMADO: "bg-blue-100 text-blue-700",
-  REALIZADO: "bg-emerald-100 text-emerald-700",
-  FALTOU: "bg-amber-100 text-amber-700",
-  CANCELADO: "bg-red-100 text-red-700",
 };
 
 export default function AgendaView() {
@@ -34,60 +32,53 @@ export default function AgendaView() {
       .catch(() => setError("Falha ao carregar a agenda"));
   }, []);
 
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!appts) return <p className="text-slate-500">Carregando agenda...</p>;
+  if (error) return <Alert tone="danger">{error}</Alert>;
+  if (!appts) return <LoadingState message="Carregando agenda..." />;
 
   return (
     <div className="space-y-3">
       <div className="flex items-baseline justify-between">
-        <h2 className="text-lg font-semibold text-slate-900">Agenda de hoje</h2>
-        <span className="text-sm text-slate-500">{appts.length} atendimento(s)</span>
+        <SectionHeader
+          title="Agenda de hoje"
+          description={`${appts.length} atendimento(s) programado(s)`}
+        />
       </div>
 
       {appts.length === 0 && (
-        <p className="rounded-lg bg-white p-4 text-slate-500">
-          Nenhum atendimento agendado para hoje.
-        </p>
+        <EmptyState message="Nenhum atendimento agendado para hoje." />
       )}
 
       <ul className="space-y-3">
         {appts.map((a) => (
           <li key={a.id}>
-            <Link
-              href={`/prestador/atendimento/${a.id}`}
-              className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-teal-300 hover:shadow"
-            >
-              <div className="flex items-center gap-4">
-                <div className="text-center">
-                  <p className="text-lg font-bold text-slate-900">
-                    {new Date(a.scheduledAt).toLocaleTimeString("pt-BR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
+            <Link href={`/prestador/atendimento/${a.id}`} className="block">
+              <Card className="flex items-center justify-between gap-4 transition hover:border-[var(--brand-primary)] hover:shadow-md">
+                <div className="flex items-center gap-4">
+                  <div className="text-center">
+                    <p className="text-lg font-bold text-[var(--text-primary)]">
+                      {new Date(a.scheduledAt).toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="font-medium text-[var(--text-primary)]">{a.patient.name}</p>
+                    <p className="text-sm text-[var(--text-muted)]">
+                      {a.reason ?? "Consulta"}
+                      {a.patient.company ? ` · ${a.patient.company}` : ""}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-slate-900">{a.patient.name}</p>
-                  <p className="text-sm text-slate-500">
-                    {a.reason ?? "Consulta"}
-                    {a.patient.company ? ` · ${a.patient.company}` : ""}
-                  </p>
+                <div className="flex flex-col items-end gap-1">
+                  <StatusBadge value={a.status} map="appointment" />
+                  {a.proceduresCount > 0 && (
+                    <span className="text-xs text-[var(--text-muted)]">
+                      {a.proceduresCount} procedimento(s)
+                    </span>
+                  )}
                 </div>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                <span
-                  className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-                    statusStyle[a.status] ?? "bg-slate-100 text-slate-700"
-                  }`}
-                >
-                  {a.status}
-                </span>
-                {a.proceduresCount > 0 && (
-                  <span className="text-xs text-slate-400">
-                    {a.proceduresCount} procedimento(s)
-                  </span>
-                )}
-              </div>
+              </Card>
             </Link>
           </li>
         ))}

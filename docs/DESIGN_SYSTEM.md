@@ -103,9 +103,35 @@ Preferir `Badge` ou `statusBadgeClass(map, value)` em novas telas.
 3. `PortalHeader` exibe logo/nome do tenant e faixa `{platformLabel} · white label`.
 4. Cores são aplicadas via `TenantTheme` sem rebuild do front-end.
 
+## Administração de branding (Portal Interno)
+
+Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
+
+| Endpoint | Método | Descrição |
+|----------|--------|-----------|
+| `/api/interno/branding` | GET | Retorna branding do tenant logado |
+| `/api/interno/branding` | PUT | Upsert de identidade visual |
+| `/api/interno/branding/logo` | POST | Upload de logo (Netlify Blobs ou disco local em dev) |
+| `/api/branding/logo/[tenantId]` | GET | Serve logo público do tenant |
+
+**Presets** disponíveis em `src/lib/theme/presets.ts` (Bibi, VitaCare, Amethyst, Forest).
+
+**Storage de logo** (`src/lib/storage/tenant-logo.ts`):
+- **Netlify (produção):** store `bibi-tenant-logos` via `@netlify/blobs`
+- **Dev local:** fallback em `public/tenant-logos/` (gitignored)
+- URL persistida: `/api/branding/logo/{tenantId}?v=...`
+
+**Validação** em `src/lib/theme/branding-validation.ts` (cores hex, URL/data URL do logo).
+
+## Componentes auxiliares
+
+| Componente | Uso |
+|------------|-----|
+| `StatusBadge` | Badges de status com mapas semânticos |
+| `SectionHeader` | Título + descrição de seção |
+| `LoadingState` / `EmptyState` | Estados de carregamento e vazio |
+
 ## Próximos passos sugeridos
 
-- Tela interna de administração de branding (CRUD)
-- Upload de logo para Netlify Blobs
-- Migrar views legadas (`BillingView`, etc.) para primitivos UI
 - Modo escuro por tenant (opcional)
+- CDN/cache tags para purge de logo após troca

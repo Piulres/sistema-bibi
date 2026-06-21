@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { columnClassForStatus } from "@/lib/company-crm";
+import Alert from "@/components/ui/Alert";
+import LoadingState from "@/components/ui/LoadingState";
 
 type CompanyCard = {
   id: string;
@@ -71,14 +73,12 @@ export default function CrmPipelineView() {
     }
   }
 
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!data) return <p className="text-slate-500">Carregando pipeline...</p>;
+  if (error) return <Alert tone="danger">{error}</Alert>;
+  if (!data) return <LoadingState message="Carregando pipeline..." />;
 
   return (
     <div className="space-y-4">
-      {msg && (
-        <p className="rounded-lg bg-indigo-50 px-4 py-2 text-sm text-indigo-800">{msg}</p>
-      )}
+      {msg && <Alert tone="info">{msg}</Alert>}
 
       <div className="flex gap-4 overflow-x-auto pb-2">
         {data.statuses.map((status) => {
