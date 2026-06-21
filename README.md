@@ -256,7 +256,7 @@ sistema-bibi/
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
 │   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, timeline
+│   ├── lib/                 # db, sessão, roles, precificação, auth, patient-overview, timeline, payments
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
@@ -302,6 +302,8 @@ sistema-bibi/
 
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
   [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
+- **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
+  [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
 - **API interativa (Swagger UI):** http://localhost:3000/api-docs.html
 - **Especificação OpenAPI:** [`public/openapi.yaml`](public/openapi.yaml)
 

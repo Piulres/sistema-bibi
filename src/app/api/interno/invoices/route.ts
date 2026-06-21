@@ -11,6 +11,9 @@ import {
 /**
  * Gera uma fatura Pay Per Use para um paciente, agregando todos os
  * procedimentos utilizados e ainda nao faturados. Fluxo "fechado na alta".
+ *
+ * Cobrança via gateway (PIX/boleto/cartão) será integrada via
+ * `src/lib/payments/charge-service.ts` quando adapters estiverem registrados.
  */
 export async function POST(request: Request) {
   try {
