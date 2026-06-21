@@ -281,6 +281,7 @@ src/
 - **Layout**: `PortalShell`, `PageHeader`, `TenantTheme` (injeta CSS variables por tenant/portal).
 - **Sessão**: `getSessionUser()` retorna `user.branding` após login.
 - Seed inclui tenant demo **VitaCare** (azul) além da Clínica Bibi (teal).
+- **Admin branding:** `/interno/branding` — CRUD visual, presets e upload de logo.
 - Ver `docs/DESIGN_SYSTEM.md`.
 
 ---

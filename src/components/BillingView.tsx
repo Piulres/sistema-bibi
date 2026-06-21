@@ -2,6 +2,13 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
+import LoadingState from "@/components/ui/LoadingState";
+import SectionHeader from "@/components/ui/SectionHeader";
+import EmptyState from "@/components/ui/EmptyState";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 type PendingItem = { id: string; procedure: string; priceLabel: string };
 type PendingGroup = {
@@ -71,84 +78,75 @@ export default function BillingView() {
     }
   }
 
-  if (loading) return <p className="text-slate-500">Carregando faturamento...</p>;
+  if (loading) return <LoadingState message="Carregando faturamento..." />;
 
   return (
     <div className="space-y-8">
-      {msg && (
-        <p className="rounded-lg bg-indigo-50 px-4 py-2 text-sm text-indigo-800">{msg}</p>
-      )}
+      {msg && <Alert tone="info">{msg}</Alert>}
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">
-          Procedimentos a faturar (Pay Per Use)
-        </h2>
-        <p className="mt-1 text-sm text-slate-500">
-          Itens utilizados e ainda não faturados, agrupados por beneficiário.
-        </p>
+        <SectionHeader
+          title="Procedimentos a faturar (Pay Per Use)"
+          description="Itens utilizados e ainda não faturados, agrupados por beneficiário."
+        />
 
         {pending.length === 0 && (
-          <p className="mt-4 rounded-lg bg-white p-4 text-slate-500">
-            Nenhum procedimento pendente de faturamento.
-          </p>
+          <EmptyState message="Nenhum procedimento pendente de faturamento." />
         )}
 
         <div className="mt-4 space-y-4">
           {pending.map((g) => (
-            <div
-              key={g.patientId}
-              className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
+            <Card key={g.patientId}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <Link
                     href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
-                    className="font-semibold text-indigo-700 hover:text-indigo-600 hover:underline"
+                    className="font-semibold text-[var(--portal-accent)] hover:underline"
                   >
                     {g.patientName}
                   </Link>
-                  <p className="text-sm text-slate-500">{g.company ?? "Particular"}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{g.company ?? "Particular"}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Link
-                    href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
-                    className="rounded-lg border border-indigo-200 px-3 py-2 text-sm font-medium text-indigo-700 transition hover:bg-indigo-50"
-                  >
-                    Cliente 360°
+                  <Link href={`/interno/beneficiarios/${g.patientId}?from=/interno`}>
+                    <Button variant="secondary" size="sm">
+                      Cliente 360°
+                    </Button>
                   </Link>
-                  <span className="text-lg font-bold text-indigo-700">{g.totalLabel}</span>
-                  <button
+                  <span className="text-lg font-bold text-[var(--portal-accent)]">
+                    {g.totalLabel}
+                  </span>
+                  <Button
+                    variant="portal"
+                    size="sm"
                     onClick={() => generateInvoice(g.patientId, g.patientName)}
                     disabled={busy === g.patientId}
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500 disabled:opacity-60"
                   >
                     {busy === g.patientId ? "Gerando..." : "Gerar fatura"}
-                  </button>
+                  </Button>
                 </div>
               </div>
-              <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
+              <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-[var(--border-default)]">
                 {g.items.map((it) => (
                   <li key={it.id} className="flex justify-between py-2 text-sm">
-                    <span className="text-slate-700">{it.procedure}</span>
-                    <span className="text-slate-500">{it.priceLabel}</span>
+                    <span className="text-[var(--text-secondary)]">{it.procedure}</span>
+                    <span className="text-[var(--text-muted)]">{it.priceLabel}</span>
                   </li>
                 ))}
               </ul>
-            </div>
+            </Card>
           ))}
         </div>
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Faturas emitidas</h2>
+        <SectionHeader title="Faturas emitidas" />
         {invoices.length === 0 && (
-          <p className="mt-4 rounded-lg bg-white p-4 text-slate-500">
-            Nenhuma fatura emitida ainda.
-          </p>
+          <EmptyState message="Nenhuma fatura emitida ainda." />
         )}
-        <div className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+        <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-slate-500">
+            <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
               <tr>
                 <th className="px-4 py-2 font-medium">Beneficiário</th>
                 <th className="px-4 py-2 font-medium">Empresa</th>
@@ -157,25 +155,25 @@ export default function BillingView() {
                 <th className="px-4 py-2 text-right font-medium">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[var(--border-default)]">
               {invoices.map((inv) => (
                 <tr key={inv.id}>
                   <td className="px-4 py-2">
                     <Link
                       href={`/interno/beneficiarios/${inv.patientId}?from=/interno`}
-                      className="font-medium text-indigo-700 hover:text-indigo-600 hover:underline"
+                      className="font-medium text-[var(--portal-accent)] hover:underline"
                     >
                       {inv.patientName}
                     </Link>
                   </td>
-                  <td className="px-4 py-2 text-slate-500">{inv.company ?? "Particular"}</td>
-                  <td className="px-4 py-2 text-slate-500">{inv.itemsCount}</td>
-                  <td className="px-4 py-2">
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700">
-                      {inv.status}
-                    </span>
+                  <td className="px-4 py-2 text-[var(--text-muted)]">
+                    {inv.company ?? "Particular"}
                   </td>
-                  <td className="px-4 py-2 text-right font-semibold text-slate-900">
+                  <td className="px-4 py-2 text-[var(--text-muted)]">{inv.itemsCount}</td>
+                  <td className="px-4 py-2">
+                    <StatusBadge value={inv.status} map="invoice" />
+                  </td>
+                  <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
                     {inv.totalLabel}
                   </td>
                 </tr>

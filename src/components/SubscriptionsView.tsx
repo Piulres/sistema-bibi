@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
+import LoadingState from "@/components/ui/LoadingState";
+import SectionHeader from "@/components/ui/SectionHeader";
+import EmptyState from "@/components/ui/EmptyState";
 
 type Subscription = {
   id: string;
@@ -135,22 +141,20 @@ export default function SubscriptionsView() {
     setCharges(data.charges ?? []);
   }
 
-  if (loading) return <p className="text-slate-500">Carregando assinaturas...</p>;
+  if (loading) return <LoadingState message="Carregando assinaturas..." />;
 
   return (
     <div className="space-y-8">
-      {msg && (
-        <p className="rounded-lg bg-indigo-50 px-4 py-2 text-sm text-indigo-800">{msg}</p>
-      )}
+      {msg && <Alert tone="info">{msg}</Alert>}
 
-      <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">Nova assinatura</h2>
+      <Card>
+        <SectionHeader title="Nova assinatura" />
         <form onSubmit={createSubscription} className="mt-4 grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="text-slate-600">Beneficiário</span>
+            <span className="text-[var(--text-secondary)]">Beneficiário</span>
             <select
               required
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
               value={form.patientId}
               onChange={(e) => setForm({ ...form, patientId: e.target.value })}
             >
@@ -163,9 +167,9 @@ export default function SubscriptionsView() {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="text-slate-600">Ciclo</span>
+            <span className="text-[var(--text-secondary)]">Ciclo</span>
             <select
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
               value={form.billingCycle}
               onChange={(e) => setForm({ ...form, billingCycle: e.target.value })}
             >
@@ -176,59 +180,50 @@ export default function SubscriptionsView() {
             </select>
           </label>
           <label className="block text-sm">
-            <span className="text-slate-600">Valor por ciclo (R$)</span>
+            <span className="text-[var(--text-secondary)]">Valor por ciclo (R$)</span>
             <input
               required
               type="number"
               min="0.01"
               step="0.01"
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] px-3 py-2"
               value={form.amount}
               onChange={(e) => setForm({ ...form, amount: e.target.value })}
             />
           </label>
           <label className="block text-sm sm:col-span-2">
-            <span className="text-slate-600">Descrição</span>
+            <span className="text-[var(--text-secondary)]">Descrição</span>
             <input
-              className="mt-1 w-full rounded-md border border-slate-200 px-3 py-2"
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] px-3 py-2"
               value={form.description}
               onChange={(e) => setForm({ ...form, description: e.target.value })}
             />
           </label>
           <div className="sm:col-span-2">
-            <button
-              type="submit"
-              disabled={busy === "create"}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500 disabled:opacity-60"
-            >
+            <Button type="submit" variant="portal" disabled={busy === "create"}>
               {busy === "create" ? "Salvando..." : "Criar assinatura"}
-            </button>
+            </Button>
           </div>
         </form>
-      </section>
+      </Card>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Assinaturas ativas</h2>
+        <SectionHeader title="Assinaturas ativas" />
         {subscriptions.length === 0 ? (
-          <p className="mt-4 rounded-lg bg-white p-4 text-slate-500">
-            Nenhuma assinatura cadastrada.
-          </p>
+          <EmptyState message="Nenhuma assinatura cadastrada." />
         ) : (
           <div className="mt-4 space-y-4">
             {subscriptions.map((sub) => (
-              <article
-                key={sub.id}
-                className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
-              >
+              <Card key={sub.id}>
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <Link
                       href={`/interno/beneficiarios/${sub.patientId}?from=/interno/assinaturas`}
-                      className="font-semibold text-indigo-700 hover:underline"
+                      className="font-semibold text-[var(--portal-accent)] hover:underline"
                     >
                       {sub.patientName}
                     </Link>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-[var(--text-muted)]">
                       {sub.companyName ?? "Particular"} · {sub.billingCycleLabel} ·{" "}
                       {sub.amountLabel}
                     </p>
@@ -242,7 +237,7 @@ export default function SubscriptionsView() {
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <select
-                      className="rounded-md border border-slate-200 px-2 py-1.5 text-sm"
+                      className="rounded-[var(--radius-button)] border border-[var(--border-muted)] px-2 py-1.5 text-sm"
                       value={sub.status}
                       disabled={busy === sub.id}
                       onChange={(e) => updateStatus(sub.id, e.target.value)}
@@ -251,40 +246,37 @@ export default function SubscriptionsView() {
                       <option value="SUSPENSA">Suspensa</option>
                       <option value="CANCELADA">Cancelada</option>
                     </select>
-                    <button
+                    <Button
                       type="button"
+                      variant="secondary"
+                      size="sm"
                       disabled={busy === `gen-${sub.id}` || sub.status !== "ATIVA"}
                       onClick={() => generateCharges(sub.id, sub.patientName)}
-                      className="rounded-lg border border-indigo-200 px-3 py-1.5 text-sm font-medium text-indigo-700 hover:bg-indigo-50 disabled:opacity-50"
                     >
                       {busy === `gen-${sub.id}` ? "Gerando..." : "Gerar cobranças"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => loadCharges(sub.id)}
-                      className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50"
-                    >
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => loadCharges(sub.id)}>
                       Ver cobranças
-                    </button>
+                    </Button>
                   </div>
                 </div>
 
                 {expanded === sub.id && (
-                  <ul className="mt-4 divide-y divide-slate-100 border-t border-slate-100">
+                  <ul className="mt-4 divide-y divide-[var(--border-default)] border-t border-[var(--border-default)]">
                     {charges.length === 0 && (
-                      <li className="py-2 text-sm text-slate-500">Nenhuma cobrança gerada.</li>
+                      <li className="py-2 text-sm text-[var(--text-muted)]">Nenhuma cobrança gerada.</li>
                     )}
                     {charges.map((charge) => (
                       <li key={charge.id} className="flex justify-between py-2 text-sm">
-                        <span className="text-slate-700">{charge.dueDateLabel}</span>
-                        <span className="text-slate-500">
+                        <span className="text-[var(--text-secondary)]">{charge.dueDateLabel}</span>
+                        <span className="text-[var(--text-muted)]">
                           {charge.amountLabel} · {charge.status}
                         </span>
                       </li>
                     ))}
                   </ul>
                 )}
-              </article>
+              </Card>
             ))}
           </div>
         )}

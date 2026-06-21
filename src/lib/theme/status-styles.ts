@@ -23,6 +23,13 @@ export const companyStatusClass: Record<string, string> = {
   CANCELADO: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]",
 };
 
+export const subscriptionStatusClass: Record<string, string> = {
+  ATIVA: "bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
+  SUSPENSA: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
+  CANCELADA: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
+  PENDENTE: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
+};
+
 export const timelineActionClass: Record<string, string> = {
   CREATED: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]",
   UPDATED: "bg-[var(--status-neutral-bg)] text-[var(--status-neutral-text)]",
@@ -31,10 +38,15 @@ export const timelineActionClass: Record<string, string> = {
   MEDICAL_RECORD_CREATED: "bg-[var(--status-brand-bg)] text-[var(--status-brand-text)]",
   INVOICE_GENERATED: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
   INVOICE_PAID: "bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
+  INVOICE_ISSUED: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
+  CHARGE_SENT: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
   CONTRACT_CHANGED: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
   SUBSCRIPTION_CREATED: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
+  SUBSCRIPTION_CHARGES_GENERATED: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
+  MESSAGE_QUEUED: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
   MESSAGE_SENT: "bg-[var(--status-brand-bg)] text-[var(--status-brand-text)]",
   MESSAGE_FAILED: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
+  LOGIN: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
 };
 
 export function statusBadgeClass(

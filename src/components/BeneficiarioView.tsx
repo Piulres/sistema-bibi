@@ -1,6 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import StatusBadge from "@/components/ui/StatusBadge";
+import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
 
 type Overview = {
   patient: {
@@ -77,30 +80,6 @@ type Overview = {
   }[];
 };
 
-const statusClass: Record<string, string> = {
-  AGENDADO: "bg-slate-100 text-slate-700",
-  CONFIRMADO: "bg-blue-100 text-blue-700",
-  REALIZADO: "bg-emerald-100 text-emerald-700",
-  FALTOU: "bg-amber-100 text-amber-700",
-  CANCELADO: "bg-red-100 text-red-700",
-  FECHADA: "bg-indigo-100 text-indigo-700",
-  PAGA: "bg-emerald-100 text-emerald-700",
-  ABERTA: "bg-amber-100 text-amber-700",
-  ATIVA: "bg-emerald-100 text-emerald-700",
-  SUSPENSA: "bg-amber-100 text-amber-700",
-  PENDENTE: "bg-amber-100 text-amber-700",
-};
-
-function Badge({ value }: { value: string }) {
-  return (
-    <span
-      className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusClass[value] ?? "bg-slate-100 text-slate-700"}`}
-    >
-      {value}
-    </span>
-  );
-}
-
 export default function BeneficiarioView() {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -121,8 +100,10 @@ export default function BeneficiarioView() {
     };
   }, []);
 
-  if (loading) return <p className="text-slate-500">Carregando seu painel...</p>;
-  if (error || !overview) return <p className="text-red-600">{error ?? "Dados indisponíveis"}</p>;
+  if (loading) return <LoadingState message="Carregando seu painel..." />;
+  if (error || !overview) {
+    return <Alert tone="danger">{error ?? "Dados indisponíveis"}</Alert>;
+  }
 
   const { patient, summary, nextAppointment } = overview;
   const activeSubscription = overview.subscriptions.find((s) => s.status === "ATIVA");
@@ -195,7 +176,7 @@ export default function BeneficiarioView() {
                     <td className="px-4 py-2 text-slate-800">{appointment.scheduledAtLabel}</td>
                     <td className="px-4 py-2 text-slate-600">{appointment.providerName}</td>
                     <td className="px-4 py-2">
-                      <Badge value={appointment.status} />
+                      <StatusBadge value={appointment.status} map="appointment" />
                     </td>
                     <td className="px-4 py-2 text-slate-500">{appointment.reason ?? "—"}</td>
                   </tr>
@@ -233,7 +214,7 @@ export default function BeneficiarioView() {
                     </td>
                     <td className="px-4 py-2 text-slate-600">{usage.appointmentDateLabel}</td>
                     <td className="px-4 py-2">
-                      <Badge value={usage.billed ? "PAGA" : "ABERTA"} />
+                      <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
                     </td>
                     <td className="px-4 py-2 text-right font-semibold text-slate-900">{usage.priceLabel}</td>
                   </tr>
@@ -260,7 +241,7 @@ export default function BeneficiarioView() {
                     <p className="font-semibold text-slate-900">{invoice.totalLabel}</p>
                     <p className="text-sm text-slate-500">{invoice.createdAtLabel}</p>
                   </div>
-                  <Badge value={invoice.status} />
+                  <StatusBadge value={invoice.status} map="invoice" />
                 </div>
                 <ul className="mt-3 divide-y divide-slate-100 border-t border-slate-100">
                   {invoice.items.map((item) => (
@@ -302,7 +283,7 @@ export default function BeneficiarioView() {
                       {sub.nextDueDateLabel ? ` · próxima: ${sub.nextDueDateLabel}` : ""}
                     </p>
                   </div>
-                  <Badge value={sub.status} />
+                  <StatusBadge value={sub.status} map="subscription" />
                 </div>
                 {sub.charges.length > 0 && (
                   <ul className="mt-4 divide-y divide-slate-100 border-t border-slate-100">

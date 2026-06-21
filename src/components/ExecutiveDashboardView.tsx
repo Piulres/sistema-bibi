@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
 
 type Dashboard = {
   generatedAtLabel: string;
@@ -66,8 +68,8 @@ export default function ExecutiveDashboardView() {
     };
   }, []);
 
-  if (error) return <p className="text-red-600">{error}</p>;
-  if (!dashboard) return <p className="text-slate-500">Carregando indicadores...</p>;
+  if (error) return <Alert tone="danger">{error}</Alert>;
+  if (!dashboard) return <LoadingState message="Carregando indicadores..." />;
 
   const { kpis, revenue, crm } = dashboard;
 

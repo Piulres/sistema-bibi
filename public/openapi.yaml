@@ -91,6 +91,17 @@ components:
             heroFrom: { type: string }
             heroTo: { type: string }
             platformLabel: { type: string }
+    BrandingTokens:
+      type: object
+      properties:
+        displayName: { type: string }
+        tagline: { type: string, nullable: true }
+        logoUrl: { type: string, nullable: true }
+        primaryColor: { type: string, example: '#0d9488' }
+        accentColor: { type: string }
+        heroFrom: { type: string }
+        heroTo: { type: string }
+        platformLabel: { type: string }
     AgendaItem:
       type: object
       properties:
@@ -605,6 +616,51 @@ paths:
                   procedures:
                     type: array
                     items: { $ref: '#/components/schemas/Procedure' }
+
+  /api/interno/branding:
+    get:
+      tags: [Interno]
+      summary: Identidade visual white-label do tenant
+      responses:
+        '200':
+          description: Branding atual
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  branding: { $ref: '#/components/schemas/BrandingTokens' }
+    put:
+      tags: [Interno]
+      summary: Atualizar identidade visual do tenant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BrandingTokens' }
+      responses:
+        '200':
+          description: Branding atualizado
+        '400': { description: Dados inválidos }
+
+  /api/interno/branding/logo:
+    post:
+      tags: [Interno]
+      summary: Upload de logo (PNG/JPG/WebP/SVG, máx. 200KB)
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Logo atualizado
+        '400': { description: Arquivo inválido }
 
   /api/interno/dashboard:
     get:
