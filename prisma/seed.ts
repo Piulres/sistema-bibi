@@ -42,8 +42,42 @@ async function main() {
 
   console.log("Criando tenant...");
   const tenant = await prisma.tenant.create({
-    data: { name: "Clínica Bibi Saúde", cnpj: "12.345.678/0001-90" },
+    data: {
+      name: "Clínica Bibi Saúde",
+      cnpj: "12.345.678/0001-90",
+      branding: {
+        create: {
+          displayName: "Clínica Bibi Saúde",
+          tagline: "Cuidado humanizado com gestão inteligente",
+          primaryColor: "#0d9488",
+          accentColor: "#14b8a6",
+          heroFrom: "#0f172a",
+          heroTo: "#134e4a",
+          platformLabel: "Powered by Sistema Bibi",
+        },
+      },
+    },
   });
+
+  console.log("Criando tenant white-label demo (VitaCare)...");
+  const vitacare = await prisma.tenant.create({
+    data: {
+      name: "Rede VitaCare",
+      cnpj: "99.888.777/0001-11",
+      branding: {
+        create: {
+          displayName: "VitaCare",
+          tagline: "Saúde corporativa sob medida",
+          primaryColor: "#2563eb",
+          accentColor: "#3b82f6",
+          heroFrom: "#1e3a8a",
+          heroTo: "#1d4ed8",
+          platformLabel: "Powered by Sistema Bibi",
+        },
+      },
+    },
+  });
+  void vitacare;
 
   console.log("Criando empresas (PJ) e pipeline CRM...");
   const company = await prisma.company.create({

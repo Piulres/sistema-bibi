@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import PortalHeader from "@/components/PortalHeader";
+import { PORTALS } from "@/lib/roles";
+import PortalShell from "@/components/layout/PortalShell";
 import AtendimentoView from "@/components/AtendimentoView";
 
 export default async function AtendimentoPage(
@@ -11,18 +12,17 @@ export default async function AtendimentoPage(
     redirect("/login");
   }
   const { id } = await props.params;
+  const portal = PORTALS.prestador;
 
   return (
-    <div className="flex-1">
-      <PortalHeader
-        portalLabel="Portal do Prestador"
-        tenantName={user.tenantName}
-        userName={user.name}
-        loginPath="/login"
-      />
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <AtendimentoView appointmentId={id} />
-      </main>
-    </div>
+    <PortalShell
+      portal="prestador"
+      portalLabel={portal.label}
+      loginPath={portal.loginPath}
+      userName={user.name}
+      branding={user.branding}
+    >
+      <AtendimentoView appointmentId={id} />
+    </PortalShell>
   );
 }

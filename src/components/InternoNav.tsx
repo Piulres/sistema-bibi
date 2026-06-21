@@ -1,11 +1,12 @@
-import Link from "next/link";
+import NavTabs, { type NavTab } from "@/components/ui/NavTabs";
+import { PORTAL_THEMES } from "@/lib/theme/portals";
 
-const links = [
-  { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" as const },
-  { href: "/interno", label: "Faturamento", key: "billing" as const },
-  { href: "/interno/crm", label: "CRM Corporativo", key: "crm" as const },
-  { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" as const },
-  { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" as const },
+const tabs: NavTab[] = [
+  { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" },
+  { href: "/interno", label: "Faturamento", key: "billing" },
+  { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
+  { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
+  { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
 ];
 
 export default function InternoNav({
@@ -13,21 +14,13 @@ export default function InternoNav({
 }: {
   active?: "dashboard" | "billing" | "crm" | "subscriptions" | "comunicacao";
 }) {
+  const theme = PORTAL_THEMES.interno;
   return (
-    <nav className="mt-6 flex gap-2 overflow-x-auto border-b border-slate-200">
-      {links.map((link) => (
-        <Link
-          key={link.href}
-          href={link.href}
-          className={`-mb-px shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition ${
-            active === link.key
-              ? "border-indigo-600 text-indigo-700"
-              : "border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700"
-          }`}
-        >
-          {link.label}
-        </Link>
-      ))}
-    </nav>
+    <NavTabs
+      tabs={tabs}
+      active={active}
+      activeClass={theme.navActiveClass}
+      idleClass={theme.navIdleClass}
+    />
   );
 }

@@ -1,26 +1,108 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand — sobrescritos por TenantTheme em runtime */
+  --brand-primary: #0d9488;
+  --brand-primary-hover: #0f766e;
+  --brand-accent: #14b8a6;
+  --brand-hero-from: #0f172a;
+  --brand-hero-to: #134e4a;
+
+  /* Portal accent — sobrescrito por portal context */
+  --portal-accent: #6366f1;
+  --portal-accent-from: #6366f1;
+  --portal-accent-to: #2563eb;
+
+  /* Surfaces */
+  --surface-page: #f8fafc;
+  --surface-card: #ffffff;
+  --surface-muted: #f1f5f9;
+  --surface-inverse: #0f172a;
+
+  /* Borders */
+  --border-default: #e2e8f0;
+  --border-muted: #cbd5e1;
+
+  /* Text */
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-inverse: #ffffff;
+
+  /* Focus */
+  --ring-focus: #99f6e4;
+
+  /* Status */
+  --status-neutral-bg: #f1f5f9;
+  --status-neutral-text: #334155;
+  --status-info-bg: #eef2ff;
+  --status-info-text: #4338ca;
+  --status-success-bg: #ecfdf5;
+  --status-success-text: #047857;
+  --status-warning-bg: #fffbeb;
+  --status-warning-text: #b45309;
+  --status-danger-bg: #fef2f2;
+  --status-danger-text: #b91c1c;
+  --status-brand-bg: #ccfbf1;
+  --status-brand-text: #0f766e;
+
+  /* Legacy aliases */
+  --background: var(--surface-page);
+  --foreground: var(--text-primary);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-brand: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+  --color-surface-page: var(--surface-page);
+  --color-surface-card: var(--surface-card);
+  --color-surface-muted: var(--surface-muted);
+  --color-border-default: var(--border-default);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --radius-card: 0.75rem;
+  --radius-button: 0.5rem;
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Utilitarios semanticos reutilizaveis */
+.ds-card {
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+}
+
+.ds-page-shell {
+  margin-inline: auto;
+  max-width: 64rem;
+  padding-inline: 1.5rem;
+  padding-block: 2rem;
+}
+
+.ds-gradient-brand {
+  background: linear-gradient(
+    to bottom right,
+    var(--brand-hero-from),
+    var(--brand-hero-to)
+  );
+}
+
+.ds-gradient-portal {
+  background: linear-gradient(
+    to bottom right,
+    var(--portal-accent-from),
+    var(--portal-accent-to)
+  );
 }

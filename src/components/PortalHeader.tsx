@@ -1,19 +1,24 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Button from "@/components/ui/Button";
 
 type Props = {
   portalLabel: string;
-  tenantName: string;
+  displayName: string;
+  logoUrl?: string | null;
   userName: string;
   loginPath: string;
+  platformLabel?: string;
 };
 
 export default function PortalHeader({
   portalLabel,
-  tenantName,
+  displayName,
+  logoUrl,
   userName,
   loginPath,
+  platformLabel = "Sistema Bibi",
 }: Props) {
   const router = useRouter();
 
@@ -24,24 +29,45 @@ export default function PortalHeader({
   }
 
   return (
-    <header className="border-b border-slate-200 bg-white">
+    <header className="border-b border-[var(--border-default)] bg-[var(--surface-card)]">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-teal-700">
-            {portalLabel}
-          </p>
-          <p className="text-sm font-medium text-slate-900">{tenantName}</p>
+        <div className="flex min-w-0 items-center gap-3">
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={logoUrl}
+              alt=""
+              className="h-9 w-9 shrink-0 rounded-lg object-contain"
+            />
+          ) : (
+            <div
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)] ds-gradient-brand"
+              aria-hidden
+            >
+              {displayName.charAt(0)}
+            </div>
+          )}
+          <div className="min-w-0">
+            <p className="truncate text-xs font-semibold uppercase tracking-wider text-[var(--brand-primary)]">
+              {portalLabel}
+            </p>
+            <p className="truncate text-sm font-medium text-[var(--text-primary)]">
+              {displayName}
+            </p>
+          </div>
         </div>
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-slate-600 sm:inline">{userName}</span>
-          <button
-            onClick={logout}
-            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
-          >
+          <span className="hidden text-sm text-[var(--text-secondary)] sm:inline">
+            {userName}
+          </span>
+          <Button variant="secondary" size="sm" onClick={logout}>
             Sair
-          </button>
+          </Button>
         </div>
       </div>
+      <p className="border-t border-[var(--border-default)] bg-[var(--surface-muted)] px-6 py-1 text-center text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+        {platformLabel} · white label
+      </p>
     </header>
   );
 }

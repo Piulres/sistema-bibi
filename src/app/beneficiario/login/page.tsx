@@ -1,14 +1,17 @@
 import LoginForm from "@/components/LoginForm";
+import { getPlatformBranding } from "@/lib/theme/branding";
 
-export default function BeneficiarioLoginPage() {
+export default async function BeneficiarioLoginPage() {
+  const branding = await getPlatformBranding();
+
   return (
     <LoginForm
       portal="beneficiario"
       title="Portal do Beneficiário"
       subtitle="Acompanhe agenda, consumo Pay Per Use, faturas e assinatura."
-      accent="from-teal-500 to-cyan-600"
       demoEmail="joao.pereira@email.com"
       demoPassword="bibi123"
+      branding={branding}
     />
   );
 }

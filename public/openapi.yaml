@@ -79,6 +79,18 @@ components:
         companyName: { type: string, nullable: true }
         patientId: { type: string, nullable: true }
         patientName: { type: string, nullable: true }
+        branding:
+          type: object
+          description: Identidade visual white-label do tenant
+          properties:
+            displayName: { type: string }
+            tagline: { type: string, nullable: true }
+            logoUrl: { type: string, nullable: true }
+            primaryColor: { type: string, example: '#0d9488' }
+            accentColor: { type: string }
+            heroFrom: { type: string }
+            heroTo: { type: string }
+            platformLabel: { type: string }
     AgendaItem:
       type: object
       properties:

@@ -2,6 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
 import { prisma } from "@/lib/db";
+import { DEFAULT_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
 
 const COOKIE_NAME = "bibi_session";
 const SECRET = process.env.SESSION_SECRET ?? "bibi-poc-dev-secret-change-me";
@@ -51,6 +52,7 @@ export type SessionUser = {
   tenantName: string;
   companyName: string | null;
   patientName: string | null;
+  branding: BrandingTokens;
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
@@ -61,9 +63,23 @@ export async function getSessionUser(): Promise<SessionUser | null> {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { tenant: true, company: true, patient: true },
+    include: { tenant: { include: { branding: true } }, company: true, patient: true },
   });
   if (!user) return null;
+
+  const brandingRow = user.tenant.branding;
+  const branding: BrandingTokens = brandingRow
+    ? {
+        displayName: brandingRow.displayName,
+        tagline: brandingRow.tagline,
+        logoUrl: brandingRow.logoUrl,
+        primaryColor: brandingRow.primaryColor,
+        accentColor: brandingRow.accentColor,
+        heroFrom: brandingRow.heroFrom,
+        heroTo: brandingRow.heroTo,
+        platformLabel: brandingRow.platformLabel,
+      }
+    : { ...DEFAULT_BRANDING, displayName: user.tenant.name };
 
   return {
     id: user.id,
@@ -76,5 +92,6 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     tenantName: user.tenant.name,
     companyName: user.company?.name ?? null,
     patientName: user.patient?.name ?? null,
+    branding,
   };
 }

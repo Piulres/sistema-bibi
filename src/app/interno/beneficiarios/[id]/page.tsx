@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import PortalHeader from "@/components/PortalHeader";
+import { PORTALS } from "@/lib/roles";
+import PortalShell from "@/components/layout/PortalShell";
 import InternoNav from "@/components/InternoNav";
 import PatientOverviewView from "@/components/PatientOverviewView";
 
@@ -29,24 +30,24 @@ export default async function PatientOverviewPage({
   const returnTo = from && RETURN_LABELS[from] ? from : "/interno";
   const returnLabel = RETURN_LABELS[returnTo] ?? "Voltar ao faturamento";
 
+  const portal = PORTALS.interno;
+
   return (
-    <div className="flex-1">
-      <PortalHeader
-        portalLabel="Portal Interno"
-        tenantName={user.tenantName}
-        userName={user.name}
-        loginPath="/interno/login"
-      />
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <InternoNav />
-        <div className="mt-8">
-          <PatientOverviewView
-            patientId={id}
-            returnTo={returnTo}
-            returnLabel={returnLabel}
-          />
-        </div>
-      </main>
-    </div>
+    <PortalShell
+      portal="interno"
+      portalLabel={portal.label}
+      loginPath={portal.loginPath}
+      userName={user.name}
+      branding={user.branding}
+    >
+      <InternoNav />
+      <div className="mt-8">
+        <PatientOverviewView
+          patientId={id}
+          returnTo={returnTo}
+          returnLabel={returnLabel}
+        />
+      </div>
+    </PortalShell>
   );
 }

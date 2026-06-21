@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import PortalHeader from "@/components/PortalHeader";
+import { PORTALS } from "@/lib/roles";
+import PortalShell from "@/components/layout/PortalShell";
+import PageHeader from "@/components/layout/PageHeader";
 import InternoNav from "@/components/InternoNav";
 import ComunicacaoView from "@/components/ComunicacaoView";
 
@@ -10,24 +12,24 @@ export default async function ComunicacaoPage() {
     redirect("/interno/login");
   }
 
+  const portal = PORTALS.interno;
+
   return (
-    <div className="flex-1">
-      <PortalHeader
-        portalLabel="Portal Interno"
-        tenantName={user.tenantName}
-        userName={user.name}
-        loginPath="/interno/login"
+    <PortalShell
+      portal="interno"
+      portalLabel={portal.label}
+      loginPath={portal.loginPath}
+      userName={user.name}
+      branding={user.branding}
+    >
+      <PageHeader
+        title="Comunicação"
+        description="Enfileire lembretes e notificações por e-mail, SMS ou WhatsApp."
       />
-      <main className="mx-auto max-w-5xl px-6 py-8">
-        <h1 className="text-2xl font-bold text-slate-900">Comunicação</h1>
-        <p className="mt-1 text-slate-600">
-          Enfileire lembretes e notificações por e-mail, SMS ou WhatsApp.
-        </p>
-        <InternoNav active="comunicacao" />
-        <div className="mt-8">
-          <ComunicacaoView />
-        </div>
-      </main>
-    </div>
+      <InternoNav active="comunicacao" />
+      <div className="mt-8">
+        <ComunicacaoView />
+      </div>
+    </PortalShell>
   );
 }
