@@ -116,6 +116,13 @@ export default function PatientOverviewView({
         <p className="mt-1 text-[var(--text-muted)]">
           Visão consolidada do beneficiário — dados, atendimentos, procedimentos e faturamento.
         </p>
+        <a
+          href={`/api/interno/patients/${patientId}/export`}
+          download
+          className="mt-3 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
+        >
+          Exportar dados (LGPD JSON)
+        </a>
       </div>
 
       <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">

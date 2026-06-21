@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { createUser, listUsers } from "@/lib/user-service";
 
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const users = await listUsers(user.tenantId);
     return NextResponse.json({ users });
   } catch (error) {
@@ -14,7 +14,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const body = (await request.json()) as {
       email?: string;
       password?: string;
@@ -22,6 +22,7 @@ export async function POST(request: Request) {
       role?: string;
       companyId?: string | null;
       patientId?: string | null;
+      internoProfile?: string | null;
     };
 
     if (!body.email?.trim() || !body.password?.trim() || !body.name?.trim() || !body.role) {
@@ -36,6 +37,7 @@ export async function POST(request: Request) {
       role: body.role,
       companyId: body.companyId,
       patientId: body.patientId,
+      internoProfile: body.internoProfile,
       createdBy: user.id,
     });
 

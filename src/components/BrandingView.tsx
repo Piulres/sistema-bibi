@@ -12,6 +12,7 @@ import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import LoadingState from "@/components/ui/LoadingState";
 import SectionHeader from "@/components/ui/SectionHeader";
+import { customDomainSetupHint } from "@/lib/custom-domain-hint";
 
 type ColorField = keyof Pick<
   BrandingTokens,
@@ -127,6 +128,29 @@ export default function BrandingView() {
     }
   }
 
+  async function verifyDomain() {
+    if (!form) return;
+    setSaving(true);
+    setMsg(null);
+    setError(null);
+    try {
+      const res = await fetch("/api/interno/branding", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, verifyCustomDomain: true }),
+      });
+      const data = await res.json();
+      if (!res.ok) setError(data.error ?? "Erro ao verificar domínio");
+      else {
+        setForm(data.branding);
+        setMsg("Domínio marcado como verificado (simulação POC)");
+        router.refresh();
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
   if (loading) return <LoadingState message="Carregando identidade visual..." />;
   if (error && !form) return <Alert tone="danger">{error}</Alert>;
   if (!form) return null;
@@ -224,6 +248,41 @@ export default function BrandingView() {
                 className="mt-1 block w-full text-sm text-[var(--text-muted)] file:mr-3 file:rounded-[var(--radius-button)] file:border-0 file:bg-[var(--surface-muted)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--text-secondary)]"
               />
             </label>
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader
+            title="Domínio customizado"
+            description="White label com DNS próprio (CNAME para Netlify). Verificação manual na POC."
+          />
+          <div className="mt-4 space-y-4">
+            <Input
+              label="Domínio"
+              value={form.customDomain ?? ""}
+              onChange={(e) => updateField("customDomain", e.target.value || null)}
+              placeholder="saude.suaempresa.com.br"
+              hint={
+                form.customDomain
+                  ? customDomainSetupHint(form.customDomain)
+                  : "Deixe vazio para usar apenas o host padrão"
+              }
+            />
+            {form.customDomain && (
+              <p className="text-sm text-[var(--text-muted)]">
+                Status:{" "}
+                {form.customDomainVerified ? (
+                  <span className="font-medium text-emerald-600">Verificado</span>
+                ) : (
+                  <span className="font-medium text-amber-600">Aguardando verificação DNS</span>
+                )}
+              </p>
+            )}
+            {form.customDomain && !form.customDomainVerified && (
+              <Button type="button" variant="secondary" size="sm" disabled={saving} onClick={verifyDomain}>
+                Marcar domínio como verificado
+              </Button>
+            )}
           </div>
         </Card>
 

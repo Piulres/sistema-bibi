@@ -13,7 +13,24 @@ export type BrandingInput = {
   heroTo: string;
   platformLabel: string;
   colorScheme?: string;
+  customDomain?: string | null;
+  verifyCustomDomain?: boolean;
 };
+
+const DOMAIN_RE = /^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?(\.[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?)+$/;
+
+export function normalizeCustomDomain(value: string | null | undefined): string | null {
+  if (value == null || value.trim() === "") return null;
+  return value.trim().toLowerCase();
+}
+
+export function validateCustomDomain(value: string | null | undefined): string | null {
+  const domain = normalizeCustomDomain(value);
+  if (!domain) return null;
+  if (domain.length > 253) return "Domínio muito longo";
+  if (!DOMAIN_RE.test(domain)) return "Domínio customizado inválido";
+  return null;
+}
 
 export function isHexColor(value: string): boolean {
   return HEX_COLOR.test(value);
@@ -70,6 +87,9 @@ export function validateBrandingInput(input: BrandingInput): string | null {
     return "Tema deve ser light, dark ou system";
   }
 
+  const domainError = validateCustomDomain(input.customDomain);
+  if (domainError) return domainError;
+
   return null;
 }
 
@@ -84,5 +104,7 @@ export function sanitizeBrandingInput(input: BrandingInput): BrandingTokens {
     heroTo: normalizeHexColor(input.heroTo)!,
     platformLabel: input.platformLabel.trim(),
     colorScheme: normalizeColorScheme(input.colorScheme),
+    customDomain: normalizeCustomDomain(input.customDomain),
+    customDomainVerified: false,
   };
 }

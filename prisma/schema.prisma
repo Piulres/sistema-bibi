@@ -31,6 +31,7 @@ model Tenant {
   timelineEvents TimelineEvent[]
   messages       Message[]
   branding       TenantBranding?
+  webhooks       WebhookEndpoint[]
 }
 
 /// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
@@ -51,6 +52,9 @@ model TenantBranding {
   platformLabel  String @default("Sistema Bibi")
   /// colorScheme: light | dark | system
   colorScheme    String @default("light")
+  /// Dominio customizado white-label (ex.: saude.cliente.com.br) — DNS manual na POC
+  customDomain   String? @unique
+  customDomainVerified Boolean @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
@@ -64,6 +68,8 @@ model User {
   password  String
   name      String
   role      String
+  /// Perfil granular do portal interno: ADMIN | FATURAMENTO | RECEPCAO | READONLY (null = ADMIN)
+  internoProfile String?
   createdAt DateTime @default(now())
 
   tenantId String
@@ -108,6 +114,9 @@ model Patient {
   cpf       String   @unique
   birthDate DateTime
   phone     String?
+  /// LGPD — consentimento para tratamento de dados
+  consentAt      DateTime?
+  consentVersion String?
   createdAt DateTime @default(now())
 
   tenantId String
@@ -361,4 +370,20 @@ model Message {
   patient   Patient @relation(fields: [patientId], references: [id])
 
   createdBy String?
+}
+
+/// Webhook outbound para integrações B2B do tenant.
+/// events: JSON array — INVOICE_ISSUED | APPOINTMENT_CREATED | COMPANY_STATUS_CHANGED | PATIENT_CREATED
+model WebhookEndpoint {
+  id        String   @id @default(cuid())
+  tenantId  String
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  label     String
+  url       String
+  secret    String?
+  events    String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([tenantId])
 }

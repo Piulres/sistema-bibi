@@ -1,17 +1,12 @@
-import { redirect } from "next/navigation";
-import { getSessionUser } from "@/lib/session";
 import { PORTALS } from "@/lib/roles";
 import PortalShell from "@/components/layout/PortalShell";
 import PageHeader from "@/components/layout/PageHeader";
 import InternoNav from "@/components/InternoNav";
 import CrmPipelineView from "@/components/CrmPipelineView";
+import { requireInternoPage } from "@/lib/interno-guard";
 
 export default async function InternoCrmPage() {
-  const user = await getSessionUser();
-  if (!user || user.role !== "INTERNO") {
-    redirect("/interno/login");
-  }
-
+  const user = await requireInternoPage("crm");
   const portal = PORTALS.interno;
 
   return (
@@ -22,11 +17,8 @@ export default async function InternoCrmPage() {
       userName={user.name}
       branding={user.branding}
     >
-      <PageHeader
-        title="CRM Corporativo"
-        description="Pipeline de empresas contratantes — do lead ao contrato ativo."
-      />
-      <InternoNav active="crm" />
+      <PageHeader title="CRM Corporativo" description="Pipeline de empresas e status de contrato." />
+      <InternoNav active="crm" permissions={user.internoPermissions} />
       <div className="mt-8">
         <CrmPipelineView />
       </div>

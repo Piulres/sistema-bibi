@@ -2,11 +2,11 @@ import { PORTALS } from "@/lib/roles";
 import PortalShell from "@/components/layout/PortalShell";
 import PageHeader from "@/components/layout/PageHeader";
 import InternoNav from "@/components/InternoNav";
-import BillingView from "@/components/BillingView";
+import IntegracoesView from "@/components/IntegracoesView";
 import { requireInternoPage } from "@/lib/interno-guard";
 
-export default async function InternoBillingPage() {
-  const user = await requireInternoPage("billing");
+export default async function IntegracoesPage() {
+  const user = await requireInternoPage("integracoes");
   const portal = PORTALS.interno;
 
   return (
@@ -18,12 +18,12 @@ export default async function InternoBillingPage() {
       branding={user.branding}
     >
       <PageHeader
-        title="Faturamento"
-        description="Controle financeiro e geração de faturas Pay Per Use."
+        title="Integrações B2B"
+        description="Webhooks outbound para ERPs, folha de pagamento e parceiros corporativos."
       />
-      <InternoNav active="billing" permissions={user.internoPermissions} />
+      <InternoNav active="integracoes" permissions={user.internoPermissions} />
       <div className="mt-8">
-        <BillingView />
+        <IntegracoesView />
       </div>
     </PortalShell>
   );

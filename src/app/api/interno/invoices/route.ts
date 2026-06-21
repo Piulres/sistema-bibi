@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
 import {
   recordTimelineEvent,
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
 
 /**
  * Gera uma fatura Pay Per Use para um paciente, agregando todos os
@@ -17,7 +18,7 @@ import {
  */
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("billing");
     const body = (await request.json()) as { patientId?: string };
 
     if (!body.patientId) {
@@ -85,6 +86,18 @@ export async function POST(request: Request) {
       );
 
       return created;
+    });
+
+    void dispatchWebhooks({
+      tenantId: user.tenantId,
+      event: "INVOICE_ISSUED",
+      data: {
+        invoiceId: invoice.id,
+        patientId: patient.id,
+        companyId: patient.companyId,
+        total: invoice.total,
+        status: invoice.status,
+      },
     });
 
     return NextResponse.json({

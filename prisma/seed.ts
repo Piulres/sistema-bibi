@@ -28,6 +28,7 @@ async function main() {
   console.log("Limpando dados existentes...");
   await prisma.timelineEvent.deleteMany();
   await prisma.message.deleteMany();
+  await prisma.webhookEndpoint.deleteMany();
   await prisma.subscriptionCharge.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.invoiceItem.deleteMany();
@@ -155,6 +156,17 @@ async function main() {
       password: DEMO_PASSWORD,
       name: "Carlos Faturamento",
       role: "INTERNO",
+      internoProfile: "ADMIN",
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.user.create({
+    data: {
+      email: "recepcao@bibi.health",
+      password: DEMO_PASSWORD,
+      name: "Paula Recepção",
+      role: "INTERNO",
+      internoProfile: "RECEPCAO",
       tenantId: tenant.id,
     },
   });
@@ -203,6 +215,8 @@ async function main() {
       cpf: "111.222.333-44",
       birthDate: new Date("1985-04-12"),
       phone: "(11) 98888-1111",
+      consentAt: new Date(),
+      consentVersion: "v1-poc",
       tenantId: tenant.id,
       companyId: company.id,
     },
@@ -233,6 +247,8 @@ async function main() {
       cpf: "555.666.777-88",
       birthDate: new Date("1992-09-30"),
       phone: "(11) 97777-2222",
+      consentAt: new Date(),
+      consentVersion: "v1-poc",
       tenantId: tenant.id,
       companyId: company.id,
     },
@@ -526,6 +542,17 @@ async function main() {
     },
   });
 
+  console.log("Criando webhook demo (Integrações B2B)...");
+  await prisma.webhookEndpoint.create({
+    data: {
+      tenantId: tenant.id,
+      label: "ERP TechCorp (demo)",
+      url: "https://webhook.site/demo-bibi-tier3",
+      secret: "demo-webhook-secret",
+      events: JSON.stringify(["INVOICE_ISSUED", "APPOINTMENT_CREATED", "COMPANY_STATUS_CHANGED"]),
+    },
+  });
+
   console.log("Criando fila de comunicacoes (Comunicacao)...");
   const msgJoao = await prisma.message.create({
     data: {
@@ -576,6 +603,7 @@ async function main() {
   console.log("\nCredenciais de acesso (POC):");
   console.log("  Prestador    -> /login              : dra.helena@bibi.health / bibi123");
   console.log("  Interno      -> /interno/login       : faturamento@bibi.health / bibi123");
+  console.log("  Recepção     -> /interno/login       : recepcao@bibi.health / bibi123 (RBAC limitado)");
   console.log("  Empresa PJ   -> /pj/login            : rh@techcorp.com / bibi123");
   console.log("  Beneficiario -> /beneficiario/login  : joao.pereira@email.com / bibi123");
 }

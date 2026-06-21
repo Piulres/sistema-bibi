@@ -2,6 +2,7 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { ROLES } from "@/lib/roles";
+import { isInternoProfile } from "@/lib/interno-permissions";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 
 export const ASSIGNABLE_ROLES = [
@@ -20,6 +21,7 @@ export type UserListView = {
   email: string;
   name: string;
   role: string;
+  internoProfile: string | null;
   companyId: string | null;
   patientId: string | null;
 };
@@ -29,6 +31,7 @@ function mapUser(u: {
   email: string;
   name: string;
   role: string;
+  internoProfile: string | null;
   companyId: string | null;
   patientId: string | null;
 }): UserListView {
@@ -37,6 +40,7 @@ function mapUser(u: {
     email: u.email,
     name: u.name,
     role: u.role,
+    internoProfile: u.internoProfile,
     companyId: u.companyId,
     patientId: u.patientId,
   };
@@ -58,10 +62,15 @@ export async function createUser(input: {
   role: string;
   companyId?: string | null;
   patientId?: string | null;
+  internoProfile?: string | null;
   createdBy: string;
 }) {
   if (!isAssignableRole(input.role)) {
     return { error: "Perfil inválido" as const };
+  }
+
+  if (input.role === ROLES.INTERNO && input.internoProfile && !isInternoProfile(input.internoProfile)) {
+    return { error: "Perfil interno inválido" as const };
   }
 
   const email = input.email.toLowerCase().trim();
@@ -82,6 +91,8 @@ export async function createUser(input: {
       password: hashPassword(input.password),
       name: input.name.trim(),
       role: input.role,
+      internoProfile:
+        input.role === ROLES.INTERNO ? (input.internoProfile ?? null) : null,
       companyId: input.companyId ?? null,
       patientId: input.patientId ?? null,
     },
@@ -108,6 +119,7 @@ export async function updateUser(input: {
   role?: string;
   companyId?: string | null;
   patientId?: string | null;
+  internoProfile?: string | null;
   createdBy: string;
 }) {
   const existing = await prisma.user.findFirst({
@@ -117,6 +129,11 @@ export async function updateUser(input: {
 
   if (input.role && !isAssignableRole(input.role)) {
     return { error: "Perfil inválido" as const };
+  }
+
+  const nextRole = input.role ?? existing.role;
+  if (nextRole === ROLES.INTERNO && input.internoProfile && !isInternoProfile(input.internoProfile)) {
+    return { error: "Perfil interno inválido" as const };
   }
 
   if (input.email) {
@@ -134,6 +151,12 @@ export async function updateUser(input: {
       password: input.password ? hashPassword(input.password) : undefined,
       name: input.name?.trim(),
       role: input.role,
+      internoProfile:
+        nextRole === ROLES.INTERNO
+          ? input.internoProfile === undefined
+            ? undefined
+            : input.internoProfile
+          : null,
       companyId: input.companyId === undefined ? undefined : input.companyId,
       patientId: input.patientId === undefined ? undefined : input.patientId,
     },

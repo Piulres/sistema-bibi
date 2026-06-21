@@ -1,0 +1,66 @@
+/** Módulos do portal interno para RBAC granular. */
+export const INTERNO_MODULES = [
+  "dashboard",
+  "billing",
+  "agenda",
+  "cadastros",
+  "crm",
+  "subscriptions",
+  "comunicacao",
+  "relatorios",
+  "branding",
+  "integracoes",
+] as const;
+
+export type InternoModule = (typeof INTERNO_MODULES)[number];
+
+/** internoProfile: ADMIN | FATURAMENTO | RECEPCAO | READONLY */
+export const INTERNO_PROFILES = {
+  ADMIN: [...INTERNO_MODULES],
+  FATURAMENTO: ["dashboard", "billing", "subscriptions", "relatorios"],
+  RECEPCAO: ["dashboard", "agenda", "cadastros", "comunicacao"],
+  READONLY: ["dashboard", "relatorios"],
+} as const satisfies Record<string, readonly InternoModule[]>;
+
+export type InternoProfile = keyof typeof INTERNO_PROFILES;
+
+const PROFILE_SET = new Set<string>(Object.keys(INTERNO_PROFILES));
+
+export function isInternoProfile(value: string): value is InternoProfile {
+  return PROFILE_SET.has(value);
+}
+
+/** null/undefined = ADMIN (compatibilidade seed). */
+export function resolveInternoPermissions(
+  role: string,
+  internoProfile: string | null | undefined,
+): InternoModule[] {
+  if (role !== "INTERNO") return [];
+  if (!internoProfile || !isInternoProfile(internoProfile)) {
+    return [...INTERNO_PROFILES.ADMIN];
+  }
+  return [...INTERNO_PROFILES[internoProfile]];
+}
+
+export function hasInternoPermission(
+  role: string,
+  internoProfile: string | null | undefined,
+  module: InternoModule,
+): boolean {
+  return resolveInternoPermissions(role, internoProfile).includes(module);
+}
+
+export function internoProfileLabel(profile: string | null | undefined): string {
+  switch (profile) {
+    case "FATURAMENTO":
+      return "Faturamento";
+    case "RECEPCAO":
+      return "Recepção";
+    case "READONLY":
+      return "Somente leitura";
+    case "ADMIN":
+      return "Administrador";
+    default:
+      return "Administrador (padrão)";
+  }
+}
