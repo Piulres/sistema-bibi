@@ -478,7 +478,41 @@ Detalhes: [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md)
 
 ---
 
-## 14. Documentação da API
+## 15. Dashboard Executivo (Épico 8)
+
+Visão consolidada de KPIs do tenant no Portal Interno, agregando dados dos
+épicos anteriores sem duplicar entidades.
+
+```mermaid
+flowchart LR
+  Page["/interno/dashboard"] --> API["GET /api/interno/dashboard"]
+  API --> Svc["getExecutiveDashboard()"]
+  Svc --> PP["Pay Per Use pendente"]
+  Svc --> CRM["Pipeline CRM"]
+  Svc --> Sub["MRR / recorrência"]
+  Svc --> Msg["Fila de comunicação"]
+  Svc --> TL["Timeline recente"]
+```
+
+| KPI | Fonte |
+|-----|-------|
+| Pendente Pay Per Use | `ProcedureUsage` não faturados |
+| Total faturado | `Invoice` |
+| MRR estimado | `Subscription` ATIVA (normalizado mensal) |
+| Pipeline CRM | `Company` por status |
+| Atividade recente | `TimelineEvent` (últimos 10) |
+
+### Checklist de homologação (Épico 8)
+
+- [x] `getExecutiveDashboard()` com agregações paralelas
+- [x] API `GET /api/interno/dashboard`
+- [x] UI `/interno/dashboard` + aba no `InternoNav`
+- [x] Links para módulos e Cliente 360°
+- [x] Build passando
+
+---
+
+## 16. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:

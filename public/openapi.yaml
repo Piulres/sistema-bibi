@@ -336,6 +336,61 @@ components:
         patientId: { type: string }
         patientName: { type: string }
         patientPhone: { type: string, nullable: true }
+    ExecutiveDashboard:
+      type: object
+      properties:
+        generatedAt: { type: string, format: date-time }
+        generatedAtLabel: { type: string }
+        kpis:
+          type: object
+          properties:
+            totalPatients: { type: integer }
+            totalCompanies: { type: integer }
+            appointmentsToday: { type: integer }
+            pendingBillingLabel: { type: string }
+            totalInvoicedLabel: { type: string }
+            activeSubscriptions: { type: integer }
+            mrrEstimateLabel: { type: string }
+            pendingMessages: { type: integer }
+            pendingRecurrenceCharges: { type: integer }
+        revenue:
+          type: object
+          properties:
+            pendingPayPerUseLabel: { type: string }
+            pendingRecurrenceLabel: { type: string }
+            invoicedOpenLabel: { type: string }
+            invoicedPaidLabel: { type: string }
+        crm:
+          type: object
+          properties:
+            activeContracts: { type: integer }
+            byStatus:
+              type: array
+              items:
+                type: object
+                properties:
+                  status: { type: string }
+                  label: { type: string }
+                  count: { type: integer }
+        topPendingBilling:
+          type: array
+          items:
+            type: object
+            properties:
+              patientId: { type: string }
+              patientName: { type: string }
+              totalLabel: { type: string }
+              itemsCount: { type: integer }
+        recentActivity:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              action: { type: string }
+              description: { type: string }
+              createdAtLabel: { type: string }
+              actorName: { type: string, nullable: true }
     CompanyPipelineCard:
       type: object
       properties:
@@ -536,6 +591,24 @@ paths:
                   procedures:
                     type: array
                     items: { $ref: '#/components/schemas/Procedure' }
+
+  /api/interno/dashboard:
+    get:
+      tags: [Interno]
+      summary: Dashboard Executivo — KPIs consolidados do tenant
+      description: >
+        Agrega receita Pay Per Use, recorrência (MRR), CRM, comunicação e
+        atividade recente da Timeline.
+      responses:
+        '200':
+          description: KPIs executivos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  dashboard: { $ref: '#/components/schemas/ExecutiveDashboard' }
+        '403': { description: Acesso negado (role != INTERNO) }
 
   /api/interno/billing:
     get:

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 const links = [
+  { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" as const },
   { href: "/interno", label: "Faturamento", key: "billing" as const },
   { href: "/interno/crm", label: "CRM Corporativo", key: "crm" as const },
   { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" as const },
@@ -10,7 +11,7 @@ const links = [
 export default function InternoNav({
   active,
 }: {
-  active: "billing" | "crm" | "subscriptions" | "comunicacao";
+  active: "dashboard" | "billing" | "crm" | "subscriptions" | "comunicacao";
 }) {
   return (
     <nav className="mt-6 flex gap-2 overflow-x-auto border-b border-slate-200">
