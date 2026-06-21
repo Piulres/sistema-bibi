@@ -393,6 +393,8 @@ sistema-bibi/
 
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/FLUXOS.md`](docs/FLUXOS.md)
+- **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
+  [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
   [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 - **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
