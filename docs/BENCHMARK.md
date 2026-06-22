@@ -18,7 +18,7 @@ e **referências de mercado** citadas no projeto.
 | ❌ | Não implementado (roadmap) |
 | ⭐ | Diferencial do Bibi vs benchmark típico de clínica |
 
-Última revisão: alinhada à `main` pós PRs #1–#23 (Tiers 1–4 + docs + PIX faturamento).
+Última revisão: alinhada à `main` pós PRs #1–#28 (Tiers 1–4, docs, PIX faturamento, deploy Netlify).
 
 ---
 

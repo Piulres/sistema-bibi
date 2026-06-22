@@ -6,6 +6,10 @@ e são renderizados automaticamente no GitHub.
 
 > **Fluxos de usuário detalhados** (todos os portais, RBAC, máquinas de estado):
 > [`FLUXOS.md`](FLUXOS.md)
+>
+> **Evidências visuais** (vídeos/screenshots): [`evidencias/README.md`](evidencias/README.md)
+>
+> **Deploy Netlify:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) · produção: https://sistema-bibi.netlify.app
 
 ---
 
