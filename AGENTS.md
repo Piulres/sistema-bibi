@@ -17,8 +17,8 @@ dinâmica por empresa).
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
-**Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
-fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
+**Deploy (PRs #26–#28, #32–#34, #39):** ambiente Cloud Agent, plugin Blobs regional,
+Prisma `rhel-openssl-3.0.x`, pipeline CI Git (`publish = ".next"` no `netlify.toml`).
 **Produção:** https://sistema-bibi.netlify.app
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/HISTORICO_2026-06-21.md`
@@ -74,7 +74,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
-- **Netlify:** config em `netlify.toml`; build com `npm run netlify:build`; ver
+- **Netlify:** config em `netlify.toml` (`publish = ".next"`); build com `npm run netlify:build`; ver
   `docs/DEPLOY_NETLIFY.md`. Site linkado na CLI pode retornar `503 usage_exceeded`
   se a cota estiver esgotada.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em

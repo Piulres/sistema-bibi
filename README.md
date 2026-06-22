@@ -387,9 +387,8 @@ sistema-bibi/
   `.env` são *gitignored*.
 - POC sem testes automatizados — recomendados para evolução do produto.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy via CLI validado;
-  deploy Git automático ainda com falhas intermitentes — ver
-  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md) e
+- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy Git e CLI validados;
+  ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md) e
   [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)).
   Build local: `npm run netlify:build`.
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
