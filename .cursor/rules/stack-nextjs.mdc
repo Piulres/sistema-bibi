@@ -38,6 +38,7 @@ Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
 
 ```bash
 npm run lint
+npm run test    # 88 Vitest — espelha CI; pre-release não roda testes
 ```
 
 Se tocar em build/deploy: `npm run pre-release` (não publica).

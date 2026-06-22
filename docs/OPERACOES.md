@@ -91,7 +91,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 1. Branch: `cursor/<descricao>-3ecd` (Cloud Agent) ou feature local.
 2. Codar e testar com `npm run dev`.
-3. `npm run lint` antes de abrir PR.
+3. `npm run lint && npm run test` antes de abrir PR (ver §4.5).
 4. **Não** incluir deploy na PR — merge na `main` não publica produção.
 
 ### 4.2 Testar fluxos localmente
@@ -116,6 +116,32 @@ Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos det
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
 
+### 4.4 Restaurar modo demo
+
+Recria a massa do seed sem apagar o schema — útil após testes destrutivos em POC.
+
+| Item | Detalhe |
+|------|---------|
+| **UI** | `/interno/seguranca` → card “Restaurar estado original do seed” |
+| **Quem** | Perfil interno **ADMIN** (`faturamento@bibi.health`) |
+| **API** | `GET /api/interno/demo/reset` (status) · `POST` com `{ "confirm": "RESTAURAR" }` |
+| **Lógica** | `src/lib/demo-reset.ts` → `runDatabaseSeed()` |
+| **Flag** | `ALLOW_DEMO_RESET` — `true` em POC Netlify; `false` desliga em produção real |
+
+> Após restaurar, IDs de usuário/paciente mudam — faça logout e login novamente.
+
+### 4.5 Validar antes de PR (`pre-release` vs CI)
+
+| Etapa | `npm run pre-release` | CI (`.github/workflows/ci.yml`) |
+|-------|----------------------|-----------------------------------|
+| Lint | ✅ | ✅ |
+| Build Netlify (`netlify:build`) | ✅ | ✅ (`npm run build`) |
+| Testes Vitest (`npm run test`) | ❌ | ✅ (88 testes) |
+| E2E Playwright (`npm run test:e2e`) | ❌ | ✅ (44 testes, `SEED_SCALE=small`) |
+| Node | qualquer 20+ | **24** |
+
+**Antes de abrir PR:** rode `npm run lint && npm run test` localmente. O `pre-release` valida o pacote Netlify, mas **não** substitui a suíte de testes do CI.
+
 ---
 
 ## 5. Operações de release (pacote fechado)
@@ -139,17 +165,21 @@ main acumula commits → pre-release OK → deploy manual → RELEASES.md atuali
 - [ ] `git checkout main && git pull`
 - [ ] `npm run pre-release` — sem erros
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
-- [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
+- [ ] `npx netlify deploy --prod --no-build --message "vX.Y.Z: resumo"`
 - [ ] Smoke test: landing + um login por portal
 - [ ] Atualizar [`RELEASES.md`](RELEASES.md) (mover rascunho → produção)
-- [ ] Commit: `docs(release): fecha pacote bibi-poc-YYYY-MM-DDx`
-- [ ] (Opcional) Tag git: `git tag -a bibi-poc-...`
+- [ ] Commit: `docs(release): fecha pacote vX.Y.Z`
+- [ ] (Recomendado) Tag git: `git tag -a vX.Y.Z`
 
 ### 5.3 Convenção de nome
 
+A partir de **1.0.0**, releases estáveis usam **versionamento semântico**:
+
 ```
-bibi-poc-AAAA-MM-DD[a|b|c]
+vMAJOR.MINOR.PATCH   (ex.: v1.0.0, v1.1.0, v1.0.1)
 ```
+
+Pacotes POC anteriores (`bibi-poc-AAAA-MM-DDx`) permanecem no histórico de [`RELEASES.md`](RELEASES.md).
 
 Exemplo atual em produção: **`v1.0.0`** (`685cc21`). Ver [`RELEASES.md`](RELEASES.md).
 
