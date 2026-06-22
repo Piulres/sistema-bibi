@@ -419,6 +419,44 @@ Disparo: `POST /api/interno/reminders` ou cron `POST /api/cron/reminders`.
 Empresa `INADIMPLENTE`, faturas `FECHADA` em aberto ou cobranças vencidas →
 alertas em `getPjPortalOverview()`.
 
+### 8.5 Restauração modo demo
+
+Permite que um admin interno volte o banco ao estado original do seed após
+explorar a POC — sem `db:reset` manual na CLI.
+
+| Item | Código |
+|------|--------|
+| Página | `/interno/seguranca` — `DemoResetCard` |
+| Guard | `isDemoResetEnabled()` + `isInternoAdmin()` |
+| API status | `GET /api/interno/demo/reset` |
+| API executar | `POST /api/interno/demo/reset` — body `{ "confirm": "RESTAURAR" }` |
+| Seed | `executeDemoReset()` → `runDatabaseSeed()` |
+
+```mermaid
+sequenceDiagram
+  participant A as Admin
+  participant UI as DemoResetCard
+  participant API as /api/interno/demo/reset
+  participant S as runDatabaseSeed()
+
+  A->>UI: Acessa /interno/seguranca
+  UI->>API: GET (status: enabled, canReset)
+  A->>UI: Digita RESTAURAR e confirma
+  UI->>API: POST { confirm: "RESTAURAR" }
+  API->>S: executeDemoReset(prisma)
+  Note over S: Recria tenants, usuários, faturas…
+  S-->>API: SeedRunResult
+  API-->>UI: 200 — IDs recriados
+  Note over A: Sessões anteriores inválidas
+```
+
+**Restrições:**
+
+- `ALLOW_DEMO_RESET=true` obrigatório em produção (padrão off com `NODE_ENV=production`)
+- Apenas perfil **ADMIN** (`faturamento@bibi.health`)
+- Operação bloqueada se outra restauração estiver em andamento (409)
+- Detalhes operacionais: [`OPERACOES.md`](OPERACOES.md) §4.4 · env: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md)
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo

@@ -79,6 +79,8 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
 | `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run test` | Vitest (unit + security + integration + api) | Antes de PR; espelha CI parcial |
+| `npm run test:e2e` | Playwright (5 specs) | Antes de PR; CI roda após `test` |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
@@ -115,6 +117,57 @@ Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos det
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
 
+Massa demo modular: `prisma/seed.ts` orquestra módulos em `prisma/seed-data/`.
+Volume controlado por `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
+
+### 4.4 Restaurar modo demo (UI)
+
+Após explorar o sistema em demo, um admin pode voltar ao estado original do seed
+sem `db:reset` manual.
+
+| Item | Detalhe |
+|------|---------|
+| **UI** | `/interno/seguranca` → card “Restaurar estado original do seed” |
+| **Quem** | Perfil interno **ADMIN** (`faturamento@bibi.health`) |
+| **API** | `GET /api/interno/demo/reset` (status) · `POST` com `{ "confirm": "RESTAURAR" }` |
+| **Lógica** | `src/lib/demo-reset.ts` → `runDatabaseSeed()` em `prisma/seed-data/run-seed.ts` |
+| **Flag** | `ALLOW_DEMO_RESET` — padrão `true` em dev; em produção, **off** salvo `true` explícito |
+| **Efeito** | Recria toda a massa; IDs mudam — sessões ativas ficam inválidas |
+
+```mermaid
+sequenceDiagram
+  participant A as Admin (INTERNO)
+  participant UI as /interno/seguranca
+  participant API as POST /api/interno/demo/reset
+  participant S as runDatabaseSeed()
+
+  A->>UI: Digita RESTAURAR e confirma
+  UI->>API: { confirm: "RESTAURAR" }
+  API->>API: isDemoResetEnabled() + ADMIN
+  API->>S: executeDemoReset(prisma)
+  S-->>API: SeedRunResult
+  API-->>UI: 200 + resumo
+```
+
+> Em produção Netlify, o botão **não aparece** sem `ALLOW_DEMO_RESET=true` no painel.
+> Ver [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) e [`TESTES.md`](TESTES.md) (`demo-reset.test.ts`).
+
+### 4.5 Validação antes de PR
+
+| Comando | O que cobre | Quando |
+|---------|-------------|--------|
+| `npm run lint` | ESLint | Sempre antes de PR |
+| `npm run test` | 53 testes Vitest | Antes de PR (recomendado) |
+| `npm run test:e2e` | 5 specs Playwright | Antes de PR (recomendado) |
+| `npm run pre-release` | lint + `netlify:build` | Antes de fechar pacote |
+
+`pre-release` **não** roda testes — o CI (`.github/workflows/ci.yml`) adiciona
+`npm run test` + `npm run test:e2e`. Para espelhar o CI localmente:
+
+```bash
+npm run lint && npm run test && npm run build && npm run test:e2e
+```
+
 ---
 
 ## 5. Operações de release (pacote fechado)
@@ -150,7 +203,7 @@ main acumula commits → pre-release OK → deploy manual → RELEASES.md atuali
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi-poc-2026-06-22b` (`158b69f`).
+Exemplo atual em produção: `bibi-poc-2026-06-22b` (`92348ba`). `main` alinhada — próximo pacote acumula merges.
 
 ---
 
@@ -167,7 +220,8 @@ Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi
 
 **Produção:** https://sistema-bibi.netlify.app
 
-**Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+**Status conhecido (22/06/2026):** ✅ HTTP 200 — pacote `bibi-poc-2026-06-22b` em produção.
+Se retornar `503 usage_exceeded`, é cota Netlify — não é bug de código.
 
 ---
 
@@ -259,7 +313,9 @@ Pedido de validação
 | [`RELEASES.md`](RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |
 | [`FLUXOS.md`](FLUXOS.md) | Fluxos de negócio |
-| [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
+| [`TESTES.md`](TESTES.md) | Estratégia e mapa de testes automatizados |
+| [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) | Mapa completo de env vars |
+| [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#46 |
 | [`evidencias/README.md`](evidencias/README.md) | Vídeos e screenshots |
 | [`AGENTS.md`](../AGENTS.md) | Instruções para IA |
 | [`.cursor/rules/operacoes-bibi.mdc`](../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |

@@ -164,10 +164,34 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 ## Próximos passos sugeridos
 
 1. **Desligar deploy Git automático** — Stop builds no painel Netlify (ver `OPERACOES.md`).
-2. **Publicar pacote pendente** — `bibi-poc-2026-06-22b` quando cota resetar (`pre-release` → CLI).
+2. ~~**Publicar pacote pendente**~~ — ✅ `bibi-poc-2026-06-22b` publicado em 22/06 (~02:36 UTC).
 3. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
 4. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
 5. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+
+### PR #41 — Testes automatizados (22/06)
+
+- Vitest: 53 testes em `tests/` (unit, security, integration, api)
+- Playwright: 5 specs E2E em `e2e/smoke.spec.ts`
+- CI: `.github/workflows/ci.yml` — lint, test, build, e2e
+- Mapa: `docs/TESTES.md`
+
+### PR #44 — Restauração modo demo (22/06)
+
+- UI: `/interno/seguranca` → `DemoResetCard` (ADMIN)
+- API: `GET|POST /api/interno/demo/reset`
+- Lógica: `src/lib/demo-reset.ts` → `runDatabaseSeed()`
+- Flag: `ALLOW_DEMO_RESET` (off em produção por padrão)
+
+### PR #46 — Variáveis de ambiente (22/06)
+
+- `docs/VARIAVEIS_AMBIENTE.md` — mapa completo (app, Netlify, CI, Cursor)
+
+### Release `bibi-poc-2026-06-22b` (22/06 ~02:36 UTC)
+
+- Commit `92348ba` — PRs #29–#46
+- Deploy: `npx netlify deploy --prod --no-build`
+- Produção: HTTP 200 — ver `docs/RELEASES.md`
 
 ### PR #42 — Operações e pacotes fechados (22/06)
 
