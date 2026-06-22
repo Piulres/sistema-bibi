@@ -387,11 +387,10 @@ sistema-bibi/
   `.env` são *gitignored*.
 - POC sem testes automatizados — recomendados para evolução do produto.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy via CLI validado;
-  deploy Git automático ainda com falhas intermitentes — ver
-  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md) e
-  [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)).
-  Build local: `npm run netlify:build`.
+- **Netlify em produção** — https://sistema-bibi.netlify.app (pode retornar **503** por cota).
+  Pacotes fechados: [`docs/RELEASES.md`](docs/RELEASES.md). Workflow Cursor:
+  [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
+  Deploy manual apenas quando necessário — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
 
 ## 14. Documentação adicional
@@ -411,6 +410,10 @@ sistema-bibi/
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
 - **Deploy Netlify (produção + troubleshooting):**
   [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)
+- **Pacotes fechados / releases:**
+  [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Workflow Cursor (dev sem deploy automático):**
+  [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Histórico do dia 21/06/2026** (PRs, deploys, commits):
   [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
 - **Evidências visuais dos fluxos** (vídeos e screenshots):

@@ -19,7 +19,10 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
-**Produção:** https://sistema-bibi.netlify.app
+**Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
+(cota Netlify). Último pacote no ar: `bibi-poc-2026-06-22a` (`beeb894`). Ver `docs/RELEASES.md`.
+**Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
+Ver `docs/WORKFLOW_CURSOR.md`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/HISTORICO_2026-06-21.md`
 
@@ -74,12 +77,16 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
-- **Netlify:** config em `netlify.toml`; build com `npm run netlify:build`; ver
-  `docs/DEPLOY_NETLIFY.md`. Site linkado na CLI pode retornar `503 usage_exceeded`
-  se a cota estiver esgotada.
+- **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
+  build CI em `npm run netlify:build`; ver `docs/DEPLOY_NETLIFY.md` e `docs/WORKFLOW_CURSOR.md`.
+  Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.
+- **Política de deploy (agentes):** **NUNCA** executar `netlify deploy --prod` nem investigar produção
+  em loop, salvo pedido explícito do usuário. Testar com `npm run dev` / `npm run pre-release`.
+  Pacotes fechados: `docs/RELEASES.md`.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/BENCHMARK.md` (posicionamento vs mercado),
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
-  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
+  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/RELEASES.md` (pacotes fechados),
+  `docs/WORKFLOW_CURSOR.md` (dev sem deploy), `docs/evidencias/` (capturas dos fluxos).
