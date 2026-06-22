@@ -1,8 +1,10 @@
 # Releases — Pacotes fechados do Sistema Bibi
 
 Registro oficial do que está **em produção**, do que está **pendente na `main`**
-e do histórico de publicações. Use este arquivo como fonte única de verdade —
-não confie em “deploy automático” para saber o que está no ar.
+(após merge de `dev`) e do histórico de publicações. Use este arquivo como fonte
+única de verdade — não confie em “deploy automático” para saber o que está no ar.
+
+**Fluxo de branches:** features integram em `dev` → release merge `dev` → `main` → deploy manual.
 
 **Produção:** https://sistema-bibi.netlify.app
 
@@ -15,8 +17,8 @@ não confie em “deploy automático” para saber o que está no ar.
 | **Versão semântica** | **1.0.0** |
 | Site produção | https://sistema-bibi.netlify.app |
 | Pacote em produção | `v1.0.0` → commit `de88c0e` · deploy `6a393af3` |
-| `main` | `de88c0e` — alinhada com produção |
-| `dev` | `f461986` — mergeada na `main` |
+| `main` | `de88c0e` — alinhada com produção (release) |
+| `dev` | branch de **integração** — PRs de feature mergeiam aqui primeiro |
 | Tag git | `v1.0.0` |
 | Validação local | `npm run pre-release` ✅ · 88 unit · 43 E2E |
 | Deploy | 22/06/2026 — `netlify build` + `--no-build` |

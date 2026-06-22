@@ -21,11 +21,12 @@ flowchart LR
     D[npm run lint] --> E[npm run pre-release]
     E --> F{Passou?}
     F -->|Não| A
-    F -->|Sim| G[PR / merge main]
+    F -->|Sim| G[PR / merge dev]
   end
 
   subgraph Release["Release (raro, manual)"]
-    G --> H{Cota Netlify OK?}
+    G --> G2[merge dev → main]
+    G2 --> H{Cota Netlify OK?}
     H -->|503 usage_exceeded| I[Aguardar reset / upgrade]
     H -->|OK| J["npx netlify deploy --prod --no-build"]
     J --> K[Atualizar RELEASES.md]
@@ -89,10 +90,18 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 ### 4.1 Branch e PR
 
-1. Branch: `cursor/<descricao>-3ecd` (Cloud Agent) ou feature local.
+| Branch | Papel |
+|--------|-------|
+| `cursor/*` | Feature do Cloud Agent ou dev local |
+| `dev` | **Integração** — destino de todos os PRs |
+| `main` | **Release** — só merge de `dev` ao fechar pacote |
+
+1. Branch: `cursor/<descricao>-82f2` (Cloud Agent) ou feature local.
 2. Codar e testar com `npm run dev`.
 3. `npm run lint` antes de abrir PR.
-4. **Não** incluir deploy na PR — merge na `main` não publica produção.
+4. Abrir PR (draft ou pronto) com **base `dev`** — **nunca `main`**.
+5. Após integração em `dev`, merge `dev` → `main` só ao fechar pacote (humano).
+6. **Não** incluir deploy na PR — merge na `main` não publica produção automaticamente.
 
 ### 4.2 Testar fluxos localmente
 
@@ -125,18 +134,20 @@ Produção **não** acompanha cada merge. Só sobe quando você fecha um pacote.
 ### 5.1 Ciclo de vida do pacote
 
 ```
-main acumula commits → pre-release OK → deploy manual → RELEASES.md atualizado
+dev acumula features → merge dev → main → pre-release OK → deploy manual → RELEASES.md
 ```
 
 | Estado | Onde ver | Significado |
 |--------|----------|-------------|
+| Em desenvolvimento | branch `dev` | Features integradas, ainda não em release |
 | Em produção | `RELEASES.md` → Pacote em produção | O que está (ou estava) no ar |
-| Pendente | `RELEASES.md` → Próximo pacote | `main` ainda não publicada |
+| Pendente release | `RELEASES.md` → Próximo pacote | `main` ainda não publicada |
 | Validado | `npm run pre-release` passou | Pronto para publicar, mas não publicado |
 
 ### 5.2 Checklist — publicar pacote
 
-- [ ] `git checkout main && git pull`
+- [ ] Features já integradas em `dev`
+- [ ] `git checkout main && git pull && git merge dev` (ou PR `dev` → `main`)
 - [ ] `npm run pre-release` — sem erros
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
 - [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
@@ -191,6 +202,7 @@ Detalhes também em `AGENTS.md`.
 | Ler `AGENTS.md` e `docs/OPERACOES.md` | Contexto do projeto |
 | `npm run dev` / testes locais | Validar sem custo |
 | `npm run lint` antes de finalizar | Qualidade |
+| Abrir PR com base **`dev`** | Integração antes de release |
 | `npm run pre-release` se pedirem “validar release” | Sem publicar |
 | Usar `db:push && db:seed` em VM nova | `db:reset` é bloqueado |
 | Consultar `RELEASES.md` para saber o que está em produção | Fonte única |
@@ -200,6 +212,7 @@ Detalhes também em `AGENTS.md`.
 | Ação | Motivo |
 |------|--------|
 | `npx netlify deploy --prod` | Queima cota + tokens |
+| PR direto na `main` (feature/bugfix) | Integrar em `dev` primeiro |
 | Loop de `curl` em produção | 503 = cota, não bug |
 | Tratar `503 usage_exceeded` como regressão | Plano Netlify |
 | `npm run db:reset` | Bloqueado / destrutivo |
