@@ -62,6 +62,7 @@ npm run dev                     # http://localhost:3000
 |----------|------------|-----|
 | `DATABASE_URL` | `file:./dev.db` | SQLite local |
 | `SEED_SCALE` | `medium` | `small` \| `medium` \| `large` |
+| `ALLOW_DEMO_RESET` | auto (dev) | `true`/`false` — botão restaurar demo em `/interno/seguranca` |
 | `PAYMENT_GATEWAY` | `mock` | PIX mock |
 | `COMMUNICATION_PROVIDER` | `console` | E-mail no terminal |
 
@@ -79,9 +80,16 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
 | `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run test` | Vitest (unit, security, integration, API) | Antes de PR; espelha CI parcial |
+| `npm run test:e2e` | Playwright (sobe dev na porta 3100) | Fluxos E2E; CI roda após Vitest |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
+
+> **Pre-release vs testes:** `pre-release` roda **lint + build Netlify** (sem Vitest/Playwright).
+> O CI GitHub (`.github/workflows/ci.yml`) adiciona `npm run test` e `npm run test:e2e`.
+> Antes de PR: `npm run lint && npm run test`. Antes de fechar pacote: `npm run pre-release`.
+> Mapa completo: [`TESTES.md`](TESTES.md).
 
 ---
 
@@ -91,7 +99,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 1. Branch: `cursor/<descricao>-3ecd` (Cloud Agent) ou feature local.
 2. Codar e testar com `npm run dev`.
-3. `npm run lint` antes de abrir PR.
+3. `npm run lint && npm run test` antes de abrir PR.
 4. **Não** incluir deploy na PR — merge na `main` não publica produção.
 
 ### 4.2 Testar fluxos localmente
@@ -114,6 +122,34 @@ Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos det
 | VM nova / sem `dev.db` | `npm run db:push && npm run db:seed` |
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
+| Ajustar volume da massa | `SEED_SCALE=small\|medium\|large` no `.env` + seed |
+
+O seed modular vive em `prisma/seed-data/` (`run-seed.ts` é o entry point compartilhado
+por `prisma db seed` e pela restauração demo). Escala padrão: `medium` (50 empresas PJ,
+~199 beneficiários, tenant VitaCare white-label).
+
+### 4.4 Restaurar modo demo (UI)
+
+Após testes ou apresentações, administradores internos podem repopular o banco sem CLI.
+
+| Item | Detalhe |
+|------|---------|
+| **Onde** | `/interno/seguranca` → card "Modo demo — restaurar dados" |
+| **Quem** | Perfil interno `ADMIN` (`faturamento@bibi.health`) |
+| **API** | `GET\|POST /api/interno/demo/reset` |
+| **Confirmação** | Digitar `RESTAURAR` no formulário |
+| **Efeito** | Executa `runDatabaseSeed()` — apaga e recria toda a massa demo |
+| **Pós-ação** | Logout automático; IDs de usuário mudam — refaça login |
+
+**Habilitação (`ALLOW_DEMO_RESET`):**
+
+| Ambiente | Padrão |
+|----------|--------|
+| `NODE_ENV !== production` | Habilitado |
+| Produção Netlify | **Desligado** — defina `ALLOW_DEMO_RESET=true` no painel só se necessário |
+
+> Diferente de `db:reset`: a restauração demo roda via API, sem `--force-reset` do Prisma.
+> Não há backup automático — operação irreversível.
 
 ---
 
@@ -150,7 +186,7 @@ main acumula commits → pre-release OK → deploy manual → RELEASES.md atuali
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi-poc-2026-06-22b` (`158b69f`).
+Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi-poc-2026-06-22b` (`4170d10`).
 
 ---
 
@@ -232,6 +268,8 @@ Pedido de validação
 | Fechar pacote em produção | `docs/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
+| Demo reset / seed modular | `OPERACOES.md` §4.3–4.4, `FLUXOS.md` §2.1 |
+| Infra de testes | `TESTES.md`, `OPERACOES.md` §3 |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
 | Base RAG / NotebookLM | `NOTEBOOKLM.md` |
 | Auditoria de PRs/deploys | `HISTORICO_2026-06-21.md` ou novo histórico datado |
@@ -261,6 +299,7 @@ Pedido de validação
 | [`FLUXOS.md`](FLUXOS.md) | Fluxos de negócio |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](evidencias/README.md) | Vídeos e screenshots |
+| [`TESTES.md`](TESTES.md) | Estratégia de testes e lacunas de segurança |
 | [`AGENTS.md`](../AGENTS.md) | Instruções para IA |
 | [`.cursor/rules/operacoes-bibi.mdc`](../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |
 | [`.cursor/rules/netlify-release.mdc`](../.cursor/rules/netlify-release.mdc) | Deploy e release (ativação inteligente) |

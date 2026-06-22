@@ -32,6 +32,15 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
+### Pre-release vs CI
+
+| Comando | Lint | Vitest | Playwright | Build Netlify |
+|---------|------|--------|------------|---------------|
+| `npm run pre-release` | ✅ | ❌ | ❌ | ✅ (`netlify:build`) |
+| CI GitHub Actions | ✅ | ✅ | ✅ | ✅ (`next build` no job unit) |
+
+Antes de PR: `npm run lint && npm run test`. Antes de fechar pacote: `npm run pre-release`.
+
 ---
 
 ## O que você **não vê** (lacunas e riscos)
@@ -79,6 +88,12 @@ Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste au
 ### 7. MFA bypass em rotas sem segundo fator
 
 Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam MFA a cada request (padrão de mercado, mas vale documentar).
+
+### 8. Restauração demo sem teste de integração E2E
+
+`POST /api/interno/demo/reset` executa o seed completo via `runDatabaseSeed()`.
+Cobertura atual: `tests/unit/demo-reset.test.ts` (flags, confirmação, guards).
+Não há teste de integração que valide o round-trip com banco real nem E2E da UI.
 
 ---
 
@@ -129,6 +144,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | Lembretes cron | ✅ auth cron |
 | Comunicação console | ❌ |
 | Branding validation | ✅ unit |
+| Demo reset (flags/confirmação) | ✅ `demo-reset.test.ts` |
 
 ---
 
@@ -151,6 +167,7 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 - agenda, appointments, procedures, records
 
 ### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
+- `GET|POST /api/interno/demo/reset` — 🔒 ADMIN + `ALLOW_DEMO_RESET` — ⚠️ unit only
 - Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
 
 ### PJ (2) — 🔑 PJ
@@ -217,6 +234,7 @@ Senha única: `bibi123`
 ## Referências
 
 - Fluxos de negócio: [`FLUXOS.md`](FLUXOS.md)
+- Operações (demo reset, scripts): [`OPERACOES.md`](OPERACOES.md)
 - Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md)
 - Evidências manuais: [`evidencias/`](evidencias/)
 - CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)

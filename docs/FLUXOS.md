@@ -133,6 +133,37 @@ Quando `User.mfaEnabled = true`:
 | Ativar | `{ action: "enable", secret, code }` | Grava secret, `mfaEnabled=true` |
 | Desativar | `{ action: "disable", code }` | Limpa MFA |
 
+### 2.1 Restaurar modo demo
+
+Disponível em `/interno/seguranca` quando `ALLOW_DEMO_RESET` está habilitado
+(padrão fora de produção). Somente perfil **ADMIN**.
+
+```mermaid
+sequenceDiagram
+  participant Admin
+  participant UI as DemoResetCard
+  participant API as POST /api/interno/demo/reset
+  participant Seed as runDatabaseSeed
+
+  Admin->>UI: Digita RESTAURAR
+  UI->>API: { confirm: "RESTAURAR" }
+  API->>Seed: Apaga tabelas + repopula seed
+  Seed-->>API: SeedRunResult
+  API-->>UI: logoutRequired: true
+  UI->>Admin: Redirect /interno/login
+```
+
+| Etapa | Detalhe |
+|-------|---------|
+| Status | `GET /api/interno/demo/reset` → `{ enabled, canReset, inProgress }` |
+| Execução | `POST` com `{ confirm: "RESTAURAR" }` — case-insensitive |
+| Guard | `requireUser(["INTERNO"])` + `isInternoAdmin` + flag de ambiente |
+| Implementação | `src/lib/demo-reset.ts` → `prisma/seed-data/run-seed.ts` |
+| Concorrência | 409 se reset já em andamento (`resetInProgress`) |
+
+**Efeitos colaterais:** todos os dados são substituídos; sessões ficam inválidas
+(IDs de usuário recriados). Credenciais demo permanecem (`bibi123`).
+
 ---
 
 ## 3. Portal Prestador
@@ -189,7 +220,7 @@ flowchart LR
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
-| `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
+| `seguranca` | `/interno/seguranca` | `SecurityView` + `DemoResetCard` | MFA TOTP; restaurar massa demo (ADMIN) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.

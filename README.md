@@ -359,6 +359,7 @@ sistema-bibi/
 | `npm run test` | Vitest — unitário, segurança, integração e API. |
 | `npm run test:watch` | Vitest em modo watch. |
 | `npm run test:e2e` | Playwright — fluxos E2E no browser. |
+| `npm run pre-release` | Lint + build Netlify (validar pacote sem publicar). |
 | `npm run db:push` | Sincroniza o schema com o banco SQLite. |
 | `npm run db:seed` | Popula o banco com os dados de demonstração. |
 | `npm run build:netlify` | Pipeline de build da Netlify (`db:push` + seed + `next build`). |
@@ -372,6 +373,8 @@ sistema-bibi/
 - **Segregação por `role` e RBAC interno** (`internoProfile`): cada portal valida
   o perfil no `proxy.ts` (checagem otimista) e no servidor (HMAC + permissões).
 - **MFA TOTP** opcional para usuários internos (`/interno/seguranca`).
+- **Restauração demo** (ADMIN): repopula o banco via UI em `/interno/seguranca`
+  quando `ALLOW_DEMO_RESET` está habilitado (padrão fora de produção).
 - **LGPD light:** consentimento no cadastro + export JSON por beneficiário.
 - Dados sensíveis (prontuário, beneficiários) ficam isolados por `tenant`.
 
@@ -420,6 +423,8 @@ sistema-bibi/
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**
   [`docs/OPERACOES.md`](docs/OPERACOES.md)
+- **Estratégia de testes automatizados:**
+  [`docs/TESTES.md`](docs/TESTES.md)
 - **Histórico do dia 21/06/2026** (PRs, deploys, commits):
   [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
 - **Evidências visuais dos fluxos** (vídeos e screenshots):
