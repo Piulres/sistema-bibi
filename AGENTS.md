@@ -43,7 +43,7 @@ Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de opera�
 ### Credenciais de demonstração (criadas pelo seed)
 Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
 
-Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários PJ** + fluxo demo TechCorp intacto.
+Massa demo (PR #31, preços PR #50): **50 empresas PJ**, **199 beneficiários**, **27 usuários PJ** + fluxo demo TechCorp intacto. Detalhes: `docs/SEED.md`.
 
 | Portal | E-mail |
 |--------|--------|
@@ -128,5 +128,6 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
+  `docs/SEED.md` (massa demo, preços de mercado, escala),
   `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
   `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).

@@ -89,7 +89,7 @@ Entidades principais:
 | `User` | Login; `role`, `internoProfile` (RBAC), MFA; `companyId`/`patientId` |
 | `Company` | Empresa contratante; status CRM (LEAD → CANCELADO) |
 | `Patient` | Beneficiário/paciente |
-| `Procedure` | Catálogo (CONSULTA/EXAME) com preço base |
+| `Procedure` | Catálogo (CONSULTA/EXAME/OCUPACIONAL) com preço base |
 | `PricingRule` | Multiplicador por empresa (precificação dinâmica) |
 | `Appointment` | Agendamento; `modality` PRESENCIAL/TELE + telemedicina |
 | `ProcedureUsage` | **Núcleo Pay Per Use** — preço congelado no uso |
@@ -117,7 +117,7 @@ SQLite não suporta enums Prisma — `role`, `status`, `category` são `String`.
 6. **PJ** acompanha consumo em `/pj`
 7. **Beneficiário** vê consumo transparente e pode **agendar consulta** em `/beneficiario`
 
-Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% desconto).
+Exemplo seed: Consulta Clínica base R$ 320 → TechCorp paga R$ 272 (15% desconto em CONSULTA/OCUPACIONAL). Ver [`SEED.md`](SEED.md).
 
 ---
 
@@ -351,24 +351,30 @@ src/
 
 ## 15. Dados de demonstração (seed)
 
+Documentação completa: [`SEED.md`](SEED.md).
+
 **Tenants:** Clínica Bibi (teal) + VitaCare demo (white label azul)
 
-**Empresa ativa:** TechCorp Benefícios LTDA (desconto 15% consulta clínica)
+**Empresas:** 50 PJ em pipeline CRM (24 ATIVAS) — perfis por setor em `pricing-market.ts`
+
+**Empresa demo:** TechCorp Benefícios LTDA (desconto 15% em consultas e ocupacionais)
 
 **Beneficiários:**
-- João Pereira (TechCorp) — atendimento hoje, 2 procedimentos pendentes, assinatura mensal
-- Maria Souza (TechCorp) — hemograma pendente, assinatura trimestral
+- João Pereira (TechCorp) — atendimento hoje, consulta + ECG pendentes de faturamento
+- Maria Souza (TechCorp) — teleconsulta agendada, hemograma pendente, assinatura trimestral
 - Pedro Almeida (particular) — fatura PAGA histórica, assinatura suspensa
 
-**CRM:** 6 empresas em estágios diversos (LEAD a CANCELADO)
+**CRM:** empresas em estágios diversos (LEAD a CANCELADO)
 
-**Comunicação:** 2 mensagens PENDENTE (WhatsApp João, e-mail Maria)
+**Comunicação:** mensagens PENDENTE (WhatsApp/e-mail) proporcionais a `SEED_SCALE`
 
 **Integrações:** webhook demo ERP TechCorp (`/interno/integracoes`)
 
 **RBAC:** usuário recepção `recepcao@bibi.health` (perfil RECEPCAO)
 
 **Prestador:** Dra. Helena — agenda do dia com atendimentos seed
+
+**Baseline:** 6 meses de faturamento corporativo derivado de `estimateCompanyMonthlyPpu()`
 
 ---
 
@@ -402,6 +408,7 @@ src/
 | `docs/RELEASES.md` | Pacotes fechados — o que está em produção vs pendente |
 | `docs/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy automático |
 | `docs/OPERACOES.md` | Mapa completo de operações + regras para agentes IA |
+| `docs/SEED.md` | Massa demo: preços de mercado, perfis por setor, escala |
 | `docs/HISTORICO_2026-06-21.md` | Auditoria PRs, commits e deploys do dia |
 | `.cursor/rules/operacoes-bibi.mdc` | Regras core (always apply) |
 | `.cursor/rules/netlify-release.mdc` | Deploy/release (ativação inteligente) |

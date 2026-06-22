@@ -88,6 +88,8 @@ Não precisa estar no `.env` local — o Next define automaticamente.
 
 Usadas por `prisma/seed.ts`, `prisma/seed-data/run-seed.ts` e `src/lib/demo-reset.ts`.
 
+Arquitetura da massa, catálogo de preços e perfis por setor: [`SEED.md`](SEED.md).
+
 ### `SEED_SCALE`
 
 | | |
@@ -313,7 +315,7 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 | `CRON_SECRET` | `src/app/api/cron/reminders/route.ts`, `cron/webhooks/route.ts` |
 | `TELEMEDICINE_BASE_URL` | `src/lib/telemedicine.ts` |
 | `NEXT_PUBLIC_SITE_URL` | `src/lib/landing/site-url.ts` |
-| `SEED_SCALE` | `prisma/seed-data/scale.ts` |
+| `SEED_SCALE` | `prisma/seed-data/scale.ts` — ver [`SEED.md`](SEED.md) |
 | `ALLOW_DEMO_RESET` | `src/lib/demo-reset.ts` |
 | `NETLIFY` | `scripts/netlify-build.mjs` |
 | `NODE_ENV` | `src/lib/db.ts`, bootstraps payment/communication |
@@ -327,3 +329,4 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 - [`docs/PAYMENTS.md`](PAYMENTS.md) — gateways PIX
 - [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md) — provedores de mensagem
 - [`docs/DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) — painel Netlify
+- [`docs/SEED.md`](SEED.md) — massa demo e precificação de mercado

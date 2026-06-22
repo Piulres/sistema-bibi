@@ -167,7 +167,8 @@ flowchart LR
 ```
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
-(ex.: TechCorp 0,85 → Consulta Clínica R$ 180 → **R$ 153** congelado em `priceCharged`).
+(ex.: TechCorp 0,85 → Consulta Clínica R$ 320 → **R$ 272** congelado em `priceCharged`).
+Preços base e descontos do seed: [`SEED.md`](SEED.md).
 
 ---
 

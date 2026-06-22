@@ -66,6 +66,7 @@ npm run dev                     # http://localhost:3000
 | `COMMUNICATION_PROVIDER` | `console` | E-mail no terminal |
 
 Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../README.md) e `AGENTS.md`.
+Massa e preços do seed: [`SEED.md`](SEED.md).
 
 ---
 
