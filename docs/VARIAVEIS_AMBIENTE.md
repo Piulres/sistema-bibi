@@ -35,7 +35,7 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `CRON_SECRET` | Sim (cron) | — | Jobs `/api/cron/*` |
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
-| `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
+| `SEED_SCALE` | Não | `medium` | Volume da massa no seed (`small` \| `medium` \| `large`) |
 | `ALLOW_DEMO_RESET` | Não | `true` | Botão restaurar demo na UI |
 | `NETLIFY` | Auto | `true` no deploy | Detecção de ambiente Netlify |
 
@@ -86,7 +86,7 @@ Não precisa estar no `.env` local — o Next define automaticamente.
 
 ## 3. Seed e modo demo
 
-Usadas por `prisma/seed.ts`, `prisma/seed-data/run-seed.ts` e `src/lib/demo-reset.ts`.
+Usadas por `prisma/seed.ts`, `prisma/seed-data/run-seed.ts` e `src/lib/demo-reset.ts`. Arquitetura: [`SEED_DATA.md`](SEED_DATA.md).
 
 ### `SEED_SCALE`
 
@@ -104,15 +104,19 @@ SEED_SCALE=medium
 
 | | |
 |---|---|
-| **Padrão** | `true` (habilitado se ausente) |
+| **Padrão local** | Habilitado se `NODE_ENV !== production` |
+| **Netlify POC** | Habilitado com `NETLIFY=true` mesmo sem esta flag (opt-out com `false`) |
 | **Desligar** | `false` ou `0` |
 | **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
 | **API** | `POST /api/interno/demo/reset` (body: `{ "confirm": "RESTAURAR" }`) |
 | **Permissão** | Somente interno **ADMIN** |
+| **Lógica** | `src/lib/demo-reset.ts` → `isDemoResetEnabled()` |
 
 ```env
 ALLOW_DEMO_RESET=true
 ```
+
+Detalhes da massa e do reset: [`SEED_DATA.md`](SEED_DATA.md).
 
 ---
 
@@ -224,7 +228,8 @@ Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 |----------|-----|-------------|
 | `SESSION_SECRET` | unit + e2e | `ci-test-session-secret-32chars` |
 | `CRON_SECRET` | unit + e2e | `ci-cron-secret` |
-| `DATABASE_URL` | unit (integração) | `file:./prisma/test.db` |
+| `DATABASE_URL` | unit (integração) | `file:./test.db` no workflow; Vitest sobrescreve para `prisma/test.db` via `globalSetup` |
+| `SEED_SCALE` | e2e (prepare db) | `small` |
 | `CI` | e2e Playwright | `true` |
 | `PLAYWRIGHT_PORT` | e2e | `3100` |
 
@@ -314,6 +319,7 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 | `TELEMEDICINE_BASE_URL` | `src/lib/telemedicine.ts` |
 | `NEXT_PUBLIC_SITE_URL` | `src/lib/landing/site-url.ts` |
 | `SEED_SCALE` | `prisma/seed-data/scale.ts` |
+| Massa demo (módulos) | `prisma/seed-data/*.ts` — ver [`SEED_DATA.md`](SEED_DATA.md) |
 | `ALLOW_DEMO_RESET` | `src/lib/demo-reset.ts` |
 | `NETLIFY` | `scripts/netlify-build.mjs` |
 | `NODE_ENV` | `src/lib/db.ts`, bootstraps payment/communication |

@@ -161,9 +161,9 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 
 Diagrama completo com sequência cross-portal: [`docs/FLUXOS.md`](docs/FLUXOS.md) §7.
 
-Exemplo de precificação dinâmica do seed: a Consulta Clínica (base R$ 180,00)
-para um beneficiário da **TechCorp** é cobrada por **R$ 153,00** (desconto
-corporativo de 15%).
+Exemplo de precificação dinâmica do seed: a Consulta Clínica (base R$ 320,00)
+para um beneficiário da **TechCorp** é cobrada por **R$ 272,00** (desconto
+corporativo de 15% — multiplier `0.85`). Tabela completa: [`docs/SEED_DATA.md`](docs/SEED_DATA.md).
 
 ## 8. Modelo de dados
 
@@ -318,7 +318,8 @@ curl -b cookies.txt http://localhost:3000/api/prestador/agenda
 sistema-bibi/
 ├── prisma/
 │   ├── schema.prisma        # modelo de dados (multi-tenant + Pay Per Use)
-│   └── seed.ts              # dados de demonstração
+│   ├── seed.ts              # entrada do seed (delega para seed-data/)
+│   └── seed-data/           # massa demo (pricing-market, scenarios, scale…)
 ├── src/
 │   ├── app/
 │   │   ├── api/             # Route Handlers (backend)

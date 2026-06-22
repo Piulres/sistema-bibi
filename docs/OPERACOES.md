@@ -114,6 +114,20 @@ Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos det
 | VM nova / sem `dev.db` | `npm run db:push && npm run db:seed` |
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
+| Restaurar demo (sem apagar schema) | `/interno/seguranca` → “Restaurar estado original do seed” (ADMIN) ou `POST /api/interno/demo/reset` |
+
+### 4.4 Massa demo e seed
+
+Arquitetura completa: [`SEED_DATA.md`](SEED_DATA.md).
+
+| Ação | Comando / local |
+|------|-----------------|
+| Popular banco vazio | `npm run db:seed` |
+| Ajustar volume | `SEED_SCALE=small\|medium\|large` no `.env` antes do seed |
+| Restaurar após testes manuais | UI em `/interno/seguranca` (requer ADMIN) |
+| Entender preços da massa | `prisma/seed-data/pricing-market.ts` |
+
+A massa inclui **50 empresas PJ**, perfis clínicos por setor, 6 meses de faturamento histórico e o fluxo fixo João/Maria/Pedro. O seed **apaga e recria** todos os registros — IDs mudam; faça login novamente após reset.
 
 ---
 
@@ -167,7 +181,7 @@ Exemplo atual em produção: `bibi-poc-2026-06-22c` (`32dad64`). Ver [`RELEASES.
 
 **Produção:** https://sistema-bibi.netlify.app
 
-**Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+**Status conhecido (22/06/2026):** site online (HTTP 200). Cota Netlify pode retornar `503 usage_exceeded` — não é bug de código.
 
 ---
 
@@ -232,6 +246,7 @@ Pedido de validação
 | Fechar pacote em produção | `docs/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
+| Massa demo / seed / preços | `SEED_DATA.md`, `VARIAVEIS_AMBIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
 | Base RAG / NotebookLM | `NOTEBOOKLM.md` |
 | Auditoria de PRs/deploys | `HISTORICO_2026-06-21.md` ou novo histórico datado |
