@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "build:netlify": "bash scripts/netlify-build.sh",
+    "build:netlify": "node scripts/netlify-build.mjs",
     "netlify:build": "npm run build:netlify",
     "netlify:dev": "netlify dev",
     "start": "next start",
