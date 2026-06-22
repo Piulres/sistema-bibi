@@ -88,6 +88,8 @@ A aplicação sobe em **http://localhost:3000**.
 > - `COMMUNICATION_PROVIDER` — `console` (POC) ou `sendgrid`/`twilio`/`meta`.
 > - `CRON_SECRET` — protege jobs `POST /api/cron/reminders` e `/api/cron/webhooks`.
 > - `TELEMEDICINE_BASE_URL` — URL base das salas virtuais mock (telemedicina).
+> - `NEXT_PUBLIC_SITE_URL` — URL pública para SEO (metadata, sitemap, Open Graph). Na Netlify, `URL` é injetada automaticamente.
+> - `SEED_SCALE` — volume da massa demo: `small` | `medium` | `large` (padrão `medium`).
 
 ## 5. URLs de teste
 
@@ -100,7 +102,9 @@ Base local: **`http://localhost:3000`**
 
 | URL | Página | Acesso |
 |-----|--------|--------|
-| `/` | Landing page com seleção de portal | Público |
+| `/` | Landing page pública (marketing, FAQ, seleção de portais) | Público |
+| `/robots.txt` | Regras para crawlers (áreas autenticadas bloqueadas) | Público |
+| `/sitemap.xml` | Sitemap das rotas públicas | Público |
 | `/login` | Login do **Portal do Prestador** | Público |
 | `/prestador` | Dashboard do prestador (agenda do dia) | `PRESTADOR` |
 | `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP) | `PRESTADOR` |
@@ -135,16 +139,24 @@ Base local: **`http://localhost:3000`**
 
 ## 6. Credenciais de demonstração
 
-Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`**
-(armazenada com hash **scrypt** — ver `src/lib/password.ts`).
+Criadas automaticamente pelo seed (`prisma/seed.ts` + módulos em `prisma/seed-data/`).
+Senha única: **`bibi123`** (armazenada com hash **scrypt** — ver `src/lib/password.ts`).
+
+Volume controlado por **`SEED_SCALE`** no `.env` (`small` | `medium` | `large`; padrão `medium`).
+O seed modular inclui massa operacional, baseline de receita mensal, tenant **VitaCare**
+(white label) e usuários MFA demo.
 
 | Portal | URL de login | E-mail | Senha |
 |--------|--------------|--------|-------|
 | Prestador | `/login` | `dra.helena@bibi.health` | `bibi123` |
 | Interno (admin) | `/interno/login` | `faturamento@bibi.health` | `bibi123` |
-| Interno (recepção) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
+| Interno (faturamento / RBAC) | `/interno/login` | `financeiro@bibi.health` | `bibi123` |
+| Interno (recepção / RBAC) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
+| Interno (MFA demo) | `/interno/login` | `seguranca@bibi.health` | `bibi123` — TOTP `JBSWY3DPEHPK3PXP` |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
+| VitaCare (white label) | `/interno/login` | `operacao@vitacare.demo` | `bibi123` |
+| VitaCare PJ | `/pj/login` | `rh@vitacarecorp.demo` | `bibi123` |
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
@@ -323,7 +335,8 @@ curl -b cookies.txt http://localhost:3000/api/prestador/agenda
 sistema-bibi/
 ├── prisma/
 │   ├── schema.prisma        # modelo de dados (multi-tenant + Pay Per Use)
-│   └── seed.ts              # dados de demonstração
+│   ├── seed.ts              # orquestração do seed
+│   └── seed-data/           # massa demo modular (escala, VitaCare, cenários…)
 ├── src/
 │   ├── app/
 │   │   ├── api/             # Route Handlers (backend)
@@ -339,10 +352,16 @@ sistema-bibi/
 │   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
-│   │   ├── layout.tsx       # layout raiz (pt-BR)
-│   │   └── page.tsx         # landing page
-│   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, invoice-service, webhooks, MFA…
+│   │   ├── layout.tsx       # layout raiz (pt-BR, fontes, metadataBase)
+│   │   ├── page.tsx         # landing page pública
+│   │   ├── robots.ts        # regras para crawlers
+│   │   └── sitemap.ts       # sitemap das rotas públicas
+│   ├── components/
+│   │   ├── landing/         # seções da landing (hero, FAQ, portais…)
+│   │   └── ui/              # primitivos do design system
+│   ├── lib/
+│   │   ├── landing/         # conteúdo e URL canônica da landing
+│   │   └── …                # db, sessão, invoice-service, webhooks, MFA…
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
@@ -406,7 +425,7 @@ sistema-bibi/
   [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
 - **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):
   [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
-- **Design system e white label:** [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
+- **Design system e white label:** [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) — inclui landing pública (`/`), SEO e componentes em `src/components/landing/`
 - **Base de conhecimento (NotebookLM / RAG):**
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
 - **Deploy Netlify (produção + troubleshooting):**
