@@ -81,13 +81,8 @@ npm run dev            # inicia o servidor de desenvolvimento
 
 A aplicação sobe em **http://localhost:3000**.
 
-> Variáveis de ambiente (`.env` — ver `.env.example`):
-> - `DATABASE_URL` — caminho do SQLite (padrão `file:./dev.db`).
-> - `SESSION_SECRET` — segredo usado para assinar o cookie de sessão.
-> - `PAYMENT_GATEWAY` — `mock` (POC) ou `asaas`/`efi`/`inter` (adapters reais).
-> - `COMMUNICATION_PROVIDER` — `console` (POC) ou `sendgrid`/`twilio`/`meta`.
-> - `CRON_SECRET` — protege jobs `POST /api/cron/reminders` e `/api/cron/webhooks`.
-> - `TELEMEDICINE_BASE_URL` — URL base das salas virtuais mock (telemedicina).
+> Variáveis de ambiente: ver [`.env.example`](.env.example) e o mapa completo em [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md).
+> Principais: `DATABASE_URL`, `SESSION_SECRET`, `PAYMENT_GATEWAY`, `COMMUNICATION_PROVIDER`, `CRON_SECRET`, `SEED_SCALE`, `ALLOW_DEMO_RESET`.
 
 ## 5. URLs de teste
 
@@ -414,6 +409,8 @@ sistema-bibi/
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
 - **Deploy Netlify (produção + troubleshooting):**
   [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)
+- **Variáveis de ambiente** (app, Netlify, CI, Cursor Cloud):
+  [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
   [`docs/RELEASES.md`](docs/RELEASES.md)
 - **Workflow Cursor (dev sem deploy automático):**

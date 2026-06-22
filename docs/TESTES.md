@@ -179,11 +179,16 @@ npm run lint && npm run test && npm run build
 
 ### Variáveis em testes
 
+Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vitest e Playwright).
+
 | Variável | Uso |
 |----------|-----|
 | `SESSION_SECRET` | HMAC de sessão e MFA challenge |
 | `CRON_SECRET` | Proteção dos jobs cron |
 | `DATABASE_URL` | `file:./prisma/test.db` em testes de integração |
+| `PAYMENT_GATEWAY` | `mock` (default Vitest) |
+| `COMMUNICATION_PROVIDER` | `console` (default Vitest) |
+| `CI` / `PLAYWRIGHT_PORT` | E2E Playwright |
 
 ---
 
