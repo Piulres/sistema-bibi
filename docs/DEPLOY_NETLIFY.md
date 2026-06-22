@@ -10,20 +10,21 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 ---
 
-## Status atual (21–22/06/2026)
+## Status atual (22/06/2026)
 
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Deploy via CLI `npx netlify deploy --prod` | ✅ Validado (PR #28) |
-| Deploy Git automático (push `main`) | ✅ Corrigido — `db.ts` não redireciona para `/tmp` no build CI |
+| Deploy Git automático (push `main`) | ✅ Corrigido (PRs #32–#34, #39) |
+| `publish` no `netlify.toml` | ✅ `.next` (obrigatório para o plugin Next.js) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
-> O site em produção foi publicado via **CLI**. Deploys disparados por merge na `main`
-> (commits `94c0f67`, `beeb894`) falharam no build remoto — verificar logs no
-> [painel Netlify](https://app.netlify.com/projects/sistema-bibi).
+> Deploys Git falhavam com *publish directory cannot be the same as the base directory*
+> quando `publish` estava vazio (Netlify usava a raiz do repo). PR #39 define
+> `publish = ".next"` no `netlify.toml`.
 
 ---
 
@@ -31,7 +32,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 | Item | Descrição |
 |------|-----------|
-| `netlify.toml` | Build, env vars, headers, `netlify dev`, plugin Blobs |
+| `netlify.toml` | Build, `publish = ".next"`, env vars, headers, `netlify dev`, plugins |
 | `netlify/plugins/patch-regional-blobs` | Desativa `USE_REGIONAL_BLOBS` no handler Next.js (PR #28) |
 | `npm run build:netlify` | `db:push` + seed + `next build` |
 | `prisma/schema.prisma` | `binaryTargets = ["native", "rhel-openssl-3.0.x"]` para Lambda |
@@ -49,8 +50,8 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 2. **`SESSION_SECRET`** — defina no painel (Site settings → Environment variables), **não** use o fallback do `netlify.toml`.
 3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
 4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
-5. **Publish directory** — deve ficar **vazio** no painel (Next.js runtime gerencia o output). Valor `.next` causa falhas.
-6. **Git** — deploy contínuo habilitado; se o build Git falhar, use `npx netlify deploy --prod` como fallback.
+5. **Publish directory** — no `netlify.toml` deve ser **`publish = ".next"`** (distDir padrão do Next.js). O `@netlify/plugin-nextjs` exige que o publish seja diferente da raiz do repositório; com publish vazio a Netlify usa `/opt/build/repo` e o build falha. No painel Netlify, deixe o campo em branco para o `netlify.toml` prevalecer — **não** sobrescreva com a raiz do repo.
+6. **Git** — deploy contínuo habilitado na `main`; fallback manual: `npx netlify deploy --prod`.
 
 ---
 
@@ -103,8 +104,8 @@ npx netlify deploy --prod
 ## Deploy contínuo via GitHub (opcional)
 
 1. Netlify → **Add new site** → **Import an existing project** → GitHub → repo `sistema-bibi`.
-2. Build command: `npm run build:netlify` (já no `netlify.toml`).
-3. **Não** definir publish directory (Next.js runtime).
+2. Build command e publish vêm do `netlify.toml` (`node scripts/netlify-build.mjs` + `publish = ".next"`).
+3. **Não** sobrescrever publish no painel — o valor do `netlify.toml` deve prevalecer.
 4. Adicionar env vars acima no painel.
 5. Para evitar deploys acidentais: desativar **Auto publishing** em Deploys ou usar branch `production` apenas.
 
@@ -137,6 +138,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | `503 usage_exceeded` | Cota Netlify | Aguardar ou upgrade |
 | `502` / handler crash | Blobs regionais sem `primaryRegion` | Plugin `patch-regional-blobs` (PR #28) |
 | `Prisma Client could not locate Query Engine` | binary target errado | `rhel-openssl-3.0.x` no schema |
+| `publish directory cannot be the same as the base directory` | `publish` vazio ou igual à raiz do repo | Definir `publish = ".next"` no `netlify.toml` (PR #39) |
 | Build Git exit code 2 | Divergência build remoto vs local | Comparar log Netlify com `npm run netlify:build` |
 | `prisma/prisma/dev.db` | `DATABASE_URL` errado | Use `file:./dev.db` (relativo ao schema) |
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |

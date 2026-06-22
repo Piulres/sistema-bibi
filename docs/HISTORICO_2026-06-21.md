@@ -3,8 +3,8 @@
 Auditoria consolidada de **commits**, **pull requests** e **deploys Netlify** do dia,
 com o estado da documentação ao final do ciclo.
 
-> **Head atual da `main`:** `beeb894` (merge do PR #28).
-> **Produção ativa:** https://sistema-bibi.netlify.app (deploy via CLI; ver seção Deploys).
+> **Head atual da `main`:** `158b69f` (PR #39 — ver addendum).
+> **Produção ativa:** https://sistema-bibi.netlify.app
 
 ---
 
@@ -16,7 +16,7 @@ com o estado da documentação ao final do ciclo.
 | Commits no dia | **~70+** (incluindo merges e agentes) |
 | Sites Netlify | `sistema-bibi` (principal) · `sistema-bibi-nt2` (secundário) |
 | Produção online | ✅ `sistema-bibi.netlify.app` responde HTTP 200 |
-| Deploy Git (CI) pós-#28 | ❌ build falha (exit code 2) — ver Deploys |
+| Deploy Git (CI) pós-#39 | ✅ corrigido — ver addendum |
 | Evidências visuais | ✅ `docs/evidencias/` (vídeos + screenshots dos fluxos) |
 
 ---
@@ -109,13 +109,13 @@ com o estado da documentação ao final do ciclo.
    - Correção: plugin `netlify/plugins/patch-regional-blobs` (força `false` no `onEnd`).
 2. **Prisma Query Engine** — build gerava `debian-openssl-3.0.x`, Lambda exige `rhel-openssl-3.0.x`.
    - Correção: `binaryTargets = ["native", "rhel-openssl-3.0.x"]` no schema.
-3. **Publish directory** — painel tinha `.next` (incorreto para Next.js runtime); corrigido via API.
+3. **Publish directory** — o painel tinha `.next` removido manualmente (orientação antiga do runtime Next.js). Com `@netlify/plugin-nextjs` atual, publish vazio faz a Netlify usar a raiz do repo e o build falha. **Corrigido no PR #39:** `publish = ".next"` no `netlify.toml`.
 
 ### Status atual
 
 - **Produção:** https://sistema-bibi.netlify.app — landing e logins respondem **HTTP 200**.
 - **Build local:** `npm run netlify:build` — ✅ passa.
-- **Deploy Git automático:** ❌ ainda falha após merge do #28 — investigar logs no painel Netlify.
+- **Deploy Git automático:** ✅ corrigido (PRs #32–#34, #39) — ver addendum abaixo.
 - **Deploy CLI:** `npx netlify deploy --prod` — validado no PR #28.
 
 ### Credenciais em produção
@@ -159,7 +159,23 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 
 ## Próximos passos sugeridos
 
-1. **Corrigir deploy Git** — comparar log do build remoto vs `npm run netlify:build` local.
+1. ~~**Corrigir deploy Git**~~ — resolvido (PRs #32–#34, #39).
 2. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
 3. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
 4. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+
+---
+
+## Addendum — 22/06/2026 (PRs #32–#39)
+
+Correções de build Git na Netlify após a auditoria inicial deste documento.
+
+| PR | Correção |
+|----|----------|
+| [#32](https://github.com/Piulres/sistema-bibi/pull/32) | `DATABASE_URL` absoluto no CI, `tsx` para seed, `NPM_FLAGS=--include=dev` |
+| [#34](https://github.com/Piulres/sistema-bibi/pull/34) | `db.ts` não redireciona SQLite para `/tmp` durante o build CI |
+| [#39](https://github.com/Piulres/sistema-bibi/pull/39) | `publish = ".next"` no `netlify.toml` — evita erro *publish directory cannot be the same as the base directory* |
+
+**Head da `main` após #39:** `158b69f`.
+
+Detalhes operacionais: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
