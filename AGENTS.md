@@ -89,6 +89,8 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 - `COMMUNICATION_PROVIDER=console` — e-mail no console (`ConsoleEmailAdapter`)
 - `CRON_SECRET` — protege `POST /api/cron/reminders` e `/api/cron/webhooks`
 - `TELEMEDICINE_BASE_URL` — base das salas virtuais mock
+- `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
+- `ALLOW_DEMO_RESET` — habilita botão de restaurar demo em `/interno/seguranca`
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver

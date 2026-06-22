@@ -356,6 +356,9 @@ sistema-bibi/
 | `npm run build` | Build de produção (inclui verificação de tipos). |
 | `npm run start` | Sobe o build de produção. |
 | `npm run lint` | ESLint. |
+| `npm run test` | Vitest — unitário, segurança, integração e API. |
+| `npm run test:watch` | Vitest em modo watch. |
+| `npm run test:e2e` | Playwright — fluxos E2E no browser. |
 | `npm run db:push` | Sincroniza o schema com o banco SQLite. |
 | `npm run db:seed` | Popula o banco com os dados de demonstração. |
 | `npm run build:netlify` | Pipeline de build da Netlify (`db:push` + seed + `next build`). |
@@ -385,7 +388,8 @@ sistema-bibi/
 - `params`, `searchParams` e `cookies()` são **assíncronos** (use `await`).
 - Banco **SQLite** local para facilitar o desenvolvimento; o arquivo `dev.db` e o
   `.env` são *gitignored*.
-- POC sem testes automatizados — recomendados para evolução do produto.
+- Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
+  Ver [`docs/TESTES.md`](docs/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
 - **Netlify em produção** — https://sistema-bibi.netlify.app (pode retornar **503** por cota).
   Pacotes fechados: [`docs/RELEASES.md`](docs/RELEASES.md). Workflow Cursor:
