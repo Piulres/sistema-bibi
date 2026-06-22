@@ -32,8 +32,10 @@ model TenantBranding {
 
 Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 
-- **Clínica Bibi Saúde** — branding teal (padrão)
-- **VitaCare** — branding azul (demonstração white label)
+- **Clínica Horizonte** — clínica cliente demo (teal)
+- **VitaCare** — white label corporativo (azul)
+
+**Sistema Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` (v1.0.2+).
 
 ## Tokens CSS
 
@@ -97,8 +99,13 @@ export default async function InternoBillingPage() {
   );
 }
 
-// Login / landing (sem sessão)
-const branding = await getPlatformBranding();
+// Landing / marketing — identidade da plataforma (Sistema Bibi)
+const branding = getPlatformBranding();
+
+// Login público — tenant por domínio ou shell "Portal da clínica"
+const loginBranding = await getLoginBrandingFromHeaders();
+
+// Portais autenticados — branding vem de getSessionUser().branding
 ```
 
 ## Status badges
@@ -113,6 +120,14 @@ Mapas reutilizáveis em `src/lib/theme/status-styles.ts`:
 Preferir `Badge` ou `statusBadgeClass(map, value)` em novas telas.
 
 ## White label na prática
+
+Três camadas (v1.0.2+):
+
+| Camada | Função | API / token |
+|--------|--------|-------------|
+| Plataforma | Site comercial, vende o produto | `getPlatformBranding()` → `PLATFORM_BRANDING` |
+| Login | Entrada genérica ou por domínio customizado | `getLoginBrandingFromHeaders()` |
+| Tenant | Dados e marca da clínica cliente | `getSessionUser().branding` |
 
 1. Cada tenant possui registro `TenantBranding`.
 2. Após login, `getSessionUser()` retorna `user.branding`.

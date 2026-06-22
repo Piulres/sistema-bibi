@@ -15,10 +15,10 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Item | Valor |
 |------|-------|
 | **Versão em produção** | **1.0.2** (`e30b2b0`) |
-| **Deploy Netlify** | Publicado 22/06/2026 ~15:08 — merge branding plataforma/clínicas (PR #77) |
-| `main` | `e30b2b0` — alinhada com produção |
+| **Deploy Netlify** | Publicado 22/06/2026 ~15:08 — app · ~15:26 doc (`6a1f042`) |
+| `main` | `6a1f042` — alinhada com produção (doc release) |
 | `dev` | `0fc9242` — **1.1.0** (v1.0.x + cadastros v1.1) |
-| Tag git em produção | **`v1.0.1`** (recomendado tagar **`v1.0.2`** após fechamento) |
+| Tag git em produção | **`v1.0.2`** |
 | Próximo pacote | **v1.1.0** — merge `dev` → `main` |
 | Validação `dev` | `npm run pre-release` · 111+ testes |
 
@@ -30,7 +30,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | *(pendente `v1.0.2`)* |
+| **Tag git** | `v1.0.2` |
 | **Commit** | `e30b2b0` |
 | **PR** | [#77](https://github.com/Piulres/sistema-bibi/pull/77) |
 | **Publicado em** | 22/06/2026 ~15:08 — deploy Netlify (build Git, `main`) |
