@@ -6,7 +6,8 @@
 
 [build]
   command = "node scripts/netlify-build.mjs"
-  # Next.js 16: NAO definir publish — o runtime @netlify/plugin-nextjs gerencia o output.
+  # O plugin Next.js exige publish != raiz do repo; .next e o distDir padrao.
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"
