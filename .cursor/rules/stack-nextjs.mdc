@@ -36,6 +36,7 @@ Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
 
 ```bash
 npm run lint
+npm run test    # 53 testes Vitest — recomendado antes de PR
 ```
 
 Se tocar em build/deploy: `npm run pre-release` (não publica).

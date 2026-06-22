@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (4)    │  Playwright — fluxos reais no browser
+                    │  E2E (5)    │  Playwright — fluxos reais no browser
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -31,6 +31,36 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
+
+**Total atual:** 53 testes Vitest (12 arquivos) + 5 specs E2E.
+
+---
+
+## Pre-release vs CI
+
+| Etapa | `npm run pre-release` | CI (`.github/workflows/ci.yml`) |
+|-------|:---------------------:|:-------------------------------:|
+| Lint | ✅ | ✅ |
+| Vitest | ❌ | ✅ |
+| `next build` | via `netlify:build` | ✅ |
+| Playwright | ❌ | ✅ |
+
+`pre-release` valida o **pacote Netlify** (lint + build com seed). O CI adiciona
+testes automatizados. Antes de PR:
+
+```bash
+npm run lint && npm run test
+```
+
+Para espelhar o CI completo (inclui E2E):
+
+```bash
+npm run lint && npm run test && npm run build && npm run test:e2e
+```
+
+> **Pitfall local:** se existir `.env` com `DATABASE_URL=file:./dev.db`, o Vitest
+> pode usar o banco de dev em vez de `prisma/test.db`. O CI não tem `.env` e
+> injeta `DATABASE_URL=file:./prisma/test.db` explicitamente.
 
 ---
 
@@ -80,6 +110,11 @@ Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste au
 
 Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam MFA a cada request (padrão de mercado, mas vale documentar).
 
+### 8. Demo reset
+
+`ALLOW_DEMO_RESET` controla o botão em `/interno/seguranca`. Em produção, off por padrão
+(`NODE_ENV=production` sem flag explícita). Teste: `tests/unit/demo-reset.test.ts`.
+
 ---
 
 ## Mapa por domínio de negócio
@@ -101,6 +136,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | scrypt hash/verify | ✅ `password.test.ts` |
 | Login API (portal, credenciais) | ✅ `auth-and-cron.test.ts` |
 | MFA TOTP + challenge HMAC | ✅ `mfa-tokens.test.ts` |
+| Demo reset (flag + confirmação) | ✅ `demo-reset.test.ts` |
 | Cookie session HMAC | ⚠️ indireto via MFA (mesmo algoritmo) |
 | Logout / me | ❌ |
 
@@ -173,7 +209,7 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
+# Lint + test + build (espelha CI local, sem E2E)
 npm run lint && npm run test && npm run build
 ```
 

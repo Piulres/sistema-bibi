@@ -81,6 +81,23 @@ Executa, em sequência:
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 
+### Pre-release vs CI completo
+
+| Etapa | `pre-release` | CI (`.github/workflows/ci.yml`) |
+|-------|:-------------:|:-------------------------------:|
+| Lint | ✅ | ✅ |
+| Vitest (`npm run test`) | ❌ | ✅ (53 testes) |
+| `next build` | via `netlify:build` | ✅ |
+| Playwright (`npm run test:e2e`) | ❌ | ✅ (5 specs) |
+
+Antes de abrir PR, recomenda-se espelhar o CI:
+
+```bash
+npm run lint && npm run test && npm run build
+# E2E (opcional local, obrigatório no CI):
+npm run test:e2e
+```
+
 ---
 
 ## Publicar em produção (manual, raro)
@@ -129,15 +146,16 @@ Assim só publica quando você roda `netlify deploy --prod` ou clica “Trigger 
 ## Produção fora do ar?
 
 ```bash
-curl -s https://sistema-bibi.netlify.app/
+curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/
 ```
 
-Se retornar `{"error":"usage_exceeded",...}`:
+| Resposta | Significado |
+|----------|-------------|
+| `200` | Site online — ver pacote em [`RELEASES.md`](RELEASES.md) |
+| `503` + `usage_exceeded` | Cota Netlify esgotada — **não é bug de código** |
+| `502` / `500` | Ver [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) |
 
-- **Não é bug de código** — cota do plano Netlify esgotada
-- Desenvolvimento continua **100% local**
-- Aguarde reset mensal ou upgrade do plano
-- Último pacote válido: ver [`RELEASES.md`](RELEASES.md)
+Desenvolvimento continua **100% local** independente do status de produção.
 
 ---
 
@@ -156,5 +174,6 @@ Se retornar `{"error":"usage_exceeded",...}`:
 
 - Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
 - Pacotes e histórico: [`RELEASES.md`](RELEASES.md)
+- Testes automatizados: [`TESTES.md`](TESTES.md)
 - Deploy e troubleshooting: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 - Fluxos do sistema: [`FLUXOS.md`](FLUXOS.md)
