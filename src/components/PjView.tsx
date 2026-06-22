@@ -9,7 +9,12 @@ import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 
-type AlertItem = { tone: "warning" | "danger" | "info"; message: string };
+type AlertItem = {
+  tone: "warning" | "danger" | "info";
+  message: string;
+  href?: string;
+  actionLabel?: string;
+};
 
 type Overview = {
   company: {
@@ -85,7 +90,17 @@ export default function PjView() {
         <div className="space-y-2">
           {alerts.map((a, i) => (
             <Alert key={i} tone={alertTone[a.tone]}>
-              {a.message}
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <span>{a.message}</span>
+                {a.href && a.actionLabel && (
+                  <a
+                    href={a.href}
+                    className="inline-flex items-center rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+                  >
+                    {a.actionLabel}
+                  </a>
+                )}
+              </div>
             </Alert>
           ))}
         </div>
@@ -167,7 +182,7 @@ export default function PjView() {
         </div>
       </section>
 
-      <section>
+      <section id="assinaturas">
         <SectionHeader title="Assinaturas recorrentes" />
         {subscriptions.length === 0 ? (
           <EmptyState message="Nenhuma assinatura vinculada à empresa." />

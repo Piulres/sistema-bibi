@@ -5,11 +5,13 @@
 # Publicar (manual):           npx netlify deploy --prod
 
 [build]
-  command = "npm run build:netlify"
+  command = "node scripts/netlify-build.mjs"
   # Next.js 16: NAO definir publish — o runtime @netlify/plugin-nextjs gerencia o output.
 
 [build.environment]
   NODE_VERSION = "22"
+  # Garante devDependencies no npm ci (tailwind, tsx, typescript) quando NODE_ENV=production.
+  NPM_FLAGS = "--include=dev"
   # Path relativo ao schema Prisma (prisma/schema.prisma) → arquivo prisma/dev.db
   DATABASE_URL = "file:./dev.db"
   NETLIFY = "true"

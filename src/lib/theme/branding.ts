@@ -53,9 +53,13 @@ export async function getTenantBranding(
 
 /** Branding padrao para paginas publicas (landing/login) — primeiro tenant demo ou fallback. */
 export async function getPlatformBranding(): Promise<BrandingTokens> {
-  const row = await prisma.tenantBranding.findFirst({
-    orderBy: { createdAt: "asc" },
-  });
-  if (!row) return { ...DEFAULT_BRANDING };
-  return fromDb(row);
+  try {
+    const row = await prisma.tenantBranding.findFirst({
+      orderBy: { createdAt: "asc" },
+    });
+    if (!row) return { ...DEFAULT_BRANDING };
+    return fromDb(row);
+  } catch {
+    return { ...DEFAULT_BRANDING };
+  }
 }

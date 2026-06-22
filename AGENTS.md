@@ -39,13 +39,20 @@ fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 ### Credenciais de demonstração (criadas pelo seed)
 Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
 
+Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários PJ** + fluxo demo TechCorp intacto.
+
 | Portal | E-mail |
 |--------|--------|
 | Prestador | `dra.helena@bibi.health` |
 | Interno (admin) | `faturamento@bibi.health` |
+| Interno (faturamento / RBAC) | `financeiro@bibi.health` |
 | Interno (recepção / RBAC) | `recepcao@bibi.health` |
+| Interno (MFA demo) | `seguranca@bibi.health` — secret TOTP `JBSWY3DPEHPK3PXP` |
 | Empresa PJ | `rh@techcorp.com` |
 | Beneficiário | `joao.pereira@email.com` |
+| VitaCare (white-label) | `operacao@vitacare.demo` |
+
+Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 ### Variáveis de ambiente relevantes (`.env.example`)
 - `PAYMENT_GATEWAY=mock` — adapter PIX POC (`MockPixAdapter`)
