@@ -1,6 +1,8 @@
 import { getSessionUser } from "@/lib/session";
 import PrestadorPortalShell from "@/components/layout/PrestadorPortalShell";
 
+export const dynamic = "force-dynamic";
+
 export default async function PrestadorLayout({
   children,
 }: {

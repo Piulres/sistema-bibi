@@ -35,6 +35,7 @@ jobs:
         env:
           SESSION_SECRET: ci-test-session-secret-32chars
           CRON_SECRET: ci-cron-secret
+          DATABASE_URL: file:./dev.db
 
   e2e:
     runs-on: ubuntu-latest

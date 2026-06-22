@@ -63,12 +63,12 @@ export type SessionUser = {
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
-  const prisma = await getPrisma();
   const store = await cookies();
   const token = store.get(COOKIE_NAME)?.value;
   const userId = verify(token);
   if (!userId) return null;
 
+  const prisma = await getPrisma();
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: { tenant: { include: { branding: true } }, company: true, patient: true },
