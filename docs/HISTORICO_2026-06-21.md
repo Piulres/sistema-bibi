@@ -164,10 +164,16 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 ## Próximos passos sugeridos
 
 1. **Desligar deploy Git automático** — Stop builds no painel Netlify (ver `OPERACOES.md`).
-2. **Publicar pacote pendente** — `bibi-poc-2026-06-22b` quando cota resetar (`pre-release` → CLI).
+2. **Fechar v1.1.0** — `dev` @ `0fc9242` (cadastros de mercado); `pre-release` → merge `dev`→`main` → deploy manual → tag `v1.1.0`.
 3. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
-4. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
+4. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais em escala.
 5. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+
+### Atualização 22/06 — `v1.0.1` em produção
+
+- Pacote **`v1.0.1`** (`e4d8a43`) publicado — agenda prestador (Dia/Próximos/Histórico), dual SQLite demo/operação.
+- Docs de release fechados em PR #75 (`docs/RELEASES.md`, `V1_0.md`, `V1_1.md`).
+- Linha **1.1** (cadastros de mercado) permanece só na `dev` — ver [`V1_1.md`](V1_1.md).
 
 ### PR #42 — Operações e pacotes fechados (22/06)
 

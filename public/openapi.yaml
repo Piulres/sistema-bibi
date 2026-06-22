@@ -494,18 +494,60 @@ paths:
   /api/prestador/agenda:
     get:
       tags: [Prestador]
-      summary: Agenda do dia do prestador logado
+      summary: Agenda do prestador logado
+      parameters:
+        - name: view
+          in: query
+          schema:
+            type: string
+            enum: [day, upcoming, past]
+            default: day
+          description: Visão da agenda (padrão day)
+        - name: date
+          in: query
+          schema: { type: string, format: date }
+          description: Data para view=day (padrão hoje, formato YYYY-MM-DD)
       responses:
         '200':
-          description: Lista de agendamentos de hoje
+          description: Lista de agendamentos conforme a visão
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  view: { type: string, enum: [day, upcoming, past] }
+                  date: { type: string, format: date, description: Presente quando view=day }
                   appointments:
                     type: array
                     items: { $ref: '#/components/schemas/AgendaItem' }
+                  summary:
+                    type: object
+                    properties:
+                      today: { type: integer }
+                      upcoming: { type: integer }
+                      past: { type: integer }
+        '401': { description: Não autenticado }
+        '403': { description: Acesso negado (role != PRESTADOR) }
+
+  /api/prestador/patients/{id}/overview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Prestador]
+      summary: Histórico clínico do paciente no escopo do prestador
+      responses:
+        '200':
+          description: Overview com atendimentos e PEP anteriores
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overview: { type: object }
+        '404': { description: Paciente não encontrado ou sem atendimentos com este prestador }
         '401': { description: Não autenticado }
         '403': { description: Acesso negado (role != PRESTADOR) }
 

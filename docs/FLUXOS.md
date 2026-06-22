@@ -149,14 +149,16 @@ Quando `User.mfaEnabled = true`:
 
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
-| `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador` | `AgendaView` | Abas **Dia / Próximos / Histórico**; navegar por data no dia; abrir atendimento |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO; link para histórico do paciente |
+| `/prestador/paciente/[id]` | `PrestadorPatientHistoryView` | Consultas anteriores e PEP no escopo do prestador |
 
 ### APIs disparadas
 
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
-| Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
+| Carregar agenda | `GET /api/prestador/agenda?view=day\|upcoming\|past&date=YYYY-MM-DD` | `day`: dia (padrão, `date` opcional); `upcoming`: futuros não cancelados; `past`: histórico. Resposta inclui `summary` (`today`, `upcoming`, `past`) |
+| Histórico do paciente | `GET /api/prestador/patients/[id]/overview` | Atendimentos e PEP anteriores com o prestador logado |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
@@ -165,11 +167,12 @@ Quando `User.mfaEnabled = true`:
 
 ```mermaid
 flowchart LR
-  A[Agenda do dia] --> B[Atendimento]
+  A[Agenda Dia/Próximos/Histórico] --> B[Atendimento]
   B --> C[Registrar ProcedureUsage]
   B --> D[Salvar PEP]
   B --> E[Marcar REALIZADO]
-  C --> F[(billed=false)]
+  B --> F[Histórico do paciente]
+  C --> G[(billed=false)]
 ```
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
@@ -582,7 +585,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
 ### Prestador
-`GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
+`GET /api/prestador/agenda` · `GET /api/prestador/patients/[id]/overview` ·
+`GET|PATCH /api/prestador/appointments/[id]` ·
 `POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
 
 ### Beneficiário
