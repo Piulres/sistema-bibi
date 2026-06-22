@@ -8,6 +8,11 @@ import {
 } from "@/lib/data-store-mode";
 import { persistOperationDatabaseNow } from "@/lib/sqlite-blob-persistence";
 import { isInternoAdmin } from "@/lib/interno-permissions";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 /** Status do modo de dados ativo (demo / operação). */
 export async function GET() {
@@ -81,6 +86,15 @@ export async function POST(request: Request) {
     await invalidatePrismaCache({ persistOperation: false });
     await setDataStoreMode(mode);
     await invalidatePrismaCache();
+
+    await recordTimelineEvent({
+      tenantId: user.tenantId,
+      entityType: TIMELINE_ENTITY_TYPES.SECURITY,
+      entityId: user.tenantId,
+      action: TIMELINE_ACTIONS.DATA_STORE_CHANGED,
+      description: `Base de dados alterada: ${status.mode} → ${mode}`,
+      createdBy: user.id,
+    });
 
     const prisma = await getPrisma();
     const [users, patients, companies] = await Promise.all([

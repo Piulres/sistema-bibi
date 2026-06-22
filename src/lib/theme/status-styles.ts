@@ -47,6 +47,11 @@ export const timelineActionClass: Record<string, string> = {
   MESSAGE_SENT: "bg-[var(--status-brand-bg)] text-[var(--status-brand-text)]",
   MESSAGE_FAILED: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
   LOGIN: "bg-[var(--status-info-bg)] text-[var(--status-info-text)]",
+  DELETED: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
+  MFA_ENABLED: "bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
+  MFA_DISABLED: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
+  DATA_STORE_CHANGED: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
+  DEMO_RESET: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
 };
 
 export function statusBadgeClass(

@@ -14,7 +14,7 @@ export async function PATCH(request: Request, { params }: Params) {
       return NextResponse.json({ error: "Informe active: true/false" }, { status: 400 });
     }
 
-    const result = await toggleWebhook(user.tenantId, id, body.active);
+    const result = await toggleWebhook(user.tenantId, id, body.active, user.id);
     if (!result) {
       return NextResponse.json({ error: "Webhook não encontrado" }, { status: 404 });
     }
@@ -30,7 +30,7 @@ export async function DELETE(_request: Request, { params }: Params) {
     const user = await requireInternoModule("integracoes");
     const { id } = await params;
 
-    const result = await deleteWebhook(user.tenantId, id);
+    const result = await deleteWebhook(user.tenantId, id, user.id);
     if (!result) {
       return NextResponse.json({ error: "Webhook não encontrado" }, { status: 404 });
     }

@@ -41,6 +41,7 @@ export async function POST(request: Request) {
       url: body.url,
       secret: body.secret,
       events,
+      createdBy: user.id,
     });
 
     if ("error" in result) {

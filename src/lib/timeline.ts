@@ -1,40 +1,14 @@
 import { getPrisma } from "@/lib/db";
 import type { Prisma, PrismaClient } from "@prisma/client";
+import {
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+  type TimelineAction,
+  type TimelineEntityType,
+} from "@/lib/timeline-constants";
 
-/** Tipos de entidade rastreados na timeline. */
-export const TIMELINE_ENTITY_TYPES = {
-  USER: "User",
-  PATIENT: "Patient",
-  APPOINTMENT: "Appointment",
-  PROCEDURE_USAGE: "ProcedureUsage",
-  MEDICAL_RECORD: "MedicalRecord",
-  INVOICE: "Invoice",
-  COMPANY: "Company",
-  SUBSCRIPTION: "Subscription",
-  MESSAGE: "Message",
-} as const;
-
-/** Ações registradas na timeline. */
-export const TIMELINE_ACTIONS = {
-  LOGIN: "LOGIN",
-  CREATED: "CREATED",
-  UPDATED: "UPDATED",
-  APPOINTMENT_COMPLETED: "APPOINTMENT_COMPLETED",
-  PROCEDURE_REGISTERED: "PROCEDURE_REGISTERED",
-  MEDICAL_RECORD_CREATED: "MEDICAL_RECORD_CREATED",
-  INVOICE_ISSUED: "INVOICE_ISSUED",
-  INVOICE_PAID: "INVOICE_PAID",
-  CHARGE_SENT: "CHARGE_SENT",
-  CONTRACT_CHANGED: "CONTRACT_CHANGED",
-  SUBSCRIPTION_CHARGES_GENERATED: "SUBSCRIPTION_CHARGES_GENERATED",
-  MESSAGE_QUEUED: "MESSAGE_QUEUED",
-  MESSAGE_SENT: "MESSAGE_SENT",
-  MESSAGE_FAILED: "MESSAGE_FAILED",
-} as const;
-
-export type TimelineEntityType =
-  (typeof TIMELINE_ENTITY_TYPES)[keyof typeof TIMELINE_ENTITY_TYPES];
-export type TimelineAction = (typeof TIMELINE_ACTIONS)[keyof typeof TIMELINE_ACTIONS];
+export { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES, TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
+export type { TimelineAction, TimelineEntityType } from "@/lib/timeline-constants";
 
 export type RecordTimelineInput = {
   tenantId: string;
@@ -175,4 +149,94 @@ export async function getPatientTimelineEvents(
     createdBy: event.createdBy,
     actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
   }));
+}
+
+export type TenantAuditFilters = {
+  entityType?: string;
+  action?: string;
+  search?: string;
+  from?: Date;
+  to?: Date;
+  page?: number;
+  limit?: number;
+};
+
+export type TenantAuditResult = {
+  events: TimelineEventView[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+/** Auditoria tenant-wide com filtros e paginação. */
+export async function getTenantAuditEvents(
+  tenantId: string,
+  filters: TenantAuditFilters = {},
+): Promise<TenantAuditResult> {
+  const prisma = await getPrisma();
+  const page = Math.max(1, filters.page ?? 1);
+  const limit = Math.min(100, Math.max(1, filters.limit ?? 50));
+  const skip = (page - 1) * limit;
+
+  const where: {
+    tenantId: string;
+    entityType?: string;
+    action?: string;
+    description?: { contains: string };
+    createdAt?: { gte?: Date; lte?: Date };
+  } = { tenantId };
+
+  if (filters.entityType?.trim()) {
+    where.entityType = filters.entityType.trim();
+  }
+  if (filters.action?.trim()) {
+    where.action = filters.action.trim();
+  }
+  if (filters.search?.trim()) {
+    where.description = { contains: filters.search.trim() };
+  }
+  if (filters.from || filters.to) {
+    where.createdAt = {};
+    if (filters.from) where.createdAt.gte = filters.from;
+    if (filters.to) where.createdAt.lte = filters.to;
+  }
+
+  const [events, total] = await Promise.all([
+    prisma.timelineEvent.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+    prisma.timelineEvent.count({ where }),
+  ]);
+
+  const actorIds = [...new Set(events.map((event) => event.createdBy).filter(Boolean))] as string[];
+  const actors =
+    actorIds.length > 0
+      ? await prisma.user.findMany({
+          where: { id: { in: actorIds } },
+          select: { id: true, name: true },
+        })
+      : [];
+  const actorMap = new Map(actors.map((actor) => [actor.id, actor.name]));
+
+  return {
+    events: events.map((event) => ({
+      id: event.id,
+      entityType: event.entityType,
+      entityId: event.entityId,
+      action: event.action,
+      description: event.description,
+      createdAt: event.createdAt.toISOString(),
+      createdAtLabel: dateTime(event.createdAt),
+      createdBy: event.createdBy,
+      actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
+    })),
+    total,
+    page,
+    limit,
+    totalPages: Math.max(1, Math.ceil(total / limit)),
+  };
 }

@@ -645,7 +645,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum evento registrado.</p>
         ) : (
           <ol className="relative mt-4 space-y-0 border-l border-teal-200 pl-6">
-            {overview.timeline.slice(0, 10).map((event) => (
+            {overview.timeline.map((event) => (
               <li key={event.id} className="relative pb-6 last:pb-0">
                 <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-teal-500 ring-2 ring-teal-100" />
                 <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">

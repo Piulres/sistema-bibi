@@ -3,6 +3,11 @@ import { getPrisma } from "@/lib/db";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { getTenantBranding } from "@/lib/theme/branding";
 import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
+import {
   sanitizeBrandingInput,
   validateBrandingInput,
   normalizeCustomDomain,
@@ -85,6 +90,15 @@ export async function PUT(request: Request) {
         ...data,
         customDomainVerified,
       },
+    });
+
+    await recordTimelineEvent({
+      tenantId: user.tenantId,
+      entityType: TIMELINE_ENTITY_TYPES.BRANDING,
+      entityId: user.tenantId,
+      action: TIMELINE_ACTIONS.UPDATED,
+      description: `Identidade visual atualizada: ${branding.displayName}${domainChanged ? " (domínio alterado)" : ""}`,
+      createdBy: user.id,
     });
 
     return NextResponse.json({

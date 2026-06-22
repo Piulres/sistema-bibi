@@ -1,6 +1,11 @@
 import "server-only";
 import crypto from "node:crypto";
 import { getPrisma } from "@/lib/db";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 export const WEBHOOK_EVENTS = [
   "INVOICE_ISSUED",
@@ -324,6 +329,7 @@ export async function createWebhook(input: {
   url: string;
   secret?: string | null;
   events: WebhookEvent[];
+  createdBy?: string;
 }) {
   const prisma = await getPrisma();
   if (input.events.length === 0) {
@@ -346,6 +352,15 @@ export async function createWebhook(input: {
     },
   });
 
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.WEBHOOK,
+    entityId: webhook.id,
+    action: TIMELINE_ACTIONS.CREATED,
+    description: `Webhook "${webhook.label}" cadastrado (${input.events.join(", ")})`,
+    createdBy: input.createdBy ?? null,
+  });
+
   return {
     webhook: {
       id: webhook.id,
@@ -359,17 +374,30 @@ export async function createWebhook(input: {
   };
 }
 
-export async function deleteWebhook(tenantId: string, webhookId: string) {
+export async function deleteWebhook(tenantId: string, webhookId: string, createdBy?: string) {
   const prisma = await getPrisma();
   const existing = await prisma.webhookEndpoint.findFirst({
     where: { id: webhookId, tenantId },
   });
   if (!existing) return null;
   await prisma.webhookEndpoint.delete({ where: { id: existing.id } });
+  await recordTimelineEvent({
+    tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.WEBHOOK,
+    entityId: existing.id,
+    action: TIMELINE_ACTIONS.DELETED,
+    description: `Webhook "${existing.label}" removido`,
+    createdBy: createdBy ?? null,
+  });
   return { ok: true as const };
 }
 
-export async function toggleWebhook(tenantId: string, webhookId: string, active: boolean) {
+export async function toggleWebhook(
+  tenantId: string,
+  webhookId: string,
+  active: boolean,
+  createdBy?: string,
+) {
   const prisma = await getPrisma();
   const existing = await prisma.webhookEndpoint.findFirst({
     where: { id: webhookId, tenantId },
@@ -378,6 +406,14 @@ export async function toggleWebhook(tenantId: string, webhookId: string, active:
   const updated = await prisma.webhookEndpoint.update({
     where: { id: existing.id },
     data: { active },
+  });
+  await recordTimelineEvent({
+    tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.WEBHOOK,
+    entityId: updated.id,
+    action: TIMELINE_ACTIONS.UPDATED,
+    description: `Webhook "${updated.label}" ${active ? "ativado" : "desativado"}`,
+    createdBy: createdBy ?? null,
   });
   return { active: updated.active };
 }

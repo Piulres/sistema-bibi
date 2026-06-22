@@ -50,6 +50,7 @@ const quickLinks = [
   { href: "/interno/crm", label: "CRM", desc: "Pipeline de empresas" },
   { href: "/interno/assinaturas", label: "Recorrência", desc: "Assinaturas e cobranças" },
   { href: "/interno/comunicacao", label: "Comunicação", desc: "Fila de mensagens" },
+  { href: "/interno/auditoria", label: "Auditoria", desc: "Timeline universal do tenant" },
 ];
 
 export default function ExecutiveDashboardView() {
@@ -210,7 +211,12 @@ export default function ExecutiveDashboardView() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Atividade recente</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Atividade recente</h2>
+          <Link href="/interno/auditoria" className="text-sm font-medium text-[var(--portal-accent)] hover:underline">
+            Ver auditoria completa
+          </Link>
+        </div>
         {dashboard.recentActivity.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Nenhum evento registrado.

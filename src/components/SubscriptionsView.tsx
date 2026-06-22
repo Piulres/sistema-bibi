@@ -13,7 +13,9 @@ type Subscription = {
   id: string;
   status: string;
   statusLabel: string;
+  billingCycle: string;
   billingCycleLabel: string;
+  amount: number;
   amountLabel: string;
   patientId: string;
   patientName: string;
@@ -41,6 +43,8 @@ export default function SubscriptionsView() {
   const [msg, setMsg] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [charges, setCharges] = useState<Charge[]>([]);
+  const [editingAmountId, setEditingAmountId] = useState<string | null>(null);
+  const [editAmount, setEditAmount] = useState("");
 
   const [form, setForm] = useState({
     patientId: "",
@@ -111,6 +115,38 @@ export default function SubscriptionsView() {
       const data = await res.json();
       if (!res.ok) setMsg(data.error ?? "Erro ao atualizar");
       else await load();
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function updateAmount(id: string) {
+    const amount = Number(editAmount);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setMsg("Valor inválido");
+      return;
+    }
+    setBusy(`amt-${id}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/interno/subscriptions/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao atualizar valor");
+      else {
+        const updated = data.chargesUpdated ?? 0;
+        setMsg(
+          updated > 0
+            ? `Valor atualizado. ${updated} cobrança(s) pendente(s) ajustada(s). Faturadas mantêm valor original.`
+            : "Valor atualizado para novas cobranças.",
+        );
+        setEditingAmountId(null);
+        await load();
+        if (expanded === id) await loadCharges(id);
+      }
     } finally {
       setBusy(null);
     }
@@ -245,7 +281,50 @@ export default function SubscriptionsView() {
                     </Link>
                     <p className="text-sm text-[var(--text-muted)]">
                       {sub.companyName ?? "Particular"} · {sub.billingCycleLabel} ·{" "}
-                      {sub.amountLabel}
+                      {editingAmountId === sub.id ? (
+                        <span className="inline-flex items-center gap-2">
+                          R$
+                          <input
+                            type="number"
+                            min="0.01"
+                            step="0.01"
+                            className="w-24 rounded border border-[var(--border-muted)] px-2 py-0.5 text-sm"
+                            value={editAmount}
+                            onChange={(e) => setEditAmount(e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="portal"
+                            disabled={busy === `amt-${sub.id}`}
+                            onClick={() => updateAmount(sub.id)}
+                          >
+                            Salvar
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditingAmountId(null)}
+                          >
+                            Cancelar
+                          </Button>
+                        </span>
+                      ) : (
+                        <>
+                          {sub.amountLabel}
+                          <button
+                            type="button"
+                            className="ml-2 text-xs text-[var(--portal-accent)] hover:underline"
+                            onClick={() => {
+                              setEditingAmountId(sub.id);
+                              setEditAmount(String(sub.amount));
+                            }}
+                          >
+                            Editar valor
+                          </button>
+                        </>
+                      )}
                     </p>
                     {sub.description && (
                       <p className="mt-1 text-sm text-slate-600">{sub.description}</p>

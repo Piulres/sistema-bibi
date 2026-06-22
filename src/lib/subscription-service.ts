@@ -198,7 +198,80 @@ export async function updateSubscriptionStatus(input: {
   return mapSubscription(subscription);
 }
 
-/** Gera cobranças futuras pendentes com base no ciclo da assinatura. */
+/** Atualiza valor/ciclo/descrição. Cobranças PENDENTE sem fatura recebem novo valor. */
+export async function updateSubscription(input: {
+  tenantId: string;
+  subscriptionId: string;
+  amount?: number;
+  billingCycle?: string;
+  description?: string | null;
+  createdBy: string;
+}) {
+  const prisma = await getPrisma();
+  const existing = await prisma.subscription.findFirst({
+    where: { id: input.subscriptionId, tenantId: input.tenantId },
+    include: { patient: { select: { name: true } } },
+  });
+  if (!existing) return null;
+
+  if (input.amount !== undefined && input.amount <= 0) {
+    return { error: "Valor deve ser maior que zero" as const };
+  }
+
+  const subscription = await prisma.subscription.update({
+    where: { id: existing.id },
+    data: {
+      amount: input.amount ?? undefined,
+      billingCycle: input.billingCycle ?? undefined,
+      description: input.description === undefined ? undefined : input.description,
+    },
+    include: {
+      patient: { select: { name: true } },
+      company: { select: { name: true } },
+      charges: { select: { dueDate: true, status: true } },
+    },
+  });
+
+  let chargesUpdated = 0;
+  if (input.amount !== undefined && input.amount !== existing.amount) {
+    const result = await prisma.subscriptionCharge.updateMany({
+      where: {
+        subscriptionId: subscription.id,
+        status: "PENDENTE",
+        invoiceId: null,
+      },
+      data: { amount: input.amount },
+    });
+    chargesUpdated = result.count;
+  }
+
+  const changes: string[] = [];
+  if (input.amount !== undefined && input.amount !== existing.amount) {
+    changes.push(`valor ${formatBRL(existing.amount)} → ${formatBRL(input.amount)}`);
+  }
+  if (input.billingCycle && input.billingCycle !== existing.billingCycle) {
+    changes.push(
+      `ciclo ${billingCycleLabel(existing.billingCycle)} → ${billingCycleLabel(input.billingCycle)}`,
+    );
+  }
+  if (input.description !== undefined && input.description !== existing.description) {
+    changes.push("descrição atualizada");
+  }
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
+    entityId: subscription.id,
+    action: TIMELINE_ACTIONS.UPDATED,
+    description:
+      changes.length > 0
+        ? `Assinatura de ${subscription.patient.name}: ${changes.join("; ")}${chargesUpdated > 0 ? ` · ${chargesUpdated} cobrança(s) pendente(s) atualizada(s)` : " · cobranças já faturadas mantêm valor original"}`
+        : `Assinatura de ${subscription.patient.name} atualizada`,
+    createdBy: input.createdBy,
+  });
+
+  return { subscription: mapSubscription(subscription), chargesUpdated };
+}
 export async function generateSubscriptionCharges(input: {
   tenantId: string;
   subscriptionId: string;

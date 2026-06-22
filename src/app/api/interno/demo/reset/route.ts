@@ -7,6 +7,11 @@ import {
   getDemoResetStatus,
   isValidDemoResetConfirmation,
 } from "@/lib/demo-reset";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 /** Status do modo demo (restauração habilitada / permissão do usuário). */
 export async function GET() {
@@ -50,6 +55,15 @@ export async function POST(request: Request) {
 
     const prisma = await getPrisma();
     const result = await executeDemoReset(prisma);
+
+    await recordTimelineEvent({
+      tenantId: user.tenantId,
+      entityType: TIMELINE_ENTITY_TYPES.SECURITY,
+      entityId: user.tenantId,
+      action: TIMELINE_ACTIONS.DEMO_RESET,
+      description: "Estado demo restaurado ao seed original",
+      createdBy: user.id,
+    });
 
     return NextResponse.json({
       message: "Modo demo restaurado com sucesso. Faça login novamente.",

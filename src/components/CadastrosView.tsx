@@ -12,6 +12,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CrudOperationsMap from "@/components/CrudOperationsMap";
 import FlowImprovementsMap from "@/components/FlowImprovementsMap";
+import CadastrosPricingTab from "@/components/cadastros/CadastrosPricingTab";
 import TabBar from "@/components/ui/TabBar";
 import {
   CompanyExtraFields,
@@ -27,6 +28,7 @@ const tabs = [
   { key: "patients", label: "Beneficiários" },
   { key: "companies", label: "Empresas" },
   { key: "procedures", label: "Procedimentos" },
+  { key: "pricing", label: "Precificação" },
   { key: "users", label: "Usuários" },
   { key: "operations", label: "Mapa CRUD" },
 ] as const;
@@ -1179,6 +1181,8 @@ export default function CadastrosView() {
           </Card>
         </div>
       )}
+
+      {tab === "pricing" && <CadastrosPricingTab />}
 
       {tab === "operations" && (
         <div className="space-y-6">

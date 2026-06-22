@@ -48,6 +48,8 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
   it("READONLY não deveria acessar billing na matriz de permissões", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "billing")).toBe(false);
     expect(hasInternoPermission("INTERNO", "READONLY", "cadastros")).toBe(false);
+    expect(hasInternoPermission("INTERNO", "READONLY", "auditoria")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "FATURAMENTO", "auditoria")).toBe(true);
   });
 
   it("módulos com guard (referência)", () => {
@@ -64,7 +66,7 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
 
   it("cobertura: todas as rotas com guard", () => {
     const guardedCount = routes.length - withoutModuleGuard.length;
-    expect(INTERNO_MODULES.length).toBe(11);
+    expect(INTERNO_MODULES.length).toBe(12);
     expect(guardedCount).toBe(routes.length);
   });
 });

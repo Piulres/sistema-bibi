@@ -1,7 +1,7 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
-import { recordTimelineEvent, TIMELINE_ACTIONS } from "@/lib/timeline";
+import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 
 export const PROCEDURE_CATEGORIES = ["CONSULTA", "EXAME"] as const;
 
@@ -70,10 +70,10 @@ export async function createProcedure(input: {
 
   await recordTimelineEvent({
     tenantId: input.tenantId,
-    entityType: "Procedure",
+    entityType: TIMELINE_ENTITY_TYPES.PROCEDURE,
     entityId: procedure.id,
     action: TIMELINE_ACTIONS.CREATED,
-    description: `Procedimento ${procedure.code} — ${procedure.name} cadastrado`,
+    description: `Procedimento ${procedure.code} — ${procedure.name} cadastrado (${formatBRL(procedure.basePrice)})`,
     createdBy: input.createdBy,
   });
 
@@ -112,12 +112,17 @@ export async function updateProcedure(input: {
     },
   });
 
+  const priceChanged =
+    input.basePrice !== undefined && input.basePrice !== existing.basePrice;
+
   await recordTimelineEvent({
     tenantId: input.tenantId,
-    entityType: "Procedure",
+    entityType: TIMELINE_ENTITY_TYPES.PROCEDURE,
     entityId: procedure.id,
     action: TIMELINE_ACTIONS.UPDATED,
-    description: `Procedimento ${procedure.code} atualizado`,
+    description: priceChanged
+      ? `Procedimento ${procedure.code}: preço ${formatBRL(existing.basePrice)} → ${formatBRL(procedure.basePrice)} (usos já registrados mantêm valor congelado)`
+      : `Procedimento ${procedure.code} atualizado`,
     createdBy: input.createdBy,
   });
 
@@ -143,9 +148,9 @@ export async function deleteProcedure(input: {
 
   await recordTimelineEvent({
     tenantId: input.tenantId,
-    entityType: "Procedure",
+    entityType: TIMELINE_ENTITY_TYPES.PROCEDURE,
     entityId: existing.id,
-    action: TIMELINE_ACTIONS.UPDATED,
+    action: TIMELINE_ACTIONS.DELETED,
     description: `Procedimento ${existing.code} removido do catálogo`,
     createdBy: input.createdBy,
   });

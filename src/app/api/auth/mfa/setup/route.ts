@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { requireUser, requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { createMfaSetup, verifyTotp } from "@/lib/mfa";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 export async function GET() {
   const prisma = await getPrisma();
@@ -49,6 +54,14 @@ export async function POST(request: Request) {
         where: { id: user.id },
         data: { mfaSecret: body.secret, mfaEnabled: true },
       });
+      await recordTimelineEvent({
+        tenantId: user.tenantId,
+        entityType: TIMELINE_ENTITY_TYPES.SECURITY,
+        entityId: user.id,
+        action: TIMELINE_ACTIONS.MFA_ENABLED,
+        description: `MFA TOTP ativado para ${user.email}`,
+        createdBy: user.id,
+      });
       return NextResponse.json({ message: "MFA ativado com sucesso", mfaEnabled: true });
     }
 
@@ -59,6 +72,14 @@ export async function POST(request: Request) {
       await prisma.user.update({
         where: { id: user.id },
         data: { mfaSecret: null, mfaEnabled: false },
+      });
+      await recordTimelineEvent({
+        tenantId: user.tenantId,
+        entityType: TIMELINE_ENTITY_TYPES.SECURITY,
+        entityId: user.id,
+        action: TIMELINE_ACTIONS.MFA_DISABLED,
+        description: `MFA TOTP desativado para ${user.email}`,
+        createdBy: user.id,
       });
       return NextResponse.json({ message: "MFA desativado", mfaEnabled: false });
     }

@@ -1,0 +1,61 @@
+/** Constantes da timeline — seguras para import em Client Components. */
+
+export const TIMELINE_ENTITY_TYPES = {
+  USER: "User",
+  PATIENT: "Patient",
+  APPOINTMENT: "Appointment",
+  PROCEDURE: "Procedure",
+  PROCEDURE_USAGE: "ProcedureUsage",
+  MEDICAL_RECORD: "MedicalRecord",
+  INVOICE: "Invoice",
+  COMPANY: "Company",
+  SUBSCRIPTION: "Subscription",
+  MESSAGE: "Message",
+  PRICING_RULE: "PricingRule",
+  WEBHOOK: "Webhook",
+  BRANDING: "Branding",
+  SECURITY: "Security",
+} as const;
+
+export const TIMELINE_ACTIONS = {
+  LOGIN: "LOGIN",
+  CREATED: "CREATED",
+  UPDATED: "UPDATED",
+  DELETED: "DELETED",
+  APPOINTMENT_COMPLETED: "APPOINTMENT_COMPLETED",
+  PROCEDURE_REGISTERED: "PROCEDURE_REGISTERED",
+  MEDICAL_RECORD_CREATED: "MEDICAL_RECORD_CREATED",
+  INVOICE_ISSUED: "INVOICE_ISSUED",
+  INVOICE_PAID: "INVOICE_PAID",
+  CHARGE_SENT: "CHARGE_SENT",
+  CONTRACT_CHANGED: "CONTRACT_CHANGED",
+  SUBSCRIPTION_CHARGES_GENERATED: "SUBSCRIPTION_CHARGES_GENERATED",
+  MESSAGE_QUEUED: "MESSAGE_QUEUED",
+  MESSAGE_SENT: "MESSAGE_SENT",
+  MESSAGE_FAILED: "MESSAGE_FAILED",
+  MFA_ENABLED: "MFA_ENABLED",
+  MFA_DISABLED: "MFA_DISABLED",
+  DATA_STORE_CHANGED: "DATA_STORE_CHANGED",
+  DEMO_RESET: "DEMO_RESET",
+} as const;
+
+export type TimelineEntityType =
+  (typeof TIMELINE_ENTITY_TYPES)[keyof typeof TIMELINE_ENTITY_TYPES];
+export type TimelineAction = (typeof TIMELINE_ACTIONS)[keyof typeof TIMELINE_ACTIONS];
+
+export const TIMELINE_ENTITY_LABELS: Record<string, string> = {
+  User: "Usuário",
+  Patient: "Beneficiário",
+  Appointment: "Agendamento",
+  Procedure: "Procedimento",
+  ProcedureUsage: "Pay Per Use",
+  MedicalRecord: "Prontuário",
+  Invoice: "Fatura",
+  Company: "Empresa",
+  Subscription: "Assinatura",
+  Message: "Comunicação",
+  PricingRule: "Precificação",
+  Webhook: "Integração",
+  Branding: "White Label",
+  Security: "Segurança",
+};
