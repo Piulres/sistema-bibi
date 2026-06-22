@@ -4,6 +4,7 @@ import {
   TIMELINE_ENTITY_TYPES,
 } from "../../src/lib/timeline";
 import type { SeedCompany } from "./companies";
+import type { ScaleConfig } from "./scale";
 import {
   APPOINTMENT_REASONS,
   BILLING_CYCLES,
@@ -38,6 +39,7 @@ export type SeedMassContext = {
   patients: PatientRef[];
   excludePatientIds: Set<string>;
   companies: SeedCompany[];
+  scale: ScaleConfig;
 };
 
 export type SeedMassStats = {
@@ -95,6 +97,13 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
   const bulkPatients = ctx.patients.filter((p) => !ctx.excludePatientIds.has(p.id));
   if (bulkPatients.length === 0) return stats;
 
+  const appointmentTotal = ctx.scale.appointmentCount;
+  const messageTotal = ctx.scale.messageCount;
+  const historyDays = ctx.scale.historyDays;
+  const chargeSpan = ctx.scale.subscriptionChargeSpan;
+  const chargeMonthsPast = Math.floor(chargeSpan / 2);
+  const chargeMonthsFuture = chargeSpan - chargeMonthsPast;
+
   const realizedAppointments: {
     id: string;
     patient: PatientRef;
@@ -102,21 +111,21 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
     scheduledAt: Date;
   }[] = [];
 
-  for (let i = 0; i < 120; i++) {
+  for (let i = 0; i < appointmentTotal; i++) {
     const patient = bulkPatients[i % bulkPatients.length]!;
     const providerId = pickProvider(ctx.providerIds, i);
 
     let scheduledAt: Date;
     let status: "AGENDADO" | "CONFIRMADO" | "REALIZADO" | "FALTOU" | "CANCELADO";
 
-    if (i < 12) {
+    if (i < Math.min(12, Math.round(appointmentTotal * 0.1))) {
       scheduledAt = todayAt(7 + (i % 10), (i * 12) % 60);
       status = i % 4 === 0 ? "CONFIRMADO" : "AGENDADO";
-    } else if (i < 20) {
+    } else if (i < Math.min(20, Math.round(appointmentTotal * 0.15))) {
       scheduledAt = daysFromNow(1 + (i % 14), 8 + (i % 8));
       status = "AGENDADO";
     } else {
-      const daysBack = 2 + (i % 178);
+      const daysBack = 2 + (i % Math.max(historyDays - 2, 30));
       scheduledAt = daysAgo(daysBack, 8 + (i % 9), (i * 7) % 60);
       const roll = i % 10;
       if (roll < 6) status = "REALIZADO";
@@ -343,7 +352,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
       });
       stats.subscriptions += 1;
 
-      for (let m = -3; m <= 2; m++) {
+      for (let m = -chargeMonthsPast; m < chargeMonthsFuture; m++) {
         const dueDate = firstDayOfMonthFromNow(m);
         const isPast = m < 0;
         const chargeStatus = isPast
@@ -367,7 +376,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
   const templates = ["APPOINTMENT_REMINDER", "INVOICE_DUE", "SUBSCRIPTION_DUE", "GENERIC"] as const;
   const msgStatuses = ["PENDENTE", "ENVIADA", "FALHA"] as const;
 
-  for (let i = 0; i < 45; i++) {
+  for (let i = 0; i < messageTotal; i++) {
     const patient = bulkPatients[i % bulkPatients.length]!;
     const channel = channels[i % channels.length]!;
     const status = msgStatuses[i % msgStatuses.length]!;
@@ -474,7 +483,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
 
 /** Cria usuários do portal beneficiário para amostra representativa. */
 export async function seedBeneficiaryPortalUsers(
-  ctx: Pick<SeedMassContext, "prisma" | "tenantId" | "patients" | "excludePatientIds"> & {
+  ctx: Pick<SeedMassContext, "prisma" | "tenantId" | "patients" | "excludePatientIds" | "scale"> & {
     password: string;
     extraEmails?: Map<string, string>;
   },
@@ -484,7 +493,9 @@ export async function seedBeneficiaryPortalUsers(
     (p) => !ctx.excludePatientIds.has(p.id) && p.companyId,
   );
 
-  for (let i = 0; i < Math.min(12, candidates.length); i++) {
+  const limit = ctx.scale.beneficiaryPortalUsers;
+
+  for (let i = 0; i < Math.min(limit, candidates.length); i++) {
     const patient = candidates[i * 7] ?? candidates[i];
     if (!patient) continue;
 

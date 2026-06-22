@@ -23,11 +23,17 @@ import {
   type PatientRef,
   type ProcedureRef,
 } from "./seed-data/scenarios";
+import { resolveSeedScale } from "./seed-data/scale";
+import { seedVitacareTenant } from "./seed-data/vitacare";
+import { seedMonthlyRevenueBaseline } from "./seed-data/monthly-baseline";
+import { currentTotpCode, DEMO_MFA_SECRET } from "./seed-data/totp-demo";
 
 const prisma = new PrismaClient();
 const DEMO_PASSWORD = hashPassword("bibi123");
 
 async function main() {
+  const scale = resolveSeedScale();
+  console.log(`Escala do seed: ${scale.scale} (SEED_SCALE)`);
   console.log("Limpando dados existentes...");
   await prisma.timelineEvent.deleteMany();
   await prisma.message.deleteMany();
@@ -67,27 +73,7 @@ async function main() {
     },
   });
 
-  console.log("Criando tenant white-label demo (VitaCare)...");
-  const vitacare = await prisma.tenant.create({
-    data: {
-      name: "Rede VitaCare",
-      cnpj: "99.888.777/0001-11",
-      branding: {
-        create: {
-          displayName: "VitaCare",
-          tagline: "Saúde corporativa sob medida",
-          primaryColor: "#2563eb",
-          accentColor: "#3b82f6",
-          heroFrom: "#1e3a8a",
-          heroTo: "#1d4ed8",
-          platformLabel: "Powered by Sistema Bibi",
-          colorScheme: "dark",
-        },
-      },
-    },
-  });
-  void vitacare;
-
+  console.log("Criando tenant white-label VitaCare (dados no final do seed)...");
   console.log(`Criando ${SEED_COMPANIES.length} empresas (PJ) e pipeline CRM...`);
   const companyIdByIndex = new Map<number, string>();
   for (const seed of SEED_COMPANIES) {
@@ -143,6 +129,28 @@ async function main() {
       name: "Paula Recepção",
       role: "INTERNO",
       internoProfile: "RECEPCAO",
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.user.create({
+    data: {
+      email: "financeiro@bibi.health",
+      password: DEMO_PASSWORD,
+      name: "Fernanda Financeiro",
+      role: "INTERNO",
+      internoProfile: "FATURAMENTO",
+      tenantId: tenant.id,
+    },
+  });
+  await prisma.user.create({
+    data: {
+      email: "seguranca@bibi.health",
+      password: DEMO_PASSWORD,
+      name: "Admin Segurança (MFA)",
+      role: "INTERNO",
+      internoProfile: "ADMIN",
+      mfaEnabled: true,
+      mfaSecret: DEMO_MFA_SECRET,
       tenantId: tenant.id,
     },
   });
@@ -507,6 +515,7 @@ async function main() {
     patients: patientRefs,
     excludePatientIds,
     companies: SEED_COMPANIES,
+    scale,
   });
 
   const beneficiaryUsers = await seedBeneficiaryPortalUsers({
@@ -515,8 +524,18 @@ async function main() {
     patients: patientRefs,
     excludePatientIds,
     password: DEMO_PASSWORD,
+    scale,
   });
   massStats.beneficiaryUsers = beneficiaryUsers;
+
+  console.log("Criando baseline de receita mensal deterministica (6 meses)...");
+  const baseline = await seedMonthlyRevenueBaseline({
+    prisma,
+    tenantId: tenant.id,
+    internoId: interno.id,
+    patients: patientRefs,
+  });
+  console.log(`  Baseline: ${baseline.months} meses · R$ ${baseline.totalRevenue.toFixed(2)}`);
 
   console.log("Criando fatura historica demo (Pedro)...");
   const agPedroPast = await prisma.appointment.create({
@@ -623,6 +642,9 @@ async function main() {
     },
   });
 
+  console.log("\nPopulando tenant VitaCare (white-label)...");
+  const vitacareStats = await seedVitacareTenant(prisma, DEMO_PASSWORD, scale);
+
   const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
   const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });
   const pjCount = await prisma.user.count({ where: { tenantId: tenant.id, role: "PJ" } });
@@ -633,14 +655,16 @@ async function main() {
   });
 
   console.log("\nSeed concluido com sucesso.");
-  console.log(`  Empresas (clientes PJ): ${companyCount}`);
-  console.log(`  Beneficiarios: ${patientCount}`);
+  console.log(`  Escala: ${scale.scale}`);
+  console.log(`  Empresas Bibi (clientes PJ): ${companyCount}`);
+  console.log(`  Beneficiarios Bibi: ${patientCount}`);
   console.log(`  Usuarios PJ: ${pjCount}`);
   console.log(`  Prestadores: ${providerIds.length}`);
-  console.log(`  Agendamentos (total): ${appointmentCount}`);
-  console.log(`  Faturas: ${invoiceCount}`);
+  console.log(`  Agendamentos Bibi: ${appointmentCount}`);
+  console.log(`  Faturas Bibi: ${invoiceCount}`);
   console.log(`  Procedimentos pendentes de faturamento: ${pendingUsages}`);
-  console.log("\nMassa operacional gerada nesta execucao:");
+  console.log(`  VitaCare: ${vitacareStats.companies} empresas · ${vitacareStats.patients} beneficiarios`);
+  console.log("\nMassa operacional Bibi (esta execucao):");
   console.log(`  +${massStats.appointments} agendamentos · +${massStats.procedureUsages} procedimentos`);
   console.log(`  +${massStats.medicalRecords} prontuarios · +${massStats.invoices} faturas · +${massStats.payments} pagamentos`);
   console.log(`  +${massStats.subscriptions} assinaturas · +${massStats.subscriptionCharges} cobrancas recorrentes`);
@@ -648,11 +672,17 @@ async function main() {
   console.log(`  +${massStats.webhookDeliveries} entregas webhook · +${massStats.beneficiaryUsers} usuarios beneficiario`);
   console.log("\nCredenciais de acesso (POC):");
   console.log("  Prestador    -> /login              : dra.helena@bibi.health / bibi123");
-  console.log("  Interno      -> /interno/login       : faturamento@bibi.health / bibi123");
-  console.log("  Recepção     -> /interno/login       : recepcao@bibi.health / bibi123 (RBAC limitado)");
+  console.log("  Interno      -> /interno/login       : faturamento@bibi.health / bibi123 (ADMIN)");
+  console.log("  Faturamento  -> /interno/login       : financeiro@bibi.health / bibi123 (RBAC FATURAMENTO)");
+  console.log("  Recepção     -> /interno/login       : recepcao@bibi.health / bibi123 (RBAC RECEPCAO)");
+  console.log("  MFA demo     -> /interno/login       : seguranca@bibi.health / bibi123 + TOTP");
+  console.log(`    Secret MFA: ${DEMO_MFA_SECRET} · Codigo atual: ${currentTotpCode()}`);
   console.log("  Empresa PJ   -> /pj/login            : rh@techcorp.com / bibi123");
   console.log("  Beneficiario -> /beneficiario/login  : joao.pereira@email.com / bibi123");
   console.log("  Beneficiario -> /beneficiario/login  : maria.souza@email.com / bibi123");
+  console.log("  VitaCare     -> /interno/login       : operacao@vitacare.demo / bibi123");
+  console.log("  VitaCare PJ  -> /pj/login            : rh@vitacarecorp.demo / bibi123");
+  console.log("\nSEED_SCALE=small|medium|large no .env controla volume da massa");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
 }
 
