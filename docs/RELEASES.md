@@ -17,7 +17,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | **Versão em produção** | **1.0.2** (`e30b2b0`) + mobile nav (`d5ef580`) |
 | **Deploy Netlify** | Auto-deploy da `main` |
 | `main` | `199b87e` — release / produção |
-| `dev` | `2b7474b` — **1.1.0** — sincronizada com `main` + cadastros v1.1 |
+| `dev` | `4a60269` — **1.1.0** — portais + RBAC + cadastros (validado) |
 | Tag git em produção | **`v1.0.2`** |
 | Próximo pacote | **v1.1.0** — validar `dev` → merge `dev` → `main` |
 | Validação `dev` | `npm run pre-release` |
