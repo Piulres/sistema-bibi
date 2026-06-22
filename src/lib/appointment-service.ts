@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
 import {
@@ -79,6 +79,7 @@ export async function listAppointments(input: {
   providerId?: string;
   patientId?: string;
 }): Promise<AppointmentView[]> {
+  const prisma = await getPrisma();
   const where: {
     tenantId: string;
     scheduledAt?: { gte?: Date; lte?: Date };
@@ -107,6 +108,7 @@ export async function listAppointments(input: {
 }
 
 export async function listProviders(tenantId: string) {
+  const prisma = await getPrisma();
   return prisma.user.findMany({
     where: { tenantId, role: "PRESTADOR" },
     select: { id: true, name: true, email: true },
@@ -124,6 +126,7 @@ export async function createAppointment(input: {
   modality?: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
   });
@@ -211,6 +214,7 @@ export async function updateAppointment(input: {
   reason?: string | null;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.appointment.findFirst({
     where: { id: input.appointmentId, tenantId: input.tenantId },
     include: { patient: true, provider: true },

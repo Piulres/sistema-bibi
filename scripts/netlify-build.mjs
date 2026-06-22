@@ -11,7 +11,8 @@ import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const dbFile = join(root, "prisma", "dev.db");
+const demoDbFile = join(root, "prisma", "demo.db");
+const dbFile = demoDbFile;
 const databaseUrl = process.env.DATABASE_URL?.startsWith("file:")
   ? process.env.DATABASE_URL.startsWith("file:./")
     ? `file:${dbFile}`
@@ -29,6 +30,7 @@ writeFileSync(
     process.env.APP_MODE ? `APP_MODE="${process.env.APP_MODE}"` : "",
     process.env.RUN_SEED_ON_BUILD ? `RUN_SEED_ON_BUILD="${process.env.RUN_SEED_ON_BUILD}"` : "",
     process.env.ALLOW_DEMO_RESET ? `ALLOW_DEMO_RESET="${process.env.ALLOW_DEMO_RESET}"` : "",
+    `DUAL_DATA_STORE="true"`,
     process.env.SESSION_SECRET ? `SESSION_SECRET="${process.env.SESSION_SECRET}"` : "",
   ]
     .filter(Boolean)

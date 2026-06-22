@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { bootstrapPaymentGateway } from "@/lib/payments/bootstrap";
 import { createPixCharge, isPaymentGatewayConfigured } from "@/lib/payments/charge-service";
@@ -73,6 +73,7 @@ export async function invoiceSubscriptionCharge(input: {
   chargeId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const charge = await prisma.subscriptionCharge.findFirst({
     where: {
       id: input.chargeId,
@@ -153,6 +154,7 @@ export async function markInvoicePaid(input: {
   gatewayId?: string | null;
   paymentId?: string | null;
 }) {
+  const prisma = await getPrisma();
   const invoice = await prisma.invoice.findFirst({
     where: { id: input.invoiceId, tenantId: input.tenantId },
     include: { patient: true, payments: true },
@@ -226,6 +228,7 @@ export async function createInvoicePixCharge(input: {
   invoiceId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   if (!isPaymentGatewayConfigured()) {
     return { error: "Gateway de pagamento não configurado (defina PAYMENT_GATEWAY=mock)" as const };
   }
@@ -311,6 +314,7 @@ export async function confirmInvoicePixPayment(input: {
   paymentId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const payment = await prisma.payment.findFirst({
     where: {
       id: input.paymentId,
@@ -335,6 +339,7 @@ export async function confirmInvoicePixPayment(input: {
 }
 
 export async function listInvoicePayments(invoiceId: string, tenantId: string) {
+  const prisma = await getPrisma();
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, tenantId },
   });

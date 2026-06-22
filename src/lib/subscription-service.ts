@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import {
   billingCycleLabel,
@@ -82,6 +82,7 @@ function mapSubscription(sub: {
 }
 
 export async function listSubscriptions(tenantId: string): Promise<SubscriptionView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.subscription.findMany({
     where: { tenantId },
     include: {
@@ -96,6 +97,7 @@ export async function listSubscriptions(tenantId: string): Promise<SubscriptionV
 }
 
 export async function listTenantPatientsForSubscription(tenantId: string) {
+  const prisma = await getPrisma();
   return prisma.patient.findMany({
     where: { tenantId },
     select: { id: true, name: true },
@@ -115,6 +117,7 @@ export async function createSubscription(input: {
   description?: string | null;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
   });
@@ -166,6 +169,7 @@ export async function updateSubscriptionStatus(input: {
   status: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.subscription.findFirst({
     where: { id: input.subscriptionId, tenantId: input.tenantId },
     include: { patient: { select: { name: true } } },
@@ -201,6 +205,7 @@ export async function generateSubscriptionCharges(input: {
   horizonMonths?: number;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const subscription = await prisma.subscription.findFirst({
     where: { id: input.subscriptionId, tenantId: input.tenantId },
     include: {
@@ -262,6 +267,7 @@ export async function generateSubscriptionCharges(input: {
 }
 
 export async function listSubscriptionCharges(subscriptionId: string, tenantId: string) {
+  const prisma = await getPrisma();
   const subscription = await prisma.subscription.findFirst({
     where: { id: subscriptionId, tenantId },
   });

@@ -40,6 +40,7 @@ yarn-error.log*
 # prisma local sqlite database
 /prisma/*.db
 /prisma/*.db-journal
+/prisma/.data-store-mode
 /prisma/prisma/
 
 # vercel

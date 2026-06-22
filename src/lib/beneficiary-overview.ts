@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { getPatientOverview, type PatientOverviewData } from "@/lib/patient-overview";
 import {
@@ -44,6 +44,7 @@ export async function getBeneficiaryOverview(
   patientId: string,
   tenantId: string,
 ): Promise<BeneficiaryOverviewData | null> {
+  const prisma = await getPrisma();
   const overview = await getPatientOverview(patientId, tenantId);
   if (!overview) return null;
 

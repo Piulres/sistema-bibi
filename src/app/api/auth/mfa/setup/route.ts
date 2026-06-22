@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { createMfaSetup, verifyTotp } from "@/lib/mfa";
 
 export async function GET() {
+  const prisma = await getPrisma();
   try {
     const session = await requireUser();
     const user = await prisma.user.findUnique({
@@ -17,6 +18,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const prisma = await getPrisma();
   try {
     const session = await requireUser();
     const body = (await request.json()) as {

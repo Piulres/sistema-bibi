@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 
 /**
  * Calcula o preco efetivo de um procedimento para um beneficiario, aplicando
@@ -10,6 +10,7 @@ export async function computePrice(
   companyId: string | null,
   tenantId?: string,
 ): Promise<{ basePrice: number; multiplier: number; price: number }> {
+  const prisma = await getPrisma();
   const procedure = tenantId
     ? await prisma.procedure.findFirst({ where: { id: procedureId, tenantId } })
     : await prisma.procedure.findUnique({ where: { id: procedureId } });

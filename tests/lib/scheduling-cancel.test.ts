@@ -1,12 +1,14 @@
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    appointment: {
-      findFirst: vi.fn(),
-      update: vi.fn(),
-    },
+const mockPrisma = {
+  appointment: {
+    findFirst: vi.fn(),
+    update: vi.fn(),
   },
+};
+
+vi.mock("@/lib/db", () => ({
+  getPrisma: vi.fn(async () => mockPrisma),
 }));
 
 vi.mock("@/lib/timeline", () => ({
@@ -15,12 +17,11 @@ vi.mock("@/lib/timeline", () => ({
   TIMELINE_ENTITY_TYPES: { APPOINTMENT: "Appointment" },
 }));
 
-import { prisma } from "@/lib/db";
 import { recordTimelineEvent } from "@/lib/timeline";
 import { cancelBeneficiaryAppointment } from "@/lib/scheduling-service";
 
-const findFirst = prisma.appointment.findFirst as ReturnType<typeof vi.fn>;
-const update = prisma.appointment.update as ReturnType<typeof vi.fn>;
+const findFirst = mockPrisma.appointment.findFirst;
+const update = mockPrisma.appointment.update;
 
 describe("cancelBeneficiaryAppointment", () => {
   const baseInput = {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { saveTenantLogo } from "@/lib/storage/tenant-logo";
 
@@ -8,6 +8,7 @@ const ALLOWED_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/s
 
 /** Upload de logo — Netlify Blobs em produção; filesystem local em dev. */
 export async function POST(request: Request) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["INTERNO"]);
     const form = await request.formData();

@@ -15,8 +15,9 @@
   NODE_VERSION = "22"
   # Garante devDependencies no npm ci (tailwind, tsx, typescript) quando NODE_ENV=production.
   NPM_FLAGS = "--include=dev"
-  # Path relativo ao schema Prisma (prisma/schema.prisma) → arquivo prisma/dev.db
+  # Path relativo ao schema Prisma (prisma/schema.prisma) → demo.db gerado no build
   DATABASE_URL = "file:./dev.db"
+  DUAL_DATA_STORE = "true"
   NETLIFY = "true"
   ALLOW_DEMO_RESET = "true"
   # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables).

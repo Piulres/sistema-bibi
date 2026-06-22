@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { computePrice, formatBRL } from "@/lib/pricing";
 import {
@@ -16,6 +16,7 @@ export async function POST(
   request: Request,
   ctx: RouteContext<"/api/prestador/appointments/[id]/procedures">,
 ) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["PRESTADOR"]);
     const { id } = await ctx.params;

@@ -1,175 +1,130 @@
 # Operação de dados — Demo vs Operação
 
-Como o Sistema Bibi gerencia **massa demo** e **dados reais** em cada ambiente.
+Como o Sistema Bibi gerencia **massa demo** e **dados reais** no mesmo site Netlify, **sem Postgres**.
 
 Complementa [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) e [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md).
 
 ---
 
+## Modelo dual SQLite (produção Netlify)
+
+Um único site (`sistema-bibi.netlify.app`) com **duas bases SQLite** embutidas no build:
+
+| Base | Arquivo | Conteúdo |
+|------|---------|------------|
+| **Demo** | `prisma/demo.db` | Massa completa do seed (50 PJ, beneficiários, fluxos) |
+| **Operação** | `prisma/operation.db` | Schema + bootstrap mínimo (tenant, usuários, catálogo) |
+
+O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados — demo ou operação** (somente ADMIN).
+
+- Configuração persistida em **Netlify Blobs** (`bibi-config/data-store-mode`)
+- Banco de **operação** persistido em **Netlify Blobs** (`bibi-databases/operation.db`)
+- Escritas no modo operação são salvas automaticamente após mutações (debounce ~1,5s)
+
+**Sem Postgres:** a operação real usa SQLite + Blobs como armazenamento compartilhado entre instâncias Lambda.
+
+---
+
 ## Dois modos
 
-| | **Demo** (`APP_MODE=demo`) | **Operação** (`APP_MODE=operation`) |
-|--|---------------------------|-------------------------------------|
+| | **Demo** | **Operação** |
+|--|----------|--------------|
 | **Objetivo** | Apresentação, testes, treinamento | Uso diário da clínica |
-| **Massa no build** | Sim (`RUN_SEED_ON_BUILD=true`) | Não |
-| **Reset na UI** | Sim (`ALLOW_DEMO_RESET=true`) | Não |
-| **Banco recomendado** | SQLite (Netlify POC) ou Postgres descartável | **Postgres** (Netlify Database) |
-| **Dados após deploy** | Snapshot do seed | Vazios ou migrados — crescem com o uso |
-
-**Produção atual** (`sistema-bibi.netlify.app`): modo **demo** — SQLite efêmero em Lambda.
+| **Massa** | Seed completo no build | Bootstrap mínimo; dados crescem com uso |
+| **Reset na UI** | Sim (`RESTAURAR` em segurança) | Não |
+| **Persistência Netlify** | Snapshot do build (efêmero por instância) | Blobs (compartilhado) |
 
 ---
 
 ## Variáveis de controle
 
-| Variável | Demo (padrão) | Operação |
-|----------|---------------|----------|
-| `APP_MODE` | `demo` | `operation` |
-| `RUN_SEED_ON_BUILD` | `true` | `false` |
-| `ALLOW_DEMO_RESET` | `true` | `false` |
-| `SEED_SCALE` | `small` \| `medium` \| `large` | — |
-| `DATABASE_URL` | `file:./dev.db` | `postgresql://...` |
+| Variável | Padrão Netlify | Descrição |
+|----------|----------------|-----------|
+| `DUAL_DATA_STORE` | `true` | Habilita seletor demo/operação |
+| `DATA_STORE_MODE` | — | Modo inicial se Blobs vazio (`demo` \| `operation`) |
+| `APP_MODE` | `demo` | Legado — mapeia para modo inicial |
+| `RUN_SEED_ON_BUILD` | `true` | Gera `demo.db` com seed no build |
+| `ALLOW_DEMO_RESET` | `true` | Botão restaurar demo (somente modo demo ativo) |
+| `DATABASE_URL` | `file:./dev.db` | Legado local; build usa `demo.db` |
 
-Lógica central: `src/lib/database-env.ts` · setup: `scripts/setup-database.ts`
+Lógica: `src/lib/data-store-mode.ts` · runtime: `src/lib/db.ts` · Blobs: `src/lib/sqlite-blob-persistence.ts`
 
 ---
 
 ## Comandos locais
 
 ```bash
-# Massa demo completa (quando conveniente)
+# Massa demo completa → demo.db + operation.db + dev.db
 npm run db:bootstrap:demo
 
-# Banco vazio para operar (schema sem seed)
+# Só operation.db vazio (bootstrap mínimo)
 npm run db:bootstrap:operation
 
-# Só rodar setup conforme .env atual
+# Setup conforme .env
 npm run db:setup
+```
 
-# Massa manual sem rebuild
-npm run db:seed
+**Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.
+
+```bash
+npm run dev
+# /interno/seguranca → alternar demo ↔ operação
 ```
 
 ---
 
 ## Build Netlify
 
-`scripts/netlify-build.mjs` chama `setup-database.ts`:
+`scripts/netlify-build.mjs` → `setup-database.ts`:
 
-1. **SQLite** → `prisma db push` + seed (se `RUN_SEED_ON_BUILD`)
-2. **Postgres** → `prisma migrate deploy` (ou `db push` se ainda sem migrations) + seed opcional
+1. `demo.db` — `db push` + seed
+2. `operation.db` — `db push` + bootstrap mínimo
+3. `dev.db` — cópia de `demo.db` (compatibilidade)
 
-### Site demo (atual)
+`DUAL_DATA_STORE=true` gravado no `.env` do build.
 
-`netlify.toml` padrão — sem `APP_MODE` → demo com seed.
+---
 
-### Site operação (futuro)
+## Alternar em produção
 
-No painel Netlify ou contexto de deploy:
+1. Login como ADMIN (`faturamento@bibi.health` / `bibi123`)
+2. `/interno/seguranca` → **Ir para operação**
+3. Confirmar digitando `OPERAR`
+4. Fazer login novamente
+
+Para voltar à demo: confirmar com `DEMO`.
+
+---
+
+## Limitações conhecidas
+
+| Aspecto | Demo | Operação |
+|---------|------|----------|
+| Compartilhamento entre Lambdas | Não (cada instância copia do build) | Sim (via Blobs) |
+| Concorrência alta | OK para apresentação | SQLite serializa escritas — adequado a clínica pequena/média POC |
+| Postgres | Não necessário | Migração futura quando escalar |
+
+---
+
+## Migrar para Postgres (futuro)
+
+Quando o volume exigir, provisionar Netlify Database e desabilitar dual-store:
 
 ```bash
-APP_MODE=operation
-RUN_SEED_ON_BUILD=false
-ALLOW_DEMO_RESET=false
+DUAL_DATA_STORE=false
 DATABASE_URL=postgresql://...
-```
-
-Exemplo em `netlify.toml` → `[context.operation.environment]`.
-
-Deploy com contexto:
-
-```bash
-npx netlify deploy --prod --build --context operation
-```
-
----
-
-## Por que SQLite na Netlify não opera de verdade
-
-Em Lambda, cada instância copia `dev.db` do build para `/tmp`. Escritas (walk-in, faturamento) **não são compartilhadas** entre portais nem entre cold starts.
-
-| Sintoma | Causa |
-|---------|--------|
-| Walk-in some na agenda do prestador | Outra instância Lambda |
-| Dados “voltam” ao demo | Cold start ou novo deploy |
-| Dashboard muda sozinho | Instância diferente |
-
-**Operação real exige Postgres** (ou outro banco compartilhado).
-
----
-
-## Migrar para Postgres (operação)
-
-### 1. Provisionar banco
-
-[Netlify Database](https://docs.netlify.com/database/) ou Postgres gerenciado externo.
-
-### 2. Alterar Prisma
-
-Em `prisma/schema.prisma`:
-
-```prisma
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-```
-
-### 3. Criar migration inicial
-
-```bash
-DATABASE_URL="postgresql://..." npx prisma migrate dev --name init
-```
-
-### 4. Configurar ambiente operação
-
-```bash
 APP_MODE=operation
-RUN_SEED_ON_BUILD=false
-ALLOW_DEMO_RESET=false
-DATABASE_URL=postgresql://...
 ```
 
-### 5. Deploy
-
-```bash
-npm run pre-release   # com DATABASE_URL de staging se possível
-npx netlify build
-npx netlify deploy --prod --no-build --context operation
-```
-
-Dados nascem **vazios** — cadastros, walk-in e PPU passam a persistir.
-
-### 6. Massa demo sob demanda
-
-- **Nunca** no banco de operação
-- Usar site demo separado, ou local: `npm run db:bootstrap:demo`
-- Botão reset só em `APP_MODE=demo`
-
----
-
-## Matriz de ambientes recomendada
-
-| Ambiente | Site | APP_MODE | Banco | Seed |
-|----------|------|----------|-------|------|
-| Dev local | localhost:3000 | demo | SQLite `dev.db` | `db:seed` quando quiser |
-| Demo pública | sistema-bibi.netlify.app | demo | SQLite build | build |
-| Operação | novo site / subdomínio | operation | Postgres | nunca automático |
-| CI / testes | — | demo | SQLite temp | sim |
-
----
-
-## Restaurar demo em produção (modo demo)
-
-`/interno/seguranca` → **Restaurar estado original do seed** (somente ADMIN).
-
-Reexecuta `runDatabaseSeed()` na instância atual — útil para apresentações, não para sincronizar todas as Lambdas.
+Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 ---
 
 ## Referências
 
-- Runtime SQLite `/tmp`: `src/lib/db.ts`
+- Modo ativo: `src/lib/data-store-mode.ts`
+- Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
+- Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
+- UI seletor: `src/components/DataStoreCard.tsx`
+- API: `GET|POST /api/interno/data-store`
 - Reset demo: `src/lib/demo-reset.ts`
-- Seed: `prisma/seed-data/run-seed.ts`
-- Deploy: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) § Limitações POC

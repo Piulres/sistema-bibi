@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import {
   DemoResetError,
@@ -12,7 +12,7 @@ import {
 export async function GET() {
   try {
     const user = await requireUser(["INTERNO"]);
-    return NextResponse.json(getDemoResetStatus(user));
+    return NextResponse.json(await getDemoResetStatus(user));
   } catch (error) {
     return authErrorResponse(error);
   }
@@ -25,7 +25,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const user = await requireUser(["INTERNO"]);
-    const status = getDemoResetStatus(user);
+    const status = await getDemoResetStatus(user);
 
     if (!status.enabled) {
       return NextResponse.json(
@@ -48,6 +48,7 @@ export async function POST(request: Request) {
       );
     }
 
+    const prisma = await getPrisma();
     const result = await executeDemoReset(prisma);
 
     return NextResponse.json({
@@ -61,7 +62,8 @@ export async function POST(request: Request) {
     }
     console.error("[demo-reset]", error);
     return NextResponse.json(
-      { error: "Falha ao restaurar modo demo. Verifique os logs do servidor." },
+      { error: "Falha ao restaurar modo demo. Verifique os logs do servidor.",
+      },
       { status: 500 },
     );
   }

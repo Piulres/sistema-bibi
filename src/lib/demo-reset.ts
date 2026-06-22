@@ -2,13 +2,21 @@ import "server-only";
 import type { PrismaClient } from "@prisma/client";
 import { runDatabaseSeed, type SeedRunResult } from "../../prisma/seed-data/run-seed";
 import { isDemoResetAllowed } from "@/lib/database-env";
+import { getDataStoreMode } from "@/lib/data-store-mode";
 import { isInternoAdmin } from "@/lib/interno-permissions";
 import type { SessionUser } from "@/lib/session";
 
 let resetInProgress = false;
 
-/** Habilita o botão de restaurar demo. Desligado em APP_MODE=operation. */
-export function isDemoResetEnabled(): boolean {
+/** Habilita o botão de restaurar demo — somente no modo demo ativo. */
+export async function isDemoResetEnabled(): Promise<boolean> {
+  if (!isDemoResetAllowed()) return false;
+  const mode = await getDataStoreMode();
+  return mode === "demo";
+}
+
+/** @deprecated Use isDemoResetEnabled() — mantido para checks síncronos em build. */
+export function isDemoResetEnabledSync(): boolean {
   return isDemoResetAllowed();
 }
 
@@ -22,8 +30,8 @@ export type DemoResetStatus = {
   inProgress: boolean;
 };
 
-export function getDemoResetStatus(user: SessionUser): DemoResetStatus {
-  const enabled = isDemoResetEnabled();
+export async function getDemoResetStatus(user: SessionUser): Promise<DemoResetStatus> {
+  const enabled = await isDemoResetEnabled();
   return {
     enabled,
     canReset: enabled && canUserResetDemo(user),
@@ -41,7 +49,7 @@ export { CONFIRM_PHRASE as DEMO_RESET_CONFIRM_PHRASE };
 
 /** Executa o seed completo e invalida sessões (IDs são recriados). */
 export async function executeDemoReset(prisma: PrismaClient): Promise<SeedRunResult> {
-  if (!isDemoResetEnabled()) {
+  if (!(await isDemoResetEnabled())) {
     throw new DemoResetError(403, "Restauração demo desabilitada neste ambiente");
   }
   if (resetInProgress) {

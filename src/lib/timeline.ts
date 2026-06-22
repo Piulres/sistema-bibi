@@ -1,5 +1,5 @@
-import { prisma } from "@/lib/db";
-import type { Prisma } from "@prisma/client";
+import { getPrisma } from "@/lib/db";
+import type { Prisma, PrismaClient } from "@prisma/client";
 
 /** Tipos de entidade rastreados na timeline. */
 export const TIMELINE_ENTITY_TYPES = {
@@ -45,7 +45,7 @@ export type RecordTimelineInput = {
   createdBy?: string | null;
 };
 
-type DbClient = Prisma.TransactionClient | typeof prisma;
+type DbClient = Prisma.TransactionClient | PrismaClient;
 
 const dateTime = (value: Date) =>
   value.toLocaleString("pt-BR", {
@@ -62,10 +62,11 @@ const dateTime = (value: Date) =>
  */
 export async function recordTimelineEvent(
   input: RecordTimelineInput,
-  client: DbClient = prisma,
+  client?: DbClient,
 ) {
   try {
-    return await client.timelineEvent.create({
+    const db = client ?? (await getPrisma());
+    return await db.timelineEvent.create({
       data: {
         tenantId: input.tenantId,
         entityType: input.entityType,
@@ -106,6 +107,7 @@ export async function getPatientTimelineEvents(
     messageIds: string[];
   },
 ): Promise<TimelineEventView[]> {
+  const prisma = await getPrisma();
   const orFilters: Prisma.TimelineEventWhereInput[] = [
     { entityType: TIMELINE_ENTITY_TYPES.PATIENT, entityId: patientId },
   ];

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
 import {
@@ -17,6 +17,7 @@ import { dispatchWebhooks } from "@/lib/webhook-service";
  * `src/lib/payments/charge-service.ts` quando adapters estiverem registrados.
  */
 export async function POST(request: Request) {
+  const prisma = await getPrisma();
   try {
     const user = await requireInternoModule("billing");
     const body = (await request.json()) as { patientId?: string };

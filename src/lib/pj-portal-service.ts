@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { billingCycleLabel, subscriptionStatusLabel } from "@/lib/subscription";
 
@@ -68,6 +68,7 @@ export async function getPjPortalOverview(
   companyId: string,
   tenantId: string,
 ): Promise<PjPortalOverview | null> {
+  const prisma = await getPrisma();
   const company = await prisma.company.findFirst({
     where: { id: companyId, tenantId },
     include: {

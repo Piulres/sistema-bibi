@@ -1,7 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { DEFAULT_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
 import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 import {
@@ -63,6 +63,7 @@ export type SessionUser = {
 };
 
 export async function getSessionUser(): Promise<SessionUser | null> {
+  const prisma = await getPrisma();
   const store = await cookies();
   const token = store.get(COOKIE_NAME)?.value;
   const userId = verify(token);

@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { companyStatusLabel } from "@/lib/company-crm";
 import { formatBRL } from "@/lib/pricing";
 import { monthsForBillingCycle } from "@/lib/subscription";
@@ -77,6 +77,7 @@ export type ExecutiveDashboardData = {
 export async function getExecutiveDashboard(
   tenantId: string,
 ): Promise<ExecutiveDashboardData> {
+  const prisma = await getPrisma();
   const todayStart = startOfToday();
   const todayEnd = endOfToday();
 
