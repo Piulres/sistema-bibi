@@ -403,7 +403,9 @@ src/
 | `docs/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy automático |
 | `docs/OPERACOES.md` | Mapa completo de operações + regras para agentes IA |
 | `docs/HISTORICO_2026-06-21.md` | Auditoria PRs, commits e deploys do dia |
-| `.cursor/rules/operacoes-bibi.mdc` | Preferências de IA (Cursor rules) |
+| `.cursor/rules/operacoes-bibi.mdc` | Regras core (always apply) |
+| `.cursor/rules/netlify-release.mdc` | Deploy/release (ativação inteligente) |
+| `.cursor/rules/stack-nextjs.mdc` | Stack e código (`src/**`) |
 | `docs/evidencias/README.md` | Vídeos e screenshots dos fluxos funcionais |
 | `public/openapi.yaml` | Especificação API |
 | `AGENTS.md` | Instruções para agentes de IA |
@@ -473,7 +475,7 @@ src/
 → Se o corpo for `usage_exceeded`, a cota Netlify esgotou — não é bug. Dev local continua normal.
 
 **Como publico em produção?**
-→ Manual: `npx netlify deploy --prod` após `pre-release` OK e cota disponível. Atualizar `docs/RELEASES.md`.
+→ Após `npm run pre-release`: `npx netlify deploy --prod --no-build` (manual). Atualizar `docs/RELEASES.md`. O `--no-build` economiza cota Netlify.
 
 **Agentes Cursor podem fazer deploy?**
 → Não, salvo pedido explícito. Regras em `AGENTS.md` e `.cursor/rules/operacoes-bibi.mdc`.

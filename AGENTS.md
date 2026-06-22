@@ -60,7 +60,8 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 ### Operações e preferências de IA
 
-**Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:** `.cursor/rules/operacoes-bibi.mdc`
+**Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:**
+`.cursor/rules/operacoes-bibi.mdc` (core) · `netlify-release.mdc` (deploy) · `stack-nextjs.mdc` (código)
 
 | Operação | Comando | Agente pode? |
 |----------|---------|--------------|
@@ -116,4 +117,4 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
   `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
-  `.cursor/rules/operacoes-bibi.mdc` (preferências IA), `docs/evidencias/` (capturas dos fluxos).
+  `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).

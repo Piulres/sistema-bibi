@@ -115,7 +115,8 @@ curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/
 ```bash
 npx netlify login    # se necessário
 npx netlify link     # site sistema-bibi
-npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: <resumo>"
+# Preferir --no-build após pre-release local (economiza build minutes na Netlify)
+npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: <resumo>"
 ```
 
 ### 4. Fechar o pacote (atualizar este arquivo)

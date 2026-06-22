@@ -94,7 +94,7 @@ Se passar, o pacote está **pronto para publicação** — mas ainda **não** fo
 ```bash
 git checkout main && git pull
 npm run pre-release
-npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"
+npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 ```
 
 Depois: atualize [`RELEASES.md`](RELEASES.md) e faça commit na `main`.

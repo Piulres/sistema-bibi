@@ -27,7 +27,7 @@ flowchart LR
   subgraph Release["Release (raro, manual)"]
     G --> H{Cota Netlify OK?}
     H -->|503 usage_exceeded| I[Aguardar reset / upgrade]
-    H -->|OK| J[npx netlify deploy --prod]
+    H -->|OK| J["npx netlify deploy --prod --no-build"]
     J --> K[Atualizar RELEASES.md]
   end
 
@@ -138,7 +138,7 @@ main acumula commits → pre-release OK → deploy manual → RELEASES.md atuali
 - [ ] `git checkout main && git pull`
 - [ ] `npm run pre-release` — sem erros
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
-- [ ] `npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"`
+- [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
 - [ ] Smoke test: landing + um login por portal
 - [ ] Atualizar [`RELEASES.md`](RELEASES.md) (mover rascunho → produção)
 - [ ] Commit: `docs(release): fecha pacote bibi-poc-YYYY-MM-DDx`
@@ -160,7 +160,7 @@ Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi
 |----------|-----------------|-------|
 | Validar build CI | `npm run pre-release` | Não publica |
 | Preview | `npx netlify deploy` | Não afeta produção |
-| Produção | `npx netlify deploy --prod` | **Só com pedido explícito** |
+| Produção | `npx netlify deploy --prod --no-build` | **Só com pedido explícito** — após `pre-release` local |
 | Parar gasto de cota | Painel → **Stop builds** | Desliga CI no push |
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
@@ -173,8 +173,15 @@ Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi
 
 ## 7. Operações para agentes de IA
 
-Regras obrigatórias para Cursor, Cloud Agent e assistentes. Detalhes também em
-`.cursor/rules/operacoes-bibi.mdc` e `AGENTS.md`.
+Regras obrigatórias para Cursor, Cloud Agent e assistentes. Implementadas em:
+
+| Arquivo | Ativação | Conteúdo |
+|---------|----------|----------|
+| `.cursor/rules/operacoes-bibi.mdc` | Always apply | Operações core, token budget, matriz de decisão |
+| `.cursor/rules/netlify-release.mdc` | Inteligente (deploy/release) | Netlify, `--no-build`, cota, checklist publicação |
+| `.cursor/rules/stack-nextjs.mdc` | Globs `src/**`, `prisma/**` | Next 16, Prisma 6, ESLint, UI |
+
+Detalhes também em `AGENTS.md`.
 
 ### 7.1 Sempre fazer
 
@@ -255,4 +262,6 @@ Pedido de validação
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](evidencias/README.md) | Vídeos e screenshots |
 | [`AGENTS.md`](../AGENTS.md) | Instruções para IA |
-| [`.cursor/rules/operacoes-bibi.mdc`](../.cursor/rules/operacoes-bibi.mdc) | Regras Cursor (always apply) |
+| [`.cursor/rules/operacoes-bibi.mdc`](../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |
+| [`.cursor/rules/netlify-release.mdc`](../.cursor/rules/netlify-release.mdc) | Deploy e release (ativação inteligente) |
+| [`.cursor/rules/stack-nextjs.mdc`](../.cursor/rules/stack-nextjs.mdc) | Stack e código (`src/**`) |
