@@ -70,20 +70,31 @@ export default function PatientOverviewView({
   patientId: string;
 }) {
   const [overview, setOverview] = useState<Overview | null>(null);
+  const [clinical, setClinical] = useState<{
+    medications: { medication: string; dosage: string; frequency: string; statusLabel: string }[];
+    examOrders: { examName: string; statusLabel: string; resultSummary: string | null }[];
+    protocols: { templateName: string; statusLabel: string; progressPercent: number }[];
+    overview: { profile: { allergies: { substance: string }[]; bloodType: string | null } } | null;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     (async () => {
-      const res = await fetch(`/api/interno/patients/${patientId}/overview`);
+      const [res, clinicalRes] = await Promise.all([
+        fetch(`/api/interno/patients/${patientId}/overview`),
+        fetch(`/api/interno/patients/${patientId}/clinical`),
+      ]);
       const data = await res.json();
+      const clinicalData = await clinicalRes.json();
       if (!active) return;
       if (!res.ok) {
         setError(data.error ?? "Erro ao carregar beneficiário");
       } else {
         setOverview(data.overview);
       }
+      if (clinicalRes.ok) setClinical(clinicalData.clinical);
       setLoading(false);
     })();
     return () => {
@@ -280,6 +291,42 @@ export default function PatientOverviewView({
           </div>
         )}
       </section>
+
+      {clinical && (
+        <section>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Dados clínicos (Care Chart)</h3>
+          <div className="mt-3 grid gap-4 lg:grid-cols-3">
+            <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4">
+              <p className="text-sm font-medium">Perfil</p>
+              {clinical.overview?.profile.allergies.length ? (
+                <ul className="mt-2 text-sm text-[var(--text-secondary)]">
+                  {clinical.overview.profile.allergies.map((a) => (
+                    <li key={a.substance}>Alergia: {a.substance}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="mt-2 text-sm text-[var(--text-muted)]">Sem alergias registradas</p>
+              )}
+            </div>
+            <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4">
+              <p className="text-sm font-medium">Medicações ({clinical.medications.length})</p>
+              <ul className="mt-2 space-y-1 text-sm text-[var(--text-secondary)]">
+                {clinical.medications.slice(0, 5).map((m, i) => (
+                  <li key={`${m.medication}-${i}`}>{m.medication} — {m.statusLabel}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4">
+              <p className="text-sm font-medium">Exames ({clinical.examOrders.length})</p>
+              <ul className="mt-2 space-y-1 text-sm text-[var(--text-secondary)]">
+                {clinical.examOrders.slice(0, 5).map((e, i) => (
+                  <li key={`${e.examName}-${i}`}>{e.examName} — {e.statusLabel}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section>
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Faturas</h3>

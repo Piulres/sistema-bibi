@@ -52,7 +52,8 @@ test.describe("Portal Beneficiário — self-service", () => {
 
   test("saudação personalizada e resumo", async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Olá,/i })).toBeVisible();
-    await expect(page.getByText(/consumo|pendente|fatura/i).first()).toBeVisible();
+    await expect(page.locator("#resumo").getByText("Pendente (Pay Per Use)")).toBeVisible();
+    await expect(page.locator("#resumo").getByText("Total faturado")).toBeVisible();
   });
 
   test("formulário de agendamento visível", async ({ page }) => {
@@ -60,8 +61,9 @@ test.describe("Portal Beneficiário — self-service", () => {
   });
 
   test("seções de agenda, consumo e faturas", async ({ page }) => {
-    await expect(page.getByText(/agenda|atendimento/i).first()).toBeVisible();
-    await expect(page.getByText(/pay per use|consumo/i).first()).toBeVisible();
+    await expect(page.locator("#agenda").getByRole("heading", { name: /Minha agenda/i })).toBeVisible();
+    await expect(page.locator("#consumo").getByRole("heading", { name: /Meu consumo/i })).toBeVisible();
+    await expect(page.locator("#faturas").getByRole("heading", { name: /Minhas faturas/i })).toBeVisible();
   });
 });
 
