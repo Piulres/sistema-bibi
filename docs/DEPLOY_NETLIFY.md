@@ -17,7 +17,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Deploy via CLI `npx netlify deploy --prod` | ✅ Validado (PR #28) |
-| Deploy Git automático (push `main`) | ❌ Falha intermitente (exit code 2) |
+| Deploy Git automático (push `main`) | ✅ Corrigido — `db.ts` não redireciona para `/tmp` no build CI |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 

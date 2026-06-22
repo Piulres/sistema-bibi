@@ -5,7 +5,7 @@
 # Publicar (manual):           npx netlify deploy --prod
 
 [build]
-  command = "npm run build:netlify"
+  command = "node scripts/netlify-build.mjs"
   # Next.js 16: NAO definir publish — o runtime @netlify/plugin-nextjs gerencia o output.
 
 [build.environment]

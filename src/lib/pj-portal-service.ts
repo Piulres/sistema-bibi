@@ -13,6 +13,8 @@ const dateOnly = (value: Date) =>
 export type PjAlert = {
   tone: "warning" | "danger" | "info";
   message: string;
+  href?: string;
+  actionLabel?: string;
 };
 
 export type PjPortalOverview = {
@@ -125,6 +127,8 @@ export async function getPjPortalOverview(
     alerts.push({
       tone: "danger",
       message: `${overdueCharges.length} cobrança(s) de assinatura vencida(s).`,
+      href: "#assinaturas",
+      actionLabel: "Ver assinaturas",
     });
   }
 

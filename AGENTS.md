@@ -39,6 +39,8 @@ fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 ### Credenciais de demonstração (criadas pelo seed)
 Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
 
+Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários PJ** + fluxo demo TechCorp intacto.
+
 | Portal | E-mail |
 |--------|--------|
 | Prestador | `dra.helena@bibi.health` |

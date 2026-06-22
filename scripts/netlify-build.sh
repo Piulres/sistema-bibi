@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Build usado na Netlify (GitHub e CLI). Garante env mínima mesmo se o painel
-# não injetar variáveis do netlify.toml (comum em contas novas / deploy remoto).
+# Wrapper legado — delega para scripts/netlify-build.mjs
 set -euo pipefail
-
-export DATABASE_URL="${DATABASE_URL:-file:./dev.db}"
-export NETLIFY="${NETLIFY:-true}"
-
-npm run db:push
-npm run db:seed
-npm run build
+exec node "$(dirname "$0")/netlify-build.mjs"
