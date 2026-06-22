@@ -12,61 +12,57 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Item | Valor |
 |------|-------|
-| Site | ❌ **503 `usage_exceeded`** — cota Netlify esgotada |
-| Pacote em produção | `bibi-poc-2026-06-22a` → commit `beeb894` (PR #28) |
-| `main` local | `158b69f` (PR #39) — **não publicado** |
-| Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
+| Site | ✅ **HTTP 200** — online |
+| Pacote em produção | `bibi-poc-2026-06-22b` → commit `92348ba` |
+| Deploy Netlify | `6a389fc10e7ad89f20d8095a` |
+| `main` | `92348ba` — **alinhada com produção** |
 | Validação local | `npm run pre-release` |
-
-> O site caiu por **cota**, não por regressão de código. Aguarde reset do plano
-> Netlify ou faça upgrade antes de publicar o próximo pacote.
 
 ---
 
 ## Pacote em produção (fechado)
 
-### `bibi-poc-2026-06-22a`
+### `bibi-poc-2026-06-22b`
 
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | *(não criada — deploy via CLI)* |
-| **Commit** | `beeb894` — merge PR #28 |
-| **Publicado em** | 22/06/2026 ~00:01 UTC (deploy CLI) |
-| **Método** | `npx netlify deploy --prod` |
+| **Commit** | `92348ba` — merge PR #46 |
+| **Publicado em** | 22/06/2026 ~02:36 UTC (deploy CLI `--no-build`) |
+| **Método** | `npx netlify build` local + `npx netlify deploy --prod --no-build` |
 | **Site** | `sistema-bibi` |
+| **Autorizado por** | Usuário (após revisão pré-produção) |
 
-**Inclui (até PR #28):**
+**Inclui (PRs #29–#46 desde `bibi-poc-2026-06-22a`):**
 
-- Tiers 1–4 completos (PIX mock, RBAC, MFA, telemedicina, TISS)
-- Plugin Blobs regional + Prisma `rhel-openssl-3.0.x`
-- Design system + white label (Blobs)
-- Docs + evidências dos fluxos
+- Fixes CI/GitHub Netlify (#29–#32, #34, #39)
+- Seed em escala: 50 PJ, massa operacional, VitaCare (#31, #33, #36)
+- Landing moderna com SEO (#37)
+- Testes automatizados Vitest + Playwright + CI (#41)
+- Workflow pacotes fechados + `pre-release` + regras `.mdc` (#42)
+- Botão restaurar demo (`/interno/seguranca`, ADMIN; off em prod sem `ALLOW_DEMO_RESET`) (#44)
+- Mapa de variáveis de ambiente (#46)
+- Docs: `OPERACOES.md`, `TESTES.md`, `VARIAVEIS_AMBIENTE.md`, etc.
 
-**Não inclui (na `main` mas fora de produção):**
+**Validação pré-deploy:**
 
-- PRs #29–#39: fixes CI GitHub, seed 50 PJ, massa operacional, landing moderna, etc.
-- Ver diff: `git log beeb894..main --oneline`
+- `npm run test` — 53/53
+- `npm run pre-release` — OK
+- Smoke: landing, logins, `/api/auth/me` → 200/401
 
 ---
 
 ## Próximo pacote (pendente)
 
-### `bibi-poc-2026-06-22b` *(rascunho — não publicar ainda)*
+*(Nenhum — `main` está alinhada com produção. Novos merges acumulam aqui antes do próximo fechamento.)*
+
+### `bibi-poc-YYYY-MM-DDa` *(rascunho)*
 
 | Campo | Valor |
 |-------|-------|
-| **Commit alvo** | `158b69f` (head da `main` em 22/06) |
-| **PRs desde produção** | #29–#39 |
-| **Destaques** | Builds Git corrigidos, seed em escala (50 PJ, VitaCare), landing moderna |
-| **Checklist** | Ver seção [Publicar um pacote](#publicar-um-pacote) abaixo |
-
-Antes de publicar:
-
-```bash
-npm run pre-release          # lint + build Netlify local (sem publicar)
-# Só depois, manualmente:
-npx netlify deploy --prod    # quando cota Netlify permitir
-```
+| **Commit alvo** | — |
+| **PRs desde produção** | — |
+| **Checklist** | `npm run pre-release` → cota OK → `deploy --prod --no-build` |
 
 ---
 
@@ -74,7 +70,8 @@ npx netlify deploy --prod    # quando cota Netlify permitir
 
 | Pacote | Commit | Data (UTC) | Método | Estado |
 |--------|--------|------------|--------|--------|
-| `bibi-poc-2026-06-22a` | `beeb894` | 22/06 ~00:01 | CLI `--prod` | ✅ Último no ar (antes do 503) |
+| `bibi-poc-2026-06-22b` | `92348ba` | 22/06 ~02:36 | CLI `--prod --no-build` | ✅ **Em produção** |
+| `bibi-poc-2026-06-22a` | `beeb894` | 22/06 ~00:01 | CLI `--prod` | ✅ Substituído |
 | `bibi-poc-2026-06-21b` | `94c0f67` | 21/06 23:37 | CLI `--prod` | ✅ Substituído |
 | `bibi-poc-2026-06-21a` | *(vários)* | 21/06 18:35+ | Git + CLI | ⚠️ Builds Git falharam |
 
@@ -84,7 +81,6 @@ npx netlify deploy --prod    # quando cota Netlify permitir
 |--------|-----|--------|
 | `94c0f67` | #27 | Build exit code 2 |
 | `beeb894` | #28 | Build Git falhou (CLI funcionou) |
-| `158b69f` | #39 | Provavelmente OK no CI — site já em 503 |
 
 Detalhes: [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md)
 
@@ -115,7 +111,7 @@ curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/
 ```bash
 npx netlify login    # se necessário
 npx netlify link     # site sistema-bibi
-# Preferir --no-build após pre-release local (economiza build minutes na Netlify)
+npx netlify build    # build local com plugins Next.js
 npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: <resumo>"
 ```
 
@@ -129,8 +125,8 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: <resumo>"
 ### 5. Tag opcional
 
 ```bash
-git tag -a bibi-poc-2026-06-22b -m "Release bibi-poc-2026-06-22b"
-git push origin bibi-poc-2026-06-22b
+git tag -a bibi-poc-YYYY-MM-DDx -m "Release bibi-poc-YYYY-MM-DDx"
+git push origin bibi-poc-YYYY-MM-DDx
 ```
 
 ---

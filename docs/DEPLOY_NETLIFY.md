@@ -14,9 +14,9 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 | Item | Estado |
 |------|--------|
-| Site principal | ❌ **503 `usage_exceeded`** — cota Netlify esgotada (não é bug de código) |
-| Pacote em produção | `bibi-poc-2026-06-22a` → commit `beeb894` (PR #28) |
-| `main` pendente | `158b69f` (PRs #29–#39) — **não publicado** |
+| Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
+| Pacote em produção | `bibi-poc-2026-06-22b` → commit `92348ba` |
+| `main` | Alinhada com produção |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Validação pré-deploy | `npm run pre-release` (lint + build, sem publicar) |
 | Deploy via CLI `npx netlify deploy --prod` | ⚠️ Só manual, quando cota permitir |
