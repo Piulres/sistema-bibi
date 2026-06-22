@@ -75,14 +75,17 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 | Reset banco | `npm run db:reset` | ❌ Bloqueado |
 | Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
 | Atualizar release | `docs/RELEASES.md` | ❌ Só após deploy confirmado |
+| Abrir PR | base **`dev`** | ❌ PR direto na `main` |
 
-**Modelo:** pacotes fechados — `main` acumula código; produção muda só com deploy manual humano.
+**Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
+
+**Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
 **503 `usage_exceeded`:** cota Netlify, não bug. Não investigar em loop nem redeployar automaticamente.
 
 **Árvore rápida:**
-- Feature/bug → dev local + lint
-- Validar release → `pre-release`
+- Feature/bug → dev local + lint → PR → `dev`
+- Validar release → `pre-release` (na `main` após merge de `dev`)
 - Produção fora → `curl` uma vez; se `usage_exceeded`, avisar usuário
 - Publicar → só com pedido explícito; seguir `OPERACOES.md` §5
 

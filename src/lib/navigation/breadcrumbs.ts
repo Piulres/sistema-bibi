@@ -32,3 +32,15 @@ export function buildAtendimentoBreadcrumbs(patientName?: string): BreadcrumbIte
   }
   return items;
 }
+
+/** Monta trilha para histórico do paciente no portal prestador. */
+export function buildPatientHistoryBreadcrumbs(patientName?: string): BreadcrumbItem[] {
+  const items: BreadcrumbItem[] = [
+    { label: "Agenda", href: "/prestador" },
+    { label: "Histórico do paciente" },
+  ];
+  if (patientName) {
+    items.push({ label: patientName });
+  }
+  return items;
+}
