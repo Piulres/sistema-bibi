@@ -65,6 +65,15 @@ PixProvider BoletoProvider CardProvider   (interfaces)
 | `PATCH` | `/api/beneficiario/invoices/{id}/pay` | Confirma PIX (beneficiário) |
 | `POST` | `/api/interno/subscriptions/charges/{chargeId}/invoice` | Cobrança → fatura |
 
+### UI — QR PIX mock (beneficiário)
+
+Componente `PixQrDisplay` (`src/components/ui/PixQrDisplay.tsx`):
+
+- Renderizado em `BeneficiarioView` após `POST …/invoices/[id]/pay`
+- Grade visual 7×7 derivada do `pixCopyPaste` (decorativa, não é QR EMV real)
+- Botão “Copiar código” com feedback “Copiado!”
+- Usa `qrCodePayload` do adapter mock apenas no backend; a UI exibe o copia-e-cola
+
 ## Adapter POC: MockPixAdapter
 
 Ativo quando `PAYMENT_GATEWAY=mock` (padrão em `.env.example`).

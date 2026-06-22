@@ -9,9 +9,9 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
+                    │  E2E (44)   │  Playwright — 6 specs (smoke, flows, interno, rbac, walk-in, flow-improvements)
                     ├─────────────┤
-                    │ API (7)     │  Handlers Next.js + auth/cron
+                    │ API (21)    │  Handlers Next.js + auth/cron + PPU E2E
                     ├─────────────┤
                     │ Integração  │  Prisma + adapters mock
                     ├─────────────┤
@@ -92,9 +92,11 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
 | Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
-| Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
-| Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
-| PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
+| Uso de procedimento | `prestador/.../procedures` | ✅ `pay-per-use-flow.test.ts` | E2E dedicado |
+| Faturamento | `invoice-service.ts` | ✅ `pay-per-use-flow.test.ts` | Integração transacional isolada |
+| PIX mock | `mock-pix-adapter.ts` | ✅ integração + PPU API | — |
+| Cancelamento agenda | `scheduling-service.ts` | ✅ `scheduling-cancel.test.ts` | E2E cancelamento beneficiário |
+| Jornada clínica | `care-journey.ts` | ✅ `care-journey.test.ts` | — |
 | TISS XML | `tiss-service.ts` | ❌ | Snapshot XML |
 
 ### Autenticação e sessão
@@ -106,6 +108,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | MFA TOTP + challenge HMAC | ✅ `mfa-tokens.test.ts` |
 | Cookie session HMAC | ⚠️ indireto via MFA (mesmo algoritmo) |
 | Logout / me | ❌ |
+| Restauração demo | ✅ `demo-reset.test.ts` |
 
 ### RBAC interno
 
@@ -176,9 +179,21 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
+# Lint + test + build (espelha CI local — recomendado antes de PR)
 npm run lint && npm run test && npm run build
 ```
+
+### `pre-release` vs CI
+
+| Etapa | `npm run pre-release` | GitHub Actions (`.github/workflows/ci.yml`) |
+|-------|----------------------|---------------------------------------------|
+| Lint | ✅ | ✅ |
+| `npm run test` (88) | ❌ | ✅ |
+| `npm run test:e2e` (44) | ❌ | ✅ |
+| `npm run netlify:build` | ✅ | `npm run build` (sem seed) |
+| Node | local (recomendado 24) | **24** |
+
+> **Pitfall:** `pre-release` valida o pacote Netlify, mas **não** roda testes. Antes de abrir PR ou fechar release, execute `npm run lint && npm run test` (e E2E se tocou em fluxos UI).
 
 ### Variáveis em testes
 
@@ -230,6 +245,7 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | 11 módulos admin |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `flow-improvements.spec.ts` | Mapa de melhorias, botão “Paciente presente”, agenda beneficiário |
 
 ---
 

@@ -139,6 +139,19 @@ Quando `User.mfaEnabled = true`:
 | Ativar | `{ action: "enable", secret, code }` | Grava secret, `mfaEnabled=true` |
 | Desativar | `{ action: "disable", code }` | Limpa MFA |
 
+### 2.3 Restauração modo demo
+
+**UI:** `/interno/seguranca` → `SecurityView` → botão “Restaurar estado original do seed”
+
+| Item | Detalhe |
+|------|---------|
+| API | `POST /api/interno/demo/reset` — `{ "confirm": "RESTAURAR" }` |
+| Permissão | Interno **ADMIN** |
+| Código | `src/lib/demo-reset.ts` → `executeDemoReset()` |
+| Efeito | Reexecuta seed; invalida sessões (IDs recriados) |
+
+Habilitação: `ALLOW_DEMO_RESET` ou ambiente não-produção / Netlify — ver [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md).
+
 ---
 
 ## 3. Portal Prestador
@@ -150,7 +163,7 @@ Quando `User.mfaEnabled = true`:
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Confirmar presença, registrar procedimentos, PEP, `FlowStepper`, marcar REALIZADO |
 
 ### APIs disparadas
 
@@ -158,6 +171,7 @@ Quando `User.mfaEnabled = true`:
 |------------|-----|------------------|
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
+| **Paciente presente** | `PATCH .../appointments/[id]` `{ status: "CONFIRMADO" }` | AGENDADO → CONFIRMADO (botão na UI) |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
@@ -467,7 +481,7 @@ cada operação com tela, rota API e tipo de exposição (UI, Download, API-only
 
 ### 8.7 Melhorias de fluxo (jornada clínica)
 
-Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?tab=operations` (aba Mapa CRUD).
+Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?tab=operations` (seção “Mapa de melhorias de fluxo”).
 
 | Melhoria | Portal | UI | API |
 |----------|--------|-----|-----|

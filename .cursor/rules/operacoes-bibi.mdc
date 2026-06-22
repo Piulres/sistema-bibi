@@ -27,7 +27,7 @@ dev local → lint → pre-release → merge main → [humano] deploy manual →
 
 | Pedido | Ação do agente | Proibido |
 |--------|----------------|----------|
-| Feature / bugfix | `npm run dev`, testar local, `npm run lint` | deploy |
+| Feature / bugfix | `npm run dev`, testar local, `npm run lint && npm run test` | deploy |
 | Validar release | `npm run pre-release` | deploy |
 | Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
 | Publicar | Só com pedido explícito; seguir `@docs/OPERACOES.md` §5 | deploy autônomo |

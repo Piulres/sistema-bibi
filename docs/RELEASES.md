@@ -18,7 +18,7 @@ não confie em “deploy automático” para saber o que está no ar.
 | `main` | `de88c0e` — alinhada com produção |
 | `dev` | `f461986` — mergeada na `main` |
 | Tag git | `v1.0.0` |
-| Validação local | `npm run pre-release` ✅ · 88 unit · 43 E2E |
+| Validação local | `npm run pre-release` ✅ · 88 unit · 44 E2E |
 | Deploy | 22/06/2026 — `netlify build` + `--no-build` |
 
 ---
@@ -74,7 +74,7 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Versão / Pacote | Commit | Data (UTC) | Método | Estado |
 |-----------------|--------|------------|--------|--------|
-| **`v1.0.0`** | `2395921` | 22/06/2026 | CLI `--prod --no-build` + tag | ✅ **Em produção** |
+| **`v1.0.0`** | `de88c0e` | 22/06/2026 | CLI `--prod --no-build` + tag | ✅ **Em produção** |
 | `bibi-poc-2026-06-22c` | `32dad64` | 22/06 ~03:50 | CLI `--prod --no-build` | ✅ Substituído por 1.0.0 |
 | `bibi-poc-2026-06-22b` | `92348ba` | 22/06 ~02:36 | CLI `--prod --no-build` | ✅ Substituído |
 | `bibi-poc-2026-06-22a` | `beeb894` | 22/06 ~00:01 | CLI `--prod` | ✅ Substituído |

@@ -37,7 +37,7 @@ Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
 ## Antes de finalizar PR
 
 ```bash
-npm run lint
+npm run lint && npm run test
 ```
 
 Se tocar em build/deploy: `npm run pre-release` (não publica).
