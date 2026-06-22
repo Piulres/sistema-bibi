@@ -252,7 +252,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
-| **Mapa CRUD** | — | — | — | Tabela `CRUD_OPERATIONS_MAP` — referência de todas as operações na UI |
+| **Mapa CRUD** | — | — | — | Tabela `CRUD_OPERATIONS_MAP` — 25+ entidades, rotas API, filtro por portal |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
