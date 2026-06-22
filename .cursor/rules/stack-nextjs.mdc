@@ -25,7 +25,7 @@ Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
 - Menus centralizados em `src/lib/navigation/` — não duplicar hrefs/labels
 - Primitivos: `src/components/ui/` (`Breadcrumbs`, `SectionNav`, `NavTabs`)
 - Tokens: `src/app/globals.css` (`--brand-*`, `--surface-*`)
-- White label: `TenantBranding` + `TenantTheme`
+- White label: `TenantBranding` + `TenantTheme`; landing = `getPlatformBranding()`, logins = `getLoginBrandingFromHeaders()`
 - E2E interno: escopar nav com `getByRole('navigation', { name: 'Navegação por abas' })`
 
 ## Padrões de API
