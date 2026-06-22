@@ -352,7 +352,7 @@ src/
 
 ## 15. Dados de demonstração (seed)
 
-**Tenants:** Clínica Bibi (teal) + VitaCare demo (white label azul)
+**Tenants:** Clínica Horizonte (teal) + VitaCare demo (white label azul)
 
 **Empresa ativa:** TechCorp Benefícios LTDA (desconto 15% consulta clínica)
 
@@ -486,12 +486,13 @@ src/
 
 ## 19. Design system e white label
 
+- **Três contextos de marca (v1.0.2):** `PLATFORM_BRANDING` (landing), `LOGIN_PORTAL_BRANDING` (logins), `TenantBranding` (portais autenticados). Ver `docs/DESIGN_SYSTEM.md`.
 - **Tokens CSS** em `src/app/globals.css` (`--brand-*`, `--surface-*`, `--status-*`, dark mode).
 - **Modelo `TenantBranding`**: `displayName`, cores hex, `logoUrl`, `platformLabel`, `colorScheme`, `customDomain`.
 - **Componentes UI** em `src/components/ui/` (`Button`, `Input`, `Card`, `Badge`, `Alert`, `NavTabs`, `StatusBadge`).
 - **Layout**: `PortalShell`, `PageHeader`, `TenantTheme` (injeta CSS variables por tenant/portal).
 - **Sessão**: `getSessionUser()` retorna `user.branding` após login.
-- Seed inclui tenant demo **VitaCare** (azul) além da Clínica Bibi (teal).
+- Seed inclui tenant demo **VitaCare** (azul) além da **Clínica Horizonte** (teal).
 - **Admin branding:** `/interno/branding` — CRUD visual, presets e upload de logo (Netlify Blobs).
 - Logos servidos em `/api/branding/logo/[tenantId]` com `Cache-Tag` para purge CDN.
 - **Tema escuro por tenant:** `colorScheme` (`light` | `dark` | `system`).
