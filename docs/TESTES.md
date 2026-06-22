@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (4)    │  Playwright — fluxos reais no browser
+                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -121,7 +121,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | Fluxo | Teste |
 |-------|-------|
 | PJ overview/reports | ❌ |
-| Beneficiário booking | ❌ E2E parcial (smoke) |
+| Beneficiário booking | ✅ E2E parcial (`flows`, `walkin-particular`) |
 | LGPD export | ❌ (rota tem guard cadastros) |
 
 ### Enterprise
@@ -219,6 +219,17 @@ Senha única: `bibi123`
 | MFA demo | `seguranca@bibi.health` |
 | PJ | `rh@techcorp.com` |
 | Beneficiário | `joao.pereira@email.com` |
+| Beneficiário (particular) | `pedro.almeida@email.com` |
+
+### Specs E2E (`e2e/`)
+
+| Arquivo | Cobertura |
+|---------|-----------|
+| `smoke.spec.ts` | Landing, logins, credencial inválida |
+| `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
+| `interno-modules.spec.ts` | 11 módulos admin |
+| `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
+| `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 
 ---
 

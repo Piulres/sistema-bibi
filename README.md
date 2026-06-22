@@ -106,8 +106,9 @@ Base local: **`http://localhost:3000`**
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
 | `/interno/assinaturas` | **Recorrência** — assinaturas e cobranças futuras | `INTERNO` |
 | `/interno/comunicacao` | **Comunicação** — fila de e-mail, SMS e WhatsApp | `INTERNO` |
-| `/interno/cadastros` | **Cadastros** — beneficiários, empresas, procedimentos, usuários | `INTERNO` |
-| `/interno/agenda` | **Agenda** — criar e gerenciar agendamentos | `INTERNO` |
+| `/interno/cadastros` | **Cadastros** — beneficiários, empresas, procedimentos, usuários; aba **Mapa CRUD** | `INTERNO` |
+| `/interno/cadastros?tab=operations` | **Mapa CRUD** — 27 entidades, rotas API, filtro por portal | `INTERNO` |
+| `/interno/agenda` | **Agenda** — agendamentos, **walk-in particular** e check-in | `INTERNO` |
 | `/interno/relatorios` | **Relatórios** — exportação CSV (faturamento, CRM) | `INTERNO` |
 | `/interno/branding` | **White label** — cores, logo, tema, domínio custom | `INTERNO` |
 | `/interno/integracoes` | **Integrações B2B** — webhooks outbound e log de entregas | `INTERNO` |
@@ -140,11 +141,14 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Interno (recepção) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
+| Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` | `bibi123` |
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
 
 ## 7. Fluxo end-to-end (Pay Per Use)
+
+### 7.1 Fluxo corporativo (beneficiário PJ)
 
 1. **Prestador** faz login em `/login` e vê a **agenda do dia**.
 2. Abre um atendimento e **registra os procedimentos utilizados** — o preço é
@@ -158,6 +162,23 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 6. **Empresa (PJ)** acompanha em `/pj` o **consumo dos beneficiários**, assinaturas
    e export CSV. **Webhooks B2B** disparam em eventos-chave (Tier 3).
 7. **Beneficiário** agenda consultas, acompanha consumo e paga faturas em self-service.
+
+### 7.2 Walk-in particular (sem empresa PJ)
+
+Paciente chega na clínica sem cadastro prévio nem vínculo corporativo:
+
+1. **Recepção** (`recepcao@bibi.health`) → `/interno/agenda` → seção **Paciente particular (walk-in)**.
+2. Cadastra nome, CPF, nascimento (`companyId` null) e **agenda na hora** (status `AGENDADO`).
+3. **Confirmar chegada** na lista do dia → `CONFIRMADO`.
+4. **Prestador** atende normalmente; preço **base** (sem desconto PJ).
+5. **Faturamento** gera fatura PPU; cobrança PIX ou manual.
+
+Demo particular: `pedro.almeida@email.com` / `bibi123`. Detalhe técnico: [`docs/FLUXOS.md`](docs/FLUXOS.md) §4.2 e §8.5.
+
+### 7.3 Mapa de operações CRUD
+
+Referência de onde cada entidade pode ser criada, lida, alterada ou removida na UI:
+`/interno/cadastros?tab=operations` — fonte em `src/lib/crud-operations-map.ts`.
 
 Diagrama completo com sequência cross-portal: [`docs/FLUXOS.md`](docs/FLUXOS.md) §7.
 

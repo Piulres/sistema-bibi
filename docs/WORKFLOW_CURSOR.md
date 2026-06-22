@@ -63,6 +63,7 @@ Senha única: **`bibi123`**. Portais e e-mails em [`README.md`](../README.md) e 
 | Interno | `/interno/login` | `faturamento@bibi.health` |
 | PJ | `/pj/login` | `rh@techcorp.com` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` |
+| Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` |
 
 Evidências gravadas: [`evidencias/`](evidencias/).
 

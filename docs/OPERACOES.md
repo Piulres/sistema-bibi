@@ -103,6 +103,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | Interno | `/interno/login` | `faturamento@bibi.health` |
 | PJ | `/pj/login` | `rh@techcorp.com` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` |
+| Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` |
 | VitaCare WL | `/interno/login` | `operacao@vitacare.demo` |
 
 Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](FLUXOS.md).

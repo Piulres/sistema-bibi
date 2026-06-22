@@ -707,6 +707,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("  Empresa PJ   -> /pj/login            : rh@techcorp.com / bibi123");
   console.log("  Beneficiario -> /beneficiario/login  : joao.pereira@email.com / bibi123");
   console.log("  Beneficiario -> /beneficiario/login  : maria.souza@email.com / bibi123");
+  console.log("  Beneficiario -> /beneficiario/login  : pedro.almeida@email.com / bibi123 (particular)");
   console.log("  VitaCare     -> /interno/login       : operacao@vitacare.demo / bibi123");
   console.log("  VitaCare PJ  -> /pj/login            : rh@vitacarecorp.demo / bibi123");
   console.log("\nSEED_SCALE=small|medium|large no .env controla volume da massa");

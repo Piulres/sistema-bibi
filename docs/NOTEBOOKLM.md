@@ -39,6 +39,7 @@ Evidências visuais: [`docs/evidencias/README.md`](evidencias/README.md). Ver se
 | Interno (recepção) | `recepcao@bibi.health` |
 | PJ | `rh@techcorp.com` |
 | Beneficiário | `joao.pereira@email.com` |
+| Beneficiário (particular) | `pedro.almeida@email.com` |
 
 ---
 
@@ -358,7 +359,7 @@ src/
 **Beneficiários:**
 - João Pereira (TechCorp) — atendimento hoje, 2 procedimentos pendentes, assinatura mensal
 - Maria Souza (TechCorp) — hemograma pendente, assinatura trimestral
-- Pedro Almeida (particular) — fatura PAGA histórica, assinatura suspensa
+- Pedro Almeida (particular) — login `pedro.almeida@email.com`; fatura PAGA histórica, assinatura suspensa; walk-in demo em `/interno/agenda`
 
 **CRM:** 6 empresas em estágios diversos (LEAD a CANCELADO)
 

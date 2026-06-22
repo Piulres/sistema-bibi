@@ -111,6 +111,16 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 
 **Config:** `src/lib/navigation/routes.ts` · **Padrão:** pages só com `PageHeader` + view (não repetir `PortalShell`/`InternoNav`).
 
+### Operação clínica e mapa CRUD
+
+| Recurso | Onde | Fonte |
+|---------|------|-------|
+| Walk-in particular | `/interno/agenda` → seção walk-in | `AppointmentsView.tsx` |
+| Edição cadastros | `/interno/cadastros` → Editar em cada aba | `CadastrosView.tsx` |
+| Mapa CRUD (27 entidades) | `/interno/cadastros?tab=operations` | `src/lib/crud-operations-map.ts` |
+
+Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedro.almeida@email.com`.
+
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
   adapters + `prisma.config.ts`). O projeto está **fixado em Prisma 6** de propósito;
