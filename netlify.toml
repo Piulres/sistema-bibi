@@ -3,6 +3,8 @@
 # Build local (sem publicar): npm run netlify:build
 # Dev com emulacao Netlify:    npm run netlify:dev
 # Publicar (manual):           npx netlify deploy --prod
+# Validar pacote (sem deploy): npm run pre-release
+# Operações:                   docs/OPERACOES.md
 
 [build]
   command = "node scripts/netlify-build.mjs"

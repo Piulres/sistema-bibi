@@ -146,9 +146,13 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 
 | Documento | Estado |
 |-----------|--------|
-| `README.md` | URLs produção, evidências, PRs #1–#28 |
-| `AGENTS.md` | Tiers + deploy + evidências |
+| `README.md` | URLs produção, evidências, operações |
+| `AGENTS.md` | Tiers + deploy + preferências IA |
 | `docs/DEPLOY_NETLIFY.md` | Status deploy, plugin Blobs, troubleshooting |
+| `docs/OPERACOES.md` | Mapa de operações + regras agentes |
+| `docs/RELEASES.md` | Pacotes fechados |
+| `docs/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy auto |
+| `.cursor/rules/operacoes-bibi.mdc` | Preferências IA (Cursor rules) |
 | `docs/FLUXOS.md` | Mapa completo (PR #24) |
 | `docs/BENCHMARK.md` | Matriz vs iClinic/Feegow/ERPMed (PR #25) |
 | `docs/NOTEBOOKLM.md` | RAG atualizado Tiers 1–4 |
@@ -159,7 +163,16 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 
 ## Próximos passos sugeridos
 
-1. **Corrigir deploy Git** — comparar log do build remoto vs `npm run netlify:build` local.
-2. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
-3. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
-4. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+1. **Desligar deploy Git automático** — Stop builds no painel Netlify (ver `OPERACOES.md`).
+2. **Publicar pacote pendente** — `bibi-poc-2026-06-22b` quando cota resetar (`pre-release` → CLI).
+3. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
+4. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
+5. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+
+### PR #42 — Operações e pacotes fechados (22/06)
+
+- `docs/OPERACOES.md` — mapa completo de operações
+- `docs/RELEASES.md` — manifesto de pacotes
+- `docs/WORKFLOW_CURSOR.md` — dev sem deploy automático
+- `.cursor/rules/operacoes-bibi.mdc` — preferências de IA
+- `npm run pre-release` — validação sem publicar
