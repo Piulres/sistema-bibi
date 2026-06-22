@@ -396,6 +396,8 @@ sistema-bibi/
 
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/FLUXOS.md`](docs/FLUXOS.md)
+- **Auditoria de falhas nos quatro portais:**
+  [`docs/AUDITORIA_FLUXOS.md`](docs/AUDITORIA_FLUXOS.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
