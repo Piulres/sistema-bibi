@@ -352,22 +352,34 @@ src/
 
 **Tenants:** Clínica Bibi (teal) + VitaCare demo (white label azul)
 
-**Empresa ativa:** TechCorp Benefícios LTDA (desconto 15% consulta clínica)
+**Escala (PRs #31, #33):** 50 empresas PJ · ~199 beneficiários · 27 usuários PJ ·
+5 prestadores · massa operacional gerada por `seedOperationalMass()` em `prisma/seed-data/scenarios.ts`.
 
-**Beneficiários:**
+**Empresa demo principal:** TechCorp Benefícios LTDA (`rh@techcorp.com`) — desconto 15%
+em consulta clínica; 12 beneficiários; fluxo E2E intacto.
+
+**Beneficiários demo (walkthrough):**
 - João Pereira (TechCorp) — atendimento hoje, 2 procedimentos pendentes, assinatura mensal
 - Maria Souza (TechCorp) — hemograma pendente, assinatura trimestral
 - Pedro Almeida (particular) — fatura PAGA histórica, assinatura suspensa
 
-**CRM:** 6 empresas em estágios diversos (LEAD a CANCELADO)
+**CRM:** 50 empresas em estágios diversos (LEAD → ATIVO → INADIMPLENTE → CANCELADO),
+mapeadas a setores e casos de mercado em `prisma/seed-data/companies.ts`.
 
-**Comunicação:** 2 mensagens PENDENTE (WhatsApp João, e-mail Maria)
+**Massa operacional adicional:** agendamentos históricos, procedimentos Pay Per Use,
+prontuários, faturas (abertas e pagas), assinaturas com cobranças vencidas,
+mensagens, timeline e entregas webhook.
+
+**Comunicação:** 2 mensagens PENDENTE (WhatsApp João, e-mail Maria) + mensagens da massa
 
 **Integrações:** webhook demo ERP TechCorp (`/interno/integracoes`)
 
 **RBAC:** usuário recepção `recepcao@bibi.health` (perfil RECEPCAO)
 
 **Prestador:** Dra. Helena — agenda do dia com atendimentos seed
+
+**Portal PJ — alertas:** cobranças de assinatura vencidas exibem CTA "Ver assinaturas"
+(âncora `#assinaturas` em `PjView`, PR #34).
 
 ---
 
@@ -377,7 +389,7 @@ src/
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
 - Deploy Netlify **em produção** — https://sistema-bibi.netlify.app (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`);
-  deploy Git automático ainda com falhas intermitentes; CLI validado (PR #28)
+  deploy Git automático corrigido (PR #34); CLI validado (PR #28)
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
 - Validação XSD TISS completa pendente (export XML mock — Tier 4)
 - Verificação de domínio custom é manual na POC (sem challenge DNS automático)

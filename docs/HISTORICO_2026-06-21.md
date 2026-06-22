@@ -3,8 +3,8 @@
 Auditoria consolidada de **commits**, **pull requests** e **deploys Netlify** do dia,
 com o estado da documentação ao final do ciclo.
 
-> **Head atual da `main`:** `beeb894` (merge do PR #28).
-> **Produção ativa:** https://sistema-bibi.netlify.app (deploy via CLI; ver seção Deploys).
+> **Head atual da `main`:** `8a8211c` (merge do PR #34).
+> **Produção ativa:** https://sistema-bibi.netlify.app
 
 ---
 
@@ -16,7 +16,7 @@ com o estado da documentação ao final do ciclo.
 | Commits no dia | **~70+** (incluindo merges e agentes) |
 | Sites Netlify | `sistema-bibi` (principal) · `sistema-bibi-nt2` (secundário) |
 | Produção online | ✅ `sistema-bibi.netlify.app` responde HTTP 200 |
-| Deploy Git (CI) pós-#28 | ❌ build falha (exit code 2) — ver Deploys |
+| Deploy Git (CI) pós-#34 | ✅ build corrigido — ver Atualização 22/06 |
 | Evidências visuais | ✅ `docs/evidencias/` (vídeos + screenshots dos fluxos) |
 
 ---
@@ -115,7 +115,7 @@ com o estado da documentação ao final do ciclo.
 
 - **Produção:** https://sistema-bibi.netlify.app — landing e logins respondem **HTTP 200**.
 - **Build local:** `npm run netlify:build` — ✅ passa.
-- **Deploy Git automático:** ❌ ainda falha após merge do #28 — investigar logs no painel Netlify.
+- **Deploy Git automático:** ✅ corrigido (PR #34) — ver Atualização 22/06.
 - **Deploy CLI:** `npx netlify deploy --prod` — validado no PR #28.
 
 ### Credenciais em produção
@@ -146,20 +146,58 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 
 | Documento | Estado |
 |-----------|--------|
-| `README.md` | URLs produção, evidências, PRs #1–#28 |
-| `AGENTS.md` | Tiers + deploy + evidências |
-| `docs/DEPLOY_NETLIFY.md` | Status deploy, plugin Blobs, troubleshooting |
-| `docs/FLUXOS.md` | Mapa completo (PR #24) |
+| `README.md` | URLs produção, massa seed, PRs #1–#34 |
+| `AGENTS.md` | Tiers + deploy + massa demo 50 empresas |
+| `docs/DEPLOY_NETLIFY.md` | Pipeline build CI, `db.ts` Lambda-only, troubleshooting |
+| `docs/FLUXOS.md` | Mapa completo + CTA alertas PJ (PR #34) |
 | `docs/BENCHMARK.md` | Matriz vs iClinic/Feegow/ERPMed (PR #25) |
-| `docs/NOTEBOOKLM.md` | RAG atualizado Tiers 1–4 |
-| `docs/HISTORICO_2026-06-21.md` | Este arquivo |
+| `docs/NOTEBOOKLM.md` | RAG atualizado + massa seed |
+| `docs/HISTORICO_2026-06-21.md` | Este arquivo (atualizado 22/06) |
 | `docs/evidencias/` | Vídeos e imagens dos fluxos |
 
 ---
 
 ## Próximos passos sugeridos
 
-1. **Corrigir deploy Git** — comparar log do build remoto vs `npm run netlify:build` local.
-2. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
-3. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
-4. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+1. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
+2. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
+3. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
+
+---
+
+## Atualização 22/06 — PRs #29–#34
+
+> **Head atual da `main`:** `8a8211c` (merge do PR #34).
+
+### Resumo
+
+| PR | Título | Entregas documentadas |
+|----|--------|----------------------|
+| [#29](https://github.com/Piulres/sistema-bibi/pull/29) | docs: auditoria 21/06 | Evidências, histórico, deploy |
+| [#30](https://github.com/Piulres/sistema-bibi/pull/30) | fix(netlify): builds GitHub | `DATABASE_URL` no CI |
+| [#31](https://github.com/Piulres/sistema-bibi/pull/31) | feat(seed): 50 clientes PJ | `prisma/seed-data/companies.ts` |
+| [#32](https://github.com/Piulres/sistema-bibi/pull/32) | fix(netlify): CI tsx | `NPM_FLAGS=--include=dev` |
+| [#33](https://github.com/Piulres/sistema-bibi/pull/33) | feat(seed): massa completa | `scenarios.ts`, histórico clínico/financeiro |
+| [#34](https://github.com/Piulres/sistema-bibi/pull/34) | fix: builds GitHub + CTA PJ | `db.ts` Lambda-only, `netlify-build.mjs`, alertas PJ |
+
+### Deploy Git — correção final (PR #34)
+
+Problemas encadeados nos builds GitHub/Netlify:
+
+1. **`DATABASE_URL` nos workers Next** — `netlify-build.mjs` grava `.env` com path absoluto.
+2. **`db.ts` redirecionava `/tmp` no build** — agora só quando `AWS_LAMBDA_FUNCTION_NAME` está definido.
+3. **`tsx` ausente no CI** — `NPM_FLAGS=--include=dev` no `netlify.toml` (PR #32).
+
+- **Build local:** `npm run netlify:build` — ✅ passa.
+- **Deploy Git automático:** ✅ corrigido (PR #34).
+
+### Seed — massa operacional
+
+- **50 empresas PJ** com cenários de mercado (`companies.ts`).
+- **~199 beneficiários**, **27 usuários PJ**, histórico de agenda, PPU, faturas e assinaturas (`scenarios.ts`).
+- Fluxo demo TechCorp preservado para walkthroughs.
+
+### Portal PJ — CTA em alertas
+
+Cobranças de assinatura vencidas exibem botão **"Ver assinaturas"** (`href: "#assinaturas"`)
+em `PjView`, gerado por `getPjPortalOverview()`.

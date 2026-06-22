@@ -10,20 +10,21 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 ---
 
-## Status atual (21–22/06/2026)
+## Status atual (22/06/2026)
 
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Deploy via CLI `npx netlify deploy --prod` | ✅ Validado (PR #28) |
-| Deploy Git automático (push `main`) | ✅ Corrigido — `db.ts` não redireciona para `/tmp` no build CI |
+| Deploy Git automático (push `main`) | ✅ Corrigido (PRs #29–#34) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
-> O site em produção foi publicado via **CLI**. Deploys disparados por merge na `main`
-> (commits `94c0f67`, `beeb894`) falharam no build remoto — verificar logs no
-> [painel Netlify](https://app.netlify.com/projects/sistema-bibi).
+> Falhas anteriores no build Git (exit code 2, commits `94c0f67`/`beeb894`) foram
+> corrigidas em [#34](https://github.com/Piulres/sistema-bibi/pull/34): `db.ts` só
+> redireciona SQLite para `/tmp` em **runtime Lambda**; o script `netlify-build.mjs`
+> grava `.env` com `DATABASE_URL` absoluto para os workers do Next no CI.
 
 ---
 
@@ -31,11 +32,12 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 | Item | Descrição |
 |------|-----------|
-| `netlify.toml` | Build, env vars, headers, `netlify dev`, plugin Blobs |
+| `netlify.toml` | Build, env vars, `NPM_FLAGS=--include=dev`, headers, `netlify dev`, plugin Blobs |
 | `netlify/plugins/patch-regional-blobs` | Desativa `USE_REGIONAL_BLOBS` no handler Next.js (PR #28) |
-| `npm run build:netlify` | `db:push` + seed + `next build` |
+| `scripts/netlify-build.mjs` | Resolve `DATABASE_URL` absoluto, grava `.env`, `db:push` + seed + `next build` |
+| `npm run build:netlify` | Alias do script acima (`netlify:build`) |
 | `prisma/schema.prisma` | `binaryTargets = ["native", "rhel-openssl-3.0.x"]` para Lambda |
-| `src/lib/db.ts` | Copia SQLite seedado para `/tmp` em serverless |
+| `src/lib/db.ts` | Copia SQLite seedado para `/tmp` **somente** em Lambda (`AWS_LAMBDA_FUNCTION_NAME`) |
 | `next.config.ts` | Inclui `prisma/**` no bundle serverless |
 | `@netlify/blobs` | Logos white-label em produção |
 | Cron endpoints | `/api/cron/reminders`, `/api/cron/webhooks` (protegidos por `CRON_SECRET`) |
@@ -68,6 +70,24 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 
 Credenciais de gateways reais: ver `docs/PAYMENTS.md` e `docs/COMMUNICATIONS.md`.
+
+---
+
+## Pipeline de build (`scripts/netlify-build.mjs`)
+
+O mesmo script roda no CI Git e no `npm run netlify:build` local:
+
+1. Normaliza `DATABASE_URL` para path absoluto (`prisma/dev.db`).
+2. Grava `.env` na raiz (workers do Next herdam variáveis no CI).
+3. `npm run db:push` → `npm run db:seed` → `npm run build`.
+
+**Por que o `.env` no CI?** O Next.js 16 pode spawnar workers de build sem herdar
+`process.env` do shell pai; sem o arquivo, `prisma` e rotas server-side falham com
+`DATABASE_URL` ausente ou relativo.
+
+**Por que `db.ts` não usa `/tmp` no build?** A cópia para `/tmp` é exclusiva do
+runtime Lambda (único diretório gravável). Durante build/CI, `AWS_LAMBDA_FUNCTION_NAME`
+não está definido — o banco fica em `prisma/dev.db` no filesystem do build.
 
 ---
 
@@ -137,8 +157,10 @@ Configure scheduled functions ou serviço externo para chamar:
 | `503 usage_exceeded` | Cota Netlify | Aguardar ou upgrade |
 | `502` / handler crash | Blobs regionais sem `primaryRegion` | Plugin `patch-regional-blobs` (PR #28) |
 | `Prisma Client could not locate Query Engine` | binary target errado | `rhel-openssl-3.0.x` no schema |
-| Build Git exit code 2 | Divergência build remoto vs local | Comparar log Netlify com `npm run netlify:build` |
-| `prisma/prisma/dev.db` | `DATABASE_URL` errado | Use `file:./dev.db` (relativo ao schema) |
+| Build Git exit code 2 | `DATABASE_URL` ausente nos workers Next | PR #34: `netlify-build.mjs` grava `.env`; validar com `npm run netlify:build` |
+| `prisma/prisma/dev.db` | `DATABASE_URL` errado ou `/tmp` no build | Use `file:./dev.db`; `db.ts` só redireciona em Lambda |
+| `tsx: not found` no seed | `devDependencies` omitidas no CI | `NPM_FLAGS=--include=dev` no `netlify.toml` (PR #32) |
+| Seed falha no CI | `DATABASE_URL` relativo | Script resolve path absoluto antes de `db:push`/`db:seed` |
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |

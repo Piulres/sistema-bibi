@@ -284,7 +284,7 @@ Serviço: `src/lib/webhook-service.ts`
 
 | Seção (`PjView`) | Dados |
 |------------------|-------|
-| Alertas | INADIMPLENTE, negociação, faturas abertas, cobranças vencidas |
+| Alertas | INADIMPLENTE, negociação, faturas abertas, cobranças vencidas — com **CTA** opcional |
 | KPIs | Contrato, beneficiários, consumo PPU, MRR |
 | Beneficiários | Consumo por colaborador |
 | Assinaturas | Planos e cobranças pendentes |
@@ -416,7 +416,17 @@ Disparo: `POST /api/interno/reminders` ou cron `POST /api/cron/reminders`.
 ### 8.4 CRM → alertas PJ
 
 Empresa `INADIMPLENTE`, faturas `FECHADA` em aberto ou cobranças vencidas →
-alertas em `getPjPortalOverview()`.
+alertas em `getPjPortalOverview()` (`pj-portal-service.ts`), renderizados em `PjView`.
+
+| Condição | Tom | CTA |
+|----------|-----|-----|
+| `status === INADIMPLENTE` | `danger` | — |
+| `status === NEGOCIACAO` | `warning` | — |
+| Faturas `FECHADA` em aberto | `warning` | — |
+| Cobranças de assinatura vencidas (`PENDENTE` + `dueDate` passado) | `danger` | `href: "#assinaturas"`, `actionLabel: "Ver assinaturas"` |
+
+O CTA usa âncora na seção **Assinaturas recorrentes** (`<section id="assinaturas">`).
+Tipos exportados: `PjAlert` com campos opcionais `href` e `actionLabel`.
 
 ---
 
