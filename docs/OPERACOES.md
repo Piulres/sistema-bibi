@@ -150,7 +150,7 @@ main acumula commits → pre-release OK → deploy manual → RELEASES.md atuali
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: `bibi-poc-2026-06-22a` (`beeb894`). Pendente: `bibi-poc-2026-06-22b` (`158b69f`).
+Exemplo atual em produção: `bibi-poc-2026-06-22c` (`32dad64`). Ver [`RELEASES.md`](RELEASES.md).
 
 ---
 
