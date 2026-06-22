@@ -274,7 +274,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       });
     }
 
-    if (b.isDemo === "joao" || b.isDemo === "maria") {
+    if (b.isDemo === "joao" || b.isDemo === "maria" || b.isDemo === "pedro") {
       await prisma.user.create({
         data: {
           email: b.email,

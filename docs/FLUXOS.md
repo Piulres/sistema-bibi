@@ -76,6 +76,7 @@ flowchart TB
 | Interno (recepção) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
+| Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` | `bibi123` |
 
 ---
 
@@ -222,17 +223,36 @@ Serviço: `src/lib/invoice-service.ts`
 | Listar | `GET /api/interno/appointments?date=` | Por data |
 | Criar | `POST /api/interno/appointments` | `createAppointment()`; TELE → `telemedicineUrl`; webhook `APPOINTMENT_CREATED` |
 | Alterar | `PATCH /api/interno/appointments/[id]` | Status/modalidade |
+| **Walk-in particular** | `POST /api/interno/patients` + `POST /api/interno/appointments` | Cadastro sem `companyId` + agendamento `AGENDADO` na mesma tela |
+| **Check-in** | `PATCH .../appointments/[id]` `{ status: "CONFIRMADO" }` | Paciente chegou à clínica (AGENDADO → CONFIRMADO) |
+
+**Fluxo walk-in (paciente não PJ):**
+
+```mermaid
+sequenceDiagram
+  participant R as Recepção
+  participant API as APIs interno
+  participant P as Prestador
+
+  R->>API: POST /patients (companyId null)
+  R->>API: POST /appointments (status AGENDADO)
+  Note over R: Opcional: POST /users (portal beneficiário)
+  R->>API: PATCH appointment CONFIRMADO
+  P->>P: Atendimento + ProcedureUsage
+  Note over P: Faturamento PPU (particular, preço base)
+```
 
 Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicine.ts`
 
 ### 4.3 Cadastros (`CadastrosView`)
 
-| Aba | Criar (POST) | Observações |
-|-----|--------------|-------------|
-| Beneficiários | `/api/interno/patients` | Webhook `PATIENT_CREATED`; link Cliente 360° |
-| Empresas | `/api/interno/companies` | — |
-| Procedimentos | `/api/interno/procedures` | PUT/DELETE por id |
-| Usuários | `/api/interno/users` | Define `role`, `internoProfile`, vínculos |
+| Aba | Criar (POST) | Atualizar | Excluir | Observações |
+|-----|--------------|-----------|---------|-------------|
+| Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
+| Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
+| Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
+| Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| **Mapa CRUD** | — | — | — | Tabela `CRUD_OPERATIONS_MAP` — referência de todas as operações na UI |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 

@@ -47,6 +47,7 @@ const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
     cpf: "999.000.111-22",
     birthDate: new Date("1978-01-05"),
     phone: "(11) 96666-3333",
+    email: "pedro.almeida@email.com",
     isDemo: "pedro",
   },
 };
@@ -112,7 +113,7 @@ export function generateBeneficiaries(companies: SeedCompany[]): GeneratedBenefi
     cpf: DEMO_BENEFICIARIES.pedro!.cpf!,
     birthDate: DEMO_BENEFICIARIES.pedro!.birthDate!,
     phone: DEMO_BENEFICIARIES.pedro!.phone!,
-    email: beneficiaryEmail("Pedro Almeida", 9999),
+    email: DEMO_BENEFICIARIES.pedro!.email!,
     companyIndex: 0,
     isDemo: "pedro",
   });
