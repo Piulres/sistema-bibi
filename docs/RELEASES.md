@@ -159,6 +159,7 @@ bibi-poc-AAAA-MM-DD[a|b|c]
 ## Links
 
 - Workflow Cursor (dev local): [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md)
+- Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
 - Deploy Netlify (troubleshooting): [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 - Histórico 21/06: [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md)
 - Evidências visuais: [`evidencias/README.md`](evidencias/README.md)

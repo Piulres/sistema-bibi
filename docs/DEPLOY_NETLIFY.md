@@ -24,7 +24,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
-> **Pacotes fechados:** [`RELEASES.md`](RELEASES.md) · **Workflow Cursor:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md)
+> **Pacotes fechados:** [`RELEASES.md`](RELEASES.md) · **Workflow Cursor:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Operações:** [`OPERACOES.md`](OPERACOES.md)
 >
 > Não publique a cada merge. Valide localmente e publique só quando decidir fechar um pacote.
 
@@ -53,7 +53,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
 4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
 5. **Publish directory** — deve ficar **vazio** no painel (Next.js runtime gerencia o output). Valor `.next` causa falhas.
-6. **Git** — deploy contínuo habilitado; se o build Git falhar, use `npx netlify deploy --prod` como fallback.
+6. **Git** — deploy contínuo **desligado** (Stop builds). Publicação só via pacote fechado — ver [`OPERACOES.md`](OPERACOES.md).
 
 ---
 

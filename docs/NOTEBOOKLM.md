@@ -14,8 +14,9 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
 
-**PRs mergeados em `main`:** #1–#28 (scaffold → Tier 4 → docs → deploy Netlify).
-Mapa de fluxos: [`docs/FLUXOS.md`](FLUXOS.md). Histórico do dia: [`docs/HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
+**PRs mergeados em `main`:** #1–#39 (scaffold → Tier 4 → docs → deploy → pacotes fechados).
+Mapa de fluxos: [`docs/FLUXOS.md`](FLUXOS.md). Operações: [`docs/OPERACOES.md`](OPERACOES.md).
+Histórico do dia: [`docs/HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 Evidências visuais: [`docs/evidencias/README.md`](evidencias/README.md). Ver seção 21 (roadmap).
 
 ---
@@ -376,8 +377,10 @@ src/
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify **em produção** — https://sistema-bibi.netlify.app (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`);
-  deploy Git automático ainda com falhas intermitentes; CLI validado (PR #28)
+- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção:
+  https://sistema-bibi.netlify.app (`docs/DEPLOY_NETLIFY.md`, `docs/RELEASES.md`, `docs/OPERACOES.md`).
+  Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual).
+  Pode retornar **503 `usage_exceeded`** (cota Netlify — não é bug de código).
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
 - Validação XSD TISS completa pendente (export XML mock — Tier 4)
 - Verificação de domínio custom é manual na POC (sem challenge DNS automático)
@@ -396,7 +399,11 @@ src/
 | `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |
 | `docs/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
 | `docs/DEPLOY_NETLIFY.md` | Deploy Netlify (produção + troubleshooting) |
+| `docs/RELEASES.md` | Pacotes fechados — o que está em produção vs pendente |
+| `docs/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy automático |
+| `docs/OPERACOES.md` | Mapa completo de operações + regras para agentes IA |
 | `docs/HISTORICO_2026-06-21.md` | Auditoria PRs, commits e deploys do dia |
+| `.cursor/rules/operacoes-bibi.mdc` | Preferências de IA (Cursor rules) |
 | `docs/evidencias/README.md` | Vídeos e screenshots dos fluxos funcionais |
 | `public/openapi.yaml` | Especificação API |
 | `AGENTS.md` | Instruções para agentes de IA |
@@ -458,6 +465,18 @@ src/
 
 **Qual a diferença entre faturamento e dashboard?**
 → `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
+
+**Como valido um pacote antes de publicar na Netlify?**
+→ `npm run pre-release` (lint + build Netlify local, sem publicar). Ver `docs/OPERACOES.md`.
+
+**Por que produção retorna 503?**
+→ Se o corpo for `usage_exceeded`, a cota Netlify esgotou — não é bug. Dev local continua normal.
+
+**Como publico em produção?**
+→ Manual: `npx netlify deploy --prod` após `pre-release` OK e cota disponível. Atualizar `docs/RELEASES.md`.
+
+**Agentes Cursor podem fazer deploy?**
+→ Não, salvo pedido explícito. Regras em `AGENTS.md` e `.cursor/rules/operacoes-bibi.mdc`.
 
 ---
 

@@ -22,7 +22,8 @@ fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
 (cota Netlify). Último pacote no ar: `bibi-poc-2026-06-22a` (`beeb894`). Ver `docs/RELEASES.md`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
-Ver `docs/WORKFLOW_CURSOR.md`.
+Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
+**Preferências IA:** `AGENTS.md` (esta seção) + `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/HISTORICO_2026-06-21.md`
 
@@ -57,6 +58,31 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
+### Operações e preferências de IA
+
+**Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:** `.cursor/rules/operacoes-bibi.mdc`
+
+| Operação | Comando | Agente pode? |
+|----------|---------|--------------|
+| Desenvolver | `npm run dev` | ✅ Sim |
+| Emular Netlify | `npm run netlify:dev` | ✅ Sim |
+| Lint | `npm run lint` | ✅ Sim |
+| Validar pacote | `npm run pre-release` | ✅ Sim (não publica) |
+| Setup banco VM nova | `db:push && db:seed` | ✅ Sim |
+| Reset banco | `npm run db:reset` | ❌ Bloqueado |
+| Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
+| Atualizar release | `docs/RELEASES.md` | ❌ Só após deploy confirmado |
+
+**Modelo:** pacotes fechados — `main` acumula código; produção muda só com deploy manual humano.
+
+**503 `usage_exceeded`:** cota Netlify, não bug. Não investigar em loop nem redeployar automaticamente.
+
+**Árvore rápida:**
+- Feature/bug → dev local + lint
+- Validar release → `pre-release`
+- Produção fora → `curl` uma vez; se `usage_exceeded`, avisar usuário
+- Publicar → só com pedido explícito; seguir `OPERACOES.md` §5
+
 ### Variáveis de ambiente relevantes (`.env.example`)
 - `PAYMENT_GATEWAY=mock` — adapter PIX POC (`MockPixAdapter`)
 - `COMMUNICATION_PROVIDER=console` — e-mail no console (`ConsoleEmailAdapter`)
@@ -88,5 +114,6 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/BENCHMARK.md` (posicionamento vs mercado),
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
-  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/RELEASES.md` (pacotes fechados),
-  `docs/WORKFLOW_CURSOR.md` (dev sem deploy), `docs/evidencias/` (capturas dos fluxos).
+  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
+  `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
+  `.cursor/rules/operacoes-bibi.mdc` (preferências IA), `docs/evidencias/` (capturas dos fluxos).

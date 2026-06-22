@@ -2,7 +2,7 @@
 
 Guia para usar o **Cursor** (local ou Cloud Agent) no dia a dia **sem** publicar
 na Netlify a cada tarefa. Produção é atualizada só quando você fecha um
-**pacote** manual — ver [`RELEASES.md`](RELEASES.md).
+**pacote** manual — ver [`RELEASES.md`](RELEASES.md) e [`OPERACOES.md`](OPERACOES.md).
 
 ---
 
@@ -154,6 +154,7 @@ Se retornar `{"error":"usage_exceeded",...}`:
 
 ## Links
 
+- Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
 - Pacotes e histórico: [`RELEASES.md`](RELEASES.md)
 - Deploy e troubleshooting: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 - Fluxos do sistema: [`FLUXOS.md`](FLUXOS.md)

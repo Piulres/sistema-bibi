@@ -414,6 +414,8 @@ sistema-bibi/
   [`docs/RELEASES.md`](docs/RELEASES.md)
 - **Workflow Cursor (dev sem deploy automático):**
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
+- **Operações (mapa completo + regras IA):**
+  [`docs/OPERACOES.md`](docs/OPERACOES.md)
 - **Histórico do dia 21/06/2026** (PRs, deploys, commits):
   [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
 - **Evidências visuais dos fluxos** (vídeos e screenshots):
