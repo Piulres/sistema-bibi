@@ -14,21 +14,21 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção** | **1.0.2** (`e30b2b0`) + mobile nav (`d5ef580`) |
-| **Deploy Netlify** | Auto-deploy da `main` |
-| `main` | `d5ef580` — release / produção |
-| `dev` | `78d0177` — **1.1.0** — sincronizada com `main` + cadastros v1.1 |
+| **Versão em produção** | **1.0.2** (`e30b2b0`) — deploy anterior à v1.1.0 |
+| **Deploy Netlify** | Auto-deploy da `main` (pode já ter build da v1.1.0; confirmar no painel) |
+| `main` | `8c8cd01` — **1.1.0** Care Chart + cadastros + mobile nav |
+| `dev` | Integração — re-sincronizar com `main` após fechar pacote |
 | Tag git em produção | **`v1.0.2`** |
-| Próximo pacote | **v1.1.0** — validar `dev` → merge `dev` → `main` |
-| Validação `dev` | `npm run pre-release` |
+| Próximo pacote | **v1.1.0** — `pre-release` na `main` → deploy manual → tag |
+| Validação | `npm run pre-release` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | Tudo em produção **+** v1.1.0 (cadastros) — **novas atividades aqui** |
-| **Release / produção** | `main` | Pacote publicado (v1.0.2 + mobile nav) |
-| **Netlify** | `main` | Espelha produção |
+| **Integração** | `dev` | Features em andamento — **novas atividades aqui** |
+| **Release / produção** | `main` | **v1.1.0** integrada (`8c8cd01`) — pendente deploy/tag |
+| **Netlify** | `main` | Pode divergir até deploy manual confirmado |
 
 > **Regra:** PRs de feature/bugfix → base **`dev`**. Merge `dev` → `main` só ao fechar pacote.
 
@@ -54,7 +54,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 - Tenant demo renomeado: **Clínica Horizonte** (não confundir com a marca da plataforma)
 - `getLoginBrandingFromHeaders()` preparado para domínio customizado white-label
 
-**Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
+**Substituído por:** v1.1.0 na `main` (cadastros + Care Chart) — aguardando deploy.
 
 ---
 
@@ -75,15 +75,23 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 ## Próximo pacote — produção (linha 1.1)
 
-### `v1.1.0` — cadastros de mercado + CRUD confiável
+### `v1.1.0` — cadastros de mercado + Care Chart
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.1.0` na `dev` |
-| **Commit** | `0fc9242` |
-| **PR** | [#72](https://github.com/Piulres/sistema-bibi/pull/72) — mergeado na `dev` |
+| **Versão** | `1.1.0` na `main` |
+| **Commit** | `8c8cd01` |
+| **PRs** | [#72](https://github.com/Piulres/sistema-bibi/pull/72) cadastros · [#86](https://github.com/Piulres/sistema-bibi/pull/86) Care Chart |
 | **Docs** | [`V1_1.md`](V1_1.md) |
-| **Checklist** | `npm run pre-release` → merge `dev`→`main` → cota OK → `deploy --prod --no-build` → tag `v1.1.0` → atualizar esta seção |
+| **Escopo** | Cadastros ANS/B2B + prontuário estruturado, medicação, exames, protocolos de cuidado |
+| **Checklist** | `npm run pre-release` na `main` → cota OK → `deploy --prod --no-build` → tag `v1.1.0` → mover para “Pacote em produção” |
+
+**Inclui Care Chart:**
+
+- Prestador: sidebar clínica + abas no atendimento; histórico em `/prestador/paciente/[id]`
+- Interno: templates de protocolo em `/interno/cadastros?tab=protocols`; visão clínica no Cliente 360°
+- Beneficiário: seções medicações, exames e plano de cuidado
+- Seed demo João Pereira com perfil clínico completo
 
 ---
 
@@ -92,7 +100,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Versão | Doc | Estado |
 |--------|-----|--------|
 | **1.0.x** | [`V1_0.md`](V1_0.md) | ✅ `v1.0.2` em produção |
-| **1.1.x** | [`V1_1.md`](V1_1.md) | Integrada na `dev` — não produção |
+| **1.1.x** | [`V1_1.md`](V1_1.md) | Integrada na `main` (`8c8cd01`) — pendente deploy |
 
 ---
 

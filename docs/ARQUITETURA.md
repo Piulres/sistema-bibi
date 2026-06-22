@@ -42,6 +42,7 @@ flowchart TB
       Webhooks["webhook-service.ts<br/>(B2B + retry Tier 3/4)"]
       RBAC["interno-permissions.ts<br/>(RBAC Tier 3)"]
       MFA["mfa.ts · tiss-service.ts<br/>(Tier 4)"]
+      Clinical["clinical/*-service.ts<br/>(Care Chart v1.1)"]
       Dashboard["executive-dashboard.ts"]
       DB["db.ts (Prisma Client)"]
     end
@@ -60,6 +61,7 @@ flowchart TB
   API --> Webhooks
   API --> RBAC
   API --> MFA
+  API --> Clinical
   API --> DB --> SQLite
   Sess --> DB
 ```
@@ -87,7 +89,18 @@ erDiagram
 
   Patient ||--o{ Appointment : "agenda"
   Patient ||--o{ MedicalRecord : "prontuário"
+  Patient ||--o| PatientClinicalProfile : "perfil clínico"
+  Patient ||--o{ MedicationPrescription : "medicações"
+  Patient ||--o{ ExamOrder : "exames"
+  Patient ||--o{ PatientProtocolEnrollment : "protocolos"
   Patient ||--o{ Invoice : "faturado"
+
+  Tenant ||--o{ CareProtocolTemplate : "templates de cuidado"
+  CareProtocolTemplate ||--o{ PatientProtocolEnrollment : "matrículas"
+
+  User ||--o{ MedicationPrescription : "prescreve"
+  User ||--o{ ExamOrder : "solicita"
+  User ||--o{ PatientProtocolEnrollment : "acompanha"
 
   Procedure ||--o{ PricingRule : "ajustado por"
   Procedure ||--o{ ProcedureUsage : "usado em"
@@ -168,6 +181,46 @@ erDiagram
     string recordType "EVOLUCAO|ANAMNESE|RECEITA|ATESTADO"
     string content
     string patientId FK
+    string providerId FK
+  }
+  PatientClinicalProfile {
+    string id PK
+    string patientId FK "unique"
+    string allergies "JSON"
+    string chronicConditions "JSON"
+    string bloodType "nullable"
+  }
+  MedicationPrescription {
+    string id PK
+    string status "ATIVA|SUSPENSA|ENCERRADA"
+    string medication
+    string dosage
+    string frequency
+    string patientId FK
+    string providerId FK
+  }
+  ExamOrder {
+    string id PK
+    string status "SOLICITADO|AGENDADO|REALIZADO|LAUDADO|CANCELADO"
+    string examName
+    string clinicalIndication "nullable"
+    string resultSummary "nullable"
+    string patientId FK
+    string providerId FK
+  }
+  CareProtocolTemplate {
+    string id PK
+    string name
+    string checklist "JSON"
+    boolean active
+    string tenantId FK
+  }
+  PatientProtocolEnrollment {
+    string id PK
+    string status "ATIVO|CONCLUIDO|SUSPENSO"
+    string checklistState "JSON"
+    string patientId FK
+    string templateId FK
     string providerId FK
   }
   Invoice {

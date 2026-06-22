@@ -60,6 +60,9 @@ quadrantChart
 | Status de consulta (agendado → realizado) | ✅ | ✅ | `appointment-service.ts` |
 | Telemedicina (link sala) | 🟡 mock | ✅ | `modality=TELE`, `telemedicine.ts` |
 | PEP / prontuário eletrônico | ✅ | ✅ | `MedicalRecord`, `AtendimentoView` |
+| Prescrição estruturada | ✅ | ✅ | `MedicationPrescription`, Care Chart |
+| Pedidos de exame com laudo | ✅ | ✅ | `ExamOrder`, workflow de status |
+| Protocolos de cuidado | ✅ | 🟡 | `CareProtocolTemplate`, checklist JSON |
 | Templates PEP (evolução, receita, atestado) | ✅ | ✅ | `pep-templates.ts` |
 | Cadastro de pacientes | ✅ | ✅ | `/interno/cadastros` |
 | Cadastro de procedimentos / tabela | ✅ | ✅ | `Procedure`, cadastros |

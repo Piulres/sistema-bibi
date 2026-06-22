@@ -20,7 +20,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v1.0.2`**; `dev` **1.1.0** @ `78d0177` (sincronizada com `main`). Ver `docs/RELEASES.md`.
+(cota Netlify). Produção: **`v1.0.2`** até deploy manual; **`main`** @ `8c8cd01` (**v1.1.0** Care Chart + cadastros). Ver `docs/RELEASES.md`.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
@@ -124,6 +124,9 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 |---------|------|-------|
 | Walk-in particular | `/interno/agenda` → seção walk-in | `AppointmentsView.tsx` |
 | Edição cadastros | `/interno/cadastros` → Editar em cada aba | `CadastrosView.tsx` |
+| Protocolos clínicos | `/interno/cadastros?tab=protocols` | `ProtocolTemplatesPanel.tsx` |
+| Care Chart (prestador) | `/prestador/atendimento/[id]` → abas clínicas | `AtendimentoView.tsx` + `ClinicalCarePanel.tsx` |
+| Histórico paciente | `/prestador/paciente/[id]` | `PrestadorPatientHistoryView.tsx` |
 | Mapa CRUD (27 entidades) | `/interno/cadastros?tab=operations` | `src/lib/crud-operations-map.ts` |
 
 Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedro.almeida@email.com`.
