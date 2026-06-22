@@ -23,10 +23,11 @@ Referências: `@docs/DEPLOY_NETLIFY.md` · `@docs/RELEASES.md` · `@docs/OPERACO
 
 ```bash
 git checkout main && git pull
+npm run lint && npm run test                 # CI também roda E2E
 npm run pre-release                              # lint + build local (obrigatório)
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
-# smoke test → atualizar docs/RELEASES.md → commit
+npx netlify deploy --prod --no-build --message "v1.0.1: resumo"
+# smoke test → atualizar docs/RELEASES.md → commit → tag vX.Y.Z
 ```
 
 > `--no-build`: usa artefatos já gerados pelo `pre-release`. Só omita se o build local falhou e o humano autorizar rebuild remoto.
@@ -50,8 +51,19 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 
 ## Convenção de pacote
 
+A partir de **1.0.0**, releases estáveis usam semver:
+
 ```
-bibi-poc-AAAA-MM-DD[a|b|c]
+vMAJOR.MINOR.PATCH   (ex.: v1.0.0, v1.1.0)
 ```
 
-Registrar em `@docs/RELEASES.md` após cada publicação manual.
+Pacotes POC (`bibi-poc-AAAA-MM-DDx`) permanecem no histórico. Registrar em `@docs/RELEASES.md` após cada publicação manual.
+
+## Pre-release vs CI
+
+| | `pre-release` | CI |
+|---|---------------|-----|
+| Testes | ❌ | ✅ 88 unit + 44 E2E |
+| Build Netlify | ✅ | `build` apenas |
+
+Antes de PR: `npm run lint && npm run test`.

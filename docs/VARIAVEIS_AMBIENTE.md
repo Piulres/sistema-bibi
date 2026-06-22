@@ -104,8 +104,8 @@ SEED_SCALE=medium
 
 | | |
 |---|---|
-| **Padrão** | `true` (habilitado se ausente) |
-| **Desligar** | `false` ou `0` |
+| **Flag explícita** | `true`/`1` → habilitado · `false`/`0` → desabilitado |
+| **Flag ausente** | Habilitado em dev (`NODE_ENV !== production`) e na Netlify (`NETLIFY=true`); desabilitado em produção fora da Netlify |
 | **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
 | **API** | `POST /api/interno/demo/reset` (body: `{ "confirm": "RESTAURAR" }`) |
 | **Permissão** | Somente interno **ADMIN** |

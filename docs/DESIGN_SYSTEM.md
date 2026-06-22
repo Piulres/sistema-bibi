@@ -66,6 +66,7 @@ Localizados em `src/components/ui/`:
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
 | `AppointmentCard` | Card de consulta com horário, status e faixa lateral por estado |
 | `TabBar` | Abas client-side com sublinhado (ex.: Cadastros) |
+| `PixQrDisplay` | QR mock decorativo + copia-e-cola PIX (beneficiário) |
 
 Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e walk-in da agenda.
 
