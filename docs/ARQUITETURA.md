@@ -275,6 +275,51 @@ redireciona ao login) e o servidor (`requireUser([...roles])` em cada handler e
 
 ---
 
+## 5. Navegação SPA e responsiva
+
+Layouts persistentes por portal (`src/app/{interno,prestador,pj,beneficiario}/layout.tsx`)
+mantêm shell, header e nav entre trocas de rota; páginas filhas renderizam só
+`PageHeader` + conteúdo. Config central: `src/lib/navigation/routes.ts`.
+
+```mermaid
+flowchart TB
+  subgraph Layout["layout.tsx (por portal)"]
+    Shell["*PortalShell<br/>min-w-0"]
+    Nav["Nav por portal"]
+    Progress["NavigationProgress"]
+  end
+
+  subgraph NavPatterns["Padrões de nav"]
+    R1["Rotas: NavTabs + MobileNavDrawer"]
+    R2["Âncoras: SectionNav + MobileSectionDrawer"]
+    R3["Client tabs: TabBar"]
+    Rail["ScrollableNavRail<br/>(gradientes + setas)"]
+  end
+
+  Layout --> Shell
+  Nav --> R1
+  Nav --> R2
+  R1 --> Rail
+  R2 --> Rail
+  R3 --> Rail
+```
+
+| Portal | Componente nav | Tipo | Breakpoint |
+|--------|----------------|------|------------|
+| Interno | `InternoNav` | 11 rotas (`INTERNO_NAV_TABS`) filtradas por RBAC | drawer &lt; **lg** (1024px) |
+| Prestador | `PrestadorNav` | 1 rota (`/prestador`) | sempre abas |
+| PJ | `SectionNav` em `PjPortalShell` | 4 âncoras (`PJ_SECTION_NAV`) | drawer &lt; lg |
+| Beneficiário | `SectionNav` em `BeneficiarioPortalShell` | 8 âncoras (`BENEFICIARIO_SECTION_NAV`) | drawer &lt; lg |
+
+**Dois modos de navegação:**
+
+1. **Rotas** (`NavTabs` / `MobileNavDrawer`) — links Next.js entre páginas distintas (interno, prestador).
+2. **Âncoras** (`SectionNav` / `MobileSectionDrawer`) — scroll + hash (`#faturas`) em página única longa (PJ, beneficiário). `IntersectionObserver` sincroniza aba ativa com a seção visível.
+
+`ScrollableNavRail` envolve faixas horizontais quando há overflow (11 abas internas, 8 seções beneficiário, abas de Cadastros). Detalhes de UI e `aria-label`: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · jornada UX: [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) §7.
+
+---
+
 ## 6. Cliente 360° (Épico 1)
 
 Visão consolidada do beneficiário no Portal Interno, reutilizando entidades

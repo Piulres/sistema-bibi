@@ -6,7 +6,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: alinhada à `main` pós walk-in particular, edição CRUD em Cadastros e mapa `CRUD_OPERATIONS_MAP` (27 entidades).
+Última revisão: alinhada à `main` pós navegação responsiva (`ScrollableNavRail`, drawers &lt; lg) e E2E `mobile-nav.spec.ts`.
 
 ---
 
@@ -93,7 +93,7 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 |:----------:|-----|----------|
 | Alta | Não pode cancelar nem reagendar consulta | Ações com regras de antecedência (ex.: até 24 h antes) |
 | Alta | PIX em dois passos manuais (gerar + confirmar) | Webhook do gateway ou polling; exibir QR Code |
-| Média | Página única longa (scroll) | Abas: Agenda · Consumo · Faturas · Prontuário |
+| Média | Página única longa (scroll) | **Parcial:** `MobileSectionDrawer` + rail em desktop; abas dedicadas ainda em backlog |
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
 | Média | Notificações mock (`COMMUNICATION_PROVIDER=console`) | Adapter real (e-mail/SMS/WhatsApp) |
 | Baixa | Sem carteirinha digital | Card com QR + dados do plano corporativo |
@@ -223,6 +223,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 - Cobertura operacional ampla (table stakes + B2B).
 - RBAC na navegação e em parte das APIs.
 - Cliente 360° com timeline universal de auditoria.
+- Navegação responsiva: 11 módulos acessíveis via drawer em mobile/tablet (&lt; 1024px) e faixa rolável em desktop.
 
 ### 5.3 Gaps e melhorias
 
@@ -342,7 +343,7 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 | [`BENCHMARK.md`](BENCHMARK.md) | Posicionamento vs iClinic/Feegow/ERPMed |
 | [`PAYMENTS.md`](PAYMENTS.md) | Motor PIX e ciclo de cobrança |
 | [`COMMUNICATIONS.md`](COMMUNICATIONS.md) | Lembretes e fila de mensagens |
-| [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens) |
+| [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens, navegação responsiva) |
 | [`evidencias/README.md`](evidencias/README.md) | Screenshots e vídeos dos fluxos validados |
 | [`OPERACOES.md`](OPERACOES.md) | Quando atualizar esta documentação |
 

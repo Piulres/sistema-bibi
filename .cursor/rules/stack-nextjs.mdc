@@ -23,10 +23,13 @@ Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
 
 - **Layouts por portal** (`src/app/{interno,prestador,pj,beneficiario}/layout.tsx`) — shell persistente; pages só com `PageHeader` + conteúdo
 - Menus centralizados em `src/lib/navigation/` — não duplicar hrefs/labels
-- Primitivos: `src/components/ui/` (`Breadcrumbs`, `SectionNav`, `NavTabs`)
+- Primitivos: `src/components/ui/` (`Breadcrumbs`, `SectionNav`, `NavTabs`, `ScrollableNavRail`, `TabBar`)
+- Drawers mobile: `MobileNavDrawer` (rotas interno), `MobileSectionDrawer` (âncoras PJ/beneficiário) — breakpoint **lg (1024px)**
 - Tokens: `src/app/globals.css` (`--brand-*`, `--surface-*`)
 - White label: `TenantBranding` + `TenantTheme`
-- E2E interno: escopar nav com `getByRole('navigation', { name: 'Navegação por abas' })`
+- Shells com `min-w-0` nos containers de conteúdo — evita overflow horizontal da nav rolável
+- E2E interno desktop: `internoNav(page)` → `getByRole('navigation', { name: 'Navegação por abas' })`
+- E2E interno mobile: `internoNavDrawer(page)` → `getByRole('navigation', { name: 'Módulos internos' })`
 
 ## Padrões de API
 
