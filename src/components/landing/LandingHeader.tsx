@@ -16,11 +16,11 @@ const NAV_LINKS = [
 
 export default function LandingHeader({ branding }: Props) {
   return (
-    <header className="sticky top-0 z-50 border-b border-[var(--border-default)]/80 bg-[var(--surface-page)]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-[var(--border-default)]/60 bg-[var(--surface-page)]/80 backdrop-blur-xl">
       <a href="#conteudo-principal" className="ds-skip-link">
         Ir para o conteúdo principal
       </a>
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3.5">
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2"
@@ -32,12 +32,12 @@ export default function LandingHeader({ branding }: Props) {
               alt=""
               width={40}
               height={40}
-              className="h-10 w-10 rounded-lg object-contain"
+              className="h-10 w-10 rounded-xl object-contain"
               priority
             />
           ) : (
             <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)]"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-[var(--text-inverse)] shadow-sm"
               style={{
                 background: `linear-gradient(135deg, var(--brand-hero-from), var(--brand-hero-to))`,
               }}
@@ -46,17 +46,20 @@ export default function LandingHeader({ branding }: Props) {
               {branding.displayName.charAt(0)}
             </span>
           )}
-          <span className="truncate font-semibold text-[var(--text-primary)]">
+          <span className="truncate text-base font-semibold tracking-tight text-[var(--text-primary)]">
             {branding.displayName}
           </span>
         </Link>
 
-        <nav aria-label="Navegação principal" className="hidden items-center gap-1 md:flex">
+        <nav
+          aria-label="Navegação principal"
+          className="hidden items-center gap-0.5 rounded-full border border-[var(--border-default)] bg-[var(--surface-card)]/80 p-1 shadow-sm md:flex"
+        >
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+              className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             >
               {link.label}
             </a>
@@ -67,13 +70,13 @@ export default function LandingHeader({ branding }: Props) {
           <LandingMobileMenu />
           <Link
             href="/beneficiario/login"
-            className="hidden rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:inline-flex"
+            className="hidden rounded-full px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:inline-flex"
           >
             Entrar
           </Link>
           <Link
             href="#portais"
-            className="inline-flex items-center justify-center rounded-[var(--radius-button)] bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-inverse)] transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2"
           >
             Acessar portais
           </Link>

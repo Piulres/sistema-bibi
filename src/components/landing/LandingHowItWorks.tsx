@@ -1,52 +1,43 @@
 import { LANDING_STEPS } from "@/lib/landing/content";
+import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 
 export default function LandingHowItWorks() {
   return (
     <section
       id="como-funciona"
       aria-labelledby="how-heading"
-      className="border-y border-[var(--border-default)] bg-[var(--surface-muted)]"
+      className="border-y border-[var(--border-default)] bg-[var(--surface-muted)]/60"
     >
-      <div className="mx-auto max-w-6xl px-6 py-20">
-        <div className="max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[var(--brand-primary)]">
-            Como funciona
-          </p>
-          <h2
-            id="how-heading"
-            className="mt-3 text-3xl font-bold tracking-tight text-[var(--text-primary)] sm:text-4xl"
-          >
-            Do agendamento ao faturamento em três etapas
-          </h2>
-          <p className="mt-4 text-lg text-[var(--text-secondary)]">
-            Fluxos curtos e integrados — sem telas excessivas, sem perda de
-            informação entre operação e financeiro.
-          </p>
-        </div>
+      <div className="mx-auto max-w-6xl px-6 py-24">
+        <LandingSectionHeader
+          id="how-heading"
+          eyebrow="Como funciona"
+          title="Do agendamento ao faturamento em três etapas"
+          description="Fluxos curtos e integrados — sem telas excessivas, sem perda de informação entre operação e financeiro."
+        />
 
-        <ol className="mt-12 grid gap-8 lg:grid-cols-3">
-          {LANDING_STEPS.map((item, index) => (
+        <ol className="relative mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
+          <div
+            className="pointer-events-none absolute left-[calc(16.67%-1px)] right-[calc(16.67%-1px)] top-10 hidden h-0.5 bg-gradient-to-r from-[var(--brand-primary)] via-[var(--brand-accent)] to-[var(--brand-primary)] opacity-30 lg:block"
+            aria-hidden
+          />
+
+          {LANDING_STEPS.map((item) => (
             <li key={item.step} className="relative">
-              {index < LANDING_STEPS.length - 1 ? (
+              <article className="landing-card-hover h-full rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
                 <span
-                  className="absolute left-8 top-16 hidden h-px w-[calc(100%-2rem)] bg-[var(--border-muted)] lg:block"
-                  aria-hidden
-                />
-              ) : null}
-              <div className="ds-card h-full p-6">
-                <span
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-primary)] text-sm font-bold text-[var(--text-inverse)]"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-accent)] text-sm font-bold text-[var(--text-inverse)] shadow-sm"
                   aria-hidden
                 >
                   {item.step}
                 </span>
-                <h3 className="mt-4 text-xl font-semibold text-[var(--text-primary)]">
+                <h3 className="mt-5 text-xl font-semibold text-[var(--text-primary)]">
                   {item.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
                   {item.description}
                 </p>
-              </div>
+              </article>
             </li>
           ))}
         </ol>

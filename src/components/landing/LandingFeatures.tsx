@@ -1,6 +1,6 @@
 import { LANDING_FEATURES } from "@/lib/landing/content";
-import Card from "@/components/ui/Card";
 import LandingIcon from "@/components/landing/LandingIcon";
+import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import type { ComponentProps } from "react";
 
 const ICON_MAP: Record<
@@ -15,47 +15,48 @@ const ICON_MAP: Record<
   enterprise: "enterprise",
 };
 
+const BENTO_SPANS: Record<(typeof LANDING_FEATURES)[number]["id"], string> = {
+  "pay-per-use": "sm:col-span-2",
+  pricing: "",
+  portals: "",
+  pep: "",
+  billing: "",
+  enterprise: "sm:col-span-2",
+};
+
 export default function LandingFeatures() {
   return (
     <section
       id="recursos"
       aria-labelledby="features-heading"
-      className="mx-auto max-w-6xl px-6 py-20"
+      className="relative mx-auto max-w-6xl px-6 py-24"
     >
-      <div className="max-w-2xl">
-        <p className="text-sm font-semibold uppercase tracking-wider text-[var(--brand-primary)]">
-          Recursos
-        </p>
-        <h2
-          id="features-heading"
-          className="mt-3 text-3xl font-bold tracking-tight text-[var(--text-primary)] sm:text-4xl"
-        >
-          Tudo que clínicas, hospitais e saúde corporativa precisam
-        </h2>
-        <p className="mt-4 text-lg text-[var(--text-secondary)]">
-          Da operação clínica ao faturamento Pay Per Use — uma plataforma unificada
-          com portais segregados e dados conectados em tempo real.
-        </p>
-      </div>
+      <div className="landing-grid-pattern pointer-events-none absolute inset-x-0 top-12 h-64 opacity-60" aria-hidden />
 
-      <ul className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <LandingSectionHeader
+        id="features-heading"
+        eyebrow="Recursos"
+        title="Tudo que clínicas, hospitais e saúde corporativa precisam"
+        description="Da operação clínica ao faturamento Pay Per Use — uma plataforma unificada com portais segregados e dados conectados em tempo real."
+      />
+
+      <ul className="relative mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {LANDING_FEATURES.map((feature) => (
-          <li key={feature.id}>
-            <Card className="h-full transition hover:-translate-y-0.5 hover:shadow-md motion-reduce:transform-none">
+          <li key={feature.id} className={BENTO_SPANS[feature.id]}>
+            <article className="landing-card-hover group h-full rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
               <div
-                className="flex h-11 w-11 items-center justify-center rounded-xl text-[var(--brand-primary)]"
-                style={{ background: "var(--status-brand-bg)" }}
+                className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[var(--brand-primary)] to-[var(--brand-accent)] text-[var(--text-inverse)] shadow-sm transition group-hover:scale-105 motion-reduce:transform-none"
                 aria-hidden
               >
-                <LandingIcon name={ICON_MAP[feature.id]} />
+                <LandingIcon name={ICON_MAP[feature.id]} className="h-6 w-6" />
               </div>
-              <h3 className="mt-4 text-lg font-semibold text-[var(--text-primary)]">
+              <h3 className="mt-5 text-lg font-semibold text-[var(--text-primary)]">
                 {feature.title}
               </h3>
               <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
                 {feature.description}
               </p>
-            </Card>
+            </article>
           </li>
         ))}
       </ul>
