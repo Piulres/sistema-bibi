@@ -6,11 +6,12 @@ import type { SessionUser } from "@/lib/session";
 
 let resetInProgress = false;
 
-/** Habilita o botão de restaurar demo (desligado em produção por padrão). */
+/** Habilita o botão de restaurar demo. POC Netlify (`NETLIFY=true`) fica ligado salvo opt-out. */
 export function isDemoResetEnabled(): boolean {
   const flag = process.env.ALLOW_DEMO_RESET?.trim().toLowerCase();
   if (flag === "true" || flag === "1") return true;
   if (flag === "false" || flag === "0") return false;
+  if (process.env.NETLIFY === "true") return true;
   return process.env.NODE_ENV !== "production";
 }
 

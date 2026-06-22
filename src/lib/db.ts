@@ -3,10 +3,21 @@ import { join } from "path";
 import { PrismaClient } from "@prisma/client";
 
 function resolveSqlitePath(configured: string): string {
-  if (configured === "file:./dev.db") {
-    return `file:${join(process.cwd(), "prisma", "dev.db")}`;
+  if (!configured.startsWith("file:")) {
+    return configured;
   }
-  return configured;
+
+  const pathPart = configured.slice("file:".length);
+  if (!pathPart.startsWith("./")) {
+    return configured;
+  }
+
+  const relative = pathPart.slice(2);
+  // Prisma resolve file:./ relativo ao schema (prisma/) — normalizamos para prisma/*.db
+  if (relative.startsWith("prisma/")) {
+    return `file:${join(process.cwd(), relative)}`;
+  }
+  return `file:${join(process.cwd(), "prisma", relative)}`;
 }
 
 function resolveDatabaseUrl(): string | undefined {

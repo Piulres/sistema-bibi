@@ -18,6 +18,7 @@
   # Path relativo ao schema Prisma (prisma/schema.prisma) → arquivo prisma/dev.db
   DATABASE_URL = "file:./dev.db"
   NETLIFY = "true"
+  ALLOW_DEMO_RESET = "true"
   # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables).
   # O valor abaixo e apenas fallback da POC — troque antes de ir a producao.
   SESSION_SECRET = "bibi-poc-netlify-secret-change-me"
@@ -31,10 +32,13 @@
 [context.production.environment]
   NODE_ENV = "production"
   NETLIFY = "true"
+  # POC demo: botão restaurar seed em /interno/seguranca (somente ADMIN)
+  ALLOW_DEMO_RESET = "true"
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"
   NETLIFY = "true"
+  ALLOW_DEMO_RESET = "true"
 
 # Emulacao local: netlify dev encaminha :8888 → next dev :3000
 [dev]
