@@ -93,3 +93,20 @@ export function daysAgo(days: number, hour = 10, minute = 0): Date {
   d.setHours(hour, minute, 0, 0);
   return d;
 }
+
+/** Meses atrás (primeiro dia do mês). */
+export function monthsAgo(months: number, day = 15, hour = 10): Date {
+  const d = new Date();
+  d.setMonth(d.getMonth() - months);
+  d.setDate(day);
+  d.setHours(hour, 0, 0, 0);
+  return d;
+}
+
+/** Dias à frente a partir de hoje. */
+export function daysFromNow(days: number, hour = 10, minute = 0): Date {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, minute, 0, 0);
+  return d;
+}
