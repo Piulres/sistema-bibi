@@ -35,6 +35,16 @@
   # POC demo: botão restaurar seed em /interno/seguranca (somente ADMIN)
   ALLOW_DEMO_RESET = "true"
 
+# Contexto de deploy para ambiente de OPERAÇÃO (Postgres — sem massa demo).
+# Uso: npx netlify deploy --prod --build --context operation
+# Requer DATABASE_URL=postgresql://... no painel Netlify.
+[context.operation.environment]
+  APP_MODE = "operation"
+  RUN_SEED_ON_BUILD = "false"
+  ALLOW_DEMO_RESET = "false"
+  NODE_ENV = "production"
+  NETLIFY = "true"
+
 [context.deploy-preview.environment]
   NODE_ENV = "production"
   NETLIFY = "true"

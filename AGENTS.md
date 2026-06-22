@@ -90,7 +90,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclui Netlify, CI, testes e **Cursor Cloud Agent**).
 
-- `DATABASE_URL` — SQLite (`file:./dev.db`)
+- `DATABASE_URL` — SQLite (`file:./dev.db`) em demo; Postgres em `APP_MODE=operation` — ver `docs/OPERACAO_DADOS.md`
 - `SESSION_SECRET` — cookie de sessão + MFA
 - `PAYMENT_GATEWAY=mock` — adapter PIX POC
 - `COMMUNICATION_PROVIDER=console` — e-mail no console

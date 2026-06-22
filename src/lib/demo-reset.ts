@@ -1,18 +1,15 @@
 import "server-only";
 import type { PrismaClient } from "@prisma/client";
 import { runDatabaseSeed, type SeedRunResult } from "../../prisma/seed-data/run-seed";
+import { isDemoResetAllowed } from "@/lib/database-env";
 import { isInternoAdmin } from "@/lib/interno-permissions";
 import type { SessionUser } from "@/lib/session";
 
 let resetInProgress = false;
 
-/** Habilita o botão de restaurar demo. POC Netlify (`NETLIFY=true`) fica ligado salvo opt-out. */
+/** Habilita o botão de restaurar demo. Desligado em APP_MODE=operation. */
 export function isDemoResetEnabled(): boolean {
-  const flag = process.env.ALLOW_DEMO_RESET?.trim().toLowerCase();
-  if (flag === "true" || flag === "1") return true;
-  if (flag === "false" || flag === "0") return false;
-  if (process.env.NETLIFY === "true") return true;
-  return process.env.NODE_ENV !== "production";
+  return isDemoResetAllowed();
 }
 
 export function canUserResetDemo(user: SessionUser): boolean {

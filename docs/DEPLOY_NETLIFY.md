@@ -139,7 +139,8 @@ Configure scheduled functions ou serviço externo para chamar:
 ## Limitações conhecidas da POC na Netlify
 
 - **SQLite** copiado para `/tmp` a cada cold start — escrita persiste só na mesma instância Lambda.
-- **Seed no build** — cada deploy recria dados demo (intencional para POC).
+- **Seed no build** — cada deploy recria dados demo (intencional para POC em `APP_MODE=demo`).
+- **Modo operação** — requer `APP_MODE=operation` + Postgres; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 - **Logos** — `@netlify/blobs` em produção; filesystem local em `next dev` puro.
 - **MFA / webhooks / PIX** — funcionam na POC, mas dependem do SQLite efêmero.
 

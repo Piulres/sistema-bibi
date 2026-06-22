@@ -36,6 +36,8 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
 | `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
+| `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
+| `RUN_SEED_ON_BUILD` | Não | `true` em demo | Seed no build Netlify (`false` em operação) |
 | `ALLOW_DEMO_RESET` | Não | `true` | Botão restaurar demo na UI |
 | `NETLIFY` | Auto | `true` no deploy | Detecção de ambiente Netlify |
 
@@ -86,7 +88,32 @@ Não precisa estar no `.env` local — o Next define automaticamente.
 
 ## 3. Seed e modo demo
 
-Usadas por `prisma/seed.ts`, `prisma/seed-data/run-seed.ts` e `src/lib/demo-reset.ts`.
+Usadas por `prisma/seed.ts`, `scripts/setup-database.ts`, `src/lib/database-env.ts` e `src/lib/demo-reset.ts`.
+
+Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
+### `APP_MODE`
+
+| | |
+|---|---|
+| **Padrão** | `demo` |
+| **Valores** | `demo` \| `operation` |
+| **Efeito** | `operation` desliga seed no build e reset na UI |
+
+```env
+APP_MODE=demo
+```
+
+### `RUN_SEED_ON_BUILD`
+
+| | |
+|---|---|
+| **Padrão** | `true` em demo; `false` se `APP_MODE=operation` |
+| **Build** | `scripts/netlify-build.mjs` → `setup-database.ts` |
+
+```env
+RUN_SEED_ON_BUILD=true
+```
 
 ### `SEED_SCALE`
 
@@ -105,7 +132,7 @@ SEED_SCALE=medium
 | | |
 |---|---|
 | **Padrão** | `true` (habilitado se ausente) |
-| **Desligar** | `false` ou `0` |
+| **Desligar** | `false` ou `0` ou `APP_MODE=operation` |
 | **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
 | **API** | `POST /api/interno/demo/reset` (body: `{ "confirm": "RESTAURAR" }`) |
 | **Permissão** | Somente interno **ADMIN** |

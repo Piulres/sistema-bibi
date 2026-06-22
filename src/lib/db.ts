@@ -1,6 +1,7 @@
 import { copyFileSync, existsSync } from "fs";
 import { join } from "path";
 import { PrismaClient } from "@prisma/client";
+import { isLambdaSqliteRuntime, isSqliteDatabaseUrl } from "@/lib/database-env";
 
 function resolveSqlitePath(configured: string): string {
   if (!configured.startsWith("file:")) {
@@ -22,18 +23,19 @@ function resolveSqlitePath(configured: string): string {
 
 function resolveDatabaseUrl(): string | undefined {
   const configured = process.env.DATABASE_URL;
-  if (!configured?.startsWith("file:")) {
+  if (!configured) return configured;
+
+  // Postgres (operação): URL direta — banco compartilhado, sem cópia /tmp.
+  if (!isSqliteDatabaseUrl(configured)) {
     return configured;
   }
 
-  // Apenas runtime Lambda (nao fase de build/CI).
-  const isLambdaRuntime = Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
-
-  if (!isLambdaRuntime) {
+  // SQLite local ou build: path absoluto.
+  if (!isLambdaSqliteRuntime()) {
     return resolveSqlitePath(configured);
   }
 
-  // Copia o SQLite seedado para /tmp (unico diretorio gravavel em serverless).
+  // SQLite em Lambda (modo demo): cópia efêmera para /tmp.
   const tmpDb = "/tmp/bibi-dev.db";
   if (!existsSync(tmpDb)) {
     const source = join(process.cwd(), "prisma", "dev.db");
