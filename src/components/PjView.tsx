@@ -213,6 +213,7 @@ export default function PjView() {
       </section>
 
       <section id="faturas">
+        <SectionHeader title="Faturas da empresa" />
         {invoices.length === 0 ? (
           <EmptyState message="Nenhuma fatura emitida ainda." />
         ) : (
