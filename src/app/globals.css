@@ -231,6 +231,84 @@ body {
   }
 }
 
+/* Landing — superfícies e padrões modernos */
+.landing-mesh-hero {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--brand-accent) 35%, transparent), transparent),
+    radial-gradient(ellipse 60% 40% at 100% 0%, color-mix(in srgb, var(--brand-primary) 25%, transparent), transparent),
+    radial-gradient(ellipse 50% 30% at 0% 100%, color-mix(in srgb, var(--brand-accent) 15%, transparent), transparent),
+    linear-gradient(to bottom right, var(--brand-hero-from), var(--brand-hero-to));
+}
+
+.landing-grid-pattern {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border-default) 40%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border-default) 40%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 70%);
+}
+
+.landing-gradient-text {
+  background: linear-gradient(135deg, var(--brand-accent), #5eead4 60%, #a7f3d0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.landing-glass {
+  border: 1px solid color-mix(in srgb, var(--border-default) 80%, transparent);
+  background: color-mix(in srgb, var(--surface-card) 75%, transparent);
+  backdrop-filter: blur(12px);
+}
+
+.landing-glass-dark {
+  border: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.06);
+  backdrop-filter: blur(16px);
+}
+
+.landing-card-hover {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.landing-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 12px 40px -12px color-mix(in srgb, var(--brand-primary) 18%, transparent),
+    var(--shadow-card);
+  border-color: color-mix(in srgb, var(--brand-primary) 30%, var(--border-default));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-card-hover:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-float {
+    animation: landing-float 6s ease-in-out infinite;
+  }
+
+  .landing-float-delayed {
+    animation: landing-float 6s ease-in-out 1.5s infinite;
+  }
+}
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
 /* SPA — transição suave entre rotas */
 @media (prefers-reduced-motion: no-preference) {
   .ds-page-enter {
