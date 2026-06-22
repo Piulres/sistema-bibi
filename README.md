@@ -70,7 +70,7 @@ renderizar os componentes de cliente que consomem a API.
 
 ## 4. Início rápido
 
-Requisitos: **Node.js 20+** (testado com Node 22) e **npm**.
+Requisitos: **Node.js 20+** (CI em Node 24; testado localmente com Node 22) e **npm**.
 
 ```bash
 npm install            # instala dependências (postinstall roda `prisma generate`)
