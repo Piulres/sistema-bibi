@@ -14,11 +14,12 @@ não confie em “deploy automático” para saber o que está no ar.
 |------|-------|
 | **Versão semântica** | **1.0.0** |
 | Site produção | https://sistema-bibi.netlify.app |
-| Pacote em produção | `v1.0.0` → tag `v1.0.0` · deploy `6a38e19c` |
-| `main` | release **1.0.0** publicada |
+| Pacote em produção | `v1.0.0` → commit `de88c0e` · deploy `6a393af3` |
+| `main` | `de88c0e` — alinhada com produção |
+| `dev` | `f461986` — mergeada na `main` |
 | Tag git | `v1.0.0` |
-| Validação local | `npm run pre-release` ✅ |
-| Deploy | 22/06/2026 — `npx netlify deploy --prod --no-build` |
+| Validação local | `npm run pre-release` ✅ · 88 unit · 43 E2E |
+| Deploy | 22/06/2026 — `netlify build` + `--no-build` |
 
 ---
 
@@ -29,9 +30,9 @@ não confie em “deploy automático” para saber o que está no ar.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v1.0.0` |
-| **Commit** | `2395921` — merge walk-in, CRUD, UI e melhorias de fluxo |
+| **Commit** | `de88c0e` — merge `dev` (PRs #64–#66) + fix teste PPU |
 | **Versão npm** | `1.0.0` (`package.json`) |
-| **Publicado em** | 22/06/2026 — deploy `6a38e19c` (netlify build + `--no-build`) |
+| **Publicado em** | 22/06/2026 — deploy `6a393af3` (netlify build + `--no-build`) |
 | **Método** | `npm run pre-release` + `npx netlify deploy --prod --no-build` |
 | **Site** | `sistema-bibi` |
 
