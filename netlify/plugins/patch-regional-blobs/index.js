@@ -1,8 +1,8 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+const { existsSync, readFileSync, writeFileSync } = require("node:fs");
+const { join } = require("node:path");
 
 /** Desativa Blobs regionais no handler Next.js (evita crash sem primaryRegion). */
-export const onEnd = async () => {
+exports.onEnd = async () => {
   const handlerPath = join(
     ".netlify/functions-internal/___netlify-server-handler/___netlify-server-handler.mjs",
   );
