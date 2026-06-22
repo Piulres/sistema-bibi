@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   DemoResetError,
   executeDemoReset,
@@ -11,7 +11,7 @@ import {
 /** Status do modo demo (restauração habilitada / permissão do usuário). */
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("seguranca");
     return NextResponse.json(await getDemoResetStatus(user));
   } catch (error) {
     return authErrorResponse(error);
@@ -24,7 +24,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("seguranca");
     const status = await getDemoResetStatus(user);
 
     if (!status.enabled) {

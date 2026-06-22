@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils/cn";
 import type { SectionNavItem } from "@/components/ui/SectionNav";
 
@@ -51,6 +52,12 @@ export default function MobileSectionDrawer({
     };
   }, [open]);
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   function selectSection(id: string) {
     onSelect(id);
     setOpen(false);
@@ -78,57 +85,60 @@ export default function MobileSectionDrawer({
         </svg>
       </button>
 
-      {open && (
-        <>
-          <button
-            type="button"
-            className="fixed inset-0 z-40 bg-black/40"
-            aria-label="Fechar menu"
-            onClick={() => setOpen(false)}
-          />
-          <div
-            id="mobile-section-drawer"
-            ref={panelRef}
-            role="dialog"
-            aria-modal="true"
-            aria-label={title}
-            className="fixed inset-y-0 right-0 z-50 flex w-[min(100%,20rem)] flex-col bg-[var(--surface-card)] shadow-xl ds-nav-drawer-enter"
-          >
-            <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
-              <p className="text-sm font-semibold text-[var(--text-primary)]">{title}</p>
+      {open && mounted
+        ? createPortal(
+            <div className="fixed inset-0 z-[60] flex">
+              <div
+                id="mobile-section-drawer"
+                ref={panelRef}
+                role="dialog"
+                aria-modal="true"
+                aria-label={title}
+                className="flex h-full w-[min(100%,20rem)] shrink-0 flex-col bg-[var(--surface-card)] shadow-xl"
+              >
+                <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{title}</p>
+                  <button
+                    type="button"
+                    onClick={() => setOpen(false)}
+                    className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                    aria-label="Fechar"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <nav className="flex-1 overflow-y-auto p-2" aria-label={title}>
+                  <ul className="space-y-0.5">
+                    {sections.map((section) => (
+                      <li key={section.id}>
+                        <button
+                          type="button"
+                          onClick={() => selectSection(section.id)}
+                          className={cn(
+                            "block w-full rounded-[var(--radius-button)] px-3 py-2.5 text-left text-sm font-medium transition",
+                            activeId === section.id ? activeClass : idleClass,
+                          )}
+                          aria-current={activeId === section.id ? "true" : undefined}
+                        >
+                          {section.label}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </nav>
+              </div>
               <button
                 type="button"
+                className="min-h-full min-w-0 flex-1 bg-black/40"
+                aria-label="Fechar menu"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
-                aria-label="Fechar"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <nav className="flex-1 overflow-y-auto p-2" aria-label={title}>
-              <ul className="space-y-0.5">
-                {sections.map((section) => (
-                  <li key={section.id}>
-                    <button
-                      type="button"
-                      onClick={() => selectSection(section.id)}
-                      className={cn(
-                        "block w-full rounded-[var(--radius-button)] px-3 py-2.5 text-left text-sm font-medium transition",
-                        activeId === section.id ? activeClass : idleClass,
-                      )}
-                      aria-current={activeId === section.id ? "true" : undefined}
-                    >
-                      {section.label}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-        </>
-      )}
+              />
+            </div>,
+            document.body,
+          )
+        : null}
     </div>
   );
 }

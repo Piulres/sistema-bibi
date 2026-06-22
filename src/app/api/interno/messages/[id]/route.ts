@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { cancelMessage } from "@/lib/message-service";
 
 export async function PATCH(
@@ -7,7 +7,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/interno/messages/[id]">,
 ) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("comunicacao");
     const { id } = await ctx.params;
     const body = (await request.json()) as { action?: string };
 

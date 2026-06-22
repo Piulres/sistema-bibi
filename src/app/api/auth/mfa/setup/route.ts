@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireUser, requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { createMfaSetup, verifyTotp } from "@/lib/mfa";
 
 export async function GET() {
@@ -20,7 +20,8 @@ export async function GET() {
 export async function POST(request: Request) {
   const prisma = await getPrisma();
   try {
-    const session = await requireUser();
+    await requireInternoModule("seguranca");
+    const session = await requireUser(["INTERNO"]);
     const body = (await request.json()) as {
       action?: "setup" | "enable" | "disable";
       secret?: string;

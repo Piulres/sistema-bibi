@@ -8,6 +8,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
+import StatCard from "@/components/ui/StatCard";
 import { cn } from "@/lib/utils/cn";
 
 type Appt = {
@@ -104,6 +105,27 @@ export default function AgendaView() {
 
   return (
     <div className="space-y-4">
+      {summary && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard
+            label="Hoje"
+            value={summary.today}
+            info="Atendimentos agendados para a data de hoje."
+          />
+          <StatCard
+            label="Próximos"
+            value={summary.upcoming}
+            tone="accent"
+            info="Consultas futuras a partir de hoje."
+          />
+          <StatCard
+            label="Histórico"
+            value={summary.past}
+            info="Atendimentos já realizados ou anteriores a hoje."
+          />
+        </div>
+      )}
+
       <div className="flex flex-wrap gap-2">
         {TABS.map((tab) => (
           <button

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   createAppointment,
   isAppointmentStatus,
@@ -11,7 +11,7 @@ import { listPatients } from "@/lib/patient-service";
 
 export async function GET(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("agenda");
     const url = new URL(request.url);
     const dateParam = url.searchParams.get("date");
     const providerId = url.searchParams.get("providerId") ?? undefined;
@@ -37,7 +37,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("agenda");
     const body = (await request.json()) as {
       patientId?: string;
       providerId?: string;

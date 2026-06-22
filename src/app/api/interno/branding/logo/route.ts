@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { saveTenantLogo } from "@/lib/storage/tenant-logo";
 
 const MAX_BYTES = 200_000;
@@ -10,7 +10,7 @@ const ALLOWED_TYPES = new Set(["image/png", "image/jpeg", "image/webp", "image/s
 export async function POST(request: Request) {
   const prisma = await getPrisma();
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("branding");
     const form = await request.formData();
     const file = form.get("file");
 

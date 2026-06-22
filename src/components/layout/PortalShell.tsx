@@ -23,6 +23,9 @@ export default function PortalShell({
 }: Props) {
   return (
     <TenantTheme branding={branding} portal={portal} className="flex flex-1 flex-col">
+      <a href="#portal-main" className="ds-skip-link">
+        Ir para o conteúdo
+      </a>
       <PortalHeader
         portalLabel={portalLabel}
         displayName={branding.displayName}
@@ -31,7 +34,7 @@ export default function PortalShell({
         loginPath={loginPath}
         platformLabel={branding.platformLabel}
       />
-      <main className="ds-page-shell min-w-0">{children}</main>
+      <main id="portal-main" className="ds-page-shell min-w-0">{children}</main>
     </TenantTheme>
   );
 }

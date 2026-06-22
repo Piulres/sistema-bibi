@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { buildTemplateBody } from "@/lib/message-service";
 import { isMessageTemplate } from "@/lib/message";
 import { getPrisma } from "@/lib/db";
@@ -9,7 +9,7 @@ import { formatBRL } from "@/lib/pricing";
 export async function GET(request: Request) {
   const prisma = await getPrisma();
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("comunicacao");
     const { searchParams } = new URL(request.url);
     const patientId = searchParams.get("patientId");
     const template = searchParams.get("template");

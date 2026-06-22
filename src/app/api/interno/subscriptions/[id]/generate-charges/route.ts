@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { generateSubscriptionCharges } from "@/lib/subscription-service";
 
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   ctx: RouteContext<"/api/interno/subscriptions/[id]/generate-charges">,
 ) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("subscriptions");
     const { id } = await ctx.params;
 
     const result = await generateSubscriptionCharges({

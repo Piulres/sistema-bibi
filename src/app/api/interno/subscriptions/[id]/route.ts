@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { updateSubscriptionStatus } from "@/lib/subscription-service";
 import { isSubscriptionStatus } from "@/lib/subscription";
 
@@ -8,7 +8,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/interno/subscriptions/[id]">,
 ) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("subscriptions");
     const { id } = await ctx.params;
     const body = (await request.json()) as { status?: string };
 

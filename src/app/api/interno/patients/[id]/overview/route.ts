@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { getPatientOverview } from "@/lib/patient-overview";
 
 /** Visão Cliente 360° consolidada de um beneficiário (Portal Interno). */
@@ -8,7 +8,7 @@ export async function GET(
   ctx: RouteContext<"/api/interno/patients/[id]/overview">,
 ) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const { id } = await ctx.params;
 
     const overview = await getPatientOverview(id, user.tenantId);

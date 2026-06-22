@@ -31,12 +31,40 @@ test.describe("navegação responsiva", () => {
   test("beneficiário: drawer mobile para seções", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await loginAs(page, "beneficiario", "joao.pereira@email.com");
+    await expect(page.locator("#faturas")).toBeAttached();
 
-    await expect(page.getByRole("button", { name: /agendar/i })).toBeVisible();
-    await page.getByRole("button", { name: /agendar/i }).click();
-    const drawer = page.getByRole("navigation", { name: "Seções do beneficiário" });
+    const sectionTrigger = page.locator('[aria-controls="mobile-section-drawer"]');
+    await expect(sectionTrigger).toBeVisible();
+    await sectionTrigger.click();
+    const drawer = page.getByRole("dialog", { name: "Seções do beneficiário" });
     await expect(drawer).toBeVisible();
     await drawer.getByRole("button", { name: "Faturas" }).click();
-    await expect(page).toHaveURL(/#faturas/);
+    await expect(page).toHaveURL(/#faturas/, { timeout: 10000 });
+  });
+
+  test("pj: drawer mobile para seções", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await loginAs(page, "pj", "rh@techcorp.com");
+    await expect(page.locator("#faturas")).toBeAttached();
+
+    const sectionTrigger = page.locator('[aria-controls="mobile-section-drawer"]');
+    await expect(sectionTrigger).toBeVisible();
+    await sectionTrigger.click();
+    const drawer = page.getByRole("dialog", { name: "Seções da empresa" });
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole("button", { name: "Faturas" }).click();
+    await expect(page).toHaveURL(/#faturas/, { timeout: 10000 });
+  });
+
+  test("prestador: drawer mobile com Início e Agenda", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await loginAs(page, "prestador", "dra.helena@bibi.health");
+
+    await expect(page.getByRole("button", { name: /início/i })).toBeVisible();
+    await page.getByRole("button", { name: /início/i }).click();
+    const drawer = page.getByRole("navigation", { name: "Módulos do prestador" });
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole("link", { name: "Agenda" }).click();
+    await expect(page).toHaveURL(/\/prestador$/);
   });
 });

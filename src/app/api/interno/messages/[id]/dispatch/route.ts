@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { dispatchMessage } from "@/lib/message-service";
 
 export async function POST(
@@ -7,7 +7,7 @@ export async function POST(
   ctx: RouteContext<"/api/interno/messages/[id]/dispatch">,
 ) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("comunicacao");
     const { id } = await ctx.params;
 
     const result = await dispatchMessage({

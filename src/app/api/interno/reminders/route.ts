@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { enqueueDueReminders } from "@/lib/reminder-service";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("comunicacao");
     const body = (await request.json().catch(() => ({}))) as { autoDispatch?: boolean };
 
     const result = await enqueueDueReminders({

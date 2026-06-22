@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { isAppointmentStatus, updateAppointment } from "@/lib/appointment-service";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("agenda");
     const { id } = await params;
     const body = (await request.json()) as {
       scheduledAt?: string;

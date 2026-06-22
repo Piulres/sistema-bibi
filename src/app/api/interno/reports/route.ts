@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { buildBillingReportCsv, buildCrmReportCsv } from "@/lib/reports/billing-report";
 
 export async function GET(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("relatorios");
     const url = new URL(request.url);
     const type = url.searchParams.get("type") ?? "billing";
 

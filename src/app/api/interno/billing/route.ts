@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
 import { isPaymentGatewayConfigured } from "@/lib/payments/charge-service";
 
@@ -11,7 +11,7 @@ import { isPaymentGatewayConfigured } from "@/lib/payments/charge-service";
 export async function GET() {
   const prisma = await getPrisma();
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("billing");
 
     const pendingUsages = await prisma.procedureUsage.findMany({
       where: {

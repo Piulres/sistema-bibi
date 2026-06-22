@@ -50,13 +50,15 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
 
 /** Abas do portal prestador. */
 export const PRESTADOR_NAV_TABS: NavTab[] = [
+  { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
   { href: "/prestador", label: "Agenda", key: "agenda" },
 ];
 
 export function resolvePrestadorActive(pathname: string): string | undefined {
+  if (pathname === "/prestador/dashboard") return "dashboard";
   if (pathname === "/prestador") return "agenda";
-  if (pathname.startsWith("/prestador/atendimento/")) return "atendimento";
-  if (pathname.startsWith("/prestador/paciente/")) return "paciente";
+  if (pathname.startsWith("/prestador/atendimento/")) return "agenda";
+  if (pathname.startsWith("/prestador/paciente/")) return "agenda";
   return undefined;
 }
 

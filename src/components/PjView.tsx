@@ -71,13 +71,21 @@ export default function PjView() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/pj/overview")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.error) setError(d.error);
+    let active = true;
+    (async () => {
+      try {
+        const res = await fetch("/api/pj/overview");
+        const d = await res.json();
+        if (!active) return;
+        if (!res.ok) setError(d.error ?? "Falha ao carregar dados da empresa");
         else setData(d);
-      })
-      .catch(() => setError("Falha ao carregar dados da empresa"));
+      } catch {
+        if (active) setError("Falha ao carregar dados da empresa");
+      }
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   if (error) return <Alert tone="danger">{error}</Alert>;
@@ -126,21 +134,33 @@ export default function PjView() {
           label="Contrato"
           value={<StatusBadge value={company.status} map="company" />}
           hint={`${company.contractActive ? "Operacional" : "Inoperante"} · CNPJ ${company.cnpj}`}
+          info="Status do contrato B2B com a clínica operadora."
         />
-        <StatCard label="Beneficiários" value={company.beneficiariesCount} />
-        <StatCard label="Consumo Pay Per Use" value={company.totalConsumedLabel} tone="accent" />
         <StatCard
-          label="Assinaturas ativas"
-          value={summary.activeSubscriptions}
-          hint={`${summary.openInvoicesCount} fatura(s) aberta(s)`}
+          label="Beneficiários"
+          value={company.beneficiariesCount}
+          info="Colaboradores vinculados ao plano corporativo da empresa."
+        />
+        <StatCard
+          label="Consumo Pay Per Use"
+          value={company.totalConsumedLabel}
+          tone="accent"
+          info="Soma dos procedimentos utilizados pelos beneficiários no modelo por uso."
+        />
+        <StatCard
+          label="Faturas em aberto"
+          value={summary.openInvoicesTotalLabel}
+          hint={`${summary.openInvoicesCount} fatura(s) · ${summary.activeSubscriptions} assinatura(s)`}
+          tone={summary.openInvoicesCount > 0 ? "warning" : "default"}
+          info="Valor total de faturas ainda não pagas pela empresa."
         />
       </div>
       </section>
 
       <section id="beneficiarios">
         <SectionHeader title="Beneficiários" />
-        <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
-          <table className="w-full text-left text-sm">
+        <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
+          <table className="w-full min-w-[36rem] text-left text-sm">
             <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
               <tr>
                 <th className="px-4 py-2 font-medium">Nome</th>
@@ -202,12 +222,12 @@ export default function PjView() {
         ) : (
           <ul className="mt-4 space-y-2">
             {invoices.map((inv) => (
-              <Card key={inv.id} padding="sm" className="flex items-center justify-between">
-                <span className="text-sm text-[var(--text-secondary)]">
+              <Card key={inv.id} padding="sm" className="flex flex-wrap items-center justify-between gap-2">
+                <span className="min-w-0 flex-1 text-sm text-[var(--text-secondary)]">
                   {inv.createdAtLabel} · {inv.patientName} ·{" "}
                   <StatusBadge value={inv.status} map="invoice" />
                 </span>
-                <span className="font-semibold text-[var(--text-primary)]">{inv.totalLabel}</span>
+                <span className="shrink-0 font-semibold text-[var(--text-primary)]">{inv.totalLabel}</span>
               </Card>
             ))}
           </ul>

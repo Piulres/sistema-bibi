@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { isCommunicationProviderConfigured } from "@/lib/communications/notification-service";
 import {
   listMessages,
@@ -10,7 +10,7 @@ import { isCommunicationChannel, isMessageTemplate } from "@/lib/message";
 
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("comunicacao");
     const messages = await listMessages(user.tenantId);
     const patients = await listPatientsForMessaging(user.tenantId);
     const providerConfigured = isCommunicationProviderConfigured()
@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("comunicacao");
     const body = (await request.json()) as {
       patientId?: string;
       channel?: string;

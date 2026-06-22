@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { invoiceSubscriptionCharge } from "@/lib/invoice-service";
 
 type Params = { params: Promise<{ chargeId: string }> };
 
 export async function POST(_request: Request, { params }: Params) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("subscriptions");
     const { chargeId } = await params;
 
     const result = await invoiceSubscriptionCharge({

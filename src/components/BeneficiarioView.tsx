@@ -362,7 +362,7 @@ export default function BeneficiarioView() {
         </p>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard
           label="Próximo atendimento"
           value={nextAppointment?.scheduledAtLabel ?? "Nenhum"}
@@ -371,13 +371,35 @@ export default function BeneficiarioView() {
               ? `${nextAppointment.providerName} · ${nextAppointment.reason ?? "Consulta"}`
               : undefined
           }
+          info="Data e horário da sua próxima consulta confirmada ou agendada."
         />
-        <StatCard label="Pendente (Pay Per Use)" value={summary.pendingAmountLabel} tone="warning" />
-        <StatCard label="Total faturado" value={summary.totalInvoicedLabel} tone="accent" />
+        <StatCard
+          label="Consultas"
+          value={summary.totalAppointments}
+          info="Total de consultas registradas na clínica."
+        />
+        <StatCard
+          label="Procedimentos"
+          value={summary.totalUsages}
+          info="Procedimentos Pay Per Use já utilizados."
+        />
+        <StatCard
+          label="Pendente (Pay Per Use)"
+          value={summary.pendingAmountLabel}
+          tone="warning"
+          info="Valor de procedimentos utilizados ainda não faturados."
+        />
+        <StatCard
+          label="Total faturado"
+          value={summary.totalInvoicedLabel}
+          tone="accent"
+          info="Soma das faturas já emitidas para você."
+        />
         <StatCard
           label="Assinatura"
           value={activeSubscription?.billingCycleLabel ?? "Sem plano ativo"}
           hint={activeSubscription ? `${activeSubscription.amountLabel}/ciclo` : undefined}
+          info="Plano recorrente ativo, se houver."
         />
       </div>
       </section>
@@ -447,8 +469,8 @@ export default function BeneficiarioView() {
         {overview.usages.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full text-left text-sm">
+          <div className="mt-3 overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
+            <table className="w-full min-w-[32rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Procedimento</th>

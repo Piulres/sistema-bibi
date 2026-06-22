@@ -1,0 +1,151 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
+import Card from "@/components/ui/Card";
+import StatCard from "@/components/ui/StatCard";
+import CalloutCard from "@/components/ui/CalloutCard";
+import StatusBadge from "@/components/ui/StatusBadge";
+import Button from "@/components/ui/Button";
+
+type Dashboard = {
+  generatedAtLabel: string;
+  kpis: {
+    appointmentsToday: number;
+    confirmedToday: number;
+    completedToday: number;
+    pendingToday: number;
+    teleToday: number;
+    proceduresWeek: number;
+    revenueWeekLabel: string;
+    uniquePatients: number;
+  };
+  nextAppointment: {
+    id: string;
+    patientName: string;
+    scheduledAtLabel: string;
+    status: string;
+    modality: string;
+  } | null;
+  todayQueue: {
+    id: string;
+    patientName: string;
+    scheduledAtLabel: string;
+    status: string;
+    modality: string;
+  }[];
+};
+
+export default function PrestadorDashboardView() {
+  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const res = await fetch("/api/prestador/dashboard");
+      const data = await res.json();
+      if (!active) return;
+      if (!res.ok) setError(data.error ?? "Erro ao carregar indicadores");
+      else setDashboard(data.dashboard);
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (error) return <Alert tone="danger">{error}</Alert>;
+  if (!dashboard) return <LoadingState message="Carregando indicadores..." />;
+
+  const { kpis, nextAppointment, todayQueue } = dashboard;
+
+  return (
+    <div className="space-y-8">
+      <p className="text-xs text-[var(--text-muted)]">Atualizado em {dashboard.generatedAtLabel}</p>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Atendimentos hoje"
+          value={kpis.appointmentsToday}
+          hint={`${kpis.completedToday} realizados · ${kpis.confirmedToday} confirmados`}
+          info="Consultas agendadas para hoje, exceto canceladas."
+        />
+        <StatCard
+          label="Pendentes hoje"
+          value={kpis.pendingToday}
+          tone="warning"
+          info="Agendados ou confirmados que ainda não foram marcados como realizados."
+        />
+        <StatCard
+          label="Procedimentos (semana)"
+          value={kpis.proceduresWeek}
+          tone="accent"
+          hint={kpis.revenueWeekLabel}
+          info="Procedimentos Pay Per Use registrados por você nesta semana."
+        />
+        <StatCard
+          label="Pacientes atendidos"
+          value={kpis.uniquePatients}
+          hint={kpis.teleToday > 0 ? `${kpis.teleToday} tele hoje` : undefined}
+          info="Total de pacientes distintos com consultas na sua agenda."
+        />
+      </div>
+
+      {nextAppointment ? (
+        <CalloutCard
+          title="Próximo atendimento"
+          description={`${nextAppointment.patientName} · ${nextAppointment.scheduledAtLabel}`}
+        >
+          <Link href={`/prestador/atendimento/${nextAppointment.id}`}>
+            <Button variant="portal" size="sm">
+              Abrir atendimento
+            </Button>
+          </Link>
+        </CalloutCard>
+      ) : (
+        <CalloutCard
+          title="Sem atendimentos pendentes hoje"
+          description="Confira a agenda completa ou consulte os próximos agendamentos."
+        >
+          <Link href="/prestador">
+            <Button variant="secondary" size="sm">
+              Ver agenda
+            </Button>
+          </Link>
+        </CalloutCard>
+      )}
+
+      <section>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Fila do dia</h2>
+        {todayQueue.length === 0 ? (
+          <p className="mt-3 text-sm text-[var(--text-muted)]">Nenhum atendimento para hoje.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {todayQueue.map((item) => (
+              <Card key={item.id} padding="sm" className="flex flex-wrap items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium text-[var(--text-primary)]">{item.patientName}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{item.scheduledAtLabel}</p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge value={item.status} map="appointment" />
+                  {item.modality === "TELE" && (
+                    <span className="text-xs text-[var(--portal-accent)]">Telemedicina</span>
+                  )}
+                  <Link
+                    href={`/prestador/atendimento/${item.id}`}
+                    className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                  >
+                    Atender
+                  </Link>
+                </div>
+              </Card>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
+  );
+}

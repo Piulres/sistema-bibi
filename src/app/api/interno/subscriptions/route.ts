@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   createSubscription,
   listSubscriptions,
@@ -9,7 +9,7 @@ import { isBillingCycle, isSubscriptionStatus } from "@/lib/subscription";
 
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("subscriptions");
     const subscriptions = await listSubscriptions(user.tenantId);
     const patients = await listTenantPatientsForSubscription(user.tenantId);
     return NextResponse.json({ subscriptions, patients });
@@ -20,7 +20,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("subscriptions");
     const body = (await request.json()) as {
       patientId?: string;
       companyId?: string | null;

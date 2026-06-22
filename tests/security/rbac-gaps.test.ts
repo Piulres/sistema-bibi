@@ -38,16 +38,17 @@ describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
   });
 
   it("maioria das rotas internas não usa guard de módulo", () => {
-    expect(withoutModuleGuard.length).toBeGreaterThan(10);
+    expect(withoutModuleGuard.length).toBeGreaterThan(0);
     expect(withoutModuleGuard.length).toBeLessThan(routes.length);
   });
 
-  it("lista rotas expostas a qualquer perfil INTERNO (incl. READONLY)", () => {
+  it("lista rotas ainda expostas a qualquer perfil INTERNO (incl. READONLY)", () => {
     const exposed = withoutModuleGuard.map(relativeApiPath).sort();
-    expect(exposed).toContain("/interno/billing");
+    expect(exposed).not.toContain("/interno/billing");
     expect(exposed).not.toContain("/interno/procedures");
     expect(exposed).not.toContain("/interno/patients");
-    expect(exposed).toContain("/interno/invoices/[id]/pix");
+    expect(exposed).not.toContain("/interno/invoices/[id]/pix");
+    expect(exposed).toContain("/interno/data-store");
   });
 
   it("READONLY não deveria acessar billing na matriz de permissões", () => {
@@ -70,9 +71,9 @@ describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
     expect(guarded).toContain("/interno/webhooks");
   });
 
-  it("cobertura esperada: 11 módulos × rotas sensíveis", () => {
+  it("cobertura esperada: rotas sensíveis com guard aumentou", () => {
     const guardedCount = routes.length - withoutModuleGuard.length;
     expect(INTERNO_MODULES.length).toBe(11);
-    expect(guardedCount).toBeLessThan(routes.length / 2);
+    expect(guardedCount).toBeGreaterThan(routes.length / 2);
   });
 });

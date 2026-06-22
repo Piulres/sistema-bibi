@@ -49,7 +49,13 @@ export default function FlowStepper({ steps, currentStepId, className }: Props) 
               >
                 {done ? "✓" : index + 1}
               </span>
-              <span className="hidden sm:inline">{step.label}</span>
+              <span className="max-w-[4.5rem] truncate text-[10px] sm:max-w-none sm:text-xs sm:whitespace-nowrap">
+                <span className="sm:hidden" aria-hidden>
+                  {step.label.split(" ")[0]}
+                </span>
+                <span className="hidden sm:inline">{step.label}</span>
+                <span className="sr-only sm:hidden">{step.label}</span>
+              </span>
             </span>
             {index < steps.length - 1 ? (
               <span
