@@ -98,6 +98,18 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
 - `ALLOW_DEMO_RESET` — restaurar demo na UI (padrão `true`)
 
+### Navegação SPA (layouts persistentes)
+
+| Portal | Layout | Nav | Breadcrumbs |
+|--------|--------|-----|-------------|
+| Interno | `src/app/interno/layout.tsx` | `InternoNav` — 11 abas + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
+| Prestador | `src/app/prestador/layout.tsx` | `PrestadorNav` | Atendimento (`buildAtendimentoBreadcrumbs`) |
+| PJ | `src/app/pj/layout.tsx` | `SectionNav` — 4 seções | — |
+| Beneficiário | `src/app/beneficiario/layout.tsx` | `SectionNav` — 8 seções | — |
+| Landing | — | `LandingHeader` + `LandingMobileMenu` | — |
+
+**Config:** `src/lib/navigation/routes.ts` · **Padrão:** pages só com `PageHeader` + view (não repetir `PortalShell`/`InternoNav`).
+
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
   adapters + `prisma.config.ts`). O projeto está **fixado em Prisma 6** de propósito;
@@ -120,7 +132,10 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
   Pacotes fechados: `docs/RELEASES.md`.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
-  Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
+  Ver `docs/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
+  `src/app/{interno,prestador,pj,beneficiario}/layout.tsx` — shell persistente;
+  páginas só renderizam `PageHeader` + conteúdo. Config central: `src/lib/navigation/`.
+  Componentes: `Breadcrumbs`, `SectionNav`, `MobileNavDrawer`, `NavigationProgress`.
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/JORNADA_CLIENTE.md` (jornada UX nos 4 portais), `docs/AUDITORIA_FLUXOS.md` (falhas mapeadas por portal),
   `docs/BENCHMARK.md` (posicionamento vs mercado),
   `docs/ARQUITETURA.md`, `docs/TESTES.md` (estratégia e mapa de testes automatizados),

@@ -58,7 +58,9 @@ Localizados em `src/components/ui/`:
 | `Card` | Container padrão (`.ds-card`) |
 | `Badge` | Pill de status com tons semânticos |
 | `Alert` | Mensagens info/success/warning/danger |
-| `NavTabs` | Navegação horizontal (usado em `InternoNav`) |
+| `NavTabs` | Navegação horizontal (`aria-label="Navegação por abas"`) |
+| `Breadcrumbs` | Trilha hierárquica (`Cliente 360°`, atendimento prestador) |
+| `SectionNav` | Âncoras em páginas de rota única (PJ, beneficiário) |
 
 ## Layout
 
@@ -67,24 +69,26 @@ Localizados em `src/components/ui/`:
 | `TenantTheme` | Injeta CSS variables no subtree |
 | `PortalShell` | Header + main padronizado para portais autenticados |
 | `PageHeader` | Título + descrição de página |
+| `InternoPortalShell` / `PrestadorPortalShell` / `PjPortalShell` / `BeneficiarioPortalShell` | Shell client-side persistente por portal (em `layout.tsx`) |
+| `InternoNav` | Abas internas + `MobileNavDrawer` no mobile |
+| `NavigationProgress` | Barra de progresso no topo durante troca de rota |
+| `LandingMobileMenu` | Menu hamburger da landing |
+
+Config de menus e rótulos: `src/lib/navigation/routes.ts`.
 
 ## Uso em páginas
 
 ```tsx
-// Portal autenticado
-const user = await getSessionUser();
-return (
-  <PortalShell
-    portal="interno"
-    portalLabel={PORTALS.interno.label}
-    loginPath={PORTALS.interno.loginPath}
-    userName={user.name}
-    branding={user.branding}
-  >
-    <PageHeader title="..." description="..." />
-    {/* conteúdo */}
-  </PortalShell>
-);
+// Portal interno — shell e nav vivem no layout; a page só declara conteúdo
+export default async function InternoBillingPage() {
+  await requireInternoPage("billing");
+  return (
+    <>
+      <PageHeader title="Faturamento" description="..." />
+      <BillingView />
+    </>
+  );
+}
 
 // Login / landing (sem sessão)
 const branding = await getPlatformBranding();

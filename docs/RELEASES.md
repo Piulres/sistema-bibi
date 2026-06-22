@@ -15,7 +15,8 @@ não confie em “deploy automático” para saber o que está no ar.
 | Site | ✅ **HTTP 200** — online |
 | Pacote em produção | `bibi-poc-2026-06-22c` → commit `32dad64` |
 | Deploy Netlify | `6a38b0693dfc26b5899c3be7` |
-| `main` | `46ee6b8` — **alinhada com produção** (docs pós-release) |
+| `main` | pendente merge `dev` → deploy `bibi-poc-2026-06-22d` |
+| `dev` | `08b7bca` — SPA navigation + docs jornada + CI Node 24 |
 | Validação local | `npm run pre-release` |
 
 ---
@@ -50,9 +51,23 @@ não confie em “deploy automático” para saber o que está no ar.
 
 ## Próximo pacote (pendente)
 
-*(Nenhum — `main` está alinhada com produção. Novos merges acumulam aqui antes do próximo fechamento.)*
+### `bibi-poc-2026-06-22d`
 
-### `bibi-poc-YYYY-MM-DDa` *(rascunho)*
+| Campo | Valor |
+|-------|-------|
+| **Commit alvo** | merge `dev` → `main` (`08b7bca`) |
+| **PRs desde produção** | #56 testes E2E · #58 SPA navigation · #59 jornada cliente · #60 auditoria fluxos · #61 CI Node 24 |
+| **Checklist** | `npm run pre-release` → cota OK → `deploy --prod --no-build` |
+
+**Inclui:**
+
+- Navegação SPA fluida: layouts persistentes, breadcrumbs, mobile drawer, `SectionNav` PJ/beneficiário
+- Config central `src/lib/navigation/`
+- Docs: `JORNADA_CLIENTE.md`, `AUDITORIA_FLUXOS.md`
+- CI GitHub Actions: Node 20 → 24
+- E2E: nav interno escopada (`Navegação por abas`)
+
+### `bibi-poc-YYYY-MM-DDa` *(rascunho legado — ignorar)*
 
 | Campo | Valor |
 |-------|-------|

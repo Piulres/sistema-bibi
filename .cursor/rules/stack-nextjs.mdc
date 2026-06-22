@@ -21,10 +21,12 @@ Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
 
 ## Padrões de UI
 
-- Novas páginas de portal: `PortalShell` + `PageHeader`
-- Primitivos: `src/components/ui/`
+- **Layouts por portal** (`src/app/{interno,prestador,pj,beneficiario}/layout.tsx`) — shell persistente; pages só com `PageHeader` + conteúdo
+- Menus centralizados em `src/lib/navigation/` — não duplicar hrefs/labels
+- Primitivos: `src/components/ui/` (`Breadcrumbs`, `SectionNav`, `NavTabs`)
 - Tokens: `src/app/globals.css` (`--brand-*`, `--surface-*`)
 - White label: `TenantBranding` + `TenantTheme`
+- E2E interno: escopar nav com `getByRole('navigation', { name: 'Navegação por abas' })`
 
 ## Padrões de API
 
