@@ -64,6 +64,46 @@ flowchart TB
   Sess --> DB
 ```
 
+### 1.1 Identidade visual — plataforma × tenant (v1.0.2+)
+
+O produto **Sistema Bibi** (vendor SaaS) é separado da marca de cada **clínica**
+(tenant). Três camadas de branding coexistem sem misturar leitura de tenant na
+landing comercial.
+
+```mermaid
+flowchart LR
+  subgraph Público
+    L["/ — Landing"]
+    LG["/login, /interno/login, …"]
+  end
+  subgraph Autenticado
+    P["Portais /prestador, /interno, …"]
+  end
+  L --> GP["getPlatformBranding()"]
+  LG --> GL["getLoginBrandingFromHeaders()"]
+  P --> GT["getSessionUser().branding"]
+  GP --> TB1["PLATFORM_BRANDING<br/>(fixo, sem DB)"]
+  GL --> TB2["LOGIN_PORTAL_BRANDING<br/>ou tenant por Host"]
+  GT --> TB3["TenantBranding<br/>(banco)"]
+```
+
+| Camada | Função | Origem | Arquivos |
+|--------|--------|--------|----------|
+| Plataforma | Marketing e site comercial | Constante `PLATFORM_BRANDING` | `src/lib/theme/tokens.ts`, `src/app/page.tsx` |
+| Login | Entrada pública por portal | `Host` → `tenant-resolver` ou shell neutro | `getLoginBrandingFromHeaders()`, páginas `*/login` |
+| Tenant | Portais após autenticação | `TenantBranding` no SQLite | `getTenantBranding()`, `TenantTheme`, `PortalHeader` |
+
+**Regras:**
+
+- Landing (`/`) **nunca** lê tenant do banco — só `getPlatformBranding()`.
+- Login genérico exibe **Portal da clínica** + *Powered by Sistema Bibi* (`LOGIN_PORTAL_BRANDING`).
+- Domínio customizado verificado (`TenantBranding.customDomain`) resolve o tenant no login via `resolveTenantIdFromHost()`.
+- Fallback sem registro de branding usa o **nome do tenant**, não a marca da plataforma (`tenantBrandingFallback` em `branding.ts`).
+
+Tenant demo no seed: **Clínica Horizonte** (+ **VitaCare** white label). O bootstrap de **operação** cria tenant genérico editável — ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
+Detalhes de UI, presets e APIs: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · fluxo de login: [`FLUXOS.md`](FLUXOS.md) §2.0.
+
 ---
 
 ## 2. Modelo de dados (ER)

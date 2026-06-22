@@ -82,6 +82,26 @@ flowchart TB
 
 ## 2. Autenticação e MFA
 
+### 2.0 Identidade visual (pré-login)
+
+Desde **v1.0.2**, a marca exibida **antes** da sessão depende da rota — não há
+um único “tenant default” na landing.
+
+| Rota | Marca exibida | Função |
+|------|---------------|--------|
+| `/` (landing) | **Sistema Bibi** | `getPlatformBranding()` — comercial da plataforma |
+| `/*/login` (sem domínio custom) | **Portal da clínica** + *Powered by Sistema Bibi* | `getLoginBrandingFromHeaders()` → `LOGIN_PORTAL_BRANDING` |
+| `/*/login` (domínio custom verificado) | Nome/logo do tenant | `resolveTenantIdFromHost()` → `getTenantBranding()` |
+| Portais autenticados | Marca do tenant logado | `getSessionUser().branding` + `TenantTheme` |
+
+**Implementação:** `src/lib/theme/branding.ts`, tokens em `src/lib/theme/tokens.ts`.
+
+**Demo:** após login como `dra.helena@bibi.health`, o header mostra **Clínica Horizonte**
+(tenant principal do seed). VitaCare (`operacao@vitacare.demo`) demonstra white label.
+
+**Pitfall:** confundir **Sistema Bibi** (produto) com **Clínica Horizonte** (cliente demo).
+No modo **operação**, o bootstrap cria tenant com nome genérico — ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
 ### 2.1 Login padrão
 
 **UI:** `LoginForm` em cada portal → **API:** `POST /api/auth/login`

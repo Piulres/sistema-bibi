@@ -40,6 +40,10 @@ de valores e faturamento sem perdas de informação.
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
 | **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
 
+**Identidade (v1.0.2+):** **Sistema Bibi** é a marca da plataforma (landing `/`);
+cada clínica é um tenant com branding próprio após o login (demo: **Clínica Horizonte**).
+Ver [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) e [`docs/V1_0.md`](docs/V1_0.md) § v1.0.2.
+
 ## 2. Pilares de negócio
 
 - **Pay Per Use** — cada procedimento utilizado é registrado com o preço

@@ -6,7 +6,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: alinhada à `main` pós walk-in particular, edição CRUD em Cadastros e mapa `CRUD_OPERATIONS_MAP` (27 entidades).
+Última revisão: alinhada à `main` **v1.0.2** — identidade plataforma × tenant, walk-in particular, CRUD em Cadastros (27 entidades na `dev`).
 
 ---
 
@@ -62,6 +62,17 @@ flowchart TB
 
 **Entrada pública:** landing (`/`) → seção Portais → login dedicado por perfil.
 Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
+
+### 1.1 Identidade na jornada (v1.0.2+)
+
+| Momento | O que o usuário vê | Impacto na percepção |
+|---------|-------------------|----------------------|
+| Landing `/` | Marca **Sistema Bibi** (produto SaaS) | Entende quem vende a plataforma |
+| Tela de login | **Portal da clínica** + *Powered by Sistema Bibi* | Entrada neutra; white label só com domínio custom |
+| Após login | Nome/cores do tenant (ex.: **Clínica Horizonte**, **VitaCare**) | Experiência da clínica contratante |
+| `/interno/branding` | Admin customiza logo, cores, domínio | Tenant passa a refletir identidade real |
+
+Detalhes técnicos: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · [`FLUXOS.md`](FLUXOS.md) §2.0.
 
 ---
 
