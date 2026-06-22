@@ -1,0 +1,46 @@
+---
+description: Convenções de código Next.js 16, React 19 e Prisma 6 do Sistema Bibi. Padrões de componentes, proxy, ESLint e APIs.
+globs:
+  - "src/**/*.ts"
+  - "src/**/*.tsx"
+  - "prisma/**"
+alwaysApply: false
+---
+
+# Stack — Sistema Bibi
+
+Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
+
+## Invariantes (não quebrar)
+
+- **Prisma 6** — não upgrade para 7 (`url` no datasource quebra)
+- **Proxy** — rotas em `src/proxy.ts`, não `middleware.ts`
+- **Async APIs** — `await params`, `await searchParams`, `await cookies()`
+- **SQLite** — sem enums Prisma; `role`/`status` como `String`
+- **ESLint** — sem `setState` síncrono em `useEffect`; usar IIFE assíncrona (ver `BillingView`, `AtendimentoView`)
+
+## Padrões de UI
+
+- Novas páginas de portal: `PortalShell` + `PageHeader`
+- Primitivos: `src/components/ui/`
+- Tokens: `src/app/globals.css` (`--brand-*`, `--surface-*`)
+- White label: `TenantBranding` + `TenantTheme`
+
+## Padrões de API
+
+- Validação de sessão no servidor: `src/lib/session.ts` (HMAC + role)
+- RBAC interno: `interno-permissions.ts` / `interno-guard.ts`
+- Adapters mock por padrão: `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`
+
+## Antes de finalizar PR
+
+```bash
+npm run lint
+```
+
+Se tocar em build/deploy: `npm run pre-release` (não publica).
+
+## Banco (agentes)
+
+- VM nova: `npm run db:push && npm run db:seed`
+- **Nunca** `npm run db:reset` (bloqueado / destrutivo)

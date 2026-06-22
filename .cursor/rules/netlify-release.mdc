@@ -1,0 +1,57 @@
+---
+description: Deploy, release e Netlify do Sistema Bibi. Use em tarefas de publicação, produção, cota 503, netlify.toml, CLI deploy ou pacotes fechados.
+alwaysApply: false
+---
+
+# Netlify e release — Sistema Bibi
+
+Referências: `@docs/DEPLOY_NETLIFY.md` · `@docs/RELEASES.md` · `@docs/OPERACOES.md` §5–6
+
+## Melhores práticas Netlify (POC)
+
+| Prática | Por quê | Como |
+|---------|---------|------|
+| Desligar CI contínuo | Evita build a cada push | Painel → **Stop builds** |
+| Build local primeiro | Economiza build minutes | `npm run pre-release` |
+| Deploy sem rebuild remoto | Não gasta minutos na Netlify | `npx netlify deploy --prod --no-build` |
+| Pacotes fechados | Controle do que está no ar | Atualizar `RELEASES.md` |
+| Preview só quando pedido | Evita deploys fantasma | Não rodar `netlify deploy` em agente |
+| Secrets no painel | Segurança | `SESSION_SECRET`, `CRON_SECRET` — não no git |
+| Ignorar 503 usage_exceeded | Não é regressão | Aguardar reset/upgrade do plano |
+
+## Fluxo de publicação (humano)
+
+```bash
+git checkout main && git pull
+npm run pre-release                              # lint + build local (obrigatório)
+curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
+npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
+# smoke test → atualizar docs/RELEASES.md → commit
+```
+
+> `--no-build`: usa artefatos já gerados pelo `pre-release`. Só omita se o build local falhou e o humano autorizar rebuild remoto.
+
+## O que agentes NÃO devem fazer
+
+- `npx netlify deploy --prod` ou `--trigger` sem pedido explícito
+- `curl` repetido em produção para “investigar”
+- Tratar `usage_exceeded` como bug de código
+- Habilitar auto-publish ou merge+deploy como solução
+- Atualizar `RELEASES.md` sem deploy confirmado pelo usuário
+
+## Troubleshooting (1 tentativa cada)
+
+| Sintoma | Causa | Ação |
+|---------|-------|------|
+| 503 `usage_exceeded` | Cota | Informar usuário; dev local |
+| Build Git falha | Divergência CI | Comparar com `npm run pre-release` local |
+| Prisma engine | binary target | `rhel-openssl-3.0.x` no schema |
+| Login falha pós-deploy | Secret | Verificar `SESSION_SECRET` no painel |
+
+## Convenção de pacote
+
+```
+bibi-poc-AAAA-MM-DD[a|b|c]
+```
+
+Registrar em `@docs/RELEASES.md` após cada publicação manual.

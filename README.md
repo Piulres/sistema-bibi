@@ -386,11 +386,10 @@ sistema-bibi/
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/TESTES.md`](docs/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy via CLI validado;
-  deploy Git automático ainda com falhas intermitentes — ver
-  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md) e
-  [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)).
-  Build local: `npm run netlify:build`.
+- **Netlify em produção** — https://sistema-bibi.netlify.app (pode retornar **503** por cota).
+  Pacotes fechados: [`docs/RELEASES.md`](docs/RELEASES.md). Workflow Cursor:
+  [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
+  Deploy manual apenas quando necessário — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
 
 ## 14. Documentação adicional
@@ -412,6 +411,12 @@ sistema-bibi/
   [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)
 - **Variáveis de ambiente** (app, Netlify, CI, Cursor Cloud):
   [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
+- **Pacotes fechados / releases:**
+  [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Workflow Cursor (dev sem deploy automático):**
+  [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
+- **Operações (mapa completo + regras IA):**
+  [`docs/OPERACOES.md`](docs/OPERACOES.md)
 - **Histórico do dia 21/06/2026** (PRs, deploys, commits):
   [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
 - **Evidências visuais dos fluxos** (vídeos e screenshots):

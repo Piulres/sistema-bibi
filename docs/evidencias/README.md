@@ -8,8 +8,9 @@ evidência ao código que a implementa.
 - Imagens: [`imagens/`](imagens/)
 
 > Ambiente validado: `npm install` → `cp .env.example .env` → `npm run db:push` →
-> `npm run db:seed` → `npm run lint` (limpo) → `npm run build` (ok) → `npm run dev`
-> (servidor em `http://localhost:3000`). Credenciais de demonstração em
+> `npm run db:seed` → `npm run pre-release` (lint + build Netlify, sem publicar) →
+> `npm run dev` (servidor em `http://localhost:3000`). Operações completas em
+> [`../OPERACOES.md`](../OPERACOES.md). Credenciais de demonstração em
 > [`../../AGENTS.md`](../../AGENTS.md) e [`../../README.md`](../../README.md).
 
 ---

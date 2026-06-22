@@ -10,20 +10,23 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 ---
 
-## Status atual (21–22/06/2026)
+## Status atual (22/06/2026)
 
 | Item | Estado |
 |------|--------|
-| Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
+| Site principal | ❌ **503 `usage_exceeded`** — cota Netlify esgotada (não é bug de código) |
+| Pacote em produção | `bibi-poc-2026-06-22a` → commit `beeb894` (PR #28) |
+| `main` pendente | `158b69f` (PRs #29–#39) — **não publicado** |
 | Build local `npm run netlify:build` | ✅ Passa |
-| Deploy via CLI `npx netlify deploy --prod` | ✅ Validado (PR #28) |
-| Deploy Git automático (push `main`) | ✅ Corrigido — `db.ts` não redireciona para `/tmp` no build CI |
+| Validação pré-deploy | `npm run pre-release` (lint + build, sem publicar) |
+| Deploy via CLI `npx netlify deploy --prod` | ⚠️ Só manual, quando cota permitir |
+| Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
-> O site em produção foi publicado via **CLI**. Deploys disparados por merge na `main`
-> (commits `94c0f67`, `beeb894`) falharam no build remoto — verificar logs no
-> [painel Netlify](https://app.netlify.com/projects/sistema-bibi).
+> **Pacotes fechados:** [`RELEASES.md`](RELEASES.md) · **Workflow Cursor:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Operações:** [`OPERACOES.md`](OPERACOES.md)
+>
+> Não publique a cada merge. Valide localmente e publique só quando decidir fechar um pacote.
 
 ---
 
@@ -50,7 +53,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
 4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
 5. **Publish directory** — deve ficar **vazio** no painel (Next.js runtime gerencia o output). Valor `.next` causa falhas.
-6. **Git** — deploy contínuo habilitado; se o build Git falhar, use `npx netlify deploy --prod` como fallback.
+6. **Git** — deploy contínuo **desligado** (Stop builds). Publicação só via pacote fechado — ver [`OPERACOES.md`](OPERACOES.md).
 
 ---
 
@@ -78,7 +81,10 @@ Credenciais de gateways reais: ver `docs/PAYMENTS.md` e `docs/COMMUNICATIONS.md`
 ## Comandos locais (sem publicar)
 
 ```bash
-# Validar o mesmo pipeline do CI Netlify
+# Validar pacote fechado (lint + build Netlify) — RECOMENDADO antes de publicar
+npm run pre-release
+
+# Validar só o build Netlify (mesmo pipeline do CI)
 npm run netlify:build
 
 # Emular Netlify Dev (porta 8888 → Next :3000)
@@ -104,13 +110,18 @@ npx netlify deploy --prod
 
 ---
 
-## Deploy contínuo via GitHub (opcional)
+## Deploy contínuo via GitHub (desaconselhado para POC)
 
-1. Netlify → **Add new site** → **Import an existing project** → GitHub → repo `sistema-bibi`.
-2. Build command: `npm run build:netlify` (já no `netlify.toml`).
-3. **Não** definir publish directory (Next.js runtime).
-4. Adicionar env vars acima no painel.
-5. Para evitar deploys acidentais: desativar **Auto publishing** em Deploys ou usar branch `production` apenas.
+Cada push na `main` consome **cota Netlify** e pode disparar agentes a tentar
+corrigir “produção fora”. Para este projeto, prefira **pacotes fechados**:
+
+1. Desligue builds automáticos: Netlify → **Stop builds** (ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md)).
+2. Desenvolva e valide com `npm run pre-release`.
+3. Publique manualmente: `npx netlify deploy --prod`.
+4. Registre em [`RELEASES.md`](RELEASES.md).
+
+Se ainda quiser CI Git: build command `npm run build:netlify` (já no `netlify.toml`);
+**não** definir publish directory manualmente no painel (Next.js runtime).
 
 ---
 
@@ -138,7 +149,7 @@ Configure scheduled functions ou serviço externo para chamar:
 
 | Sintoma | Causa provável | Ação |
 |---------|----------------|------|
-| `503 usage_exceeded` | Cota Netlify | Aguardar ou upgrade |
+| `503 usage_exceeded` | Cota Netlify esgotada | Aguardar reset/upgrade; dev local continua; ver `RELEASES.md` |
 | `502` / handler crash | Blobs regionais sem `primaryRegion` | Plugin `patch-regional-blobs` (PR #28) |
 | `Prisma Client could not locate Query Engine` | binary target errado | `rhel-openssl-3.0.x` no schema |
 | Build Git exit code 2 | Divergência build remoto vs local | Comparar log Netlify com `npm run netlify:build` |

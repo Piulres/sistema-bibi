@@ -19,7 +19,11 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
-**Produção:** https://sistema-bibi.netlify.app
+**Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
+(cota Netlify). Último pacote no ar: `bibi-poc-2026-06-22a` (`beeb894`). Ver `docs/RELEASES.md`.
+**Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
+Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
+**Preferências IA:** `AGENTS.md` (esta seção) + `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/HISTORICO_2026-06-21.md`
 
@@ -55,6 +59,31 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; habilitado por padrão via `ALLOW_DEMO_RESET=true`).
+### Operações e preferências de IA
+
+**Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:**
+`.cursor/rules/operacoes-bibi.mdc` (core) · `netlify-release.mdc` (deploy) · `stack-nextjs.mdc` (código)
+
+| Operação | Comando | Agente pode? |
+|----------|---------|--------------|
+| Desenvolver | `npm run dev` | ✅ Sim |
+| Emular Netlify | `npm run netlify:dev` | ✅ Sim |
+| Lint | `npm run lint` | ✅ Sim |
+| Validar pacote | `npm run pre-release` | ✅ Sim (não publica) |
+| Setup banco VM nova | `db:push && db:seed` | ✅ Sim |
+| Reset banco | `npm run db:reset` | ❌ Bloqueado |
+| Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
+| Atualizar release | `docs/RELEASES.md` | ❌ Só após deploy confirmado |
+
+**Modelo:** pacotes fechados — `main` acumula código; produção muda só com deploy manual humano.
+
+**503 `usage_exceeded`:** cota Netlify, não bug. Não investigar em loop nem redeployar automaticamente.
+
+**Árvore rápida:**
+- Feature/bug → dev local + lint
+- Validar release → `pre-release`
+- Produção fora → `curl` uma vez; se `usage_exceeded`, avisar usuário
+- Publicar → só com pedido explícito; seguir `OPERACOES.md` §5
 
 ### Variáveis de ambiente relevantes (`.env.example`)
 
@@ -83,9 +112,12 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
-- **Netlify:** config em `netlify.toml`; build com `npm run netlify:build`; ver
-  `docs/DEPLOY_NETLIFY.md`. Site linkado na CLI pode retornar `503 usage_exceeded`
-  se a cota estiver esgotada.
+- **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
+  build CI em `npm run netlify:build`; ver `docs/DEPLOY_NETLIFY.md` e `docs/WORKFLOW_CURSOR.md`.
+  Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.
+- **Política de deploy (agentes):** **NUNCA** executar `netlify deploy --prod` nem investigar produção
+  em loop, salvo pedido explícito do usuário. Testar com `npm run dev` / `npm run pre-release`.
+  Pacotes fechados: `docs/RELEASES.md`.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
@@ -94,3 +126,7 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
   `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/VARIAVEIS_AMBIENTE.md` (mapa de env vars, CI, Netlify e Cursor),
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
+  `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
+  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
+  `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
+  `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).

@@ -1,0 +1,65 @@
+---
+description: Operações Sistema Bibi — pacotes fechados, economia de tokens/cota, deploy só manual. Ativa em tarefas de infra, release, produção ou Netlify.
+alwaysApply: true
+---
+
+# Operações Sistema Bibi
+
+Fonte canônica: `@docs/OPERACOES.md` · Pacotes: `@docs/RELEASES.md` · Workflow: `@docs/WORKFLOW_CURSOR.md`
+
+## Princípios (melhores práticas)
+
+1. **Referência, não duplicação** — detalhes em `docs/`, não reinventar em chat.
+2. **Token budget** — uma verificação de produção (`curl`); sem loops de debug remoto.
+3. **Build local, publish raro** — validar com `pre-release`; publicar só humano.
+4. **Escopo mínimo** — mudanças focadas; não alterar deploy/infra sem pedido.
+5. **Escalar ao usuário** — cota esgotada, deploy ou secrets → informar, não improvisar.
+
+## Modelo: pacotes fechados
+
+```
+dev local → lint → pre-release → merge main → [humano] deploy manual → RELEASES.md
+```
+
+`main` à frente de produção é **normal**. Produção ≠ último commit.
+
+## Matriz rápida — o que fazer
+
+| Pedido | Ação do agente | Proibido |
+|--------|----------------|----------|
+| Feature / bugfix | `npm run dev`, testar local, `npm run lint` | deploy |
+| Validar release | `npm run pre-release` | deploy |
+| Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
+| Publicar | Só com pedido explícito; seguir `@docs/OPERACOES.md` §5 | deploy autônomo |
+| Pós-deploy | Atualizar `@docs/RELEASES.md` | marcar publicado sem confirmação |
+
+## Comandos
+
+**Permitidos:** `dev`, `netlify:dev`, `lint`, `build`, `pre-release`, `db:push && db:seed`
+
+**Proibidos (salvo pedido explícito):** `netlify deploy` (qualquer), `db:reset`, `netlify deploy --trigger`, loops em produção
+
+## Produção
+
+- URL: https://sistema-bibi.netlify.app
+- `503` + `usage_exceeded` = **cota Netlify**, não bug — dev local continua
+- Pacote no ar: `@docs/RELEASES.md` (`bibi-poc-2026-06-22a` @ `beeb894`)
+
+## Netlify — economia de cota (resumo)
+
+- **Stop builds** no painel — não depender de CI em cada push
+- Validar: `npm run pre-release` (build local)
+- Publicar (humano): `npx netlify deploy --prod --no-build` após build local OK
+- Secrets (`SESSION_SECRET`, `CRON_SECRET`) só no painel — nunca commitar
+- Detalhes: `@.cursor/rules/netlify-release.mdc`
+
+## Stack — invariantes
+
+- Next.js 16, React 19, Prisma **6** (não v7)
+- Proxy em `src/proxy.ts` (não `middleware.ts`)
+- `await` em `params`, `searchParams`, `cookies()`
+- Detalhes de código: `@.cursor/rules/stack-nextjs.mdc`
+
+## Credenciais demo
+
+Senha `bibi123` — e-mails em `@AGENTS.md`

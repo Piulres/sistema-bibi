@@ -8,6 +8,7 @@
     "build:netlify": "node scripts/netlify-build.mjs",
     "netlify:build": "npm run build:netlify",
     "netlify:dev": "netlify dev",
+    "pre-release": "node scripts/pre-release.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

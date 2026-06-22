@@ -10,6 +10,8 @@ e são renderizados automaticamente no GitHub.
 > **Evidências visuais** (vídeos/screenshots): [`evidencias/README.md`](evidencias/README.md)
 >
 > **Deploy Netlify:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) · produção: https://sistema-bibi.netlify.app
+>
+> **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](RELEASES.md)
 
 ---
 
