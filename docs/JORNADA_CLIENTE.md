@@ -343,7 +343,7 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 | [`BENCHMARK.md`](BENCHMARK.md) | Posicionamento vs iClinic/Feegow/ERPMed |
 | [`PAYMENTS.md`](PAYMENTS.md) | Motor PIX e ciclo de cobrança |
 | [`COMMUNICATIONS.md`](COMMUNICATIONS.md) | Lembretes e fila de mensagens |
-| [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens) |
+| [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens, navegação responsiva) |
 | [`evidencias/README.md`](evidencias/README.md) | Screenshots e vídeos dos fluxos validados |
 | [`OPERACOES.md`](OPERACOES.md) | Quando atualizar esta documentação |
 
