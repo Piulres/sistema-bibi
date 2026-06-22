@@ -75,11 +75,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("Criando tenant...");
   const tenant = await prisma.tenant.create({
     data: {
-      name: "Clínica Bibi Saúde",
+      name: "Clínica Horizonte",
       cnpj: "12.345.678/0001-90",
       branding: {
         create: {
-          displayName: "Clínica Bibi Saúde",
+          displayName: "Clínica Horizonte",
           tagline: "Cuidado humanizado com gestão inteligente",
           primaryColor: "#0d9488",
           accentColor: "#14b8a6",

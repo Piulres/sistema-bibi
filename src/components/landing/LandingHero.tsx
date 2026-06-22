@@ -41,8 +41,8 @@ export default function LandingHero({ branding }: Props) {
         </p>
 
         <p className="landing-fade-in mt-4 max-w-2xl text-sm text-white/65">
-          Cada tenant opera com marca própria — logo, cores e domínio — sobre a
-          infraestrutura {branding.platformLabel}.
+          Cada clínica cliente opera com marca própria — logo, cores e domínio —
+          sobre a infraestrutura {branding.displayName}.
         </p>
 
         <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
