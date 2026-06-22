@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (4)    │  Playwright — fluxos reais no browser
+                    │  E2E (5)    │  Playwright — fluxos reais no browser
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -101,6 +101,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | scrypt hash/verify | ✅ `password.test.ts` |
 | Login API (portal, credenciais) | ✅ `auth-and-cron.test.ts` |
 | MFA TOTP + challenge HMAC | ✅ `mfa-tokens.test.ts` |
+| Demo reset (flag, RBAC, confirmação) | ✅ `demo-reset.test.ts` |
 | Cookie session HMAC | ⚠️ indireto via MFA (mesmo algoritmo) |
 | Logout / me | ❌ |
 
@@ -173,9 +174,24 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
+# Lint + test + build (recomendado antes de PR — espelha CI Vitest + build)
 npm run lint && npm run test && npm run build
+
+# Validar pacote Netlify (NÃO roda testes — ver OPERACOES.md)
+npm run pre-release
 ```
+
+### `pre-release` vs CI
+
+| | `npm run pre-release` | GitHub Actions CI |
+|--|----------------------|-------------------|
+| Lint | ✅ | ✅ |
+| Vitest | ❌ | ✅ |
+| `next build` | via `netlify:build` | ✅ |
+| Playwright | ❌ | ✅ (job separado) |
+| Node | local | 20 |
+
+Node na Netlify: **22** (`netlify.toml`). Divergência intencional — validar localmente com a versão do ambiente alvo quando possível.
 
 ### Variáveis em testes
 

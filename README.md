@@ -130,7 +130,7 @@ Base local: **`http://localhost:3000`**
 
 ## 6. Credenciais de demonstração
 
-Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`**
+Criadas automaticamente pelo seed — ver [`docs/SEED.md`](docs/SEED.md). Senha única: **`bibi123`**
 (armazenada com hash **scrypt** — ver `src/lib/password.ts`).
 
 | Portal | URL de login | E-mail | Senha |
@@ -138,8 +138,11 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Prestador | `/login` | `dra.helena@bibi.health` | `bibi123` |
 | Interno (admin) | `/interno/login` | `faturamento@bibi.health` | `bibi123` |
 | Interno (recepção) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
+| Interno (MFA demo) | `/interno/login` | `seguranca@bibi.health` | `bibi123` + TOTP |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
+| VitaCare (interno) | `/interno/login` | `operacao@vitacare.demo` | `bibi123` |
+| VitaCare (PJ) | `/pj/login` | `rh@vitacarecorp.demo` | `bibi123` |
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
@@ -318,7 +321,13 @@ curl -b cookies.txt http://localhost:3000/api/prestador/agenda
 sistema-bibi/
 ├── prisma/
 │   ├── schema.prisma        # modelo de dados (multi-tenant + Pay Per Use)
-│   └── seed.ts              # dados de demonstração
+│   ├── seed.ts              # wrapper CLI → seed-data/run-seed.ts
+│   └── seed-data/           # massa modular (empresas, VitaCare, escala)
+├── e2e/                     # testes Playwright (smoke)
+├── tests/                   # Vitest (unit, security, integration, api)
+├── scripts/
+│   ├── netlify-build.mjs    # pipeline build Netlify
+│   └── pre-release.mjs      # lint + netlify:build
 ├── src/
 │   ├── app/
 │   │   ├── api/             # Route Handlers (backend)
@@ -334,10 +343,16 @@ sistema-bibi/
 │   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
 │   │   ├── pj/              # /pj e /pj/login
 │   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
+│   │   ├── sitemap.ts       # SEO
+│   │   ├── robots.ts        # SEO
 │   │   ├── layout.tsx       # layout raiz (pt-BR)
 │   │   └── page.tsx         # landing page
-│   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, invoice-service, webhooks, MFA…
+│   ├── components/
+│   │   ├── landing/         # seções da landing pública
+│   │   └── ui/              # primitivos do design system
+│   ├── lib/
+│   │   ├── landing/         # copy e URL canônica (SEO)
+│   │   └── …                # db, sessão, invoice-service, webhooks, MFA…
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md
@@ -396,6 +411,8 @@ sistema-bibi/
 
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/FLUXOS.md`](docs/FLUXOS.md)
+- **Seed e massa demo** (50 PJ, VitaCare, escala, restaurar demo):
+  [`docs/SEED.md`](docs/SEED.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):

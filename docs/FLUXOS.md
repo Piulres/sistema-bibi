@@ -71,8 +71,12 @@ flowchart TB
 | Interno (recepção) | `/interno/login` | `recepcao@bibi.health` | `bibi123` |
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
+| Interno (MFA demo) | `/interno/login` | `seguranca@bibi.health` | `bibi123` + TOTP |
+| VitaCare (interno) | `/interno/login` | `operacao@vitacare.demo` | `bibi123` |
+| VitaCare (PJ) | `/pj/login` | `rh@vitacarecorp.demo` | `bibi123` |
+| VitaCare (prestador) | `/login` | `dr.silva@vitacare.demo` | `bibi123` |
 
----
+Massa completa e escala: [`SEED.md`](SEED.md).
 
 ## 2. Autenticação e MFA
 
@@ -133,6 +137,38 @@ Quando `User.mfaEnabled = true`:
 | Ativar | `{ action: "enable", secret, code }` | Grava secret, `mfaEnabled=true` |
 | Desativar | `{ action: "disable", code }` | Limpa MFA |
 
+### 2.3 Restaurar modo demo
+
+**UI:** `/interno/seguranca` → `DemoResetCard` (abaixo do MFA)  
+**API:** `GET|POST /api/interno/demo/reset`  
+**Código:** `src/lib/demo-reset.ts` · seed compartilhado: `prisma/seed-data/run-seed.ts`
+
+```mermaid
+sequenceDiagram
+  participant A as Admin interno
+  participant UI as DemoResetCard
+  participant API as POST /api/interno/demo/reset
+  participant DB as runDatabaseSeed()
+
+  A->>UI: Digita RESTAURAR
+  UI->>API: { confirm: "RESTAURAR" }
+  API->>API: Verifica ALLOW_DEMO_RESET + ADMIN
+  API->>DB: Wipe + seed completo
+  API-->>UI: { logoutRequired: true }
+  UI->>A: Redirect /interno/login
+```
+
+| Resposta | Status | Motivo |
+|----------|--------|--------|
+| Reset OK | 200 | `{ logoutRequired: true, result: SeedRunResult }` |
+| Confirmação inválida | 400 | Frase diferente de `RESTAURAR` |
+| Flag desligada | 403 | `ALLOW_DEMO_RESET` off (padrão em production) |
+| Não é ADMIN | 403 | Perfil sem permissão |
+| Já em andamento | 409 | Mutex em memória |
+
+> Em produção, defina `ALLOW_DEMO_RESET=true` no painel Netlify para habilitar o botão.
+> Detalhes: [`SEED.md`](SEED.md) · [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) §3.
+
 ---
 
 ## 3. Portal Prestador
@@ -189,7 +225,7 @@ flowchart LR
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
-| `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
+| `seguranca` | `/interno/seguranca` | `SecurityView` + `DemoResetCard` | MFA TOTP + restaurar demo |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.

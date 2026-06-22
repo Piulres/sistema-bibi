@@ -16,7 +16,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 |------|--------|
 | Site principal | ❌ **503 `usage_exceeded`** — cota Netlify esgotada (não é bug de código) |
 | Pacote em produção | `bibi-poc-2026-06-22a` → commit `beeb894` (PR #28) |
-| `main` pendente | `158b69f` (PRs #29–#39) — **não publicado** |
+| `main` pendente | `92348ba` (PRs #29–#46) — **não publicado** |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Validação pré-deploy | `npm run pre-release` (lint + build, sem publicar) |
 | Deploy via CLI `npx netlify deploy --prod` | ⚠️ Só manual, quando cota permitir |
@@ -70,7 +70,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | `COMMUNICATION_PROVIDER` | Não | `console` (POC) ou `sendgrid`/`twilio`/`meta` |
 | `TELEMEDICINE_BASE_URL` | Não | URL base das salas virtuais mock |
 | `SEED_SCALE` | Não | `medium` — volume do seed no build |
-| `ALLOW_DEMO_RESET` | Não | `true` — botão restaurar demo na UI |
+| `ALLOW_DEMO_RESET` | Não | off em production por padrão — `true`/`1` para habilitar botão restaurar demo |
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 
@@ -84,12 +84,26 @@ Credenciais de gateways reais: ver `docs/PAYMENTS.md` e `docs/COMMUNICATIONS.md`
 # Validar pacote fechado (lint + build Netlify) — RECOMENDADO antes de publicar
 npm run pre-release
 
-# Validar só o build Netlify (mesmo pipeline do CI)
+# Validar só o build Netlify (pipeline de produção)
 npm run netlify:build
 
 # Emular Netlify Dev (porta 8888 → Next :3000)
 npm run netlify:dev
 ```
+
+### Dois pipelines de validação
+
+| | GitHub Actions (`.github/workflows/ci.yml`) | Netlify (`npm run pre-release`) |
+|--|---------------------------------------------|--------------------------------|
+| Objetivo | Qualidade de código + smoke E2E | Pacote deployável |
+| Lint | ✅ | ✅ |
+| Vitest | ✅ | ❌ |
+| `next build` | ✅ | ✅ (via `netlify:build`) |
+| `db:push` + seed | job E2E apenas | ✅ no build |
+| Playwright | ✅ | ❌ |
+| Node | 20 | 22 (`netlify.toml`) |
+
+O script [`scripts/netlify-build.mjs`](../scripts/netlify-build.mjs) grava um `.env` temporário na raiz do projeto (gitignored) com `DATABASE_URL` absoluto — necessário para workers Next.js herdarem a variável durante o build.
 
 ---
 

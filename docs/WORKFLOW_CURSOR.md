@@ -9,14 +9,15 @@ na Netlify a cada tarefa. Produção é atualizada só quando você fecha um
 ## Resumo em 30 segundos
 
 ```
-Desenvolver → testar local → npm run pre-release → (você decide) → deploy manual
+Desenvolver → testar local → lint + test → pre-release → (você decide) → deploy manual
 ```
 
 | Fase | Onde | Comando / ação |
 |------|------|----------------|
 | Codar | Cursor | branches `cursor/*` |
 | Testar | localhost | `npm run dev` ou `npm run netlify:dev` |
-| Validar pacote | máquina local | `npm run pre-release` |
+| Validar código | máquina local | `npm run lint && npm run test` |
+| Validar pacote Netlify | máquina local | `npm run pre-release` |
 | Publicar | **só você** | `npx netlify deploy --prod` |
 | Registrar | git | atualizar `docs/RELEASES.md` |
 
@@ -66,6 +67,16 @@ Senha única: **`bibi123`**. Portais e e-mails em [`README.md`](../README.md) e 
 
 Evidências gravadas: [`evidencias/`](evidencias/).
 
+### Testes automatizados
+
+```bash
+npm run test          # Vitest — roda no CI a cada push/PR
+npm run test:e2e      # Playwright — smoke dos portais (opcional local)
+```
+
+> `pre-release` **não** executa testes — só lint + `netlify:build`. Rode `npm run test` antes do PR.
+> Mapa completo: [`TESTES.md`](TESTES.md).
+
 ---
 
 ## Validar pacote (sem publicar)
@@ -77,7 +88,9 @@ npm run pre-release
 Executa, em sequência:
 
 1. `npm run lint`
-2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+2. `npm run netlify:build` (db:push + seed + `next build` — pipeline Netlify)
+
+**Não inclui:** `npm run test` nem Playwright E2E (esses rodam no CI GitHub).
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 

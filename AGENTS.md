@@ -58,7 +58,7 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
-**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; habilitado por padrão via `ALLOW_DEMO_RESET=true`).
+**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; habilitado fora de `production` — em produção exige `ALLOW_DEMO_RESET=true`). Ver `docs/SEED.md`.
 ### Operações e preferências de IA
 
 **Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:**
@@ -96,7 +96,7 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 - `CRON_SECRET` — jobs `/api/cron/*`
 - `TELEMEDICINE_BASE_URL` — salas de telemedicina mock
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
-- `ALLOW_DEMO_RESET` — restaurar demo na UI (padrão `true`)
+- `ALLOW_DEMO_RESET` — restaurar demo na UI (off em production por padrão)
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
