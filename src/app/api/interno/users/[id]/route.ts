@@ -15,6 +15,7 @@ export async function PATCH(request: Request, { params }: Params) {
       role?: string;
       companyId?: string | null;
       patientId?: string | null;
+      internoProfile?: string | null;
     };
 
     const result = await updateUser({

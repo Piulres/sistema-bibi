@@ -14,6 +14,7 @@ export type PatientListView = {
   id: string;
   name: string;
   cpf: string;
+  birthDate: string;
   birthDateLabel: string;
   phone: string | null;
   companyId: string | null;
@@ -33,6 +34,7 @@ function mapPatient(p: {
     id: p.id,
     name: p.name,
     cpf: p.cpf,
+    birthDate: p.birthDate.toISOString().slice(0, 10),
     birthDateLabel: dateOnly(p.birthDate),
     phone: p.phone,
     companyId: p.companyId,
