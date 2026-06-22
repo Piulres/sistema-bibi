@@ -40,6 +40,7 @@ flowchart LR
 | Desenvolver feature | Diário | Cursor | `npm run dev` |
 | Emular Netlify local | Quando usar Blobs | Humano | `npm run netlify:dev` |
 | Lint | Antes de PR | Agente | `npm run lint` |
+| Testes automatizados | Antes de PR | Agente | `npm run test` (ver §3) |
 | Validar pacote | Antes de release | Humano ou agente | `npm run pre-release` |
 | Publicar produção | **Raro** | **Só humano** | §5 · `DEPLOY_NETLIFY.md` |
 | Fechar pacote | Após deploy | Humano | `RELEASES.md` § Publicar |
@@ -76,6 +77,10 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run dev` | Next.js dev server (:3000) | Desenvolvimento diário |
 | `npm run netlify:dev` | Netlify Dev (:8888 → :3000) | Testar Blobs, headers, proxy |
 | `npm run lint` | ESLint | Antes de PR |
+| `npm run test` | Vitest (unit, security, integration, API) | Antes de PR — **roda no CI** |
+| `npm run test:watch` | Vitest em modo watch | Desenvolvimento de testes |
+| `npm run test:e2e` | Playwright (browser) | Smoke dos portais — job E2E no CI |
+| `npm run test:coverage` | Vitest + cobertura | Análise pontual |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
 | `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
@@ -83,7 +88,22 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
----
+### `pre-release` vs CI GitHub
+
+Os dois pipelines **não são idênticos**:
+
+| Etapa | `npm run pre-release` | CI (`.github/workflows/ci.yml`) |
+|-------|----------------------|----------------------------------|
+| ESLint | ✅ | ✅ |
+| Vitest (`npm run test`) | ❌ | ✅ |
+| `next build` | via `netlify:build` | ✅ |
+| `db:push` + seed | via `netlify:build` | só no job E2E |
+| Playwright E2E | ❌ | ✅ (job separado) |
+| Node | local (recomendado 22) | 20 (unit) / 20 (e2e) |
+
+**Recomendação:** antes de abrir PR, rode `npm run lint && npm run test`. Use `pre-release` para validar o pacote Netlify (build com seed).
+
+Detalhes: [`TESTES.md`](TESTES.md) · [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 
 ## 4. Operações de desenvolvimento
 
@@ -91,7 +111,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 1. Branch: `cursor/<descricao>-3ecd` (Cloud Agent) ou feature local.
 2. Codar e testar com `npm run dev`.
-3. `npm run lint` antes de abrir PR.
+3. `npm run lint && npm run test` antes de abrir PR.
 4. **Não** incluir deploy na PR — merge na `main` não publica produção.
 
 ### 4.2 Testar fluxos localmente
@@ -114,6 +134,21 @@ Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos det
 | VM nova / sem `dev.db` | `npm run db:push && npm run db:seed` |
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
+
+### 4.4 Restaurar modo demo (UI)
+
+Alternativa não destrutiva ao `db:reset` — repopula via `runDatabaseSeed()` (mesmo fluxo do seed).
+
+| Item | Valor |
+|------|-------|
+| Onde | `/interno/seguranca` → card “Restaurar estado original do seed” |
+| Quem | Interno com `internoProfile=ADMIN` |
+| Flag | `ALLOW_DEMO_RESET` — off em production por padrão |
+| Confirmação | Digitar `RESTAURAR` |
+| API | `GET|POST /api/interno/demo/reset` |
+| Após reset | Logout automático — IDs de sessão e registros mudam |
+
+Arquitetura do seed: [`SEED.md`](SEED.md) · Fluxo: [`FLUXOS.md`](FLUXOS.md) §2.3
 
 ---
 
@@ -190,6 +225,7 @@ Detalhes também em `AGENTS.md`.
 | Ler `AGENTS.md` e `docs/OPERACOES.md` | Contexto do projeto |
 | `npm run dev` / testes locais | Validar sem custo |
 | `npm run lint` antes de finalizar | Qualidade |
+| `npm run test` antes de PR | Espelha job Vitest do CI |
 | `npm run pre-release` se pedirem “validar release” | Sem publicar |
 | Usar `db:push && db:seed` em VM nova | `db:reset` é bloqueado |
 | Consultar `RELEASES.md` para saber o que está em produção | Fonte única |
@@ -232,6 +268,7 @@ Pedido de validação
 | Fechar pacote em produção | `docs/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
+| Seed / massa demo | `SEED.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
 | Base RAG / NotebookLM | `NOTEBOOKLM.md` |
 | Auditoria de PRs/deploys | `HISTORICO_2026-06-21.md` ou novo histórico datado |
@@ -259,6 +296,8 @@ Pedido de validação
 | [`RELEASES.md`](RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |
 | [`FLUXOS.md`](FLUXOS.md) | Fluxos de negócio |
+| [`SEED.md`](SEED.md) | Massa demo, escala, VitaCare, restaurar demo |
+| [`TESTES.md`](TESTES.md) | Testes automatizados |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](evidencias/README.md) | Vídeos e screenshots |
 | [`AGENTS.md`](../AGENTS.md) | Instruções para IA |

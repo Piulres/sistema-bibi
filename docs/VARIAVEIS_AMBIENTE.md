@@ -34,9 +34,9 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `COMMUNICATION_PROVIDER` | Não | `console` (dev) | E-mail / SMS / WhatsApp |
 | `CRON_SECRET` | Sim (cron) | — | Jobs `/api/cron/*` |
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
-| `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
+| `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / fallback produção | SEO, sitemap, Open Graph |
 | `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
-| `ALLOW_DEMO_RESET` | Não | `true` | Botão restaurar demo na UI |
+| `ALLOW_DEMO_RESET` | Não | habilitado em dev; **off em prod** | Botão restaurar demo na UI |
 | `NETLIFY` | Auto | `true` no deploy | Detecção de ambiente Netlify |
 
 ---
@@ -95,23 +95,32 @@ Usadas por `prisma/seed.ts`, `prisma/seed-data/run-seed.ts` e `src/lib/demo-rese
 | **Padrão** | `medium` |
 | **Valores** | `small` \| `medium` \| `large` |
 | **Efeito** | Volume de agendamentos, mensagens, assinaturas e tenant VitaCare |
+| **Não afeta** | Número de empresas PJ (fixo em 50) — ver [`SEED.md`](SEED.md) |
 
 ```env
 SEED_SCALE=medium
 ```
 
+Presets completos: [`SEED.md`](SEED.md) § O que `SEED_SCALE` controla.
+
 ### `ALLOW_DEMO_RESET`
 
 | | |
 |---|---|
-| **Padrão** | `true` (habilitado se ausente) |
-| **Desligar** | `false` ou `0` |
+| **Padrão se ausente** | Habilitado em `development`/`test`; **desabilitado em `production`** |
+| **Forçar ligado** | `true` ou `1` (necessário em produção para usar a UI) |
+| **Forçar desligado** | `false` ou `0` |
 | **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
-| **API** | `POST /api/interno/demo/reset` (body: `{ "confirm": "RESTAURAR" }`) |
+| **API** | `GET|POST /api/interno/demo/reset` (body POST: `{ "confirm": "RESTAURAR" }`) |
 | **Permissão** | Somente interno **ADMIN** |
+| **Implementação** | `src/lib/demo-reset.ts` |
 
 ```env
+# Local / demo compartilhada — opcional (já habilitado fora de production)
 ALLOW_DEMO_RESET=true
+
+# Produção Netlify — só definir se quiser o botão no ar
+# ALLOW_DEMO_RESET=true
 ```
 
 ---
@@ -181,7 +190,7 @@ META_WHATSAPP_TOKEN=
 |---|---|
 | **Exposta ao browser** | Sim (prefixo `NEXT_PUBLIC_`) |
 | **Onde** | `src/lib/landing/site-url.ts` |
-| **Fallback** | `process.env.URL` (Netlify injeta automaticamente) → `VERCEL_URL` → `http://localhost:3000` |
+| **Fallback** | `URL` (Netlify) → `VERCEL_URL` → `https://sistema-bibi.netlify.app` |
 
 ```env
 NEXT_PUBLIC_SITE_URL=https://sistema-bibi.netlify.app
@@ -284,7 +293,7 @@ O repositório **não define** variáveis `CURSOR_*` no código. O ambiente **Cu
 |-------|---------|
 | `db:reset` / `prisma migrate` destrutivo | Aborta com prompt de consentimento |
 | Setup recomendado | `db:push` + `db:seed` |
-| Restaurar demo via UI | `ALLOW_DEMO_RESET=true` + login admin em `/interno/seguranca` |
+| Restaurar demo via UI | `ALLOW_DEMO_RESET=true` em production + login ADMIN em `/interno/seguranca` (fora de production: habilitado por padrão) |
 | Branches CI | `cursor/**` disparam workflow (ver `ci.yml`) |
 
 ### Variáveis típicas na VM Cursor (mesmas do dev local)
