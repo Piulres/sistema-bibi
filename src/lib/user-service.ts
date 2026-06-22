@@ -5,6 +5,8 @@ import { ROLES } from "@/lib/roles";
 import { isInternoProfile } from "@/lib/interno-permissions";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 
+export { COUNCIL_TYPES } from "@/lib/cadastro-constants";
+
 export const ASSIGNABLE_ROLES = [
   ROLES.PRESTADOR,
   ROLES.INTERNO,
@@ -16,6 +18,14 @@ export function isAssignableRole(value: string): boolean {
   return (ASSIGNABLE_ROLES as readonly string[]).includes(value);
 }
 
+export type UserProfessionalFields = {
+  phone?: string | null;
+  councilType?: string | null;
+  councilNumber?: string | null;
+  councilUf?: string | null;
+  specialty?: string | null;
+};
+
 export type UserListView = {
   id: string;
   email: string;
@@ -24,7 +34,17 @@ export type UserListView = {
   internoProfile: string | null;
   companyId: string | null;
   patientId: string | null;
+  phone: string | null;
+  councilType: string | null;
+  councilNumber: string | null;
+  councilUf: string | null;
+  specialty: string | null;
 };
+
+function trimOrNull(value: string | null | undefined): string | null {
+  const v = value?.trim();
+  return v || null;
+}
 
 function mapUser(u: {
   id: string;
@@ -34,6 +54,11 @@ function mapUser(u: {
   internoProfile: string | null;
   companyId: string | null;
   patientId: string | null;
+  phone: string | null;
+  councilType: string | null;
+  councilNumber: string | null;
+  councilUf: string | null;
+  specialty: string | null;
 }): UserListView {
   return {
     id: u.id,
@@ -43,7 +68,32 @@ function mapUser(u: {
     internoProfile: u.internoProfile,
     companyId: u.companyId,
     patientId: u.patientId,
+    phone: u.phone,
+    councilType: u.councilType,
+    councilNumber: u.councilNumber,
+    councilUf: u.councilUf,
+    specialty: u.specialty,
   };
+}
+
+function professionalData(fields: UserProfessionalFields) {
+  return {
+    phone: fields.phone === undefined ? undefined : trimOrNull(fields.phone),
+    councilType: fields.councilType === undefined ? undefined : trimOrNull(fields.councilType),
+    councilNumber: fields.councilNumber === undefined ? undefined : trimOrNull(fields.councilNumber),
+    councilUf: fields.councilUf === undefined ? undefined : trimOrNull(fields.councilUf)?.toUpperCase(),
+    specialty: fields.specialty === undefined ? undefined : trimOrNull(fields.specialty),
+  };
+}
+
+function validateRoleLinks(role: string, companyId?: string | null, patientId?: string | null) {
+  if (role === ROLES.PJ && !companyId) {
+    return { error: "Usuário PJ precisa de empresa vinculada" as const };
+  }
+  if (role === ROLES.BENEFICIARIO && !patientId) {
+    return { error: "Usuário beneficiário precisa de paciente vinculado" as const };
+  }
+  return null;
 }
 
 export async function listUsers(tenantId: string): Promise<UserListView[]> {
@@ -54,17 +104,19 @@ export async function listUsers(tenantId: string): Promise<UserListView[]> {
   return rows.map(mapUser);
 }
 
-export async function createUser(input: {
-  tenantId: string;
-  email: string;
-  password: string;
-  name: string;
-  role: string;
-  companyId?: string | null;
-  patientId?: string | null;
-  internoProfile?: string | null;
-  createdBy: string;
-}) {
+export async function createUser(
+  input: {
+    tenantId: string;
+    email: string;
+    password: string;
+    name: string;
+    role: string;
+    companyId?: string | null;
+    patientId?: string | null;
+    internoProfile?: string | null;
+    createdBy: string;
+  } & UserProfessionalFields,
+) {
   if (!isAssignableRole(input.role)) {
     return { error: "Perfil inválido" as const };
   }
@@ -73,16 +125,12 @@ export async function createUser(input: {
     return { error: "Perfil interno inválido" as const };
   }
 
+  const linkError = validateRoleLinks(input.role, input.companyId, input.patientId);
+  if (linkError) return linkError;
+
   const email = input.email.toLowerCase().trim();
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) return { error: "E-mail já cadastrado" as const };
-
-  if (input.role === ROLES.PJ && !input.companyId) {
-    return { error: "Usuário PJ precisa de empresa vinculada" as const };
-  }
-  if (input.role === ROLES.BENEFICIARIO && !input.patientId) {
-    return { error: "Usuário beneficiário precisa de paciente vinculado" as const };
-  }
 
   const user = await prisma.user.create({
     data: {
@@ -91,10 +139,10 @@ export async function createUser(input: {
       password: hashPassword(input.password),
       name: input.name.trim(),
       role: input.role,
-      internoProfile:
-        input.role === ROLES.INTERNO ? (input.internoProfile ?? null) : null,
-      companyId: input.companyId ?? null,
-      patientId: input.patientId ?? null,
+      internoProfile: input.role === ROLES.INTERNO ? (input.internoProfile ?? null) : null,
+      companyId: input.role === ROLES.PJ ? (input.companyId ?? null) : null,
+      patientId: input.role === ROLES.BENEFICIARIO ? (input.patientId ?? null) : null,
+      ...professionalData(input),
     },
   });
 
@@ -110,18 +158,20 @@ export async function createUser(input: {
   return { user: mapUser(user) };
 }
 
-export async function updateUser(input: {
-  tenantId: string;
-  userId: string;
-  email?: string;
-  password?: string;
-  name?: string;
-  role?: string;
-  companyId?: string | null;
-  patientId?: string | null;
-  internoProfile?: string | null;
-  createdBy: string;
-}) {
+export async function updateUser(
+  input: {
+    tenantId: string;
+    userId: string;
+    email?: string;
+    password?: string;
+    name?: string;
+    role?: string;
+    companyId?: string | null;
+    patientId?: string | null;
+    internoProfile?: string | null;
+    createdBy: string;
+  } & UserProfessionalFields,
+) {
   const existing = await prisma.user.findFirst({
     where: { id: input.userId, tenantId: input.tenantId },
   });
@@ -135,6 +185,14 @@ export async function updateUser(input: {
   if (nextRole === ROLES.INTERNO && input.internoProfile && !isInternoProfile(input.internoProfile)) {
     return { error: "Perfil interno inválido" as const };
   }
+
+  const nextCompanyId =
+    input.companyId !== undefined ? input.companyId : existing.companyId;
+  const nextPatientId =
+    input.patientId !== undefined ? input.patientId : existing.patientId;
+
+  const linkError = validateRoleLinks(nextRole, nextCompanyId, nextPatientId);
+  if (linkError) return linkError;
 
   if (input.email) {
     const email = input.email.toLowerCase().trim();
@@ -157,8 +215,9 @@ export async function updateUser(input: {
             ? undefined
             : input.internoProfile
           : null,
-      companyId: input.companyId === undefined ? undefined : input.companyId,
-      patientId: input.patientId === undefined ? undefined : input.patientId,
+      companyId: nextRole === ROLES.PJ ? nextCompanyId : null,
+      patientId: nextRole === ROLES.BENEFICIARIO ? nextPatientId : null,
+      ...professionalData(input),
     },
   });
 

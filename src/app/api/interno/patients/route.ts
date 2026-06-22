@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { createPatient, listPatients } from "@/lib/patient-service";
 
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const patients = await listPatients(user.tenantId);
     return NextResponse.json({ patients });
   } catch (error) {
@@ -14,12 +14,17 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const body = (await request.json()) as {
       name?: string;
       cpf?: string;
       birthDate?: string;
       phone?: string | null;
+      email?: string | null;
+      gender?: string | null;
+      motherName?: string | null;
+      employeeId?: string | null;
+      bondType?: string | null;
       companyId?: string | null;
     };
 
@@ -33,6 +38,11 @@ export async function POST(request: Request) {
       cpf: body.cpf,
       birthDate: new Date(body.birthDate),
       phone: body.phone,
+      email: body.email,
+      gender: body.gender,
+      motherName: body.motherName,
+      employeeId: body.employeeId,
+      bondType: body.bondType,
       companyId: body.companyId,
       createdBy: user.id,
     });

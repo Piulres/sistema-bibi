@@ -2,6 +2,9 @@ import "server-only";
 import { prisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
+import { isValidCpf, normalizeCpf } from "@/lib/validation/br-documents";
+
+export { PATIENT_BOND_TYPES, PATIENT_GENDERS } from "@/lib/cadastro-constants";
 
 const dateOnly = (value: Date) =>
   value.toLocaleDateString("pt-BR", {
@@ -10,6 +13,14 @@ const dateOnly = (value: Date) =>
     year: "numeric",
   });
 
+export type PatientExtraFields = {
+  email?: string | null;
+  gender?: string | null;
+  motherName?: string | null;
+  employeeId?: string | null;
+  bondType?: string | null;
+};
+
 export type PatientListView = {
   id: string;
   name: string;
@@ -17,9 +28,19 @@ export type PatientListView = {
   birthDate: string;
   birthDateLabel: string;
   phone: string | null;
+  email: string | null;
+  gender: string | null;
+  motherName: string | null;
+  employeeId: string | null;
+  bondType: string | null;
   companyId: string | null;
   companyName: string | null;
 };
+
+function trimOrNull(value: string | null | undefined): string | null {
+  const v = value?.trim();
+  return v || null;
+}
 
 function mapPatient(p: {
   id: string;
@@ -27,6 +48,11 @@ function mapPatient(p: {
   cpf: string;
   birthDate: Date;
   phone: string | null;
+  email: string | null;
+  gender: string | null;
+  motherName: string | null;
+  employeeId: string | null;
+  bondType: string | null;
   companyId: string | null;
   company: { name: string } | null;
 }): PatientListView {
@@ -37,8 +63,23 @@ function mapPatient(p: {
     birthDate: p.birthDate.toISOString().slice(0, 10),
     birthDateLabel: dateOnly(p.birthDate),
     phone: p.phone,
+    email: p.email,
+    gender: p.gender,
+    motherName: p.motherName,
+    employeeId: p.employeeId,
+    bondType: p.bondType,
     companyId: p.companyId,
     companyName: p.company?.name ?? null,
+  };
+}
+
+function patientExtraData(fields: PatientExtraFields) {
+  return {
+    email: fields.email === undefined ? undefined : trimOrNull(fields.email),
+    gender: fields.gender === undefined ? undefined : trimOrNull(fields.gender),
+    motherName: fields.motherName === undefined ? undefined : trimOrNull(fields.motherName),
+    employeeId: fields.employeeId === undefined ? undefined : trimOrNull(fields.employeeId),
+    bondType: fields.bondType === undefined ? undefined : trimOrNull(fields.bondType),
   };
 }
 
@@ -51,16 +92,20 @@ export async function listPatients(tenantId: string): Promise<PatientListView[]>
   return rows.map(mapPatient);
 }
 
-export async function createPatient(input: {
-  tenantId: string;
-  name: string;
-  cpf: string;
-  birthDate: Date;
-  phone?: string | null;
-  companyId?: string | null;
-  createdBy: string;
-}) {
-  const cpf = input.cpf.replace(/\D/g, "");
+export async function createPatient(
+  input: {
+    tenantId: string;
+    name: string;
+    cpf: string;
+    birthDate: Date;
+    phone?: string | null;
+    companyId?: string | null;
+    createdBy: string;
+  } & PatientExtraFields,
+) {
+  const cpf = normalizeCpf(input.cpf);
+  if (!isValidCpf(cpf)) return { error: "CPF inválido" as const };
+
   const existing = await prisma.patient.findUnique({ where: { cpf } });
   if (existing) return { error: "CPF já cadastrado" as const };
 
@@ -77,10 +122,11 @@ export async function createPatient(input: {
       name: input.name.trim(),
       cpf,
       birthDate: input.birthDate,
-      phone: input.phone?.trim() || null,
+      phone: trimOrNull(input.phone),
       companyId: input.companyId ?? null,
       consentAt: new Date(),
       consentVersion: "v1-poc",
+      ...patientExtraData(input),
     },
     include: { company: { select: { name: true } } },
   });
@@ -108,23 +154,26 @@ export async function createPatient(input: {
   return { patient: mapPatient(patient) };
 }
 
-export async function updatePatient(input: {
-  tenantId: string;
-  patientId: string;
-  name?: string;
-  cpf?: string;
-  birthDate?: Date;
-  phone?: string | null;
-  companyId?: string | null;
-  createdBy: string;
-}) {
+export async function updatePatient(
+  input: {
+    tenantId: string;
+    patientId: string;
+    name?: string;
+    cpf?: string;
+    birthDate?: Date;
+    phone?: string | null;
+    companyId?: string | null;
+    createdBy: string;
+  } & PatientExtraFields,
+) {
   const existing = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
   });
   if (!existing) return null;
 
   if (input.cpf) {
-    const cpf = input.cpf.replace(/\D/g, "");
+    const cpf = normalizeCpf(input.cpf);
+    if (!isValidCpf(cpf)) return { error: "CPF inválido" as const };
     const dup = await prisma.patient.findFirst({
       where: { cpf, NOT: { id: existing.id } },
     });
@@ -142,10 +191,11 @@ export async function updatePatient(input: {
     where: { id: existing.id },
     data: {
       name: input.name?.trim(),
-      cpf: input.cpf ? input.cpf.replace(/\D/g, "") : undefined,
+      cpf: input.cpf ? normalizeCpf(input.cpf) : undefined,
       birthDate: input.birthDate,
-      phone: input.phone === undefined ? undefined : input.phone?.trim() || null,
+      phone: input.phone === undefined ? undefined : trimOrNull(input.phone),
       companyId: input.companyId === undefined ? undefined : input.companyId,
+      ...patientExtraData(input),
     },
     include: { company: { select: { name: true } } },
   });

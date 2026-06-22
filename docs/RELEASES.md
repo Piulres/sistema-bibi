@@ -61,14 +61,26 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 ---
 
-## Próximo pacote (pendente)
+## Próximo pacote (pendente — `dev`)
 
-*(Nenhum — aguardando próximo ciclo de desenvolvimento após 1.0.0)*
+### `v1.1.0` — cadastros de mercado + CRUD confiável
 
 | Campo | Valor |
 |-------|-------|
-| **Versão alvo** | `1.1.0` ou `1.0.1` (a definir) |
-| **Checklist** | `npm run pre-release` → cota OK → `deploy --prod --no-build` → tag |
+| **Versão alvo** | `1.1.0` |
+| **Branch** | `dev` |
+| **Escopo** | Cadastros enriquecidos (empresa/beneficiário/prestador), validação CPF/CNPJ, RBAC cadastros, testes CRUD, agenda prestador histórico |
+| **Docs** | [`V1_1.md`](V1_1.md) |
+| **Checklist** | `npm run pre-release` → merge `dev`→`main` → cota OK → `deploy --prod --no-build` → tag `v1.1.0` |
+
+---
+
+## Documentação por versão
+
+| Versão | Doc | Estado |
+|--------|-----|--------|
+| **1.0.0** | [`V1_0.md`](V1_0.md) | ✅ Fechada em produção (`de88c0e`) |
+| **1.1.0** | [`V1_1.md`](V1_1.md) | 🚧 Em desenvolvimento na `dev` |
 
 ---
 

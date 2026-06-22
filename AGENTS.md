@@ -79,6 +79,8 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
+**Versões:** `1.0.0` fechada — ver `docs/V1_0.md`. Desenvolvimento atual: **`1.1.0`** na `dev` — ver `docs/V1_1.md`.
+
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
 **503 `usage_exceeded`:** cota Netlify, não bug. Não investigar em loop nem redeployar automaticamente.
