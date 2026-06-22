@@ -45,7 +45,8 @@ describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
   it("lista rotas expostas a qualquer perfil INTERNO (incl. READONLY)", () => {
     const exposed = withoutModuleGuard.map(relativeApiPath).sort();
     expect(exposed).toContain("/interno/billing");
-    expect(exposed).toContain("/interno/procedures");
+    expect(exposed).not.toContain("/interno/procedures");
+    expect(exposed).not.toContain("/interno/patients");
     expect(exposed).toContain("/interno/invoices/[id]/pix");
   });
 
@@ -62,6 +63,9 @@ describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
 
     expect(guarded).toContain("/interno/invoices");
     expect(guarded).toContain("/interno/users");
+    expect(guarded).toContain("/interno/patients");
+    expect(guarded).toContain("/interno/companies");
+    expect(guarded).toContain("/interno/procedures");
     expect(guarded).toContain("/interno/branding");
     expect(guarded).toContain("/interno/webhooks");
   });

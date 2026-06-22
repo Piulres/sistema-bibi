@@ -1,18 +1,23 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { updatePatient } from "@/lib/patient-service";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const { id } = await params;
     const body = (await request.json()) as {
       name?: string;
       cpf?: string;
       birthDate?: string;
       phone?: string | null;
+      email?: string | null;
+      gender?: string | null;
+      motherName?: string | null;
+      employeeId?: string | null;
+      bondType?: string | null;
       companyId?: string | null;
     };
 
@@ -23,6 +28,11 @@ export async function PATCH(request: Request, { params }: Params) {
       cpf: body.cpf,
       birthDate: body.birthDate ? new Date(body.birthDate) : undefined,
       phone: body.phone,
+      email: body.email,
+      gender: body.gender,
+      motherName: body.motherName,
+      employeeId: body.employeeId,
+      bondType: body.bondType,
       companyId: body.companyId,
       createdBy: user.id,
     });

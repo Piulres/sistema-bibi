@@ -13,6 +13,15 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import CrudOperationsMap from "@/components/CrudOperationsMap";
 import FlowImprovementsMap from "@/components/FlowImprovementsMap";
 import TabBar from "@/components/ui/TabBar";
+import {
+  CompanyExtraFields,
+  CompanyStatusSelect,
+  PatientExtraFields,
+  UserProfessionalFields,
+  emptyCompanyExtra,
+  emptyPatientExtra,
+  emptyUserProfessional,
+} from "@/components/cadastros/CadastroExtraFields";
 
 const tabs = [
   { key: "patients", label: "Beneficiários" },
@@ -34,6 +43,11 @@ type PatientRow = {
   birthDate: string;
   birthDateLabel: string;
   phone: string | null;
+  email: string | null;
+  gender: string | null;
+  motherName: string | null;
+  employeeId: string | null;
+  bondType: string | null;
   companyId: string | null;
   companyName: string | null;
 };
@@ -42,6 +56,16 @@ type CompanyRow = {
   id: string;
   name: string;
   cnpj: string;
+  tradeName: string | null;
+  email: string | null;
+  phone: string | null;
+  contactName: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  addressStreet: string | null;
+  addressCity: string | null;
+  addressState: string | null;
+  addressZip: string | null;
   status: string;
   statusLabel: string;
   contractActive: boolean;
@@ -64,6 +88,11 @@ type UserRow = {
   internoProfile: string | null;
   companyId: string | null;
   patientId: string | null;
+  phone: string | null;
+  councilType: string | null;
+  councilNumber: string | null;
+  councilUf: string | null;
+  specialty: string | null;
 };
 
 export default function CadastrosView() {
@@ -74,6 +103,7 @@ export default function CadastrosView() {
     tabFromUrl && tabs.some((t) => t.key === tabFromUrl) ? (tabFromUrl as Tab) : "patients";
 
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
@@ -88,8 +118,14 @@ export default function CadastrosView() {
     birthDate: "",
     phone: "",
     companyId: "",
+    ...emptyPatientExtra(),
   });
-  const [companyForm, setCompanyForm] = useState({ name: "", cnpj: "", status: "ATIVO" });
+  const [companyForm, setCompanyForm] = useState({
+    name: "",
+    cnpj: "",
+    status: "ATIVO",
+    ...emptyCompanyExtra(),
+  });
   const [procForm, setProcForm] = useState({
     code: "",
     name: "",
@@ -104,6 +140,7 @@ export default function CadastrosView() {
     internoProfile: "",
     companyId: "",
     patientId: "",
+    ...emptyUserProfessional(),
   });
 
   const [editingPatient, setEditingPatient] = useState<PatientRow | null>(null);
@@ -120,12 +157,24 @@ export default function CadastrosView() {
   );
 
   const load = useCallback(async () => {
-    const [p, c, pr, u] = await Promise.all([
-      fetch("/api/interno/patients").then((r) => r.json()),
-      fetch("/api/interno/companies").then((r) => r.json()),
-      fetch("/api/interno/procedures").then((r) => r.json()),
-      fetch("/api/interno/users").then((r) => r.json()),
-    ]);
+    setLoadError(null);
+    const endpoints = [
+      { key: "beneficiários", url: "/api/interno/patients" },
+      { key: "empresas", url: "/api/interno/companies" },
+      { key: "procedimentos", url: "/api/interno/procedures" },
+      { key: "usuários", url: "/api/interno/users" },
+    ] as const;
+
+    const results = await Promise.all(endpoints.map((e) => fetch(e.url).then((r) => ({ ...e, r }))));
+    const failed = results.find((x) => !x.r.ok);
+    if (failed) {
+      const data = await failed.r.json().catch(() => ({}));
+      setLoadError(data.error ?? `Sem permissão ou erro ao carregar ${failed.key}`);
+      setLoading(false);
+      return;
+    }
+
+    const [p, c, pr, u] = await Promise.all(results.map((x) => x.r.json()));
     setPatients(p.patients ?? []);
     setCompanies(c.companies ?? []);
     setProcedures(pr.procedures ?? []);
@@ -161,7 +210,14 @@ export default function CadastrosView() {
       if (!res.ok) setMsg(data.error ?? "Erro");
       else {
         setMsg(`Beneficiário ${data.patient.name} cadastrado`);
-        setPatientForm({ name: "", cpf: "", birthDate: "", phone: "", companyId: "" });
+        setPatientForm({
+          name: "",
+          cpf: "",
+          birthDate: "",
+          phone: "",
+          companyId: "",
+          ...emptyPatientExtra(),
+        });
         await load();
       }
     } finally {
@@ -183,6 +239,11 @@ export default function CadastrosView() {
           cpf: editingPatient.cpf,
           birthDate: editingPatient.birthDate,
           phone: editingPatient.phone,
+          email: editingPatient.email,
+          gender: editingPatient.gender,
+          motherName: editingPatient.motherName,
+          employeeId: editingPatient.employeeId,
+          bondType: editingPatient.bondType,
           companyId: editingPatient.companyId,
         }),
       });
@@ -212,7 +273,7 @@ export default function CadastrosView() {
       if (!res.ok) setMsg(data.error ?? "Erro");
       else {
         setMsg(`Empresa ${data.company.name} cadastrada`);
-        setCompanyForm({ name: "", cnpj: "", status: "ATIVO" });
+        setCompanyForm({ name: "", cnpj: "", status: "ATIVO", ...emptyCompanyExtra() });
         await load();
       }
     } finally {
@@ -234,6 +295,16 @@ export default function CadastrosView() {
           cnpj: editingCompany.cnpj,
           status: editingCompany.status,
           contractActive: editingCompany.contractActive,
+          tradeName: editingCompany.tradeName,
+          email: editingCompany.email,
+          phone: editingCompany.phone,
+          contactName: editingCompany.contactName,
+          contactEmail: editingCompany.contactEmail,
+          contactPhone: editingCompany.contactPhone,
+          addressStreet: editingCompany.addressStreet,
+          addressCity: editingCompany.addressCity,
+          addressState: editingCompany.addressState,
+          addressZip: editingCompany.addressZip,
         }),
       });
       const data = await res.json();
@@ -328,6 +399,7 @@ export default function CadastrosView() {
           internoProfile: "",
           companyId: "",
           patientId: "",
+          ...emptyUserProfessional(),
         });
         await load();
       }
@@ -348,6 +420,11 @@ export default function CadastrosView() {
         role: editingUser.role,
         companyId: editingUser.companyId,
         patientId: editingUser.patientId,
+        phone: editingUser.phone,
+        councilType: editingUser.councilType,
+        councilNumber: editingUser.councilNumber,
+        councilUf: editingUser.councilUf,
+        specialty: editingUser.specialty,
       };
       if (userEditPassword) body.password = userEditPassword;
       if (editingUser.role === "INTERNO") {
@@ -385,6 +462,7 @@ export default function CadastrosView() {
   }
 
   if (loading) return <LoadingState message="Carregando cadastros..." />;
+  if (loadError) return <Alert tone="danger">{loadError}</Alert>;
 
   return (
     <div className="space-y-6">
@@ -452,6 +530,16 @@ export default function CadastrosView() {
                   ))}
                 </select>
               </label>
+              <PatientExtraFields
+                values={{
+                  email: patientForm.email,
+                  gender: patientForm.gender,
+                  motherName: patientForm.motherName,
+                  employeeId: patientForm.employeeId,
+                  bondType: patientForm.bondType,
+                }}
+                onChange={(patch) => setPatientForm({ ...patientForm, ...patch })}
+              />
               <Button type="submit" variant="portal" disabled={busy === "patient"}>
                 {busy === "patient" ? "Salvando..." : "Cadastrar"}
               </Button>
@@ -517,6 +605,26 @@ export default function CadastrosView() {
                             </option>
                           ))}
                         </select>
+                        <PatientExtraFields
+                          values={{
+                            email: editingPatient.email ?? "",
+                            gender: editingPatient.gender ?? "",
+                            motherName: editingPatient.motherName ?? "",
+                            employeeId: editingPatient.employeeId ?? "",
+                            bondType: editingPatient.bondType ?? "",
+                          }}
+                          onChange={(patch) =>
+                            setEditingPatient({
+                              ...editingPatient,
+                              ...patch,
+                              email: patch.email ?? editingPatient.email,
+                              gender: patch.gender ?? editingPatient.gender,
+                              motherName: patch.motherName ?? editingPatient.motherName,
+                              employeeId: patch.employeeId ?? editingPatient.employeeId,
+                              bondType: patch.bondType ?? editingPatient.bondType,
+                            })
+                          }
+                        />
                         <div className="flex gap-2">
                           <Button
                             type="submit"
@@ -561,10 +669,10 @@ export default function CadastrosView() {
       {tab === "companies" && (
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
-            <SectionHeader title="Nova empresa" />
+            <SectionHeader title="Nova empresa" description="Razão social e CNPJ são obrigatórios (padrão mercado B2B)." />
             <form onSubmit={submitCompany} className="mt-4 space-y-3">
               <label className="block text-sm">
-                <span className="text-[var(--text-secondary)]">Nome</span>
+                <span className="text-[var(--text-secondary)]">Razão social</span>
                 <input
                   required
                   className={fieldClass}
@@ -581,6 +689,21 @@ export default function CadastrosView() {
                   onChange={(e) => setCompanyForm({ ...companyForm, cnpj: e.target.value })}
                 />
               </label>
+              <CompanyExtraFields
+                values={{
+                  tradeName: companyForm.tradeName,
+                  email: companyForm.email,
+                  phone: companyForm.phone,
+                  contactName: companyForm.contactName,
+                  contactEmail: companyForm.contactEmail,
+                  contactPhone: companyForm.contactPhone,
+                  addressStreet: companyForm.addressStreet,
+                  addressCity: companyForm.addressCity,
+                  addressState: companyForm.addressState,
+                  addressZip: companyForm.addressZip,
+                }}
+                onChange={(patch) => setCompanyForm({ ...companyForm, ...patch })}
+              />
               <Button type="submit" variant="portal" disabled={busy === "company"}>
                 Cadastrar
               </Button>
@@ -609,18 +732,32 @@ export default function CadastrosView() {
                           setEditingCompany({ ...editingCompany, cnpj: e.target.value })
                         }
                       />
-                      <select
-                        className={fieldClass}
+                      <CompanyStatusSelect
                         value={editingCompany.status}
-                        onChange={(e) =>
-                          setEditingCompany({ ...editingCompany, status: e.target.value })
+                        onChange={(status) =>
+                          setEditingCompany({ ...editingCompany, status })
                         }
-                      >
-                        <option value="ATIVO">Ativo</option>
-                        <option value="INADIMPLENTE">Inadimplente</option>
-                        <option value="SUSPENSO">Suspenso</option>
-                        <option value="CANCELADO">Cancelado</option>
-                      </select>
+                      />
+                      <CompanyExtraFields
+                        values={{
+                          tradeName: editingCompany.tradeName ?? "",
+                          email: editingCompany.email ?? "",
+                          phone: editingCompany.phone ?? "",
+                          contactName: editingCompany.contactName ?? "",
+                          contactEmail: editingCompany.contactEmail ?? "",
+                          contactPhone: editingCompany.contactPhone ?? "",
+                          addressStreet: editingCompany.addressStreet ?? "",
+                          addressCity: editingCompany.addressCity ?? "",
+                          addressState: editingCompany.addressState ?? "",
+                          addressZip: editingCompany.addressZip ?? "",
+                        }}
+                        onChange={(patch) =>
+                          setEditingCompany({
+                            ...editingCompany,
+                            ...patch,
+                          })
+                        }
+                      />
                       <label className="flex items-center gap-2">
                         <input
                           type="checkbox"
@@ -893,6 +1030,17 @@ export default function CadastrosView() {
                   </select>
                 </label>
               )}
+              <UserProfessionalFields
+                show={userForm.role === "PRESTADOR"}
+                values={{
+                  phone: userForm.phone,
+                  councilType: userForm.councilType,
+                  councilNumber: userForm.councilNumber,
+                  councilUf: userForm.councilUf,
+                  specialty: userForm.specialty,
+                }}
+                onChange={(patch) => setUserForm({ ...userForm, ...patch })}
+              />
               <Button type="submit" variant="portal" disabled={busy === "user"}>
                 Criar usuário
               </Button>
@@ -989,6 +1137,19 @@ export default function CadastrosView() {
                           ))}
                         </select>
                       )}
+                      <UserProfessionalFields
+                        show={editingUser.role === "PRESTADOR"}
+                        values={{
+                          phone: editingUser.phone ?? "",
+                          councilType: editingUser.councilType ?? "",
+                          councilNumber: editingUser.councilNumber ?? "",
+                          councilUf: editingUser.councilUf ?? "",
+                          specialty: editingUser.specialty ?? "",
+                        }}
+                        onChange={(patch) =>
+                          setEditingUser({ ...editingUser, ...patch })
+                        }
+                      />
                       <div className="flex gap-2">
                         <Button type="submit" size="sm" variant="portal" disabled={busy === `edit-user-${u.id}`}>
                           Salvar

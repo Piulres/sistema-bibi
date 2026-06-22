@@ -20,7 +20,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Pacote em produção: **`v1.0.0`** (`de88c0e`); próximo deploy: **`v1.0.1`** na `dev`. Ver `docs/RELEASES.md` e `docs/V1_0.md`.
+(cota Netlify). Produção: **`v1.0.0`** (`de88c0e`); `dev` em **1.1.0** (v1.0.1 + cadastros). Ver `docs/RELEASES.md`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
 **Preferências IA:** `AGENTS.md` (esta seção) + `.cursor/rules/operacoes-bibi.mdc`.
@@ -78,6 +78,8 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 | Abrir PR | base **`dev`** | ❌ PR direto na `main` |
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
+
+**Versões:** `1.0.0` fechada — ver `docs/V1_0.md`. Desenvolvimento atual: **`1.1.0`** na `dev` — ver `docs/V1_1.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 

@@ -23,6 +23,11 @@ export async function POST(request: Request) {
       companyId?: string | null;
       patientId?: string | null;
       internoProfile?: string | null;
+      phone?: string | null;
+      councilType?: string | null;
+      councilNumber?: string | null;
+      councilUf?: string | null;
+      specialty?: string | null;
     };
 
     if (!body.email?.trim() || !body.password?.trim() || !body.name?.trim() || !body.role) {
@@ -38,6 +43,11 @@ export async function POST(request: Request) {
       companyId: body.companyId,
       patientId: body.patientId,
       internoProfile: body.internoProfile,
+      phone: body.phone,
+      councilType: body.councilType,
+      councilNumber: body.councilNumber,
+      councilUf: body.councilUf,
+      specialty: body.specialty,
       createdBy: user.id,
     });
 

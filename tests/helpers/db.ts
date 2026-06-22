@@ -13,15 +13,24 @@ export async function ensureTestDatabase(): Promise<void> {
   process.env.DATABASE_URL = TEST_DATABASE_URL;
   process.env.DUAL_DATA_STORE = "false";
 
-  if (!existsSync(TEST_DB_PATH)) {
-    execSync("npx prisma db push --skip-generate", {
-      cwd: process.cwd(),
-      env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
-      stdio: "pipe",
-    });
+  const firstCreate = !existsSync(TEST_DB_PATH);
+
+  execSync("npx prisma db push --skip-generate", {
+    cwd: process.cwd(),
+    env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
+    stdio: "pipe",
+  });
+
+  const prisma = new PrismaClient({
+    datasources: { db: { url: TEST_DATABASE_URL } },
+  });
+  const tenantCount = await prisma.tenant.count();
+  await prisma.$disconnect();
+
+  if (firstCreate || tenantCount === 0) {
     execSync("npx prisma db seed", {
       cwd: process.cwd(),
-      env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
+      env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL, SEED_SCALE: "small" },
       stdio: "pipe",
     });
   }

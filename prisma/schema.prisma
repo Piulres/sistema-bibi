@@ -74,6 +74,13 @@ model User {
   /// MFA TOTP (Tier 4) — secret base32; habilitado quando mfaEnabled=true
   mfaEnabled Boolean @default(false)
   mfaSecret  String?
+  /// Telefone de contato (prestador / interno)
+  phone          String?
+  /// Conselho profissional (prestador): CRM | CRO | CRP | COREN | OUTRO
+  councilType    String?
+  councilNumber  String?
+  councilUf      String?
+  specialty      String?
   createdAt DateTime @default(now())
 
   tenantId String
@@ -92,11 +99,21 @@ model User {
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
-/// status: LEAD | PROPOSTA | NEGOCIACAO | ATIVO | INADIMPLENTE | CANCELADO
+/// name = razão social · status: LEAD | PROPOSTA | NEGOCIACAO | ATIVO | INADIMPLENTE | CANCELADO
 model Company {
   id             String   @id @default(cuid())
   name           String
   cnpj           String   @unique
+  tradeName      String?
+  email          String?
+  phone          String?
+  contactName    String?
+  contactEmail   String?
+  contactPhone   String?
+  addressStreet  String?
+  addressCity    String?
+  addressState   String?
+  addressZip     String?
   status         String   @default("ATIVO")
   contractActive Boolean  @default(true)
   createdAt      DateTime @default(now())
@@ -118,6 +135,14 @@ model Patient {
   cpf       String   @unique
   birthDate DateTime
   phone     String?
+  email     String?
+  /// M | F | O | NI
+  gender    String?
+  motherName String?
+  /// Matrícula / código na empresa
+  employeeId String?
+  /// TITULAR | DEPENDENTE | SOCIO
+  bondType  String?
   /// LGPD — consentimento para tratamento de dados
   consentAt      DateTime?
   consentVersion String?

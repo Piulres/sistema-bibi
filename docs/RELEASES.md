@@ -15,12 +15,11 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Item | Valor |
 |------|-------|
 | **Versão em produção** | **1.0.0** (`de88c0e`) |
-| **Próximo deploy (linha 1.0)** | **1.0.1** — commit `a31e195` na `dev` |
-| Site produção | https://sistema-bibi.netlify.app |
-| `main` | `de88c0e` — aguardando merge `dev` → `main` |
-| `dev` | `a31e195` — integração (v1.0.1 + futura v1.1) |
+| **Próximo deploy (linha 1.0)** | **1.0.1** — PR #73 → `main` (sem v1.1) |
+| `main` | `de88c0e` — aguardando merge PR #73 |
+| `dev` | **1.1.0** — v1.0.1 + PR #72 integrado |
 | Tag git em produção | `v1.0.0` |
-| Validação `dev` | `npm run pre-release` · 101 unit · 44+ E2E |
+| Validação `dev` | `npm run pre-release` · 101+ unit · 50+ E2E |
 
 ---
 
@@ -44,27 +43,23 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.0.1` |
-| **Commit** | `a31e195` (merge `dev`) |
-| **Branch** | `dev` → merge `main` → deploy manual |
+| **PR** | [#73](https://github.com/Piulres/sistema-bibi/pull/73) → `main` |
+| **Escopo** | PRs #69–#71 (sem cadastros v1.1) |
 | **Docs** | [`V1_0.md`](V1_0.md) |
-| **PRs incluídos** | #69 agenda/histórico prestador · #70 dev-first · #71 dual SQLite demo/operação |
-| **Checklist** | `npm run pre-release` → merge `dev`→`main` → cota OK → `deploy --prod --no-build` → tag `v1.0.1` → atualizar esta seção |
-
-**Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
 
 ---
 
-## Em desenvolvimento — somente `dev` (não produção)
+## Integrado na `dev` — não produção
 
 ### `v1.1.0` — cadastros de mercado + CRUD confiável
 
 | Campo | Valor |
 |-------|-------|
-| **Versão alvo** | `1.1.0` |
-| **Branch** | `dev` (após merge PR #72) |
-| **PR** | #72 `cursor/v11-crud-cadastros-82f2` |
+| **Versão** | `1.1.0` na `dev` |
+| **PR** | [#72](https://github.com/Piulres/sistema-bibi/pull/72) — mergeado na `dev` |
 | **Docs** | [`V1_1.md`](V1_1.md) |
 | **Produção** | ❌ Não publicar neste ciclo |
+
 
 ---
 
@@ -72,8 +67,8 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Versão | Doc | Estado |
 |--------|-----|--------|
-| **1.0.x** | [`V1_0.md`](V1_0.md) | `v1.0.1` pendente deploy |
-| **1.1.x** | [`V1_1.md`](V1_1.md) | Só `dev` |
+| **1.0.x** | [`V1_0.md`](V1_0.md) | `v1.0.1` pendente deploy (PR #73) |
+| **1.1.x** | [`V1_1.md`](V1_1.md) | Integrada na `dev` — não produção |
 
 ---
 

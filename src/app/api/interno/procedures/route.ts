@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   createProcedure,
   isProcedureCategory,
@@ -8,7 +8,7 @@ import {
 
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const procedures = await listProcedures(user.tenantId);
     return NextResponse.json({ procedures });
   } catch (error) {
@@ -18,7 +18,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("cadastros");
     const body = (await request.json()) as {
       code?: string;
       name?: string;
