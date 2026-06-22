@@ -11,7 +11,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
                     ┌─────────────┐
                     │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
                     ├─────────────┤
-                    │ API (7)     │  Handlers Next.js + auth/cron
+                    │ API (6)     │  Handlers Next.js + auth/cron + exportações
                     ├─────────────┤
                     │ Integração  │  Prisma + adapters mock
                     ├─────────────┤
@@ -31,6 +31,15 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
+
+**Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).
+
+| Fixture | E-mail / CPF | Uso típico |
+|---------|----------------|------------|
+| João Pereira | `joao.pereira@email.com` / `111.222.333-44` | PEP, timeline, consumo pendente PPU |
+| Maria Souza | `maria.souza@email.com` | Fatura FECHADA + PIX pendente |
+| Pedro Almeida | `pedro.almeida@email.com` | Particular, fatura PAGA |
+| Dra. Helena | `dra.helena@bibi.health` | Prestador com CRM/SP, export PEP |
 
 ---
 
@@ -120,9 +129,10 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Fluxo | Teste |
 |-------|-------|
-| PJ overview/reports | ❌ |
+| PJ overview/reports | ✅ `portal-flows.test.ts` |
 | Beneficiário booking | ✅ E2E parcial (`flows`, `walkin-particular`) |
-| LGPD export | ❌ (rota tem guard cadastros) |
+| Exportações PDF/Excel | ✅ `exports.test.ts` (PEP, faturas, auditoria, portais) |
+| LGPD export JSON | ✅ `exports.test.ts` + guard cadastros |
 
 ### Enterprise
 
