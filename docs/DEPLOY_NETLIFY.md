@@ -64,6 +64,8 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | `PAYMENT_GATEWAY` | Não | `mock` (POC) ou `asaas`/`efi`/`inter` |
 | `COMMUNICATION_PROVIDER` | Não | `console` (POC) ou `sendgrid`/`twilio`/`meta` |
 | `TELEMEDICINE_BASE_URL` | Não | URL base das salas virtuais mock |
+| `SEED_SCALE` | Não | `small` \| `medium` (padrão) \| `large` — volume do seed |
+| `ALLOW_DEMO_RESET` | Não | `true` habilita restauração demo em `/interno/seguranca` (padrão off em produção) |
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 
@@ -125,6 +127,8 @@ Configure scheduled functions ou serviço externo para chamar:
 
 - **SQLite** copiado para `/tmp` a cada cold start — escrita persiste só na mesma instância Lambda.
 - **Seed no build** — cada deploy recria dados demo (intencional para POC).
+- **Restauração demo em runtime** — com `ALLOW_DEMO_RESET=true`, admins podem
+  repopular o SQLite via `/interno/seguranca` sem novo deploy (útil em previews).
 - **Logos** — `@netlify/blobs` em produção; filesystem local em `next dev` puro.
 - **MFA / webhooks / PIX** — funcionam na POC, mas dependem do SQLite efêmero.
 
@@ -142,6 +146,8 @@ Configure scheduled functions ou serviço externo para chamar:
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
+| Botão demo ausente em produção | `ALLOW_DEMO_RESET` não definido | Definir `ALLOW_DEMO_RESET=true` no painel (somente se intencional) |
+| Reset demo 403 | Usuário não é ADMIN | Login com `faturamento@bibi.health` (perfil ADMIN) |
 
 ---
 

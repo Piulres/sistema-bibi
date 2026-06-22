@@ -132,6 +132,54 @@ Quando `User.mfaEnabled = true`:
 | Ativar | `{ action: "enable", secret, code }` | Grava secret, `mfaEnabled=true` |
 | Desativar | `{ action: "disable", code }` | Limpa MFA |
 
+### 2.3 Restauração do modo demo (PR #44)
+
+Repopula o banco com a massa original do seed — útil após testes ou antes de
+demonstrações. **Não há backup automático.**
+
+**UI:** `/interno/seguranca` → `DemoResetCard` (visível só para ADMIN quando habilitado)
+
+**API:** `GET|POST /api/interno/demo/reset`
+
+| Ação | Método | Body / resposta | Efeito |
+|------|--------|-----------------|--------|
+| Status | `GET` | `{ enabled, canReset, inProgress }` | Flag de ambiente + permissão |
+| Restaurar | `POST` | `{ "confirm": "RESTAURAR" }` | `runDatabaseSeed()` → logout |
+
+```mermaid
+sequenceDiagram
+  participant A as Admin (INTERNO)
+  participant UI as DemoResetCard
+  participant API as POST /api/interno/demo/reset
+  participant S as runDatabaseSeed
+  participant Auth as POST /api/auth/logout
+
+  A->>UI: digita RESTAURAR
+  UI->>API: { confirm: "RESTAURAR" }
+  API->>API: isDemoResetEnabled + isInternoAdmin
+  API->>S: deleteMany + seed completo
+  S-->>API: SeedRunResult
+  API-->>UI: { logoutRequired: true }
+  UI->>Auth: encerra sessão
+  UI->>A: redirect /interno/login
+```
+
+**Habilitação** (`src/lib/demo-reset.ts`):
+
+| `ALLOW_DEMO_RESET` | `NODE_ENV` | Resultado |
+|--------------------|------------|-----------|
+| `true` / `1` | qualquer | habilitado |
+| `false` / `0` | qualquer | desabilitado |
+| *(ausente)* | ≠ `production` | habilitado |
+| *(ausente)* | `production` | desabilitado |
+
+**Permissão:** `canUserResetDemo()` — perfil **ADMIN** (`internoProfile` nulo ou `ADMIN`).
+Usuários `FATURAMENTO` / `RECEPCAO` recebem 403 na API mesmo com a flag ligada.
+
+**Concorrência:** segunda requisição simultânea retorna **409** (`resetInProgress`).
+
+**Código:** `src/lib/demo-reset.ts` · `prisma/seed-data/run-seed.ts` (compartilhado com `prisma db seed`)
+
 ---
 
 ## 3. Portal Prestador
@@ -188,7 +236,7 @@ flowchart LR
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
-| `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
+| `seguranca` | `/interno/seguranca` | `SecurityView` + `DemoResetCard` | MFA TOTP; restaurar seed (ADMIN) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
@@ -418,6 +466,11 @@ Disparo: `POST /api/interno/reminders` ou cron `POST /api/cron/reminders`.
 Empresa `INADIMPLENTE`, faturas `FECHADA` em aberto ou cobranças vencidas →
 alertas em `getPjPortalOverview()`.
 
+### 8.5 Restauração do modo demo
+
+Ver [§2.3](#23-restauração-do-modo-demo-pr-44). Alternativa CLI: `npm run db:seed`
+ou `npm run db:reset` (apenas desenvolvimento local).
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo
@@ -534,7 +587,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
 `companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*` ·
+`demo/reset` (restaurar seed — ADMIN)
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`
@@ -551,6 +605,8 @@ Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml)
 4. **TISS** — XML simplificado; validação XSD pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
 6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
+7. **Restauração demo** — `POST /api/interno/demo/reset` apaga e repopula o banco;
+   desligada em `production` sem `ALLOW_DEMO_RESET=true` (ver §2.3).
 
 ---
 
