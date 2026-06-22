@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Operações Sistema Bibi
 
-Fonte canônica: `@docs/OPERACOES.md` · Pacotes: `@docs/RELEASES.md` · Workflow: `@docs/WORKFLOW_CURSOR.md`
+Fonte canônica: `@docs/OPERACOES.md` · Dados demo/operação: `@docs/OPERACAO_DADOS.md` · Pacotes: `@docs/RELEASES.md` · Workflow: `@docs/WORKFLOW_CURSOR.md`
 
 ## Princípios (melhores práticas)
 
@@ -37,6 +37,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 | Validar release | `npm run pre-release` | deploy |
 | Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
 | Publicar | Só com pedido explícito; seguir `@docs/OPERACOES.md` §5 | deploy autônomo |
+| Alternar demo/operação | Orientar `@docs/OPERACAO_DADOS.md` § produção | trocar `DATABASE_URL` manualmente |
 | Pós-deploy | Atualizar `@docs/RELEASES.md` | marcar publicado sem confirmação |
 
 ## Comandos

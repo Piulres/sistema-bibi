@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 
 const dateOnly = (value: Date) =>
   value.toLocaleDateString("pt-BR", {
@@ -10,6 +10,7 @@ const dateOnly = (value: Date) =>
 
 /** Exportação LGPD light — dados pessoais e histórico resumido do beneficiário. */
 export async function buildPatientLgpdExport(tenantId: string, patientId: string) {
+  const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
     where: { id: patientId, tenantId },
     include: {

@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 
 function escapeXml(value: string): string {
   return value
@@ -11,6 +11,7 @@ function escapeXml(value: string): string {
 
 /** Gera XML simplificado de guia TISS/ANS para fatura Pay Per Use (POC Tier 4). */
 export async function buildTissGuideXml(tenantId: string, invoiceId: string): Promise<string | null> {
+  const prisma = await getPrisma();
   const invoice = await prisma.invoice.findFirst({
     where: { id: invoiceId, tenantId },
     include: {

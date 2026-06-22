@@ -2,11 +2,12 @@ import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { buildTemplateBody } from "@/lib/message-service";
 import { isMessageTemplate } from "@/lib/message";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 
 /** Sugere assunto/corpo para templates de comunicacao. */
 export async function GET(request: Request) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["INTERNO"]);
     const { searchParams } = new URL(request.url);

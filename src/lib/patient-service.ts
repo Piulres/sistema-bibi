@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
 
@@ -43,6 +43,7 @@ function mapPatient(p: {
 }
 
 export async function listPatients(tenantId: string): Promise<PatientListView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.patient.findMany({
     where: { tenantId },
     include: { company: { select: { name: true } } },
@@ -60,6 +61,7 @@ export async function createPatient(input: {
   companyId?: string | null;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const cpf = input.cpf.replace(/\D/g, "");
   const existing = await prisma.patient.findUnique({ where: { cpf } });
   if (existing) return { error: "CPF já cadastrado" as const };
@@ -118,6 +120,7 @@ export async function updatePatient(input: {
   companyId?: string | null;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
   });

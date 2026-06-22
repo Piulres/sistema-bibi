@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { companyStatusLabel, isCompanyStatus } from "@/lib/company-crm";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 
@@ -35,6 +35,7 @@ function mapCompany(c: {
 }
 
 export async function listCompanies(tenantId: string): Promise<CompanyView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.company.findMany({
     where: { tenantId },
     include: { _count: { select: { patients: true } } },
@@ -51,6 +52,7 @@ export async function createCompany(input: {
   contractActive?: boolean;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const cnpj = input.cnpj.replace(/\D/g, "");
   const existing = await prisma.company.findUnique({ where: { cnpj } });
   if (existing) return { error: "CNPJ já cadastrado" as const };
@@ -87,6 +89,7 @@ export async function updateCompany(input: {
   contractActive?: boolean;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.company.findFirst({
     where: { id: input.companyId, tenantId: input.tenantId },
   });

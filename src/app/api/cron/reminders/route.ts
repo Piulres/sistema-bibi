@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { enqueueDueReminders } from "@/lib/reminder-service";
 
 /**
@@ -7,6 +7,7 @@ import { enqueueDueReminders } from "@/lib/reminder-service";
  * Pode ser chamado por Netlify Scheduled Functions ou cron externo.
  */
 export async function POST(request: Request) {
+  const prisma = await getPrisma();
   const secret = request.headers.get("x-cron-secret") ?? request.headers.get("authorization");
   const expected = process.env.CRON_SECRET?.trim();
 

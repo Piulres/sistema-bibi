@@ -11,6 +11,7 @@ let testPrisma: PrismaClient | undefined;
 /** Garante SQLite isolado para integração/API sem tocar no dev.db local. */
 export async function ensureTestDatabase(): Promise<void> {
   process.env.DATABASE_URL = TEST_DATABASE_URL;
+  process.env.DUAL_DATA_STORE = "false";
 
   if (!existsSync(TEST_DB_PATH)) {
     execSync("npx prisma db push --skip-generate", {

@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { DEFAULT_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
 import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 import { brandingToCssVars } from "@/lib/theme/css-vars";
@@ -44,6 +44,7 @@ function fromDb(
 export async function getTenantBranding(
   tenantId: string,
 ): Promise<TenantBrandingRecord> {
+  const prisma = await getPrisma();
   const row = await prisma.tenantBranding.findUnique({ where: { tenantId } });
   if (!row) {
     return { tenantId, ...DEFAULT_BRANDING };
@@ -53,6 +54,7 @@ export async function getTenantBranding(
 
 /** Branding padrao para paginas publicas (landing/login) — primeiro tenant demo ou fallback. */
 export async function getPlatformBranding(): Promise<BrandingTokens> {
+  const prisma = await getPrisma();
   try {
     const row = await prisma.tenantBranding.findFirst({
       orderBy: { createdAt: "asc" },

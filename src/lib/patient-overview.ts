@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { getPatientTimelineEvents, type TimelineEventView } from "@/lib/timeline";
 
@@ -94,6 +94,7 @@ export async function getPatientOverview(
   patientId: string,
   tenantId: string,
 ): Promise<PatientOverviewData | null> {
+  const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
     where: { id: patientId, tenantId },
     include: {

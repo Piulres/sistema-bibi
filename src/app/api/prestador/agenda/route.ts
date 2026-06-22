@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 
 const LIMIT = 60;
@@ -41,6 +41,7 @@ function mapAppointment(a: {
 }
 
 export async function GET(request: Request) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["PRESTADOR"]);
     const url = new URL(request.url);

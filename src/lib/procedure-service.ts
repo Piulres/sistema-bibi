@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { recordTimelineEvent, TIMELINE_ACTIONS } from "@/lib/timeline";
 
@@ -36,6 +36,7 @@ function mapProcedure(p: {
 }
 
 export async function listProcedures(tenantId: string): Promise<ProcedureView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.procedure.findMany({
     where: { tenantId },
     orderBy: [{ category: "asc" }, { name: "asc" }],
@@ -51,6 +52,7 @@ export async function createProcedure(input: {
   basePrice: number;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.procedure.findFirst({
     where: { tenantId: input.tenantId, code: input.code.trim() },
   });
@@ -87,6 +89,7 @@ export async function updateProcedure(input: {
   basePrice?: number;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.procedure.findFirst({
     where: { id: input.procedureId, tenantId: input.tenantId },
   });
@@ -126,6 +129,7 @@ export async function deleteProcedure(input: {
   procedureId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.procedure.findFirst({
     where: { id: input.procedureId, tenantId: input.tenantId },
     include: { usages: { take: 1 } },

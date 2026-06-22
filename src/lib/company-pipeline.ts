@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import {
   COMPANY_STATUSES,
   companyStatusLabel,
@@ -26,6 +26,7 @@ export type CompanyPipelineData = {
 
 /** Lista empresas do tenant para o pipeline CRM. */
 export async function getCompanyPipeline(tenantId: string): Promise<CompanyPipelineData> {
+  const prisma = await getPrisma();
   const companies = await prisma.company.findMany({
     where: { tenantId },
     include: {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import {
   recordTimelineEvent,
@@ -10,6 +10,7 @@ import { isPepRecordType } from "@/lib/pep-templates";
 
 /** Adiciona uma anotacao ao prontuario (PEP) do paciente. */
 export async function POST(request: Request) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["PRESTADOR"]);
     const body = (await request.json()) as {

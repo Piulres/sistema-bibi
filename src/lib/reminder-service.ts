@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { bootstrapCommunicationGateway } from "@/lib/communications/bootstrap";
 import { buildTemplateBody } from "@/lib/message";
@@ -40,6 +40,7 @@ export async function enqueueDueReminders(input: {
   createdBy: string;
   autoDispatch?: boolean;
 }): Promise<ReminderEnqueueResult> {
+  const prisma = await getPrisma();
   const now = new Date();
   const tomorrowEnd = new Date(now.getTime() + MS_DAY);
   const chargeHorizon = new Date(now.getTime() + 3 * MS_DAY);
