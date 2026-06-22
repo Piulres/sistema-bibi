@@ -83,6 +83,16 @@ Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste au
 
 Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam MFA a cada request (padrão de mercado, mas vale documentar).
 
+### 8. Dual data store (demo/operação)
+
+| Módulo | Teste | Cobertura |
+|--------|-------|-----------|
+| `data-store-mode.ts` | `tests/lib/data-store-mode.test.ts` | ✅ parse, cache, dual-store flag |
+| `database-env.ts` | `tests/lib/database-env.test.ts` | ✅ detecção SQLite/Postgres/Lambda |
+| `demo-reset.ts` | `tests/unit/demo-reset.test.ts` | ✅ bloqueio em modo operação |
+| API agenda prestador | `tests/api/portal-flows.test.ts` | ✅ `view=day\|upcoming\|past` + overview paciente |
+| Persistência Blobs | — | ❌ sem teste de integração Netlify |
+
 ---
 
 ## Mapa por domínio de negócio
@@ -150,10 +160,11 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 - `POST /api/cron/reminders` — ⏰ ✅ testado
 - `POST /api/cron/webhooks` — ⏰
 
-### Prestador (5 rotas) — 🔑 PRESTADOR
-- agenda, appointments, procedures, records
+### Prestador (6 rotas) — 🔑 PRESTADOR
+- agenda (`view=day|upcoming|past`), appointments, procedures, records, patients overview
 
-### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
+### Interno (40 rotas) — 🔑 INTERNO (9 com 🔒)
+- Inclui `data-store` e `demo/reset` (v1.0.1)
 - Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
 
 ### PJ (2) — 🔑 PJ

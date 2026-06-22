@@ -43,11 +43,17 @@ flowchart TB
       RBAC["interno-permissions.ts<br/>(RBAC Tier 3)"]
       MFA["mfa.ts · tiss-service.ts<br/>(Tier 4)"]
       Dashboard["executive-dashboard.ts"]
-      DB["db.ts (Prisma Client)"]
+      DSM["data-store-mode.ts<br/>sqlite-blob-persistence.ts"]
+      DB["db.ts<br/>(getPrisma · dual SQLite)"]
     end
   end
 
-  SQLite[("SQLite<br/>dev.db")]
+  subgraph Storage["Persistência"]
+    DemoDB[("demo.db<br/>massa seed")]
+    OpDB[("operation.db<br/>dados reais")]
+    Blobs[("Netlify Blobs<br/>bibi-config · bibi-databases")]
+    LegacyDB[("dev.db / test.db<br/>legado local")]
+  end
 
   Cliente -->|HTTP| Proxy --> Pages
   Pages --> API
@@ -60,9 +66,63 @@ flowchart TB
   API --> Webhooks
   API --> RBAC
   API --> MFA
-  API --> DB --> SQLite
+  API --> DB
+  DSM --> DB
+  DB --> DemoDB
+  DB --> OpDB
+  DB --> LegacyDB
+  OpDB -.->|persistência Lambda| Blobs
+  DSM -.->|modo ativo| Blobs
   Sess --> DB
 ```
+
+---
+
+## 1.1 Persistência dual SQLite (v1.0.1)
+
+Produção Netlify e dev local podem operar com **duas bases SQLite** no mesmo site,
+selecionadas em runtime por `getPrisma()` (`src/lib/db.ts`).
+
+```mermaid
+flowchart TB
+  subgraph Runtime["Runtime Next.js"]
+    API["Route Handlers / serviços"]
+    GP["getPrisma()"]
+    DSM["data-store-mode.ts"]
+    SBP["sqlite-blob-persistence.ts"]
+  end
+
+  subgraph Files["Arquivos SQLite"]
+    Demo[("demo.db<br/>seed completo")]
+    Op[("operation.db<br/>bootstrap + uso")]
+  end
+
+  subgraph Netlify["Netlify (produção)"]
+    BMode[("Blobs bibi-config<br/>data-store-mode")]
+    BDb[("Blobs bibi-databases<br/>operation.db")]
+  end
+
+  API --> GP
+  GP --> DSM
+  DSM -->|modo demo| Demo
+  DSM -->|modo operation| Op
+  DSM <-->|persistir modo| BMode
+  Op <-->|escritas debounced| SBP
+  SBP <-->|upload/download| BDb
+```
+
+| Modo | Arquivo | Origem | Persistência em Lambda |
+|------|---------|--------|------------------------|
+| **demo** | `prisma/demo.db` | Build (`setup-database.ts` + seed) | Cópia efêmera em `/tmp` por instância |
+| **operation** | `prisma/operation.db` | Build (bootstrap) + mutações | Netlify Blobs após cada escrita (debounce ~1,5s) |
+
+**Controle:** `DUAL_DATA_STORE=true` · modo em Blobs ou `prisma/.data-store-mode` (dev) ·
+UI/API em `/interno/seguranca` e `GET|POST /api/interno/data-store` (ADMIN).
+
+**Refator v1.0.1:** serviços e APIs usam `await getPrisma()` em vez de import estático —
+permite trocar de base sem reiniciar o processo (cache invalidado ao alternar modo).
+
+Detalhes operacionais: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · variáveis: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md).
 
 ---
 

@@ -181,7 +181,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v1.0.0`** (`de88c0e`). Ver [`RELEASES.md`](RELEASES.md).
+Exemplo atual em produção: **`v1.0.0`** (`de88c0e`). Próximo deploy: **`v1.0.1`** (`e4d8a43` na `main`). Ver [`RELEASES.md`](RELEASES.md).
 
 ---
 

@@ -55,7 +55,9 @@ quadrantChart
 
 | Ação / capability | Bibi | iClinic / Feegow | Onde no Bibi |
 |-------------------|:----:|:----------------:|--------------|
-| Agenda do prestador (dia) | ✅ | ✅ | `/prestador`, `AgendaView` |
+| Agenda do prestador (dia) | ✅ | ✅ | `/prestador`, `AgendaView` (`view=day`) |
+| Agenda prestador — próximos / histórico | ✅ | ✅ | `AgendaView` (`view=upcoming\|past`) |
+| Histórico do paciente (prestador) | ✅ | ✅ | `/prestador/paciente/[id]`, `provider-patient-overview.ts` |
 | Agenda administrativa (CRUD) | ✅ | ✅ | `/interno/agenda`, `AppointmentsView` |
 | Status de consulta (agendado → realizado) | ✅ | ✅ | `appointment-service.ts` |
 | Telemedicina (link sala) | 🟡 mock | ✅ | `modality=TELE`, `telemedicine.ts` |
@@ -163,7 +165,7 @@ quadrantChart
 | White label (cores, logo) | ✅ | ✅ | `TenantBranding` |
 | Domínio customizado | 🟡 manual | ✅ | `customDomain` |
 | Auditoria (timeline) | ⭐ ✅ | 🟡 | `TimelineEvent` |
-| Postgres produção | ❌ SQLite POC | ✅ | roadmap |
+| Postgres produção | ❌ SQLite dual-store POC | ✅ | [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) |
 | SLA / HA | ❌ | ✅ | — |
 
 ---
@@ -176,8 +178,9 @@ Referência rápida das **ações expostas na interface** — útil para demo e 
 
 | Tela | Ações |
 |------|-------|
-| Agenda | Abrir atendimento |
-| Atendimento | Registrar procedimento · Salvar PEP · Usar template · Marcar REALIZADO |
+| Agenda | Abas Dia / Próximos / Histórico · navegar data · abrir atendimento · ver histórico do paciente |
+| Atendimento | Registrar procedimento · Salvar PEP · Usar template · Marcar REALIZADO · **Histórico completo** |
+| Histórico paciente | Consultas · procedimentos · PEP · timeline · abrir atendimento passado |
 
 ### Portal Interno
 
@@ -193,7 +196,7 @@ Referência rápida das **ações expostas na interface** — útil para demo e 
 | Relatórios | Download CSV faturamento / CRM |
 | White Label | Editar branding · Upload logo · Domínio custom |
 | Integrações | CRUD webhook · Ver entregas · Retry |
-| Segurança | Setup / enable / disable MFA |
+| Segurança | Setup / enable / disable MFA · **Alternar demo ↔ operação** · Restaurar seed demo |
 | Cliente 360° | Ver overview · Export LGPD JSON |
 
 ### Portal PJ
