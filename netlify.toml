@@ -10,8 +10,8 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  # Instala devDependencies (tsx, prisma CLI) mesmo com NODE_ENV=production no contexto.
-  NPM_CONFIG_PRODUCTION = "false"
+  # Garante devDependencies no npm ci (tailwind, tsx, typescript) quando NODE_ENV=production.
+  NPM_FLAGS = "--include=dev"
   # Path relativo ao schema Prisma (prisma/schema.prisma) → arquivo prisma/dev.db
   DATABASE_URL = "file:./dev.db"
   NETLIFY = "true"
