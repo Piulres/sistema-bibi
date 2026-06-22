@@ -465,6 +465,20 @@ Fonte canônica: `src/lib/crud-operations-map.ts` · UI: `/interno/cadastros?tab
 Cobre **27 entidades** nos portais Interno, Prestador, Beneficiário, PJ, Auth e Sistema —
 cada operação com tela, rota API e tipo de exposição (UI, Download, API-only, Cron).
 
+### 8.7 Melhorias de fluxo (jornada clínica)
+
+Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?tab=operations` (aba Mapa CRUD).
+
+| Melhoria | Portal | UI | API |
+|----------|--------|-----|-----|
+| Cancelar consulta | Beneficiário | `/beneficiario` → Minha agenda | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` |
+| Confirmar presença | Prestador | `/prestador/atendimento/[id]` | `PATCH …/prestador/appointments/[id]` `{ status: "CONFIRMADO" }` |
+| Stepper PPU | Beneficiário / Prestador | FlowStepper no resumo e atendimento | `care-journey.ts` |
+| QR PIX mock | Beneficiário | `/beneficiario` → Faturas | `POST …/invoices/[id]/pay` |
+| Walk-in + check-in | Interno | `/interno/agenda` | §8.5 |
+
+Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo
@@ -574,6 +588,7 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
 `POST /api/beneficiario/appointments` ·
+`PATCH /api/beneficiario/appointments/[id]` ·
 `POST|PATCH /api/beneficiario/invoices/[id]/pay`
 
 ### PJ

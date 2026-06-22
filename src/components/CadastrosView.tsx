@@ -11,6 +11,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CrudOperationsMap from "@/components/CrudOperationsMap";
+import FlowImprovementsMap from "@/components/FlowImprovementsMap";
 import TabBar from "@/components/ui/TabBar";
 
 const tabs = [
@@ -1019,15 +1020,26 @@ export default function CadastrosView() {
       )}
 
       {tab === "operations" && (
-        <Card>
-          <SectionHeader
-            title="Mapa de operações CRUD"
-            description="Onde cada entidade do sistema pode ser criada, consultada, alterada ou removida na interface."
-          />
-          <div className="mt-4">
-            <CrudOperationsMap />
-          </div>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <SectionHeader
+              title="Mapa de operações CRUD"
+              description="Onde cada entidade do sistema pode ser criada, consultada, alterada ou removida na interface."
+            />
+            <div className="mt-4">
+              <CrudOperationsMap />
+            </div>
+          </Card>
+          <Card>
+            <SectionHeader
+              title="Mapa de melhorias de fluxo"
+              description="Passos de jornada implementados e backlog priorizado por portal."
+            />
+            <div className="mt-4">
+              <FlowImprovementsMap />
+            </div>
+          </Card>
+        </div>
       )}
     </div>
   );

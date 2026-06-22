@@ -17,12 +17,15 @@ test.describe("Portal Interno — walk-in particular", () => {
 
     await page.goto("/interno/cadastros?tab=operations");
     await expect(page.getByRole("heading", { name: /Mapa de operações CRUD/i })).toBeVisible();
-    await expect(page.getByText(/Beneficiário \/ paciente/i)).toBeVisible();
+    await expect(page.getByText(/Beneficiário \/ paciente/i).first()).toBeVisible();
     await expect(page.getByText(/Prontuário \(PEP\)/i)).toBeVisible();
 
-    await page.getByRole("button", { name: "Prestador", exact: true }).click();
-    await expect(page.getByText(/Uso de procedimento \(PPU\)/i)).toBeVisible();
-    await expect(page.getByText(/Beneficiário \/ paciente/i)).toHaveCount(0);
+    const crudCard = page.locator(".ds-card").filter({
+      has: page.getByRole("heading", { name: /Mapa de operações CRUD/i }),
+    });
+    await crudCard.getByRole("button", { name: "Prestador", exact: true }).click();
+    await expect(crudCard.getByText(/Uso de procedimento \(PPU\)/i)).toBeVisible();
+    await expect(crudCard.getByText(/Beneficiário \/ paciente/i)).toHaveCount(0);
   });
 
   test("cadastra walk-in particular e confirma chegada", async ({ page }) => {

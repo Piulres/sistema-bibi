@@ -283,7 +283,7 @@ sequenceDiagram
 | # | Gap | Impacto | Melhoria sugerida |
 |---|-----|---------|-------------------|
 | 1 | Beneficiário agenda, mas confirmação é manual na recepção | Fricção operacional | Confirmação automática ou notificação push |
-| 2 | Sem indicador visual de progresso entre portais | Usuário não sabe “onde está” no ciclo | Status tracker: Agendado → Em atendimento → Aguardando fatura → Pago |
+| 2 | Sem indicador visual de progresso entre portais | Usuário não sabe “onde está” no ciclo | **Parcial:** `FlowStepper` + `care-journey.ts` no Beneficiário e Prestador; mapa em `flow-improvements-map.ts` |
 | 3 | PJ vê alertas, mas não pode resolver | RH depende de suporte | Self-service de regularização ou chat |
 | 4 | Lembretes automáticos mock (`console`) | Paciente não recebe lembrete real | Adapter SendGrid/Twilio em produção |
 | 5 | Sem repasse ao prestador | Prestador não vê receita gerada | Módulo de repasse / extrato prestador |
@@ -317,7 +317,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 
 | # | Melhoria | Portal(es) | Impacto | Tier sugerido |
 |---|----------|------------|---------|---------------|
-| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 |
+| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **Cancelar:** ✅ `PATCH …/beneficiario/appointments/[id]` · Reagendar: backlog |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
 | 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 |
@@ -325,7 +325,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 | 6 | Navegação por abas no portal Beneficiário | Beneficiário | UX mobile | 5 |
 | 7 | Notificações reais (e-mail/SMS) | Todos | Lembretes e confirmações | 5 |
 | 8 | Drill-down por beneficiário no PJ | PJ | Analytics corporativo | 5+ |
-| 9 | Status tracker cross-portal | Todos | Visibilidade do ciclo PPU | 5+ |
+| 9 | Status tracker cross-portal | Todos | Visibilidade do ciclo PPU | 5+ | **Parcial:** `FlowStepper` Beneficiário/Prestador |
 | 10 | Gateway PIX real (Asaas/Efí) | Beneficiário, Interno | Receita em produção | 5 |
 
 Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHMARK.md`](BENCHMARK.md) §5.
@@ -336,7 +336,8 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 
 | Documento | Conteúdo relacionado |
 |-----------|---------------------|
-| [`FLUXOS.md`](FLUXOS.md) | Ações técnicas, APIs, RBAC, máquinas de estado |
+| [`FLUXOS.md`](FLUXOS.md) | Ações técnicas, APIs, RBAC, máquinas de estado, §8.7 melhorias de fluxo |
+| `src/lib/flow-improvements-map.ts` | Mapa canônico implementado vs backlog |
 | [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) | Falhas mapeadas por portal (segurança, RBAC API, bugs) |
 | [`BENCHMARK.md`](BENCHMARK.md) | Posicionamento vs iClinic/Feegow/ERPMed |
 | [`PAYMENTS.md`](PAYMENTS.md) | Motor PIX e ciclo de cobrança |

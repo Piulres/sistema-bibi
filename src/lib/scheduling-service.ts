@@ -1,6 +1,11 @@
 import "server-only";
 import { prisma } from "@/lib/db";
 import { createAppointment } from "@/lib/appointment-service";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 /** Horário comercial simplificado para slots (POC). */
 const SLOT_START_HOUR = 8;
@@ -94,4 +99,49 @@ export async function bookBeneficiaryAppointment(input: {
     status: "AGENDADO",
     createdBy: input.createdBy,
   });
+}
+
+/** Cancela consulta self-service — somente AGENDADO e futura. */
+export async function cancelBeneficiaryAppointment(input: {
+  tenantId: string;
+  patientId: string;
+  appointmentId: string;
+  createdBy: string;
+}) {
+  const appointment = await prisma.appointment.findFirst({
+    where: {
+      id: input.appointmentId,
+      tenantId: input.tenantId,
+      patientId: input.patientId,
+    },
+    include: { patient: { select: { name: true } } },
+  });
+
+  if (!appointment) {
+    return { error: "Agendamento não encontrado" as const };
+  }
+
+  if (appointment.status !== "AGENDADO") {
+    return { error: "Somente consultas agendadas podem ser canceladas" as const };
+  }
+
+  if (appointment.scheduledAt.getTime() <= Date.now()) {
+    return { error: "Não é possível cancelar consultas passadas ou em andamento" as const };
+  }
+
+  await prisma.appointment.update({
+    where: { id: appointment.id },
+    data: { status: "CANCELADO" },
+  });
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
+    entityId: appointment.id,
+    action: TIMELINE_ACTIONS.UPDATED,
+    description: `${appointment.patient.name} cancelou consulta agendada`,
+    createdBy: input.createdBy,
+  });
+
+  return { ok: true as const, status: "CANCELADO" as const };
 }
