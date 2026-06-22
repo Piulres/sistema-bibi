@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
+                    │  E2E (37)   │  Playwright — 7 specs (smoke, flows, interno, rbac, walk-in, mobile-nav, flow-improvements)
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -87,6 +87,17 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa por domínio de negócio
 
+### Care Chart (clínico)
+
+| Etapa | Módulo | Teste atual | Próximo |
+|-------|--------|-------------|---------|
+| Perfil clínico | `clinical-profile-service.ts` | ❌ | API PATCH alergias/condições |
+| Prescrição | `medication-service.ts` | ❌ | API POST + transição de status |
+| Pedido de exame | `exam-order-service.ts` | ❌ | API workflow SOLICITADO → LAUDADO |
+| Protocolos | `care-protocol-service.ts` | ❌ | API matrícula + checklist |
+| UI prestador | `AtendimentoView`, `ClinicalCarePanel` | ❌ | E2E abas clínicas |
+| UI beneficiário | `BeneficiarioView` `#medicacoes` | ⚠️ parcial | E2E com âncoras `#resumo`/`#agenda` (fix PR #86) |
+
 ### Pay Per Use (receita)
 
 | Etapa | Módulo | Teste atual | Próximo |
@@ -150,8 +161,10 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 - `POST /api/cron/reminders` — ⏰ ✅ testado
 - `POST /api/cron/webhooks` — ⏰
 
-### Prestador (5 rotas) — 🔑 PRESTADOR
+### Prestador (14 rotas) — 🔑 PRESTADOR
 - agenda, appointments, procedures, records
+- clinical-overview, clinical-profile, medications, exam-orders, protocols
+- PATCH medications/[id], exam-orders/[id], protocols/[id]
 
 ### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
 - Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
@@ -230,6 +243,8 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | 11 módulos admin |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `mobile-nav.spec.ts` | Drawer mobile em interno e beneficiário |
+| `flow-improvements.spec.ts` | Cancelamento beneficiário, stepper PPU, QR PIX |
 
 ---
 

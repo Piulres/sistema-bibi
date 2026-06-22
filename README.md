@@ -35,10 +35,10 @@ de valores e faturamento sem perdas de informação.
 
 | Portal | Público | Foco |
 |--------|---------|------|
-| **Portal do Prestador** | Médicos / profissionais de saúde | Agenda inteligente e prontuário eletrônico (PEP) |
+| **Portal do Prestador** | Médicos / profissionais de saúde | Agenda, atendimento, PEP e **Care Chart** (medicação, exames, protocolos) |
 | **Portal Interno** | Equipe administrativa | Dashboard executivo, faturamento, CRM, recorrência e comunicação |
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
-| **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
+| **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas, medicações, exames e plano de cuidado |
 
 ## 2. Pilares de negócio
 
@@ -206,6 +206,11 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | `Appointment` | Agendamento; `modality` PRESENCIAL/TELE + `telemedicineUrl`. |
 | `ProcedureUsage` | **Uso efetivo de procedimento — núcleo do Pay Per Use** (preço congelado). |
 | `MedicalRecord` | Prontuário eletrônico (PEP) com `recordType` e templates. |
+| `PatientClinicalProfile` | Perfil clínico persistente (alergias, condições crônicas, tipo sanguíneo). |
+| `MedicationPrescription` | Prescrição estruturada com workflow de status. |
+| `ExamOrder` | Pedido de exame com laudo e workflow de status. |
+| `CareProtocolTemplate` | Template de protocolo de cuidado (checklist JSON por tenant). |
+| `PatientProtocolEnrollment` | Matrícula do paciente em um protocolo com progresso. |
 | `Invoice` / `InvoiceItem` | Fatura; item via `usageId` (Pay Per Use) ou `subscriptionChargeId`. |
 | `Payment` | Histórico de pagamento (PIX pendente/confirmado, manual). |
 | `Subscription` | Assinatura recorrente (ciclo + valor por beneficiário/empresa). |

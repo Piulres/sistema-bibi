@@ -79,12 +79,14 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 | 4. Pós-atendimento | Consulta consumo Pay Per Use | Seção “Consumo Pay Per Use” | Vê procedimentos `billed` / não `billed` |
 | 5. Faturamento | Aguarda fatura emitida pelo interno | KPI “Total faturado” | — |
 | 6. Pagamento | Gera PIX → confirma pagamento | Seção “Faturas” | `Invoice` PAGA |
-| 7. Acompanhamento | Consulta PEP, assinatura, timeline | Seções inferiores | Somente leitura |
+| 7. Acompanhamento clínico | Consulta medicações, exames e plano de cuidado | `#medicacoes`, `#exames`, `#plano` | `GET /api/beneficiario/clinical` |
+| 8. Histórico | Consulta PEP, assinatura, timeline | `#prontuario` e seções inferiores | Somente leitura |
 
 ### 2.2 Pontos fortes
 
 - Self-service completo: agendar + pagar + ver consumo.
 - Transparência Pay Per Use com preço congelado (`priceCharged`).
+- Visibilidade clínica: medicações ativas, status de exames e protocolos de cuidado.
 - Escopo estrito por `patientId` — sem acesso a dados de terceiros.
 
 ### 2.3 Gaps e melhorias
@@ -93,7 +95,7 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 |:----------:|-----|----------|
 | Alta | Não pode cancelar nem reagendar consulta | Ações com regras de antecedência (ex.: até 24 h antes) |
 | Alta | PIX em dois passos manuais (gerar + confirmar) | Webhook do gateway ou polling; exibir QR Code |
-| Média | Página única longa (scroll) | Abas: Agenda · Consumo · Faturas · Prontuário |
+| Média | Página única longa (scroll) | Abas ou nav por âncora (`#resumo`, `#agenda`, `#medicacoes`…) — parcialmente endereçável |
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
 | Média | Notificações mock (`COMMUNICATION_PROVIDER=console`) | Adapter real (e-mail/SMS/WhatsApp) |
 | Baixa | Sem carteirinha digital | Card com QR + dados do plano corporativo |
@@ -149,14 +151,18 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 |-------|-----------------|------------|--------|
 | 1. Entrada | Login prestador | `/login` | Sessão `PRESTADOR` |
 | 2. Agenda do dia | Vê consultas de hoje | `/prestador` | `GET /api/prestador/agenda` |
-| 3. Abrir atendimento | Clica no card do paciente | `/prestador/atendimento/[id]` | Detalhe: paciente, empresa, procedimentos |
-| 4. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
-| 5. PEP | Salva evolução/receita/atestado | Templates PEP | `MedicalRecord` + timeline |
-| 6. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
+| 3. Abrir atendimento | Clica no card do paciente | `/prestador/atendimento/[id]` | Detalhe + sidebar clínica + abas Care Chart |
+| 4. Registrar uso | Adiciona procedimento do catálogo | Aba Procedimentos | `ProcedureUsage` com `priceCharged` congelado |
+| 5. PEP | Salva evolução/receita/atestado | Aba Prontuário | `MedicalRecord` + timeline |
+| 6. Care Chart | Prescreve medicação, solicita exames, matricula protocolo | Abas Medicação · Exames · Protocolos · Perfil | APIs `.../medications`, `.../exam-orders`, `.../protocols` |
+| 7. Histórico longitudinal | Consulta timeline do paciente | `/prestador/paciente/[id]` | Consultas, PEP, abas clínicas |
+| 8. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
 
 ### 4.2 Pontos fortes
 
-- Fluxo clínico enxuto: agenda → atendimento → PEP → conclusão.
+- Fluxo clínico enxuto: agenda → atendimento → PEP → Care Chart → conclusão.
+- Sidebar clínica com alergias, medicações ativas e exames pendentes no atendimento.
+- Histórico longitudinal por paciente (`/prestador/paciente/[id]`).
 - Preço congelado no momento do uso (Pay Per Use).
 - Templates PEP (`pep-templates.ts`) aceleram documentação.
 
@@ -167,7 +173,7 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 | Alta | Só exibe agenda do dia | Calendário semanal/mensal + filtros |
 | Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
-| Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
+| Média | ~~Sem histórico clínico no atendimento~~ | ✅ Resolvido v1.1 — sidebar + `/prestador/paciente/[id]` |
 | Média | Sem assinatura digital em receitas/atestados | Conformidade CFM + PDF |
 | Baixa | Sem fila automática de atendimento | “Próximo paciente” após marcar REALIZADO |
 

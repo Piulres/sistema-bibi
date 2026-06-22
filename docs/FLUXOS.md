@@ -149,8 +149,26 @@ Quando `User.mfaEnabled = true`:
 
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
-| `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento ou histórico do paciente |
+| `/prestador/pacientes` | `PrestadorPatientsView` | Listar pacientes atendidos; abrir histórico longitudinal |
+| `/prestador/paciente/[id]` | `PrestadorPatientHistoryView` | Timeline, consultas, PEP, abas clínicas (Care Chart) |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Procedimentos, PEP, medicação, exames, protocolos, perfil clínico |
+
+### Care Chart no atendimento
+
+Layout em duas colunas: **sidebar clínica** (`ClinicalSidebar`) com alergias, medicações
+ativas, exames pendentes e protocolos; **abas** (`TabBar`) para o fluxo do encontro.
+
+| Aba | Ação | API / serviço |
+|-----|------|---------------|
+| Procedimentos | Registrar uso Pay Per Use | `POST .../appointments/[id]/procedures` |
+| Prontuário | Salvar PEP (templates) | `POST /api/prestador/records` |
+| Medicação | Prescrever / suspender / encerrar | `POST\|GET .../patients/[id]/medications` · `PATCH .../medications/[id]` |
+| Exames | Solicitar / atualizar status / laudar | `POST\|GET .../patients/[id]/exam-orders` · `PATCH .../exam-orders/[id]` |
+| Protocolos | Matricular / marcar checklist | `POST\|GET .../patients/[id]/protocols` · `PATCH .../protocols/[id]` |
+| Perfil clínico | Alergias, condições crônicas, tipo sanguíneo | `GET\|PATCH .../patients/[id]/clinical-profile` |
+
+Sidebar carrega via `GET /api/prestador/patients/[id]/clinical-overview` (`clinical-overview.ts`).
 
 ### APIs disparadas
 
@@ -158,9 +176,14 @@ Quando `User.mfaEnabled = true`:
 |------------|-----|------------------|
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
+| Visão clínica (sidebar) | `GET /api/prestador/patients/[id]/clinical-overview` | Perfil + meds ativas + exames pendentes + protocolos |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
+| Prescrever medicação | `POST .../patients/[id]/medications` | `MedicationPrescription` ATIVA + timeline |
+| Solicitar exame | `POST .../patients/[id]/exam-orders` | `ExamOrder` SOLICITADO + timeline |
+| Laudar exame | `PATCH .../exam-orders/[id]` | status LAUDADO + `resultSummary` |
+| Matricular protocolo | `POST .../patients/[id]/protocols` | `PatientProtocolEnrollment` + timeline |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
 ```mermaid
@@ -168,8 +191,10 @@ flowchart LR
   A[Agenda do dia] --> B[Atendimento]
   B --> C[Registrar ProcedureUsage]
   B --> D[Salvar PEP]
-  B --> E[Marcar REALIZADO]
-  C --> F[(billed=false)]
+  B --> E[Care Chart: meds / exames / protocolos]
+  B --> F[Marcar REALIZADO]
+  C --> G[(billed=false)]
+  A --> H[Histórico /prestador/paciente/id]
 ```
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
@@ -245,6 +270,17 @@ sequenceDiagram
 Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicine.ts`
 
 ### 4.3 Cadastros (`CadastrosView`)
+
+Abas: Pacientes · Empresas · Procedimentos · Usuários · **Protocolos clínicos** · Mapa CRUD.
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| CRUD entidades | `/api/interno/patients|companies|procedures|users` | Validação CPF/CNPJ, RBAC cadastros |
+| Templates de protocolo | `GET\|POST /api/interno/protocol-templates` | `CareProtocolTemplate` por tenant |
+| Editar template | `PATCH /api/interno/protocol-templates/[id]` | Checklist JSON, `active`, retorno sugerido |
+| Visão clínica (Cliente 360°) | `GET /api/interno/patients/[id]/clinical` | Overview consolidado do paciente |
+
+UI protocolos: `ProtocolTemplatesPanel` em `/interno/cadastros?tab=protocols`.
 
 | Aba | Criar (POST) | Atualizar | Excluir | Observações |
 |-----|--------------|-----------|---------|-------------|
@@ -342,11 +378,15 @@ flowchart LR
 | Agenda | Lista + link telemedicina |
 | Consumo Pay Per Use | Procedimentos billed/não billed |
 | Faturas | Pagar com PIX (status FECHADA) |
+| **Medicações** (`#medicacoes`) | Prescrições ativas (somente leitura) |
+| **Exames** (`#exames`) | Pedidos e status (somente leitura) |
+| **Plano de cuidado** (`#plano`) | Protocolos ativos com progresso |
 | Assinatura / PEP / Timeline | Somente leitura |
 
 | Ação | API | Serviço |
 |------|-----|---------|
 | Overview | `GET /api/beneficiario/overview` | `beneficiary-overview.ts` |
+| **Dados clínicos** | `GET /api/beneficiario/clinical` | `clinical-overview.ts` + listagens |
 | Prestadores | `GET /api/beneficiario/providers` | Users PRESTADOR |
 | Slots | `GET /api/beneficiario/slots?providerId&date` | `scheduling-service.ts` (8h–18h, 30 min) |
 | Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
@@ -573,6 +613,40 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 **SubscriptionCharge:** `PENDENTE → FATURADA | CANCELADA`
 
+### 10.6 MedicationPrescription
+
+Valores: `ATIVA | SUSPENSA | ENCERRADA`
+
+- Criação sempre `ATIVA` (`medication-service.ts`).
+- `ENCERRADA` define `endDate` automaticamente.
+- Eventos timeline: `MEDICATION_PRESCRIBED`, `MEDICATION_UPDATED`.
+
+### 10.7 ExamOrder
+
+Valores: `SOLICITADO | AGENDADO | REALIZADO | LAUDADO | CANCELADO`
+
+```mermaid
+stateDiagram-v2
+  [*] --> SOLICITADO: prestador solicita
+  SOLICITADO --> AGENDADO: PATCH scheduledAt
+  AGENDADO --> REALIZADO: PATCH status
+  REALIZADO --> LAUDADO: PATCH resultSummary / markReviewed
+  SOLICITADO --> CANCELADO: PATCH
+  AGENDADO --> CANCELADO: PATCH
+```
+
+- `resultAttachmentKey` reservado para anexo de laudo (upload não implementado na POC).
+- Eventos timeline: `EXAM_ORDERED`, `EXAM_UPDATED`.
+
+### 10.8 PatientProtocolEnrollment
+
+Valores: `ATIVO | CONCLUIDO | SUSPENSO`
+
+- Checklist em JSON (`checklistState`: `{ [itemId]: boolean }`).
+- `progressPercent` calculado no serviço (`care-protocol-service.ts`).
+- `nextReviewAt` derivado de `suggestedReturnDays` do template na matrícula.
+- Eventos timeline: `PROTOCOL_STARTED`, `PROTOCOL_UPDATED`.
+
 ---
 
 ## 11. Mapa de APIs por portal
@@ -583,10 +657,14 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
+`GET /api/prestador/patients/[id]/clinical-overview|clinical-profile|medications|exam-orders|protocols` ·
+`POST .../medications|exam-orders|protocols` ·
+`PATCH /api/prestador/medications/[id]` · `PATCH /api/prestador/exam-orders/[id]` ·
+`PATCH /api/prestador/protocols/[id]`
 
 ### Beneficiário
-`GET /api/beneficiario/overview|providers|slots` ·
+`GET /api/beneficiario/overview|providers|slots|clinical` ·
 `POST /api/beneficiario/appointments` ·
 `PATCH /api/beneficiario/appointments/[id]` ·
 `POST|PATCH /api/beneficiario/invoices/[id]/pay`
@@ -596,7 +674,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
-`companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
+`companies/*` · `procedures/*` · `users/*` · `protocol-templates/*` ·
+`subscriptions/*` · `messages/*` ·
 `reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
 
 ### Cron (sistema)
