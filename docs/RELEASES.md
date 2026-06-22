@@ -14,32 +14,52 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção** | **1.0.1** (`e4d8a43`) |
-| **Deploy Netlify** | Publicado 22/06/2026 ~13:49 — PR #73 |
-| `main` | `e4d8a43` — alinhada com produção |
-| `dev` | `0fc9242` — **1.1.0** (v1.0.1 + cadastros v1.1) |
-| Tag git em produção | **`v1.0.1`** |
-| Próximo pacote | **v1.1.0** — merge `dev` → `main` (futuro) |
+| **Versão em produção** | **1.0.2** (`e30b2b0`) |
+| **Deploy Netlify** | Publicado 22/06/2026 ~15:08 — merge branding plataforma/clínicas (PR #77) |
+| `main` | `e30b2b0` — alinhada com produção |
+| `dev` | `0fc9242` — **1.1.0** (v1.0.x + cadastros v1.1) |
+| Tag git em produção | **`v1.0.1`** (recomendado tagar **`v1.0.2`** após fechamento) |
+| Próximo pacote | **v1.1.0** — merge `dev` → `main` |
 | Validação `dev` | `npm run pre-release` · 111+ testes |
 
 ---
 
 ## Pacote em produção (fechado)
 
-### `v1.0.1` — agenda prestador + demo/operação
+### `v1.0.2` — identidade plataforma vs clínicas (white label)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | *(pendente `v1.0.2`)* |
+| **Commit** | `e30b2b0` |
+| **PR** | [#77](https://github.com/Piulres/sistema-bibi/pull/77) |
+| **Publicado em** | 22/06/2026 ~15:08 — deploy Netlify (build Git, `main`) |
+| **Escopo** | Separação Sistema Bibi (produto) × tenant clínico |
+| **Docs** | [`V1_0.md`](V1_0.md) (linha 1.0.x) |
+
+**Inclui:**
+
+- Landing e marketing com **`PLATFORM_BRANDING`** fixo (**Sistema Bibi**), sem ler tenant do banco
+- Logins com shell **Portal da clínica** + `Powered by Sistema Bibi`; branding do tenant após autenticação
+- Tenant demo renomeado: **Clínica Horizonte** (não confundir com a marca da plataforma)
+- `getLoginBrandingFromHeaders()` preparado para domínio customizado white-label
+
+**Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
+
+---
+
+### `v1.0.1` — agenda prestador + demo/operação *(substituído)*
 
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v1.0.1` |
 | **Commit** | `e4d8a43` |
 | **PR** | [#73](https://github.com/Piulres/sistema-bibi/pull/73) |
-| **Publicado em** | 22/06/2026 — deploy Netlify (build Git) |
+| **Publicado em** | 22/06/2026 ~13:49 — deploy Netlify (build Git) |
 | **Escopo** | PRs #69–#71 (sem cadastros v1.1) |
 | **Docs** | [`V1_0.md`](V1_0.md) |
 
 **Inclui:** agenda prestador (dia/próximos/histórico), dual SQLite demo/operação, fluxo dev-first.
-
-**Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
 
 ---
 
@@ -61,7 +81,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Versão | Doc | Estado |
 |--------|-----|--------|
-| **1.0.x** | [`V1_0.md`](V1_0.md) | ✅ `v1.0.1` em produção |
+| **1.0.x** | [`V1_0.md`](V1_0.md) | ✅ `v1.0.2` em produção |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Integrada na `dev` — não produção |
 
 ---
@@ -70,7 +90,8 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Versão / Pacote | Commit | Data (UTC) | Estado |
 |-----------------|--------|------------|--------|
-| **`v1.0.1`** | `e4d8a43` | 22/06/2026 | ✅ **Em produção** |
+| **`v1.0.2`** | `e30b2b0` | 22/06/2026 | ✅ **Em produção** |
+| `v1.0.1` | `e4d8a43` | 22/06/2026 | ✅ Substituído |
 | `v1.0.0` | `685cc21` | 22/06/2026 | ✅ Substituído |
 | `bibi-poc-2026-06-22c` | `32dad64` | 22/06/2026 | ✅ Substituído |
 | `bibi-poc-2026-06-22b` | `92348ba` | 22/06/2026 | ✅ Substituído |
