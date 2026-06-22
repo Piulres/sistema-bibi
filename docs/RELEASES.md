@@ -16,7 +16,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 |------|-------|
 | **Versão em produção** | **1.0.2** (`e30b2b0`) |
 | **Deploy Netlify** | Publicado 22/06/2026 ~15:08 — app · ~15:26 doc (`6a1f042`) |
-| `main` | `6a1f042` — alinhada com produção (doc release) |
+| `main` | `7be4b8b` — alinhada com produção (doc + `package.json` 1.0.2) |
 | `dev` | `0fc9242` — **1.1.0** (v1.0.x + cadastros v1.1) |
 | Tag git em produção | **`v1.0.2`** |
 | Próximo pacote | **v1.1.0** — merge `dev` → `main` |
