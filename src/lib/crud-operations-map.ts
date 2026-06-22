@@ -332,8 +332,12 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
       ui("Prestadores", "/beneficiario → Agendar", "GET /api/beneficiario/providers"),
       ui("Horários livres", "/beneficiario → Agendar", "GET /api/beneficiario/slots"),
     ],
-    update: none,
-    delete: none,
+    update: [
+      ui("Cancelar consulta", "/beneficiario → Minha agenda", "PATCH /api/beneficiario/appointments/[id]"),
+    ],
+    delete: [
+      ui("Cancelar (status CANCELADO)", "/beneficiario → Minha agenda", "PATCH …/appointments/[id] { action: cancel }"),
+    ],
   },
   {
     entity: "Pagamento PIX (beneficiário)",

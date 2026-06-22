@@ -9,6 +9,8 @@ import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import StatCard from "@/components/ui/StatCard";
 import FlowStepper from "@/components/ui/FlowStepper";
+import AppointmentCard from "@/components/ui/AppointmentCard";
+import PixQrDisplay from "@/components/ui/PixQrDisplay";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 
 type Overview = {
@@ -33,6 +35,7 @@ type Overview = {
   } | null;
   appointments: {
     id: string;
+    scheduledAt: string;
     scheduledAtLabel: string;
     status: string;
     modality: string;
@@ -184,6 +187,26 @@ export default function BeneficiarioView() {
     }
   }
 
+  async function cancelAppointment(id: string) {
+    setBusy(`cancel-${id}`);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/beneficiario/appointments/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "cancel" }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao cancelar");
+      else {
+        setMsg("Consulta cancelada com sucesso.");
+        await reloadOverview();
+      }
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function payWithPix(invoiceId: string) {
     setBusy(`pix-${invoiceId}`);
     setMsg(null);
@@ -245,7 +268,7 @@ export default function BeneficiarioView() {
       {pixState && (
         <Alert tone="info">
           <p className="font-medium">PIX gerado</p>
-          <p className="mt-2 break-all font-mono text-xs">{pixState.pixCopyPaste}</p>
+          <PixQrDisplay copyPaste={pixState.pixCopyPaste} className="mt-3" />
           <Button
             className="mt-3"
             variant="portal"
@@ -360,46 +383,58 @@ export default function BeneficiarioView() {
       </section>
 
       <section id="agenda">
+        <SectionHeader
+          title="Minha agenda"
+          description="Consultas agendadas e histórico recente."
+        />
         {overview.appointments.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum atendimento registrado.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
+            Nenhum atendimento registrado.
+          </p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Data</th>
-                  <th className="px-4 py-2 font-medium">Prestador</th>
-                  <th className="px-4 py-2 font-medium">Status</th>
-                  <th className="px-4 py-2 font-medium">Modalidade</th>
-                  <th className="px-4 py-2 font-medium">Motivo</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.appointments.map((appointment) => (
-                  <tr key={appointment.id}>
-                    <td className="px-4 py-2 text-[var(--text-secondary)]">{appointment.scheduledAtLabel}</td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.providerName}</td>
-                    <td className="px-4 py-2">
-                      <StatusBadge value={appointment.status} map="appointment" />
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">
-                      {appointment.modality === "TELE" ? (
-                        appointment.telemedicineUrl ? (
-                          <a href={appointment.telemedicineUrl} target="_blank" rel="noreferrer" className="text-[var(--portal-accent)] hover:underline">
-                            Tele · entrar
-                          </a>
-                        ) : (
-                          "Telemedicina"
-                        )
-                      ) : (
-                        "Presencial"
-                      )}
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="mt-3 space-y-3">
+            {overview.appointments.map((appointment) => {
+              const time = new Date(appointment.scheduledAt).toLocaleTimeString("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              });
+              const canCancel = appointment.status === "AGENDADO";
+              return (
+                <AppointmentCard
+                  key={appointment.id}
+                  time={time}
+                  title={appointment.providerName}
+                  subtitle={appointment.scheduledAtLabel}
+                  status={appointment.status}
+                  meta={
+                    appointment.modality === "TELE" && appointment.telemedicineUrl ? (
+                      <a
+                        href={appointment.telemedicineUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-[var(--portal-accent)] hover:underline"
+                      >
+                        Entrar na teleconsulta
+                      </a>
+                    ) : appointment.reason ? (
+                      <span className="text-xs text-[var(--text-muted)]">{appointment.reason}</span>
+                    ) : null
+                  }
+                  actions={
+                    canCancel ? (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        disabled={busy === `cancel-${appointment.id}`}
+                        onClick={() => cancelAppointment(appointment.id)}
+                      >
+                        {busy === `cancel-${appointment.id}` ? "Cancelando..." : "Cancelar"}
+                      </Button>
+                    ) : null
+                  }
+                />
+              );
+            })}
           </div>
         )}
       </section>

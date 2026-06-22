@@ -14,6 +14,8 @@ import {
   type PepRecordType,
 } from "@/lib/pep-templates";
 import LoadingState from "@/components/ui/LoadingState";
+import FlowStepper from "@/components/ui/FlowStepper";
+import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 
 type Usage = {
   id: string;
@@ -157,10 +159,34 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
     }
   }
 
+  async function confirmArrival() {
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/prestador/appointments/${appointmentId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "CONFIRMADO" }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao confirmar presença");
+      else {
+        setMsg("Presença do paciente confirmada.");
+        await load();
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!detail) return <LoadingState message="Carregando atendimento..." />;
 
   const total = detail.usages.reduce((s, u) => s + u.priceCharged, 0);
+  const journeyStep = resolveCareJourneyStep({
+    appointmentStatus: detail.appointment.status,
+    hasUnbilledUsages: detail.usages.some((u) => !u.billed),
+  });
 
   return (
     <div className="space-y-6">
@@ -170,6 +196,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       />
 
       <Card padding="lg">
+        <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">{detail.patient.name}</h1>
@@ -182,9 +209,14 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               {detail.appointment.reason ?? "Consulta"}
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
             <StatusBadge value={detail.appointment.status} map="appointment" />
-            {detail.appointment.status !== "REALIZADO" && (
+            {detail.appointment.status === "AGENDADO" && (
+              <Button variant="secondary" size="sm" onClick={confirmArrival} disabled={busy}>
+                Paciente presente
+              </Button>
+            )}
+            {detail.appointment.status !== "REALIZADO" && detail.appointment.status !== "CANCELADO" && (
               <Button variant="primary" size="sm" onClick={markRealizado} disabled={busy}>
                 Marcar como realizado
               </Button>
