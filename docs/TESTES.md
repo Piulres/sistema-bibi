@@ -32,6 +32,16 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
+### `globalSetup` e ciclo de vida do banco
+
+[`tests/global-setup.ts`](../tests/global-setup.ts) roda **antes dos workers** Vitest e chama `ensureTestDatabase()` ([`tests/helpers/db.ts`](../tests/helpers/db.ts)):
+
+1. Define `DATABASE_URL` para `file:./prisma/test.db`
+2. Se o arquivo não existir: `prisma db push` + `prisma db seed` (mesma massa demo, escala padrão `medium`)
+3. Testes de integração/API reutilizam o mesmo SQLite — **não** tocam `dev.db`
+
+O job CI `unit-integration-api` passa `DATABASE_URL=file:./test.db`, mas o `globalSetup` **sobrescreve** para `prisma/test.db` em runtime. O job E2E usa `dev.db` com `SEED_SCALE=small` (seed explícito no workflow).
+
 ---
 
 ## O que você **não vê** (lacunas e riscos)

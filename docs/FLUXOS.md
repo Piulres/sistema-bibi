@@ -72,6 +72,8 @@ flowchart TB
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
 
+Massa completa (50 empresas, preços de mercado, perfis por setor): [`SEED_DATA.md`](SEED_DATA.md).
+
 ---
 
 ## 2. Autenticação e MFA
@@ -552,6 +554,7 @@ Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml)
 4. **TISS** — XML simplificado; validação XSD pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
 6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
+7. **Massa demo** — preços e cenários B2B em `prisma/seed-data/`; ver [`SEED_DATA.md`](SEED_DATA.md).
 
 ---
 

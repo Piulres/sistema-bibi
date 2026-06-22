@@ -58,7 +58,7 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
-**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; em produção via `ALLOW_DEMO_RESET=true` no `netlify.toml`).
+**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; em produção via `NETLIFY=true` + `ALLOW_DEMO_RESET=true` no `netlify.toml`). Detalhes: `docs/SEED_DATA.md`.
 ### Operações e preferências de IA
 
 **Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:**
@@ -127,6 +127,7 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
   `docs/VARIAVEIS_AMBIENTE.md` (mapa de env vars, CI, Netlify e Cursor),
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
-  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
-  `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
-  `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).
+  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys),  `docs/OPERACOES.md` (mapa de operações),
+ `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
+ `docs/SEED_DATA.md` (massa demo, pricing-market, reset),
+ `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).
