@@ -14,13 +14,23 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção** | **1.0.2** (`e30b2b0`) |
-| **Deploy Netlify** | Publicado 22/06/2026 ~15:08 — app · ~15:26 doc (`6a1f042`) |
-| `main` | `7be4b8b` — alinhada com produção (doc + `package.json` 1.0.2) |
-| `dev` | `0fc9242` — **1.1.0** (v1.0.x + cadastros v1.1) |
+| **Versão em produção** | **1.0.2** (`e30b2b0`) + mobile nav (`d5ef580`) |
+| **Deploy Netlify** | Auto-deploy da `main` |
+| `main` | `d5ef580` — release / produção |
+| `dev` | `78d0177` — **1.1.0** — sincronizada com `main` + cadastros v1.1 |
 | Tag git em produção | **`v1.0.2`** |
-| Próximo pacote | **v1.1.0** — merge `dev` → `main` |
-| Validação `dev` | `npm run pre-release` · 111+ testes |
+| Próximo pacote | **v1.1.0** — validar `dev` → merge `dev` → `main` |
+| Validação `dev` | `npm run pre-release` |
+
+### Sincronização de ambientes
+
+| Ambiente | Branch | Conteúdo |
+|----------|--------|----------|
+| **Integração** | `dev` | Tudo em produção **+** v1.1.0 (cadastros) — **novas atividades aqui** |
+| **Release / produção** | `main` | Pacote publicado (v1.0.2 + mobile nav) |
+| **Netlify** | `main` | Espelha produção |
+
+> **Regra:** PRs de feature/bugfix → base **`dev`**. Merge `dev` → `main` só ao fechar pacote.
 
 ---
 
@@ -154,6 +164,14 @@ git push origin main
 git push origin vX.Y.Z
 ```
 
+### 6. Re-sincronizar `dev` após release
+
+```bash
+git checkout dev
+git merge main
+git push origin dev
+```
+
 ---
 
 ## Convenção de nomes
@@ -174,6 +192,7 @@ Pacotes POC anteriores (`bibi-poc-AAAA-MM-DDx`) permanecem no histórico.
 |------|---------|
 | Deploy a cada PR mergeado | Queima cota Netlify + tokens de agente |
 | `netlify deploy --prod` em agente sem pedido | Custo e risco desnecessários |
+| PR de feature direto na `main` | Integrar em `dev` primeiro |
 | Confiar só no deploy Git | Histórico de falhas — validar com `pre-release` |
 | `npm run db:reset` em agente | Bloqueado — use `db:push && db:seed` |
 
