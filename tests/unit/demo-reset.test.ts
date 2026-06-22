@@ -15,22 +15,24 @@ describe("demo-reset", () => {
     else process.env.ALLOW_DEMO_RESET = originalFlag;
   });
 
-  it("habilita reset fora de producao por padrao", () => {
+  it("habilita reset por padrao (dev e producao)", () => {
     process.env.NODE_ENV = "development";
     delete process.env.ALLOW_DEMO_RESET;
     expect(isDemoResetEnabled()).toBe(true);
-  });
 
-  it("desabilita reset em producao sem flag", () => {
     process.env.NODE_ENV = "production";
     delete process.env.ALLOW_DEMO_RESET;
+    expect(isDemoResetEnabled()).toBe(true);
+  });
+
+  it("desabilita reset quando ALLOW_DEMO_RESET=false", () => {
+    process.env.ALLOW_DEMO_RESET = "false";
     expect(isDemoResetEnabled()).toBe(false);
   });
 
-  it("respeita ALLOW_DEMO_RESET=true em producao", () => {
-    process.env.NODE_ENV = "production";
-    process.env.ALLOW_DEMO_RESET = "true";
-    expect(isDemoResetEnabled()).toBe(true);
+  it("respeita ALLOW_DEMO_RESET=0", () => {
+    process.env.ALLOW_DEMO_RESET = "0";
+    expect(isDemoResetEnabled()).toBe(false);
   });
 
   it("exige frase RESTAURAR", () => {

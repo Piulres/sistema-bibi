@@ -6,12 +6,11 @@ import type { SessionUser } from "@/lib/session";
 
 let resetInProgress = false;
 
-/** Habilita o botão de restaurar demo (desligado em produção por padrão). */
+/** Habilita o botão de restaurar demo (habilitado por padrão; use ALLOW_DEMO_RESET=false para desligar). */
 export function isDemoResetEnabled(): boolean {
   const flag = process.env.ALLOW_DEMO_RESET?.trim().toLowerCase();
-  if (flag === "true" || flag === "1") return true;
   if (flag === "false" || flag === "0") return false;
-  return process.env.NODE_ENV !== "production";
+  return true;
 }
 
 export function canUserResetDemo(user: SessionUser): boolean {
