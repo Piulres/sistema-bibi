@@ -148,8 +148,9 @@ Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedr
   em loop, salvo pedido explícito do usuário. Testar com `npm run dev` / `npm run pre-release`.
   Pacotes fechados: `docs/RELEASES.md`.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
-  `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
-  Ver `docs/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
+ `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
+ Landing usa `PLATFORM_BRANDING` (Sistema Bibi); logins usam `getLoginBrandingFromHeaders()`.
+ Ver `docs/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
   `src/app/{interno,prestador,pj,beneficiario}/layout.tsx` — shell persistente;
   páginas só renderizam `PageHeader` + conteúdo. Config central: `src/lib/navigation/`.
   Componentes: `Breadcrumbs`, `SectionNav`, `MobileNavDrawer`, `NavigationProgress`.

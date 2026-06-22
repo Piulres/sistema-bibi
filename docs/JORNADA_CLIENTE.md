@@ -60,7 +60,7 @@ flowchart TB
 | **Prestador** | Médico / profissional | `/login` | `/prestador` | Entrega o serviço clínico |
 | **Interno** | Equipe administrativa | `/interno/login` | `/interno/dashboard` | Operação, faturamento e backoffice |
 
-**Entrada pública:** landing (`/`) → seção Portais → login dedicado por perfil.
+**Entrada pública:** landing (`/`) com identidade **Sistema Bibi** (`getPlatformBranding`) → seção Portais → login dedicado por perfil (shell neutro ou branding do tenant se `Host` resolve domínio custom).
 Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 
 ---

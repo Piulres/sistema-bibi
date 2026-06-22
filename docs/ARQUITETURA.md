@@ -43,6 +43,7 @@ flowchart TB
       RBAC["interno-permissions.ts<br/>(RBAC Tier 3)"]
       MFA["mfa.ts · tiss-service.ts<br/>(Tier 4)"]
       Dashboard["executive-dashboard.ts"]
+      Branding["theme/branding.ts<br/>tenant-resolver.ts<br/>(plataforma vs clínica)"]
       DB["db.ts (Prisma Client)"]
     end
   end
@@ -569,6 +570,7 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 | Portal PJ | `pj-portal-service.ts`, `PjView.tsx` |
 | LGPD | `patient-export.ts`, export JSON |
 | Domínio custom | `tenant-resolver.ts`, `TenantBranding.customDomain` |
+| Identidade visual | `theme/tokens.ts` (`PLATFORM_BRANDING`, `CLINIC_BRANDING_DEFAULTS`), `theme/branding.ts` (`getPlatformBranding`, `getLoginBranding`, `getTenantBranding`) |
 
 ---
 
