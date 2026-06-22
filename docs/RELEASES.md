@@ -14,7 +14,7 @@ não confie em “deploy automático” para saber o que está no ar.
 |------|-------|
 | Site | ❌ **503 `usage_exceeded`** — cota Netlify esgotada |
 | Pacote em produção | `bibi-poc-2026-06-22a` → commit `beeb894` (PR #28) |
-| `main` local | `158b69f` (PR #39) — **não publicado** |
+| `main` local | `4170d10` (PR #42) — **não publicado** |
 | Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
 | Validação local | `npm run pre-release` |
 
@@ -44,7 +44,7 @@ não confie em “deploy automático” para saber o que está no ar.
 
 **Não inclui (na `main` mas fora de produção):**
 
-- PRs #29–#39: fixes CI GitHub, seed 50 PJ, massa operacional, landing moderna, etc.
+- PRs #29–#44: fixes CI, seed em escala, landing, testes automatizados, demo reset, docs de operações, etc.
 - Ver diff: `git log beeb894..main --oneline`
 
 ---
@@ -55,9 +55,9 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Campo | Valor |
 |-------|-------|
-| **Commit alvo** | `158b69f` (head da `main` em 22/06) |
-| **PRs desde produção** | #29–#39 |
-| **Destaques** | Builds Git corrigidos, seed em escala (50 PJ, VitaCare), landing moderna |
+| **Commit alvo** | `4170d10` (head da `main` em 22/06) |
+| **PRs desde produção** | #29–#44 |
+| **Destaques** | Seed modular (`SEED_SCALE`), landing moderna, Vitest + Playwright + CI, botão restaurar demo, `OPERACOES.md` |
 | **Checklist** | Ver seção [Publicar um pacote](#publicar-um-pacote) abaixo |
 
 Antes de publicar:
@@ -85,6 +85,7 @@ npx netlify deploy --prod    # quando cota Netlify permitir
 | `94c0f67` | #27 | Build exit code 2 |
 | `beeb894` | #28 | Build Git falhou (CLI funcionou) |
 | `158b69f` | #39 | Provavelmente OK no CI — site já em 503 |
+| `4170d10` | #41–#44 | Não publicado — site em 503 |
 
 Detalhes: [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md)
 

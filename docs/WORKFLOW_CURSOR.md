@@ -71,6 +71,16 @@ Evidências gravadas: [`evidencias/`](evidencias/).
 ## Validar pacote (sem publicar)
 
 ```bash
+npm run lint && npm run test   # antes de PR (espelha CI parcial)
+npm run pre-release            # antes de fechar pacote (lint + build Netlify)
+```
+
+`pre-release` **não** executa Vitest nem Playwright — o CI GitHub roda ambos após merge.
+Ver [`TESTES.md`](TESTES.md) para o mapa completo.
+
+### O que `pre-release` executa
+
+```bash
 npm run pre-release
 ```
 
@@ -120,7 +130,8 @@ Assim só publica quando você roda `netlify deploy --prod` ou clica “Trigger 
 | **Nunca** `netlify deploy --prod` | Salvo pedido explícito do usuário |
 | **Nunca** “verificar produção” em loop | Um `curl` basta; 503 = cota, não bug |
 | Preferir `npm run dev` + testes locais | Economiza tokens e cota |
-| Usar `npm run pre-release` | Valida sem publicar |
+| Usar `npm run pre-release` | Valida build sem publicar |
+| `npm run test` antes de PR | Alinha com CI (lint + test no GitHub Actions) |
 | Atualizar `RELEASES.md` | Só após deploy manual confirmado pelo usuário |
 | Não investigar 503 como regressão | Resposta `usage_exceeded` = plano Netlify |
 
@@ -156,5 +167,6 @@ Se retornar `{"error":"usage_exceeded",...}`:
 
 - Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
 - Pacotes e histórico: [`RELEASES.md`](RELEASES.md)
+- Estratégia de testes: [`TESTES.md`](TESTES.md)
 - Deploy e troubleshooting: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 - Fluxos do sistema: [`FLUXOS.md`](FLUXOS.md)
