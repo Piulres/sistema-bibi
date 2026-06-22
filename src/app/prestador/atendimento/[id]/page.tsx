@@ -1,7 +1,5 @@
 import { redirect } from "next/navigation";
 import { getSessionUser } from "@/lib/session";
-import { PORTALS } from "@/lib/roles";
-import PortalShell from "@/components/layout/PortalShell";
 import AtendimentoView from "@/components/AtendimentoView";
 
 export default async function AtendimentoPage(
@@ -12,17 +10,6 @@ export default async function AtendimentoPage(
     redirect("/login");
   }
   const { id } = await props.params;
-  const portal = PORTALS.prestador;
 
-  return (
-    <PortalShell
-      portal="prestador"
-      portalLabel={portal.label}
-      loginPath={portal.loginPath}
-      userName={user.name}
-      branding={user.branding}
-    >
-      <AtendimentoView appointmentId={id} />
-    </PortalShell>
-  );
+  return <AtendimentoView appointmentId={id} />;
 }

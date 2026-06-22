@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
+import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import { buildAtendimentoBreadcrumbs } from "@/lib/navigation";
 import {
   buildPepTemplate,
   PEP_RECORD_TYPES,
@@ -163,12 +164,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
 
   return (
     <div className="space-y-6">
-      <Link
-        href="/prestador"
-        className="text-sm text-[var(--text-muted)] transition hover:text-[var(--text-primary)]"
-      >
-        ← Voltar para a agenda
-      </Link>
+      <Breadcrumbs
+        items={buildAtendimentoBreadcrumbs(detail.patient.name)}
+        className="mb-2"
+      />
 
       <Card padding="lg">
         <div className="flex flex-wrap items-start justify-between gap-3">

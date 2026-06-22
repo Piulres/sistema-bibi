@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getSiteUrl } from "@/lib/landing/site-url";
+import NavigationProgress from "@/components/layout/NavigationProgress";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -50,9 +51,11 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
+      data-scroll-behavior="smooth"
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans antialiased">
+        <NavigationProgress />
         {children}
       </body>
     </html>

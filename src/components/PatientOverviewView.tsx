@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import LoadingState from "@/components/ui/LoadingState";
@@ -67,12 +66,8 @@ type Overview = {
 
 export default function PatientOverviewView({
   patientId,
-  returnTo = "/interno",
-  returnLabel = "Voltar ao faturamento",
 }: {
   patientId: string;
-  returnTo?: string;
-  returnLabel?: string;
 }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -106,20 +101,10 @@ export default function PatientOverviewView({
   return (
     <div className="space-y-8">
       <div>
-        <Link
-          href={returnTo}
-          className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
-        >
-          ← {returnLabel}
-        </Link>
-        <h1 className="mt-3 text-2xl font-bold text-[var(--text-primary)]">Cliente 360°</h1>
-        <p className="mt-1 text-[var(--text-muted)]">
-          Visão consolidada do beneficiário — dados, atendimentos, procedimentos e faturamento.
-        </p>
         <a
           href={`/api/interno/patients/${patientId}/export`}
           download
-          className="mt-3 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
+          className="inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
         >
           Exportar dados (LGPD JSON)
         </a>
