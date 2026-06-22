@@ -330,14 +330,18 @@ sistema-bibi/
 │   │   │   ├── cron/        # reminders, webhooks retry
 │   │   │   └── procedures/  # catálogo
 │   │   ├── login/           # /login (Prestador)
-│   │   ├── interno/         # dashboard, faturamento, cadastros, integrações…
-│   │   ├── beneficiario/    # /beneficiario e /beneficiario/login
-│   │   ├── pj/              # /pj e /pj/login
-│   │   ├── prestador/       # /prestador e /prestador/atendimento/[id]
-│   │   ├── layout.tsx       # layout raiz (pt-BR)
+│   │   ├── interno/         # dashboard, faturamento, cadastros… (+ layout.tsx SPA)
+│   │   ├── beneficiario/    # /beneficiario e /beneficiario/login (+ layout.tsx)
+│   │   ├── pj/              # /pj e /pj/login (+ layout.tsx)
+│   │   ├── prestador/       # /prestador e /prestador/atendimento/[id] (+ layout.tsx)
+│   │   ├── layout.tsx       # layout raiz (pt-BR, NavigationProgress)
 │   │   └── page.tsx         # landing page
-│   ├── components/          # componentes de cliente (views/forms)
-│   ├── lib/                 # db, sessão, invoice-service, webhooks, MFA…
+│   ├── components/
+│   │   ├── ui/              # primitivos (Button, NavTabs, Breadcrumbs, SectionNav…)
+│   │   └── layout/          # PortalShell, *PortalShell, NavigationProgress, MobileNavDrawer
+│   ├── lib/
+│   │   ├── navigation/      # rotas, breadcrumbs e resolvers de aba ativa (fonte única)
+│   │   └── …                # db, sessão, invoice-service, webhooks, MFA…
 │   └── proxy.ts             # proteção de rotas (Next 16 "Proxy")
 ├── .env.example
 └── README.md

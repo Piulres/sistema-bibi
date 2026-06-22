@@ -28,7 +28,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
 | E2E | Playwright | `e2e/` | `npm run test:e2e` |
-| CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
+| CI | GitHub Actions (Node **24**) | `.github/workflows/ci.yml` | push/PR em `main`, `cursor/**` |
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
@@ -204,6 +204,33 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 5. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
 6. **P2 — Webhooks:** integração com fila de retry
 7. **P3 — Performance:** smoke de carga em `computePrice` e dashboard KPIs
+
+---
+
+## Playwright — padrões E2E
+
+### Ambiente CI
+
+O workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) usa **Node 24**.
+O job `e2e` prepara o banco com `SEED_SCALE=small`, instala Chromium e roda na
+porta `3100` (`CI=true`, `PLAYWRIGHT_PORT`).
+
+### Nav do portal interno (SPA #58)
+
+Com layouts persistentes, o dashboard interno tem **quick links** além das abas
+principais. Testes que clicam em módulos devem escopar a navegação:
+
+```typescript
+import { internoNav } from "./helpers/auth";
+
+await internoNav(page).getByRole("link", { name: "Cadastros" }).click();
+```
+
+O helper retorna `getByRole("navigation", { name: "Navegação por abas" })` —
+o mesmo `aria-label` de `NavTabs` em `InternoNav`. Sem escopo, `getByRole("link", …)`
+pode acertar links do dashboard em vez da nav.
+
+Arquitetura da SPA: [`ARQUITETURA.md`](ARQUITETURA.md) §5.
 
 ---
 

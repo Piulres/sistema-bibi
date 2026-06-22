@@ -12,6 +12,8 @@ ver [`evidencias/README.md`](evidencias/README.md). Para operações (dev, relea
 ver [`OPERACOES.md`](OPERACOES.md). Para histórico de PRs/deploys do dia,
 ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 
+> **Navegação SPA (layouts persistentes, breadcrumbs):** [`ARQUITETURA.md`](ARQUITETURA.md) §5 · componentes em [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
+
 ---
 
 ## Índice

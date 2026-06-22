@@ -14,9 +14,9 @@ não confie em “deploy automático” para saber o que está no ar.
 |------|-------|
 | Site produção | https://sistema-bibi.netlify.app — **ainda `bibi-poc-2026-06-22c`** até deploy manual |
 | Pacote em produção | `bibi-poc-2026-06-22c` → commit `32dad64` |
-| `main` | `abe4b16` — **pronta para publicar** `bibi-poc-2026-06-22d` |
-| `dev` | `abe4b16` — alinhada com `main` |
-| Validação local | `npm run pre-release` ✅ (`abe4b16`) |
+| `main` | `a73b9b5` — **pronta para publicar** `bibi-poc-2026-06-22d` |
+| `dev` | `a73b9b5` — alinhada com `main` |
+| Validação local | `npm run pre-release` ✅ (`a73b9b5`) |
 
 ---
 
@@ -54,7 +54,7 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Campo | Valor |
 |-------|-------|
-| **Commit alvo** | `abe4b16` (`main` = `dev`) |
+| **Commit alvo** | `a73b9b5` (`main` = `dev`) |
 | **PRs desde produção** | #56 testes E2E · #58 SPA navigation · #59 jornada cliente · #60 auditoria fluxos · #61 CI Node 24 |
 | **Checklist** | `npm run pre-release` ✅ → deploy no site **sistema-bibi** (ver abaixo) |
 

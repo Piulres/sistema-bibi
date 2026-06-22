@@ -12,6 +12,8 @@ e são renderizados automaticamente no GitHub.
 > **Deploy Netlify:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) · produção: https://sistema-bibi.netlify.app
 >
 > **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](RELEASES.md)
+>
+> **Design system e componentes de navegação:** [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)
 
 ---
 
@@ -272,6 +274,60 @@ flowchart LR
 A validação ocorre em duas camadas: `src/proxy.ts` (checagem otimista do cookie,
 redireciona ao login) e o servidor (`requireUser([...roles])` em cada handler e
 `getSessionUser()` em cada página), que valida assinatura HMAC e `role`.
+
+---
+
+## 5. Navegação SPA por portal (PR #58)
+
+Cada portal autenticado usa **layout persistente** (`layout.tsx`) com shell
+client-side que **não remonta** entre trocas de rota. Páginas individuais
+renderizam apenas `PageHeader` + conteúdo — sem repetir `PortalShell` ou nav.
+
+```mermaid
+flowchart TB
+  Root["layout.tsx raiz<br/>NavigationProgress"]
+  subgraph Interno["Portal Interno"]
+    IL["interno/layout.tsx<br/>InternoPortalShell"]
+    IP["interno/*/page.tsx<br/>PageHeader + view"]
+  end
+  subgraph Prestador["Portal Prestador"]
+    PL["prestador/layout.tsx<br/>PrestadorPortalShell"]
+    PP["prestador/*/page.tsx"]
+  end
+  Root --> IL --> IP
+  Root --> PL --> PP
+```
+
+| Portal | Layout | Shell | Navegação | Breadcrumbs |
+|--------|--------|-------|-----------|-------------|
+| Interno | `src/app/interno/layout.tsx` | `InternoPortalShell` | `InternoNav` (11 abas) + `MobileNavDrawer` | `buildPatientBreadcrumbs` |
+| Prestador | `src/app/prestador/layout.tsx` | `PrestadorPortalShell` | `PrestadorNav` | `buildAtendimentoBreadcrumbs` |
+| PJ | `src/app/pj/layout.tsx` | `PjPortalShell` | `SectionNav` (âncoras na rota única) | — |
+| Beneficiário | `src/app/beneficiario/layout.tsx` | `BeneficiarioPortalShell` | `SectionNav` (8 seções) | — |
+| Landing | — | `LandingHeader` + `LandingMobileMenu` | — | — |
+
+**Config central** (`src/lib/navigation/`):
+
+| Arquivo | Responsabilidade |
+|---------|------------------|
+| `routes.ts` | Abas (`INTERNO_NAV_TABS`, `PRESTADOR_NAV_TABS`), seções PJ/beneficiário, labels e `resolve*Active()` |
+| `breadcrumbs.ts` | `buildPatientBreadcrumbs`, `buildAtendimentoBreadcrumbs` |
+| `index.ts` | Re-export público |
+
+**Rotas públicas do interno** (sem shell autenticado): `/interno/login` e
+`/interno/faturamento` (redirect legado — ver `INTERNO_PUBLIC_PATHS`).
+
+**Padrão para nova página interna:**
+
+1. Adicionar entrada em `INTERNO_NAV_TABS` e `resolveInternoActive()` se for nova aba.
+2. Page server: `requireInternoPage("module")` + `PageHeader` + view.
+3. Não importar `InternoNav` na page — o layout já fornece.
+
+**E2E:** escopar cliques na nav com `internoNav(page)` (`e2e/helpers/auth.ts`) —
+`NavTabs` expõe `aria-label="Navegação por abas"`. Sem escopo, links do dashboard
+podem colidir com a nav principal.
+
+Ver também: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · [`TESTES.md`](TESTES.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md).
 
 ---
 
