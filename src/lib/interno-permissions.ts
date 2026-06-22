@@ -51,6 +51,14 @@ export function hasInternoPermission(
   return resolveInternoPermissions(role, internoProfile).includes(module);
 }
 
+export function isInternoAdmin(
+  role: string,
+  internoProfile: string | null | undefined,
+): boolean {
+  if (role !== "INTERNO") return false;
+  return !internoProfile || internoProfile === "ADMIN";
+}
+
 export function internoProfileLabel(profile: string | null | undefined): string {
   switch (profile) {
     case "FATURAMENTO":
