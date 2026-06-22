@@ -9,7 +9,8 @@ function resolveDatabaseUrl(): string | undefined {
   }
 
   const isServerless =
-    process.env.NETlify === "true" || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
+    Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME) ||
+    (process.env.NETLIFY === "true" && process.env.CI !== "true");
 
   if (!isServerless) {
     return configured;
