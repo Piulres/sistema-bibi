@@ -88,6 +88,43 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 
 Config de menus e rótulos: `src/lib/navigation/routes.ts`.
 
+### Navegação responsiva
+
+Breakpoint único: **lg (1024px)** — abaixo disso, rotas e seções migram para drawer; acima, faixa horizontal com `ScrollableNavRail`.
+
+| Padrão | Portal | &lt; lg | ≥ lg | `aria-label` (E2E) |
+|--------|--------|--------|------|-------------------|
+| Rotas multi-página | Interno | `MobileNavDrawer` | `NavTabs` + rail | `"Navegação por abas"` / `"Módulos internos"` |
+| Âncoras em página única | PJ, Beneficiário | `MobileSectionDrawer` | `SectionNav` + rail | `"Seções da empresa"` / `"Seções do beneficiário"` |
+| Abas client-side | Cadastros, etc. | — (sempre rail) | `TabBar` + rail | `"Abas da página"` (customizável) |
+| Rotas | Prestador | — (1 aba) | `NavTabs` | `"Navegação por abas"` |
+
+**`ScrollableNavRail`** (`src/components/ui/ScrollableNavRail.tsx`):
+- `ResizeObserver` + listener de scroll detectam overflow;
+- gradientes laterais e botões com `aria-label` “Rolar navegação para a esquerda/direita”;
+- scrollbar oculta; `snap-x` nos itens; padding extra quando há setas.
+
+**Drawers** (`MobileNavDrawer`, `MobileSectionDrawer`):
+- visíveis só com `lg:hidden`; trigger mostra rótulo da aba/seção ativa;
+- painel lateral direito, overlay, `Escape` fecha e devolve foco ao trigger;
+- `body { overflow: hidden }` enquanto aberto.
+
+**Overflow horizontal:** shells (`*PortalShell`, `PortalShell`) e `main` usam `min-w-0` para que filhos com `w-max` (nav) não estourem a página.
+
+**Branding mobile:** em `/interno/branding`, `BrandingView` empilha a pré-visualização acima do formulário em telas estreitas (`order-first lg:order-none`).
+
+```tsx
+// InternoNav — drawer + abas desktop (fonte: InternoNav.tsx)
+<MobileNavDrawer tabs={tabs} active={resolvedActive} title="Módulos internos" />
+<NavTabs tabs={tabs} active={resolvedActive} className="hidden lg:flex" />
+
+// SectionNav — âncoras com hash (#faturas)
+<MobileSectionDrawer sections={sections} activeId={activeId} onSelect={handleClick} title={drawerTitle} />
+<ScrollableNavRail className="hidden lg:block">…</ScrollableNavRail>
+```
+
+Detalhe arquitetural: [`ARQUITETURA.md`](ARQUITETURA.md) §5 · testes E2E: [`TESTES.md`](TESTES.md).
+
 ## Uso em páginas
 
 ```tsx

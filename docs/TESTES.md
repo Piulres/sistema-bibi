@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
+                    │  E2E (37)   │  Playwright — 7 specs (+ mobile-nav, flow-improvements)
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -230,6 +230,26 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | 11 módulos admin |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `flow-improvements.spec.ts` | FlowStepper, cancelamento de consulta |
+| `mobile-nav.spec.ts` | Drawer interno (&lt; lg), abas desktop com rail, drawer de seções beneficiário |
+
+### Projetos Playwright
+
+`playwright.config.ts` define dois projetos — todos os specs rodam em ambos:
+
+| Projeto | Dispositivo | Uso |
+|---------|-------------|-----|
+| `chromium` | Desktop Chrome | Fluxos padrão (1280×800 nos testes de desktop) |
+| `mobile-chrome` | Pixel 7 | Viewport mobile; `mobile-nav.spec.ts` força 390×844 onde necessário |
+
+Helpers em `e2e/helpers/auth.ts`:
+
+| Helper | Quando usar |
+|--------|-------------|
+| `internoNav(page)` | Desktop (≥ lg) — `getByRole('navigation', { name: 'Navegação por abas' })` |
+| `internoNavDrawer(page)` | Mobile (&lt; lg) — `getByRole('navigation', { name: 'Módulos internos' })` |
+
+**Pitfall:** abaixo de 1024px o interno **não** renderiza `NavTabs`; testes que clicam em abas devem usar o drawer ou `setViewportSize({ width: 1280, … })`.
 
 ---
 
