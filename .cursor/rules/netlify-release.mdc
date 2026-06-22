@@ -25,7 +25,7 @@ Referências: `@docs/DEPLOY_NETLIFY.md` · `@docs/RELEASES.md` · `@docs/OPERACO
 git checkout main && git pull
 npm run pre-release                              # lint + build local (obrigatório)
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
+npx netlify deploy --prod --no-build --message "vX.Y.Z: resumo"
 # smoke test → atualizar docs/RELEASES.md → commit
 ```
 
@@ -50,8 +50,11 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 
 ## Convenção de pacote
 
+A partir de **1.0.0**, use versionamento semântico:
+
 ```
-bibi-poc-AAAA-MM-DD[a|b|c]
+vMAJOR.MINOR.PATCH   (ex.: v1.0.0, v1.1.0)
 ```
 
-Registrar em `@docs/RELEASES.md` após cada publicação manual.
+Pacotes POC legados (`bibi-poc-AAAA-MM-DDx`) permanecem no histórico de `@docs/RELEASES.md`.
+Registrar cada publicação manual nesse arquivo.

@@ -82,6 +82,8 @@ Executa, em sequência:
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 
+> **Não confundir com CI:** o `pre-release` roda lint + build Netlify. O CI (`.github/workflows/ci.yml`) adiciona `npm run test` (88 Vitest) e `npm run test:e2e` (44 Playwright). Antes de PR: `npm run lint && npm run test`.
+
 ---
 
 ## Publicar em produção (manual, raro)
@@ -95,7 +97,7 @@ Se passar, o pacote está **pronto para publicação** — mas ainda **não** fo
 ```bash
 git checkout main && git pull
 npm run pre-release
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
+npx netlify deploy --prod --no-build --message "vX.Y.Z: resumo"
 ```
 
 Depois: atualize [`RELEASES.md`](RELEASES.md) e faça commit na `main`.
@@ -147,7 +149,7 @@ Se retornar `{"error":"usage_exceeded",...}`:
 | Tarefa | Onde |
 |--------|------|
 | Feature, bugfix, seed, docs | Cursor (local ou Cloud) |
-| `npm run pre-release` | Qualquer ambiente com Node 22 |
+| `npm run pre-release` | Qualquer ambiente com Node 20+ (CI em Node 24) |
 | `netlify deploy --prod` | **Sua máquina** com CLI logada (recomendado) |
 | Configurar env vars / cota | Painel Netlify (humano) |
 

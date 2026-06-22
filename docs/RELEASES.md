@@ -14,8 +14,8 @@ não confie em “deploy automático” para saber o que está no ar.
 |------|-------|
 | **Versão semântica** | **1.0.0** |
 | Site produção | https://sistema-bibi.netlify.app |
-| Pacote em produção | `v1.0.0` → tag `v1.0.0` · deploy `6a38e19c` |
-| `main` | release **1.0.0** publicada |
+| Pacote em produção | `v1.0.0` → tag `v1.0.0` · commit `685cc21` · deploy `6a38e19c` |
+| `main` | release **1.0.0** publicada (pode ter commits docs-only à frente) |
 | Tag git | `v1.0.0` |
 | Validação local | `npm run pre-release` ✅ |
 | Deploy | 22/06/2026 — `npx netlify deploy --prod --no-build` |
@@ -29,7 +29,7 @@ não confie em “deploy automático” para saber o que está no ar.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v1.0.0` |
-| **Commit** | `2395921` — merge walk-in, CRUD, UI e melhorias de fluxo |
+| **Commit** | `685cc21` — chore release 1.0.0 (código em `2395921`) |
 | **Versão npm** | `1.0.0` (`package.json`) |
 | **Publicado em** | 22/06/2026 — deploy `6a38e19c` (netlify build + `--no-build`) |
 | **Método** | `npm run pre-release` + `npx netlify deploy --prod --no-build` |
@@ -73,7 +73,7 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Versão / Pacote | Commit | Data (UTC) | Método | Estado |
 |-----------------|--------|------------|--------|--------|
-| **`v1.0.0`** | `2395921` | 22/06/2026 | CLI `--prod --no-build` + tag | ✅ **Em produção** |
+| **`v1.0.0`** | `685cc21` | 22/06/2026 | CLI `--prod --no-build` + tag | ✅ **Em produção** |
 | `bibi-poc-2026-06-22c` | `32dad64` | 22/06 ~03:50 | CLI `--prod --no-build` | ✅ Substituído por 1.0.0 |
 | `bibi-poc-2026-06-22b` | `92348ba` | 22/06 ~02:36 | CLI `--prod --no-build` | ✅ Substituído |
 | `bibi-poc-2026-06-22a` | `beeb894` | 22/06 ~00:01 | CLI `--prod` | ✅ Substituído |

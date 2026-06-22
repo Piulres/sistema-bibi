@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
+                    │  E2E (44)   │  Playwright — 6 specs (smoke, flows, interno, rbac, walk-in, flow-improvements)
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -176,9 +176,21 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
+# Lint + test + build (espelha parte do CI local)
 npm run lint && npm run test && npm run build
 ```
+
+### `pre-release` vs CI
+
+| Etapa | `npm run pre-release` | CI GitHub Actions |
+|-------|----------------------|-------------------|
+| Lint | ✅ | ✅ |
+| Build | ✅ (`netlify:build`) | ✅ (`npm run build`) |
+| Vitest (88) | ❌ | ✅ |
+| Playwright (44) | ❌ | ✅ |
+| Node | 20+ local | **24** |
+
+> Antes de PR: `npm run lint && npm run test`. O `pre-release` valida o artefato Netlify, não a suíte completa.
 
 ### Variáveis em testes
 
@@ -230,6 +242,7 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | 11 módulos admin |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `flow-improvements.spec.ts` | Mapa de melhorias, confirmar presença prestador |
 
 ---
 

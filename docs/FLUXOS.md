@@ -139,6 +139,19 @@ Quando `User.mfaEnabled = true`:
 | Ativar | `{ action: "enable", secret, code }` | Grava secret, `mfaEnabled=true` |
 | Desativar | `{ action: "disable", code }` | Limpa MFA |
 
+### 2.3 Restaurar modo demo
+
+Recria a massa do seed (IDs novos) sem reset destrutivo do schema.
+
+| Item | Detalhe |
+|------|---------|
+| **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
+| **Quem** | ADMIN interno (`faturamento@bibi.health`) |
+| **API** | `POST /api/interno/demo/reset` · body `{ "confirm": "RESTAURAR" }` |
+| **Flag** | `ALLOW_DEMO_RESET` — ligado em POC Netlify por padrão |
+
+Fonte: `src/lib/demo-reset.ts`. Após restaurar, refaça login (sessões antigas invalidam).
+
 ---
 
 ## 3. Portal Prestador
