@@ -91,6 +91,30 @@ type Overview = {
   }[];
 };
 
+type ClinicalData = {
+  activeMedications: {
+    id: string;
+    medication: string;
+    dosage: string;
+    frequency: string;
+    statusLabel: string;
+  }[];
+  examOrders: {
+    id: string;
+    examName: string;
+    statusLabel: string;
+    resultSummary: string | null;
+    scheduledAtLabel: string | null;
+  }[];
+  protocols: {
+    id: string;
+    templateName: string;
+    statusLabel: string;
+    progressPercent: number;
+    nextReviewAtLabel: string | null;
+  }[];
+};
+
 type PixState = {
   invoiceId: string;
   paymentId: string;
@@ -99,6 +123,7 @@ type PixState = {
 
 export default function BeneficiarioView() {
   const [overview, setOverview] = useState<Overview | null>(null);
+  const [clinical, setClinical] = useState<ClinicalData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -123,15 +148,18 @@ export default function BeneficiarioView() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const [overviewRes, providersRes] = await Promise.all([
+      const [overviewRes, providersRes, clinicalRes] = await Promise.all([
         fetch("/api/beneficiario/overview"),
         fetch("/api/beneficiario/providers"),
+        fetch("/api/beneficiario/clinical"),
       ]);
       const overviewData = await overviewRes.json();
       const providersData = await providersRes.json();
+      const clinicalData = await clinicalRes.json();
       if (!active) return;
       if (!overviewRes.ok) setError(overviewData.error ?? "Erro ao carregar seus dados");
       else setOverview(overviewData.overview);
+      if (clinicalRes.ok) setClinical(clinicalData.clinical);
       setProviders(providersData.providers ?? []);
       setLoading(false);
     })();
@@ -561,6 +589,60 @@ export default function BeneficiarioView() {
                     ))}
                   </ul>
                 )}
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section id="medicacoes">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minhas medicações</h3>
+        {!clinical?.activeMedications?.length ? (
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma medicação ativa.</p>
+        ) : (
+          <div className="mt-3 space-y-3">
+            {clinical.activeMedications.map((m) => (
+              <article key={m.id} className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">
+                <p className="font-medium text-[var(--text-primary)]">{m.medication}</p>
+                <p className="text-sm text-[var(--text-muted)]">{m.dosage} · {m.frequency}</p>
+                <StatusBadge value="ATIVA" label={m.statusLabel} className="mt-2" />
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section id="exames">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meus exames</h3>
+        {!clinical?.examOrders?.length ? (
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum exame solicitado.</p>
+        ) : (
+          <div className="mt-3 space-y-3">
+            {clinical.examOrders.map((e) => (
+              <article key={e.id} className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p className="font-medium">{e.examName}</p>
+                  <StatusBadge value={e.statusLabel} label={e.statusLabel} />
+                </div>
+                {e.scheduledAtLabel && <p className="mt-1 text-xs text-[var(--text-muted)]">Agendado: {e.scheduledAtLabel}</p>}
+                {e.resultSummary && <p className="mt-2 text-sm text-[var(--text-secondary)]">{e.resultSummary}</p>}
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section id="plano">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu plano de cuidado</h3>
+        {!clinical?.protocols?.filter((p) => p.statusLabel === "Ativo").length ? (
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum protocolo ativo.</p>
+        ) : (
+          <div className="mt-3 space-y-3">
+            {clinical.protocols.filter((p) => p.statusLabel === "Ativo").map((p) => (
+              <article key={p.id} className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">
+                <p className="font-medium">{p.templateName}</p>
+                <p className="text-sm text-[var(--text-muted)]">Progresso: {p.progressPercent}%</p>
+                {p.nextReviewAtLabel && <p className="text-xs text-[var(--text-muted)]">Próxima revisão: {p.nextReviewAtLabel}</p>}
               </article>
             ))}
           </div>

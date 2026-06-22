@@ -13,11 +13,13 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import CrudOperationsMap from "@/components/CrudOperationsMap";
 import FlowImprovementsMap from "@/components/FlowImprovementsMap";
 import TabBar from "@/components/ui/TabBar";
+import ProtocolTemplatesPanel from "@/components/ProtocolTemplatesPanel";
 
 const tabs = [
   { key: "patients", label: "Beneficiários" },
   { key: "companies", label: "Empresas" },
   { key: "procedures", label: "Procedimentos" },
+  { key: "protocols", label: "Protocolos clínicos" },
   { key: "users", label: "Usuários" },
   { key: "operations", label: "Mapa CRUD" },
 ] as const;
@@ -794,6 +796,18 @@ export default function CadastrosView() {
             </ul>
           </Card>
         </div>
+      )}
+
+      {tab === "protocols" && (
+        <Card>
+          <SectionHeader
+            title="Protocolos clínicos"
+            description="Templates de cuidado aplicáveis no atendimento (HAS, DM2, etc.)."
+          />
+          <div className="mt-4">
+            <ProtocolTemplatesPanel />
+          </div>
+        </Card>
       )}
 
       {tab === "users" && (

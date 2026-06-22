@@ -32,6 +32,7 @@ import {
 import { resolveSeedScale } from "./scale";
 import { seedVitacareTenant } from "./vitacare";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
+import { seedClinicalDemo } from "./clinical-demo";
 import { currentTotpCode, DEMO_MFA_SECRET } from "./totp-demo";
 
 const DEMO_PASSWORD = hashPassword("bibi123");
@@ -63,6 +64,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.invoiceItem.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.procedureUsage.deleteMany();
+  await prisma.patientProtocolEnrollment.deleteMany();
+  await prisma.examOrder.deleteMany();
+  await prisma.medicationPrescription.deleteMany();
+  await prisma.patientClinicalProfile.deleteMany();
+  await prisma.careProtocolTemplate.deleteMany();
   await prisma.medicalRecord.deleteMany();
   await prisma.appointment.deleteMany();
   await prisma.pricingRule.deleteMany();
@@ -402,6 +408,15 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       description: "Anotação clínica registrada no prontuário de João Pereira",
       createdBy: prestador.id,
     },
+  });
+
+  console.log("Criando massa Care Chart (perfil, meds, exames, protocolos)...");
+  await seedClinicalDemo(prisma, {
+    tenantId: tenant.id,
+    patientId: joaoId,
+    providerId: prestador.id,
+    appointmentId: ag1.id,
+    procedureHbA1cId: procedures["EXA-GLI"]?.id,
   });
 
   const usageMaria = await prisma.procedureUsage.create({

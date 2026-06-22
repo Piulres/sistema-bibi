@@ -51,10 +51,12 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
 /** Abas do portal prestador. */
 export const PRESTADOR_NAV_TABS: NavTab[] = [
   { href: "/prestador", label: "Agenda", key: "agenda" },
+  { href: "/prestador/pacientes", label: "Pacientes", key: "pacientes" },
 ];
 
 export function resolvePrestadorActive(pathname: string): string | undefined {
   if (pathname === "/prestador") return "agenda";
+  if (pathname.startsWith("/prestador/pacientes")) return "pacientes";
   if (pathname.startsWith("/prestador/atendimento/")) return "atendimento";
   if (pathname.startsWith("/prestador/paciente/")) return "paciente";
   return undefined;
@@ -75,6 +77,9 @@ export const BENEFICIARIO_SECTION_NAV = [
   { id: "agenda", label: "Agenda" },
   { id: "consumo", label: "Consumo" },
   { id: "faturas", label: "Faturas" },
+  { id: "medicacoes", label: "Medicações" },
+  { id: "exames", label: "Exames" },
+  { id: "plano", label: "Plano de cuidado" },
   { id: "assinatura", label: "Assinatura" },
   { id: "prontuario", label: "Prontuário" },
   { id: "historico", label: "Histórico" },
