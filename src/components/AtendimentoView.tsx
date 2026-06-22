@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
@@ -208,6 +209,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               {new Date(detail.appointment.scheduledAt).toLocaleString("pt-BR")} ·{" "}
               {detail.appointment.reason ?? "Consulta"}
             </p>
+            <Link
+              href={`/prestador/paciente/${detail.patient.id}`}
+              className="mt-2 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
+            >
+              Ver histórico completo do paciente →
+            </Link>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <StatusBadge value={detail.appointment.status} map="appointment" />

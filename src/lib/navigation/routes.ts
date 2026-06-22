@@ -56,6 +56,7 @@ export const PRESTADOR_NAV_TABS: NavTab[] = [
 export function resolvePrestadorActive(pathname: string): string | undefined {
   if (pathname === "/prestador") return "agenda";
   if (pathname.startsWith("/prestador/atendimento/")) return "atendimento";
+  if (pathname.startsWith("/prestador/paciente/")) return "paciente";
   return undefined;
 }
 
