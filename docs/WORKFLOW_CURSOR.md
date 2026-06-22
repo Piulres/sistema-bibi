@@ -77,6 +77,14 @@ Senha única: **`bibi123`**. Portais e e-mails em [`README.md`](../README.md) e 
 
 Evidências gravadas: [`evidencias/`](evidencias/).
 
+### Testar navegação mobile
+
+```bash
+npm run test:e2e -- e2e/mobile-nav.spec.ts --project=mobile-chrome
+```
+
+Ou redimensione o browser em `npm run dev` — drawers aparecem abaixo de **1024px** (breakpoint `lg`).
+
 ---
 
 ## Validar pacote (sem publicar)

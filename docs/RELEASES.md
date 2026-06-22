@@ -53,6 +53,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 - Logins com shell **Portal da clínica** + `Powered by Sistema Bibi`; branding do tenant após autenticação
 - Tenant demo renomeado: **Clínica Horizonte** (não confundir com a marca da plataforma)
 - `getLoginBrandingFromHeaders()` preparado para domínio customizado white-label
+- **Navegação responsiva** (`d5ef580` na `main`): drawers mobile, `ScrollableNavRail`, E2E `mobile-nav.spec.ts`
 
 **Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
 

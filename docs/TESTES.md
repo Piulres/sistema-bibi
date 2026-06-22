@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
+                    │  E2E (37)   │  Playwright — 7 specs × 2 projetos (desktop + Pixel 7)
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -223,13 +223,28 @@ Senha única: `bibi123`
 
 ### Specs E2E (`e2e/`)
 
-| Arquivo | Cobertura |
-|---------|-----------|
-| `smoke.spec.ts` | Landing, logins, credencial inválida |
-| `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | 11 módulos admin |
-| `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
-| `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| Arquivo | Cenários | Cobertura |
+|---------|----------|-----------|
+| `smoke.spec.ts` | 5 | Landing, logins, credencial inválida |
+| `flows.spec.ts` | 13 | Proxy, PJ, beneficiário, prestador, logout |
+| `interno-modules.spec.ts` | 4 | 11 módulos admin |
+| `rbac.spec.ts` | 7 | RECEPCAO e FATURAMENTO — nav e bloqueios |
+| `walkin-particular.spec.ts` | 2 | Walk-in, check-in, mapa CRUD e filtro portal |
+| `flow-improvements.spec.ts` | 3 | Mapa de melhorias em cadastros, confirmar presença prestador |
+| `mobile-nav.spec.ts` | 3 | Drawer interno, faixa rolável desktop, drawer beneficiário |
+
+**Projetos Playwright** (`playwright.config.ts`):
+
+| Projeto | Dispositivo | Uso |
+|---------|-------------|-----|
+| `chromium` | Desktop Chrome | Fluxos gerais |
+| `mobile-chrome` | Pixel 7 (390×844) | Navegação responsiva e drawers |
+
+Cada spec roda nos dois projetos (74 execuções no CI). Para só mobile: `npx playwright test --project=mobile-chrome`.
+
+**Escopo de asserts em nav:** use `getByRole('navigation', { name: 'Navegação por abas' })` no interno — ver `e2e/helpers/auth.ts` (`internoNav`, `internoNavDrawer`).
+
+> **Na `dev` (v1.1):** `e2e/cadastros-crud.spec.ts` (+9 cenários) — ver [`V1_1.md`](V1_1.md).
 
 ---
 

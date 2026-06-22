@@ -106,6 +106,15 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 5. Após integração em `dev`, merge `dev` → `main` só ao fechar pacote (humano).
 6. **Não** incluir deploy na PR — merge na `main` não publica produção automaticamente.
 
+**Estado atual (22/06/2026):**
+
+| Branch | Commit | Conteúdo |
+|--------|--------|----------|
+| `main` | `d5ef580` | v1.0.2 + navegação responsiva (produção) |
+| `dev` | `78d0177` | `main` + v1.1.0 cadastros (integração) |
+
+> Após sync `main` → `dev`, novas features continuam abrindo PR na **`dev`**. Detalhes: [`RELEASES.md`](RELEASES.md) § Sincronização de ambientes.
+
 ### 4.2 Testar fluxos localmente
 
 | Portal | URL | Login demo |
