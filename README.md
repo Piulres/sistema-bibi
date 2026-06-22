@@ -398,6 +398,8 @@ sistema-bibi/
   [`docs/FLUXOS.md`](docs/FLUXOS.md)
 - **Jornada do cliente nos 4 portais (UX, gaps e melhorias):**
   [`docs/JORNADA_CLIENTE.md`](docs/JORNADA_CLIENTE.md)
+- **Auditoria de falhas nos quatro portais:**
+  [`docs/AUDITORIA_FLUXOS.md`](docs/AUDITORIA_FLUXOS.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):

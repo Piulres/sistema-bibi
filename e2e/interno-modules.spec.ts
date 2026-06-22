@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAs } from "./helpers/auth";
+import { internoNav, loginAs } from "./helpers/auth";
 
 const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno/dashboard", heading: /Dashboard Executivo/i },
@@ -31,7 +31,7 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
 
   test("nav exibe todos os módulos para admin", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    const nav = page.getByRole("navigation", { name: "Navegação por abas" });
+    const nav = internoNav(page);
     for (const label of [
       "Dashboard",
       "Faturamento",

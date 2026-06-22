@@ -6,7 +6,8 @@ Documentação de **todos os fluxos de usuário e de negócio**, derivada do có
 Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](ARQUITETURA.md). Para posicionamento vs mercado,
 ver [`BENCHMARK.md`](BENCHMARK.md). Para jornada do usuário e backlog de melhorias UX,
-ver [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md). Para evidências visuais dos fluxos,
+ver [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md). Para **falhas mapeadas nos quatro portais**,
+ver [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md). Para evidências visuais dos fluxos,
 ver [`evidencias/README.md`](evidencias/README.md). Para operações (dev, release, deploy, IA),
 ver [`OPERACOES.md`](OPERACOES.md). Para histórico de PRs/deploys do dia,
 ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
@@ -28,7 +29,8 @@ ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 11. [Mapa de APIs por portal](#11-mapa-de-apis-por-portal)
 12. [Observações da POC](#12-observações-da-poc)
 
-Jornada do cliente (UX, gaps e melhorias por portal): [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md).
+Jornada do cliente (UX, gaps e melhorias por portal): [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md).  
+Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md).
 
 ---
 
@@ -452,6 +454,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.
+> Evidências e tabela de endpoints: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §4.
 
 ---
 
@@ -555,6 +558,7 @@ Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml)
 4. **TISS** — XML simplificado; validação XSD pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
 6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
+7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
 
 ---
 

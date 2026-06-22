@@ -29,3 +29,8 @@ export async function loginAs(
   await page.getByRole("button", { name: /entrar/i }).click();
   await page.waitForURL(DASHBOARD_PATTERNS[portal]);
 }
+
+/** Abas do portal interno (`InternoNav` / `NavTabs`) — evita colisão com quick links do dashboard. */
+export function internoNav(page: Page) {
+  return page.getByRole("navigation", { name: "Navegação por abas" });
+}

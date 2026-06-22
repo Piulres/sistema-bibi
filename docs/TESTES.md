@@ -36,6 +36,9 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 ## O que você **não vê** (lacunas e riscos)
 
+> **Auditoria completa (2026-06-22):** falhas mapeadas nos quatro portais com
+> evidências de código, testes e `curl` — [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md).
+
 ### 1. RBAC inconsistente entre UI e API
 
 | Onde | Comportamento |
@@ -222,6 +225,7 @@ Senha única: `bibi123`
 ## Referências
 
 - Fluxos de negócio: [`FLUXOS.md`](FLUXOS.md)
+- Auditoria de falhas por portal: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md)
 - Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md)
 - Evidências manuais: [`evidencias/`](evidencias/)
 - CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
