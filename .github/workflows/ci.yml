@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit-integration-api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit + integration + API tests
+        run: npm run test
+        env:
+          SESSION_SECRET: ci-test-session-secret-32chars
+          CRON_SECRET: ci-cron-secret
+          DATABASE_URL: file:./prisma/test.db
+
+      - name: Build
+        run: npm run build
+        env:
+          SESSION_SECRET: ci-test-session-secret-32chars
+          CRON_SECRET: ci-cron-secret
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: unit-integration-api
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare database
+        run: npm run db:push && npm run db:seed
+        env:
+          SESSION_SECRET: ci-test-session-secret-32chars
+          CRON_SECRET: ci-cron-secret
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: E2E tests
+        run: npm run test:e2e
+        env:
+          CI: true
+          SESSION_SECRET: ci-test-session-secret-32chars
+          CRON_SECRET: ci-cron-secret
+          PLAYWRIGHT_PORT: "3100"
