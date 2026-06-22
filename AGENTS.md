@@ -54,11 +54,15 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
+**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; requer `ALLOW_DEMO_RESET` fora de dev ou em preview).
+
 ### Variáveis de ambiente relevantes (`.env.example`)
 - `PAYMENT_GATEWAY=mock` — adapter PIX POC (`MockPixAdapter`)
 - `COMMUNICATION_PROVIDER=console` — e-mail no console (`ConsoleEmailAdapter`)
 - `CRON_SECRET` — protege `POST /api/cron/reminders` e `/api/cron/webhooks`
 - `TELEMEDICINE_BASE_URL` — base das salas virtuais mock
+- `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
+- `ALLOW_DEMO_RESET` — habilita botão de restaurar demo em `/interno/seguranca`
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver

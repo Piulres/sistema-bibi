@@ -3,6 +3,7 @@ import {
   INTERNO_MODULES,
   INTERNO_PROFILES,
   hasInternoPermission,
+  isInternoAdmin,
   resolveInternoPermissions,
 } from "@/lib/interno-permissions";
 
@@ -34,5 +35,12 @@ describe("interno-permissions (RBAC)", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "relatorios")).toBe(true);
     expect(hasInternoPermission("INTERNO", "READONLY", "billing")).toBe(false);
     expect(hasInternoPermission("INTERNO", "READONLY", "integracoes")).toBe(false);
+  });
+
+  it("isInternoAdmin identifica ADMIN e null", () => {
+    expect(isInternoAdmin("INTERNO", "ADMIN")).toBe(true);
+    expect(isInternoAdmin("INTERNO", null)).toBe(true);
+    expect(isInternoAdmin("INTERNO", "FATURAMENTO")).toBe(false);
+    expect(isInternoAdmin("PRESTADOR", "ADMIN")).toBe(false);
   });
 });

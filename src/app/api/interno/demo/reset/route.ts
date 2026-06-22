@@ -1,0 +1,68 @@
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import {
+  DemoResetError,
+  executeDemoReset,
+  getDemoResetStatus,
+  isValidDemoResetConfirmation,
+} from "@/lib/demo-reset";
+
+/** Status do modo demo (restauração habilitada / permissão do usuário). */
+export async function GET() {
+  try {
+    const user = await requireUser(["INTERNO"]);
+    return NextResponse.json(getDemoResetStatus(user));
+  } catch (error) {
+    return authErrorResponse(error);
+  }
+}
+
+/**
+ * Restaura o banco ao estado original do seed (modo demo).
+ * Requer perfil ADMIN e confirmação explícita no body: { "confirm": "RESTAURAR" }
+ */
+export async function POST(request: Request) {
+  try {
+    const user = await requireUser(["INTERNO"]);
+    const status = getDemoResetStatus(user);
+
+    if (!status.enabled) {
+      return NextResponse.json(
+        { error: "Restauração demo desabilitada neste ambiente" },
+        { status: 403 },
+      );
+    }
+    if (!status.canReset) {
+      return NextResponse.json(
+        { error: "Apenas administradores podem restaurar o modo demo" },
+        { status: 403 },
+      );
+    }
+
+    const body = (await request.json().catch(() => ({}))) as { confirm?: string };
+    if (!isValidDemoResetConfirmation(body.confirm)) {
+      return NextResponse.json(
+        { error: 'Digite "RESTAURAR" para confirmar a operação' },
+        { status: 400 },
+      );
+    }
+
+    const result = await executeDemoReset(prisma);
+
+    return NextResponse.json({
+      message: "Modo demo restaurado com sucesso. Faça login novamente.",
+      result,
+      logoutRequired: true,
+    });
+  } catch (error) {
+    if (error instanceof DemoResetError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
+    console.error("[demo-reset]", error);
+    return NextResponse.json(
+      { error: "Falha ao restaurar modo demo. Verifique os logs do servidor." },
+      { status: 500 },
+    );
+  }
+}
