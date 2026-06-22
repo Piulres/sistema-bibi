@@ -7,6 +7,7 @@ import { GET as pjReportsGet } from "@/app/api/pj/reports/route";
 import { GET as beneficiarioOverviewGet } from "@/app/api/beneficiario/overview/route";
 import { GET as beneficiarioProvidersGet } from "@/app/api/beneficiario/providers/route";
 import { GET as prestadorAgendaGet } from "@/app/api/prestador/agenda/route";
+import { GET as prestadorPatientOverviewGet } from "@/app/api/prestador/patients/[id]/overview/route";
 import { GET as authMeGet } from "@/app/api/auth/me/route";
 import {
   clearSessionMock,
@@ -142,10 +143,54 @@ describe("API — fluxos por portal", () => {
     });
 
     it("GET /api/prestador/agenda retorna atendimentos do dia", async () => {
-      const res = await prestadorAgendaGet();
+      const res = await prestadorAgendaGet(new Request("http://localhost/api/prestador/agenda"));
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(Array.isArray(body.appointments)).toBe(true);
+      expect(body.view).toBe("day");
+      expect(body.summary).toMatchObject({
+        today: expect.any(Number),
+        upcoming: expect.any(Number),
+        past: expect.any(Number),
+      });
+    });
+
+    it("GET /api/prestador/agenda?view=upcoming retorna consultas futuras", async () => {
+      const res = await prestadorAgendaGet(
+        new Request("http://localhost/api/prestador/agenda?view=upcoming"),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.view).toBe("upcoming");
+      expect(Array.isArray(body.appointments)).toBe(true);
+    });
+
+    it("GET /api/prestador/agenda?view=past retorna histórico", async () => {
+      const res = await prestadorAgendaGet(
+        new Request("http://localhost/api/prestador/agenda?view=past"),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.view).toBe("past");
+      expect(Array.isArray(body.appointments)).toBe(true);
+    });
+
+    it("GET /api/prestador/patients/[id]/overview retorna histórico do paciente", async () => {
+      const agendaRes = await prestadorAgendaGet(
+        new Request("http://localhost/api/prestador/agenda?view=past"),
+      );
+      const agenda = await agendaRes.json();
+      const patientId = agenda.appointments[0]?.patient?.id;
+      if (!patientId) return;
+
+      const res = await prestadorPatientOverviewGet(
+        new Request(`http://localhost/api/prestador/patients/${patientId}/overview`),
+        { params: Promise.resolve({ id: patientId }) },
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.overview.patient.id).toBe(patientId);
+      expect(Array.isArray(body.overview.appointments)).toBe(true);
     });
   });
 
