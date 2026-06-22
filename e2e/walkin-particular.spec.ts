@@ -38,10 +38,7 @@ test.describe("Portal Interno — walk-in particular", () => {
     await page.getByRole("button", { name: /Cadastrar e agendar agora/i }).click();
     await expect(page.getByText(/Walk-in:.*cadastrado/i)).toBeVisible({ timeout: 15_000 });
 
-    const card = page
-      .locator(".ds-card")
-      .filter({ hasText: `Walk-in Teste ${unique}` })
-      .filter({ hasText: /·/ });
+    const card = page.locator(".ds-card").filter({ hasText: `Walk-in Teste ${unique}` }).last();
     await card.getByRole("button", { name: /Confirmar chegada/i }).click();
     await expect(page.getByText(/Chegada confirmada/i)).toBeVisible();
   });

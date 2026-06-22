@@ -11,6 +11,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CrudOperationsMap from "@/components/CrudOperationsMap";
+import TabBar from "@/components/ui/TabBar";
 
 const tabs = [
   { key: "patients", label: "Beneficiários" },
@@ -388,19 +389,11 @@ export default function CadastrosView() {
     <div className="space-y-6">
       {msg && <Alert tone="info">{msg}</Alert>}
 
-      <div className="flex flex-wrap gap-2">
-        {tabs.map((t) => (
-          <Button
-            key={t.key}
-            type="button"
-            variant={tab === t.key ? "portal" : "secondary"}
-            size="sm"
-            onClick={() => selectTab(t.key)}
-          >
-            {t.label}
-          </Button>
-        ))}
-      </div>
+      <TabBar
+        tabs={tabs.map((t) => ({ key: t.key, label: t.label }))}
+        active={tab}
+        onSelect={(key) => selectTab(key as Tab)}
+      />
 
       {tab === "patients" && (
         <div className="grid gap-6 lg:grid-cols-2">

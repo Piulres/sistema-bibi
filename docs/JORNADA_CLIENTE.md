@@ -235,7 +235,9 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
 | Baixa | 11 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
 
-**Código:** `src/components/InternoNav.tsx` · `src/lib/interno-permissions.ts`
+**Melhorias visuais implementadas (2026-06):** `StatCard` unificado em dashboard/PJ/beneficiário/faturamento; `FlowStepper` na jornada PPU; `CalloutCard` + `AppointmentCard` na agenda interna e prestador; `TabBar` em Cadastros; `EmptyState` com título e dica.
+
+**Código:** `src/components/InternoNav.tsx` · `src/lib/interno-permissions.ts` · `docs/DESIGN_SYSTEM.md`
 
 ---
 

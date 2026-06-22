@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import Card from "@/components/ui/Card";
-import StatusBadge from "@/components/ui/StatusBadge";
+import AppointmentCard from "@/components/ui/AppointmentCard";
 import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
@@ -37,49 +35,42 @@ export default function AgendaView() {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-baseline justify-between">
-        <SectionHeader
-          title="Agenda de hoje"
-          description={`${appts.length} atendimento(s) programado(s)`}
-        />
-      </div>
+      <SectionHeader
+        title="Agenda de hoje"
+        description={`${appts.length} atendimento(s) programado(s)`}
+      />
 
       {appts.length === 0 && (
-        <EmptyState message="Nenhum atendimento agendado para hoje." />
+        <EmptyState
+          title="Sem consultas hoje"
+          message="Nenhum atendimento agendado para hoje."
+          hint="Novos agendamentos aparecem aqui quando a recepção confirma a agenda."
+        />
       )}
 
       <ul className="space-y-3">
         {appts.map((a) => (
           <li key={a.id}>
-            <Link href={`/prestador/atendimento/${a.id}`} className="block">
-              <Card className="flex items-center justify-between gap-4 transition hover:border-[var(--brand-primary)] hover:shadow-md">
-                <div className="flex items-center gap-4">
-                  <div className="text-center">
-                    <p className="text-lg font-bold text-[var(--text-primary)]">
-                      {new Date(a.scheduledAt).toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="font-medium text-[var(--text-primary)]">{a.patient.name}</p>
-                    <p className="text-sm text-[var(--text-muted)]">
-                      {a.reason ?? "Consulta"}
-                      {a.patient.company ? ` · ${a.patient.company}` : ""}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex flex-col items-end gap-1">
-                  <StatusBadge value={a.status} map="appointment" />
-                  {a.proceduresCount > 0 && (
-                    <span className="text-xs text-[var(--text-muted)]">
-                      {a.proceduresCount} procedimento(s)
-                    </span>
-                  )}
-                </div>
-              </Card>
-            </Link>
+            <AppointmentCard
+              href={`/prestador/atendimento/${a.id}`}
+              time={new Date(a.scheduledAt).toLocaleTimeString("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
+              title={a.patient.name}
+              subtitle={a.reason ?? "Consulta"}
+              status={a.status}
+              particular={!a.patient.company}
+              meta={
+                a.proceduresCount > 0 ? (
+                  <p className="text-xs text-[var(--text-muted)]">
+                    {a.proceduresCount} procedimento(s) registrado(s)
+                  </p>
+                ) : (
+                  <p className="text-xs text-[var(--portal-accent)]">Abrir atendimento →</p>
+                )
+              }
+            />
           </li>
         ))}
       </ul>

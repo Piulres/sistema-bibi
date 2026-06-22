@@ -9,6 +9,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
+import StatCard from "@/components/ui/StatCard";
 
 type PendingItem = { id: string; procedure: string; priceLabel: string };
 type PendingGroup = {
@@ -181,6 +182,25 @@ export default function BillingView() {
           Gateway de pagamento não configurado. Defina PAYMENT_GATEWAY=mock no .env para habilitar PIX.
         </Alert>
       )}
+
+      <div className="grid gap-4 sm:grid-cols-3">
+        <StatCard
+          label="Beneficiários com pendência"
+          value={pending.length}
+          tone="warning"
+          hint="Aguardando geração de fatura"
+        />
+        <StatCard
+          label="Faturas emitidas"
+          value={invoices.length}
+          tone="accent"
+        />
+        <StatCard
+          label="Faturas em aberto"
+          value={invoices.filter((i) => i.status !== "PAGA").length}
+          hint="Inclui FECHADA aguardando pagamento"
+        />
+      </div>
 
       <section>
         <SectionHeader
