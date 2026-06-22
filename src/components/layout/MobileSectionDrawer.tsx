@@ -1,32 +1,35 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
-import type { NavTab } from "@/components/ui/NavTabs";
+import type { SectionNavItem } from "@/components/ui/SectionNav";
 
 type Props = {
-  tabs: NavTab[];
-  active?: string;
+  sections: readonly SectionNavItem[];
+  activeId: string;
+  onSelect: (id: string) => void;
   activeClass?: string;
   idleClass?: string;
   title?: string;
+  className?: string;
 };
 
-/** Menu mobile em drawer — complementa NavTabs em telas abaixo de lg (1024px). */
-export default function MobileNavDrawer({
-  tabs,
-  active,
+/** Drawer mobile para navegação por seções (âncoras) em páginas de rota única. */
+export default function MobileSectionDrawer({
+  sections,
+  activeId,
+  onSelect,
   activeClass = "bg-[var(--surface-muted)] text-[var(--portal-accent)]",
   idleClass = "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",
-  title = "Menu",
+  title = "Seções",
+  className,
 }: Props) {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const activeTab = tabs.find((t) => t.key === active);
-  const currentLabel = activeTab?.label ?? title;
+  const activeSection = sections.find((s) => s.id === activeId);
+  const currentLabel = activeSection?.label ?? title;
 
   useEffect(() => {
     if (!open) return;
@@ -40,7 +43,7 @@ export default function MobileNavDrawer({
 
     document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-    panelRef.current?.querySelector<HTMLElement>("a")?.focus();
+    panelRef.current?.querySelector<HTMLElement>("button")?.focus();
 
     return () => {
       document.removeEventListener("keydown", onKey);
@@ -48,15 +51,20 @@ export default function MobileNavDrawer({
     };
   }, [open]);
 
+  function selectSection(id: string) {
+    onSelect(id);
+    setOpen(false);
+  }
+
   return (
-    <div className="lg:hidden">
+    <div className={cn("lg:hidden", className)}>
       <button
         ref={triggerRef}
         type="button"
         onClick={() => setOpen(true)}
         className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
         aria-expanded={open}
-        aria-controls="mobile-nav-drawer"
+        aria-controls="mobile-section-drawer"
       >
         <span className="truncate">{currentLabel}</span>
         <svg
@@ -79,7 +87,7 @@ export default function MobileNavDrawer({
             onClick={() => setOpen(false)}
           />
           <div
-            id="mobile-nav-drawer"
+            id="mobile-section-drawer"
             ref={panelRef}
             role="dialog"
             aria-modal="true"
@@ -101,19 +109,19 @@ export default function MobileNavDrawer({
             </div>
             <nav className="flex-1 overflow-y-auto p-2" aria-label={title}>
               <ul className="space-y-0.5">
-                {tabs.map((tab) => (
-                  <li key={tab.href}>
-                    <Link
-                      href={tab.href}
-                      onClick={() => setOpen(false)}
+                {sections.map((section) => (
+                  <li key={section.id}>
+                    <button
+                      type="button"
+                      onClick={() => selectSection(section.id)}
                       className={cn(
-                        "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium transition",
-                        active === tab.key ? activeClass : idleClass,
+                        "block w-full rounded-[var(--radius-button)] px-3 py-2.5 text-left text-sm font-medium transition",
+                        activeId === section.id ? activeClass : idleClass,
                       )}
-                      aria-current={active === tab.key ? "page" : undefined}
+                      aria-current={activeId === section.id ? "true" : undefined}
                     >
-                      {tab.label}
-                    </Link>
+                      {section.label}
+                    </button>
                   </li>
                 ))}
               </ul>

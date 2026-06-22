@@ -159,7 +159,7 @@ export default function BrandingView() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
-      <form onSubmit={handleSave} className="space-y-6">
+      <form onSubmit={handleSave} className="order-2 space-y-6 lg:order-1">
         {msg && <Alert tone="success">{msg}</Alert>}
         {error && <Alert tone="danger">{error}</Alert>}
 
@@ -325,7 +325,7 @@ export default function BrandingView() {
         </div>
       </form>
 
-      <aside className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+      <aside className="order-1 space-y-4 lg:order-2 lg:sticky lg:top-6 lg:self-start">
         <Card padding="sm">
           <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
             Pré-visualização

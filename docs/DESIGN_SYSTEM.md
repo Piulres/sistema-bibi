@@ -60,9 +60,10 @@ Localizados em `src/components/ui/`:
 | `Card` | Container padrão (`.ds-card`) |
 | `Badge` | Pill de status com tons semânticos |
 | `Alert` | Mensagens info/success/warning/danger |
-| `NavTabs` | Navegação horizontal (`aria-label="Navegação por abas"`) |
+| `NavTabs` | Navegação horizontal entre rotas — `ScrollableNavRail` (`aria-label="Navegação por abas"`) |
 | `Breadcrumbs` | Trilha hierárquica (`Cliente 360°`, atendimento prestador) |
-| `SectionNav` | Âncoras em páginas de rota única (PJ, beneficiário) |
+| `SectionNav` | Âncoras PJ/beneficiário — drawer abaixo de lg + faixa rolável |
+| `ScrollableNavRail` | Scroll horizontal com gradientes e setas quando transborda |
 | `StatCard` | KPI com label, valor, hint e tom semântico (`warning`, `success`, `accent`…) |
 | `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
@@ -79,7 +80,9 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 | `PortalShell` | Header + main padronizado para portais autenticados |
 | `PageHeader` | Título + descrição de página |
 | `InternoPortalShell` / `PrestadorPortalShell` / `PjPortalShell` / `BeneficiarioPortalShell` | Shell client-side persistente por portal (em `layout.tsx`) |
-| `InternoNav` | Abas internas + `MobileNavDrawer` no mobile |
+| `InternoNav` | Abas internas + `MobileNavDrawer` abaixo de **lg** (1024px) |
+| `MobileNavDrawer` | Drawer de rotas (interno) |
+| `MobileSectionDrawer` | Drawer de seções (PJ, beneficiário) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
 | `LandingMobileMenu` | Menu hamburger da landing |
 
