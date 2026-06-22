@@ -153,7 +153,9 @@ Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedr
   Ver `docs/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
   `src/app/{interno,prestador,pj,beneficiario}/layout.tsx` — shell persistente;
   páginas só renderizam `PageHeader` + conteúdo. Config central: `src/lib/navigation/`.
-  Componentes: `Breadcrumbs`, `SectionNav`, `MobileNavDrawer`, `NavigationProgress`.
+  Componentes: `Breadcrumbs`, `SectionNav`, `NavTabs`, `ScrollableNavRail`,
+  `MobileNavDrawer`, `MobileSectionDrawer`, `NavigationProgress`. Breakpoint drawer: **lg** (1024px).
+  Arquitetura: `docs/ARQUITETURA.md` §5 · testes: `e2e/mobile-nav.spec.ts`.
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/JORNADA_CLIENTE.md` (jornada UX nos 4 portais), `docs/AUDITORIA_FLUXOS.md` (falhas mapeadas por portal),
   `docs/BENCHMARK.md` (posicionamento vs mercado),
   `docs/ARQUITETURA.md`, `docs/TESTES.md` (estratégia e mapa de testes automatizados),

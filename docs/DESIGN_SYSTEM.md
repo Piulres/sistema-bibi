@@ -88,6 +88,24 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 
 Config de menus e rótulos: `src/lib/navigation/routes.ts`.
 
+## Navegação responsiva
+
+Breakpoint principal: **lg** (1024px, Tailwind).
+
+| Viewport | Interno | PJ / Beneficiário | Prestador |
+|----------|---------|-------------------|-----------|
+| **&lt; lg** | Botão abre `MobileNavDrawer` com todas as abas | Botão abre `MobileSectionDrawer` com seções | `NavTabs` com scroll |
+| **≥ lg** | `NavTabs` + `ScrollableNavRail` (11 módulos) | `SectionNav` com faixa rolável | `NavTabs` com faixa rolável |
+
+**Padrões de implementação:**
+
+- Menus e rótulos em `src/lib/navigation/routes.ts` — não duplicar hrefs nas pages
+- Shells (`*PortalShell`) com `min-w-0` para conter overflow horizontal
+- E2E mobile: `npx playwright test e2e/mobile-nav.spec.ts --project=mobile-chrome`
+- Asserts de nav interno: `getByRole('navigation', { name: 'Navegação por abas' })`
+
+Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md) §5.
+
 ## Uso em páginas
 
 ```tsx

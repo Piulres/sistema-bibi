@@ -275,6 +275,53 @@ redireciona ao login) e o servidor (`requireUser([...roles])` em cada handler e
 
 ---
 
+## 5. Navegação SPA e responsividade
+
+Layouts persistentes por portal (`src/app/{interno,prestador,pj,beneficiario}/layout.tsx`)
+mantêm shell, nav e `NavigationProgress` entre trocas de rota; páginas renderizam
+apenas `PageHeader` + conteúdo. Config central: `src/lib/navigation/routes.ts`.
+
+```mermaid
+flowchart TB
+  subgraph Config["src/lib/navigation/"]
+    Routes["routes.ts<br/>INTERNO_NAV_TABS · PJ_SECTION_NAV · BENEFICIARIO_SECTION_NAV"]
+  end
+
+  subgraph Interno["Portal Interno"]
+  Routes --> INav["InternoNav"]
+  INav --> DrawerI["MobileNavDrawer<br/>&lt; lg"]
+  INav --> TabsI["NavTabs + ScrollableNavRail<br/>≥ lg"]
+  end
+
+  subgraph PJBen["PJ / Beneficiário"]
+  Routes --> SNav["SectionNav"]
+  SNav --> DrawerS["MobileSectionDrawer<br/>&lt; lg"]
+  SNav --> RailS["ScrollableNavRail<br/>≥ lg"]
+  end
+
+  subgraph Prestador["Prestador"]
+  Routes --> PNav["NavTabs + ScrollableNavRail"]
+  end
+```
+
+| Portal | Padrão | Breakpoint | Componentes |
+|--------|--------|------------|-------------|
+| **Interno** | Rotas entre módulos (11 abas) | **lg** (1024px) | `MobileNavDrawer` + `NavTabs` |
+| **Prestador** | Rotas agenda/atendimento | — | `NavTabs` com faixa rolável |
+| **PJ** | Página única com âncoras | **lg** | `MobileSectionDrawer` + `SectionNav` |
+| **Beneficiário** | Página única com âncoras (8 seções) | **lg** | `MobileSectionDrawer` + `SectionNav` |
+
+**`ScrollableNavRail`** — scroll horizontal com gradientes e setas quando as abas
+transbordam (`NavTabs`, `SectionNav`, `TabBar`). Shells usam `min-w-0` para evitar
+overflow horizontal da página.
+
+**RBAC na nav:** `InternoNav` filtra `INTERNO_NAV_TABS` por `interno-permissions.ts`
+antes de renderizar desktop ou drawer.
+
+Detalhes visuais: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · jornada UX: [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · testes: `e2e/mobile-nav.spec.ts`.
+
+---
+
 ## 6. Cliente 360° (Épico 1)
 
 Visão consolidada do beneficiário no Portal Interno, reutilizando entidades
@@ -369,7 +416,7 @@ flowchart LR
 - `src/lib/company-crm.ts` — constantes e regras de status
 - `src/lib/company-pipeline.ts` — consulta agrupada por etapa
 - `src/components/CrmPipelineView.tsx` — kanban horizontal (mobile-first)
-- `src/components/InternoNav.tsx` — navegação Faturamento / CRM
+- `src/components/InternoNav.tsx` — 11 abas + drawer mobile (`MobileNavDrawer` &lt; lg)
 
 ### Checklist de homologação (Épico 3)
 
