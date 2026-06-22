@@ -1,8 +1,8 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
 import SectionHeader from "@/components/ui/SectionHeader";
+import ExportButtons from "@/components/ExportButtons";
 
 export default function ReportsView() {
   return (
@@ -10,15 +10,27 @@ export default function ReportsView() {
       <Card>
         <SectionHeader
           title="Exportar relatórios"
-          description="Downloads em CSV para análise externa ou integração contábil."
+          description="Downloads em PDF, Excel ou CSV para análise externa ou integração contábil."
         />
-        <div className="mt-6 flex flex-wrap gap-4">
-          <a href="/api/interno/reports?type=billing" download>
-            <Button variant="portal">Faturamento e Pay Per Use (CSV)</Button>
-          </a>
-          <a href="/api/interno/reports?type=crm" download>
-            <Button variant="secondary">Pipeline CRM (CSV)</Button>
-          </a>
+        <div className="mt-6 space-y-4">
+          <div>
+            <p className="mb-2 text-sm font-medium text-[var(--text-secondary)]">
+              Faturamento e Pay Per Use
+            </p>
+            <ExportButtons
+              baseUrl="/api/interno/reports"
+              query={{ type: "billing" }}
+              formats={["pdf", "xlsx", "csv"]}
+            />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-[var(--text-secondary)]">Pipeline CRM</p>
+            <ExportButtons
+              baseUrl="/api/interno/reports"
+              query={{ type: "crm" }}
+              formats={["pdf", "xlsx", "csv"]}
+            />
+          </div>
         </div>
       </Card>
 

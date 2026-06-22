@@ -10,6 +10,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
+import ExportButtons from "@/components/ExportButtons";
 
 type AuditEvent = {
   id: string;
@@ -168,14 +169,26 @@ export default function AuditoriaView() {
       </Card>
 
       <section>
-        <SectionHeader
-          title="Eventos do sistema"
-          description={
-            data
-              ? `${data.total} evento(s) · página ${data.page} de ${data.totalPages}`
-              : undefined
-          }
-        />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeader
+            title="Eventos do sistema"
+            description={
+              data
+                ? `${data.total} evento(s) · página ${data.page} de ${data.totalPages}`
+                : undefined
+            }
+          />
+          <ExportButtons
+            baseUrl="/api/interno/audit/export"
+            query={{
+              entityType: entityType || undefined,
+              action: action || undefined,
+              search: search.trim() || undefined,
+              from: from || undefined,
+              to: to || undefined,
+            }}
+          />
+        </div>
         {events.length === 0 ? (
           <EmptyState message="Nenhum evento encontrado para os filtros selecionados." />
         ) : (

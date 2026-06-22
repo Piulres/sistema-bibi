@@ -9,6 +9,7 @@ import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import StatCard from "@/components/ui/StatCard";
 import FlowStepper from "@/components/ui/FlowStepper";
+import ExportButtons from "@/components/ExportButtons";
 import AppointmentCard from "@/components/ui/AppointmentCard";
 import PixQrDisplay from "@/components/ui/PixQrDisplay";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
@@ -363,6 +364,9 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("resumo") && (
       <section id="resumo" className="space-y-4">
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "resumo" }} />
+      </div>
       <Card padding="sm">
         <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
         <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
@@ -482,10 +486,15 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("consumo") && (
       <section id="consumo">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu consumo (Pay Per Use)</h3>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Transparência prévia — você paga apenas pelo que foi utilizado.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu consumo (Pay Per Use)</h3>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              Transparência prévia — você paga apenas pelo que foi utilizado.
+            </p>
+          </div>
+          <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "consumo" }} />
+        </div>
         {overview.usages.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
         ) : (
@@ -522,7 +531,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("faturas") && (
       <section id="faturas">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minhas faturas</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minhas faturas</h3>
+          <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "faturas" }} />
+        </div>
         {overview.invoices.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma fatura emitida.</p>
         ) : (
@@ -539,6 +551,11 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <StatusBadge value={invoice.status} map="invoice" />
+                    <ExportButtons
+                      baseUrl={`/api/beneficiario/invoices/${invoice.id}/export`}
+                      formats={["pdf", "xlsx"]}
+                      variant="ghost"
+                    />
                     {invoice.status === "FECHADA" && (
                       <Button
                         variant="portal"
@@ -568,7 +585,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("assinatura") && (
       <section id="assinatura">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minha assinatura</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minha assinatura</h3>
+          <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "assinatura" }} />
+        </div>
         {overview.subscriptions.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Você não possui assinatura recorrente.
@@ -616,7 +636,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("prontuario") && (
       <section id="prontuario">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu prontuário</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu prontuário</h3>
+          <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "prontuario" }} />
+        </div>
         {overview.medicalRecords.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma anotação clínica.</p>
         ) : (
@@ -628,7 +651,15 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
                   <span>{record.providerName}</span>
-                  <span>{record.createdAtLabel}</span>
+                  <div className="flex items-center gap-2">
+                    <span>{record.createdAtLabel}</span>
+                    <ExportButtons
+                      baseUrl="/api/beneficiario/export"
+                      query={{ section: "prontuario", recordId: record.id }}
+                      formats={["pdf"]}
+                      variant="ghost"
+                    />
+                  </div>
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm text-[var(--text-secondary)]">{record.content}</p>
               </article>
@@ -640,7 +671,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("historico") && (
       <section id="historico">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atividades</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atividades</h3>
+          <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "historico" }} />
+        </div>
         {overview.timeline.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum evento registrado.</p>
         ) : (

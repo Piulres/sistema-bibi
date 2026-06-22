@@ -6,6 +6,7 @@ import Alert from "@/components/ui/Alert";
 import StatCard from "@/components/ui/StatCard";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
+import ExportButtons from "@/components/ExportButtons";
 
 type Extrato = {
   periodLabel: string;
@@ -51,7 +52,10 @@ export default function PrestadorExtratoView() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-[var(--text-muted)]">Período: {extrato.periodLabel}</p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <p className="text-sm text-[var(--text-muted)]">Período: {extrato.periodLabel}</p>
+        <ExportButtons baseUrl="/api/prestador/extrato/export" />
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
