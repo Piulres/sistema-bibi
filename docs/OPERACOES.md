@@ -81,6 +81,9 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
+| `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
+| `npm run db:bootstrap:operation` | Só `operation.db` (bootstrap mínimo) | Piloto operação local |
+| `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
 ---
@@ -108,13 +111,29 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](FLUXOS.md).
 
-### 4.3 Banco de dados local
+### 4.3 Banco de dados local e demo vs operação
 
 | Situação | Comando |
 |----------|---------|
 | VM nova / sem `dev.db` | `npm run db:push && npm run db:seed` |
+| Dual-store (demo + operação) | `npm run db:bootstrap:demo` |
+| Só banco de operação | `npm run db:bootstrap:operation` |
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
+
+**Alternar demo ↔ operação** (mesmo site, SQLite + Blobs em produção):
+
+| Ambiente | Como alternar |
+|----------|---------------|
+| Local | `/interno/seguranca` → card “Base de dados” (ADMIN); modo em `prisma/.data-store-mode` |
+| Produção | Mesma UI; confirmar `OPERAR` ou `DEMO`; login novamente após trocar |
+
+| Modo | Conteúdo | Persistência em produção |
+|------|----------|--------------------------|
+| **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
+| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
+
+Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---
 
@@ -169,6 +188,8 @@ Exemplo atual em produção: **`v1.0.0`** (`de88c0e`). Ver [`RELEASES.md`](RELEA
 **Produção:** https://sistema-bibi.netlify.app
 
 **Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+
+**Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---
 
@@ -232,6 +253,7 @@ Pedido de validação
 |--------|-----------|
 | Fechar pacote em produção | `docs/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
+| Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
@@ -245,7 +267,9 @@ Pedido de validação
 | Operação | Local (`dev`) | `netlify:dev` | Produção Netlify |
 |----------|---------------|---------------|------------------|
 | Codar / debug | ✅ | ✅ | ❌ agente |
-| SQLite persistente | ✅ | ✅ | ❌ efêmero `/tmp` |
+| SQLite demo | ✅ `demo.db` / `dev.db` | ✅ | ⚠️ efêmero `/tmp` por instância |
+| SQLite operação | ✅ `operation.db` | ✅ Blobs | ✅ Blobs (`operation.db`) |
+| Alternar demo ↔ operação | ✅ `/interno/seguranca` | ✅ | ✅ `/interno/seguranca` (ADMIN) |
 | Logos white-label | filesystem | Blobs | Blobs |
 | PIX / e-mail | mock / console | mock / console | mock / console |
 | Validar build | `pre-release` | `pre-release` | — |
@@ -257,6 +281,7 @@ Pedido de validação
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) | Demo vs operação, dual SQLite, Blobs, seletor |
 | [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) | Resumo workflow Cursor |
 | [`RELEASES.md`](RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |

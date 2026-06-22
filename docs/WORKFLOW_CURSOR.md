@@ -156,6 +156,7 @@ Se retornar `{"error":"usage_exceeded",...}`:
 ## Links
 
 - Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
+- Demo vs operação: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md)
 - Pacotes e histórico: [`RELEASES.md`](RELEASES.md)
 - Deploy e troubleshooting: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 - Fluxos do sistema: [`FLUXOS.md`](FLUXOS.md)

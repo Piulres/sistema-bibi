@@ -92,13 +92,42 @@ Usadas por `prisma/seed.ts`, `scripts/setup-database.ts`, `src/lib/database-env.
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
+### `DUAL_DATA_STORE`
+
+| | |
+|---|---|
+| **Padrão** | `true` em dev e Netlify (`netlify.toml`) |
+| **Valores** | `true` \| `false` |
+| **Efeito** | Habilita seletor demo/operação e dual SQLite (`demo.db` + `operation.db`) |
+| **Desligar** | `false` — um único `dev.db` legado (sem UI de troca) |
+
+```env
+DUAL_DATA_STORE=true
+```
+
+### `DATA_STORE_MODE`
+
+| | |
+|---|---|
+| **Padrão** | `demo` (se Blobs/arquivo local vazio) |
+| **Valores** | `demo` \| `operation` |
+| **Onde** | Netlify Blobs (`bibi-config/data-store-mode`) ou `prisma/.data-store-mode` em dev |
+| **UI** | `/interno/seguranca` → card “Base de dados” (ADMIN) — confirmação `OPERAR` / `DEMO` |
+| **API** | `GET\|POST /api/interno/data-store` |
+
+Modo inicial opcional no painel Netlify (antes da primeira troca na UI):
+
+```env
+DATA_STORE_MODE=demo
+```
+
 ### `APP_MODE`
 
 | | |
 |---|---|
 | **Padrão** | `demo` |
 | **Valores** | `demo` \| `operation` |
-| **Efeito** | `operation` desliga seed no build e reset na UI |
+| **Efeito** | Modo inicial legado se `DATA_STORE_MODE` ausente; `operation` desliga seed no build |
 
 ```env
 APP_MODE=demo
@@ -132,8 +161,8 @@ SEED_SCALE=medium
 | | |
 |---|---|
 | **Padrão** | `true` (habilitado se ausente) |
-| **Desligar** | `false` ou `0` ou `APP_MODE=operation` |
-| **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
+| **Desligar** | `false` ou `0` ou modo **operação** ativo no seletor |
+| **UI** | `/interno/seguranca` → “Restaurar estado original do seed” (somente modo **demo**) |
 | **API** | `POST /api/interno/demo/reset` (body: `{ "confirm": "RESTAURAR" }`) |
 | **Permissão** | Somente interno **ADMIN** |
 

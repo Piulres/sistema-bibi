@@ -82,14 +82,18 @@ npm run dev            # inicia o servidor de desenvolvimento
 A aplicação sobe em **http://localhost:3000**.
 
 > Variáveis de ambiente: ver [`.env.example`](.env.example) e o mapa completo em [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md).
-> Principais: `DATABASE_URL`, `SESSION_SECRET`, `PAYMENT_GATEWAY`, `COMMUNICATION_PROVIDER`, `CRON_SECRET`, `SEED_SCALE`, `ALLOW_DEMO_RESET`.
+> Principais: `DATABASE_URL`, `DUAL_DATA_STORE`, `DATA_STORE_MODE`, `SESSION_SECRET`, `PAYMENT_GATEWAY`, `COMMUNICATION_PROVIDER`, `CRON_SECRET`, `SEED_SCALE`, `ALLOW_DEMO_RESET`.
+>
+> Dual-store (demo + operação): `npm run db:bootstrap:demo` — ver [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
 
 ## 5. URLs de teste
 
 Base local: **`http://localhost:3000`**
 (na rede interna da VM o servidor também responde em `http://172.30.0.2:3000`).
 
-**Produção (Netlify):** https://sistema-bibi.netlify.app — mesmas credenciais demo do seed.
+**Produção (Netlify):** https://sistema-bibi.netlify.app — credenciais demo do seed.
+
+**Demo vs operação:** após deploy com dual-store, alterne em `/interno/seguranca` (ADMIN) — confirme `OPERAR` ou `DEMO`. Ver [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
 
 ### Páginas (interface)
 
@@ -112,7 +116,7 @@ Base local: **`http://localhost:3000`**
 | `/interno/relatorios` | **Relatórios** — exportação CSV (faturamento, CRM) | `INTERNO` |
 | `/interno/branding` | **White label** — cores, logo, tema, domínio custom | `INTERNO` |
 | `/interno/integracoes` | **Integrações B2B** — webhooks outbound e log de entregas | `INTERNO` |
-| `/interno/seguranca` | **Segurança** — MFA TOTP para usuários internos | `INTERNO` |
+| `/interno/seguranca` | **Segurança** — MFA TOTP; seletor **demo/operação**; restaurar demo | `INTERNO` (ADMIN para dados) |
 | `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
 | `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
@@ -377,7 +381,10 @@ sistema-bibi/
 | `npm run test:e2e` | Playwright — fluxos E2E no browser. |
 | `npm run db:push` | Sincroniza o schema com o banco SQLite. |
 | `npm run db:seed` | Popula o banco com os dados de demonstração. |
-| `npm run build:netlify` | Pipeline de build da Netlify (`db:push` + seed + `next build`). |
+| `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` com seed (dual-store). |
+| `npm run db:bootstrap:operation` | Só `operation.db` com bootstrap mínimo. |
+| `npm run db:setup` | Setup de banco conforme `.env` (mesmo fluxo do build Netlify). |
+| `npm run build:netlify` | Pipeline de build da Netlify (`setup-database` + `next build`). |
 | `npm run netlify:build` | Alias de `build:netlify` — validar localmente sem publicar. |
 | `npm run netlify:dev` | `netlify dev` — emula Netlify na porta 8888. |
 
@@ -393,7 +400,7 @@ sistema-bibi/
 
 > ⚠️ **POC**: senhas com hash **scrypt** no seed e novos usuários; adapters de
 > pagamento/comunicação usam **mock/console** para demonstração. Em produção:
-> HTTPS, Postgres, gateways reais, auditoria de acesso e validação XSD TISS.
+> HTTPS, gateways reais, auditoria de acesso e validação XSD TISS. Postgres opcional para escala — a POC opera com SQLite + Blobs (ver `docs/OPERACAO_DADOS.md`).
 
 ## 13. Notas técnicas e limitações da POC
 
@@ -402,8 +409,8 @@ sistema-bibi/
 - **Middleware virou "Proxy" no Next 16**: a proteção de rotas está em
   `src/proxy.ts` (não há `middleware.ts`).
 - `params`, `searchParams` e `cookies()` são **assíncronos** (use `await`).
-- Banco **SQLite** local para facilitar o desenvolvimento; o arquivo `dev.db` e o
-  `.env` são *gitignored*.
+- Banco **SQLite** local (`dev.db`, `demo.db`, `operation.db`); `.env` é *gitignored*.
+- **Demo vs operação:** mesmo site alterna entre massa de teste e dados reais via `/interno/seguranca` — [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/TESTES.md`](docs/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
@@ -411,7 +418,7 @@ sistema-bibi/
   Pacotes fechados: [`docs/RELEASES.md`](docs/RELEASES.md). Workflow Cursor:
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
   Deploy manual apenas quando necessário — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
-- **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
+- **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres para alta escala, validação XSD TISS completa.
 
 ## 14. Documentação adicional
 
@@ -442,6 +449,8 @@ sistema-bibi/
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**
   [`docs/OPERACOES.md`](docs/OPERACOES.md)
+- **Demo vs operação (dual SQLite + Blobs):**
+  [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md)
 - **Histórico do dia 21/06/2026** (PRs, deploys, commits):
   [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
 - **Evidências visuais dos fluxos** (vídeos e screenshots):

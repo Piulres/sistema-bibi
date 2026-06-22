@@ -90,14 +90,17 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclui Netlify, CI, testes e **Cursor Cloud Agent**).
 
-- `DATABASE_URL` — SQLite (`file:./dev.db`) em demo; Postgres em `APP_MODE=operation` — ver `docs/OPERACAO_DADOS.md`
+- `DATABASE_URL` — SQLite (`file:./dev.db`); dual-store gera `demo.db` + `operation.db` no build — ver `docs/OPERACAO_DADOS.md`
+- `DUAL_DATA_STORE` — seletor demo/operação (`true` em dev e Netlify)
+- `DATA_STORE_MODE` — modo inicial (`demo` \| `operation`) se Blobs vazio
 - `SESSION_SECRET` — cookie de sessão + MFA
 - `PAYMENT_GATEWAY=mock` — adapter PIX POC
 - `COMMUNICATION_PROVIDER=console` — e-mail no console
 - `CRON_SECRET` — jobs `/api/cron/*`
 - `TELEMEDICINE_BASE_URL` — salas de telemedicina mock
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
-- `ALLOW_DEMO_RESET` — restaurar demo na UI (padrão `true`)
+- `ALLOW_DEMO_RESET` — restaurar demo na UI (somente modo **demo** ativo)
+- **Demo vs operação:** `/interno/seguranca` (ADMIN) — `docs/OPERACAO_DADOS.md`
 
 ### Navegação SPA (layouts persistentes)
 
