@@ -8,11 +8,14 @@ import {
 describe("demo-reset", () => {
   const originalNodeEnv = process.env.NODE_ENV;
   const originalFlag = process.env.ALLOW_DEMO_RESET;
+  const originalNetlify = process.env.NETLIFY;
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
     if (originalFlag === undefined) delete process.env.ALLOW_DEMO_RESET;
     else process.env.ALLOW_DEMO_RESET = originalFlag;
+    if (originalNetlify === undefined) delete process.env.NETLIFY;
+    else process.env.NETLIFY = originalNetlify;
   });
 
   it("habilita reset fora de producao por padrao", () => {
@@ -21,8 +24,16 @@ describe("demo-reset", () => {
     expect(isDemoResetEnabled()).toBe(true);
   });
 
-  it("desabilita reset em producao sem flag", () => {
+  it("habilita reset em producao Netlify POC (NETLIFY=true)", () => {
     process.env.NODE_ENV = "production";
+    process.env.NETLIFY = "true";
+    delete process.env.ALLOW_DEMO_RESET;
+    expect(isDemoResetEnabled()).toBe(true);
+  });
+
+  it("desabilita reset em producao fora da Netlify", () => {
+    process.env.NODE_ENV = "production";
+    delete process.env.NETLIFY;
     delete process.env.ALLOW_DEMO_RESET;
     expect(isDemoResetEnabled()).toBe(false);
   });
