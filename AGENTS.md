@@ -58,7 +58,7 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
-**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; habilitado por padrão via `ALLOW_DEMO_RESET=true`).
+**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; em produção via `ALLOW_DEMO_RESET=true` no `netlify.toml`).
 ### Operações e preferências de IA
 
 **Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:**

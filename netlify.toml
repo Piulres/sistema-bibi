@@ -31,10 +31,13 @@
 [context.production.environment]
   NODE_ENV = "production"
   NETLIFY = "true"
+  # POC demo: botão restaurar seed em /interno/seguranca (somente ADMIN)
+  ALLOW_DEMO_RESET = "true"
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"
   NETLIFY = "true"
+  ALLOW_DEMO_RESET = "true"
 
 # Emulacao local: netlify dev encaminha :8888 → next dev :3000
 [dev]

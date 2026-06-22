@@ -134,6 +134,7 @@ export default function LoginForm({
                   label="E-mail"
                   id="email"
                   type="email"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -142,6 +143,7 @@ export default function LoginForm({
                   label="Senha"
                   id="password"
                   type="password"
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -161,6 +163,7 @@ export default function LoginForm({
                 <Input
                   label="Código MFA"
                   id="mfaCode"
+                  autoComplete="one-time-code"
                   value={mfaCode}
                   onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
                   inputMode="numeric"
