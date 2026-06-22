@@ -15,7 +15,7 @@ não confie em “deploy automático” para saber o que está no ar.
 | Site | ✅ **HTTP 200** — online |
 | Pacote em produção | `bibi-poc-2026-06-22c` → commit `32dad64` |
 | Deploy Netlify | `6a38b0693dfc26b5899c3be7` |
-| `main` | `32dad64` — **alinhada com produção** |
+| `main` | `46ee6b8` — **alinhada com produção** (docs pós-release) |
 | Validação local | `npm run pre-release` |
 
 ---
