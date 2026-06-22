@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { internoNav, loginAs } from "./helpers/auth";
+import { loginAs, openInternoNav, portalMain } from "./helpers/auth";
 
 const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno/dashboard", heading: /Dashboard Executivo/i },
@@ -31,7 +31,7 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
 
   test("nav exibe todos os módulos para admin", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    const nav = internoNav(page);
+    const nav = await openInternoNav(page);
     for (const label of [
       "Dashboard",
       "Faturamento",
@@ -51,8 +51,9 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
 
   test("faturamento exibe pendências ou faturas emitidas", async ({ page }) => {
     await page.goto("/interno");
+    await expect(page.getByRole("heading", { name: "Faturamento", level: 1 })).toBeVisible();
     await expect(
-      page.getByText(/pendente|fatura|pay per use|procedimento/i).first(),
+      portalMain(page).getByText(/procedimentos a faturar|faturas emitidas|nenhum procedimento pendente/i).first(),
     ).toBeVisible({ timeout: 15_000 });
   });
 
