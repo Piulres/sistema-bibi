@@ -128,5 +128,6 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
+  `docs/SEED.md` (massa demo, preços de mercado, escala),
   `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
   `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).
