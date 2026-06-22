@@ -151,7 +151,7 @@ main acumula commits → pre-release OK → deploy manual → RELEASES.md atuali
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: `bibi-poc-2026-06-22c` (`32dad64`). Ver [`RELEASES.md`](RELEASES.md).
+Exemplo atual em produção: **`v1.0.0`** (`2395921`). Ver [`RELEASES.md`](RELEASES.md).
 
 ---
 
