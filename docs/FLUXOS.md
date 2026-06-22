@@ -149,15 +149,30 @@ Quando `User.mfaEnabled = true`:
 
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
-| `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador` | `AgendaView` | Abas **Dia / Próximos / Histórico**; navegar datas; abrir atendimento ou histórico do paciente |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO; link **Histórico completo** |
+| `/prestador/paciente/[id]` | `PrestadorPatientHistoryView` | Visão consolidada: consultas, procedimentos, PEP e timeline do paciente |
+
+### Agenda (`AgendaView`)
+
+Três visões via query `view` na API (padrão `day`):
+
+| Aba | `view` | Comportamento |
+|-----|--------|---------------|
+| **Dia** | `day` | Consultas de uma data (`date=YYYY-MM-DD`); navegação anterior/próximo dia |
+| **Próximos** | `upcoming` | Futuras (≥ hoje), exceto `CANCELADO`; até 60 registros |
+| **Histórico** | `past` | Anteriores a hoje; ordenação decrescente; até 60 registros |
+
+Resposta inclui `summary: { today, upcoming, past }` para badges nas abas.
+Cada card expõe link para `/prestador/paciente/[id]` (histórico) e para atendimento.
 
 ### APIs disparadas
 
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
-| Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
+| Carregar agenda | `GET /api/prestador/agenda?view=day\|upcoming\|past&date=` | Appointments do provider + `tenantId` |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
+| Histórico do paciente | `GET /api/prestador/patients/[id]/overview` | `getProviderPatientOverview()` |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
@@ -165,10 +180,12 @@ Quando `User.mfaEnabled = true`:
 
 ```mermaid
 flowchart LR
-  A[Agenda do dia] --> B[Atendimento]
+  A[Agenda Dia / Próximos / Histórico] --> B[Atendimento]
+  A --> H[Histórico do paciente]
   B --> C[Registrar ProcedureUsage]
   B --> D[Salvar PEP]
   B --> E[Marcar REALIZADO]
+  B --> H
   C --> F[(billed=false)]
 ```
 
@@ -195,10 +212,21 @@ flowchart LR
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
-| `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
+| `seguranca` | `/interno/seguranca` | `SecurityView` + `DataStoreCard` | MFA TOTP · seletor demo/operação (ADMIN) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
+
+### 4.0 Segurança e base de dados (`SecurityView` + `DataStoreCard`)
+
+| Ação | API / UI | Efeito |
+|------|----------|--------|
+| MFA setup/enable/disable | `GET\|POST /api/auth/mfa/setup` | TOTP (§2.2) |
+| Status demo/operação | `GET /api/interno/data-store` | Modo ativo, `dualStoreEnabled`, persistência Blobs |
+| Alternar modo | `POST /api/interno/data-store` | Body `{ mode, confirm: "OPERAR" \| "DEMO" }` — somente ADMIN |
+| Restaurar seed demo | `POST /api/interno/demo/reset` | `{ confirm: "RESTAURAR" }` — somente modo **demo** ativo |
+
+Após alternar modo: sessão invalidada → novo login. Detalhes operacionais: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ### 4.1 Faturamento (`BillingView`)
 
@@ -479,6 +507,18 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
 
+### 8.8 Demo vs operação (dual SQLite)
+
+Fonte canônica: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · runtime: `getPrisma()` em `src/lib/db.ts`.
+
+| Passo | Ação | Efeito |
+|-------|------|--------|
+| 1 | Build Netlify | Gera `demo.db` (seed) + `operation.db` (bootstrap mínimo) |
+| 2 | Runtime | `getPrisma()` resolve `demo.db` ou `operation.db` conforme modo ativo |
+| 3 | Alternar (ADMIN) | `/interno/seguranca` → confirmação `OPERAR` / `DEMO` |
+| 4 | Persistência operação | Escritas em `operation.db` → Netlify Blobs (`bibi-databases/operation.db`) |
+| 5 | Modo demo | Snapshot do build; reset via UI quando `ALLOW_DEMO_RESET=true` |
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo
@@ -582,8 +622,10 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
 ### Prestador
-`GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`GET /api/prestador/agenda?view=day|upcoming|past` ·
+`GET|PATCH /api/prestador/appointments/[id]` ·
+`POST .../procedures` · `POST /api/prestador/records` ·
+`GET /api/prestador/patients/[id]/overview` · `GET /api/procedures`
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
@@ -597,7 +639,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
 `companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*` ·
+`data-store` · `demo/reset`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`
@@ -609,12 +652,13 @@ Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml)
 ## 12. Observações da POC
 
 1. **Proxy ≠ RBAC** — `src/proxy.ts` só verifica cookie; role e perfil validados no servidor.
-2. **SQLite + Prisma 6** — status são `String`, não enums Prisma.
-3. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
-4. **TISS** — XML simplificado; validação XSD pendente (Tier 5).
-5. **Domínio custom** — verificação manual; sem challenge DNS automático.
-6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
-7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
+2. **Dual SQLite** — `getPrisma()` escolhe `demo.db` ou `operation.db`; operação persiste em Netlify Blobs. Ver §8.8 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+3. **SQLite + Prisma 6** — status são `String`, não enums Prisma.
+4. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
+5. **TISS** — XML simplificado; validação XSD pendente (Tier 5).
+6. **Domínio custom** — verificação manual; sem challenge DNS automático.
+7. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
+8. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
 
 ---
 

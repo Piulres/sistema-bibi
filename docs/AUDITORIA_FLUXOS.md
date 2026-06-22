@@ -78,7 +78,8 @@ Credenciais demo: senha `bibi123` — ver tabela em [`FLUXOS.md`](FLUXOS.md) §1
 |-------|-----------|
 | Login → agenda do dia | e2e `flows.spec.ts`, `smoke.spec.ts` |
 | Abrir tela de atendimento | e2e quando há consulta no dia |
-| `GET /api/prestador/agenda` | `tests/api/portal-flows.test.ts` |
+| `GET /api/prestador/agenda` (day/upcoming/past) | `tests/api/portal-flows.test.ts` |
+| `GET /api/prestador/patients/[id]/overview` | `tests/api/portal-flows.test.ts` |
 
 ### Falhas
 
@@ -86,10 +87,8 @@ Credenciais demo: senha `bibi123` — ver tabela em [`FLUXOS.md`](FLUXOS.md) §1
 |------|-------|----------|---------|
 | **Alta** | Concluir atendimento (`REALIZADO`) | `markRealizado()` não verifica `res.ok` — falha da API é silenciosa | `src/components/AtendimentoView.tsx` |
 | **Alta** | Registrar procedimento / salvar PEP | Mensagens de erro renderizadas com `<Alert tone="success">` | `src/components/AtendimentoView.tsx` |
-| **Média** | Carregar agenda | `AgendaView` não checa `res.ok` — 401/403 aparece como agenda vazia | `src/components/AgendaView.tsx` |
 | **Média** | Registrar procedimento (PPU) | API não valida status do agendamento — aceita `CANCELADO` / `FALTOU` | `src/app/api/prestador/appointments/[id]/procedures/route.ts` |
 | **Média** | Máquina de estados (§10.1 FLUXOS) | PATCH de status sem regras de transição | `src/app/api/prestador/appointments/[id]/route.ts` |
-| **Baixa** | Agenda API | Filtro por `providerId` sem `tenantId` explícito (mitigado por UUID) | `src/app/api/prestador/agenda/route.ts` |
 
 ### Detalhe — UX do atendimento
 

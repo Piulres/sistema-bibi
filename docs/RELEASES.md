@@ -15,12 +15,12 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Item | Valor |
 |------|-------|
 | **Versão em produção** | **1.0.0** (`de88c0e`) |
-| **Próximo deploy (linha 1.0)** | **1.0.1** — commit `a31e195` na `dev` |
+| **Próximo deploy (linha 1.0)** | **1.0.1** — commit `e4d8a43` na `main` (merge PR #73) |
 | Site produção | https://sistema-bibi.netlify.app |
-| `main` | `de88c0e` — aguardando merge `dev` → `main` |
+| `main` | `e4d8a43` — **v1.0.1** mergeado; aguardando deploy manual |
 | `dev` | `a31e195` — integração (v1.0.1 + futura v1.1) |
 | Tag git em produção | `v1.0.0` |
-| Validação `dev` | `npm run pre-release` · 101 unit · 44+ E2E |
+| Validação `main` | `npm run pre-release` · 101 unit · 44+ E2E |
 
 ---
 
@@ -44,11 +44,11 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.0.1` |
-| **Commit** | `a31e195` (merge `dev`) |
-| **Branch** | `dev` → merge `main` → deploy manual |
+| **Commit** | `e4d8a43` (merge PR #73 na `main`) |
+| **Branch** | `main` — deploy manual pendente |
 | **Docs** | [`V1_0.md`](V1_0.md) |
-| **PRs incluídos** | #69 agenda/histórico prestador · #70 dev-first · #71 dual SQLite demo/operação |
-| **Checklist** | `npm run pre-release` → merge `dev`→`main` → cota OK → `deploy --prod --no-build` → tag `v1.0.1` → atualizar esta seção |
+| **PRs incluídos** | #69 agenda/histórico prestador · #70 dev-first · #71 dual SQLite demo/operação · #73 release |
+| **Checklist** | `npm run pre-release` → cota OK → `deploy --prod --no-build` → tag `v1.0.1` → atualizar esta seção |
 
 **Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
 
@@ -72,7 +72,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Versão | Doc | Estado |
 |--------|-----|--------|
-| **1.0.x** | [`V1_0.md`](V1_0.md) | `v1.0.1` pendente deploy |
+| **1.0.x** | [`V1_0.md`](V1_0.md) | `v1.0.1` na `main` — pendente deploy |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Só `dev` |
 
 ---
