@@ -43,7 +43,7 @@ Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de opera�
 ### Credenciais de demonstração (criadas pelo seed)
 Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
 
-Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários PJ** + fluxo demo TechCorp intacto.
+Massa demo (PR #31, preços PR #50): **50 empresas PJ**, **199 beneficiários**, **27 usuários PJ** + fluxo demo TechCorp intacto. Detalhes: `docs/SEED.md`.
 
 | Portal | E-mail |
 |--------|--------|
