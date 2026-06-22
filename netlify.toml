@@ -1,9 +1,8 @@
 # Sistema Bibi — Netlify (Next.js 16 + Prisma/SQLite POC)
 #
-# STATUS: preparado para deploy, mas NÃO publicar até revisar credenciais e limites da conta.
 # Build local (sem publicar): npm run netlify:build
 # Dev com emulacao Netlify:    npm run netlify:dev
-# Publicar (manual, quando ok): npx netlify deploy --prod
+# Publicar (manual):           npx netlify deploy --prod
 
 [build]
   command = "npm run build:netlify"
@@ -18,11 +17,19 @@
   # O valor abaixo e apenas fallback da POC — troque antes de ir a producao.
   SESSION_SECRET = "bibi-poc-netlify-secret-change-me"
 
+[[plugins]]
+  package = "./netlify/plugins/patch-regional-blobs"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
 [context.production.environment]
   NODE_ENV = "production"
+  NETLIFY = "true"
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"
+  NETLIFY = "true"
 
 # Emulacao local: netlify dev encaminha :8888 → next dev :3000
 [dev]
