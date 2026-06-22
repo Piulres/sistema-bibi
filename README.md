@@ -149,6 +149,23 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
 
+### Massa de demonstração (seed)
+
+O `npm run db:seed` popula **50 empresas PJ**, **~199 beneficiários**, **27 usuários PJ**
+e histórico operacional completo (agenda, Pay Per Use, faturas, assinaturas, timeline).
+O fluxo demo **TechCorp** (`rh@techcorp.com`) permanece intacto para walkthroughs E2E.
+
+Dados modulares em `prisma/seed-data/`:
+
+| Arquivo | Conteúdo |
+|---------|----------|
+| `companies.ts` | 50 empresas com setor, status CRM e cenário de mercado |
+| `generators.ts` | Beneficiários e usuários PJ sintéticos |
+| `scenarios.ts` | Massa operacional (`seedOperationalMass`) |
+| `catalog.ts` | Procedimentos extras e prestadores |
+
+Após o seed, o console imprime contagens (empresas, faturas, pendências de faturamento).
+
 ## 7. Fluxo end-to-end (Pay Per Use)
 
 1. **Prestador** faz login em `/login` e vê a **agenda do dia**.
@@ -323,7 +340,8 @@ curl -b cookies.txt http://localhost:3000/api/prestador/agenda
 sistema-bibi/
 ├── prisma/
 │   ├── schema.prisma        # modelo de dados (multi-tenant + Pay Per Use)
-│   └── seed.ts              # dados de demonstração
+│   ├── seed.ts              # orquestração do seed
+│   └── seed-data/           # massa demo (empresas, cenários, geradores)
 ├── src/
 │   ├── app/
 │   │   ├── api/             # Route Handlers (backend)
@@ -387,10 +405,8 @@ sistema-bibi/
   `.env` são *gitignored*.
 - POC sem testes automatizados — recomendados para evolução do produto.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy via CLI validado;
-  deploy Git automático ainda com falhas intermitentes — ver
-  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md) e
-  [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)).
+- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy Git e CLI validados;
+  ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)).
   Build local: `npm run netlify:build`.
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
 
