@@ -9,7 +9,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (4)    │  Playwright — fluxos reais no browser
+                    │  E2E (5)    │  Playwright — fluxos reais no browser
                     ├─────────────┤
                     │ API (7)     │  Handlers Next.js + auth/cron
                     ├─────────────┤
@@ -30,7 +30,80 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | E2E | Playwright | `e2e/` | `npm run test:e2e` |
 | CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
 
-Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
+Banco de testes isolado: `prisma/test.db` (criado no primeiro `npm run test` com
+`DATABASE_URL` apontando para ele — ver [setup](#setup-local-e-pitfalls) abaixo).
+
+---
+
+## Estrutura de pastas
+
+```
+tests/
+├── setup.ts              # beforeAll: ensureTestDatabase()
+├── helpers/
+│   ├── db.ts             # test.db isolado (push + seed na 1ª execução)
+│   └── request.ts        # jsonRequest() para Route Handlers
+├── mocks/server-only.ts  # stub do pacote server-only no Vitest
+├── unit/                 # lógica pura (password, pricing, proxy…)
+├── security/             # RBAC gaps, MFA/HMAC
+├── integration/          # Prisma + adapters (usa getTestPrisma)
+└── api/                  # handlers importados diretamente (usa @/lib/db)
+
+e2e/
+└── smoke.spec.ts         # smoke + login + Pay Per Use
+
+.github/workflows/ci.yml  # lint → vitest → build → playwright
+vitest.config.ts          # env de teste (SESSION_SECRET, CRON_SECRET…)
+playwright.config.ts      # dev server na porta 3100 (PLAYWRIGHT_PORT)
+```
+
+---
+
+## Setup local e pitfalls
+
+### Primeira execução
+
+```bash
+npm install
+# Workaround: comente DATABASE_URL no .env (o Vitest carrega .env e sobrescreve o export)
+DATABASE_URL=file:./prisma/test.db npm run test
+```
+
+O helper `ensureTestDatabase()` (`tests/helpers/db.ts`) cria `prisma/test.db` na
+primeira rodada (`prisma db push` + `prisma db seed`). O arquivo é **gitignored**
+e não interfere no `dev.db` de desenvolvimento.
+
+### Pitfall: `.env` sobrescreve `DATABASE_URL`
+
+O Vitest carrega `.env` do projeto. Se `DATABASE_URL=file:./dev.db` estiver definido
+(como no `.env.example`), ele **prevalece** sobre `export DATABASE_URL=...` no shell.
+
+| Ambiente | `DATABASE_URL` efetivo | Resultado |
+|----------|------------------------|-----------|
+| GitHub Actions CI | `file:./prisma/test.db` (workflow, sem `.env`) | ✅ 47 testes |
+| Local com `.env` padrão | `file:./dev.db` | ⚠️ API tests falham se `dev.db` vazio ou sem seed |
+| Local — workaround | comentar `DATABASE_URL` no `.env` e exportar `file:./prisma/test.db` | ✅ espelha o CI |
+
+### Pitfall: singleton `db.ts` vs `beforeAll`
+
+Testes de **integração** usam `getTestPrisma()` após `ensureTestDatabase()`.
+Testes de **API** importam Route Handlers que carregam `prisma` de `src/lib/db.ts` no
+**import do módulo** — o client Prisma é criado antes do seed de `test.db`. Por isso
+os testes de API dependem de `test.db` **já existir e estar seedado** (criado pelo
+próprio `npm run test` na primeira passagem dos testes de integração, ou manualmente
+com `DATABASE_URL=file:./prisma/test.db npx prisma db push && ... db seed`).
+
+### E2E (Playwright)
+
+O `playwright.config.ts` sobe `npm run dev` na porta **3100** (não 3000). Antes
+da primeira rodada E2E, popule o banco de dev:
+
+```bash
+npm run db:push && npm run db:seed
+npm run test:e2e
+```
+
+No CI, o job `e2e` executa `db:push` + `db:seed` antes do Playwright.
 
 ---
 
@@ -161,20 +234,37 @@ Contrato OpenAPI: `public/openapi.yaml` — candidato a testes de contrato (não
 
 ---
 
+## CI (GitHub Actions)
+
+Workflow: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
+
+| Job | Etapas | Variáveis |
+|-----|--------|-----------|
+| `unit-integration-api` | `npm ci` → lint → test → build | `DATABASE_URL=file:./prisma/test.db`, `SESSION_SECRET`, `CRON_SECRET` |
+| `e2e` | `db:push` + `db:seed` → Playwright Chromium | `CI=true`, `PLAYWRIGHT_PORT=3100` |
+
+Dispara em **push** para `main` e branches `cursor/**`, e em **pull requests** para `main`.
+
+---
+
 ## Comandos
 
 ```bash
-# Todos os testes Vitest (unit + security + integration + api)
-npm run test
+```bash
+# Vitest — comente DATABASE_URL no .env ou o Vitest usará dev.db
+DATABASE_URL=file:./prisma/test.db npm run test
 
 # Modo watch durante desenvolvimento
-npm run test:watch
+DATABASE_URL=file:./prisma/test.db npm run test:watch
 
-# E2E (sobe dev server na porta 3100)
+# Cobertura
+npm run test:coverage
+
+# E2E (sobe dev server na porta 3100; exige dev.db seedado)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
-npm run lint && npm run test && npm run build
+# Espelha o job unit-integration-api do CI
+npm run lint && DATABASE_URL=file:./prisma/test.db npm run test && npm run build
 ```
 
 ### Variáveis em testes

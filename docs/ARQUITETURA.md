@@ -623,3 +623,43 @@ Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
 
 - **Swagger UI:** http://localhost:3000/api-docs.html
 - **Spec (YAML):** http://localhost:3000/openapi.yaml
+
+---
+
+## 21. Pipeline de qualidade (testes e CI)
+
+A partir do PR #41, o repositório inclui testes automatizados em três camadas e
+validação contínua no GitHub Actions.
+
+```mermaid
+flowchart LR
+  subgraph Local["Desenvolvedor"]
+    V["Vitest<br/>tests/**"]
+    P["Playwright<br/>e2e/**"]
+  end
+
+  subgraph CI["GitHub Actions<br/>.github/workflows/ci.yml"]
+    L[lint]
+    T[test]
+    B[build]
+    E[e2e]
+    L --> T --> B --> E
+  end
+
+  V --> CI
+  P --> CI
+```
+
+| Camada | Runner | Escopo | Banco |
+|--------|--------|--------|-------|
+| Unitário / segurança | Vitest | `tests/unit/`, `tests/security/` | Nenhum |
+| Integração | Vitest | `tests/integration/` | `prisma/test.db` via `getTestPrisma()` |
+| API | Vitest | `tests/api/` | `prisma/test.db` via `@/lib/db` |
+| E2E | Playwright | `e2e/smoke.spec.ts` | `dev.db` seedado (porta 3100) |
+
+**Documentação detalhada:** [`TESTES.md`](TESTES.md) — mapa por domínio, lacunas
+RBAC API vs UI, proxy otimista, setup local e variáveis de ambiente.
+
+**Ponto crítico (local):** o Vitest carrega `.env`; se `DATABASE_URL=file:./dev.db`,
+os testes de API usam `dev.db` em vez de `test.db`. O CI não tem `.env` e define
+`DATABASE_URL=file:./prisma/test.db` no workflow. Ver troubleshooting em [`TESTES.md`](TESTES.md).

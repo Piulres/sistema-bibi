@@ -88,6 +88,22 @@ A aplicação sobe em **http://localhost:3000**.
 > - `COMMUNICATION_PROVIDER` — `console` (POC) ou `sendgrid`/`twilio`/`meta`.
 > - `CRON_SECRET` — protege jobs `POST /api/cron/reminders` e `/api/cron/webhooks`.
 > - `TELEMEDICINE_BASE_URL` — URL base das salas virtuais mock (telemedicina).
+> - `SEED_SCALE` — volume da massa demo: `small` | `medium` (padrão) | `large`.
+
+### Testes automatizados
+
+```bash
+# Vitest (unitário, segurança, integração, API)
+# Comente DATABASE_URL no .env antes — o Vitest carrega .env e sobrescreve exports
+DATABASE_URL=file:./prisma/test.db npm run test
+
+# E2E com Playwright (exige dev.db seedado; servidor na porta 3100)
+npm run db:push && npm run db:seed
+npm run test:e2e
+```
+
+Mapa completo, lacunas de segurança e troubleshooting: [`docs/TESTES.md`](docs/TESTES.md).
+O CI em [`.github/workflows/ci.yml`](.github/workflows/ci.yml) roda lint, testes e build em todo push/PR na `main`.
 
 ## 5. URLs de teste
 
@@ -236,7 +252,10 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 ### Portal Interno (`role: INTERNO`)
 
-> Rotas sensíveis respeitam **RBAC** via `internoProfile` (ADMIN, FATURAMENTO, RECEPCAO, READONLY).
+> A **navegação** filtra módulos por `internoProfile` (ADMIN, FATURAMENTO, RECEPCAO,
+> READONLY). Porém a maioria das rotas `/api/interno/*` ainda exige apenas
+> `role === INTERNO` — perfil READONLY pode chamar billing/cadastros via API.
+> Ver [`docs/TESTES.md`](docs/TESTES.md) § lacunas RBAC e `tests/security/rbac-gaps.test.ts`.
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
@@ -321,9 +340,13 @@ curl -b cookies.txt http://localhost:3000/api/prestador/agenda
 
 ```
 sistema-bibi/
+├── .github/workflows/ci.yml # lint, Vitest, build, Playwright E2E
 ├── prisma/
 │   ├── schema.prisma        # modelo de dados (multi-tenant + Pay Per Use)
-│   └── seed.ts              # dados de demonstração
+│   ├── seed.ts              # orquestrador do seed
+│   └── seed-data/           # massa modular (companies, generators, vitacare, scale…)
+├── tests/                   # Vitest: unit, security, integration, api
+├── e2e/                     # Playwright: smoke + fluxos críticos
 ├── src/
 │   ├── app/
 │   │   ├── api/             # Route Handlers (backend)
@@ -356,9 +379,10 @@ sistema-bibi/
 | `npm run build` | Build de produção (inclui verificação de tipos). |
 | `npm run start` | Sobe o build de produção. |
 | `npm run lint` | ESLint. |
-| `npm run test` | Vitest — unitário, segurança, integração e API. |
+| `npm run test` | Vitest — unitário, segurança, integração e API. Requer `DATABASE_URL=file:./prisma/test.db` e `.env` sem conflito (ver [`docs/TESTES.md`](docs/TESTES.md)). |
 | `npm run test:watch` | Vitest em modo watch. |
-| `npm run test:e2e` | Playwright — fluxos E2E no browser. |
+| `npm run test:coverage` | Vitest com relatório de cobertura. |
+| `npm run test:e2e` | Playwright — fluxos E2E no browser (porta 3100). |
 | `npm run db:push` | Sincroniza o schema com o banco SQLite. |
 | `npm run db:seed` | Popula o banco com os dados de demonstração. |
 | `npm run build:netlify` | Pipeline de build da Netlify (`db:push` + seed + `next build`). |
@@ -411,6 +435,7 @@ sistema-bibi/
 - **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):
   [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
 - **Design system e white label:** [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
+- **Testes automatizados (mapa, CI, lacunas de segurança):** [`docs/TESTES.md`](docs/TESTES.md)
 - **Base de conhecimento (NotebookLM / RAG):**
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
 - **Deploy Netlify (produção + troubleshooting):**
