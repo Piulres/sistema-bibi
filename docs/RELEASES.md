@@ -13,42 +13,38 @@ não confie em “deploy automático” para saber o que está no ar.
 | Item | Valor |
 |------|-------|
 | Site | ✅ **HTTP 200** — online |
-| Pacote em produção | `bibi-poc-2026-06-22b` → commit `92348ba` |
-| Deploy Netlify | `6a389fc10e7ad89f20d8095a` |
-| `main` | `92348ba` — **alinhada com produção** |
+| Pacote em produção | `bibi-poc-2026-06-22c` → commit `32dad64` |
+| Deploy Netlify | `6a38b0693dfc26b5899c3be7` |
+| `main` | `32dad64` — **alinhada com produção** |
 | Validação local | `npm run pre-release` |
 
 ---
 
 ## Pacote em produção (fechado)
 
-### `bibi-poc-2026-06-22b`
+### `bibi-poc-2026-06-22c`
 
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | *(não criada — deploy via CLI)* |
-| **Commit** | `92348ba` — merge PR #46 |
-| **Publicado em** | 22/06/2026 ~02:36 UTC (deploy CLI `--no-build`) |
+| **Commit** | `32dad64` — merge PR #52 |
+| **Publicado em** | 22/06/2026 ~03:50 UTC (deploy CLI `--no-build`) |
 | **Método** | `npx netlify build` local + `npx netlify deploy --prod --no-build` |
 | **Site** | `sistema-bibi` |
-| **Autorizado por** | Usuário (após revisão pré-produção) |
+| **Autorizado por** | Usuário (“Aplicar correção”) |
 
-**Inclui (PRs #29–#46 desde `bibi-poc-2026-06-22a`):**
+**Inclui (desde `bibi-poc-2026-06-22b`):**
 
-- Fixes CI/GitHub Netlify (#29–#32, #34, #39)
-- Seed em escala: 50 PJ, massa operacional, VitaCare (#31, #33, #36)
-- Landing moderna com SEO (#37)
-- Testes automatizados Vitest + Playwright + CI (#41)
-- Workflow pacotes fechados + `pre-release` + regras `.mdc` (#42)
-- Botão restaurar demo (`/interno/seguranca`, ADMIN; off em prod sem `ALLOW_DEMO_RESET`) (#44)
-- Mapa de variáveis de ambiente (#46)
-- Docs: `OPERACOES.md`, `TESTES.md`, `VARIAVEIS_AMBIENTE.md`, etc.
+- Demo reset habilitado em POC Netlify (`ALLOW_DEMO_RESET` + `NETLIFY=true` no `netlify.toml`)
+- Redirect `/interno/faturamento` → `/interno` (corrige 404)
+- `autoComplete` nos formulários de login (aviso de console)
+- Fix CI: `DATABASE_URL` nos jobs unit/e2e + `globalSetup` Vitest + normalização SQLite em `db.ts`
 
 **Validação pré-deploy:**
 
-- `npm run test` — 53/53
+- `npm run test` — 54/54
 - `npm run pre-release` — OK
-- Smoke: landing, logins, `/api/auth/me` → 200/401
+- Smoke: landing 200, login API 200, `/interno/faturamento` → 307
 
 ---
 
@@ -70,7 +66,8 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Pacote | Commit | Data (UTC) | Método | Estado |
 |--------|--------|------------|--------|--------|
-| `bibi-poc-2026-06-22b` | `92348ba` | 22/06 ~02:36 | CLI `--prod --no-build` | ✅ **Em produção** |
+| `bibi-poc-2026-06-22c` | `32dad64` | 22/06 ~03:50 | CLI `--prod --no-build` | ✅ **Em produção** |
+| `bibi-poc-2026-06-22b` | `92348ba` | 22/06 ~02:36 | CLI `--prod --no-build` | ✅ Substituído |
 | `bibi-poc-2026-06-22a` | `beeb894` | 22/06 ~00:01 | CLI `--prod` | ✅ Substituído |
 | `bibi-poc-2026-06-21b` | `94c0f67` | 21/06 23:37 | CLI `--prod` | ✅ Substituído |
 | `bibi-poc-2026-06-21a` | *(vários)* | 21/06 18:35+ | Git + CLI | ⚠️ Builds Git falharam |
