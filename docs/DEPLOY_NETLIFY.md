@@ -64,6 +64,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | `PAYMENT_GATEWAY` | Não | `mock` (POC) ou `asaas`/`efi`/`inter` |
 | `COMMUNICATION_PROVIDER` | Não | `console` (POC) ou `sendgrid`/`twilio`/`meta` |
 | `TELEMEDICINE_BASE_URL` | Não | URL base das salas virtuais mock |
+| `NEXT_PUBLIC_SITE_URL` | Não | URL canônica para SEO (metadata, sitemap, JSON-LD). Na Netlify, `URL` costuma bastar |
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 
@@ -141,6 +142,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | `prisma/prisma/dev.db` | `DATABASE_URL` errado | Use `file:./dev.db` (relativo ao schema) |
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
+| Open Graph com URL errada | `NEXT_PUBLIC_SITE_URL` ausente em preview | Definir no painel ou confiar em `URL` da Netlify |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
 
 ---

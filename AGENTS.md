@@ -59,8 +59,10 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 - `COMMUNICATION_PROVIDER=console` — e-mail no console (`ConsoleEmailAdapter`)
 - `CRON_SECRET` — protege `POST /api/cron/reminders` e `/api/cron/webhooks`
 - `TELEMEDICINE_BASE_URL` — base das salas virtuais mock
+- `NEXT_PUBLIC_SITE_URL` — URL pública para SEO (metadata, sitemap, Open Graph); na Netlify `URL` é injetada automaticamente
 
 ### Notas não óbvias
+- **Landing pública (`/`):** seções em `src/components/landing/`, conteúdo em `src/lib/landing/content.ts`, SEO em `robots.ts`/`sitemap.ts` — ver `docs/DESIGN_SYSTEM.md`.
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
   adapters + `prisma.config.ts`). O projeto está **fixado em Prisma 6** de propósito;
   não faça upgrade sem migrar o schema.

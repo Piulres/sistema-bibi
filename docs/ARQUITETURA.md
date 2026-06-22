@@ -18,7 +18,7 @@ e são renderizados automaticamente no GitHub.
 ```mermaid
 flowchart TB
   subgraph Cliente["Navegador (Mobile-first)"]
-    Land["Landing /"]
+    Land["Landing /<br/>SEO · JSON-LD · portais"]
     PortP["Portal Prestador<br/>/login · /prestador"]
     PortI["Portal Interno<br/>/interno/login · /interno/dashboard<br/>/interno · cadastros · agenda · crm<br/>/interno/assinaturas · comunicacao · relatorios<br/>/interno/branding · integracoes · seguranca"]
     PortPJ["Portal Empresa (PJ)<br/>/pj/login · /pj"]
@@ -32,6 +32,7 @@ flowchart TB
     subgraph Lib["src/lib"]
       Sess["session.ts<br/>(HMAC + cookie httpOnly)"]
       Auth["api-auth.ts<br/>(requireUser/role)"]
+      Landing["landing/* + theme/branding<br/>(conteúdo + getPlatformBranding)"]
       Price["pricing.ts<br/>(precificação dinâmica)"]
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
       Timeline["timeline.ts<br/>(auditoria universal)"]
@@ -48,6 +49,8 @@ flowchart TB
   SQLite[("SQLite<br/>dev.db")]
 
   Cliente -->|HTTP| Proxy --> Pages
+  Land --> Pages
+  Pages --> Landing
   Pages --> API
   API --> Auth --> Sess
   API --> Price
@@ -612,6 +615,49 @@ flowchart LR
 - [x] UI `/interno/dashboard` + aba no `InternoNav`
 - [x] Links para módulos e Cliente 360°
 - [x] Build passando
+
+---
+
+## 21. Landing page pública (PR #37)
+
+Página de marketing em `/` com SEO, acessibilidade e integração ao white label.
+Detalhes de componentes, tokens e edição de conteúdo: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)
+(seção *Landing page pública*).
+
+```mermaid
+flowchart TB
+  subgraph Publico["Rotas públicas indexáveis"]
+    Home["/"]
+    Logins["/login · /interno/login<br/>/pj/login · /beneficiario/login"]
+  end
+  subgraph SEO["SEO (App Router)"]
+    Meta["generateMetadata()"]
+    Robots["robots.ts"]
+    Sitemap["sitemap.ts"]
+    JsonLd["LandingJsonLd<br/>Organization · SoftwareApplication · FAQPage"]
+  end
+  subgraph Conteudo["Conteúdo"]
+    Content["lib/landing/content.ts"]
+    Brand["getPlatformBranding()"]
+    Url["getSiteUrl()"]
+  end
+  Home --> Meta & JsonLd
+  Brand --> Home
+  Content --> Home
+  Url --> Meta & Robots & Sitemap & JsonLd
+  Home --> Logins
+```
+
+| Camada | Arquivo |
+|--------|---------|
+| Página | `src/app/page.tsx` |
+| Seções UI | `src/components/landing/*` |
+| Textos | `src/lib/landing/content.ts` |
+| URL canônica | `src/lib/landing/site-url.ts` (`NEXT_PUBLIC_SITE_URL` / `URL`) |
+| Crawlers | `src/app/robots.ts`, `src/app/sitemap.ts` |
+
+**Restrições da POC:** branding da landing = primeiro `TenantBranding` do banco; áreas
+autenticadas ficam em `disallow` no `robots.ts`.
 
 ---
 

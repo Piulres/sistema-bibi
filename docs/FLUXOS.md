@@ -61,6 +61,22 @@ flowchart TB
 | Auditoria | `TimelineEvent` via `recordTimelineEvent()` |
 | Integrações B2B | `webhook-service.ts` + cron retry |
 
+### Landing pública (`/`)
+
+Fluxo de entrada **sem autenticação** (PR #37). A página é Server Component que carrega
+`getPlatformBranding()` e renderiza seções âncora:
+
+| Âncora | Seção | Destino típico |
+|--------|-------|----------------|
+| *(topo)* | Hero + stats | CTA “Acessar portais” → `#portais` |
+| `#recursos` | Features Pay Per Use, PEP, enterprise | Informativo |
+| `#como-funciona` | Três passos operacionais | Informativo |
+| `#portais` | Cards dos quatro portais | `/login`, `/interno/login`, `/pj/login`, `/beneficiario/login` |
+| `#faq` | Perguntas frequentes | Informativo |
+
+**SEO:** `generateMetadata()`, `robots.txt`, `sitemap.xml` e JSON-LD (`LandingJsonLd`).
+Áreas autenticadas não são indexadas. Detalhes: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md).
+
 ### Credenciais demo (seed)
 
 | Portal | Login | E-mail | Senha |

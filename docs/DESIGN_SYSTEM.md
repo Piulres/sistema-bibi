@@ -141,8 +141,76 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 | `SectionHeader` | Título + descrição de seção |
 | `LoadingState` / `EmptyState` | Estados de carregamento e vazio |
 
+## Landing page pública (`/`)
+
+Página de marketing e entrada nos quatro portais, implementada em PR #37. É uma **Server
+Component** (`src/app/page.tsx`) que reutiliza o branding do tenant padrão via
+`getPlatformBranding()` (primeiro `TenantBranding` do banco, fallback em
+`DEFAULT_BRANDING`).
+
+### Arquitetura
+
+```mermaid
+flowchart TB
+  Page["src/app/page.tsx"] --> Theme["TenantTheme"]
+  Page --> Meta["generateMetadata()"]
+  Page --> JsonLd["LandingJsonLd"]
+  Page --> Sections["LandingHeader · Hero · Stats · Features<br/>HowItWorks · Portals · Faq · Cta · Footer"]
+  Content["src/lib/landing/content.ts"] --> Sections
+  Branding["getPlatformBranding()"] --> Page
+  SiteUrl["getSiteUrl()"] --> Meta & JsonLd & robots & sitemap
+```
+
+| Camada | Arquivo | Responsabilidade |
+|--------|---------|------------------|
+| Página | `src/app/page.tsx` | Composição das seções + `generateMetadata()` |
+| Conteúdo | `src/lib/landing/content.ts` | Stats, features, passos, portais, FAQ (editável sem tocar na UI) |
+| URL canônica | `src/lib/landing/site-url.ts` | `NEXT_PUBLIC_SITE_URL` → `URL` (Netlify) → fallback produção |
+| SEO estático | `src/app/robots.ts`, `src/app/sitemap.ts` | Crawlers e sitemap das rotas públicas |
+| JSON-LD | `src/components/landing/LandingJsonLd.tsx` | `Organization`, `SoftwareApplication`, `FAQPage` |
+| Estilos | `src/app/globals.css` | `.landing-fade-in`, `.ds-skip-link` |
+
+### Componentes (`src/components/landing/`)
+
+| Componente | Seção / âncora | Notas |
+|------------|----------------|-------|
+| `LandingHeader` | Nav sticky | Skip link, nav `#recursos` … `#faq`, CTA “Acessar portais” |
+| `LandingHero` | Hero | Gradiente `--brand-hero-from/to`, badges de confiança |
+| `LandingStats` | Métricas | Valores de `LANDING_STATS` |
+| `LandingFeatures` | `#recursos` | Grid de `LANDING_FEATURES` + ícones (`LandingIcon`) |
+| `LandingHowItWorks` | `#como-funciona` | Três passos (`LANDING_STEPS`) |
+| `LandingPortals` | `#portais` | Cards com links para `/login`, `/interno/login`, etc. |
+| `LandingFaq` | `#faq` | `<dl>` semântico a partir de `LANDING_FAQ` |
+| `LandingCta` | CTA final | Link para `#portais` |
+| `LandingFooter` | Rodapé | `platformLabel` + links de login |
+
+### SEO e metadados
+
+- **`generateMetadata()`** em `page.tsx`: título dinâmico (`{displayName} — Gestão Inteligente em Saúde`),
+  description via `buildLandingDescription(tagline)`, Open Graph/Twitter, `metadataBase` e canonical `/`.
+- **`robots.ts`**: permite `/` e logins; **bloqueia** `/api/*` e áreas autenticadas (`/prestador/`, `/interno/*` operacional, `/pj/`, `/beneficiario/`).
+- **`sitemap.ts`**: `/`, `/login`, `/interno/login`, `/pj/login`, `/beneficiario/login`.
+- Variável **`NEXT_PUBLIC_SITE_URL`** (ou `URL` injetada pela Netlify) alimenta metadata, sitemap e JSON-LD.
+
+### Acessibilidade e performance
+
+- **Skip link** (`.ds-skip-link`) → `#conteudo-principal`.
+- Seções com `aria-labelledby`; FAQ em `<dl>`; foco visível com `--ring-focus`.
+- Logo no header: `priority` no `next/image`; `display: swap` nas fontes Geist (`layout.tsx`).
+- Animação `.landing-fade-in` **desligada** quando `prefers-reduced-motion: reduce`.
+
+### Editar conteúdo da landing
+
+1. Textos de negócio (features, FAQ, portais): `src/lib/landing/content.ts`.
+2. Tagline e nome exibido no hero: `TenantBranding` do tenant padrão (seed: Clínica Bibi Saúde) ou `/interno/branding`.
+3. URL canônica em deploy: definir `NEXT_PUBLIC_SITE_URL` no painel Netlify (ver [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)).
+
+> A landing usa o branding do **primeiro tenant** (`orderBy: createdAt asc`). Em cenários
+> multi-tenant com domínio custom, evoluir para `tenant-resolver` na rota `/` (Tier 5).
+
 ## Próximos passos sugeridos
 
 - Purge de cache CDN via `Cache-Tag: tenant-logo-{tenantId}` após troca de logo (Netlify)
 - Verificação automática de domínio custom (DNS TXT/CNAME)
 - Paleta de superfície customizável por tenant (além de light/dark/system)
+- Resolver tenant por domínio na landing (hoje: primeiro tenant do seed)
