@@ -88,6 +88,9 @@ A aplicação sobe em **http://localhost:3000**.
 > - `COMMUNICATION_PROVIDER` — `console` (POC) ou `sendgrid`/`twilio`/`meta`.
 > - `CRON_SECRET` — protege jobs `POST /api/cron/reminders` e `/api/cron/webhooks`.
 > - `TELEMEDICINE_BASE_URL` — URL base das salas virtuais mock (telemedicina).
+> - `SEED_SCALE` — volume da massa demo: `small` | `medium` (padrão) | `large`.
+> - `ALLOW_DEMO_RESET` — habilita o botão de restaurar demo em `/interno/seguranca`
+>   (padrão: ligado fora de `production`; em produção defina `true` explicitamente).
 
 ## 5. URLs de teste
 
@@ -116,7 +119,7 @@ Base local: **`http://localhost:3000`**
 | `/interno/relatorios` | **Relatórios** — exportação CSV (faturamento, CRM) | `INTERNO` |
 | `/interno/branding` | **White label** — cores, logo, tema, domínio custom | `INTERNO` |
 | `/interno/integracoes` | **Integrações B2B** — webhooks outbound e log de entregas | `INTERNO` |
-| `/interno/seguranca` | **Segurança** — MFA TOTP para usuários internos | `INTERNO` |
+| `/interno/seguranca` | **Segurança** — MFA TOTP e restauração do modo demo (ADMIN) | `INTERNO` |
 | `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
 | `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
@@ -148,6 +151,27 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
+
+### Restaurar modo demo
+
+Após testes ou apresentações, um **administrador interno** pode repopular o banco
+com a massa original do seed sem redeploy:
+
+1. Login em `/interno/login` com conta **ADMIN** (ex.: `faturamento@bibi.health`).
+2. Acesse `/interno/seguranca` → card **“Modo demo — restaurar dados”**.
+3. Digite `RESTAURAR` e confirme.
+
+A operação executa `runDatabaseSeed()` (mesmo fluxo de `npm run db:seed`): apaga
+todos os registros e recria tenants, empresas, beneficiários e fluxos demo.
+A sessão atual é encerrada — faça login novamente (IDs são recriados).
+
+| Ambiente | Habilitado por padrão? | Como ligar |
+|----------|------------------------|------------|
+| `development` / preview | Sim | — |
+| `production` | Não | `ALLOW_DEMO_RESET=true` no painel Netlify |
+
+> **CLI equivalente:** `npm run db:reset` (dev) ou `npm run db:push && npm run db:seed`.
+> Detalhes do fluxo: [`docs/FLUXOS.md`](docs/FLUXOS.md) §2.3.
 
 ## 7. Fluxo end-to-end (Pay Per Use)
 
@@ -372,6 +396,8 @@ sistema-bibi/
 - **Segregação por `role` e RBAC interno** (`internoProfile`): cada portal valida
   o perfil no `proxy.ts` (checagem otimista) e no servidor (HMAC + permissões).
 - **MFA TOTP** opcional para usuários internos (`/interno/seguranca`).
+- **Restauração demo** (ADMIN): repopula o seed via UI; desligada em produção
+  por padrão (`ALLOW_DEMO_RESET`).
 - **LGPD light:** consentimento no cadastro + export JSON por beneficiário.
 - Dados sensíveis (prontuário, beneficiários) ficam isolados por `tenant`.
 

@@ -369,6 +369,10 @@ src/
 
 **Prestador:** Dra. Helena — agenda do dia com atendimentos seed
 
+**Restaurar massa demo (UI):** `/interno/seguranca` → card “Modo demo — restaurar dados”
+(somente ADMIN; requer `ALLOW_DEMO_RESET` em produção). Executa o mesmo seed de
+`npm run db:seed` via `runDatabaseSeed()` — ver `docs/FLUXOS.md` §2.3.
+
 ---
 
 ## 16. Limitações da POC

@@ -101,6 +101,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | scrypt hash/verify | ✅ `password.test.ts` |
 | Login API (portal, credenciais) | ✅ `auth-and-cron.test.ts` |
 | MFA TOTP + challenge HMAC | ✅ `mfa-tokens.test.ts` |
+| Demo reset (flag, confirmação, ADMIN) | ✅ `demo-reset.test.ts` |
 | Cookie session HMAC | ⚠️ indireto via MFA (mesmo algoritmo) |
 | Logout / me | ❌ |
 
@@ -132,7 +133,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ---
 
-## Mapa das 58 rotas API
+## Mapa das 59 rotas API
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -150,8 +151,9 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 ### Prestador (5 rotas) — 🔑 PRESTADOR
 - agenda, appointments, procedures, records
 
-### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
+### Interno (39 rotas) — 🔑 INTERNO (9 com 🔒)
 - Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
+- `GET|POST /api/interno/demo/reset` — restauração seed (ADMIN + `ALLOW_DEMO_RESET`) ✅ unit
 
 ### PJ (2) — 🔑 PJ
 ### Beneficiário (5) — 🔑 BENEFICIARIO
@@ -184,6 +186,7 @@ npm run lint && npm run test && npm run build
 | `SESSION_SECRET` | HMAC de sessão e MFA challenge |
 | `CRON_SECRET` | Proteção dos jobs cron |
 | `DATABASE_URL` | `file:./prisma/test.db` em testes de integração |
+| `ALLOW_DEMO_RESET` | Flag de restauração demo (`demo-reset.test.ts`) |
 
 ---
 
