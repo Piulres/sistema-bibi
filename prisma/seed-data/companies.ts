@@ -101,7 +101,7 @@ export const SEED_COMPANIES: SeedCompany[] = [
     cnpj: C(8, "10.777.888/0001-99"),
     status: "ATIVO",
     sector: "Educação",
-    useCase: "Rede de escolas — plano saúde para professores e funcionários administrativos",
+    useCase: "Rede de escolas — benefício corporativo e telemedicina para professores",
     beneficiaryCount: 11,
     clinicalDiscount: 0.87,
   },

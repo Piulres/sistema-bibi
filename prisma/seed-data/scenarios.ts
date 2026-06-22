@@ -7,9 +7,16 @@ import type { SeedCompany } from "./companies";
 import type { ScaleConfig } from "./scale";
 import {
   APPOINTMENT_REASONS,
-  BILLING_CYCLES,
   MEDICAL_RECORD_SNIPPETS,
 } from "./catalog";
+import {
+  benefitProductForSector,
+  chargePrice,
+  companyByIndex,
+  isTelemedicineAppointment,
+  pickAppointmentReason,
+  pickProcedureCode,
+} from "./pricing-market";
 import {
   daysAgo,
   daysFromNow,
@@ -19,7 +26,13 @@ import {
   todayAt,
 } from "./helpers";
 
-export type ProcedureRef = { id: string; basePrice: number; name: string; code: string };
+export type ProcedureRef = {
+  id: string;
+  basePrice: number;
+  name: string;
+  code: string;
+  category: string;
+};
 
 export type PatientRef = {
   id: string;
@@ -56,22 +69,8 @@ export type SeedMassStats = {
   beneficiaryUsers: number;
 };
 
-const PROCEDURE_CODES = [
-  "CON-CLM", "CON-CAR", "CON-DER", "CON-PSI", "CON-OFT",
-  "EXA-HEM", "EXA-ECG", "EXA-USG", "EXA-RX", "EXA-GLI", "EXA-COL",
-] as const;
-
-function priceFor(
-  code: string,
-  basePrice: number,
-  companyIndex: number,
-  discounts: Map<number, number>,
-): number {
-  if (code === "CON-CLM" && companyIndex > 0) {
-    const m = discounts.get(companyIndex);
-    if (m) return Math.round(basePrice * m * 100) / 100;
-  }
-  return basePrice;
+function monthBucket(date: Date): string {
+  return `${date.getFullYear()}-${date.getMonth()}`;
 }
 
 function pickProvider(providerIds: string[], salt: number): string {
@@ -133,14 +132,23 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
       else status = "CANCELADO";
     }
 
-    const isTele = i % 6 === 0;
+    const isTele = isTelemedicineAppointment(
+      patient.companyIndex,
+      ctx.companies,
+      i,
+    );
+    const reason =
+      patient.companyIndex > 0
+        ? pickAppointmentReason(patient.companyIndex, ctx.companies, i)
+        : pick(APPOINTMENT_REASONS, i);
+
     const appointment = await ctx.prisma.appointment.create({
       data: {
         scheduledAt,
         status,
         modality: isTele ? "TELE" : "PRESENCIAL",
         telemedicineUrl: isTele ? `https://meet.bibi.health/room/seed-${i}` : null,
-        reason: pick(APPOINTMENT_REASONS, i),
+        reason,
         tenantId: ctx.tenantId,
         patientId: patient.id,
         providerId,
@@ -168,15 +176,20 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
 
   for (let i = 0; i < realizedAppointments.length; i++) {
     const appt = realizedAppointments[i]!;
-    const procCount = 1 + (i % 3);
+    const company = companyByIndex(ctx.companies, appt.patient.companyIndex);
+    const isOccupational =
+      company?.sector === "Indústria" ||
+      company?.sector === "Construção Civil" ||
+      company?.sector === "Logística";
+    const procCount = isOccupational ? 2 + (i % 2) : 1 + (i % 2);
 
     for (let j = 0; j < procCount; j++) {
-      const code = PROCEDURE_CODES[(i + j) % PROCEDURE_CODES.length]!;
+      const code = pickProcedureCode(appt.patient.companyIndex, ctx.companies, i + j);
       const proc = ctx.procedures[code];
       if (!proc) continue;
 
-      const charged = priceFor(
-        code,
+      const charged = chargePrice(
+        proc.category,
         proc.basePrice,
         appt.patient.companyIndex,
         ctx.discountByCompanyIndex,
@@ -221,102 +234,104 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
     }
   }
 
-  const invoicesByPatient = new Map<string, typeof billedUsages>();
+  const invoicesByBucket = new Map<string, typeof billedUsages>();
   for (const item of billedUsages) {
-    const list = invoicesByPatient.get(item.patient.id) ?? [];
+    const bucketKey = item.patient.companyId
+      ? `corp:${item.patient.companyId}:${monthBucket(item.performedAt)}`
+      : `part:${item.patient.id}:${monthBucket(item.performedAt)}`;
+    const list = invoicesByBucket.get(bucketKey) ?? [];
     list.push(item);
-    invoicesByPatient.set(item.patient.id, list);
+    invoicesByBucket.set(bucketKey, list);
   }
 
   let invoiceSeq = 0;
-  for (const [patientId, items] of invoicesByPatient) {
-    const patient = bulkPatients.find((p) => p.id === patientId);
-    if (!patient || items.length === 0) continue;
+  for (const [, items] of invoicesByBucket) {
+    const patient = items[0]!.patient;
+    if (items.length === 0) continue;
 
-    for (let offset = 0; offset < items.length; offset += 4) {
-      const batch = items.slice(offset, offset + 4);
-      const total = batch.reduce((s, x) => s + x.amount, 0);
-      invoiceSeq += 1;
+    const total = items.reduce((s, x) => s + x.amount, 0);
+    invoiceSeq += 1;
 
-      const statusRoll = invoiceSeq % 10;
-      const status = statusRoll < 5 ? "PAGA" : statusRoll < 8 ? "FECHADA" : "ABERTA";
+    const statusRoll = invoiceSeq % 10;
+    const status = statusRoll < 5 ? "PAGA" : statusRoll < 8 ? "FECHADA" : "ABERTA";
 
-      const invoice = await ctx.prisma.invoice.create({
+    const invoice = await ctx.prisma.invoice.create({
+      data: {
+        tenantId: ctx.tenantId,
+        patientId: patient.id,
+        companyId: patient.companyId,
+        total,
+        status,
+        createdAt: items[0]!.performedAt,
+        items: {
+          create: items.map((b) => ({
+            description: b.description,
+            amount: b.amount,
+            usageId: b.usageId,
+          })),
+        },
+      },
+    });
+    stats.invoices += 1;
+
+    await ctx.prisma.timelineEvent.create({
+      data: {
+        tenantId: ctx.tenantId,
+        entityType: TIMELINE_ENTITY_TYPES.INVOICE,
+        entityId: invoice.id,
+        action: TIMELINE_ACTIONS.INVOICE_ISSUED,
+        description: patient.companyId
+          ? `Fatura corporativa Pay Per Use — ${patient.name}`
+          : `Fatura Pay Per Use emitida para ${patient.name}`,
+        createdBy: ctx.internoId,
+        createdAt: items[0]!.performedAt,
+      },
+    });
+    stats.timelineEvents += 1;
+
+    if (status === "PAGA") {
+      await ctx.prisma.payment.create({
         data: {
-          tenantId: ctx.tenantId,
-          patientId,
-          companyId: patient.companyId,
-          total,
-          status,
-          createdAt: batch[0]!.performedAt,
-          items: {
-            create: batch.map((b) => ({
-              description: b.description,
-              amount: b.amount,
-              usageId: b.usageId,
-            })),
-          },
+          invoiceId: invoice.id,
+          method: "PIX",
+          amount: total,
+          status: "CONFIRMED",
+          gatewayId: "mock",
+          externalId: `seed-pix-${invoice.id.slice(-8)}`,
+          pixCopyPaste: `00020126580014br.gov.bcb.pix0136${invoice.id.slice(-12)}`,
+          qrCodePayload: `PIX|${total}|${invoice.id}`,
+          paidAt: new Date(items[0]!.performedAt.getTime() + 2 * 24 * 60 * 60 * 1000),
+          createdBy: ctx.internoId,
         },
       });
-      stats.invoices += 1;
+      stats.payments += 1;
 
       await ctx.prisma.timelineEvent.create({
         data: {
           tenantId: ctx.tenantId,
           entityType: TIMELINE_ENTITY_TYPES.INVOICE,
           entityId: invoice.id,
-          action: TIMELINE_ACTIONS.INVOICE_ISSUED,
-          description: `Fatura Pay Per Use emitida para ${patient.name}`,
+          action: TIMELINE_ACTIONS.INVOICE_PAID,
+          description: `Pagamento PIX confirmado — ${patient.name}`,
           createdBy: ctx.internoId,
-          createdAt: batch[0]!.performedAt,
+          createdAt: new Date(items[0]!.performedAt.getTime() + 2 * 24 * 60 * 60 * 1000),
         },
       });
       stats.timelineEvents += 1;
-
-      if (status === "PAGA") {
-        await ctx.prisma.payment.create({
-          data: {
-            invoiceId: invoice.id,
-            method: "PIX",
-            amount: total,
-            status: "CONFIRMED",
-            gatewayId: "mock",
-            externalId: `seed-pix-${invoice.id.slice(-8)}`,
-            pixCopyPaste: `00020126580014br.gov.bcb.pix0136${invoice.id.slice(-12)}`,
-            qrCodePayload: `PIX|${total}|${invoice.id}`,
-            paidAt: new Date(batch[0]!.performedAt.getTime() + 2 * 24 * 60 * 60 * 1000),
-            createdBy: ctx.internoId,
-          },
-        });
-        stats.payments += 1;
-
-        await ctx.prisma.timelineEvent.create({
-          data: {
-            tenantId: ctx.tenantId,
-            entityType: TIMELINE_ENTITY_TYPES.INVOICE,
-            entityId: invoice.id,
-            action: TIMELINE_ACTIONS.INVOICE_PAID,
-            description: `Pagamento PIX confirmado — ${patient.name}`,
-            createdBy: ctx.internoId,
-            createdAt: new Date(batch[0]!.performedAt.getTime() + 2 * 24 * 60 * 60 * 1000),
-          },
-        });
-        stats.timelineEvents += 1;
-      } else if (status === "FECHADA" && invoiceSeq % 3 === 0) {
-        await ctx.prisma.payment.create({
-          data: {
-            invoiceId: invoice.id,
-            method: "PIX",
-            amount: total,
-            status: "PENDING",
-            gatewayId: "mock",
-            externalId: `seed-pix-pending-${invoice.id.slice(-8)}`,
-            pixCopyPaste: `00020126580014br.gov.bcb.pix0136pending-${invoice.id.slice(-10)}`,
-            createdBy: ctx.internoId,
-          },
-        });
-        stats.payments += 1;
-      }
+    } else if (status === "FECHADA" && invoiceSeq % 3 === 0) {
+      await ctx.prisma.payment.create({
+        data: {
+          invoiceId: invoice.id,
+          method: "PIX",
+          amount: total,
+          status: "PENDING",
+          gatewayId: "mock",
+          externalId: `seed-pix-pending-${invoice.id.slice(-8)}`,
+          pixCopyPaste: `00020126580014br.gov.bcb.pix0136pending-${invoice.id.slice(-10)}`,
+          createdBy: ctx.internoId,
+        },
+      });
+      stats.payments += 1;
     }
   }
 
@@ -327,16 +342,13 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
     if (!companyId) continue;
 
     const companyPatients = bulkPatients.filter((p) => p.companyId === companyId);
-    const withSub = companyPatients.filter((_, idx) => idx % 2 === 0 || company.index <= 5);
+    const withSub = companyPatients.filter(
+      (_, idx) => idx % 3 === 0 || (company.index <= 3 && idx % 2 === 0),
+    );
 
     for (let i = 0; i < withSub.length; i++) {
       const patient = withSub[i]!;
-      const cycle = pick(BILLING_CYCLES, company.index + i);
-      const amount =
-        cycle === "MENSAL" ? 69.9 + (company.index % 5) * 10 :
-        cycle === "TRIMESTRAL" ? 189.9 + (company.index % 4) * 20 :
-        cycle === "SEMESTRAL" ? 349.9 :
-        599.9;
+      const product = benefitProductForSector(company.sector, company.index + i);
 
       const subscription = await ctx.prisma.subscription.create({
         data: {
@@ -344,10 +356,10 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
           patientId: patient.id,
           companyId,
           status: "ATIVA",
-          billingCycle: cycle,
+          billingCycle: product.billingCycle,
           startDate: monthsAgo(6 + (i % 4)),
-          amount,
-          description: `Plano corporativo ${company.name.split(" ")[0]} — ${company.sector}`,
+          amount: product.amount,
+          description: `${product.description} — ${company.name.split(" ")[0]}`,
         },
       });
       stats.subscriptions += 1;
@@ -363,7 +375,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
           data: {
             subscriptionId: subscription.id,
             dueDate,
-            amount,
+            amount: product.amount,
             status: chargeStatus,
           },
         });

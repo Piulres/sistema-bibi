@@ -2,95 +2,105 @@ import type { PrismaClient } from "@prisma/client";
 import { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "../../src/lib/timeline";
 import { monthsAgo } from "./helpers";
 import type { PatientRef } from "./scenarios";
+import type { SeedCompany } from "./companies";
+import { estimateCompanyMonthlyPpu, formatBrl } from "./pricing-market";
 
 /**
- * Baseline de receita mensal determinística (6 meses).
- * Faturas consolidadas com totais fixos — relatórios comparáveis entre execuções.
+ * Fechamento mensal corporativo (6 meses) — totais derivados do perfil de cada empresa,
+ * não valores fixos arbitrários. Reflete contratos B2B Pay Per Use típicos.
  */
 export async function seedMonthlyRevenueBaseline(input: {
   prisma: PrismaClient;
   tenantId: string;
   internoId: string;
   patients: PatientRef[];
+  companies: SeedCompany[];
+  companyIdByIndex: Map<number, string>;
 }): Promise<{ months: number; totalRevenue: number }> {
-  /** Totais fixos por mês (R$) — série ascendente para gráficos de tendência */
-  const monthlyTotals = [28_400, 31_200, 29_800, 34_500, 36_100, 38_900];
-
-  const corporatePatients = input.patients.filter((p) => p.companyId);
-  if (corporatePatients.length === 0) return { months: 0, totalRevenue: 0 };
+  const monthCount = 6;
+  const activeCompanies = input.companies.filter((c) => c.status === "ATIVO" && c.beneficiaryCount > 0);
+  if (activeCompanies.length === 0) return { months: 0, totalRevenue: 0 };
 
   let totalRevenue = 0;
 
-  for (let m = 0; m < monthlyTotals.length; m++) {
-    const monthDate = monthsAgo(monthlyTotals.length - m, 10);
-    const target = monthlyTotals[m]!;
-    const anchorPatient = corporatePatients[m % corporatePatients.length]!;
+  for (let m = 0; m < monthCount; m++) {
+    const monthDate = monthsAgo(monthCount - m, 10);
+    const growth = 1 + m * 0.03;
 
-    const invoice = await input.prisma.invoice.create({
-      data: {
-        tenantId: input.tenantId,
-        patientId: anchorPatient.id,
-        companyId: anchorPatient.companyId,
-        total: target,
-        status: m < 4 ? "PAGA" : "FECHADA",
-        createdAt: monthDate,
-        items: {
-          create: [
-            {
-              description: `Faturamento corporativo consolidado — mês ${m + 1}/6`,
-              amount: Math.round(target * 0.62 * 100) / 100,
-            },
-            {
-              description: `Procedimentos Pay Per Use — mês ${m + 1}/6`,
-              amount: Math.round(target * 0.38 * 100) / 100,
-            },
-          ],
-        },
-      },
-    });
+    for (const company of activeCompanies) {
+      const companyId = input.companyIdByIndex.get(company.index);
+      if (!companyId) continue;
 
-    totalRevenue += target;
+      const companyPatients = input.patients.filter((p) => p.companyId === companyId);
+      if (companyPatients.length === 0) continue;
 
-    await input.prisma.timelineEvent.create({
-      data: {
-        tenantId: input.tenantId,
-        entityType: TIMELINE_ENTITY_TYPES.INVOICE,
-        entityId: invoice.id,
-        action: TIMELINE_ACTIONS.INVOICE_ISSUED,
-        description: `Baseline mensal M-${m + 1} — R$ ${target.toFixed(2)}`,
-        createdBy: input.internoId,
-        createdAt: monthDate,
-      },
-    });
+      const base = estimateCompanyMonthlyPpu(company);
+      const target = Math.round(base * growth * 100) / 100;
+      if (target < 50) continue;
 
-    if (m < 4) {
-      await input.prisma.payment.create({
+      const anchorPatient = companyPatients[m % companyPatients.length]!;
+      const occupationalShare =
+        company.sector === "Indústria" ||
+        company.sector === "Construção Civil" ||
+        company.sector === "Logística"
+          ? 0.55
+          : 0.18;
+      const clinicalShare = 1 - occupationalShare;
+
+      const invoice = await input.prisma.invoice.create({
         data: {
-          invoiceId: invoice.id,
-          method: "PIX",
-          amount: target,
-          status: "CONFIRMED",
-          gatewayId: "mock",
-          externalId: `baseline-m${m}-${invoice.id.slice(-6)}`,
-          pixCopyPaste: `00020126580014br.gov.bcb.pix0136baseline-m${m}`,
-          paidAt: new Date(monthDate.getTime() + 3 * 24 * 60 * 60 * 1000),
-          createdBy: input.internoId,
+          tenantId: input.tenantId,
+          patientId: anchorPatient.id,
+          companyId,
+          total: target,
+          status: m < 4 ? "PAGA" : "FECHADA",
+          createdAt: monthDate,
+          items: {
+            create: [
+              {
+                description: `Procedimentos clínicos Pay Per Use — ${company.sector}`,
+                amount: Math.round(target * clinicalShare * 100) / 100,
+              },
+              {
+                description: `Medicina do trabalho / PCMSO — ${company.name.split(" ")[0]}`,
+                amount: Math.round(target * occupationalShare * 100) / 100,
+              },
+            ],
+          },
         },
       });
+
+      totalRevenue += target;
 
       await input.prisma.timelineEvent.create({
         data: {
           tenantId: input.tenantId,
           entityType: TIMELINE_ENTITY_TYPES.INVOICE,
           entityId: invoice.id,
-          action: TIMELINE_ACTIONS.INVOICE_PAID,
-          description: `Baseline mensal M-${m + 1} pago via PIX`,
+          action: TIMELINE_ACTIONS.INVOICE_ISSUED,
+          description: `Fechamento mensal ${company.name.split(" ")[0]} — ${formatBrl(target)}`,
           createdBy: input.internoId,
-          createdAt: new Date(monthDate.getTime() + 3 * 24 * 60 * 60 * 1000),
+          createdAt: monthDate,
         },
       });
+
+      if (m < 4) {
+        await input.prisma.payment.create({
+          data: {
+            invoiceId: invoice.id,
+            method: "PIX",
+            amount: target,
+            status: "CONFIRMED",
+            gatewayId: "mock",
+            externalId: `corp-m${m}-${company.index}`,
+            pixCopyPaste: `00020126580014br.gov.bcb.pix0136corp-${company.index}-m${m}`,
+            paidAt: new Date(monthDate.getTime() + 5 * 24 * 60 * 60 * 1000),
+            createdBy: input.internoId,
+          },
+        });
+      }
     }
   }
 
-  return { months: monthlyTotals.length, totalRevenue };
+  return { months: monthCount, totalRevenue };
 }
