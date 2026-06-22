@@ -5,7 +5,8 @@ Documentação de **todos os fluxos de usuário e de negócio**, derivada do có
 
 Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](ARQUITETURA.md). Para posicionamento vs mercado,
-ver [`BENCHMARK.md`](BENCHMARK.md). Para evidências visuais dos fluxos,
+ver [`BENCHMARK.md`](BENCHMARK.md). Para jornada do usuário e backlog de melhorias UX,
+ver [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md). Para evidências visuais dos fluxos,
 ver [`evidencias/README.md`](evidencias/README.md). Para operações (dev, release, deploy, IA),
 ver [`OPERACOES.md`](OPERACOES.md). Para histórico de PRs/deploys do dia,
 ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
@@ -26,6 +27,8 @@ ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 10. [Máquinas de estado](#10-máquinas-de-estado)
 11. [Mapa de APIs por portal](#11-mapa-de-apis-por-portal)
 12. [Observações da POC](#12-observações-da-poc)
+
+Jornada do cliente (UX, gaps e melhorias por portal): [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md).
 
 ---
 

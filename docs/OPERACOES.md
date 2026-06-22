@@ -232,6 +232,7 @@ Pedido de validação
 | Fechar pacote em produção | `docs/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
+| Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
 | Base RAG / NotebookLM | `NOTEBOOKLM.md` |
 | Auditoria de PRs/deploys | `HISTORICO_2026-06-21.md` ou novo histórico datado |
@@ -259,6 +260,7 @@ Pedido de validação
 | [`RELEASES.md`](RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |
 | [`FLUXOS.md`](FLUXOS.md) | Fluxos de negócio |
+| [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) | Jornada UX nos 4 portais |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](evidencias/README.md) | Vídeos e screenshots |
 | [`AGENTS.md`](../AGENTS.md) | Instruções para IA |

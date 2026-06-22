@@ -121,7 +121,8 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
-- **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/BENCHMARK.md` (posicionamento vs mercado),
+- **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/JORNADA_CLIENTE.md` (jornada UX nos 4 portais),
+  `docs/BENCHMARK.md` (posicionamento vs mercado),
   `docs/ARQUITETURA.md`, `docs/TESTES.md` (estratégia e mapa de testes automatizados),
   `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/VARIAVEIS_AMBIENTE.md` (mapa de env vars, CI, Netlify e Cursor),

@@ -393,6 +393,7 @@ src/
 |-----------|----------|
 | `README.md` | Guia completo, URLs, scripts |
 | `docs/FLUXOS.md` | Fluxos de usuário e negócio (todos os portais) |
+| `docs/JORNADA_CLIENTE.md` | Jornada UX nos 4 portais, gaps e backlog priorizado |
 | `docs/BENCHMARK.md` | Matriz Ações × Benchmark (iClinic, Feegow, ERPMed) |
 | `docs/ARQUITETURA.md` | Diagramas Mermaid, épicos, checklists |
 | `docs/PAYMENTS.md` | Motor de cobrança Strategy |
