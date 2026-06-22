@@ -28,7 +28,7 @@ jobs:
         env:
           SESSION_SECRET: ci-test-session-secret-32chars
           CRON_SECRET: ci-cron-secret
-          DATABASE_URL: file:./prisma/test.db
+          DATABASE_URL: file:./test.db
 
       - name: Build
         run: npm run build
