@@ -148,13 +148,19 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
 
   async function markRealizado() {
     setBusy(true);
+    setMsg(null);
     try {
-      await fetch(`/api/prestador/appointments/${appointmentId}`, {
+      const res = await fetch(`/api/prestador/appointments/${appointmentId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "REALIZADO" }),
       });
-      await load();
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao marcar como realizado");
+      else {
+        setMsg("Atendimento marcado como realizado.");
+        await load();
+      }
     } finally {
       setBusy(false);
     }

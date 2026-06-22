@@ -13,6 +13,16 @@ import AppointmentCard from "@/components/ui/AppointmentCard";
 import PixQrDisplay from "@/components/ui/PixQrDisplay";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 
+export type BeneficiarioSection =
+  | "agendar"
+  | "resumo"
+  | "agenda"
+  | "consumo"
+  | "faturas"
+  | "assinatura"
+  | "prontuario"
+  | "historico";
+
 type Overview = {
   patient: {
     name: string;
@@ -97,7 +107,8 @@ type PixState = {
   pixCopyPaste: string;
 };
 
-export default function BeneficiarioView() {
+export default function BeneficiarioView({ section }: { section?: BeneficiarioSection }) {
+  const show = (id: BeneficiarioSection) => !section || section === id;
   const [overview, setOverview] = useState<Overview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -264,8 +275,10 @@ export default function BeneficiarioView() {
 
   return (
     <div className="space-y-8">
-      {msg && <Alert tone="info">{msg}</Alert>}
-      {pixState && (
+      {msg && (show("agendar") || show("agenda") || show("faturas")) && (
+        <Alert tone="info">{msg}</Alert>
+      )}
+      {pixState && show("faturas") && (
         <Alert tone="info">
           <p className="font-medium">PIX gerado</p>
           <PixQrDisplay copyPaste={pixState.pixCopyPaste} className="mt-3" />
@@ -281,6 +294,7 @@ export default function BeneficiarioView() {
         </Alert>
       )}
 
+      {show("agendar") && (
       <section id="agendar">
       <Card>
         <SectionHeader
@@ -345,7 +359,9 @@ export default function BeneficiarioView() {
         </form>
       </Card>
       </section>
+      )}
 
+      {show("resumo") && (
       <section id="resumo" className="space-y-4">
       <Card padding="sm">
         <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
@@ -403,7 +419,9 @@ export default function BeneficiarioView() {
         />
       </div>
       </section>
+      )}
 
+      {show("agenda") && (
       <section id="agenda">
         <SectionHeader
           title="Minha agenda"
@@ -460,7 +478,9 @@ export default function BeneficiarioView() {
           </div>
         )}
       </section>
+      )}
 
+      {show("consumo") && (
       <section id="consumo">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu consumo (Pay Per Use)</h3>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
@@ -498,7 +518,9 @@ export default function BeneficiarioView() {
           </div>
         )}
       </section>
+      )}
 
+      {show("faturas") && (
       <section id="faturas">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minhas faturas</h3>
         {overview.invoices.length === 0 ? (
@@ -542,7 +564,9 @@ export default function BeneficiarioView() {
           </div>
         )}
       </section>
+      )}
 
+      {show("assinatura") && (
       <section id="assinatura">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minha assinatura</h3>
         {overview.subscriptions.length === 0 ? (
@@ -588,7 +612,9 @@ export default function BeneficiarioView() {
           </div>
         )}
       </section>
+      )}
 
+      {show("prontuario") && (
       <section id="prontuario">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu prontuário</h3>
         {overview.medicalRecords.length === 0 ? (
@@ -610,7 +636,9 @@ export default function BeneficiarioView() {
           </div>
         )}
       </section>
+      )}
 
+      {show("historico") && (
       <section id="historico">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atividades</h3>
         {overview.timeline.length === 0 ? (
@@ -629,6 +657,7 @@ export default function BeneficiarioView() {
           </ol>
         )}
       </section>
+      )}
     </div>
   );
 }

@@ -26,7 +26,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | Tudo em produção **+** v1.1.0 (cadastros) — **novas atividades aqui** |
+| **Integração** | `dev` | Pacote **v1.1.0** — cadastros + portais + RBAC — **novas atividades aqui** |
 | **Release / produção** | `main` | Pacote publicado (v1.0.2 + mobile nav) |
 | **Netlify** | `main` | Espelha produção |
 
@@ -75,15 +75,26 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 ## Próximo pacote — produção (linha 1.1)
 
-### `v1.1.0` — cadastros de mercado + CRUD confiável
+### `v1.1.0` — portais completos + cadastros + RBAC
 
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.1.0` na `dev` |
-| **Base** | `main` @ `d5ef580` + cadastros (PR #72) |
-| **PR** | [#72](https://github.com/Piulres/sistema-bibi/pull/72) — mergeado na `dev` |
+| **Base** | `main` + cadastros (PR #72) + melhorias dos 4 portais |
+| **PRs** | [#72](https://github.com/Piulres/sistema-bibi/pull/72), [#83](https://github.com/Piulres/sistema-bibi/pull/83) |
 | **Docs** | [`V1_1.md`](V1_1.md) |
-| **Checklist** | `npm run pre-release` na `dev` → merge `dev`→`main` → deploy → tag `v1.1.0` → atualizar esta seção |
+| **Checklist** | `npm run pre-release` na `dev` → merge `dev`→`main` → **deploy manual (autorização humana)** → tag `v1.1.0` |
+
+**Inclui (integração `dev`):**
+
+- Cadastros v1.1 (CRUD mercado, CPF/CNPJ, E2E)
+- Acessibilidade: `InfoTooltip`, `aria-describedby`, skip link nos portais
+- **Prestador:** dashboard, extrato, relatórios CSV, nav mobile
+- **Beneficiário:** 8 rotas dedicadas (`/beneficiario/resumo`, `/agenda`, …)
+- **PJ/Benef:** KPIs extras, tabelas mobile, drawer corrigido
+- **Interno:** RBAC API nas rotas sensíveis, UX 403 no faturamento, MFA restrito
+
+**Não inclui até deploy:** nada deste pacote está em produção até merge `dev`→`main` + deploy autorizado.
 
 ---
 

@@ -24,7 +24,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: `npm run dev -- --port ${PORT}`,
+    // E2E usa massa demo (PJ/beneficiário); evita operation.db sem usuários demo.
+    command: `DUAL_DATA_STORE=false npm run dev -- --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

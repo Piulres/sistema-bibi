@@ -20,15 +20,22 @@ function generateValidCpf(): string {
   return [...base, d1, d2].join("");
 }
 
-/** Amanhã (UTC) — evita colisão com massa do seed no dia corrente. */
-function tomorrowIsoDate(): string {
+/** Data e horário únicos por execução — evita colisão com seed e runs anteriores. */
+function uniqueWalkInSlot(): { date: string; time: string } {
   const d = new Date();
-  d.setUTCDate(d.getUTCDate() + 1);
-  return d.toISOString().slice(0, 10);
+  d.setUTCDate(d.getUTCDate() + 45 + (Date.now() % 30));
+  const halfHour = Math.floor(Date.now() / 1000) % 18;
+  const hour = 8 + Math.floor(halfHour / 2);
+  const minute = (halfHour % 2) * 30;
+  return {
+    date: d.toISOString().slice(0, 10),
+    time: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+  };
 }
 
 test.describe("Portal Interno — walk-in particular", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "recepcao@bibi.health");
   });
 
@@ -59,19 +66,20 @@ test.describe("Portal Interno — walk-in particular", () => {
     const cpf = generateValidCpf();
     const walkInName = `Walk-in Teste ${unique}`;
 
+    const { date: slotDate, time: slotTime } = uniqueWalkInSlot();
+
     await page.goto("/interno/agenda");
     await expect(page.getByText(/Carregando agenda/i)).toHaveCount(0, { timeout: 15_000 });
 
-    // Data compartilhada (walk-in + agenda do dia) — amanhã + 09:00 evita conflito com seed/horário "agora"
-    await page.getByRole("textbox", { name: "Data" }).fill(tomorrowIsoDate());
+    await page.getByRole("textbox", { name: "Data" }).fill(slotDate);
     await expect(page.getByText(/Carregando agenda/i)).toHaveCount(0, { timeout: 15_000 });
 
     const walkInForm = page.locator("#walk-in form");
     await page.locator("#walkin-name").fill(walkInName);
     await page.locator("#walkin-cpf").fill(cpf);
     await page.locator("#walkin-birth").fill("1990-05-15");
-    await page.locator("#walkin-provider").selectOption({ index: 1 });
-    await walkInForm.locator("#walkin-time").fill("09:00");
+    await page.locator("#walkin-provider").selectOption({ label: "Dra. Helena Martins" });
+    await walkInForm.locator("#walkin-time").fill(slotTime);
 
     await page.getByRole("button", { name: /Cadastrar e agendar agora/i }).click();
     await expect(page.getByText(/Walk-in:.*cadastrado.*agendado/i)).toBeVisible({ timeout: 15_000 });

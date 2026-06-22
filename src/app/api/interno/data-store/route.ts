@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma, invalidatePrismaCache } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   getDataStoreStatus,
   parseDataStoreMode,
@@ -12,7 +12,7 @@ import { isInternoAdmin } from "@/lib/interno-permissions";
 /** Status do modo de dados ativo (demo / operação). */
 export async function GET() {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("seguranca");
     if (!isInternoAdmin(user.role, user.internoProfile)) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }
@@ -33,7 +33,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["INTERNO"]);
+    const user = await requireInternoModule("seguranca");
     if (!isInternoAdmin(user.role, user.internoProfile)) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }

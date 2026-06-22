@@ -38,6 +38,7 @@ test.describe("Pay Per Use — fluxo crítico de receita", () => {
     await page.getByLabel(/senha/i).fill("bibi123");
     await page.getByRole("button", { name: /entrar/i }).click();
     await expect(page).toHaveURL(/\/prestador/);
-    await expect(page.getByText(/agenda|atendimento/i).first()).toBeVisible();
+    await page.goto("/prestador");
+    await expect(page.getByRole("heading", { name: /agenda de hoje/i })).toBeVisible();
   });
 });

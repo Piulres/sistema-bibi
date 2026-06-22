@@ -52,11 +52,7 @@ export default function MobileSectionDrawer({
     };
   }, [open]);
 
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const canPortal = typeof document !== "undefined";
 
   function selectSection(id: string) {
     onSelect(id);
@@ -85,7 +81,7 @@ export default function MobileSectionDrawer({
         </svg>
       </button>
 
-      {open && mounted
+      {open && canPortal
         ? createPortal(
             <div className="fixed inset-0 z-[60] flex">
               <div

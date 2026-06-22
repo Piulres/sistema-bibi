@@ -25,11 +25,8 @@ function relativeApiPath(file: string): string {
     .replace("/route.ts", "");
 }
 
-/**
- * Documenta lacuna de segurança: UI filtra nav por RBAC, mas a maioria das APIs
- * internas só exige role INTERNO — perfil READONLY pode chamar billing, cadastros etc.
- */
-describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
+/** Inventário RBAC — rotas internas devem usar requireInternoModule. */
+describe("RBAC — APIs internas com requireInternoModule", () => {
   const routes = listRouteFiles(API_ROOT);
 
   const withoutModuleGuard = routes.filter((file) => {
@@ -37,18 +34,15 @@ describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
     return !src.includes("requireInternoModule");
   });
 
-  it("maioria das rotas internas não usa guard de módulo", () => {
-    expect(withoutModuleGuard.length).toBeGreaterThan(0);
-    expect(withoutModuleGuard.length).toBeLessThan(routes.length);
+  it("todas as rotas internas usam guard de módulo", () => {
+    expect(withoutModuleGuard).toEqual([]);
   });
 
-  it("lista rotas ainda expostas a qualquer perfil INTERNO (incl. READONLY)", () => {
+  it("rotas sensíveis não ficam expostas sem guard", () => {
     const exposed = withoutModuleGuard.map(relativeApiPath).sort();
     expect(exposed).not.toContain("/interno/billing");
-    expect(exposed).not.toContain("/interno/procedures");
-    expect(exposed).not.toContain("/interno/patients");
     expect(exposed).not.toContain("/interno/invoices/[id]/pix");
-    expect(exposed).toContain("/interno/data-store");
+    expect(exposed).not.toContain("/interno/data-store");
   });
 
   it("READONLY não deveria acessar billing na matriz de permissões", () => {
@@ -56,24 +50,21 @@ describe("RBAC gaps — APIs internas sem requireInternoModule", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "cadastros")).toBe(false);
   });
 
-  it("módulos com guard correto (referência para correção)", () => {
+  it("módulos com guard (referência)", () => {
     const guarded = routes
       .filter((f) => readFileSync(f, "utf8").includes("requireInternoModule"))
       .map(relativeApiPath)
       .sort();
 
     expect(guarded).toContain("/interno/invoices");
-    expect(guarded).toContain("/interno/users");
-    expect(guarded).toContain("/interno/patients");
-    expect(guarded).toContain("/interno/companies");
-    expect(guarded).toContain("/interno/procedures");
-    expect(guarded).toContain("/interno/branding");
+    expect(guarded).toContain("/interno/billing");
+    expect(guarded).toContain("/interno/dashboard");
     expect(guarded).toContain("/interno/webhooks");
   });
 
-  it("cobertura esperada: rotas sensíveis com guard aumentou", () => {
+  it("cobertura: todas as rotas com guard", () => {
     const guardedCount = routes.length - withoutModuleGuard.length;
     expect(INTERNO_MODULES.length).toBe(11);
-    expect(guardedCount).toBeGreaterThan(routes.length / 2);
+    expect(guardedCount).toBe(routes.length);
   });
 });

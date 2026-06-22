@@ -7,6 +7,10 @@ import { GET as pjReportsGet } from "@/app/api/pj/reports/route";
 import { GET as beneficiarioOverviewGet } from "@/app/api/beneficiario/overview/route";
 import { GET as beneficiarioProvidersGet } from "@/app/api/beneficiario/providers/route";
 import { GET as prestadorAgendaGet } from "@/app/api/prestador/agenda/route";
+import { GET as internoReportsGet } from "@/app/api/interno/reports/route";
+import { GET as prestadorDashboardGet } from "@/app/api/prestador/dashboard/route";
+import { GET as prestadorExtratoGet } from "@/app/api/prestador/extrato/route";
+import { GET as prestadorReportsGet } from "@/app/api/prestador/reports/route";
 import { GET as prestadorPatientOverviewGet } from "@/app/api/prestador/patients/[id]/overview/route";
 import { GET as authMeGet } from "@/app/api/auth/me/route";
 import {
@@ -78,14 +82,37 @@ describe("API — fluxos por portal", () => {
       await setSessionForEmail("recepcao@bibi.health");
     });
 
-    it("acessa agenda mas não faturamento sensível via billing read", async () => {
+    it("acessa agenda mas recebe 403 no faturamento", async () => {
       const agenda = await internoAgendaGet(
         new Request("http://localhost/api/interno/appointments"),
       );
       expect(agenda.status).toBe(200);
 
       const billing = await internoBillingGet();
+      expect(billing.status).toBe(403);
+    });
+  });
+
+  describe("Portal Interno (FATURAMENTO — RBAC)", () => {
+    beforeEach(async () => {
+      await setSessionForEmail("financeiro@bibi.health");
+    });
+
+    it("acessa billing e relatórios", async () => {
+      const billing = await internoBillingGet();
       expect(billing.status).toBe(200);
+
+      const reports = await internoReportsGet(
+        new Request("http://localhost/api/interno/reports?type=billing"),
+      );
+      expect(reports.status).toBe(200);
+    });
+
+    it("recebe 403 na agenda", async () => {
+      const agenda = await internoAgendaGet(
+        new Request("http://localhost/api/interno/appointments"),
+      );
+      expect(agenda.status).toBe(403);
     });
   });
 
@@ -155,24 +182,26 @@ describe("API — fluxos por portal", () => {
       });
     });
 
-    it("GET /api/prestador/agenda?view=upcoming retorna consultas futuras", async () => {
-      const res = await prestadorAgendaGet(
-        new Request("http://localhost/api/prestador/agenda?view=upcoming"),
-      );
+    it("GET /api/prestador/dashboard retorna KPIs", async () => {
+      const res = await prestadorDashboardGet();
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.view).toBe("upcoming");
-      expect(Array.isArray(body.appointments)).toBe(true);
+      expect(body.dashboard.kpis).toBeDefined();
     });
 
-    it("GET /api/prestador/agenda?view=past retorna histórico", async () => {
-      const res = await prestadorAgendaGet(
-        new Request("http://localhost/api/prestador/agenda?view=past"),
-      );
+    it("GET /api/prestador/extrato retorna linhas", async () => {
+      const res = await prestadorExtratoGet(new Request("http://localhost/api/prestador/extrato"));
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.view).toBe("past");
-      expect(Array.isArray(body.appointments)).toBe(true);
+      expect(body.extrato.summary).toBeDefined();
+    });
+
+    it("GET /api/prestador/reports exporta CSV", async () => {
+      const res = await prestadorReportsGet(
+        new Request("http://localhost/api/prestador/reports?type=procedures"),
+      );
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toContain("text/csv");
     });
 
     it("GET /api/prestador/patients/[id]/overview retorna histórico do paciente", async () => {

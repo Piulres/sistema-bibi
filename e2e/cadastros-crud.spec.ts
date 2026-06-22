@@ -51,6 +51,7 @@ function editingListItem(page: import("@playwright/test").Page) {
 
 test.describe("Cadastros — existência das abas CRUD", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "faturamento@bibi.health");
     await page.goto("/interno/cadastros");
   });
@@ -78,6 +79,7 @@ test.describe("Cadastros — existência das abas CRUD", () => {
 
 test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "faturamento@bibi.health");
     await page.goto("/interno/cadastros");
     await expect(page.getByText(/Carregando cadastros/i)).toHaveCount(0, { timeout: 15_000 });
@@ -166,6 +168,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
 
 test.describe("Cadastros — RBAC recepção", () => {
   test("RECEPCAO acessa e carrega cadastros", async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "recepcao@bibi.health");
     await page.goto("/interno/cadastros");
     await expect(page.getByText(/Carregando cadastros/i)).toHaveCount(0, { timeout: 15_000 });

@@ -13,7 +13,7 @@ const DASHBOARD_PATTERNS: Record<PortalKey, RegExp> = {
   prestador: /\/prestador/,
   interno: /\/interno\/dashboard/,
   pj: /\/pj$/,
-  beneficiario: /\/beneficiario$/,
+  beneficiario: /\/beneficiario\/(resumo|agendar|agenda|consumo|faturas|assinatura|prontuario|historico)/,
 };
 
 /** Preenche credenciais demo e aguarda redirecionamento pós-login. */

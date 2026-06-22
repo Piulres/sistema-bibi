@@ -9,7 +9,7 @@ const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno/crm", heading: /CRM Corporativo/i },
   { path: "/interno/assinaturas", heading: /Recorrência/i },
   { path: "/interno/comunicacao", heading: /Comunicação/i },
-  { path: "/interno/relatorios", heading: "Relatórios" },
+  { path: "/interno/relatorios", heading: /^Relatórios$/ },
   { path: "/interno/branding", heading: /White Label/i },
   { path: "/interno/integracoes", heading: /Integrações B2B/i },
   { path: "/interno/seguranca", heading: /Segurança/i },
@@ -17,6 +17,7 @@ const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
 
 test.describe("Portal Interno — módulos (ADMIN)", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "faturamento@bibi.health");
   });
 

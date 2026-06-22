@@ -3,6 +3,7 @@ import { internoNav, loginAs } from "./helpers/auth";
 
 test.describe("RBAC — perfil RECEPCAO", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "recepcao@bibi.health");
   });
 
@@ -29,6 +30,7 @@ test.describe("RBAC — perfil RECEPCAO", () => {
 
 test.describe("RBAC — perfil FATURAMENTO", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "financeiro@bibi.health");
   });
 

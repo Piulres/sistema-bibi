@@ -31,7 +31,7 @@ export const PORTALS = {
     role: ROLES.BENEFICIARIO,
     label: "Portal do Beneficiário",
     loginPath: "/beneficiario/login",
-    dashboardPath: "/beneficiario",
+    dashboardPath: "/beneficiario/resumo",
   },
 } as const;
 

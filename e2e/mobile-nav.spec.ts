@@ -28,18 +28,16 @@ test.describe("navegação responsiva", () => {
     await expect(page).toHaveURL(/\/interno\/branding/);
   });
 
-  test("beneficiário: drawer mobile para seções", async ({ page }) => {
+  test("beneficiário: drawer mobile para módulos", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await loginAs(page, "beneficiario", "joao.pereira@email.com");
-    await expect(page.locator("#faturas")).toBeAttached();
 
-    const sectionTrigger = page.locator('[aria-controls="mobile-section-drawer"]');
-    await expect(sectionTrigger).toBeVisible();
-    await sectionTrigger.click();
-    const drawer = page.getByRole("dialog", { name: "Seções do beneficiário" });
+    await expect(page.getByRole("button", { name: /resumo/i })).toBeVisible();
+    await page.getByRole("button", { name: /resumo/i }).click();
+    const drawer = page.getByRole("navigation", { name: "Módulos do beneficiário" });
     await expect(drawer).toBeVisible();
-    await drawer.getByRole("button", { name: "Faturas" }).click();
-    await expect(page).toHaveURL(/#faturas/, { timeout: 10000 });
+    await drawer.getByRole("link", { name: "Faturas" }).click();
+    await expect(page).toHaveURL(/\/beneficiario\/faturas/);
   });
 
   test("pj: drawer mobile para seções", async ({ page }) => {

@@ -49,8 +49,11 @@ describe("Pay Per Use — fluxo completo via API", () => {
     expect(procedure).toBeTruthy();
 
     const slot = new Date();
-    slot.setDate(slot.getDate() + 30);
-    slot.setHours(10, 0, 0, 0);
+    // Horário único por execução para evitar conflito com seed ou runs anteriores
+    const dayOffset = 120 + (Date.now() % 30);
+    const halfHour = Math.floor(Date.now() / 1000) % 20;
+    slot.setDate(slot.getDate() + dayOffset);
+    slot.setHours(8 + Math.floor(halfHour / 2), (halfHour % 2) * 30, 0, 0);
 
     await setSessionForEmail("recepcao@bibi.health");
     const apptRes = await createAppointmentPost(

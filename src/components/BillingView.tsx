@@ -55,12 +55,24 @@ export default function BillingView() {
     setLoading(false);
   }, []);
 
+  const [permissionError, setPermissionError] = useState<string | null>(null);
+
   useEffect(() => {
     let active = true;
     (async () => {
       const res = await fetch("/api/interno/billing");
       const data = await res.json();
       if (!active) return;
+      if (res.status === 403) {
+        setPermissionError(data.error ?? "Sem permissão para acessar o faturamento");
+        setLoading(false);
+        return;
+      }
+      if (!res.ok) {
+        setPermissionError(data.error ?? "Erro ao carregar faturamento");
+        setLoading(false);
+        return;
+      }
       setPending(data.pending ?? []);
       setInvoices(data.invoices ?? []);
       setGatewayConfigured(Boolean(data.paymentGatewayConfigured));
@@ -152,6 +164,7 @@ export default function BillingView() {
   }
 
   if (loading) return <LoadingState message="Carregando faturamento..." />;
+  if (permissionError) return <Alert tone="danger">{permissionError}</Alert>;
 
   return (
     <div className="space-y-8">

@@ -3,6 +3,7 @@ import { loginAs } from "./helpers/auth";
 
 test.describe("Melhorias de fluxo — mapa interno", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "recepcao@bibi.health");
   });
 
@@ -43,7 +44,7 @@ test.describe("Portal Beneficiário — agenda com cards", () => {
   });
 
   test("seção Minha agenda com cards", async ({ page }) => {
-    await page.goto("/beneficiario");
+    await page.goto("/beneficiario/agenda");
     await expect(page.getByRole("heading", { name: /Minha agenda/i })).toBeVisible();
   });
 });

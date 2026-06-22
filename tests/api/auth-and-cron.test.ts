@@ -59,7 +59,7 @@ describe("API — auth/login", () => {
     );
     expect(res.status).toBe(200);
     const body = await res.json();
-    expect(body.redirectTo).toBe("/prestador");
+    expect(body.redirectTo).toBe("/prestador/dashboard");
     expect(body.user.role).toBe("PRESTADOR");
   });
 });

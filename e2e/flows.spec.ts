@@ -52,22 +52,29 @@ test.describe("Portal Beneficiário — self-service", () => {
 
   test("saudação personalizada e resumo", async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Olá,/i })).toBeVisible();
-    await expect(page.getByText(/consumo|pendente|fatura/i).first()).toBeVisible();
+    await expect(page.getByText("Próximo atendimento")).toBeVisible();
+    await expect(page.getByText("Pendente (Pay Per Use)")).toBeVisible();
   });
 
   test("formulário de agendamento visível", async ({ page }) => {
+    await page.goto("/beneficiario/agendar");
     await expect(page.getByRole("heading", { name: "Agendar consulta" })).toBeVisible();
   });
 
   test("seções de agenda, consumo e faturas", async ({ page }) => {
-    await expect(page.getByText(/agenda|atendimento/i).first()).toBeVisible();
-    await expect(page.getByText(/pay per use|consumo/i).first()).toBeVisible();
+    await page.goto("/beneficiario/agenda");
+    await expect(page.getByRole("heading", { name: /Minha agenda/i })).toBeVisible();
+    await page.goto("/beneficiario/consumo");
+    await expect(page.getByRole("heading", { name: /Meu consumo/i })).toBeVisible();
+    await page.goto("/beneficiario/faturas");
+    await expect(page.getByRole("heading", { name: /Minhas faturas/i })).toBeVisible();
   });
 });
 
 test.describe("Portal Prestador — agenda e atendimento", () => {
   test.beforeEach(async ({ page }) => {
     await loginAs(page, "prestador", "dra.helena@bibi.health");
+    await page.goto("/prestador");
   });
 
   test("agenda do dia carrega", async ({ page }) => {
