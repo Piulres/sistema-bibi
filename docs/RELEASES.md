@@ -16,8 +16,8 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 |------|-------|
 | **Versão em produção** | **1.0.2** (`e30b2b0`) + mobile nav (`d5ef580`) |
 | **Deploy Netlify** | Auto-deploy da `main` |
-| `main` | `d5ef580` — release / produção |
-| `dev` | `78d0177` — **1.1.0** — sincronizada com `main` + cadastros v1.1 |
+| `main` | `199b87e` — release / produção |
+| `dev` | `2b7474b` — **1.1.0** — sincronizada com `main` + cadastros v1.1 |
 | Tag git em produção | **`v1.0.2`** |
 | Próximo pacote | **v1.1.0** — validar `dev` → merge `dev` → `main` |
 | Validação `dev` | `npm run pre-release` |
@@ -27,11 +27,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | Tudo em produção **+** v1.1.0 (cadastros) — **novas atividades aqui** |
-<<<<<<< HEAD
-| **Release / produção** | `main` | Pacote publicado (v1.0.2 + patches) |
-=======
 | **Release / produção** | `main` | Pacote publicado (v1.0.2 + mobile nav) |
->>>>>>> origin/main
 | **Netlify** | `main` | Espelha produção |
 
 > **Regra:** PRs de feature/bugfix → base **`dev`**. Merge `dev` → `main` só ao fechar pacote.
