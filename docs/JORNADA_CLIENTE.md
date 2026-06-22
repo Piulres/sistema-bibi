@@ -148,11 +148,12 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 | Etapa | Ação do usuário | Onde na UI | Efeito |
 |-------|-----------------|------------|--------|
 | 1. Entrada | Login prestador | `/login` | Sessão `PRESTADOR` |
-| 2. Agenda do dia | Vê consultas de hoje | `/prestador` | `GET /api/prestador/agenda` |
+| 2. Agenda | Abas Dia / Próximos / Histórico | `/prestador` | `GET /api/prestador/agenda?view=…` |
 | 3. Abrir atendimento | Clica no card do paciente | `/prestador/atendimento/[id]` | Detalhe: paciente, empresa, procedimentos |
-| 4. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
-| 5. PEP | Salva evolução/receita/atestado | Templates PEP | `MedicalRecord` + timeline |
-| 6. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
+| 4. Histórico clínico | Link “Ver histórico completo” | `/prestador/paciente/[id]` | `GET /api/prestador/patients/[id]/overview` |
+| 5. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
+| 6. PEP | Salva evolução/receita/atestado | Templates PEP | `MedicalRecord` + timeline |
+| 7. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
 
 ### 4.2 Pontos fortes
 
@@ -164,12 +165,14 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | Só exibe agenda do dia | Calendário semanal/mensal + filtros |
+| Média | Sem calendário semanal/mensal | Grade visual além das abas Dia/Próximos/Histórico |
 | Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
-| Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
+| Média | Histórico limitado ao escopo do prestador | Sidebar com resumo no atendimento (alergias, últimos procedimentos) |
 | Média | Sem assinatura digital em receitas/atestados | Conformidade CFM + PDF |
 | Baixa | Sem fila automática de atendimento | “Próximo paciente” após marcar REALIZADO |
+
+> **v1.0.1 (produção):** abas Dia/Próximos/Histórico e página `/prestador/paciente/[id]` já entregues — ver [`V1_0.md`](V1_0.md).
 
 **Código:** `src/components/AgendaView.tsx` · `src/components/AtendimentoView.tsx`
 

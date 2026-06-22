@@ -75,6 +75,16 @@ Senha única: **`bibi123`**. Portais e e-mails em [`README.md`](../README.md) e 
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` |
 
+### Fluxos v1.0.1 (produção)
+
+| Fluxo | Onde validar | O que conferir |
+|-------|--------------|----------------|
+| Agenda prestador | `/prestador` | Abas **Dia / Próximos / Histórico**; navegação por data no dia |
+| Histórico do paciente | `/prestador/paciente/[id]` | Link em atendimento → consultas anteriores + PEP |
+| Demo ↔ operação | `/interno/seguranca` | Card “Base de dados”; confirmar `OPERAR` / `DEMO` |
+
+Detalhes: [`V1_0.md`](V1_0.md) · [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · [`FLUXOS.md`](FLUXOS.md) §3.
+
 Evidências gravadas: [`evidencias/`](evidencias/).
 
 ---
@@ -105,10 +115,12 @@ Se passar, o pacote está **pronto para publicação** — mas ainda **não** fo
 ```bash
 git checkout main && git pull
 npm run pre-release
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
+npx netlify deploy --prod --no-build --message "vX.Y.Z: resumo"
 ```
 
-Depois: atualize [`RELEASES.md`](RELEASES.md) e faça commit na `main`.
+Depois: atualize [`RELEASES.md`](RELEASES.md) e faça commit na `main` (`docs(release): fecha pacote vX.Y.Z`).
+
+Convenção de versão: **`vMAJOR.MINOR.PATCH`** (ex.: `v1.0.1`, `v1.1.0`). Pacotes POC antigos (`bibi-poc-AAAA-MM-DDx`) ficam só no histórico — ver [`RELEASES.md`](RELEASES.md).
 
 ---
 

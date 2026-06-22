@@ -247,7 +247,8 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/prestador/agenda` | Agenda do dia do prestador logado. |
+| `GET` | `/api/prestador/agenda` | Agenda do prestador. Query: `view=day\|upcoming\|past` (padrão `day`); `date=YYYY-MM-DD` (só em `day`). Retorna `summary` com contagens. |
+| `GET` | `/api/prestador/patients/{id}/overview` | Histórico clínico do paciente no escopo do prestador logado. |
 | `GET` | `/api/prestador/appointments/{id}` | Detalhe do atendimento (procedimentos + PEP). |
 | `PATCH` | `/api/prestador/appointments/{id}` | Atualiza o status. Body: `{ status }`. |
 | `POST` | `/api/prestador/appointments/{id}/procedures` | Registra um procedimento (Pay Per Use). Body: `{ procedureId }`. |

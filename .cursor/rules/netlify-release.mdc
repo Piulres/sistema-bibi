@@ -30,8 +30,8 @@ git checkout main && git pull && git merge origin/dev
 # 2. Validar e publicar
 npm run pre-release                              # lint + build local (obrigatório)
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
-# smoke test → atualizar docs/RELEASES.md → commit na main
+npx netlify deploy --prod --no-build --message "vX.Y.Z: resumo"
+# smoke test → atualizar docs/RELEASES.md → commit docs(release): fecha pacote vX.Y.Z
 ```
 
 > `--no-build`: usa artefatos já gerados pelo `pre-release`. Só omita se o build local falhou e o humano autorizar rebuild remoto.
@@ -55,8 +55,8 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 
 ## Convenção de pacote
 
-```
-bibi-poc-AAAA-MM-DD[a|b|c]
-```
+Releases estáveis: **`vMAJOR.MINOR.PATCH`** (ex.: `v1.0.1`, `v1.1.0`).
 
-Registrar em `@docs/RELEASES.md` após cada publicação manual.
+Pacotes POC antigos (`bibi-poc-AAAA-MM-DDx`) ficam no histórico — ver `@docs/RELEASES.md`.
+
+Registrar em `@docs/RELEASES.md` após cada publicação manual confirmada.

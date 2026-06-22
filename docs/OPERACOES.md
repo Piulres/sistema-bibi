@@ -169,19 +169,23 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 - [ ] `git checkout main && git pull && git merge dev` (ou PR `dev` → `main`)
 - [ ] `npm run pre-release` — sem erros
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
-- [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
+- [ ] `npx netlify deploy --prod --no-build --message "vX.Y.Z: resumo"`
 - [ ] Smoke test: landing + um login por portal
 - [ ] Atualizar [`RELEASES.md`](RELEASES.md) (mover rascunho → produção)
-- [ ] Commit: `docs(release): fecha pacote bibi-poc-YYYY-MM-DDx`
-- [ ] (Opcional) Tag git: `git tag -a bibi-poc-...`
+- [ ] Commit: `docs(release): fecha pacote vX.Y.Z`
+- [ ] (Opcional) Tag git: `git tag -a vX.Y.Z -m "Release X.Y.Z"`
 
-### 5.3 Convenção de nome
+### 5.3 Convenção de versão
+
+A partir de **1.0.0**, releases estáveis usam versionamento semântico:
 
 ```
-bibi-poc-AAAA-MM-DD[a|b|c]
+vMAJOR.MINOR.PATCH   (ex.: v1.0.1, v1.1.0)
 ```
 
-Exemplo atual em produção: **`v1.0.1`** (`e4d8a43`). Ver [`RELEASES.md`](RELEASES.md).
+Pacotes POC anteriores (`bibi-poc-AAAA-MM-DDx`) permanecem no histórico de [`RELEASES.md`](RELEASES.md).
+
+Exemplo atual em produção: **`v1.0.1`** (`e4d8a43`).
 
 ---
 
