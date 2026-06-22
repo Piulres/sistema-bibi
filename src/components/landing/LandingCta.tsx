@@ -25,8 +25,8 @@ export default function LandingCta({ branding }: Props) {
             Pronto para conhecer o {branding.displayName}?
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/80">
-            Explore a demonstração completa com os quatro portais, fluxo Pay Per Use
-            e branding white label configurável por tenant.
+            Explore a demonstração com os quatro portais, fluxo Pay Per Use
+            e white label configurável para cada clínica cliente.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link

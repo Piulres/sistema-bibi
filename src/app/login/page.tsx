@@ -1,14 +1,14 @@
 import LoginForm from "@/components/LoginForm";
-import { getPlatformBranding } from "@/lib/theme/branding";
+import { getLoginBrandingFromHeaders } from "@/lib/theme/branding";
 
 export default async function PrestadorLoginPage() {
-  const branding = await getPlatformBranding();
+  const branding = await getLoginBrandingFromHeaders();
 
   return (
     <LoginForm
       portal="prestador"
       title="Portal do Prestador"
-      subtitle="Acesso a agenda e prontuário eletrônico."
+      subtitle="Entre com as credenciais da sua clínica para acessar agenda e prontuário."
       demoEmail="dra.helena@bibi.health"
       demoPassword="bibi123"
       branding={branding}

@@ -1,14 +1,14 @@
 import LoginForm from "@/components/LoginForm";
-import { getPlatformBranding } from "@/lib/theme/branding";
+import { getLoginBrandingFromHeaders } from "@/lib/theme/branding";
 
 export default async function InternoLoginPage() {
-  const branding = await getPlatformBranding();
+  const branding = await getLoginBrandingFromHeaders();
 
   return (
     <LoginForm
       portal="interno"
       title="Portal Interno"
-      subtitle="Faturamento Pay Per Use e administração."
+      subtitle="Entre com as credenciais da sua clínica para administrar operação e faturamento."
       demoEmail="faturamento@bibi.health"
       demoPassword="bibi123"
       branding={branding}

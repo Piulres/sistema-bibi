@@ -115,7 +115,7 @@ export const LANDING_FAQ = [
   {
     question: "Posso usar minha própria marca (white label)?",
     answer:
-      "Cada tenant configura logo, cores, nome de exibição e domínio customizado. A infraestrutura permanece unificada, mas a experiência visual é da sua clínica ou operadora.",
+      "Sim. Cada clínica cliente configura logo, cores, nome de exibição e domínio customizado. A operação e os dados são da clínica; a infraestrutura é Sistema Bibi.",
   },
   {
     question: "A solução está em conformidade com a LGPD?",
@@ -135,6 +135,6 @@ export const LANDING_TRUST_BADGES = [
 export function buildLandingDescription(tagline: string | null): string {
   return (
     tagline ??
-    "Plataforma SaaS HealthTech com Pay Per Use, quatro portais integrados, faturamento previsível e white label para clínicas, hospitais e saúde corporativa."
+    "Plataforma SaaS que clínicas e operadoras usam para Pay Per Use, quatro portais integrados, faturamento previsível e white label com dados isolados por cliente."
   );
 }

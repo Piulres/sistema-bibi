@@ -15,7 +15,7 @@ import LandingFooter from "@/components/landing/LandingFooter";
 import LandingJsonLd from "@/components/landing/LandingJsonLd";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = await getPlatformBranding();
+  const branding = getPlatformBranding();
   const siteUrl = getSiteUrl();
   const title = `${branding.displayName} — Gestão Inteligente em Saúde`;
   const description = buildLandingDescription(branding.tagline);
@@ -59,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  const branding = await getPlatformBranding();
+  const branding = getPlatformBranding();
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
