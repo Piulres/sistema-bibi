@@ -7,7 +7,10 @@ import Alert from "@/components/ui/Alert";
 import LoadingState from "@/components/ui/LoadingState";
 import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
-import StatusBadge from "@/components/ui/StatusBadge";
+import CalloutCard from "@/components/ui/CalloutCard";
+import AppointmentCard from "@/components/ui/AppointmentCard";
+import FlowStepper from "@/components/ui/FlowStepper";
+import { CARE_JOURNEY_STEPS } from "@/lib/care-journey";
 
 type Appointment = {
   id: string;
@@ -24,6 +27,11 @@ type Option = { id: string; name: string };
 
 const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
+
+function timeFromScheduleLabel(label: string): string {
+  const match = label.match(/(\d{2}:\d{2})/);
+  return match?.[1] ?? "—";
+}
 
 export default function AppointmentsView() {
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
@@ -225,12 +233,19 @@ export default function AppointmentsView() {
     <div className="space-y-8">
       {msg && <Alert tone="info">{msg}</Alert>}
 
-      <Card id="walk-in">
-        <SectionHeader
-          title="Paciente particular (walk-in)"
-          description="Chegou na clínica sem cadastro prévio e sem empresa PJ — cadastre e agende em um passo."
+      <CalloutCard
+        id="walk-in"
+        variant="walk-in"
+        title="Paciente particular (walk-in)"
+        description="Chegou na clínica sem cadastro prévio e sem empresa PJ — cadastre e agende em um passo."
+        badge="Recepção"
+      >
+        <FlowStepper
+          steps={[...CARE_JOURNEY_STEPS]}
+          currentStepId="agendado"
+          className="mb-4"
         />
-        <form onSubmit={walkInAndSchedule} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <form onSubmit={walkInAndSchedule} className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <label className="block text-sm" htmlFor="walkin-name">
             <span className="text-[var(--text-secondary)]">Nome completo</span>
             <input
@@ -321,7 +336,7 @@ export default function AppointmentsView() {
             </Button>
           </div>
         </form>
-      </Card>
+      </CalloutCard>
 
       <Card>
         <SectionHeader title="Novo agendamento" description="Beneficiário já cadastrado (PJ ou particular)." />
@@ -410,19 +425,23 @@ export default function AppointmentsView() {
       <section>
         <SectionHeader title={`Agenda do dia (${date.split("-").reverse().join("/")})`} />
         {appointments.length === 0 ? (
-          <EmptyState message="Nenhum agendamento nesta data." />
+          <EmptyState
+            title="Agenda vazia"
+            message="Nenhum agendamento nesta data."
+            hint="Use o walk-in acima para pacientes particulares ou agende um beneficiário já cadastrado."
+          />
         ) : (
           <div className="mt-4 space-y-3">
             {appointments.map((a) => (
-              <Card key={a.id}>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">{a.scheduledAtLabel}</p>
-                    <p className="text-sm text-[var(--text-muted)]">
-                      {a.patientName} · {a.providerName}
-                      {a.modality === "TELE" ? " · Telemedicina" : ""}
-                    </p>
-                    {a.telemedicineUrl && (
+              <AppointmentCard
+                key={a.id}
+                time={timeFromScheduleLabel(a.scheduledAtLabel)}
+                title={a.patientName}
+                subtitle={`${a.providerName}${a.modality === "TELE" ? " · Telemedicina" : ""}`}
+                status={a.status}
+                meta={
+                  <>
+                    {a.telemedicineUrl ? (
                       <a
                         href={a.telemedicineUrl}
                         target="_blank"
@@ -431,11 +450,14 @@ export default function AppointmentsView() {
                       >
                         Entrar na sala virtual
                       </a>
-                    )}
-                    {a.reason && <p className="text-sm text-[var(--text-secondary)]">{a.reason}</p>}
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <StatusBadge value={a.status} map="appointment" />
+                    ) : null}
+                    {a.reason ? (
+                      <p className="text-sm text-[var(--text-secondary)]">{a.reason}</p>
+                    ) : null}
+                  </>
+                }
+                actions={
+                  <>
                     {a.status === "AGENDADO" && (
                       <Button
                         type="button"
@@ -448,7 +470,7 @@ export default function AppointmentsView() {
                       </Button>
                     )}
                     <select
-                      className="rounded border px-2 py-1 text-sm"
+                      className="rounded border border-[var(--border-muted)] bg-[var(--surface-card)] px-2 py-1 text-sm"
                       value={a.status}
                       disabled={busy === a.id}
                       onChange={(e) => updateStatus(a.id, e.target.value)}
@@ -459,9 +481,9 @@ export default function AppointmentsView() {
                       <option value="FALTOU">Faltou</option>
                       <option value="CANCELADO">Cancelado</option>
                     </select>
-                  </div>
-                </div>
-              </Card>
+                  </>
+                }
+              />
             ))}
           </div>
         )}

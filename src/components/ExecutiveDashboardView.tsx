@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
+import Card from "@/components/ui/Card";
+import StatCard from "@/components/ui/StatCard";
 
 type Dashboard = {
   generatedAtLabel: string;
@@ -75,96 +77,84 @@ export default function ExecutiveDashboardView() {
 
   return (
     <div className="space-y-8">
-      <p className="text-xs text-slate-400">Atualizado em {dashboard.generatedAtLabel}</p>
+      <p className="text-xs text-[var(--text-muted)]">Atualizado em {dashboard.generatedAtLabel}</p>
 
       <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">
           Indicadores principais
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Pendente Pay Per Use</p>
-            <p className="mt-1 text-2xl font-bold text-amber-700">{kpis.pendingBillingLabel}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Total faturado</p>
-            <p className="mt-1 text-2xl font-bold text-indigo-700">{kpis.totalInvoicedLabel}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">MRR estimado (recorrência)</p>
-            <p className="mt-1 text-2xl font-bold text-emerald-700">{kpis.mrrEstimateLabel}</p>
-            <p className="mt-1 text-xs text-slate-400">
-              {kpis.activeSubscriptions} assinatura(s) ativa(s)
-            </p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Atendimentos hoje</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">{kpis.appointmentsToday}</p>
-          </div>
+          <StatCard label="Pendente Pay Per Use" value={kpis.pendingBillingLabel} tone="warning" />
+          <StatCard label="Total faturado" value={kpis.totalInvoicedLabel} tone="accent" />
+          <StatCard
+            label="MRR estimado (recorrência)"
+            value={kpis.mrrEstimateLabel}
+            tone="success"
+            hint={`${kpis.activeSubscriptions} assinatura(s) ativa(s)`}
+          />
+          <StatCard label="Atendimentos hoje" value={kpis.appointmentsToday} />
         </div>
       </section>
 
       <section>
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-slate-500">
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">
           Operacional
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Beneficiários</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">{kpis.totalPatients}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Empresas (CRM)</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">{kpis.totalCompanies}</p>
-            <p className="mt-1 text-xs text-slate-400">{crm.activeContracts} contrato(s) ativo(s)</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Cobranças recorrentes pendentes</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">
-              {kpis.pendingRecurrenceCharges}
-            </p>
-            <p className="mt-1 text-xs text-slate-400">{revenue.pendingRecurrenceLabel}</p>
-          </div>
-          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm text-slate-500">Mensagens na fila</p>
-            <p className="mt-1 text-xl font-semibold text-slate-900">{kpis.pendingMessages}</p>
-          </div>
+          <StatCard label="Beneficiários" value={kpis.totalPatients} />
+          <StatCard
+            label="Empresas (CRM)"
+            value={kpis.totalCompanies}
+            hint={`${crm.activeContracts} contrato(s) ativo(s)`}
+          />
+          <StatCard
+            label="Cobranças recorrentes pendentes"
+            value={kpis.pendingRecurrenceCharges}
+            hint={revenue.pendingRecurrenceLabel}
+          />
+          <StatCard label="Mensagens na fila" value={kpis.pendingMessages} />
         </div>
       </section>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Receita</h2>
+        <Card padding="sm">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Receita</h2>
           <dl className="mt-4 space-y-3 text-sm">
             <div className="flex justify-between">
-              <dt className="text-slate-500">Pay Per Use pendente</dt>
-              <dd className="font-semibold text-amber-700">{revenue.pendingPayPerUseLabel}</dd>
+              <dt className="text-[var(--text-muted)]">Pay Per Use pendente</dt>
+              <dd className="font-semibold text-[var(--status-warning-text)]">
+                {revenue.pendingPayPerUseLabel}
+              </dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-slate-500">Recorrência pendente</dt>
-              <dd className="font-semibold text-amber-700">{revenue.pendingRecurrenceLabel}</dd>
+              <dt className="text-[var(--text-muted)]">Recorrência pendente</dt>
+              <dd className="font-semibold text-[var(--status-warning-text)]">
+                {revenue.pendingRecurrenceLabel}
+              </dd>
             </div>
-            <div className="flex justify-between border-t border-slate-100 pt-3">
-              <dt className="text-slate-500">Faturas em aberto</dt>
-              <dd className="font-semibold text-slate-900">{revenue.invoicedOpenLabel}</dd>
+            <div className="flex justify-between border-t border-[var(--border-default)] pt-3">
+              <dt className="text-[var(--text-muted)]">Faturas em aberto</dt>
+              <dd className="font-semibold text-[var(--text-primary)]">{revenue.invoicedOpenLabel}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-slate-500">Faturas pagas</dt>
-              <dd className="font-semibold text-emerald-700">{revenue.invoicedPaidLabel}</dd>
+              <dt className="text-[var(--text-muted)]">Faturas pagas</dt>
+              <dd className="font-semibold text-[var(--status-success-text)]">
+                {revenue.invoicedPaidLabel}
+              </dd>
             </div>
           </dl>
-        </section>
+        </Card>
 
-        <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <h2 className="text-lg font-semibold text-slate-900">Pipeline CRM</h2>
+        <Card padding="sm">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Pipeline CRM</h2>
           {crm.byStatus.length === 0 ? (
-            <p className="mt-4 text-sm text-slate-500">Nenhuma empresa cadastrada.</p>
+            <p className="mt-4 text-sm text-[var(--text-muted)]">Nenhuma empresa cadastrada.</p>
           ) : (
             <ul className="mt-4 space-y-2">
               {crm.byStatus.map((row) => (
                 <li key={row.status} className="flex items-center justify-between text-sm">
-                  <span className="text-slate-600">{row.label}</span>
-                  <span className="rounded-full bg-slate-100 px-2.5 py-0.5 font-medium text-slate-800">
+                  <span className="text-[var(--text-secondary)]">{row.label}</span>
+                  <span className="rounded-full bg-[var(--surface-muted)] px-2.5 py-0.5 font-medium text-[var(--text-primary)]">
                     {row.count}
                   </span>
                 </li>
@@ -173,42 +163,42 @@ export default function ExecutiveDashboardView() {
           )}
           <Link
             href="/interno/crm"
-            className="mt-4 inline-block text-sm font-medium text-indigo-600 hover:underline"
+            className="mt-4 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
           >
             Ver pipeline completo →
           </Link>
-        </section>
+        </Card>
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Maiores pendências Pay Per Use</h2>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Maiores pendências Pay Per Use</h2>
         {dashboard.topPendingBilling.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Nenhum procedimento pendente de faturamento.
           </p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+          <div className="mt-3 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
             <table className="w-full text-left text-sm">
-              <thead className="bg-slate-50 text-slate-500">
+              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Beneficiário</th>
                   <th className="px-4 py-2 font-medium">Itens</th>
                   <th className="px-4 py-2 text-right font-medium">Valor</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[var(--border-default)]">
                 {dashboard.topPendingBilling.map((row) => (
                   <tr key={row.patientId}>
                     <td className="px-4 py-2">
                       <Link
                         href={`/interno/beneficiarios/${row.patientId}?from=/interno/dashboard`}
-                        className="font-medium text-indigo-700 hover:underline"
+                        className="font-medium text-[var(--portal-accent)] hover:underline"
                       >
                         {row.patientName}
                       </Link>
                     </td>
-                    <td className="px-4 py-2 text-slate-500">{row.itemsCount}</td>
-                    <td className="px-4 py-2 text-right font-semibold text-slate-900">
+                    <td className="px-4 py-2 text-[var(--text-muted)]">{row.itemsCount}</td>
+                    <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
                       {row.totalLabel}
                     </td>
                   </tr>
@@ -220,21 +210,23 @@ export default function ExecutiveDashboardView() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Atividade recente</h2>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Atividade recente</h2>
         {dashboard.recentActivity.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-white p-4 text-slate-500">Nenhum evento registrado.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
+            Nenhum evento registrado.
+          </p>
         ) : (
-          <ol className="relative mt-4 space-y-0 border-l border-indigo-200 pl-6">
+          <ol className="relative mt-4 space-y-0 border-l border-[var(--portal-accent)]/30 pl-6">
             {dashboard.recentActivity.map((event) => (
               <li key={event.id} className="relative pb-5 last:pb-0">
-                <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-white bg-indigo-500 ring-2 ring-indigo-100" />
-                <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-                  <p className="text-xs text-slate-400">{event.createdAtLabel}</p>
-                  <p className="mt-1 text-sm text-slate-800">{event.description}</p>
-                  <p className="mt-1 text-xs text-slate-500">
+                <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-[var(--surface-card)] bg-[var(--portal-accent)] ring-2 ring-[var(--portal-accent)]/20" />
+                <Card padding="sm">
+                  <p className="text-xs text-[var(--text-muted)]">{event.createdAtLabel}</p>
+                  <p className="mt-1 text-sm text-[var(--text-secondary)]">{event.description}</p>
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">
                     {event.actorName ?? "Sistema"} · {event.action.replaceAll("_", " ")}
                   </p>
-                </div>
+                </Card>
               </li>
             ))}
           </ol>
@@ -242,16 +234,17 @@ export default function ExecutiveDashboardView() {
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-slate-900">Acesso rápido</h2>
+        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Acesso rápido</h2>
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {quickLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-indigo-200 hover:shadow-md"
-            >
-              <p className="font-semibold text-indigo-700">{link.label}</p>
-              <p className="mt-1 text-xs text-slate-500">{link.desc}</p>
+            <Link key={link.href} href={link.href}>
+              <Card
+                padding="sm"
+                className="h-full transition hover:border-[var(--portal-accent)] hover:shadow-md"
+              >
+                <p className="font-semibold text-[var(--portal-accent)]">{link.label}</p>
+                <p className="mt-1 text-xs text-[var(--text-muted)]">{link.desc}</p>
+              </Card>
             </Link>
           ))}
         </div>

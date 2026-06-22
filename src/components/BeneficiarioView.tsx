@@ -7,6 +7,9 @@ import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
+import StatCard from "@/components/ui/StatCard";
+import FlowStepper from "@/components/ui/FlowStepper";
+import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 
 type Overview = {
   patient: {
@@ -229,6 +232,12 @@ export default function BeneficiarioView() {
 
   const { patient, summary, nextAppointment } = overview;
   const activeSubscription = overview.subscriptions.find((s) => s.status === "ATIVA");
+  const journeyStep = resolveCareJourneyStep({
+    appointmentStatus: nextAppointment?.status,
+    hasUnbilledUsages: overview.usages.some((u) => !u.billed),
+    hasOpenInvoice: overview.invoices.some((i) => i.status !== "PAGA"),
+    hasPaidInvoice: overview.invoices.some((i) => i.status === "PAGA"),
+  });
 
   return (
     <div className="space-y-8">
@@ -315,7 +324,8 @@ export default function BeneficiarioView() {
       </section>
 
       <section id="resumo" className="space-y-4">
-      <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
+      <Card padding="sm">
+        <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
         <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">CPF {patient.cpf}</p>
         <p className="text-sm text-[var(--text-muted)]">
@@ -327,37 +337,25 @@ export default function BeneficiarioView() {
             ? `Plano corporativo: ${patient.company.name}`
             : "Atendimento particular"}
         </p>
-      </div>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
-          <p className="text-sm text-[var(--text-muted)]">Próximo atendimento</p>
-          <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
-            {nextAppointment?.scheduledAtLabel ?? "Nenhum agendado"}
-          </p>
-          {nextAppointment && (
-            <p className="mt-1 text-xs text-[var(--text-muted)]">
-              {nextAppointment.providerName} · {nextAppointment.reason ?? "Consulta"}
-            </p>
-          )}
-        </div>
-        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
-          <p className="text-sm text-[var(--text-muted)]">Pendente (Pay Per Use)</p>
-          <p className="mt-1 text-lg font-semibold text-amber-700">{summary.pendingAmountLabel}</p>
-        </div>
-        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
-          <p className="text-sm text-[var(--text-muted)]">Total faturado</p>
-          <p className="mt-1 text-lg font-semibold text-indigo-700">{summary.totalInvoicedLabel}</p>
-        </div>
-        <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
-          <p className="text-sm text-[var(--text-muted)]">Assinatura</p>
-          <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
-            {activeSubscription?.billingCycleLabel ?? "Sem plano ativo"}
-          </p>
-          {activeSubscription && (
-            <p className="mt-1 text-xs text-[var(--text-muted)]">{activeSubscription.amountLabel}/ciclo</p>
-          )}
-        </div>
+        <StatCard
+          label="Próximo atendimento"
+          value={nextAppointment?.scheduledAtLabel ?? "Nenhum"}
+          hint={
+            nextAppointment
+              ? `${nextAppointment.providerName} · ${nextAppointment.reason ?? "Consulta"}`
+              : undefined
+          }
+        />
+        <StatCard label="Pendente (Pay Per Use)" value={summary.pendingAmountLabel} tone="warning" />
+        <StatCard label="Total faturado" value={summary.totalInvoicedLabel} tone="accent" />
+        <StatCard
+          label="Assinatura"
+          value={activeSubscription?.billingCycleLabel ?? "Sem plano ativo"}
+          hint={activeSubscription ? `${activeSubscription.amountLabel}/ciclo` : undefined}
+        />
       </div>
       </section>
 

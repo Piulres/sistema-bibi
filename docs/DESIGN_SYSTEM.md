@@ -61,6 +61,13 @@ Localizados em `src/components/ui/`:
 | `NavTabs` | Navegação horizontal (`aria-label="Navegação por abas"`) |
 | `Breadcrumbs` | Trilha hierárquica (`Cliente 360°`, atendimento prestador) |
 | `SectionNav` | Âncoras em páginas de rota única (PJ, beneficiário) |
+| `StatCard` | KPI com label, valor, hint e tom semântico (`warning`, `success`, `accent`…) |
+| `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
+| `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
+| `AppointmentCard` | Card de consulta com horário, status e faixa lateral por estado |
+| `TabBar` | Abas client-side com sublinhado (ex.: Cadastros) |
+
+Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e walk-in da agenda.
 
 ## Layout
 

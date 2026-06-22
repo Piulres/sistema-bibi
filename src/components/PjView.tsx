@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Card from "@/components/ui/Card";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
+import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
@@ -121,36 +122,18 @@ export default function PjView() {
 
       <section id="resumo">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <p className="text-sm text-[var(--text-muted)]">Contrato</p>
-          <div className="mt-2">
-            <StatusBadge value={company.status} map="company" />
-          </div>
-          <p className="mt-2 text-xs text-[var(--text-muted)]">
-            {company.contractActive ? "Operacional" : "Inoperante"} · CNPJ {company.cnpj}
-          </p>
-        </Card>
-        <Card>
-          <p className="text-sm text-[var(--text-muted)]">Beneficiários</p>
-          <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
-            {company.beneficiariesCount}
-          </p>
-        </Card>
-        <Card>
-          <p className="text-sm text-[var(--text-muted)]">Consumo Pay Per Use</p>
-          <p className="mt-1 text-lg font-semibold text-[var(--portal-accent)]">
-            {company.totalConsumedLabel}
-          </p>
-        </Card>
-        <Card>
-          <p className="text-sm text-[var(--text-muted)]">Assinaturas ativas</p>
-          <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">
-            {summary.activeSubscriptions}
-          </p>
-          <p className="text-xs text-[var(--text-muted)]">
-            {summary.openInvoicesCount} fatura(s) aberta(s)
-          </p>
-        </Card>
+        <StatCard
+          label="Contrato"
+          value={<StatusBadge value={company.status} map="company" />}
+          hint={`${company.contractActive ? "Operacional" : "Inoperante"} · CNPJ ${company.cnpj}`}
+        />
+        <StatCard label="Beneficiários" value={company.beneficiariesCount} />
+        <StatCard label="Consumo Pay Per Use" value={company.totalConsumedLabel} tone="accent" />
+        <StatCard
+          label="Assinaturas ativas"
+          value={summary.activeSubscriptions}
+          hint={`${summary.openInvoicesCount} fatura(s) aberta(s)`}
+        />
       </div>
       </section>
 
