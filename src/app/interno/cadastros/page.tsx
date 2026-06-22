@@ -1,21 +1,21 @@
-import { PORTALS } from "@/lib/roles";
-import PortalShell from "@/components/layout/PortalShell";
+import { Suspense } from "react";
 import PageHeader from "@/components/layout/PageHeader";
-import InternoNav from "@/components/InternoNav";
 import CadastrosView from "@/components/CadastrosView";
+import LoadingState from "@/components/ui/LoadingState";
 import { requireInternoPage } from "@/lib/interno-guard";
 
-export default async function CadastrosPage() {
-  const user = await requireInternoPage("cadastros");
-  const portal = PORTALS.interno;
+export default async function InternoCadastrosPage() {
+  await requireInternoPage("cadastros");
 
   return (
-    <PortalShell portal="interno" portalLabel={portal.label} loginPath={portal.loginPath} userName={user.name} branding={user.branding}>
-      <PageHeader title="Cadastros" description="Beneficiários, empresas, procedimentos e usuários." />
-      <InternoNav active="cadastros" permissions={user.internoPermissions} />
-      <div className="mt-8">
+    <>
+      <PageHeader
+        title="Cadastros"
+        description="Beneficiários, empresas, procedimentos e usuários do tenant."
+      />
+      <Suspense fallback={<LoadingState message="Carregando cadastros..." />}>
         <CadastrosView />
-      </div>
-    </PortalShell>
+      </Suspense>
+    </>
   );
 }

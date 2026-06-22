@@ -1,20 +1,14 @@
-import NavTabs, { type NavTab } from "@/components/ui/NavTabs";
-import { PORTAL_THEMES } from "@/lib/theme/portals";
-import type { InternoModule } from "@/lib/interno-permissions";
+"use client";
 
-const allTabs: NavTab[] = [
-  { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" },
-  { href: "/interno", label: "Faturamento", key: "billing" },
-  { href: "/interno/agenda", label: "Agenda", key: "agenda" },
-  { href: "/interno/cadastros", label: "Cadastros", key: "cadastros" },
-  { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
-  { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
-  { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
-  { href: "/interno/relatorios", label: "Relatórios", key: "relatorios" },
-  { href: "/interno/branding", label: "White Label", key: "branding" },
-  { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
-  { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
-];
+import { usePathname } from "next/navigation";
+import NavTabs from "@/components/ui/NavTabs";
+import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
+import { PORTAL_THEMES } from "@/lib/theme/portals";
+import {
+  INTERNO_NAV_TABS,
+  resolveInternoActive,
+} from "@/lib/navigation";
+import type { InternoModule } from "@/lib/interno-permissions";
 
 export default function InternoNav({
   active,
@@ -23,18 +17,31 @@ export default function InternoNav({
   active?: InternoModule;
   permissions?: InternoModule[];
 }) {
+  const pathname = usePathname();
   const theme = PORTAL_THEMES.interno;
+  const resolvedActive = active ?? resolveInternoActive(pathname);
+
   const tabs =
     permissions && permissions.length > 0
-      ? allTabs.filter((tab) => permissions.includes(tab.key as InternoModule))
-      : allTabs;
+      ? INTERNO_NAV_TABS.filter((tab) => permissions.includes(tab.key as InternoModule))
+      : INTERNO_NAV_TABS;
 
   return (
-    <NavTabs
-      tabs={tabs}
-      active={active}
-      activeClass={theme.navActiveClass}
-      idleClass={theme.navIdleClass}
-    />
+    <div className="mt-6">
+      <MobileNavDrawer
+        tabs={tabs}
+        active={resolvedActive}
+        activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
+        idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+        title="Módulos internos"
+      />
+      <NavTabs
+        tabs={tabs}
+        active={resolvedActive}
+        activeClass={theme.navActiveClass}
+        idleClass={theme.navIdleClass}
+        className="hidden md:flex"
+      />
+    </div>
   );
 }

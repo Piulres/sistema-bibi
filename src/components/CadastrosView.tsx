@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
@@ -23,7 +24,12 @@ const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
 
 export default function CadastrosView() {
-  const [tab, setTab] = useState<Tab>("patients");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams.get("tab");
+  const tab: Tab =
+    tabFromUrl && tabs.some((t) => t.key === tabFromUrl) ? (tabFromUrl as Tab) : "patients";
+
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
@@ -64,6 +70,13 @@ export default function CadastrosView() {
     companyId: "",
     patientId: "",
   });
+
+  const selectTab = useCallback(
+    (next: Tab) => {
+      router.replace(`/interno/cadastros?tab=${next}`, { scroll: false });
+    },
+    [router],
+  );
 
   const load = useCallback(async () => {
     const [p, c, pr, u] = await Promise.all([
@@ -222,7 +235,7 @@ export default function CadastrosView() {
             type="button"
             variant={tab === t.key ? "portal" : "secondary"}
             size="sm"
-            onClick={() => setTab(t.key)}
+            onClick={() => selectTab(t.key)}
           >
             {t.label}
           </Button>

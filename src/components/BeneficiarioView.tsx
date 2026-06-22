@@ -249,6 +249,7 @@ export default function BeneficiarioView() {
         </Alert>
       )}
 
+      <section id="agendar">
       <Card>
         <SectionHeader
           title="Agendar consulta"
@@ -311,8 +312,10 @@ export default function BeneficiarioView() {
           </div>
         </form>
       </Card>
+      </section>
 
-      <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
+      <section id="resumo" className="space-y-4">
+      <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
         <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">CPF {patient.cpf}</p>
         <p className="text-sm text-[var(--text-muted)]">
@@ -324,7 +327,7 @@ export default function BeneficiarioView() {
             ? `Plano corporativo: ${patient.company.name}`
             : "Atendimento particular"}
         </p>
-      </section>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-5 shadow-sm">
@@ -356,9 +359,9 @@ export default function BeneficiarioView() {
           )}
         </div>
       </div>
+      </section>
 
-      <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minha agenda</h3>
+      <section id="agenda">
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum atendimento registrado.</p>
         ) : (
@@ -403,7 +406,7 @@ export default function BeneficiarioView() {
         )}
       </section>
 
-      <section>
+      <section id="consumo">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu consumo (Pay Per Use)</h3>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
           Transparência prévia — você paga apenas pelo que foi utilizado.
@@ -441,7 +444,7 @@ export default function BeneficiarioView() {
         )}
       </section>
 
-      <section>
+      <section id="faturas">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minhas faturas</h3>
         {overview.invoices.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma fatura emitida.</p>
@@ -485,7 +488,7 @@ export default function BeneficiarioView() {
         )}
       </section>
 
-      <section>
+      <section id="assinatura">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Minha assinatura</h3>
         {overview.subscriptions.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
@@ -531,7 +534,7 @@ export default function BeneficiarioView() {
         )}
       </section>
 
-      <section>
+      <section id="prontuario">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu prontuário</h3>
         {overview.medicalRecords.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma anotação clínica.</p>
@@ -553,7 +556,7 @@ export default function BeneficiarioView() {
         )}
       </section>
 
-      <section>
+      <section id="historico">
         <h3 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atividades</h3>
         {overview.timeline.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum evento registrado.</p>

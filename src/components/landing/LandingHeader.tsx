@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { BrandingTokens } from "@/lib/theme/tokens";
+import LandingMobileMenu from "@/components/landing/LandingMobileMenu";
 
 type Props = {
   branding: BrandingTokens;
@@ -63,6 +64,7 @@ export default function LandingHeader({ branding }: Props) {
         </nav>
 
         <div className="flex items-center gap-2">
+          <LandingMobileMenu />
           <Link
             href="/beneficiario/login"
             className="hidden rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:inline-flex"
