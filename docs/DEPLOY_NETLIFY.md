@@ -56,6 +56,8 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 ## Variáveis de ambiente (Netlify UI)
 
+> Mapa completo (app + CI + Cursor): [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md)
+
 | Variável | Obrigatória | Valor sugerido |
 |----------|-------------|----------------|
 | `DATABASE_URL` | Sim (build) | `file:./dev.db` (path relativo ao schema Prisma) |
@@ -64,6 +66,8 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | `PAYMENT_GATEWAY` | Não | `mock` (POC) ou `asaas`/`efi`/`inter` |
 | `COMMUNICATION_PROVIDER` | Não | `console` (POC) ou `sendgrid`/`twilio`/`meta` |
 | `TELEMEDICINE_BASE_URL` | Não | URL base das salas virtuais mock |
+| `SEED_SCALE` | Não | `medium` — volume do seed no build |
+| `ALLOW_DEMO_RESET` | Não | `true` — botão restaurar demo na UI |
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 

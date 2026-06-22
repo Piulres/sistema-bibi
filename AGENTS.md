@@ -54,15 +54,20 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
-**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; requer `ALLOW_DEMO_RESET` fora de dev ou em preview).
+**Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; habilitado por padrão via `ALLOW_DEMO_RESET=true`).
 
 ### Variáveis de ambiente relevantes (`.env.example`)
-- `PAYMENT_GATEWAY=mock` — adapter PIX POC (`MockPixAdapter`)
-- `COMMUNICATION_PROVIDER=console` — e-mail no console (`ConsoleEmailAdapter`)
-- `CRON_SECRET` — protege `POST /api/cron/reminders` e `/api/cron/webhooks`
-- `TELEMEDICINE_BASE_URL` — base das salas virtuais mock
+
+Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclui Netlify, CI, testes e **Cursor Cloud Agent**).
+
+- `DATABASE_URL` — SQLite (`file:./dev.db`)
+- `SESSION_SECRET` — cookie de sessão + MFA
+- `PAYMENT_GATEWAY=mock` — adapter PIX POC
+- `COMMUNICATION_PROVIDER=console` — e-mail no console
+- `CRON_SECRET` — jobs `/api/cron/*`
+- `TELEMEDICINE_BASE_URL` — salas de telemedicina mock
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
-- `ALLOW_DEMO_RESET` — habilita botão de restaurar demo em `/interno/seguranca`
+- `ALLOW_DEMO_RESET` — restaurar demo na UI (padrão `true`)
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
@@ -87,4 +92,5 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/BENCHMARK.md` (posicionamento vs mercado),
   `docs/ARQUITETURA.md`, `docs/TESTES.md` (estratégia e mapa de testes automatizados),
   `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
+  `docs/VARIAVEIS_AMBIENTE.md` (mapa de env vars, CI, Netlify e Cursor),
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
