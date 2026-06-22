@@ -4,25 +4,21 @@ import {
   TIMELINE_ENTITY_TYPES,
 } from "../src/lib/timeline";
 import { hashPassword } from "../src/lib/password";
+import { contractActiveForStatus } from "./seed-data/helpers";
+import { SEED_COMPANIES } from "./seed-data/companies";
+import {
+  generateBeneficiaries,
+  generatePjUsers,
+  ensureUniqueCpfs,
+} from "./seed-data/generators";
+import {
+  todayAt,
+  firstDayOfMonthFromNow,
+  daysAgo,
+} from "./seed-data/helpers";
 
 const prisma = new PrismaClient();
 const DEMO_PASSWORD = hashPassword("bibi123");
-
-/** Primeiro dia do mês daqui a N meses. */
-function firstDayOfMonthFromNow(monthsAhead: number): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(1);
-  d.setMonth(d.getMonth() + monthsAhead);
-  return d;
-}
-
-/** Retorna uma data de hoje com a hora informada (horario local). */
-function todayAt(hour: number, minute = 0): Date {
-  const d = new Date();
-  d.setHours(hour, minute, 0, 0);
-  return d;
-}
 
 async function main() {
   console.log("Limpando dados existentes...");
@@ -85,63 +81,22 @@ async function main() {
   });
   void vitacare;
 
-  console.log("Criando empresas (PJ) e pipeline CRM...");
-  const company = await prisma.company.create({
-    data: {
-      name: "TechCorp Benefícios LTDA",
-      cnpj: "98.765.432/0001-10",
-      status: "ATIVO",
-      contractActive: true,
-      tenantId: tenant.id,
-    },
-  });
-  await prisma.company.create({
-    data: {
-      name: "NovaLog Transportes SA",
-      cnpj: "11.222.333/0001-44",
-      status: "NEGOCIACAO",
-      contractActive: false,
-      tenantId: tenant.id,
-    },
-  });
-  await prisma.company.create({
-    data: {
-      name: "BetaStart Tecnologia",
-      cnpj: "22.333.444/0001-55",
-      status: "LEAD",
-      contractActive: false,
-      tenantId: tenant.id,
-    },
-  });
-  await prisma.company.create({
-    data: {
-      name: "VelozCom Varejo",
-      cnpj: "33.444.555/0001-66",
-      status: "INADIMPLENTE",
-      contractActive: true,
-      tenantId: tenant.id,
-    },
-  });
-  await prisma.company.create({
-    data: {
-      name: "OldCorp Encerrada",
-      cnpj: "44.555.666/0001-77",
-      status: "CANCELADO",
-      contractActive: false,
-      tenantId: tenant.id,
-    },
-  });
-  await prisma.company.create({
-    data: {
-      name: "PropostaMed Clínicas",
-      cnpj: "55.666.777/0001-88",
-      status: "PROPOSTA",
-      contractActive: false,
-      tenantId: tenant.id,
-    },
-  });
+  console.log(`Criando ${SEED_COMPANIES.length} empresas (PJ) e pipeline CRM...`);
+  const companyIdByIndex = new Map<number, string>();
+  for (const seed of SEED_COMPANIES) {
+    const company = await prisma.company.create({
+      data: {
+        name: seed.name,
+        cnpj: seed.cnpj,
+        status: seed.status,
+        contractActive: contractActiveForStatus(seed.status),
+        tenantId: tenant.id,
+      },
+    });
+    companyIdByIndex.set(seed.index, company.id);
+  }
 
-  console.log("Criando usuarios dos quatro portais...");
+  console.log("Criando usuarios dos portais...");
   const prestador = await prisma.user.create({
     data: {
       email: "dra.helena@bibi.health",
@@ -171,16 +126,23 @@ async function main() {
       tenantId: tenant.id,
     },
   });
-  await prisma.user.create({
-    data: {
-      email: "rh@techcorp.com",
-      password: DEMO_PASSWORD,
-      name: "Ana RH (TechCorp)",
-      role: "PJ",
-      tenantId: tenant.id,
-      companyId: company.id,
-    },
-  });
+
+  const pjUsers = generatePjUsers(SEED_COMPANIES);
+  for (const pj of pjUsers) {
+    const companyId = companyIdByIndex.get(pj.companyIndex);
+    if (!companyId) continue;
+    await prisma.user.create({
+      data: {
+        email: pj.email,
+        password: DEMO_PASSWORD,
+        name: pj.name,
+        role: "PJ",
+        tenantId: tenant.id,
+        companyId,
+      },
+    });
+  }
+
   console.log("Criando catalogo de procedimentos...");
   const procData = [
     { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 180, tissCode: "10101012" },
@@ -198,91 +160,85 @@ async function main() {
     procedures[p.code] = { id: created.id, basePrice: created.basePrice, name: created.name };
   }
 
-  console.log("Criando regra de precificacao dinamica (desconto corporativo)...");
-  // Desconto de 15% para consultas clinicas dos beneficiarios da TechCorp.
-  await prisma.pricingRule.create({
-    data: {
-      description: "Desconto corporativo TechCorp (-15%) em Consulta Clínica",
-      multiplier: 0.85,
-      procedureId: procedures["CON-CLM"].id,
-      companyId: company.id,
-    },
-  });
+  console.log("Criando regras de precificacao dinamica (descontos corporativos)...");
+  for (const seed of SEED_COMPANIES) {
+    if (!seed.clinicalDiscount) continue;
+    const companyId = companyIdByIndex.get(seed.index);
+    if (!companyId) continue;
+    await prisma.pricingRule.create({
+      data: {
+        description: `Desconto corporativo ${seed.name.split(" ")[0]} (${Math.round((1 - seed.clinicalDiscount) * 100)}%) em Consulta Clínica`,
+        multiplier: seed.clinicalDiscount,
+        procedureId: procedures["CON-CLM"].id,
+        companyId,
+      },
+    });
+  }
 
   console.log("Criando beneficiarios...");
-  const joao = await prisma.patient.create({
-    data: {
-      name: "João Pereira",
-      cpf: "111.222.333-44",
-      birthDate: new Date("1985-04-12"),
-      phone: "(11) 98888-1111",
-      consentAt: new Date(),
-      consentVersion: "v1-poc",
-      tenantId: tenant.id,
-      companyId: company.id,
-    },
-  });
-  await prisma.timelineEvent.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: TIMELINE_ENTITY_TYPES.PATIENT,
-      entityId: joao.id,
-      action: TIMELINE_ACTIONS.CREATED,
-      description: "Beneficiário João Pereira cadastrado",
-      createdBy: prestador.id,
-    },
-  });
-  await prisma.user.create({
-    data: {
-      email: "joao.pereira@email.com",
-      password: DEMO_PASSWORD,
-      name: "João Pereira",
-      role: "BENEFICIARIO",
-      tenantId: tenant.id,
-      patientId: joao.id,
-    },
-  });
-  const maria = await prisma.patient.create({
-    data: {
-      name: "Maria Souza",
-      cpf: "555.666.777-88",
-      birthDate: new Date("1992-09-30"),
-      phone: "(11) 97777-2222",
-      consentAt: new Date(),
-      consentVersion: "v1-poc",
-      tenantId: tenant.id,
-      companyId: company.id,
-    },
-  });
-  await prisma.timelineEvent.create({
-    data: {
-      tenantId: tenant.id,
-      entityType: TIMELINE_ENTITY_TYPES.PATIENT,
-      entityId: maria.id,
-      action: TIMELINE_ACTIONS.CREATED,
-      description: "Beneficiário Maria Souza cadastrado",
-      createdBy: prestador.id,
-    },
-  });
-  const pedro = await prisma.patient.create({
-    data: {
-      name: "Pedro Almeida",
-      cpf: "999.000.111-22",
-      birthDate: new Date("1978-01-05"),
-      phone: "(11) 96666-3333",
-      tenantId: tenant.id,
-      companyId: null,
-    },
-  });
+  const beneficiaries = ensureUniqueCpfs(generateBeneficiaries(SEED_COMPANIES));
+  const patientIdByDemo = new Map<string, string>();
+  const patientIds: string[] = [];
 
-  console.log("Criando agenda do dia para a prestadora...");
+  for (const b of beneficiaries) {
+    const companyId =
+      b.companyIndex > 0 ? (companyIdByIndex.get(b.companyIndex) ?? null) : null;
+
+    const patient = await prisma.patient.create({
+      data: {
+        name: b.name,
+        cpf: b.cpf,
+        birthDate: b.birthDate,
+        phone: b.phone,
+        consentAt: b.isDemo !== "pedro" ? new Date() : null,
+        consentVersion: b.isDemo !== "pedro" ? "v1-poc" : null,
+        tenantId: tenant.id,
+        companyId,
+      },
+    });
+    patientIds.push(patient.id);
+
+    if (b.isDemo) {
+      patientIdByDemo.set(b.isDemo, patient.id);
+      await prisma.timelineEvent.create({
+        data: {
+          tenantId: tenant.id,
+          entityType: TIMELINE_ENTITY_TYPES.PATIENT,
+          entityId: patient.id,
+          action: TIMELINE_ACTIONS.CREATED,
+          description: `Beneficiário ${b.name} cadastrado`,
+          createdBy: prestador.id,
+        },
+      });
+    }
+
+    if (b.isDemo === "joao") {
+      await prisma.user.create({
+        data: {
+          email: b.email,
+          password: DEMO_PASSWORD,
+          name: b.name,
+          role: "BENEFICIARIO",
+          tenantId: tenant.id,
+          patientId: patient.id,
+        },
+      });
+    }
+  }
+
+  const joaoId = patientIdByDemo.get("joao")!;
+  const mariaId = patientIdByDemo.get("maria")!;
+  const pedroId = patientIdByDemo.get("pedro")!;
+  const techCorpId = companyIdByIndex.get(1)!;
+
+  console.log("Criando agenda do dia e consultas historicas...");
   const ag1 = await prisma.appointment.create({
     data: {
       scheduledAt: todayAt(9, 0),
       status: "CONFIRMADO",
       reason: "Retorno - dor torácica",
       tenantId: tenant.id,
-      patientId: joao.id,
+      patientId: joaoId,
       providerId: prestador.id,
     },
   });
@@ -296,6 +252,7 @@ async function main() {
       createdBy: prestador.id,
     },
   });
+
   const ag2 = await prisma.appointment.create({
     data: {
       scheduledAt: todayAt(10, 30),
@@ -304,7 +261,7 @@ async function main() {
       telemedicineUrl: "https://meet.bibi.health/room/seed-tele-maria",
       reason: "Check-up anual (telemedicina)",
       tenantId: tenant.id,
-      patientId: maria.id,
+      patientId: mariaId,
       providerId: prestador.id,
     },
   });
@@ -314,12 +271,38 @@ async function main() {
       status: "AGENDADO",
       reason: "Avaliação dermatológica",
       tenantId: tenant.id,
-      patientId: pedro.id,
+      patientId: pedroId,
       providerId: prestador.id,
     },
   });
 
-  console.log("Registrando uso de procedimentos (Pay Per Use) e prontuario...");
+  // Agenda adicional para popular dashboard (30 consultas espalhadas)
+  const bulkPatients = patientIds.filter((id) => id !== joaoId && id !== mariaId && id !== pedroId);
+  const appointmentReasons = [
+    "Consulta de rotina", "Retorno", "Check-up anual", "Dor de cabeça",
+    "Avaliação cardiológica", "Exame admissional", "Teleconsulta", "ASO periódico",
+  ];
+  for (let i = 0; i < Math.min(30, bulkPatients.length); i++) {
+    const patientId = bulkPatients[i]!;
+    const isToday = i < 8;
+    const scheduledAt = isToday
+      ? todayAt(8 + (i % 8), (i * 15) % 60)
+      : daysAgo(1 + (i % 14), 9 + (i % 6));
+    await prisma.appointment.create({
+      data: {
+        scheduledAt,
+        status: isToday ? (i % 3 === 0 ? "CONFIRMADO" : "AGENDADO") : "REALIZADO",
+        modality: i % 5 === 0 ? "TELE" : "PRESENCIAL",
+        telemedicineUrl: i % 5 === 0 ? `https://meet.bibi.health/room/seed-bulk-${i}` : null,
+        reason: appointmentReasons[i % appointmentReasons.length],
+        tenantId: tenant.id,
+        patientId,
+        providerId: prestador.id,
+      },
+    });
+  }
+
+  console.log("Registrando uso de procedimentos (Pay Per Use) e prontuario demo...");
   const usageJoaoConsulta = await prisma.procedureUsage.create({
     data: {
       appointmentId: ag1.id,
@@ -337,6 +320,7 @@ async function main() {
       createdBy: prestador.id,
     },
   });
+
   const usageJoaoEcg = await prisma.procedureUsage.create({
     data: {
       appointmentId: ag1.id,
@@ -354,11 +338,12 @@ async function main() {
       createdBy: prestador.id,
     },
   });
+
   const recordJoao = await prisma.medicalRecord.create({
     data: {
       content:
         "Paciente refere melhora da dor torácica após ajuste medicamentoso. ECG sem alterações agudas. Mantida conduta.",
-      patientId: joao.id,
+      patientId: joaoId,
       providerId: prestador.id,
       appointmentId: ag1.id,
     },
@@ -392,12 +377,12 @@ async function main() {
     },
   });
 
-  console.log("Criando assinaturas recorrentes (Recorrência)...");
+  console.log("Criando assinaturas recorrentes...");
   const subJoao = await prisma.subscription.create({
     data: {
       tenantId: tenant.id,
-      patientId: joao.id,
-      companyId: company.id,
+      patientId: joaoId,
+      companyId: techCorpId,
       status: "ATIVA",
       billingCycle: "MENSAL",
       startDate: new Date("2025-01-01"),
@@ -415,12 +400,11 @@ async function main() {
       createdBy: interno.id,
     },
   });
-  const joaoDueDates = [
+  for (const dueDate of [
     firstDayOfMonthFromNow(0),
     firstDayOfMonthFromNow(1),
     firstDayOfMonthFromNow(2),
-  ];
-  for (const dueDate of joaoDueDates) {
+  ]) {
     await prisma.subscriptionCharge.create({
       data: {
         subscriptionId: subJoao.id,
@@ -436,8 +420,7 @@ async function main() {
       entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
       entityId: subJoao.id,
       action: TIMELINE_ACTIONS.SUBSCRIPTION_CHARGES_GENERATED,
-      description:
-        "3 cobrança(s) futura(s) geradas para João Pereira (R$ 89,90/mensal)",
+      description: "3 cobrança(s) futura(s) geradas para João Pereira (R$ 89,90/mensal)",
       createdBy: interno.id,
     },
   });
@@ -445,8 +428,8 @@ async function main() {
   const subMaria = await prisma.subscription.create({
     data: {
       tenantId: tenant.id,
-      patientId: maria.id,
-      companyId: company.id,
+      patientId: mariaId,
+      companyId: techCorpId,
       status: "ATIVA",
       billingCycle: "TRIMESTRAL",
       startDate: new Date("2025-03-01"),
@@ -476,7 +459,7 @@ async function main() {
   const subPedro = await prisma.subscription.create({
     data: {
       tenantId: tenant.id,
-      patientId: pedro.id,
+      patientId: pedroId,
       companyId: null,
       status: "SUSPENSA",
       billingCycle: "MENSAL",
@@ -497,14 +480,37 @@ async function main() {
     },
   });
 
+  // Assinaturas adicionais para empresas ativas (amostra)
+  const activeCompanyIndices = SEED_COMPANIES.filter((c) => c.status === "ATIVO" && c.index > 1).slice(0, 10);
+  for (const seed of activeCompanyIndices) {
+    const companyPatients = await prisma.patient.findMany({
+      where: { companyId: companyIdByIndex.get(seed.index) },
+      take: 2,
+    });
+    for (const p of companyPatients) {
+      await prisma.subscription.create({
+        data: {
+          tenantId: tenant.id,
+          patientId: p.id,
+          companyId: companyIdByIndex.get(seed.index),
+          status: "ATIVA",
+          billingCycle: seed.index % 2 === 0 ? "MENSAL" : "TRIMESTRAL",
+          startDate: daysAgo(90),
+          amount: seed.index % 2 === 0 ? 79.9 : 219.9,
+          description: `Plano corporativo ${seed.name.split(" ")[0]}`,
+        },
+      });
+    }
+  }
+
   console.log("Criando fatura historica demo (Pedro)...");
   const agPedroPast = await prisma.appointment.create({
     data: {
-      scheduledAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+      scheduledAt: daysAgo(30),
       status: "REALIZADO",
       reason: "Avaliação dermatológica",
       tenantId: tenant.id,
-      patientId: pedro.id,
+      patientId: pedroId,
       providerId: prestador.id,
     },
   });
@@ -519,7 +525,7 @@ async function main() {
   const invPedro = await prisma.invoice.create({
     data: {
       tenantId: tenant.id,
-      patientId: pedro.id,
+      patientId: pedroId,
       companyId: null,
       total: procedures["CON-DER"].basePrice,
       status: "PAGA",
@@ -540,7 +546,7 @@ async function main() {
       entityType: TIMELINE_ENTITY_TYPES.INVOICE,
       entityId: invPedro.id,
       action: TIMELINE_ACTIONS.INVOICE_ISSUED,
-      description: `Fatura Pay Per Use emitida para Pedro Almeida (R$ 220,00)`,
+      description: "Fatura Pay Per Use emitida para Pedro Almeida (R$ 220,00)",
       createdBy: interno.id,
     },
   });
@@ -556,11 +562,11 @@ async function main() {
     },
   });
 
-  console.log("Criando fila de comunicacoes (Comunicacao)...");
+  console.log("Criando fila de comunicacoes...");
   const msgJoao = await prisma.message.create({
     data: {
       tenantId: tenant.id,
-      patientId: joao.id,
+      patientId: joaoId,
       channel: "WHATSAPP",
       template: "APPOINTMENT_REMINDER",
       body: "Olá João Pereira, lembramos sua consulta agendada para hoje às 09:00. Em caso de impossibilidade, entre em contato conosco.",
@@ -582,7 +588,7 @@ async function main() {
   const msgMaria = await prisma.message.create({
     data: {
       tenantId: tenant.id,
-      patientId: maria.id,
+      patientId: mariaId,
       channel: "EMAIL",
       template: "SUBSCRIPTION_DUE",
       subject: "Cobrança recorrente — Bibi Saúde",
@@ -602,7 +608,14 @@ async function main() {
     },
   });
 
-  console.log("Seed concluido com sucesso.");
+  const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
+  const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });
+  const pjCount = await prisma.user.count({ where: { tenantId: tenant.id, role: "PJ" } });
+
+  console.log("\nSeed concluido com sucesso.");
+  console.log(`  Empresas (clientes PJ): ${companyCount}`);
+  console.log(`  Beneficiarios: ${patientCount}`);
+  console.log(`  Usuarios PJ: ${pjCount}`);
   console.log("\nCredenciais de acesso (POC):");
   console.log("  Prestador    -> /login              : dra.helena@bibi.health / bibi123");
   console.log("  Interno      -> /interno/login       : faturamento@bibi.health / bibi123");
