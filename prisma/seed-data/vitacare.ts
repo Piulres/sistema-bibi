@@ -7,7 +7,7 @@ import {
   type PatientRef,
   type ProcedureRef,
 } from "./scenarios";
-import { EXTRA_PROCEDURES } from "./catalog";
+import { ALL_SEED_PROCEDURES } from "./pricing-market";
 
 type VitacareCompany = {
   name: string;
@@ -122,12 +122,9 @@ export async function seedVitacareTenant(
     }
   }
 
-  const procData = [
-    { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 175, tissCode: "10101012" },
-    { code: "CON-CAR", name: "Consulta Cardiologia", category: "CONSULTA", basePrice: 240, tissCode: "10101039" },
-    { code: "EXA-HEM", name: "Hemograma Completo", category: "EXAME", basePrice: 42, tissCode: "40304361" },
-    ...EXTRA_PROCEDURES.slice(0, 2),
-  ];
+  const procData = ALL_SEED_PROCEDURES.filter((p) =>
+    ["CON-CLM", "CON-CAR", "EXA-HEM", "CON-PSI", "OCC-PCM"].includes(p.code),
+  );
 
   const procedures: Record<string, ProcedureRef> = {};
   for (const p of procData) {
@@ -139,6 +136,7 @@ export async function seedVitacareTenant(
       basePrice: created.basePrice,
       name: created.name,
       code: p.code,
+      category: p.category,
     };
   }
 

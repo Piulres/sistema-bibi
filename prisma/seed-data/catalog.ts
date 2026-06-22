@@ -17,15 +17,6 @@ export const SEED_PROVIDERS = [
   },
 ] as const;
 
-/** Procedimentos extras além do catálogo base. */
-export const EXTRA_PROCEDURES = [
-  { code: "CON-PSI", name: "Consulta Psicologia", category: "CONSULTA", basePrice: 200, tissCode: "10101063" },
-  { code: "EXA-RX", name: "Raio-X Tórax", category: "EXAME", basePrice: 85, tissCode: "40801063" },
-  { code: "EXA-GLI", name: "Glicemia em Jejum", category: "EXAME", basePrice: 25, tissCode: "40301605" },
-  { code: "EXA-COL", name: "Colesterol Total", category: "EXAME", basePrice: 30, tissCode: "40301621" },
-  { code: "CON-OFT", name: "Consulta Oftalmologia", category: "CONSULTA", basePrice: 210, tissCode: "10101055" },
-] as const;
-
 export const APPOINTMENT_REASONS = [
   "Consulta de rotina",
   "Retorno",

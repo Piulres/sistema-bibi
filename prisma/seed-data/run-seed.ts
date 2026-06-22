@@ -16,7 +16,13 @@ import {
   firstDayOfMonthFromNow,
   daysAgo,
 } from "./helpers";
-import { EXTRA_PROCEDURES, SEED_PROVIDERS } from "./catalog";
+import { SEED_PROVIDERS } from "./catalog";
+import {
+  ALL_SEED_PROCEDURES,
+  CORPORATE_BENEFIT_PRODUCTS,
+  chargePrice,
+  formatBrl,
+} from "./pricing-market";
 import {
   seedOperationalMass,
   seedBeneficiaryPortalUsers,
@@ -185,15 +191,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   }
 
   console.log("Criando catalogo de procedimentos...");
-  const procData = [
-    { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 180, tissCode: "10101012" },
-    { code: "CON-CAR", name: "Consulta Cardiologia", category: "CONSULTA", basePrice: 250, tissCode: "10101039" },
-    { code: "CON-DER", name: "Consulta Dermatologia", category: "CONSULTA", basePrice: 220, tissCode: "10101047" },
-    { code: "EXA-HEM", name: "Hemograma Completo", category: "EXAME", basePrice: 45, tissCode: "40304361" },
-    { code: "EXA-ECG", name: "Eletrocardiograma", category: "EXAME", basePrice: 120, tissCode: "40101010" },
-    { code: "EXA-USG", name: "Ultrassonografia Abdominal", category: "EXAME", basePrice: 190, tissCode: "40901106" },
-    ...EXTRA_PROCEDURES,
-  ];
+  const procData = [...ALL_SEED_PROCEDURES];
   const procedures: Record<string, ProcedureRef> = {};
   for (const p of procData) {
     const created = await prisma.procedure.create({
@@ -204,6 +202,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       basePrice: created.basePrice,
       name: created.name,
       code: p.code,
+      category: p.category,
     };
   }
 
@@ -219,14 +218,18 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     if (!seed.clinicalDiscount) continue;
     const companyId = companyIdByIndex.get(seed.index);
     if (!companyId) continue;
-    await prisma.pricingRule.create({
-      data: {
-        description: `Desconto corporativo ${seed.name.split(" ")[0]} (${Math.round((1 - seed.clinicalDiscount) * 100)}%) em Consulta Clínica`,
-        multiplier: seed.clinicalDiscount,
-        procedureId: procedures["CON-CLM"].id,
-        companyId,
-      },
-    });
+    const discountPct = Math.round((1 - seed.clinicalDiscount) * 100);
+    for (const proc of ALL_SEED_PROCEDURES) {
+      if (proc.category !== "CONSULTA" && proc.category !== "OCUPACIONAL") continue;
+      await prisma.pricingRule.create({
+        data: {
+          description: `Desconto corporativo ${seed.name.split(" ")[0]} (${discountPct}%) em ${proc.name}`,
+          multiplier: seed.clinicalDiscount,
+          procedureId: procedures[proc.code]!.id,
+          companyId,
+        },
+      });
+    }
   }
 
   console.log("Criando beneficiarios...");
@@ -339,11 +342,17 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   });
 
   console.log("Registrando uso de procedimentos (Pay Per Use) e prontuario demo...");
+  const joaoConsultaPrice = chargePrice(
+    "CONSULTA",
+    procedures["CON-CLM"].basePrice,
+    1,
+    discountByCompanyIndex,
+  );
   const usageJoaoConsulta = await prisma.procedureUsage.create({
     data: {
       appointmentId: ag1.id,
       procedureId: procedures["CON-CLM"].id,
-      priceCharged: procedures["CON-CLM"].basePrice * 0.85,
+      priceCharged: joaoConsultaPrice,
     },
   });
   await prisma.timelineEvent.create({
@@ -352,7 +361,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
       entityId: usageJoaoConsulta.id,
       action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
-      description: "Consulta Clínica Médica registrada para João Pereira (R$ 153,00)",
+      description: `Consulta Clínica Médica registrada para João Pereira (${formatBrl(joaoConsultaPrice)})`,
       createdBy: prestador.id,
     },
   });
@@ -370,7 +379,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
       entityId: usageJoaoEcg.id,
       action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
-      description: "Eletrocardiograma registrado para João Pereira (R$ 120,00)",
+      description: `Eletrocardiograma registrado para João Pereira (${formatBrl(procedures["EXA-ECG"].basePrice)})`,
       createdBy: prestador.id,
     },
   });
@@ -408,22 +417,24 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       entityType: TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE,
       entityId: usageMaria.id,
       action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
-      description: "Hemograma Completo registrado para Maria Souza (R$ 45,00)",
+      description: `Hemograma Completo registrado para Maria Souza (${formatBrl(procedures["EXA-HEM"].basePrice)})`,
       createdBy: prestador.id,
     },
   });
 
   console.log("Criando assinaturas recorrentes...");
+  const telemedicina = CORPORATE_BENEFIT_PRODUCTS.TELEMEDICINA_24H;
+  const checkup = CORPORATE_BENEFIT_PRODUCTS.CHECKUP_PROGRAMADO;
   const subJoao = await prisma.subscription.create({
     data: {
       tenantId: tenant.id,
       patientId: joaoId,
       companyId: techCorpId,
       status: "ATIVA",
-      billingCycle: "MENSAL",
+      billingCycle: telemedicina.billingCycle,
       startDate: new Date("2025-01-01"),
-      amount: 89.9,
-      description: "Plano corporativo TechCorp — telemedicina",
+      amount: telemedicina.amount,
+      description: `${telemedicina.description} — TechCorp`,
     },
   });
   await prisma.timelineEvent.create({
@@ -445,7 +456,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       data: {
         subscriptionId: subJoao.id,
         dueDate,
-        amount: 89.9,
+        amount: telemedicina.amount,
         status: "PENDENTE",
       },
     });
@@ -456,7 +467,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       entityType: TIMELINE_ENTITY_TYPES.SUBSCRIPTION,
       entityId: subJoao.id,
       action: TIMELINE_ACTIONS.SUBSCRIPTION_CHARGES_GENERATED,
-      description: "3 cobrança(s) futura(s) geradas para João Pereira (R$ 89,90/mensal)",
+      description: `3 cobrança(s) futura(s) geradas para João Pereira (${formatBrl(telemedicina.amount)}/mensal)`,
       createdBy: interno.id,
     },
   });
@@ -467,10 +478,10 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       patientId: mariaId,
       companyId: techCorpId,
       status: "ATIVA",
-      billingCycle: "TRIMESTRAL",
+      billingCycle: checkup.billingCycle,
       startDate: new Date("2025-03-01"),
-      amount: 249.9,
-      description: "Check-up trimestral corporativo",
+      amount: checkup.amount,
+      description: `${checkup.description} — TechCorp`,
     },
   });
   await prisma.timelineEvent.create({
@@ -487,22 +498,23 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     data: {
       subscriptionId: subMaria.id,
       dueDate: firstDayOfMonthFromNow(2),
-      amount: 249.9,
+      amount: checkup.amount,
       status: "PENDENTE",
     },
   });
 
+  const particular = CORPORATE_BENEFIT_PRODUCTS.TELEMEDICINA_PARTICULAR;
   const subPedro = await prisma.subscription.create({
     data: {
       tenantId: tenant.id,
       patientId: pedroId,
       companyId: null,
       status: "SUSPENSA",
-      billingCycle: "MENSAL",
+      billingCycle: particular.billingCycle,
       startDate: new Date("2024-06-01"),
       endDate: new Date("2025-12-31"),
-      amount: 59.9,
-      description: "Plano particular — suspenso por inadimplência",
+      amount: particular.amount,
+      description: `${particular.description} — suspenso por inadimplência`,
     },
   });
   await prisma.timelineEvent.create({
@@ -547,6 +559,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     tenantId: tenant.id,
     internoId: interno.id,
     patients: patientRefs,
+    companies: SEED_COMPANIES,
+    companyIdByIndex,
   });
   console.log(`  Baseline: ${baseline.months} meses · R$ ${baseline.totalRevenue.toFixed(2)}`);
 
@@ -593,7 +607,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       entityType: TIMELINE_ENTITY_TYPES.INVOICE,
       entityId: invPedro.id,
       action: TIMELINE_ACTIONS.INVOICE_ISSUED,
-      description: "Fatura Pay Per Use emitida para Pedro Almeida (R$ 220,00)",
+      description: `Fatura Pay Per Use emitida para Pedro Almeida (${formatBrl(procedures["CON-DER"].basePrice)})`,
       createdBy: interno.id,
     },
   });
@@ -639,7 +653,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       channel: "EMAIL",
       template: "SUBSCRIPTION_DUE",
       subject: "Cobrança recorrente — Bibi Saúde",
-      body: "Olá Maria Souza, sua assinatura possui cobrança pendente de R$ 249,90. Regularize para manter o plano ativo.",
+      body: `Olá Maria Souza, sua assinatura possui cobrança pendente de ${formatBrl(checkup.amount)}. Regularize para manter o benefício ativo.`,
       status: "PENDENTE",
       createdBy: interno.id,
     },
