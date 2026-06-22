@@ -329,6 +329,7 @@ src/
 │   ├── subscription*.ts        # Recorrência
 │   ├── message*.ts             # Comunicação
 │   ├── theme/                  # Design system + branding
+│   ├── navigation/             # Rotas, breadcrumbs, resolvers SPA (PR #58)
 │   ├── payments/               # Motor cobrança + MockPixAdapter (Tier 1)
 │   └── communications/         # Motor comunicação + ConsoleAdapter (Tier 1)
 ├── app/
@@ -338,8 +339,8 @@ src/
 │   ├── pj/                     # Portal empresa
 │   └── beneficiario/           # Portal beneficiário
 └── components/
-    ├── ui/                     # Design system (Button, Card, Badge…)
-    ├── layout/                 # PortalShell, TenantTheme, PageHeader
+    ├── ui/                     # Design system (Button, NavTabs, Breadcrumbs, SectionNav…)
+    ├── layout/                 # *PortalShell, NavigationProgress, MobileNavDrawer
     ├── CadastrosView.tsx       # Tier 2
     ├── AppointmentsView.tsx    # Tier 2
     ├── ReportsView.tsx         # Tier 2

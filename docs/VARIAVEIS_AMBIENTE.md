@@ -220,11 +220,19 @@ Guia completo: [`docs/DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
+| Item | Valor |
+|------|-------|
+| **Node.js** | **24** (`actions/setup-node@v4`) |
+| **Branches** | `main`, `cursor/**` (push e PR) |
+| **Jobs** | `unit-integration-api` (lint, test, build) → `e2e` (Playwright) |
+
 | Variável | Job | Valor no CI |
 |----------|-----|-------------|
 | `SESSION_SECRET` | unit + e2e | `ci-test-session-secret-32chars` |
 | `CRON_SECRET` | unit + e2e | `ci-cron-secret` |
 | `DATABASE_URL` | unit (integração) | `file:./prisma/test.db` |
+| `DATABASE_URL` | e2e | `file:./dev.db` (após `db:push` + `db:seed`) |
+| `SEED_SCALE` | e2e | `small` |
 | `CI` | e2e Playwright | `true` |
 | `PLAYWRIGHT_PORT` | e2e | `3100` |
 

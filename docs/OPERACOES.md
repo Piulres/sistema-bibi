@@ -49,6 +49,8 @@ flowchart LR
 
 ## 2. Setup inicial
 
+Requisitos: **Node.js 20+** (CI GitHub Actions em **Node 24**; `pre-release` testado com Node 22).
+
 ```bash
 git clone https://github.com/Piulres/sistema-bibi.git
 cd sistema-bibi

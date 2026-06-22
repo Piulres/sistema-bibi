@@ -146,7 +146,7 @@ Se retornar `{"error":"usage_exceeded",...}`:
 | Tarefa | Onde |
 |--------|------|
 | Feature, bugfix, seed, docs | Cursor (local ou Cloud) |
-| `npm run pre-release` | Qualquer ambiente com Node 22 |
+| `npm run pre-release` | Qualquer ambiente com Node 20+ (CI em Node 24) |
 | `netlify deploy --prod` | **Sua máquina** com CLI logada (recomendado) |
 | Configurar env vars / cota | Painel Netlify (humano) |
 

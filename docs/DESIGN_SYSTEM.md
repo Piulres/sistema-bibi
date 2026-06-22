@@ -74,7 +74,7 @@ Localizados em `src/components/ui/`:
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
 | `LandingMobileMenu` | Menu hamburger da landing |
 
-Config de menus e rótulos: `src/lib/navigation/routes.ts`.
+Config de menus e rótulos: `src/lib/navigation/routes.ts`. Arquitetura SPA: [`ARQUITETURA.md`](ARQUITETURA.md) §5.
 
 ## Uso em páginas
 
