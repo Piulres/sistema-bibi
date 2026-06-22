@@ -1,9 +1,29 @@
 # Deploy na Netlify — Sistema Bibi
 
-Guia para publicar a POC quando a conta e o ambiente estiverem prontos.
-**O repositório já inclui `netlify.toml` e scripts de build — não é necessário publicar agora.**
+Guia para publicar e manter a POC na Netlify.
 
-Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.md) · [`ARQUITETURA.md`](ARQUITETURA.md)
+**Produção ativa:** https://sistema-bibi.netlify.app
+(site secundário: https://sistema-bibi-nt2.netlify.app)
+
+Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.md) ·
+[`ARQUITETURA.md`](ARQUITETURA.md) · [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md)
+
+---
+
+## Status atual (21–22/06/2026)
+
+| Item | Estado |
+|------|--------|
+| Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
+| Build local `npm run netlify:build` | ✅ Passa |
+| Deploy via CLI `npx netlify deploy --prod` | ✅ Validado (PR #28) |
+| Deploy Git automático (push `main`) | ❌ Falha intermitente (exit code 2) |
+| Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
+| Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
+
+> O site em produção foi publicado via **CLI**. Deploys disparados por merge na `main`
+> (commits `94c0f67`, `beeb894`) falharam no build remoto — verificar logs no
+> [painel Netlify](https://app.netlify.com/projects/sistema-bibi).
 
 ---
 
@@ -11,13 +31,15 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 | Item | Descrição |
 |------|-----------|
-| `netlify.toml` | Build, env vars, headers, `netlify dev` |
+| `netlify.toml` | Build, env vars, headers, `netlify dev`, plugin Blobs |
+| `netlify/plugins/patch-regional-blobs` | Desativa `USE_REGIONAL_BLOBS` no handler Next.js (PR #28) |
 | `npm run build:netlify` | `db:push` + seed + `next build` |
+| `prisma/schema.prisma` | `binaryTargets = ["native", "rhel-openssl-3.0.x"]` para Lambda |
 | `src/lib/db.ts` | Copia SQLite seedado para `/tmp` em serverless |
 | `next.config.ts` | Inclui `prisma/**` no bundle serverless |
 | `@netlify/blobs` | Logos white-label em produção |
 | Cron endpoints | `/api/cron/reminders`, `/api/cron/webhooks` (protegidos por `CRON_SECRET`) |
-| Site CLI (opcional) | Projeto `sistema-bibi-2` pode estar linkado localmente |
+| Site CLI | Projeto `sistema-bibi` linkado na conta Netlify |
 
 ---
 
@@ -27,7 +49,8 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 2. **`SESSION_SECRET`** — defina no painel (Site settings → Environment variables), **não** use o fallback do `netlify.toml`.
 3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
 4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
-5. **Git** — conectar o repo no painel só quando quiser deploys automáticos.
+5. **Publish directory** — deve ficar **vazio** no painel (Next.js runtime gerencia o output). Valor `.next` causa falhas.
+6. **Git** — deploy contínuo habilitado; se o build Git falhar, use `npx netlify deploy --prod` como fallback.
 
 ---
 
@@ -112,6 +135,9 @@ Configure scheduled functions ou serviço externo para chamar:
 | Sintoma | Causa provável | Ação |
 |---------|----------------|------|
 | `503 usage_exceeded` | Cota Netlify | Aguardar ou upgrade |
+| `502` / handler crash | Blobs regionais sem `primaryRegion` | Plugin `patch-regional-blobs` (PR #28) |
+| `Prisma Client could not locate Query Engine` | binary target errado | `rhel-openssl-3.0.x` no schema |
+| Build Git exit code 2 | Divergência build remoto vs local | Comparar log Netlify com `npm run netlify:build` |
 | `prisma/prisma/dev.db` | `DATABASE_URL` errado | Use `file:./dev.db` (relativo ao schema) |
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |

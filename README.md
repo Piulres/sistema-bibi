@@ -94,6 +94,8 @@ A aplicação sobe em **http://localhost:3000**.
 Base local: **`http://localhost:3000`**
 (na rede interna da VM o servidor também responde em `http://172.30.0.2:3000`).
 
+**Produção (Netlify):** https://sistema-bibi.netlify.app — mesmas credenciais demo do seed.
+
 ### Páginas (interface)
 
 | URL | Página | Acesso |
@@ -385,8 +387,11 @@ sistema-bibi/
   `.env` são *gitignored*.
 - POC sem testes automatizados — recomendados para evolução do produto.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify preparado, não publicado** — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
-  Build local: `npm run netlify:build`. Publicação manual quando a conta estiver ok.
+- **Netlify em produção** — https://sistema-bibi.netlify.app (deploy via CLI validado;
+  deploy Git automático ainda com falhas intermitentes — ver
+  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md) e
+  [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)).
+  Build local: `npm run netlify:build`.
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres produção, validação XSD TISS completa.
 
 ## 14. Documentação adicional
@@ -404,8 +409,12 @@ sistema-bibi/
 - **Design system e white label:** [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
 - **Base de conhecimento (NotebookLM / RAG):**
   [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
-- **Deploy Netlify (preparado, sem publicar):**
+- **Deploy Netlify (produção + troubleshooting):**
   [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)
+- **Histórico do dia 21/06/2026** (PRs, deploys, commits):
+  [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
+- **Evidências visuais dos fluxos** (vídeos e screenshots):
+  [`docs/evidencias/README.md`](docs/evidencias/README.md)
 - **API interativa (Swagger UI):** http://localhost:3000/api-docs.html
 - **Especificação OpenAPI:** [`public/openapi.yaml`](public/openapi.yaml)
 

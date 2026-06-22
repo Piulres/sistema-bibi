@@ -14,8 +14,9 @@ apenas procedimentos efetivamente utilizados, com **precificação dinâmica** p
 
 **Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
 
-**PRs mergeados em `main`:** #1–#23 (scaffold → Tier 4 + docs + fix PIX faturamento interno).
-Mapa de fluxos: [`docs/FLUXOS.md`](FLUXOS.md). Ver seção 21 (roadmap).
+**PRs mergeados em `main`:** #1–#28 (scaffold → Tier 4 → docs → deploy Netlify).
+Mapa de fluxos: [`docs/FLUXOS.md`](FLUXOS.md). Histórico do dia: [`docs/HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
+Evidências visuais: [`docs/evidencias/README.md`](evidencias/README.md). Ver seção 21 (roadmap).
 
 ---
 
@@ -375,7 +376,8 @@ src/
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify **preparado** (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`); publicação manual quando cota ok
+- Deploy Netlify **em produção** — https://sistema-bibi.netlify.app (`netlify.toml`, `docs/DEPLOY_NETLIFY.md`);
+  deploy Git automático ainda com falhas intermitentes; CLI validado (PR #28)
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
 - Validação XSD TISS completa pendente (export XML mock — Tier 4)
 - Verificação de domínio custom é manual na POC (sem challenge DNS automático)
@@ -393,7 +395,9 @@ src/
 | `docs/PAYMENTS.md` | Motor de cobrança Strategy |
 | `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |
 | `docs/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
-| `docs/DEPLOY_NETLIFY.md` | Deploy Netlify (preparado, sem publicar) |
+| `docs/DEPLOY_NETLIFY.md` | Deploy Netlify (produção + troubleshooting) |
+| `docs/HISTORICO_2026-06-21.md` | Auditoria PRs, commits e deploys do dia |
+| `docs/evidencias/README.md` | Vídeos e screenshots dos fluxos funcionais |
 | `public/openapi.yaml` | Especificação API |
 | `AGENTS.md` | Instruções para agentes de IA |
 

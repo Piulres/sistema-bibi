@@ -5,7 +5,9 @@ Documentação de **todos os fluxos de usuário e de negócio**, derivada do có
 
 Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](ARQUITETURA.md). Para posicionamento vs mercado,
-ver [`BENCHMARK.md`](BENCHMARK.md).
+ver [`BENCHMARK.md`](BENCHMARK.md). Para evidências visuais dos fluxos,
+ver [`evidencias/README.md`](evidencias/README.md). Para histórico de PRs/deploys do dia,
+ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 
 ---
 

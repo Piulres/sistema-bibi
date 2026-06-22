@@ -17,6 +17,11 @@ dinâmica por empresa).
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
+**Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
+fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
+**Produção:** https://sistema-bibi.netlify.app
+**Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
+**Histórico 21/06:** `docs/HISTORICO_2026-06-21.md`
 
 ### Stack e como rodar
 - **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4**, **Prisma 6 + SQLite**.
@@ -69,4 +74,5 @@ Senha única: **`bibi123`** (hash **scrypt** via `src/lib/password.ts`).
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/BENCHMARK.md` (posicionamento vs mercado),
-  `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`.
+  `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
+  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
