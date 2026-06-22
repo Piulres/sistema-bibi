@@ -31,6 +31,7 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
 
   test("nav exibe todos os módulos para admin", async ({ page }) => {
     await page.goto("/interno/dashboard");
+    const nav = page.getByRole("navigation", { name: "Navegação por abas" });
     for (const label of [
       "Dashboard",
       "Faturamento",
@@ -44,7 +45,7 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
       "Integrações",
       "Segurança",
     ]) {
-      await expect(page.getByRole("link", { name: label })).toBeVisible();
+      await expect(nav.getByRole("link", { name: label, exact: true })).toBeVisible();
     }
   });
 

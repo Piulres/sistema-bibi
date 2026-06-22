@@ -1,0 +1,126 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
+import { cn } from "@/lib/utils/cn";
+import type { NavTab } from "@/components/ui/NavTabs";
+
+type Props = {
+  tabs: NavTab[];
+  active?: string;
+  activeClass?: string;
+  idleClass?: string;
+  title?: string;
+};
+
+/** Menu mobile em drawer — complementa NavTabs em telas pequenas. */
+export default function MobileNavDrawer({
+  tabs,
+  active,
+  activeClass = "bg-[var(--surface-muted)] text-[var(--portal-accent)]",
+  idleClass = "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",
+  title = "Menu",
+}: Props) {
+  const [open, setOpen] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const activeTab = tabs.find((t) => t.key === active);
+  const currentLabel = activeTab?.label ?? title;
+
+  useEffect(() => {
+    if (!open) return;
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        triggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    panelRef.current?.querySelector<HTMLElement>("a")?.focus();
+
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [open]);
+
+  return (
+    <div className="md:hidden">
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => setOpen(true)}
+        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
+        aria-expanded={open}
+        aria-controls="mobile-nav-drawer"
+      >
+        <span className="truncate">{currentLabel}</span>
+        <svg
+          className="h-5 w-5 shrink-0 text-[var(--text-muted)]"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          aria-hidden
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      </button>
+
+      {open && (
+        <>
+          <button
+            type="button"
+            className="fixed inset-0 z-40 bg-black/40"
+            aria-label="Fechar menu"
+            onClick={() => setOpen(false)}
+          />
+          <div
+            id="mobile-nav-drawer"
+            ref={panelRef}
+            role="dialog"
+            aria-modal="true"
+            aria-label={title}
+            className="fixed inset-y-0 right-0 z-50 flex w-[min(100%,20rem)] flex-col bg-[var(--surface-card)] shadow-xl ds-nav-drawer-enter"
+          >
+            <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{title}</p>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                aria-label="Fechar"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <nav className="flex-1 overflow-y-auto p-2" aria-label={title}>
+              <ul className="space-y-0.5">
+                {tabs.map((tab) => (
+                  <li key={tab.href}>
+                    <Link
+                      href={tab.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium transition",
+                        active === tab.key ? activeClass : idleClass,
+                      )}
+                      aria-current={active === tab.key ? "page" : undefined}
+                    >
+                      {tab.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}

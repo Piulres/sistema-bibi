@@ -119,6 +119,7 @@ export default function PjView() {
         </a>
       </div>
 
+      <section id="resumo">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card>
           <p className="text-sm text-[var(--text-muted)]">Contrato</p>
@@ -151,8 +152,9 @@ export default function PjView() {
           </p>
         </Card>
       </div>
+      </section>
 
-      <section>
+      <section id="beneficiarios">
         <SectionHeader title="Beneficiários" />
         <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
           <table className="w-full text-left text-sm">
@@ -210,7 +212,7 @@ export default function PjView() {
         )}
       </section>
 
-      <section>
+      <section id="faturas">
         <SectionHeader title="Faturas da empresa" />
         {invoices.length === 0 ? (
           <EmptyState message="Nenhuma fatura emitida ainda." />

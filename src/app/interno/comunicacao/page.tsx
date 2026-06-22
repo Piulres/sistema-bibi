@@ -1,27 +1,17 @@
-import { PORTALS } from "@/lib/roles";
-import PortalShell from "@/components/layout/PortalShell";
 import PageHeader from "@/components/layout/PageHeader";
-import InternoNav from "@/components/InternoNav";
 import ComunicacaoView from "@/components/ComunicacaoView";
 import { requireInternoPage } from "@/lib/interno-guard";
 
-export default async function ComunicacaoPage() {
-  const user = await requireInternoPage("comunicacao");
-  const portal = PORTALS.interno;
+export default async function InternoComunicacaoPage() {
+  await requireInternoPage("comunicacao");
 
   return (
-    <PortalShell
-      portal="interno"
-      portalLabel={portal.label}
-      loginPath={portal.loginPath}
-      userName={user.name}
-      branding={user.branding}
-    >
-      <PageHeader title="Comunicação" description="Fila de mensagens e lembretes ao beneficiário." />
-      <InternoNav active="comunicacao" permissions={user.internoPermissions} />
-      <div className="mt-8">
-        <ComunicacaoView />
-      </div>
-    </PortalShell>
+    <>
+      <PageHeader
+        title="Comunicação"
+        description="Campanhas e mensagens para beneficiários e empresas."
+      />
+      <ComunicacaoView />
+    </>
   );
 }

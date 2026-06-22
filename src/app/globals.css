@@ -230,3 +230,43 @@ body {
     transform: translateY(0);
   }
 }
+
+/* SPA — transição suave entre rotas */
+@media (prefers-reduced-motion: no-preference) {
+  .ds-page-enter {
+    animation: ds-page-enter 0.22s ease-out both;
+  }
+
+  .ds-nav-drawer-enter {
+    animation: ds-nav-drawer-enter 0.2s ease-out both;
+  }
+}
+
+@keyframes ds-page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ds-nav-drawer-enter {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Scroll-margin para âncoras com header sticky */
+[id] {
+  scroll-margin-top: 5rem;
+}
