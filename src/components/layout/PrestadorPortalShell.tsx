@@ -27,7 +27,7 @@ export default function PrestadorPortalShell({ user, children }: Props) {
       branding={user.branding}
     >
       <PrestadorNav />
-      <div className="portal-page-content mt-8">{children}</div>
+      <div className="portal-page-content mt-8 min-w-0">{children}</div>
     </PortalShell>
   );
 }

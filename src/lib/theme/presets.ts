@@ -9,11 +9,11 @@ export type BrandingPreset = {
 
 export const BRANDING_PRESETS: BrandingPreset[] = [
   {
-    id: "bibi",
-    label: "Bibi Saúde",
-    description: "Teal — identidade padrão da plataforma",
+    id: "horizonte",
+    label: "Clínica Horizonte",
+    description: "Teal — clínica demo padrão da POC",
     tokens: {
-      displayName: "Clínica Bibi Saúde",
+      displayName: "Clínica Horizonte",
       tagline: "Cuidado humanizado com gestão inteligente",
       logoUrl: null,
       primaryColor: "#0d9488",

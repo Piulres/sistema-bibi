@@ -33,8 +33,9 @@ export default function PjPortalShell({ user, children }: Props) {
         activeClass={theme.navActiveClass}
         idleClass={theme.navIdleClass}
         className="mt-6"
+        drawerTitle="Seções da empresa"
       />
-      <div className="portal-page-content mt-8">{children}</div>
+      <div className="portal-page-content mt-8 min-w-0">{children}</div>
     </PortalShell>
   );
 }

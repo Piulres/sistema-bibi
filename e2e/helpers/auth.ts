@@ -30,7 +30,12 @@ export async function loginAs(
   await page.waitForURL(DASHBOARD_PATTERNS[portal]);
 }
 
-/** Abas do portal interno (`InternoNav` / `NavTabs`) — evita colisão com quick links do dashboard. */
+/** Abas do portal interno em desktop (≥ lg). */
 export function internoNav(page: Page) {
   return page.getByRole("navigation", { name: "Navegação por abas" });
+}
+
+/** Menu drawer do interno em mobile/tablet (abaixo de lg / 1024px). */
+export function internoNavDrawer(page: Page) {
+  return page.getByRole("navigation", { name: "Módulos internos" });
 }

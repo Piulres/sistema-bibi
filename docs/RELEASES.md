@@ -14,52 +14,76 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção** | **1.0.0** (`de88c0e`) |
-| **Próximo deploy (linha 1.0)** | **1.0.1** — PR #73 → `main` (sem v1.1) |
-| `main` | `de88c0e` — aguardando merge PR #73 |
-| `dev` | **1.1.0** — v1.0.1 + PR #72 integrado |
-| Tag git em produção | `v1.0.0` |
-| Validação `dev` | `npm run pre-release` · 101+ unit · 50+ E2E |
+| **Versão em produção** | **1.0.2** (`e30b2b0`) + mobile nav (`d5ef580` na `main`) |
+| **Deploy Netlify** | Auto-deploy da `main` (último: mobile nav) |
+| `main` | `d5ef580` — release / produção |
+| `dev` | **1.1.0** — `main` + cadastros v1.1 (sincronizada) |
+| Tag git em produção | **`v1.0.2`** |
+| Próximo pacote | **v1.1.0** — validar `dev` → merge `dev` → `main` |
+| Validação `dev` | `npm run pre-release` |
+
+### Sincronização de ambientes
+
+| Ambiente | Branch | Conteúdo |
+|----------|--------|----------|
+| **Integração** | `dev` | Tudo em produção **+** v1.1.0 (cadastros) — **novas atividades aqui** |
+| **Release / produção** | `main` | Pacote publicado (v1.0.2 + patches) |
+| **Netlify** | `main` | Espelha produção |
+
+> **Regra:** PRs de feature/bugfix → base **`dev`**. Merge `dev` → `main` só ao fechar pacote.
 
 ---
 
 ## Pacote em produção (fechado)
 
-### `v1.0.0` — primeira versão estável
+### `v1.0.2` — identidade plataforma vs clínicas (white label)
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v1.0.0` |
-| **Commit** | `de88c0e` |
-| **Publicado em** | 22/06/2026 — deploy `6a393af3` |
-| **Escopo** | POC consolidada — PRs #64–#66 (walk-in, mapas CRUD, melhorias visuais/fluxo) |
+| **Tag git** | `v1.0.2` |
+| **Commit** | `e30b2b0` |
+| **PR** | [#77](https://github.com/Piulres/sistema-bibi/pull/77) |
+| **Publicado em** | 22/06/2026 ~15:08 — deploy Netlify (build Git, `main`) |
+| **Escopo** | Separação Sistema Bibi (produto) × tenant clínico |
+| **Docs** | [`V1_0.md`](V1_0.md) (linha 1.0.x) |
+
+**Inclui:**
+
+- Landing e marketing com **`PLATFORM_BRANDING`** fixo (**Sistema Bibi**), sem ler tenant do banco
+- Logins com shell **Portal da clínica** + `Powered by Sistema Bibi`; branding do tenant após autenticação
+- Tenant demo renomeado: **Clínica Horizonte** (não confundir com a marca da plataforma)
+- `getLoginBrandingFromHeaders()` preparado para domínio customizado white-label
+
+**Não inclui:** cadastros v1.1 (PR #72) — na `dev`, não produção.
 
 ---
 
-## Próximo pacote — produção (linha 1.0)
-
-### `v1.0.1` — agenda prestador + demo/operação
+### `v1.0.1` — agenda prestador + demo/operação *(substituído)*
 
 | Campo | Valor |
 |-------|-------|
-| **Versão** | `1.0.1` |
-| **PR** | [#73](https://github.com/Piulres/sistema-bibi/pull/73) → `main` |
+| **Tag git** | `v1.0.1` |
+| **Commit** | `e4d8a43` |
+| **PR** | [#73](https://github.com/Piulres/sistema-bibi/pull/73) |
+| **Publicado em** | 22/06/2026 ~13:49 — deploy Netlify (build Git) |
 | **Escopo** | PRs #69–#71 (sem cadastros v1.1) |
 | **Docs** | [`V1_0.md`](V1_0.md) |
 
+**Inclui:** agenda prestador (dia/próximos/histórico), dual SQLite demo/operação, fluxo dev-first.
+
 ---
 
-## Integrado na `dev` — não produção
+## Próximo pacote — produção (linha 1.1)
 
 ### `v1.1.0` — cadastros de mercado + CRUD confiável
 
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.1.0` na `dev` |
+| **Base** | `main` @ `d5ef580` + cadastros (PR #72) |
 | **PR** | [#72](https://github.com/Piulres/sistema-bibi/pull/72) — mergeado na `dev` |
 | **Docs** | [`V1_1.md`](V1_1.md) |
-| **Produção** | ❌ Não publicar neste ciclo |
-
+| **Checklist** | `npm run pre-release` na `dev` → merge `dev`→`main` → deploy → tag `v1.1.0` → atualizar esta seção |
 
 ---
 
@@ -67,7 +91,7 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Versão | Doc | Estado |
 |--------|-----|--------|
-| **1.0.x** | [`V1_0.md`](V1_0.md) | `v1.0.1` pendente deploy (PR #73) |
+| **1.0.x** | [`V1_0.md`](V1_0.md) | ✅ `v1.0.2` em produção |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Integrada na `dev` — não produção |
 
 ---
@@ -76,7 +100,9 @@ Registro oficial do que está **em produção**, do que está **pendente na `mai
 
 | Versão / Pacote | Commit | Data (UTC) | Estado |
 |-----------------|--------|------------|--------|
-| **`v1.0.0`** | `de88c0e` | 22/06/2026 | ✅ **Em produção** (será substituído por 1.0.1) |
+| **`v1.0.2`** | `e30b2b0` | 22/06/2026 | ✅ **Em produção** |
+| `v1.0.1` | `e4d8a43` | 22/06/2026 | ✅ Substituído |
+| `v1.0.0` | `685cc21` | 22/06/2026 | ✅ Substituído |
 | `bibi-poc-2026-06-22c` | `32dad64` | 22/06/2026 | ✅ Substituído |
 | `bibi-poc-2026-06-22b` | `92348ba` | 22/06/2026 | ✅ Substituído |
 | `bibi-poc-2026-06-22a` | `beeb894` | 22/06/2026 | ✅ Substituído |
@@ -99,11 +125,16 @@ Detalhes: [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md)
 Fluxo **manual** — só quando você decidir. Agentes Cursor **não** devem
 executar deploy sem pedido explícito.
 
-### 1. Preparar na `main`
+### 1. Preparar na `dev`, integrar na `main`
 
 ```bash
+git checkout dev
+git pull origin dev
+npm run pre-release
+
 git checkout main
 git pull origin main
+git merge dev
 npm run pre-release
 ```
 
@@ -120,7 +151,7 @@ curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/
 npx netlify login    # se necessário
 npx netlify link     # site sistema-bibi
 npx netlify build    # build local com plugins Next.js (incluído no pre-release)
-npx netlify deploy --prod --no-build --message "v1.0.1: agenda prestador + demo/operação"
+npx netlify deploy --prod --no-build --message "vX.Y.Z: descrição"
 ```
 
 ### 4. Fechar o pacote (atualizar este arquivo)
@@ -133,9 +164,17 @@ npx netlify deploy --prod --no-build --message "v1.0.1: agenda prestador + demo/
 ### 5. Tag (recomendado para versões estáveis)
 
 ```bash
-git tag -a v1.0.1 -m "Release 1.0.1 — agenda prestador + demo/operação"
+git tag -a vX.Y.Z -m "Release X.Y.Z — descrição"
 git push origin main
-git push origin v1.0.1
+git push origin vX.Y.Z
+```
+
+### 6. Re-sincronizar `dev` após release
+
+```bash
+git checkout dev
+git merge main
+git push origin dev
 ```
 
 ---
@@ -158,6 +197,7 @@ Pacotes POC anteriores (`bibi-poc-AAAA-MM-DDx`) permanecem no histórico.
 |------|---------|
 | Deploy a cada PR mergeado | Queima cota Netlify + tokens de agente |
 | `netlify deploy --prod` em agente sem pedido | Custo e risco desnecessários |
+| PR de feature direto na `main` | Integrar em `dev` primeiro |
 | Confiar só no deploy Git | Histórico de falhas — validar com `pre-release` |
 | `npm run db:reset` em agente | Bloqueado — use `db:push && db:seed` |
 

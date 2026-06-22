@@ -32,8 +32,10 @@ model TenantBranding {
 
 Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 
-- **Clínica Bibi Saúde** — branding teal (padrão)
-- **VitaCare** — branding azul (demonstração white label)
+- **Clínica Horizonte** — clínica cliente demo (teal)
+- **VitaCare** — white label corporativo (azul)
+
+**Sistema Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` (v1.0.2+).
 
 ## Tokens CSS
 
@@ -58,9 +60,10 @@ Localizados em `src/components/ui/`:
 | `Card` | Container padrão (`.ds-card`) |
 | `Badge` | Pill de status com tons semânticos |
 | `Alert` | Mensagens info/success/warning/danger |
-| `NavTabs` | Navegação horizontal (`aria-label="Navegação por abas"`) |
+| `NavTabs` | Navegação horizontal entre rotas — `ScrollableNavRail` (`aria-label="Navegação por abas"`) |
 | `Breadcrumbs` | Trilha hierárquica (`Cliente 360°`, atendimento prestador) |
-| `SectionNav` | Âncoras em páginas de rota única (PJ, beneficiário) |
+| `SectionNav` | Âncoras PJ/beneficiário — drawer abaixo de lg + faixa rolável |
+| `ScrollableNavRail` | Scroll horizontal com gradientes e setas quando transborda |
 | `StatCard` | KPI com label, valor, hint e tom semântico (`warning`, `success`, `accent`…) |
 | `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
@@ -77,7 +80,9 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 | `PortalShell` | Header + main padronizado para portais autenticados |
 | `PageHeader` | Título + descrição de página |
 | `InternoPortalShell` / `PrestadorPortalShell` / `PjPortalShell` / `BeneficiarioPortalShell` | Shell client-side persistente por portal (em `layout.tsx`) |
-| `InternoNav` | Abas internas + `MobileNavDrawer` no mobile |
+| `InternoNav` | Abas internas + `MobileNavDrawer` abaixo de **lg** (1024px) |
+| `MobileNavDrawer` | Drawer de rotas (interno) |
+| `MobileSectionDrawer` | Drawer de seções (PJ, beneficiário) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
 | `LandingMobileMenu` | Menu hamburger da landing |
 
@@ -97,8 +102,13 @@ export default async function InternoBillingPage() {
   );
 }
 
-// Login / landing (sem sessão)
-const branding = await getPlatformBranding();
+// Landing / marketing — identidade da plataforma (Sistema Bibi)
+const branding = getPlatformBranding();
+
+// Login público — tenant por domínio ou shell "Portal da clínica"
+const loginBranding = await getLoginBrandingFromHeaders();
+
+// Portais autenticados — branding vem de getSessionUser().branding
 ```
 
 ## Status badges
@@ -113,6 +123,14 @@ Mapas reutilizáveis em `src/lib/theme/status-styles.ts`:
 Preferir `Badge` ou `statusBadgeClass(map, value)` em novas telas.
 
 ## White label na prática
+
+Três camadas (v1.0.2+):
+
+| Camada | Função | API / token |
+|--------|--------|-------------|
+| Plataforma | Site comercial, vende o produto | `getPlatformBranding()` → `PLATFORM_BRANDING` |
+| Login | Entrada genérica ou por domínio customizado | `getLoginBrandingFromHeaders()` |
+| Tenant | Dados e marca da clínica cliente | `getSessionUser().branding` |
 
 1. Cada tenant possui registro `TenantBranding`.
 2. Após login, `getSessionUser()` retorna `user.branding`.

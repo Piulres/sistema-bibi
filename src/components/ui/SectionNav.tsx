@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
+import ScrollableNavRail from "@/components/ui/ScrollableNavRail";
+import MobileSectionDrawer from "@/components/layout/MobileSectionDrawer";
 
 export type SectionNavItem = {
   id: string;
@@ -13,14 +15,16 @@ type Props = {
   activeClass?: string;
   idleClass?: string;
   className?: string;
+  drawerTitle?: string;
 };
 
-/** Navegação por âncoras em páginas de rota única — scroll suave entre seções. */
+/** Navegação por âncoras — drawer em mobile/tablet, faixa rolável em desktop largo. */
 export default function SectionNav({
   sections,
   activeClass = "border-[var(--portal-accent)] text-[var(--portal-accent)]",
   idleClass = "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
   className,
+  drawerTitle = "Seções da página",
 }: Props) {
   const [activeId, setActiveId] = useState(() => sections[0]?.id ?? "");
 
@@ -71,28 +75,36 @@ export default function SectionNav({
   }, [sections]);
 
   return (
-    <nav
-      aria-label="Seções da página"
-      className={cn(
-        "flex gap-2 overflow-x-auto border-b border-[var(--border-default)] pb-px",
-        "snap-x snap-mandatory scroll-px-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-        className,
-      )}
-    >
-      {sections.map((section) => (
-        <button
-          key={section.id}
-          type="button"
-          onClick={() => handleClick(section.id)}
-          className={cn(
-            "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
-            activeId === section.id ? activeClass : idleClass,
-          )}
-          aria-current={activeId === section.id ? "true" : undefined}
+    <div className={className}>
+      <MobileSectionDrawer
+        sections={sections}
+        activeId={activeId}
+        onSelect={handleClick}
+        activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
+        idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+        title={drawerTitle}
+      />
+      <ScrollableNavRail className="hidden lg:block">
+        <nav
+          aria-label="Seções da página"
+          className="flex w-max min-w-full gap-2 border-b border-[var(--border-default)] pb-px"
         >
-          {section.label}
-        </button>
-      ))}
-    </nav>
+          {sections.map((section) => (
+            <button
+              key={section.id}
+              type="button"
+              onClick={() => handleClick(section.id)}
+              className={cn(
+                "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
+                activeId === section.id ? activeClass : idleClass,
+              )}
+              aria-current={activeId === section.id ? "true" : undefined}
+            >
+              {section.label}
+            </button>
+          ))}
+        </nav>
+      </ScrollableNavRail>
+    </div>
   );
 }

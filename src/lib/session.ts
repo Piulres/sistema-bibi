@@ -2,7 +2,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import crypto from "node:crypto";
 import { getPrisma } from "@/lib/db";
-import { DEFAULT_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
+import { CLINIC_BRANDING_DEFAULTS, type BrandingTokens } from "@/lib/theme/tokens";
 import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 import {
   resolveInternoPermissions,
@@ -90,7 +90,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
         customDomain: brandingRow.customDomain,
         customDomainVerified: brandingRow.customDomainVerified,
       }
-    : { ...DEFAULT_BRANDING, displayName: user.tenant.name };
+    : { displayName: user.tenant.name, ...CLINIC_BRANDING_DEFAULTS };
 
   return {
     id: user.id,

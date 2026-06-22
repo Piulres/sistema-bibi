@@ -31,7 +31,7 @@ export default function PortalShell({
         loginPath={loginPath}
         platformLabel={branding.platformLabel}
       />
-      <main className="ds-page-shell">{children}</main>
+      <main className="ds-page-shell min-w-0">{children}</main>
     </TenantTheme>
   );
 }

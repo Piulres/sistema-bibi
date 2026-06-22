@@ -35,7 +35,7 @@ export default function InternoPortalShell({ user, children }: Props) {
       branding={user.branding}
     >
       <InternoNav permissions={user.internoPermissions} />
-      <div className="portal-page-content mt-8">{children}</div>
+      <div className="portal-page-content mt-8 min-w-0">{children}</div>
     </PortalShell>
   );
 }

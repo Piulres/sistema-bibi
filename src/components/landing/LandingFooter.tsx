@@ -23,8 +23,8 @@ export default function LandingFooter({ branding }: Props) {
               {branding.displayName}
             </p>
             <p className="mt-2 max-w-sm text-sm text-[var(--text-secondary)]">
-              Plataforma SaaS HealthTech com Pay Per Use, operação clínica e
-              faturamento integrado.
+              SaaS HealthTech para clínicas e operadoras — Pay Per Use, operação
+              clínica e faturamento integrado.
             </p>
             <p className="mt-3 text-xs text-[var(--text-muted)]">
               {branding.platformLabel}
@@ -51,7 +51,7 @@ export default function LandingFooter({ branding }: Props) {
         </div>
 
         <div className="mt-10 flex flex-col gap-2 border-t border-[var(--border-default)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} {branding.displayName}. Demonstração POC.</p>
+          <p>© {year} {branding.displayName}. Demonstração POC do produto.</p>
           <p>
             <Link
               href="/interno/login"

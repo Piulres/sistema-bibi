@@ -40,7 +40,7 @@ export default function InternoNav({
         active={resolvedActive}
         activeClass={theme.navActiveClass}
         idleClass={theme.navIdleClass}
-        className="hidden md:flex"
+        className="hidden lg:flex"
       />
     </div>
   );
