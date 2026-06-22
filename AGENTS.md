@@ -81,5 +81,6 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/DESIGN_SYSTEM.md`. Use `PortalShell` + `PageHeader` em novas páginas de portal.
 - **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/BENCHMARK.md` (posicionamento vs mercado),
-  `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
+  `docs/ARQUITETURA.md`, `docs/TESTES.md` (estratégia e mapa de testes automatizados),
+  `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
