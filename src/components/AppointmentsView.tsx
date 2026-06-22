@@ -303,9 +303,10 @@ export default function AppointmentsView() {
               ))}
             </select>
           </label>
-          <label className="block text-sm">
+          <label className="block text-sm" htmlFor="walkin-time">
             <span className="text-[var(--text-secondary)]">Horário (vazio = agora)</span>
             <input
+              id="walkin-time"
               type="time"
               className={fieldClass}
               value={walkIn.time}
