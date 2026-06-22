@@ -6,7 +6,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: alinhada à `main` pós PRs #1–#39 (Tiers 1–4, quatro portais, Pay Per Use E2E).
+Última revisão: alinhada à `main` pós walk-in particular, edição CRUD em Cadastros e mapa `CRUD_OPERATIONS_MAP` (27 entidades).
 
 ---
 
@@ -208,8 +208,9 @@ flowchart LR
 |--------|------|-------------------|
 | Dashboard | `/interno/dashboard` | KPIs → links rápidos (faturamento, CRM, recorrência) |
 | Faturamento | `/interno` | Pendências PPU → gerar fatura → PIX / marcar paga → TISS XML |
-| Agenda | `/interno/agenda` | CRUD agendamentos, status, modalidade TELE |
-| Cadastros | `/interno/cadastros` | Beneficiários, empresas, procedimentos, usuários |
+| Agenda | `/interno/agenda` | CRUD agendamentos, **walk-in particular**, check-in, modalidade TELE |
+| Cadastros | `/interno/cadastros` | Beneficiários, empresas, procedimentos, usuários (criar + **editar**) |
+| Mapa CRUD | `/interno/cadastros?tab=operations` | 27 entidades — telas, rotas API, filtro por portal |
 | CRM | `/interno/crm` | Pipeline lead → ativo (kanban) |
 | Recorrência | `/interno/assinaturas` | Assinaturas → gerar cobranças → faturar |
 | Comunicação | `/interno/comunicacao` | Fila de mensagens + lembretes automáticos |
@@ -252,7 +253,8 @@ sequenceDiagram
 
   Note over B,R: 1. Agendamento
   B->>B: Self-service OU
-  R->>R: /interno/agenda
+  R->>R: /interno/agenda (cadastrado)
+  R->>R: /interno/agenda walk-in (particular)
 
   Note over P: 2. Atendimento
   P->>P: Registrar procedimento (preço congelado)

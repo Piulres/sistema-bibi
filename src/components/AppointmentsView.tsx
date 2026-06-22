@@ -195,21 +195,28 @@ export default function AppointmentsView() {
 
   async function updateStatus(id: string, status: string) {
     setBusy(id);
+    setMsg(null);
     try {
       const res = await fetch(`/api/interno/appointments/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-      if (res.ok) await load();
+      if (res.ok) {
+        await load();
+        return true;
+      }
+      const data = await res.json().catch(() => ({}));
+      setMsg((data as { error?: string }).error ?? "Erro ao atualizar agendamento");
+      return false;
     } finally {
       setBusy(null);
     }
   }
 
   async function confirmArrival(id: string) {
-    await updateStatus(id, "CONFIRMADO");
-    setMsg("Chegada confirmada — paciente aguardando atendimento.");
+    const ok = await updateStatus(id, "CONFIRMADO");
+    if (ok) setMsg("Chegada confirmada — paciente aguardando atendimento.");
   }
 
   if (loading) return <LoadingState message="Carregando agenda..." />;

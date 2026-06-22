@@ -252,7 +252,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
-| **Mapa CRUD** | — | — | — | Tabela `CRUD_OPERATIONS_MAP` — 25+ entidades, rotas API, filtro por portal |
+| **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
@@ -443,6 +443,27 @@ Disparo: `POST /api/interno/reminders` ou cron `POST /api/cron/reminders`.
 
 Empresa `INADIMPLENTE`, faturas `FECHADA` em aberto ou cobranças vencidas →
 alertas em `getPjPortalOverview()`.
+
+### 8.5 Walk-in particular (recepção)
+
+Paciente **sem empresa PJ** (`Patient.companyId = null`). UI em `AppointmentsView`:
+
+| Passo | Ação na UI | API |
+|-------|------------|-----|
+| 1 | Preencher walk-in (nome, CPF, nascimento, prestador) | `POST /api/interno/patients` |
+| 2 | **Cadastrar e agendar agora** | `POST /api/interno/appointments` (`AGENDADO`) |
+| 3 | Opcional: criar portal beneficiário | `POST /api/interno/users` |
+| 4 | **Confirmar chegada** na lista do dia | `PATCH …/appointments/[id]` → `CONFIRMADO` |
+| 5 | Prestador atende → PPU preço base | fluxo §7 |
+
+Credencial demo: `pedro.almeida@email.com` (particular, histórico de fatura PAGA no seed).
+
+### 8.6 Mapa de operações CRUD
+
+Fonte canônica: `src/lib/crud-operations-map.ts` · UI: `/interno/cadastros?tab=operations`.
+
+Cobre **27 entidades** nos portais Interno, Prestador, Beneficiário, PJ, Auth e Sistema —
+cada operação com tela, rota API e tipo de exposição (UI, Download, API-only, Cron).
 
 ---
 
