@@ -6,11 +6,28 @@ Plataforma visual unificada com identidade configurável por tenant (white label
 
 ## Visão geral
 
-O design system separa três camadas:
+O design system separa quatro camadas:
 
 1. **Tokens globais** (`src/app/globals.css`) — superfícies, texto, bordas, status e variáveis de marca.
-2. **Branding por tenant** (`TenantBranding` + `TenantTheme`) — cores, nome de exibição, tagline e logo injetados em runtime via CSS variables.
-3. **Tema por portal** (`src/lib/theme/portals.ts`) — acentos visuais dos quatro portais (Prestador, Interno, PJ, Beneficiário).
+2. **Identidade da plataforma** (`PLATFORM_BRANDING`) — landing e marketing; marca fixa **Sistema Bibi**, sem ler tenant do banco.
+3. **Branding por tenant** (`TenantBranding` + `TenantTheme`) — cores, nome de exibição, tagline e logo injetados em runtime via CSS variables.
+4. **Tema por portal** (`src/lib/theme/portals.ts`) — acentos visuais dos quatro portais (Prestador, Interno, PJ, Beneficiário).
+
+## Identidade plataforma vs tenant
+
+A partir de **v1.0.2**, três contextos de branding coexistem (definidos em `src/lib/theme/tokens.ts`):
+
+| Constante / função | Onde aparece | `displayName` típico |
+|--------------------|--------------|----------------------|
+| `PLATFORM_BRANDING` / `getPlatformBranding()` | Landing (`/`), metadata comercial | **Sistema Bibi** |
+| `LOGIN_PORTAL_BRANDING` / `getLoginBrandingFromHeaders()` | Logins sem domínio customizado | **Portal da clínica** |
+| `TenantBranding` / `getTenantBranding()` | Portais autenticados | Nome da clínica (ex. Clínica Horizonte) |
+
+**Regra:** a landing **nunca** herda branding de tenant. Logins usam tenant apenas quando `resolveTenantIdFromHost()` encontra `customDomain` verificado em `TenantBranding`; caso contrário, exibem o shell neutro com `Powered by Sistema Bibi`.
+
+**Fallback de tenant:** se não houver registro `TenantBranding`, `getTenantBranding()` usa o nome do tenant no banco + `CLINIC_BRANDING_DEFAULTS` — não a marca da plataforma.
+
+**Domínio customizado:** `src/lib/tenant-resolver.ts` ignora `localhost` e `*.netlify.app`; só resolve hosts com `customDomainVerified: true`.
 
 ## Modelo de dados
 
@@ -32,7 +49,7 @@ model TenantBranding {
 
 Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 
-- **Clínica Bibi Saúde** — branding teal (padrão)
+- **Clínica Horizonte** — branding teal (tenant padrão da POC; não confundir com a marca **Sistema Bibi**)
 - **VitaCare** — branding azul (demonstração white label)
 
 ## Tokens CSS
@@ -86,19 +103,13 @@ Config de menus e rótulos: `src/lib/navigation/routes.ts`.
 ## Uso em páginas
 
 ```tsx
-// Portal interno — shell e nav vivem no layout; a page só declara conteúdo
-export default async function InternoBillingPage() {
-  await requireInternoPage("billing");
-  return (
-    <>
-      <PageHeader title="Faturamento" description="..." />
-      <BillingView />
-    </>
-  );
-}
+// Landing — sempre marca da plataforma (sem sessão, sem tenant)
+const branding = getPlatformBranding();
 
-// Login / landing (sem sessão)
-const branding = await getPlatformBranding();
+// Logins — tenant por domínio customizado ou shell neutro
+const branding = await getLoginBrandingFromHeaders();
+
+// Portais autenticados — branding vem da sessão (getSessionUser().branding)
 ```
 
 ## Status badges
@@ -130,7 +141,7 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 | `/api/interno/branding/logo` | POST | Upload de logo (Netlify Blobs ou disco local em dev) |
 | `/api/branding/logo/[tenantId]` | GET | Serve logo público do tenant |
 
-**Presets** disponíveis em `src/lib/theme/presets.ts` (Bibi, VitaCare, Amethyst, Forest).
+**Presets** disponíveis em `src/lib/theme/presets.ts` (Horizonte, VitaCare, Amethyst, Forest).
 
 **Storage de logo** (`src/lib/storage/tenant-logo.ts`):
 - **Netlify (produção):** store `bibi-tenant-logos` via `@netlify/blobs`
