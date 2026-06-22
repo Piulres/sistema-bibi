@@ -26,6 +26,9 @@ fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 ### Stack e como rodar
 - **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4**, **Prisma 6 + SQLite**.
 - Comandos padrão estão em `package.json`: `npm run dev`, `npm run build`, `npm run lint`.
+- **Testes:** `DATABASE_URL=file:./prisma/test.db npm run test` (Vitest);
+  `npm run test:e2e` (Playwright, porta 3100, exige `dev.db` seedado).
+  Ver `docs/TESTES.md` para mapa, CI e pitfalls.
 - Banco local (Prisma + SQLite): primeiro setup em uma VM nova exige criar o `.env`
   e popular o banco (o `dev.db` e o `.env` são gitignored, então **não** vêm no checkout):
  - `cp .env.example .env` (se `.env` não existir)

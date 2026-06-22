@@ -10,20 +10,21 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 ---
 
-## Status atual (21–22/06/2026)
+## Status atual (22/06/2026)
 
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Deploy via CLI `npx netlify deploy --prod` | ✅ Validado (PR #28) |
-| Deploy Git automático (push `main`) | ✅ Corrigido — `db.ts` não redireciona para `/tmp` no build CI |
+| Deploy Git automático (push `main`) | ✅ `publish = ".next"` no `netlify.toml` (PR #39) |
+| CI GitHub Actions | ✅ lint + Vitest + build + Playwright (PR #41) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
-> O site em produção foi publicado via **CLI**. Deploys disparados por merge na `main`
-> (commits `94c0f67`, `beeb894`) falharam no build remoto — verificar logs no
-> [painel Netlify](https://app.netlify.com/projects/sistema-bibi).
+> O site em produção foi publicado via **CLI** (PR #28). Deploys Git devem passar
+> após o fix `publish = ".next"` — validar no [painel Netlify](https://app.netlify.com/projects/sistema-bibi).
+> Testes de regressão: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
 ---
 
@@ -49,8 +50,11 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 2. **`SESSION_SECRET`** — defina no painel (Site settings → Environment variables), **não** use o fallback do `netlify.toml`.
 3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
 4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
-5. **Publish directory** — deve ficar **vazio** no painel (Next.js runtime gerencia o output). Valor `.next` causa falhas.
-6. **Git** — deploy contínuo habilitado; se o build Git falhar, use `npx netlify deploy --prod` como fallback.
+5. **Publish directory** — o plugin `@netlify/plugin-nextjs` exige `publish !=` raiz
+   do repositório. O `netlify.toml` define `publish = ".next"` (PR #39). No painel
+   Netlify, deixe vazio ou alinhado com o toml — **não** use a raiz do repo.
+6. **Git** — deploy contínuo habilitado; se o build Git falhar, compare o log com
+   `npm run netlify:build` e verifique o [CI GitHub](../.github/workflows/ci.yml).
 
 ---
 
@@ -103,8 +107,8 @@ npx netlify deploy --prod
 ## Deploy contínuo via GitHub (opcional)
 
 1. Netlify → **Add new site** → **Import an existing project** → GitHub → repo `sistema-bibi`.
-2. Build command: `npm run build:netlify` (já no `netlify.toml`).
-3. **Não** definir publish directory (Next.js runtime).
+2. Build command: `node scripts/netlify-build.mjs` (já no `netlify.toml` como `npm run build:netlify`).
+3. **Publish directory:** `.next` (definido no `netlify.toml`; o plugin Next.js exige distDir explícito).
 4. Adicionar env vars acima no painel.
 5. Para evitar deploys acidentais: desativar **Auto publishing** em Deploys ou usar branch `production` apenas.
 
