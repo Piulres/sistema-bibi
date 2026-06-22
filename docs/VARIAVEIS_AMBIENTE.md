@@ -36,6 +36,8 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
 | `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
+| `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
+| `RUN_SEED_ON_BUILD` | Não | `true` em demo | Seed no build Netlify (`false` em operação) |
 | `ALLOW_DEMO_RESET` | Não | `true` | Botão restaurar demo na UI |
 | `NETLIFY` | Auto | `true` no deploy | Detecção de ambiente Netlify |
 
@@ -86,7 +88,61 @@ Não precisa estar no `.env` local — o Next define automaticamente.
 
 ## 3. Seed e modo demo
 
-Usadas por `prisma/seed.ts`, `prisma/seed-data/run-seed.ts` e `src/lib/demo-reset.ts`.
+Usadas por `prisma/seed.ts`, `scripts/setup-database.ts`, `src/lib/database-env.ts` e `src/lib/demo-reset.ts`.
+
+Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
+### `DUAL_DATA_STORE`
+
+| | |
+|---|---|
+| **Padrão** | `true` em dev e Netlify (`netlify.toml`) |
+| **Valores** | `true` \| `false` |
+| **Efeito** | Habilita seletor demo/operação e dual SQLite (`demo.db` + `operation.db`) |
+| **Desligar** | `false` — um único `dev.db` legado (sem UI de troca) |
+
+```env
+DUAL_DATA_STORE=true
+```
+
+### `DATA_STORE_MODE`
+
+| | |
+|---|---|
+| **Padrão** | `demo` (se Blobs/arquivo local vazio) |
+| **Valores** | `demo` \| `operation` |
+| **Onde** | Netlify Blobs (`bibi-config/data-store-mode`) ou `prisma/.data-store-mode` em dev |
+| **UI** | `/interno/seguranca` → card “Base de dados” (ADMIN) — confirmação `OPERAR` / `DEMO` |
+| **API** | `GET\|POST /api/interno/data-store` |
+
+Modo inicial opcional no painel Netlify (antes da primeira troca na UI):
+
+```env
+DATA_STORE_MODE=demo
+```
+
+### `APP_MODE`
+
+| | |
+|---|---|
+| **Padrão** | `demo` |
+| **Valores** | `demo` \| `operation` |
+| **Efeito** | Modo inicial legado se `DATA_STORE_MODE` ausente; `operation` desliga seed no build |
+
+```env
+APP_MODE=demo
+```
+
+### `RUN_SEED_ON_BUILD`
+
+| | |
+|---|---|
+| **Padrão** | `true` em demo; `false` se `APP_MODE=operation` |
+| **Build** | `scripts/netlify-build.mjs` → `setup-database.ts` |
+
+```env
+RUN_SEED_ON_BUILD=true
+```
 
 ### `SEED_SCALE`
 
@@ -105,8 +161,8 @@ SEED_SCALE=medium
 | | |
 |---|---|
 | **Padrão** | `true` (habilitado se ausente) |
-| **Desligar** | `false` ou `0` |
-| **UI** | `/interno/seguranca` → “Restaurar estado original do seed” |
+| **Desligar** | `false` ou `0` ou modo **operação** ativo no seletor |
+| **UI** | `/interno/seguranca` → “Restaurar estado original do seed” (somente modo **demo**) |
 | **API** | `POST /api/interno/demo/reset` (body: `{ "confirm": "RESTAURAR" }`) |
 | **Permissão** | Somente interno **ADMIN** |
 

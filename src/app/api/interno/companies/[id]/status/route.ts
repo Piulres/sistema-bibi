@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   companyStatusLabel,
@@ -18,6 +18,7 @@ export async function PATCH(
   request: Request,
   ctx: RouteContext<"/api/interno/companies/[id]/status">,
 ) {
+  const prisma = await getPrisma();
   try {
     const user = await requireInternoModule("crm");
     const { id } = await ctx.params;

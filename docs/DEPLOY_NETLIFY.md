@@ -138,10 +138,14 @@ Configure scheduled functions ou serviço externo para chamar:
 
 ## Limitações conhecidas da POC na Netlify
 
-- **SQLite** copiado para `/tmp` a cada cold start — escrita persiste só na mesma instância Lambda.
-- **Seed no build** — cada deploy recria dados demo (intencional para POC).
+- **Modo demo** — SQLite copiado para `/tmp` por instância Lambda; escrita não compartilhada entre cold starts (OK para apresentação).
+- **Modo operação** — SQLite + **Netlify Blobs** (`bibi-databases/operation.db`); escritas compartilhadas entre instâncias. Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+- **Seed no build** — gera `demo.db` com massa completa; cada deploy recria o snapshot demo.
+- **Seletor demo/operação** — `/interno/seguranca` (ADMIN); persistência do modo em Blobs (`bibi-config/data-store-mode`).
 - **Logos** — `@netlify/blobs` em produção; filesystem local em `next dev` puro.
-- **MFA / webhooks / PIX** — funcionam na POC, mas dependem do SQLite efêmero.
+- **MFA / webhooks / PIX** — funcionam na POC; no modo demo dependem do SQLite efêmero por instância.
+
+**Postgres** — opcional para escala futura (`DUAL_DATA_STORE=false` + `DATABASE_URL=postgresql://...`). Não é obrigatório para operar com dados reais na POC atual.
 
 ---
 
@@ -157,13 +161,27 @@ Configure scheduled functions ou serviço externo para chamar:
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
+| Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
+| Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
+| Card “Base de dados” não aparece | Versão antiga ou não-ADMIN | Deploy com PR dual-store; login `faturamento@bibi.health` (ADMIN) |
+
+---
+
+## Demo vs operação em produção
+
+Após deploy com dual-store (`DUAL_DATA_STORE=true`):
+
+1. Login ADMIN → `/interno/seguranca`
+2. **Ir para operação** → confirmar `OPERAR` (ou **demo** → `DEMO`)
+3. Login novamente
+
+Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---
 
 ## Evolução recomendada
 
-1. Migrar Prisma → Postgres ([Netlify Database](https://docs.netlify.com/database/))
-2. Remover seed do build de produção
-3. Gateways reais (Asaas, SendGrid) com secrets só no painel
-4. Purge CDN de logos via `Cache-Tag: tenant-logo-{tenantId}`
-5. SSO OAuth/SAML (Tier 5)
+1. **Opcional:** migrar Prisma → Postgres ([Netlify Database](https://docs.netlify.com/database/)) quando volume exigir
+2. Gateways reais (Asaas, SendGrid) com secrets só no painel
+3. Purge CDN de logos via `Cache-Tag: tenant-logo-{tenantId}`
+4. SSO OAuth/SAML (Tier 5)

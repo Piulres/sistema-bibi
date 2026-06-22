@@ -1,8 +1,10 @@
 # Releases — Pacotes fechados do Sistema Bibi
 
 Registro oficial do que está **em produção**, do que está **pendente na `main`**
-e do histórico de publicações. Use este arquivo como fonte única de verdade —
-não confie em “deploy automático” para saber o que está no ar.
+(após merge de `dev`) e do histórico de publicações. Use este arquivo como fonte
+única de verdade — não confie em “deploy automático” para saber o que está no ar.
+
+**Fluxo de branches:** features integram em `dev` → release merge `dev` → `main` → deploy manual.
 
 **Produção:** https://sistema-bibi.netlify.app
 
@@ -12,14 +14,13 @@ não confie em “deploy automático” para saber o que está no ar.
 
 | Item | Valor |
 |------|-------|
-| **Versão semântica** | **1.0.0** |
+| **Versão em produção** | **1.0.0** (`de88c0e`) |
+| **Próximo deploy (linha 1.0)** | **1.0.1** — commit `a31e195` na `dev` |
 | Site produção | https://sistema-bibi.netlify.app |
-| Pacote em produção | `v1.0.0` → commit `de88c0e` · deploy `6a393af3` |
-| `main` | `de88c0e` — alinhada com produção |
-| `dev` | `f461986` — mergeada na `main` |
-| Tag git | `v1.0.0` |
-| Validação local | `npm run pre-release` ✅ · 88 unit · 43 E2E |
-| Deploy | 22/06/2026 — `netlify build` + `--no-build` |
+| `main` | `de88c0e` — aguardando merge `dev` → `main` |
+| `dev` | `a31e195` — integração (v1.0.1 + futura v1.1) |
+| Tag git em produção | `v1.0.0` |
+| Validação `dev` | `npm run pre-release` · 101 unit · 44+ E2E |
 
 ---
 
@@ -30,56 +31,62 @@ não confie em “deploy automático” para saber o que está no ar.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v1.0.0` |
-| **Commit** | `de88c0e` — merge `dev` (PRs #64–#66) + fix teste PPU |
-| **Versão npm** | `1.0.0` (`package.json`) |
-| **Publicado em** | 22/06/2026 — deploy `6a393af3` (netlify build + `--no-build`) |
-| **Método** | `npm run pre-release` + `npx netlify deploy --prod --no-build` |
-| **Site** | `sistema-bibi` |
-
-**Marco:** POC consolidada em versão **1.0** — quatro portais, Pay Per Use completo, walk-in particular, mapas CRUD/fluxo e melhorias visuais.
-
-**Inclui (desde `bibi-poc-2026-06-22c`):**
-
-- Navegação SPA fluida (layouts persistentes, breadcrumbs, mobile drawer)
-- Walk-in particular na recepção + confirmação de chegada
-- Mapa CRUD (27 entidades) e mapa de melhorias de fluxo
-- Edição inline em Cadastros (paciente, empresa, procedimento, usuário)
-- Melhorias visuais: `StatCard`, `FlowStepper`, `AppointmentCard`, `TabBar`
-- Jornada PPU: stepper Beneficiário/Prestador, cancelamento de consulta, PIX QR mock
-- Prestador: botão “Paciente presente” (`CONFIRMADO`)
-- Docs: `JORNADA_CLIENTE.md`, `AUDITORIA_FLUXOS.md`, `FLUXOS.md` §8.5–8.7
-- CI Node 24 · 88 testes unitários · 44 E2E
-
-**Validação pré-deploy:**
-
-- `npm run lint` — OK
-- `npm run test` — 88/88
-- `npm run test:e2e` — 44 (1 skip condicional)
-- `npm run pre-release` — OK
+| **Commit** | `de88c0e` |
+| **Publicado em** | 22/06/2026 — deploy `6a393af3` |
+| **Escopo** | POC consolidada — PRs #64–#66 (walk-in, mapas CRUD, melhorias visuais/fluxo) |
 
 ---
 
-## Próximo pacote (pendente)
+## Próximo pacote — produção (linha 1.0)
 
-*(Nenhum — aguardando próximo ciclo de desenvolvimento após 1.0.0)*
+### `v1.0.1` — agenda prestador + demo/operação
 
 | Campo | Valor |
 |-------|-------|
-| **Versão alvo** | `1.1.0` ou `1.0.1` (a definir) |
-| **Checklist** | `npm run pre-release` → cota OK → `deploy --prod --no-build` → tag |
+| **Versão** | `1.0.1` |
+| **Commit** | `a31e195` (merge `dev`) |
+| **Branch** | `dev` → merge `main` → deploy manual |
+| **Docs** | [`V1_0.md`](V1_0.md) |
+| **PRs incluídos** | #69 agenda/histórico prestador · #70 dev-first · #71 dual SQLite demo/operação |
+| **Checklist** | `npm run pre-release` → merge `dev`→`main` → cota OK → `deploy --prod --no-build` → tag `v1.0.1` → atualizar esta seção |
+
+**Não inclui:** cadastros v1.1 (PR #72) — permanece só na `dev`.
+
+---
+
+## Em desenvolvimento — somente `dev` (não produção)
+
+### `v1.1.0` — cadastros de mercado + CRUD confiável
+
+| Campo | Valor |
+|-------|-------|
+| **Versão alvo** | `1.1.0` |
+| **Branch** | `dev` (após merge PR #72) |
+| **PR** | #72 `cursor/v11-crud-cadastros-82f2` |
+| **Docs** | [`V1_1.md`](V1_1.md) |
+| **Produção** | ❌ Não publicar neste ciclo |
+
+---
+
+## Documentação por versão
+
+| Versão | Doc | Estado |
+|--------|-----|--------|
+| **1.0.x** | [`V1_0.md`](V1_0.md) | `v1.0.1` pendente deploy |
+| **1.1.x** | [`V1_1.md`](V1_1.md) | Só `dev` |
 
 ---
 
 ## Histórico de releases
 
-| Versão / Pacote | Commit | Data (UTC) | Método | Estado |
-|-----------------|--------|------------|--------|--------|
-| **`v1.0.0`** | `2395921` | 22/06/2026 | CLI `--prod --no-build` + tag | ✅ **Em produção** |
-| `bibi-poc-2026-06-22c` | `32dad64` | 22/06 ~03:50 | CLI `--prod --no-build` | ✅ Substituído por 1.0.0 |
-| `bibi-poc-2026-06-22b` | `92348ba` | 22/06 ~02:36 | CLI `--prod --no-build` | ✅ Substituído |
-| `bibi-poc-2026-06-22a` | `beeb894` | 22/06 ~00:01 | CLI `--prod` | ✅ Substituído |
-| `bibi-poc-2026-06-21b` | `94c0f67` | 21/06 23:37 | CLI `--prod` | ✅ Substituído |
-| `bibi-poc-2026-06-21a` | *(vários)* | 21/06 18:35+ | Git + CLI | ⚠️ Builds Git falharam |
+| Versão / Pacote | Commit | Data (UTC) | Estado |
+|-----------------|--------|------------|--------|
+| **`v1.0.0`** | `de88c0e` | 22/06/2026 | ✅ **Em produção** (será substituído por 1.0.1) |
+| `bibi-poc-2026-06-22c` | `32dad64` | 22/06/2026 | ✅ Substituído |
+| `bibi-poc-2026-06-22b` | `92348ba` | 22/06/2026 | ✅ Substituído |
+| `bibi-poc-2026-06-22a` | `beeb894` | 22/06/2026 | ✅ Substituído |
+| `bibi-poc-2026-06-21b` | `94c0f67` | 21/06/2026 | ✅ Substituído |
+| `bibi-poc-2026-06-21a` | *(vários)* | 21/06/2026 | ⚠️ Builds Git falharam |
 
 ### Deploys Git que falharam (não contam como release)
 
@@ -118,7 +125,7 @@ curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/
 npx netlify login    # se necessário
 npx netlify link     # site sistema-bibi
 npx netlify build    # build local com plugins Next.js (incluído no pre-release)
-npx netlify deploy --prod --no-build --message "v1.0.0: primeira versão estável"
+npx netlify deploy --prod --no-build --message "v1.0.1: agenda prestador + demo/operação"
 ```
 
 ### 4. Fechar o pacote (atualizar este arquivo)
@@ -131,9 +138,9 @@ npx netlify deploy --prod --no-build --message "v1.0.0: primeira versão estáve
 ### 5. Tag (recomendado para versões estáveis)
 
 ```bash
-git tag -a v1.0.0 -m "Release 1.0.0 — primeira versão estável"
+git tag -a v1.0.1 -m "Release 1.0.1 — agenda prestador + demo/operação"
 git push origin main
-git push origin v1.0.0
+git push origin v1.0.1
 ```
 
 ---

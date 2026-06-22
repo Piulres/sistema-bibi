@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { verifyPassword } from "@/lib/password";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { createSession } from "@/lib/session";
 import { PORTALS, type PortalKey } from "@/lib/roles";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { createMfaChallengeToken } from "@/lib/mfa";
 
 export async function POST(request: Request) {
+  const prisma = await getPrisma();
   let body: { email?: string; password?: string; portal?: string };
   try {
     body = await request.json();

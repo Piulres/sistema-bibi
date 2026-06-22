@@ -9,7 +9,7 @@ na Netlify a cada tarefa. Produção é atualizada só quando você fecha um
 ## Resumo em 30 segundos
 
 ```
-Desenvolver → testar local → npm run pre-release → (você decide) → deploy manual
+Desenvolver → testar local → PR → dev → (fechar pacote) → main → deploy manual
 ```
 
 | Fase | Onde | Comando / ação |
@@ -17,8 +17,18 @@ Desenvolver → testar local → npm run pre-release → (você decide) → depl
 | Codar | Cursor | branches `cursor/*` |
 | Testar | localhost | `npm run dev` ou `npm run netlify:dev` |
 | Validar pacote | máquina local | `npm run pre-release` |
+| Integrar | GitHub | **PR (draft) → `dev`** — nunca direto na `main` |
+| Release | GitHub | merge `dev` → `main` (humano, ao fechar pacote) |
 | Publicar | **só você** | `npx netlify deploy --prod` |
 | Registrar | git | atualizar `docs/RELEASES.md` |
+
+### Branches
+
+| Branch | Papel |
+|--------|-------|
+| `cursor/*` | Feature / bugfix do agente ou dev local |
+| `dev` | Integração — **base padrão de PRs** |
+| `main` | Release estável — deploy e produção |
 
 ---
 
@@ -118,6 +128,7 @@ Assim só publica quando você roda `netlify deploy --prod` ou clica “Trigger 
 
 | Regra | Detalhe |
 |-------|---------|
+| **PRs abrem na `dev`** | Base branch padrão; nunca `main` para feature/bugfix |
 | **Nunca** `netlify deploy --prod` | Salvo pedido explícito do usuário |
 | **Nunca** “verificar produção” em loop | Um `curl` basta; 503 = cota, não bug |
 | Preferir `npm run dev` + testes locais | Economiza tokens e cota |
@@ -156,6 +167,7 @@ Se retornar `{"error":"usage_exceeded",...}`:
 ## Links
 
 - Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
+- Demo vs operação: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md)
 - Pacotes e histórico: [`RELEASES.md`](RELEASES.md)
 - Deploy e troubleshooting: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 - Fluxos do sistema: [`FLUXOS.md`](FLUXOS.md)

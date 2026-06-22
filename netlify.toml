@@ -15,8 +15,9 @@
   NODE_VERSION = "22"
   # Garante devDependencies no npm ci (tailwind, tsx, typescript) quando NODE_ENV=production.
   NPM_FLAGS = "--include=dev"
-  # Path relativo ao schema Prisma (prisma/schema.prisma) → arquivo prisma/dev.db
+  # Path relativo ao schema Prisma (prisma/schema.prisma) → demo.db gerado no build
   DATABASE_URL = "file:./dev.db"
+  DUAL_DATA_STORE = "true"
   NETLIFY = "true"
   ALLOW_DEMO_RESET = "true"
   # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables).
@@ -34,6 +35,16 @@
   NETLIFY = "true"
   # POC demo: botão restaurar seed em /interno/seguranca (somente ADMIN)
   ALLOW_DEMO_RESET = "true"
+
+# Contexto de deploy para ambiente de OPERAÇÃO (Postgres — sem massa demo).
+# Uso: npx netlify deploy --prod --build --context operation
+# Requer DATABASE_URL=postgresql://... no painel Netlify.
+[context.operation.environment]
+  APP_MODE = "operation"
+  RUN_SEED_ON_BUILD = "false"
+  ALLOW_DEMO_RESET = "false"
+  NODE_ENV = "production"
+  NETLIFY = "true"
 
 [context.deploy-preview.environment]
   NODE_ENV = "production"

@@ -1,4 +1,5 @@
 import { describe, expect, it, afterEach } from "vitest";
+import { invalidateDataStoreModeCache } from "@/lib/data-store-mode";
 import {
   isDemoResetEnabled,
   isValidDemoResetConfirmation,
@@ -9,6 +10,8 @@ describe("demo-reset", () => {
   const originalNodeEnv = process.env.NODE_ENV;
   const originalFlag = process.env.ALLOW_DEMO_RESET;
   const originalNetlify = process.env.NETLIFY;
+  const originalAppMode = process.env.APP_MODE;
+  const originalDataStoreMode = process.env.DATA_STORE_MODE;
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
@@ -16,32 +19,44 @@ describe("demo-reset", () => {
     else process.env.ALLOW_DEMO_RESET = originalFlag;
     if (originalNetlify === undefined) delete process.env.NETLIFY;
     else process.env.NETLIFY = originalNetlify;
+    if (originalAppMode === undefined) delete process.env.APP_MODE;
+    else process.env.APP_MODE = originalAppMode;
+    if (originalDataStoreMode === undefined) delete process.env.DATA_STORE_MODE;
+    else process.env.DATA_STORE_MODE = originalDataStoreMode;
+    invalidateDataStoreModeCache();
   });
 
-  it("habilita reset fora de producao por padrao", () => {
+  it("habilita reset fora de producao por padrao", async () => {
     process.env.NODE_ENV = "development";
     delete process.env.ALLOW_DEMO_RESET;
-    expect(isDemoResetEnabled()).toBe(true);
+    expect(await isDemoResetEnabled()).toBe(true);
   });
 
-  it("habilita reset em producao Netlify POC (NETLIFY=true)", () => {
+  it("habilita reset em producao Netlify POC (NETLIFY=true)", async () => {
     process.env.NODE_ENV = "production";
     process.env.NETLIFY = "true";
     delete process.env.ALLOW_DEMO_RESET;
-    expect(isDemoResetEnabled()).toBe(true);
+    expect(await isDemoResetEnabled()).toBe(true);
   });
 
-  it("desabilita reset em producao fora da Netlify", () => {
+  it("desabilita reset em modo operacao", async () => {
+    process.env.APP_MODE = "operation";
+    process.env.NETLIFY = "true";
+    process.env.ALLOW_DEMO_RESET = "true";
+    expect(await isDemoResetEnabled()).toBe(false);
+  });
+
+  it("desabilita reset em producao fora da Netlify", async () => {
     process.env.NODE_ENV = "production";
     delete process.env.NETLIFY;
     delete process.env.ALLOW_DEMO_RESET;
-    expect(isDemoResetEnabled()).toBe(false);
+    expect(await isDemoResetEnabled()).toBe(false);
   });
 
-  it("respeita ALLOW_DEMO_RESET=true em producao", () => {
+  it("respeita ALLOW_DEMO_RESET=true em producao", async () => {
     process.env.NODE_ENV = "production";
     process.env.ALLOW_DEMO_RESET = "true";
-    expect(isDemoResetEnabled()).toBe(true);
+    expect(await isDemoResetEnabled()).toBe(true);
   });
 
   it("exige frase RESTAURAR", () => {

@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Operações Sistema Bibi
 
-Fonte canônica: `@docs/OPERACOES.md` · Pacotes: `@docs/RELEASES.md` · Workflow: `@docs/WORKFLOW_CURSOR.md`
+Fonte canônica: `@docs/OPERACOES.md` · Dados demo/operação: `@docs/OPERACAO_DADOS.md` · Pacotes: `@docs/RELEASES.md` · Workflow: `@docs/WORKFLOW_CURSOR.md`
 
 ## Princípios (melhores práticas)
 
@@ -18,19 +18,26 @@ Fonte canônica: `@docs/OPERACOES.md` · Pacotes: `@docs/RELEASES.md` · Workflo
 ## Modelo: pacotes fechados
 
 ```
-dev local → lint → pre-release → merge main → [humano] deploy manual → RELEASES.md
+dev local → lint → PR → merge dev → merge main → [humano] deploy manual → RELEASES.md
 ```
 
-`main` à frente de produção é **normal**. Produção ≠ último commit.
+| Branch | Papel |
+|--------|-------|
+| `cursor/*` | Feature do agente / desenvolvimento |
+| `dev` | **Integração** — destino de todos os PRs (draft ou não) |
+| `main` | **Release** — só recebe merge de `dev` ao fechar pacote |
+
+`main` à frente de produção é **normal**. Produção ≠ último commit. **PRs de feature nunca abrem direto na `main`.**
 
 ## Matriz rápida — o que fazer
 
 | Pedido | Ação do agente | Proibido |
 |--------|----------------|----------|
-| Feature / bugfix | `npm run dev`, testar local, `npm run lint` | deploy |
+| Feature / bugfix | `npm run dev`, testar local, `npm run lint`, PR → **`dev`** | deploy, PR → `main` |
 | Validar release | `npm run pre-release` | deploy |
 | Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
 | Publicar | Só com pedido explícito; seguir `@docs/OPERACOES.md` §5 | deploy autônomo |
+| Alternar demo/operação | Orientar `@docs/OPERACAO_DADOS.md` § produção | trocar `DATABASE_URL` manualmente |
 | Pós-deploy | Atualizar `@docs/RELEASES.md` | marcar publicado sem confirmação |
 
 ## Comandos
@@ -43,7 +50,7 @@ dev local → lint → pre-release → merge main → [humano] deploy manual →
 
 - URL: https://sistema-bibi.netlify.app
 - `503` + `usage_exceeded` = **cota Netlify**, não bug — dev local continua
-- Pacote no ar: `@docs/RELEASES.md` (`v1.0.0` @ `de88c0e`)
+- Pacote no ar: `@docs/RELEASES.md` (`v1.0.0` @ `de88c0e` — próximo: `v1.0.1`)
 
 ## Netlify — economia de cota (resumo)
 

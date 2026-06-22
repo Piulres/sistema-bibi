@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import {
   CommunicationProviderNotConfiguredError,
   sendEmail,
@@ -82,6 +82,7 @@ function mapMessage(msg: {
 }
 
 export async function listMessages(tenantId: string): Promise<MessageView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.message.findMany({
     where: { tenantId },
     include: { patient: { select: { name: true, phone: true } } },
@@ -91,6 +92,7 @@ export async function listMessages(tenantId: string): Promise<MessageView[]> {
 }
 
 export async function listPatientsForMessaging(tenantId: string) {
+  const prisma = await getPrisma();
   return prisma.patient.findMany({
     where: { tenantId },
     select: { id: true, name: true, phone: true },
@@ -107,6 +109,7 @@ export async function queueMessage(input: {
   body: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
   });
@@ -143,6 +146,7 @@ export async function dispatchMessage(input: {
   messageId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const message = await prisma.message.findFirst({
     where: { id: input.messageId, tenantId: input.tenantId },
     include: { patient: true },
@@ -227,6 +231,7 @@ export async function cancelMessage(input: {
   messageId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const message = await prisma.message.findFirst({
     where: { id: input.messageId, tenantId: input.tenantId },
     include: { patient: { select: { name: true, phone: true } } },

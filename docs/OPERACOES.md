@@ -21,11 +21,12 @@ flowchart LR
     D[npm run lint] --> E[npm run pre-release]
     E --> F{Passou?}
     F -->|Não| A
-    F -->|Sim| G[PR / merge main]
+    F -->|Sim| G[PR / merge dev]
   end
 
   subgraph Release["Release (raro, manual)"]
-    G --> H{Cota Netlify OK?}
+    G --> G2[merge dev → main]
+    G2 --> H{Cota Netlify OK?}
     H -->|503 usage_exceeded| I[Aguardar reset / upgrade]
     H -->|OK| J["npx netlify deploy --prod --no-build"]
     J --> K[Atualizar RELEASES.md]
@@ -81,6 +82,9 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
+| `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
+| `npm run db:bootstrap:operation` | Só `operation.db` (bootstrap mínimo) | Piloto operação local |
+| `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
 ---
@@ -89,10 +93,18 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 ### 4.1 Branch e PR
 
-1. Branch: `cursor/<descricao>-3ecd` (Cloud Agent) ou feature local.
+| Branch | Papel |
+|--------|-------|
+| `cursor/*` | Feature do Cloud Agent ou dev local |
+| `dev` | **Integração** — destino de todos os PRs |
+| `main` | **Release** — só merge de `dev` ao fechar pacote |
+
+1. Branch: `cursor/<descricao>-82f2` (Cloud Agent) ou feature local.
 2. Codar e testar com `npm run dev`.
 3. `npm run lint` antes de abrir PR.
-4. **Não** incluir deploy na PR — merge na `main` não publica produção.
+4. Abrir PR (draft ou pronto) com **base `dev`** — **nunca `main`**.
+5. Após integração em `dev`, merge `dev` → `main` só ao fechar pacote (humano).
+6. **Não** incluir deploy na PR — merge na `main` não publica produção automaticamente.
 
 ### 4.2 Testar fluxos localmente
 
@@ -108,13 +120,29 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](FLUXOS.md).
 
-### 4.3 Banco de dados local
+### 4.3 Banco de dados local e demo vs operação
 
 | Situação | Comando |
 |----------|---------|
 | VM nova / sem `dev.db` | `npm run db:push && npm run db:seed` |
+| Dual-store (demo + operação) | `npm run db:bootstrap:demo` |
+| Só banco de operação | `npm run db:bootstrap:operation` |
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
 | Recriar do zero | `npm run db:reset` — **só humano** (agentes bloqueados) |
+
+**Alternar demo ↔ operação** (mesmo site, SQLite + Blobs em produção):
+
+| Ambiente | Como alternar |
+|----------|---------------|
+| Local | `/interno/seguranca` → card “Base de dados” (ADMIN); modo em `prisma/.data-store-mode` |
+| Produção | Mesma UI; confirmar `OPERAR` ou `DEMO`; login novamente após trocar |
+
+| Modo | Conteúdo | Persistência em produção |
+|------|----------|--------------------------|
+| **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
+| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
+
+Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---
 
@@ -125,18 +153,20 @@ Produção **não** acompanha cada merge. Só sobe quando você fecha um pacote.
 ### 5.1 Ciclo de vida do pacote
 
 ```
-main acumula commits → pre-release OK → deploy manual → RELEASES.md atualizado
+dev acumula features → merge dev → main → pre-release OK → deploy manual → RELEASES.md
 ```
 
 | Estado | Onde ver | Significado |
 |--------|----------|-------------|
+| Em desenvolvimento | branch `dev` | Features integradas, ainda não em release |
 | Em produção | `RELEASES.md` → Pacote em produção | O que está (ou estava) no ar |
-| Pendente | `RELEASES.md` → Próximo pacote | `main` ainda não publicada |
+| Pendente release | `RELEASES.md` → Próximo pacote | `main` ainda não publicada |
 | Validado | `npm run pre-release` passou | Pronto para publicar, mas não publicado |
 
 ### 5.2 Checklist — publicar pacote
 
-- [ ] `git checkout main && git pull`
+- [ ] Features já integradas em `dev`
+- [ ] `git checkout main && git pull && git merge dev` (ou PR `dev` → `main`)
 - [ ] `npm run pre-release` — sem erros
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
 - [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
@@ -170,6 +200,8 @@ Exemplo atual em produção: **`v1.0.0`** (`de88c0e`). Ver [`RELEASES.md`](RELEA
 
 **Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
 
+**Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
 ---
 
 ## 7. Operações para agentes de IA
@@ -191,6 +223,7 @@ Detalhes também em `AGENTS.md`.
 | Ler `AGENTS.md` e `docs/OPERACOES.md` | Contexto do projeto |
 | `npm run dev` / testes locais | Validar sem custo |
 | `npm run lint` antes de finalizar | Qualidade |
+| Abrir PR com base **`dev`** | Integração antes de release |
 | `npm run pre-release` se pedirem “validar release” | Sem publicar |
 | Usar `db:push && db:seed` em VM nova | `db:reset` é bloqueado |
 | Consultar `RELEASES.md` para saber o que está em produção | Fonte única |
@@ -200,6 +233,7 @@ Detalhes também em `AGENTS.md`.
 | Ação | Motivo |
 |------|--------|
 | `npx netlify deploy --prod` | Queima cota + tokens |
+| PR direto na `main` (feature/bugfix) | Integrar em `dev` primeiro |
 | Loop de `curl` em produção | 503 = cota, não bug |
 | Tratar `503 usage_exceeded` como regressão | Plano Netlify |
 | `npm run db:reset` | Bloqueado / destrutivo |
@@ -232,6 +266,7 @@ Pedido de validação
 |--------|-----------|
 | Fechar pacote em produção | `docs/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
+| Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
@@ -245,7 +280,9 @@ Pedido de validação
 | Operação | Local (`dev`) | `netlify:dev` | Produção Netlify |
 |----------|---------------|---------------|------------------|
 | Codar / debug | ✅ | ✅ | ❌ agente |
-| SQLite persistente | ✅ | ✅ | ❌ efêmero `/tmp` |
+| SQLite demo | ✅ `demo.db` / `dev.db` | ✅ | ⚠️ efêmero `/tmp` por instância |
+| SQLite operação | ✅ `operation.db` | ✅ Blobs | ✅ Blobs (`operation.db`) |
+| Alternar demo ↔ operação | ✅ `/interno/seguranca` | ✅ | ✅ `/interno/seguranca` (ADMIN) |
 | Logos white-label | filesystem | Blobs | Blobs |
 | PIX / e-mail | mock / console | mock / console | mock / console |
 | Validar build | `pre-release` | `pre-release` | — |
@@ -257,6 +294,7 @@ Pedido de validação
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) | Demo vs operação, dual SQLite, Blobs, seletor |
 | [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) | Resumo workflow Cursor |
 | [`RELEASES.md`](RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |

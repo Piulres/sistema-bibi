@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import {
   confirmInvoicePixPayment,
@@ -9,6 +9,7 @@ import {
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(_request: Request, { params }: Params) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["BENEFICIARIO"]);
     const { id } = await params;
@@ -44,6 +45,7 @@ export async function POST(_request: Request, { params }: Params) {
 }
 
 export async function PATCH(request: Request, { params }: Params) {
+  const prisma = await getPrisma();
   try {
     const user = await requireUser(["BENEFICIARIO"]);
     const { id } = await params;

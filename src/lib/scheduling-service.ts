@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { createAppointment } from "@/lib/appointment-service";
 import {
   recordTimelineEvent,
@@ -29,6 +29,7 @@ export async function getAvailableSlots(input: {
   providerId: string;
   date: Date;
 }): Promise<{ slots: { start: string; label: string }[] }> {
+  const prisma = await getPrisma();
   const dayStart = startOfDay(input.date);
   const dayEnd = endOfDay(input.date);
 
@@ -108,6 +109,7 @@ export async function cancelBeneficiaryAppointment(input: {
   appointmentId: string;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const appointment = await prisma.appointment.findFirst({
     where: {
       id: input.appointmentId,

@@ -12,5 +12,6 @@ export {
 export {
   buildPatientBreadcrumbs,
   buildAtendimentoBreadcrumbs,
+  buildPatientHistoryBreadcrumbs,
   type BreadcrumbItem,
 } from "@/lib/navigation/breadcrumbs";

@@ -1,6 +1,8 @@
 import { getSessionUser } from "@/lib/session";
 import BeneficiarioPortalShell from "@/components/layout/BeneficiarioPortalShell";
 
+export const dynamic = "force-dynamic";
+
 export default async function BeneficiarioLayout({
   children,
 }: {

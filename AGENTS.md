@@ -20,7 +20,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Pacote em produção: **`v1.0.0`** (`de88c0e`). Ver `docs/RELEASES.md`.
+(cota Netlify). Pacote em produção: **`v1.0.0`** (`de88c0e`); próximo deploy: **`v1.0.1`** na `dev`. Ver `docs/RELEASES.md` e `docs/V1_0.md`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
 **Preferências IA:** `AGENTS.md` (esta seção) + `.cursor/rules/operacoes-bibi.mdc`.
@@ -75,14 +75,17 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 | Reset banco | `npm run db:reset` | ❌ Bloqueado |
 | Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
 | Atualizar release | `docs/RELEASES.md` | ❌ Só após deploy confirmado |
+| Abrir PR | base **`dev`** | ❌ PR direto na `main` |
 
-**Modelo:** pacotes fechados — `main` acumula código; produção muda só com deploy manual humano.
+**Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
+
+**Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
 **503 `usage_exceeded`:** cota Netlify, não bug. Não investigar em loop nem redeployar automaticamente.
 
 **Árvore rápida:**
-- Feature/bug → dev local + lint
-- Validar release → `pre-release`
+- Feature/bug → dev local + lint → PR → `dev`
+- Validar release → `pre-release` (na `main` após merge de `dev`)
 - Produção fora → `curl` uma vez; se `usage_exceeded`, avisar usuário
 - Publicar → só com pedido explícito; seguir `OPERACOES.md` §5
 
@@ -90,14 +93,17 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclui Netlify, CI, testes e **Cursor Cloud Agent**).
 
-- `DATABASE_URL` — SQLite (`file:./dev.db`)
+- `DATABASE_URL` — SQLite (`file:./dev.db`); dual-store gera `demo.db` + `operation.db` no build — ver `docs/OPERACAO_DADOS.md`
+- `DUAL_DATA_STORE` — seletor demo/operação (`true` em dev e Netlify)
+- `DATA_STORE_MODE` — modo inicial (`demo` \| `operation`) se Blobs vazio
 - `SESSION_SECRET` — cookie de sessão + MFA
 - `PAYMENT_GATEWAY=mock` — adapter PIX POC
 - `COMMUNICATION_PROVIDER=console` — e-mail no console
 - `CRON_SECRET` — jobs `/api/cron/*`
 - `TELEMEDICINE_BASE_URL` — salas de telemedicina mock
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
-- `ALLOW_DEMO_RESET` — restaurar demo na UI (padrão `true`)
+- `ALLOW_DEMO_RESET` — restaurar demo na UI (somente modo **demo** ativo)
+- **Demo vs operação:** `/interno/seguranca` (ADMIN) — `docs/OPERACAO_DADOS.md`
 
 ### Navegação SPA (layouts persistentes)
 

@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 
 function csvEscape(value: string | number | null | undefined): string {
@@ -12,6 +12,7 @@ function csvEscape(value: string | number | null | undefined): string {
 
 /** Relatório CSV de faturamento e procedimentos pendentes. */
 export async function buildBillingReportCsv(tenantId: string): Promise<string> {
+  const prisma = await getPrisma();
   const [invoices, pendingUsages] = await Promise.all([
     prisma.invoice.findMany({
       where: { tenantId },
@@ -65,6 +66,7 @@ export async function buildBillingReportCsv(tenantId: string): Promise<string> {
 
 /** Relatório CSV do pipeline CRM. */
 export async function buildCrmReportCsv(tenantId: string): Promise<string> {
+  const prisma = await getPrisma();
   const companies = await prisma.company.findMany({
     where: { tenantId },
     include: { _count: { select: { patients: true, invoices: true } } },

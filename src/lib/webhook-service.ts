@@ -1,6 +1,6 @@
 import "server-only";
 import crypto from "node:crypto";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 
 export const WEBHOOK_EVENTS = [
   "INVOICE_ISSUED",
@@ -83,6 +83,7 @@ async function recordDeliveryResult(input: {
   errorMessage?: string;
   attempt: number;
 }) {
+  const prisma = await getPrisma();
   if (input.ok) {
     await prisma.webhookDelivery.update({
       where: { id: input.deliveryId },
@@ -116,6 +117,7 @@ export async function dispatchWebhooks(input: {
   event: WebhookEvent;
   data: Record<string, unknown>;
 }): Promise<void> {
+  const prisma = await getPrisma();
   const endpoints = await prisma.webhookEndpoint.findMany({
     where: { tenantId: input.tenantId, active: true },
   });
@@ -181,6 +183,7 @@ export async function listWebhookDeliveries(
   tenantId: string,
   limit = 50,
 ): Promise<WebhookDeliveryView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.webhookDelivery.findMany({
     where: { tenantId },
     include: { webhook: { select: { label: true } } },
@@ -204,6 +207,7 @@ export async function listWebhookDeliveries(
 }
 
 export async function retryWebhookDelivery(tenantId: string, deliveryId: string) {
+  const prisma = await getPrisma();
   const delivery = await prisma.webhookDelivery.findFirst({
     where: { id: deliveryId, tenantId },
     include: { webhook: true },
@@ -244,6 +248,7 @@ export async function retryWebhookDelivery(tenantId: string, deliveryId: string)
 
 /** Processa fila de retries (cron). */
 export async function processWebhookRetries(): Promise<{ processed: number; succeeded: number }> {
+  const prisma = await getPrisma();
   const now = new Date();
   const pending = await prisma.webhookDelivery.findMany({
     where: {
@@ -296,6 +301,7 @@ export type WebhookView = {
 };
 
 export async function listWebhooks(tenantId: string): Promise<WebhookView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.webhookEndpoint.findMany({
     where: { tenantId },
     orderBy: { createdAt: "desc" },
@@ -319,6 +325,7 @@ export async function createWebhook(input: {
   secret?: string | null;
   events: WebhookEvent[];
 }) {
+  const prisma = await getPrisma();
   if (input.events.length === 0) {
     return { error: "Selecione ao menos um evento" as const };
   }
@@ -353,6 +360,7 @@ export async function createWebhook(input: {
 }
 
 export async function deleteWebhook(tenantId: string, webhookId: string) {
+  const prisma = await getPrisma();
   const existing = await prisma.webhookEndpoint.findFirst({
     where: { id: webhookId, tenantId },
   });
@@ -362,6 +370,7 @@ export async function deleteWebhook(tenantId: string, webhookId: string) {
 }
 
 export async function toggleWebhook(tenantId: string, webhookId: string, active: boolean) {
+  const prisma = await getPrisma();
   const existing = await prisma.webhookEndpoint.findFirst({
     where: { id: webhookId, tenantId },
   });

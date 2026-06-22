@@ -1,5 +1,5 @@
 import "server-only";
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { ROLES } from "@/lib/roles";
 import { isInternoProfile } from "@/lib/interno-permissions";
@@ -47,6 +47,7 @@ function mapUser(u: {
 }
 
 export async function listUsers(tenantId: string): Promise<UserListView[]> {
+  const prisma = await getPrisma();
   const rows = await prisma.user.findMany({
     where: { tenantId },
     orderBy: { name: "asc" },
@@ -65,6 +66,7 @@ export async function createUser(input: {
   internoProfile?: string | null;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   if (!isAssignableRole(input.role)) {
     return { error: "Perfil inválido" as const };
   }
@@ -122,6 +124,7 @@ export async function updateUser(input: {
   internoProfile?: string | null;
   createdBy: string;
 }) {
+  const prisma = await getPrisma();
   const existing = await prisma.user.findFirst({
     where: { id: input.userId, tenantId: input.tenantId },
   });
