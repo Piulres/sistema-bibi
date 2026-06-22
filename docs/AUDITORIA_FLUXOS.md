@@ -6,7 +6,7 @@ via API.
 
 **Data da auditoria:** 2026-06-22  
 **Commit de referência:** `93f466a` (HEAD no momento da auditoria)  
-**Relacionado:** [`FLUXOS.md`](FLUXOS.md) (fluxos esperados) · [`TESTES.md`](TESTES.md) (cobertura e riscos)
+**Relacionado:** [`FLUXOS.md`](FLUXOS.md) (fluxos esperados) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) (jornada UX e backlog) · [`TESTES.md`](TESTES.md) (cobertura e riscos)
 
 ---
 

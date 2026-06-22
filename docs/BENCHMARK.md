@@ -250,6 +250,7 @@ Escala: **0** ausente · **1** parcial/mock · **2** implementado alinhado ao me
 | Documento | Conteúdo relacionado |
 |-----------|---------------------|
 | [`FLUXOS.md`](FLUXOS.md) | Fluxos detalhados de cada ação |
+| [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) | Jornada UX nos 4 portais e backlog priorizado |
 | [`NOTEBOOKLM.md`](NOTEBOOKLM.md) | Tiers 1–4 e épicos |
 | [`ARQUITETURA.md`](ARQUITETURA.md) | Diagramas técnicos |
 | [`PAYMENTS.md`](PAYMENTS.md) | Motor de cobrança vs mercado |
