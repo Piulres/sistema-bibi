@@ -4,7 +4,10 @@
 
 ## Posicionamento recomendado
 
-O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, beneficiários e prestadores em um modelo transparente de consumo, eliminando desperdícios e permitindo cobrança baseada em uso real.
+O ServiceOS Bibi é uma **infraestrutura horizontal Pay Per Use** que conecta empresas,
+clientes finais e prestadores em múltiplos nichos (saúde, veterinária, odontologia,
+jurídico, bem-estar e educação) — eliminando desperdícios e permitindo cobrança baseada
+em uso real, com a mesma stack técnica para todos os verticais.
 
 ---
 
@@ -107,15 +110,17 @@ O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, ben
 
 ### Q3
 
+- **Expansão comercial Vet, Dental e Legal** — tenants demo ServiceOS v2.0
 - IA SOAP
 - IA resumo clínico
-- Analytics
+- Analytics multi-nicho
 
 ### Q4
 
 - Saúde populacional
 - Certificação SBIS
 - Marketplace de prestadores
+- **SPA e Educação** — verticais bem-estar e capacitação corporativa
 
 ---
 
@@ -129,9 +134,12 @@ O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, ben
 
 ## Pitch curto
 
-Sistema Bibi é uma plataforma SaaS de saúde corporativa que conecta empresas, beneficiários e prestadores em uma única operação digital.
+ServiceOS Bibi é uma infraestrutura SaaS multi-nicho que conecta empresas, clientes
+e prestadores em uma única operação digital — de clínicas a escritórios de advocacia.
 
-Diferente de ERPs clínicos tradicionais ou operadoras digitais, o Bibi oferece controle de consumo individualizado, cobrança Pay Per Use e arquitetura multi-tenant white-label preparada para escalar redes de saúde corporativa.
+Diferente de ERPs verticais ou operadoras digitais, o Bibi oferece controle de consumo
+individualizado, cobrança Pay Per Use e arquitetura multi-tenant white-label preparada
+para escalar qualquer nicho de serviços profissionais.
 
 ---
 

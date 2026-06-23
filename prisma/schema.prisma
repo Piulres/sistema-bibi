@@ -1,6 +1,6 @@
-// Sistema Bibi - HealthTech SaaS (POC)
-// Modelo inspirado na ERPMed/Centtralmed: multi-tenancy, Pay Per Use,
-// gestao de beneficiarios e faturamento de procedimentos.
+// Sistema Bibi v2.0 — ServiceOS Multi-Nicho (POC)
+// Infraestrutura horizontal Pay Per Use: Saúde, Veterinária, Odontologia,
+// Jurídico, Bem-estar e Educação via parametrização por tenant (niche + labels).
 //
 // Nota: SQLite nao suporta enums no Prisma; usamos String com valores
 // documentados nos comentarios de cada campo.
@@ -15,11 +15,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// Cliente do SaaS (clinica ou hospital). Base da segregacao multi-tenant.
+/// Cliente do SaaS (clínica, escritório, pet shop, etc.). Base da segregação multi-tenant.
 model Tenant {
   id        String   @id @default(cuid())
   name      String
   cnpj      String   @unique
+  /// Nicho operacional: MEDICAL | VET | DENTAL | LEGAL | SPA | EDUCATION
+  niche     String   @default("MEDICAL")
+  /// JSON — dicionário de termos da UI (ex.: patient → "Pet" no nicho VET)
+  labels    String?
   createdAt DateTime @default(now())
 
   users        User[]
@@ -174,17 +178,19 @@ model Patient {
   messages       Message[]
 }
 
-/// Catalogo de procedimentos (consultas e exames) com preco base.
-/// category: CONSULTA | EXAME
+/// Catálogo de serviços agnóstico — consulta médica, hora técnica jurídica, banho e tosa, etc.
+/// category: CONSULTA | EXAME | SERVICO | SESSAO | OCUPACIONAL
+/// serviceType: classificação livre por nicho (ex.: CLINICA, JURIDICO, ESTETICA)
 model Procedure {
-  id        String   @id @default(cuid())
-  code      String
-  name      String
-  category  String
-  basePrice Float
-  /// Código TUSS/ANS para guia TISS (Tier 4)
-  tissCode  String?
-  createdAt DateTime @default(now())
+  id          String   @id @default(cuid())
+  code        String
+  name        String
+  category    String
+  serviceType String?
+  basePrice   Float
+  /// Código regulatório opcional (TUSS/ANS, OAB, etc.)
+  tissCode    String?
+  createdAt   DateTime @default(now())
 
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id])

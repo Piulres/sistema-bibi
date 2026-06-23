@@ -148,7 +148,7 @@ export function isTelemedicineAppointment(
   return salt % 100 < profile.telemedicineRatio * 100;
 }
 
-const DISCOUNTABLE_CATEGORIES = new Set(["CONSULTA", "OCUPACIONAL"]);
+const DISCOUNTABLE_CATEGORIES = new Set(["CONSULTA", "OCUPACIONAL", "SERVICO", "SESSAO"]);
 
 export function chargePrice(
   category: string,

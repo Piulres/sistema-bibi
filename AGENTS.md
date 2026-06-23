@@ -6,13 +6,21 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Cursor Cloud specific instructions
 
-### O que é o Sistema Bibi
-POC de plataforma SaaS HealthTech (multi-tenant) com **quatro portais** segregados por
-`role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
+### O que é o Sistema Bibi (ServiceOS v2.0)
+Infraestrutura horizontal **ServiceOS** (evolução da POC HealthTech) com **quatro portais**
+segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
 (`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
-**Pay Per Use** (cobra apenas procedimentos efetivamente usados, com precificação
-dinâmica por empresa).
+**Pay Per Use** sobre qualquer tipo de serviço (consulta médica, hora jurídica, aula de yoga…).
+
+**Multi-nicho (v2.0):** cada `Tenant` possui `niche` (`MEDICAL`|`VET`|`DENTAL`|`LEGAL`|`SPA`|`EDUCATION`)
+e `labels` (JSON) para tradução automática da UI. Hook `useNiche()` nos portais.
+Paletas white label por nicho. Ver `docs/V2_0_ARCHITECTURE.md`.
+
+**Dicionários por tenant para IAs:** o campo `Tenant.labels` armazena termos específicos
+do nicho (ex.: "Paciente" → "Pet" no VET, → "Cliente" no LEGAL). Agentes e RAG devem
+carregar `niche` + `labels` do tenant ativo ao gerar conteúdo contextualizado — ver
+`src/lib/niche/defaults.ts` para defaults e `src/hooks/useNiche.ts` para consumo na UI.
 
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise

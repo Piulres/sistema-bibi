@@ -27,6 +27,8 @@ export default function PjPortalShell({ user, children }: Props) {
       loginPath={portal.loginPath}
       userName={user.name}
       branding={user.branding}
+      niche={user.niche}
+      labels={user.labels}
     >
       <SectionNav
         sections={PJ_SECTION_NAV}

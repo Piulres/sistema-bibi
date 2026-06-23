@@ -33,6 +33,8 @@ export default function InternoPortalShell({ user, children }: Props) {
       loginPath={portal.loginPath}
       userName={user.name}
       branding={user.branding}
+      niche={user.niche}
+      labels={user.labels}
     >
       <InternoNav permissions={user.internoPermissions} />
       <div className="portal-page-content mt-8 min-w-0">{children}</div>

@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { buildLandingDescription } from "@/lib/landing/content";
 import { getSiteUrl } from "@/lib/landing/site-url";
+import { resolveLandingNiche } from "@/lib/niche/resolve";
+import { nicheLandingBranding } from "@/lib/niche/branding";
+import { getNicheConfig } from "@/lib/niche/defaults";
 import TenantTheme from "@/components/layout/TenantTheme";
 import LandingHeader from "@/components/landing/LandingHeader";
-import LandingHero from "@/components/landing/LandingHero";
+import LandingHeroNiche from "@/components/landing/LandingHeroNiche";
 import LandingStats from "@/components/landing/LandingStats";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingHowItWorks from "@/components/landing/LandingHowItWorks";
@@ -15,10 +19,13 @@ import LandingFooter from "@/components/landing/LandingFooter";
 import LandingJsonLd from "@/components/landing/LandingJsonLd";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = getPlatformBranding();
+  const h = await headers();
+  const resolved = await resolveLandingNiche(h.get("host"));
+  const config = getNicheConfig(resolved.niche);
+  const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
   const siteUrl = getSiteUrl();
-  const title = `${branding.displayName} — Gestão Inteligente em Saúde`;
-  const description = buildLandingDescription(branding.tagline);
+  const title = `${branding.displayName} — ${config.name} · ServiceOS Pay Per Use`;
+  const description = buildLandingDescription(config.tagline);
 
   return {
     title,
@@ -46,27 +53,26 @@ export async function generateMetadata(): Promise<Metadata> {
       googleBot: { index: true, follow: true },
     },
     keywords: [
-      "healthtech",
-      "saas saúde",
+      "serviceos",
       "pay per use",
-      "prontuário eletrônico",
-      "faturamento clínico",
-      "saúde corporativa",
+      "multi-nicho",
       "white label",
-      "LGPD",
+      ...config.landing.keywords,
     ],
   };
 }
 
 export default async function Home() {
-  const branding = getPlatformBranding();
+  const h = await headers();
+  const resolved = await resolveLandingNiche(h.get("host"));
+  const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
       <LandingJsonLd branding={branding} />
       <LandingHeader branding={branding} />
       <main id="conteudo-principal" className="flex-1">
-        <LandingHero branding={branding} />
+        <LandingHeroNiche niche={resolved.niche} branding={branding} />
         <LandingStats />
         <LandingFeatures />
         <LandingHowItWorks />

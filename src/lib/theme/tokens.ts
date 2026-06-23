@@ -20,10 +20,10 @@ export const CLINIC_BRANDING_DEFAULTS = {
 
 /** Identidade comercial da plataforma (landing e marketing). */
 export const PLATFORM_BRANDING: BrandingTokens = {
-  displayName: "Sistema Bibi",
-  tagline: "Gestão inteligente em saúde para clínicas e operadoras",
+  displayName: "ServiceOS Bibi",
+  tagline: "Infraestrutura Pay Per Use multi-nicho para serviços profissionais",
   ...SHARED_BRAND_COLORS,
-  platformLabel: "Plataforma SaaS HealthTech",
+  platformLabel: "ServiceOS · Pay Per Use Multi-Nicho",
 };
 
 /** Shell neutro dos logins públicos quando o tenant não é resolvido por domínio. */

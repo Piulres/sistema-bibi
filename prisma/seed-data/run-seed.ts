@@ -31,6 +31,8 @@ import {
 } from "./scenarios";
 import { resolveSeedScale } from "./scale";
 import { seedVitacareTenant } from "./vitacare";
+import { seedNicheTenants } from "./niche-tenants";
+import { getNicheConfig } from "../../src/lib/niche/defaults";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
 import { seedMedicalStock } from "./stock-demo";
@@ -88,6 +90,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     data: {
       name: "Clínica Horizonte",
       cnpj: "12.345.678/0001-90",
+      niche: "MEDICAL",
+      labels: JSON.stringify(getNicheConfig("MEDICAL").labels),
       branding: {
         create: {
           displayName: "Clínica Horizonte",
@@ -787,6 +791,9 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("\nPopulando tenant VitaCare (white-label)...");
   const vitacareStats = await seedVitacareTenant(prisma, DEMO_PASSWORD, scale);
 
+  console.log("\nPopulando tenants ServiceOS multi-nicho (v2.0)...");
+  const nicheStats = await seedNicheTenants(prisma, DEMO_PASSWORD);
+
   const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
   const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });
   const pjCount = await prisma.user.count({ where: { tenantId: tenant.id, role: "PJ" } });
@@ -806,6 +813,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log(`  Faturas Bibi: ${invoiceCount}`);
   console.log(`  Procedimentos pendentes de faturamento: ${pendingUsages}`);
   console.log(`  VitaCare: ${vitacareStats.companies} empresas · ${vitacareStats.patients} beneficiarios`);
+  console.log(`  ServiceOS nichos: ${nicheStats.tenants} tenants · ${nicheStats.procedures} procedimentos demo`);
   console.log("\nMassa operacional Bibi (esta execucao):");
   console.log(`  +${massStats.appointments} agendamentos · +${massStats.procedureUsages} procedimentos`);
   console.log(`  +${massStats.medicalRecords} prontuarios · +${massStats.invoices} faturas · +${massStats.payments} pagamentos`);
@@ -825,6 +833,12 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("  Beneficiario -> /beneficiario/login  : pedro.almeida@email.com / bibi123 (particular)");
   console.log("  VitaCare     -> /interno/login       : operacao@vitacare.demo / bibi123");
   console.log("  VitaCare PJ  -> /pj/login            : rh@vitacarecorp.demo / bibi123");
+  console.log("\nServiceOS multi-nicho (v2.0) — senha bibi123:");
+  console.log("  PetCare (VET)     -> /interno/login : operacao@petcare.demo");
+  console.log("  Smile (DENTAL)    -> /interno/login : operacao@smile.demo");
+  console.log("  Lex (LEGAL)       -> /interno/login : operacao@lex.demo");
+  console.log("  Zen (SPA)         -> /interno/login : operacao@zen.demo");
+  console.log("  EduPrime (EDU)    -> /interno/login : operacao@eduprime.demo");
   console.log("\nSEED_SCALE=small|medium|large no .env controla volume da massa");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
 

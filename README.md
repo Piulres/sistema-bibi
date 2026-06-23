@@ -1,8 +1,9 @@
-# Sistema Bibi
+# Bibi v2.0: ServiceOS — Infraestrutura Pay Per Use Multi-Nicho
 
-> Plataforma SaaS **HealthTech** (POC) para gestão inteligente de clínicas e
-> hospitais, inspirada no modelo **ERPMed/Centtralmed**. Foco em **Pay Per Use**,
-> previsibilidade financeira, extinção da burocracia e fidelização de pacientes.
+> Plataforma SaaS **ServiceOS** para gestão inteligente de serviços profissionais em
+> múltiplos nichos (Saúde, Veterinária, Odontologia, Jurídico, Bem-estar e Educação).
+> Inspirada no modelo **ERPMed/Centtralmed**, com foco em **Pay Per Use**, previsibilidade
+> financeira e white label por tenant.
 
 ---
 
@@ -27,18 +28,39 @@
 
 ## 1. Visão geral
 
-O Sistema Bibi é uma plataforma multi-tenant (cada clínica/hospital é um *tenant*)
-com **quatro portais segregados** por perfil de acesso. O objetivo da POC é
-demonstrar o modelo de negócio **Pay Per Use**: o beneficiário paga apenas pelos
-serviços (consultas e exames) efetivamente utilizados, com transparência prévia
-de valores e faturamento sem perdas de informação.
+O **ServiceOS Bibi** é uma infraestrutura multi-tenant horizontal: o mesmo código-core
+suporta clínicas, pet shops, consultórios odontológicos, escritórios de advocacia,
+spas e escolas — alterando apenas nomenclatura (labels) e identidade visual por nicho.
+
+Cada operação é um *tenant* com **quatro portais segregados** por perfil de acesso.
+O modelo **Pay Per Use** cobra apenas serviços efetivamente utilizados, com transparência
+prévia de valores e faturamento sem perdas de informação — de consultas médicas a
+horas técnicas jurídicas ou aulas de yoga.
 
 | Portal | Público | Foco |
 |--------|---------|------|
-| **Portal do Prestador** | Médicos / profissionais de saúde | Agenda inteligente e prontuário eletrônico (PEP) |
-| **Portal Interno** | Equipe administrativa | Dashboard executivo, faturamento, CRM, recorrência e comunicação |
-| **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
-| **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
+| **Portal do Prestador** | Profissionais (médicos, advogados, instrutores…) | Agenda e registro de serviços |
+| **Portal Interno** | Equipe administrativa | Dashboard, faturamento, CRM e comunicação |
+| **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários/clientes |
+| **Portal do Beneficiário** | Clientes finais | Agenda, consumo Pay Per Use e faturas |
+
+### ROI demonstrável multi-nicho
+
+O take rate incide sobre **qualquer transação de serviço** processada na plataforma:
+
+| Nicho | Exemplo de serviço | Preço demo | Volume típico/mês* |
+|-------|-------------------|------------|-------------------|
+| Saúde | Consulta clínica | R$ 320 | 200+ atendimentos/clínica |
+| Veterinária | Banho e tosa | R$ 95 | 150+ serviços/pet shop |
+| Odontologia | Consulta odontológica | R$ 350 | 80+ consultas/consultório |
+| Jurídico | Parecer jurídico | R$ 600 | 40+ entregas/escritório |
+| Bem-estar | Aula de yoga | R$ 120 | 300+ sessões/estúdio |
+| Educação | Aula particular | R$ 150 | 120+ aulas/escola |
+
+\*Estimativas do seed operacional; ver `prisma/seed-data/niche-tenants.ts`.
+
+**Um único deploy** atende de clínicas a escritórios de advocacia — reduzindo custo de
+infraestrutura e acelerando time-to-market para novos verticais sem fork de código.
 
 ## 2. Pilares de negócio
 

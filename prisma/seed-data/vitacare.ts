@@ -52,6 +52,7 @@ export async function seedVitacareTenant(
     data: {
       name: "Rede VitaCare",
       cnpj: "99.888.777/0001-11",
+      niche: "MEDICAL",
       branding: {
         create: {
           displayName: "VitaCare",
