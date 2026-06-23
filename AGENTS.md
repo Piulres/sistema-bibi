@@ -20,7 +20,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v1.0.2`**; `dev` **1.1.0** @ `78d0177` (sincronizada com `main`). Ver `docs/RELEASES.md`.
+(cota Netlify). Produção: **`v1.1.0`** Care Chart @ `8c8cd01`; `dev` integra próximo pacote. Ver `docs/RELEASES.md` e `docs/V1_1.md`.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).

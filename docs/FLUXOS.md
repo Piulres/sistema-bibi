@@ -150,7 +150,9 @@ Quando `User.mfaEnabled = true`:
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/pacientes` | `PrestadorPatientsView` | Buscar pacientes com atendimentos do provider |
+| `/prestador/paciente/[id]` | `PrestadorPatientHistoryView` | Histórico + Care Chart (PEP, meds, exames, protocolos) |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, Care Chart, marcar REALIZADO |
 
 ### APIs disparadas
 
@@ -161,6 +163,11 @@ Quando `User.mfaEnabled = true`:
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
+| Care Chart (sidebar) | `GET /api/prestador/patients/[id]/clinical-overview` | Perfil + meds ativas + exames pendentes + protocolos |
+| Perfil clínico | `PUT /api/prestador/patients/[id]/clinical-profile` | Alergias, comorbidades, tipo sanguíneo |
+| Prescrever medicação | `POST .../patients/[id]/medications` | `MedicationPrescription` status `ATIVA` |
+| Solicitar exame | `POST .../patients/[id]/exam-orders` | `ExamOrder` status `SOLICITADO` |
+| Matricular protocolo | `POST .../patients/[id]/protocols` | `PatientProtocolEnrollment` |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
 ```mermaid
@@ -168,12 +175,28 @@ flowchart LR
   A[Agenda do dia] --> B[Atendimento]
   B --> C[Registrar ProcedureUsage]
   B --> D[Salvar PEP]
+  B --> G[Care Chart]
   B --> E[Marcar REALIZADO]
   C --> F[(billed=false)]
 ```
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
 (ex.: TechCorp 0,85 → Consulta Clínica R$ 180 → **R$ 153** congelado em `priceCharged`).
+
+### 3.1 Care Chart (v1.1.0)
+
+Módulo clínico estendido além do PEP textual. Documentação completa: [`V1_1.md`](V1_1.md).
+
+| Área | Rota / componente | Capacidades |
+|------|-------------------|-------------|
+| Lista de pacientes | `/prestador/pacientes` | Busca por nome/CPF (pacientes com consultas do provider) |
+| Histórico | `/prestador/paciente/[id]` | PEP + `ClinicalCarePanel` (perfil, meds, exames, protocolos) |
+| Atendimento | `/prestador/atendimento/[id]` | Sidebar clínica + painel Care Chart no fluxo do dia |
+| Status meds | `PATCH /api/prestador/medications/[id]` | `ATIVA` \| `SUSPENSA` \| `ENCERRADA` |
+| Status exames | `PATCH /api/prestador/exam-orders/[id]` | `SOLICITADO` → `AGENDADO` → `REALIZADO` → `LAUDADO` |
+| Protocolos | `PATCH /api/prestador/protocols/[id]` | Checklist JSON + status `ATIVO` \| `CONCLUIDO` \| `SUSPENSO` |
+
+Demo seed: `joao.pereira@email.com` — perfil HAS/DM2, Losartana, HbA1c pendente, protocolo HAS.
 
 ---
 
@@ -196,7 +219,7 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
-| *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
+| *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + aba clínica Care Chart + export LGPD |
 
 Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
 
@@ -252,9 +275,12 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| **Protocolos clínicos** | `/api/interno/protocol-templates` | `PATCH .../protocol-templates/[id]` | `DELETE` | Templates reutilizáveis (checklist JSON) |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
+
+**Cliente 360° — visão clínica:** `GET /api/interno/patients/[id]/clinical` → perfil, medicações, exames e protocolos (somente leitura no interno; edição pelo prestador).
 
 ### 4.4 CRM (`CrmPipelineView`)
 
@@ -343,6 +369,7 @@ flowchart LR
 | Consumo Pay Per Use | Procedimentos billed/não billed |
 | Faturas | Pagar com PIX (status FECHADA) |
 | Assinatura / PEP / Timeline | Somente leitura |
+| **Care Chart** | Medicações ativas, exames e protocolos (somente leitura) |
 
 | Ação | API | Serviço |
 |------|-----|---------|
@@ -352,6 +379,7 @@ flowchart LR
 | Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
 | PIX | `POST /api/beneficiario/invoices/[id]/pay` | `createInvoicePixCharge()` |
 | Confirmar PIX | `PATCH .../pay` `{ paymentId }` | `confirmInvoicePixPayment()` |
+| Care Chart | `GET /api/beneficiario/clinical` | Perfil, meds, exames, protocolos (anti-IDOR via `patientId`) |
 
 ---
 
@@ -583,10 +611,14 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
+`GET /api/prestador/patients` · `GET .../patients/[id]/clinical-overview` ·
+`GET|PUT .../clinical-profile` · `GET|POST .../medications` · `PATCH /api/prestador/medications/[id]` ·
+`GET|POST .../exam-orders` · `PATCH /api/prestador/exam-orders/[id]` ·
+`GET|POST .../protocols` · `PATCH /api/prestador/protocols/[id]`
 
 ### Beneficiário
-`GET /api/beneficiario/overview|providers|slots` ·
+`GET /api/beneficiario/overview|providers|slots|clinical` ·
 `POST /api/beneficiario/appointments` ·
 `PATCH /api/beneficiario/appointments/[id]` ·
 `POST|PATCH /api/beneficiario/invoices/[id]/pay`
@@ -596,8 +628,9 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
-`companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`companies/*` · `procedures/*` · `users/*` · `protocol-templates/*` ·
+`subscriptions/*` · `messages/*` · `reminders` · `crm/pipeline` · `reports` ·
+`branding/*` · `webhooks/*`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`

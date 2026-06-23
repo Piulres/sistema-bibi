@@ -36,6 +36,7 @@ flowchart TB
       Auth["api-auth.ts<br/>(requireUser/role)"]
       Price["pricing.ts<br/>(precificação dinâmica)"]
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
+      Clinical["clinical-*-service.ts<br/>clinical-overview.ts<br/>(Care Chart v1.1)"]
       Timeline["timeline.ts<br/>(auditoria universal)"]
       Payments["payments/* + invoice-service<br/>(PIX mock Tier 1)"]
       Comms["communications/* + reminder-service<br/>(console adapter Tier 1)"]
@@ -54,6 +55,7 @@ flowchart TB
   API --> Auth --> Sess
   API --> Price
   API --> Overview --> DB
+  API --> Clinical --> DB
   API --> Timeline --> DB
   API --> Payments
   API --> Comms
@@ -87,7 +89,14 @@ erDiagram
 
   Patient ||--o{ Appointment : "agenda"
   Patient ||--o{ MedicalRecord : "prontuário"
+  Patient ||--o| PatientClinicalProfile : "perfil Care Chart"
+  Patient ||--o{ MedicationPrescription : "prescrições"
+  Patient ||--o{ ExamOrder : "exames"
+  Patient ||--o{ PatientProtocolEnrollment : "protocolos"
   Patient ||--o{ Invoice : "faturado"
+
+  Tenant ||--o{ CareProtocolTemplate : "templates protocolo"
+  CareProtocolTemplate ||--o{ PatientProtocolEnrollment : "matrículas"
 
   Procedure ||--o{ PricingRule : "ajustado por"
   Procedure ||--o{ ProcedureUsage : "usado em"
