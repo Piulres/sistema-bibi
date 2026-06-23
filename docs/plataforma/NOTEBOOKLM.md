@@ -452,7 +452,7 @@ src/
 → `/interno` (Faturamento) → coluna **Ações** na tabela de faturas: botões **PIX** e **Marcar paga** (Tier 1). Beneficiário paga em `/beneficiario`.
 
 **Onde está o fluxo completo do sistema?**
-→ [`docs/produto/FLUXOS.md`](FLUXOS.md) — diagramas Mermaid, RBAC, máquinas de estado e Pay Per Use E2E.
+→ [`../produto/FLUXOS.md`](../produto/FLUXOS.md) — diagramas Mermaid, RBAC, máquinas de estado e Pay Per Use E2E.
 
 **Por que dispatch de mensagem falha?**
 → Configure `COMMUNICATION_PROVIDER=console` (POC) ou registre adapter real (SendGrid, etc.).

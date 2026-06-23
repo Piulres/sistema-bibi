@@ -56,7 +56,7 @@ Para atingir mercado **enterprise**, o Bibi evolui de plataforma de gestão para
 
 **FATO:** Memed integra via API/widget no fluxo do atendimento — ver etapas em doc 07 §2.1.
 
-**FATO:** Motor de comunicação já prevê `WhatsAppProvider` em Strategy Pattern ([`docs/COMMUNICATIONS.md`](../../docs/COMMUNICATIONS.md)).
+**FATO:** Motor de comunicação já prevê `WhatsAppProvider` em Strategy Pattern ([`../plataforma/COMMUNICATIONS.md`](../plataforma/COMMUNICATIONS.md)).
 
 ### Certificação SBIS PEP
 

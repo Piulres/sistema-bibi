@@ -6,7 +6,7 @@ agentes de IA (Cursor / Cloud Agent).
 
 > **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Labels:** `useLabels()` + `src/constants/niches.ts`
 
-**Leitura rápida:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Pacotes:** [`RELEASES.md`](RELEASES.md) · **Deploy:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
+**Leitura rápida:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Pacotes:** [`RELEASES.md`](../versoes/RELEASES.md) · **Deploy:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 
 ---
 
@@ -130,7 +130,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | SPA (Zen) | `operacao@zen.demo` |
 | EDUCATION (EduPrime) | `operacao@eduprime.demo` |
 
-Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](FLUXOS.md).
+Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
 
 ### 4.3 Banco de dados local e demo vs operação
 
@@ -183,7 +183,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
 - [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
 - [ ] Smoke test: landing + um login por portal
-- [ ] Atualizar [`RELEASES.md`](RELEASES.md) (mover rascunho → produção)
+- [ ] Atualizar [`RELEASES.md`](../versoes/RELEASES.md) (mover rascunho → produção)
 - [ ] Commit: `docs(release): fecha pacote bibi-poc-YYYY-MM-DDx`
 - [ ] (Opcional) Tag git: `git tag -a bibi-poc-...`
 
@@ -310,12 +310,12 @@ Pedido de validação
 |-----------|----------|
 | [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) | Demo vs operação, dual SQLite, Blobs, seletor |
 | [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) | Resumo workflow Cursor |
-| [`RELEASES.md`](RELEASES.md) | Pacotes fechados e histórico |
+| [`RELEASES.md`](../versoes/RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |
-| [`FLUXOS.md`](FLUXOS.md) | Fluxos de negócio |
+| [`FLUXOS.md`](../produto/FLUXOS.md) | Fluxos de negócio |
 | [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) | Jornada UX nos 4 portais |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
-| [`evidencias/README.md`](evidencias/README.md) | Vídeos e screenshots |
+| [`evidencias/README.md`](../evidencias/README.md) | Vídeos e screenshots |
 | [`AGENTS.md`](../AGENTS.md) | Instruções para IA |
 | [`.cursor/rules/operacoes-bibi.mdc`](../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |
 | [`.cursor/rules/netlify-release.mdc`](../.cursor/rules/netlify-release.mdc) | Deploy e release (ativação inteligente) |

@@ -176,7 +176,7 @@ Respostas anônimas. Uso apenas para benchmark interno.
 |------------|-------------------|
 | Perplexity | Principal (fontes + URLs) |
 | ChatGPT / Claude | Principal, iterando por camada A–J |
-| NotebookLM | Principal + upload de `docs/pesquisa/*.md` e `docs/BENCHMARK.md` |
+| NotebookLM | Principal + upload de `docs/pesquisa/*.md` e `docs/plataforma/BENCHMARK.md` |
 | Entrevistas | Formulário de entrevista |
 
 ---

@@ -5,7 +5,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 
 > **v2.0:** nomenclatura dinâmica por nicho (`useLabels()`). Escopo: [`V2_0.md`](V2_0.md).
 
-Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](BENCHMARK.md)
+Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
 Última revisão: **ServiceOS v2.0** — labels por tenant, landing segmentada, tenants demo multi-nicho.
@@ -339,7 +339,7 @@ Escala por dimensão de jornada (não cobertura de código).
 
 Legenda: ✅ implementado · 🟡 parcial/mock · ❌ ausente · ⭐ diferencial vs mercado clínico.
 
-Scorecard vs concorrentes: [`BENCHMARK.md`](BENCHMARK.md) §4.
+Scorecard vs concorrentes: [`BENCHMARK.md`](../plataforma/BENCHMARK.md) §4.
 
 ---
 
@@ -360,7 +360,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 | 9 | Status tracker cross-portal | Todos | Visibilidade do ciclo PPU | 5+ | **Parcial:** `FlowStepper` Beneficiário/Prestador |
 | 10 | Gateway PIX real (Asaas/Efí) | Beneficiário, Interno | Receita em produção | 5 |
 
-Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHMARK.md`](BENCHMARK.md) §5.
+Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHMARK.md`](../plataforma/BENCHMARK.md) §5.
 
 ---
 
@@ -371,12 +371,12 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 | [`FLUXOS.md`](FLUXOS.md) | Ações técnicas, APIs, RBAC, máquinas de estado, §8.7 melhorias de fluxo |
 | `src/lib/flow-improvements-map.ts` | Mapa canônico implementado vs backlog |
 | [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) | Falhas mapeadas por portal (segurança, RBAC API, bugs) |
-| [`BENCHMARK.md`](BENCHMARK.md) | Posicionamento vs iClinic/Feegow/ERPMed |
-| [`PAYMENTS.md`](PAYMENTS.md) | Motor PIX e ciclo de cobrança |
-| [`COMMUNICATIONS.md`](COMMUNICATIONS.md) | Lembretes e fila de mensagens |
-| [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens) |
+| [`BENCHMARK.md`](../plataforma/BENCHMARK.md) | Posicionamento vs iClinic/Feegow/ERPMed |
+| [`PAYMENTS.md`](../plataforma/PAYMENTS.md) | Motor PIX e ciclo de cobrança |
+| [`COMMUNICATIONS.md`](../plataforma/COMMUNICATIONS.md) | Lembretes e fila de mensagens |
+| [`DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens) |
 | [`evidencias/README.md`](evidencias/README.md) | Screenshots e vídeos dos fluxos validados |
-| [`OPERACOES.md`](OPERACOES.md) | Quando atualizar esta documentação |
+| [`OPERACOES.md`](../plataforma/OPERACOES.md) | Quando atualizar esta documentação |
 
 ---
 

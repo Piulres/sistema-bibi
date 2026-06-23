@@ -189,7 +189,7 @@ PAYMENT_GATEWAY=mock
 
 ### Credenciais de gateways (planejadas — não lidas pelo código hoje)
 
-Documentadas para integração futura. Ver [`docs/PAYMENTS.md`](PAYMENTS.md).
+Documentadas para integração futura. Ver [`PAYMENTS.md`](PAYMENTS.md).
 
 ```env
 ASAAS_API_KEY=
@@ -218,7 +218,7 @@ COMMUNICATION_PROVIDER=console
 
 ### Credenciais de provedores (planejadas — não lidas pelo código hoje)
 
-Ver [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md).
+Ver [`COMMUNICATIONS.md`](COMMUNICATIONS.md).
 
 ```env
 SENDGRID_API_KEY=
@@ -268,7 +268,7 @@ O script [`scripts/netlify-build.mjs`](../scripts/netlify-build.mjs) no build:
 2. Grava `.env` temporário com `DATABASE_URL`, `NETLIFY`, `SESSION_SECRET`
 3. Executa `db:push` → `db:seed` → `next build`
 
-Guia completo: [`docs/DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
+Guia completo: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 ---
 
@@ -305,7 +305,7 @@ COMMUNICATION_PROVIDER=console
 - Usa `prisma/test.db` (isolado do `dev.db`)
 - `DATABASE_URL` sobrescrito em runtime dos testes de integração/API
 
-Ver também: [`docs/TESTES.md`](TESTES.md).
+Ver também: [`TESTES.md`](TESTES.md).
 
 ---
 
@@ -353,8 +353,8 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 |---------|----------|
 | `AGENTS.md` / `CLAUDE.md` | Stack, portais, credenciais, restrições |
 | Este arquivo | Mapa completo de env vars |
-| `docs/DEPLOY_NETLIFY.md` | Deploy e envs de produção |
-| `docs/TESTES.md` | Env vars de CI/testes |
+| `docs/plataforma/DEPLOY_NETLIFY.md` | Deploy e envs de produção |
+| `docs/plataforma/TESTES.md` | Env vars de CI/testes |
 
 ---
 
@@ -380,6 +380,6 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 
 - [`.env.example`](../.env.example) — template comentado
 - [`README.md`](../README.md) — início rápido
-- [`docs/PAYMENTS.md`](PAYMENTS.md) — gateways PIX
-- [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md) — provedores de mensagem
-- [`docs/DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) — painel Netlify
+- [`PAYMENTS.md`](PAYMENTS.md) — gateways PIX
+- [`COMMUNICATIONS.md`](COMMUNICATIONS.md) — provedores de mensagem
+- [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) — painel Netlify

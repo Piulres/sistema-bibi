@@ -6,12 +6,12 @@ Documentação de **todos os fluxos de usuário e de negócio**, derivada do có
 > **ServiceOS v2.0:** vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo completo: [`V2_0.md`](V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
-ver [`ARQUITETURA.md`](ARQUITETURA.md). Para posicionamento vs mercado,
-ver [`BENCHMARK.md`](BENCHMARK.md). Para jornada do usuário e backlog de melhorias UX,
+ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado,
+ver [`BENCHMARK.md`](../plataforma/BENCHMARK.md). Para jornada do usuário e backlog de melhorias UX,
 ver [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md). Para **falhas mapeadas nos quatro portais**,
 ver [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md). Para evidências visuais dos fluxos,
 ver [`evidencias/README.md`](evidencias/README.md). Para operações (dev, release, deploy, IA),
-ver [`OPERACOES.md`](OPERACOES.md). Para histórico de PRs/deploys do dia,
+ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys do dia,
 ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 
 ---

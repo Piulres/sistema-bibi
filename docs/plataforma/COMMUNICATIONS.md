@@ -110,5 +110,5 @@ Modelo `Message` usa `String` para enums (SQLite/Postgres). Contratos TypeScript
 
 ## Ver também
 
-- [`FLUXOS.md`](FLUXOS.md) — seções 4.6 (comunicação interna) e 8.2 (lembretes automáticos)
+- [`FLUXOS.md`](../produto/FLUXOS.md) — seções 4.6 (comunicação interna) e 8.2 (lembretes automáticos)
 - [`ARQUITETURA.md`](ARQUITETURA.md) — Épico 7

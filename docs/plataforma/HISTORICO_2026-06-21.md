@@ -128,7 +128,7 @@ Mesmas do seed local — senha **`bibi123`**. Ver [`README.md`](../README.md) se
 
 Material visual capturado durante validação do ambiente (PR #26 / branch `cursor/dev-env-setup-f6a6`):
 
-📁 [`docs/evidencias/README.md`](evidencias/README.md)
+📁 [`docs/evidencias/README.md`](../evidencias/README.md)
 
 | Fluxo | Vídeo | Código principal |
 |-------|-------|------------------|
@@ -144,35 +144,37 @@ Material visual capturado durante validação do ambiente (PR #26 / branch `curs
 
 ## Documentação atualizada neste ciclo
 
+> **Nota (jun/2026):** a árvore de docs foi reorganizada. Caminhos canônicos hoje: `docs/plataforma/`, `docs/produto/`, `docs/versoes/`, `docs/segmentos/`. A tabela abaixo reflete os paths **na época** (21/06).
+
 | Documento | Estado |
 |-----------|--------|
 | `README.md` | URLs produção, evidências, operações |
 | `AGENTS.md` | Tiers + deploy + preferências IA |
-| `docs/DEPLOY_NETLIFY.md` | Status deploy, plugin Blobs, troubleshooting |
-| `docs/OPERACOES.md` | Mapa de operações + regras agentes |
-| `docs/RELEASES.md` | Pacotes fechados |
-| `docs/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy auto |
+| `docs/plataforma/DEPLOY_NETLIFY.md` | Status deploy, plugin Blobs, troubleshooting |
+| `docs/plataforma/OPERACOES.md` | Mapa de operações + regras agentes |
+| `docs/versoes/RELEASES.md` | Pacotes fechados |
+| `docs/plataforma/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy auto |
 | `.cursor/rules/operacoes-bibi.mdc` | Preferências IA (Cursor rules) |
-| `docs/FLUXOS.md` | Mapa completo (PR #24) |
-| `docs/BENCHMARK.md` | Matriz vs iClinic/Feegow/ERPMed (PR #25) |
-| `docs/NOTEBOOKLM.md` | RAG atualizado Tiers 1–4 |
-| `docs/HISTORICO_2026-06-21.md` | Este arquivo |
+| `docs/produto/FLUXOS.md` | Mapa completo (PR #24) |
+| `docs/plataforma/BENCHMARK.md` | Matriz vs iClinic/Feegow/ERPMed (PR #25) |
+| `docs/plataforma/NOTEBOOKLM.md` | RAG atualizado Tiers 1–4 |
+| `docs/plataforma/HISTORICO_2026-06-21.md` | Este arquivo |
 | `docs/evidencias/` | Vídeos e imagens dos fluxos |
 
 ---
 
-## Próximos passos sugeridos
+## Próximos passos sugeridos *(snapshot 21/06 — ver [`OPERACOES.md`](OPERACOES.md) e [`../versoes/RELEASES.md`](../versoes/RELEASES.md) para estado atual)*
 
-1. **Desligar deploy Git automático** — Stop builds no painel Netlify (ver `OPERACOES.md`).
-2. **Publicar pacote pendente** — `bibi-poc-2026-06-22b` quando cota resetar (`pre-release` → CLI).
-3. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify (não usar fallback do `netlify.toml`).
-4. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais.
+1. **Desligar deploy Git automático** — Stop builds no painel Netlify.
+2. **Publicar pacotes** — `pre-release` → `netlify build` → deploy manual.
+3. **Definir `SESSION_SECRET` e `CRON_SECRET`** no painel Netlify.
+4. **Migrar SQLite → Postgres** (Netlify Database) antes de dados reais em escala.
 5. **Tier 5** — SSO OAuth/SAML, validação XSD TISS completa.
 
 ### PR #42 — Operações e pacotes fechados (22/06)
 
-- `docs/OPERACOES.md` — mapa completo de operações
-- `docs/RELEASES.md` — manifesto de pacotes
-- `docs/WORKFLOW_CURSOR.md` — dev sem deploy automático
+- `docs/plataforma/OPERACOES.md` — mapa completo de operações
+- `docs/versoes/RELEASES.md` — manifesto de pacotes
+- `docs/plataforma/WORKFLOW_CURSOR.md` — dev sem deploy automático
 - `.cursor/rules/operacoes-bibi.mdc` — preferências de IA
 - `npm run pre-release` — validação sem publicar

@@ -5,7 +5,7 @@ e **vocabulário dinâmico por nicho** (`useLabels()`).
 
 > **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Arquitetura:** [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md)
 
-> Fluxos de administração de branding: [`FLUXOS.md`](FLUXOS.md) §4 (módulo `branding`).
+> Fluxos de administração de branding: [`FLUXOS.md`](../produto/FLUXOS.md) §4 (módulo `branding`).
 
 ## Visão geral
 

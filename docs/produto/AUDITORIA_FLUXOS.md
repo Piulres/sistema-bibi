@@ -10,7 +10,7 @@ via API.
 
 **Data da auditoria:** 2026-06-22 (fluxos core) · atualização v2.0: 2026-06-23  
 **Commit de referência (auditoria original):** `93f466a`  
-**Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](TESTES.md)
+**Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](../plataforma/TESTES.md)
 
 ---
 
@@ -248,7 +248,7 @@ documentados em [`FLUXOS.md`](FLUXOS.md) §4.4.
 | Sev. | Área | Problema | Notas |
 |------|------|----------|-------|
 | **Alta** | `src/proxy.ts` | Verifica apenas **presença** do cookie — não role nem HMAC | Páginas compensam com redirect server-side |
-| **Alta** | RBAC interno | Matriz UI ≠ matriz API | Ver §4 e [`TESTES.md`](TESTES.md) §1 |
+| **Alta** | RBAC interno | Matriz UI ≠ matriz API | Ver §4 e [`TESTES.md`](../plataforma/TESTES.md) §1 |
 | **Alta** | MFA API | Setup aberto a todos os roles | Deveria restringir a `INTERNO` + módulo `seguranca` |
 | **Média** | `SESSION_SECRET` | Fallback dev se variável ausente | Risco se chegar a produção sem override |
 | **Baixa** | TISS | XML sem validação XSD | POC — [`FLUXOS.md`](FLUXOS.md) §12.4 |

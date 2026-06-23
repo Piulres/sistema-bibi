@@ -247,7 +247,7 @@ Senha única: `bibi123`
 
 ## Referências
 
-- Fluxos de negócio: [`FLUXOS.md`](FLUXOS.md)
+- Fluxos de negócio: [`FLUXOS.md`](../produto/FLUXOS.md)
 - Auditoria de falhas por portal: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md)
 - Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md)
 - Evidências manuais: [`evidencias/`](evidencias/)

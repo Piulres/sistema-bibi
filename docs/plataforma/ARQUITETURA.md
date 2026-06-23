@@ -5,13 +5,13 @@ principais fluxos do sistema. Os diagramas usam [Mermaid](https://mermaid.js.org
 e são renderizados automaticamente no GitHub.
 
 > **Fluxos de usuário detalhados** (todos os portais, RBAC, máquinas de estado):
-> [`FLUXOS.md`](FLUXOS.md)
+> [`FLUXOS.md`](../produto/FLUXOS.md)
 >
-> **Evidências visuais** (vídeos/screenshots): [`evidencias/README.md`](evidencias/README.md)
+> **Evidências visuais** (vídeos/screenshots): [`evidencias/README.md`](../evidencias/README.md)
 >
 > **Deploy Netlify:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) · produção: https://sistema-bibi.netlify.app
 >
-> **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](RELEASES.md)
+> **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](../versoes/RELEASES.md)
 >
 > **ServiceOS v2.0 (multi-nicho):** [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useLabels()`
 
@@ -533,7 +533,7 @@ classDiagram
   PaymentGatewayRegistry --> PaymentProvider
 ```
 
-Detalhes: [`docs/PAYMENTS.md`](PAYMENTS.md)
+Detalhes: [`PAYMENTS.md`](PAYMENTS.md)
 
 ### Checklist de homologação (Épico 4)
 
@@ -628,7 +628,7 @@ flowchart LR
 Fila de mensagens outbound (e-mail, SMS, WhatsApp) com contratos Strategy,
 **ConsoleEmailAdapter** POC e lembretes automáticos (`reminder-service`).
 
-Detalhes: [`docs/COMMUNICATIONS.md`](COMMUNICATIONS.md)
+Detalhes: [`COMMUNICATIONS.md`](COMMUNICATIONS.md)
 
 ### Checklist de homologação (Épico 7)
 
@@ -730,7 +730,7 @@ flowchart LR
 ## 20. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
-Fluxos de usuário detalhados: [`FLUXOS.md`](FLUXOS.md).
+Fluxos de usuário detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
 
 - **Swagger UI:** http://localhost:3000/api-docs.html

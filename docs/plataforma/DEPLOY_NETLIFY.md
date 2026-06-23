@@ -5,7 +5,7 @@ Guia para publicar e manter a POC na Netlify.
 **Produção ativa:** https://sistema-bibi.netlify.app
 (site secundário: https://sistema-bibi-nt2.netlify.app)
 
-Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.md) ·
+Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../produto/FLUXOS.md) ·
 [`ARQUITETURA.md`](ARQUITETURA.md) · [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md)
 
 ---
@@ -24,7 +24,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
-> **Pacotes fechados:** [`RELEASES.md`](RELEASES.md) · **Workflow Cursor:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Operações:** [`OPERACOES.md`](OPERACOES.md)
+> **Pacotes fechados:** [`RELEASES.md`](../versoes/RELEASES.md) · **Workflow Cursor:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Operações:** [`OPERACOES.md`](OPERACOES.md)
 >
 > Não publique a cada merge. Valide localmente e publique só quando decidir fechar um pacote.
 
@@ -74,7 +74,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 
-Credenciais de gateways reais: ver `docs/PAYMENTS.md` e `docs/COMMUNICATIONS.md`.
+Credenciais de gateways reais: ver [`PAYMENTS.md`](PAYMENTS.md) e [`COMMUNICATIONS.md`](COMMUNICATIONS.md).
 
 ---
 
@@ -118,7 +118,7 @@ corrigir “produção fora”. Para este projeto, prefira **pacotes fechados**:
 1. Desligue builds automáticos: Netlify → **Stop builds** (ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md)).
 2. Desenvolva e valide com `npm run pre-release`.
 3. Publique manualmente: `npx netlify deploy --prod`.
-4. Registre em [`RELEASES.md`](RELEASES.md).
+4. Registre em [`RELEASES.md`](../versoes/RELEASES.md).
 
 Se ainda quiser CI Git: build command `npm run build:netlify` (já no `netlify.toml`);
 **não** definir publish directory manualmente no painel (Next.js runtime).

@@ -82,10 +82,10 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — produção vs pendente |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.0.0 em produção** |
 | [`versoes/V2_0.md`](versoes/V2_0.md) | Escopo ServiceOS v2.0 |
 | [`versoes/V2_0_ARCHITECTURE.md`](versoes/V2_0_ARCHITECTURE.md) | Arquitetura multi-nicho |
-| [`versoes/V1_2.md`](versoes/V1_2.md) | Release anterior em produção |
+| [`versoes/V1_2.md`](versoes/V1_2.md) | Histórico (substituído por v2.0) |
 
 ---
 
@@ -101,4 +101,4 @@ Transversal a todos os segmentos: [`pesquisa/README.md`](pesquisa/README.md)
 npm run docs:verify
 ```
 
-O script falha se encontrar caminhos de documentação obsoletos (`docs/OPERACOES.md` na raiz), arquivo `08-prompt-healthos-expansao.md` (renomeado) ou menções desatualizadas a **HealthOS** / **Sistema Bibi** fora do contexto histórico v1.x.
+O script falha se encontrar caminhos obsoletos na raiz de `docs/` (ex.: `docs/OPERACOES.md`), stubs em `docs/pesquisa/nichos/`, menções a **ServiceOS Bibi** ou links quebrados para `OPERACOES.md` / `FLUXOS.md` sem `plataforma/` ou `produto/`.

@@ -2,7 +2,7 @@
 
 Guia para usar o **Cursor** (local ou Cloud Agent) no dia a dia **sem** publicar
 na Netlify a cada tarefa. Produção é atualizada só quando você fecha um
-**pacote** manual — ver [`RELEASES.md`](RELEASES.md) e [`OPERACOES.md`](OPERACOES.md).
+**pacote** manual — ver [`RELEASES.md`](../versoes/RELEASES.md) e [`OPERACOES.md`](OPERACOES.md).
 
 ---
 
@@ -110,7 +110,7 @@ npm run pre-release
 npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 ```
 
-Depois: atualize [`RELEASES.md`](RELEASES.md) e faça commit na `main`.
+Depois: atualize [`RELEASES.md`](../versoes/RELEASES.md) e faça commit na `main`.
 
 ---
 
@@ -151,7 +151,7 @@ Se retornar `{"error":"usage_exceeded",...}`:
 - **Não é bug de código** — cota do plano Netlify esgotada
 - Desenvolvimento continua **100% local**
 - Aguarde reset mensal ou upgrade do plano
-- Último pacote válido: ver [`RELEASES.md`](RELEASES.md)
+- Último pacote válido: ver [`RELEASES.md`](../versoes/RELEASES.md)
 
 ---
 
@@ -170,6 +170,6 @@ Se retornar `{"error":"usage_exceeded",...}`:
 
 - Mapa de operações: [`OPERACOES.md`](OPERACOES.md)
 - Demo vs operação: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md)
-- Pacotes e histórico: [`RELEASES.md`](RELEASES.md)
+- Pacotes e histórico: [`RELEASES.md`](../versoes/RELEASES.md)
 - Deploy e troubleshooting: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
-- Fluxos do sistema: [`FLUXOS.md`](FLUXOS.md)
+- Fluxos do sistema: [`FLUXOS.md`](../produto/FLUXOS.md)

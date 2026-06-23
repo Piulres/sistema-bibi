@@ -116,7 +116,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | ✅ **`v2.0.0` em produção** |
-| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
+| **1.4.x** | Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) | 🚧 Isolado — docs na branch |
 
 ---
 
@@ -213,6 +213,6 @@ git checkout dev && git merge main && git push origin dev
 
 ## Links
 
-- [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md)
-- [`OPERACOES.md`](OPERACOES.md)
-- [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
+- [`../plataforma/WORKFLOW_CURSOR.md`](../plataforma/WORKFLOW_CURSOR.md)
+- [`../plataforma/OPERACOES.md`](../plataforma/OPERACOES.md)
+- [`../plataforma/DEPLOY_NETLIFY.md`](../plataforma/DEPLOY_NETLIFY.md)
