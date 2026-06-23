@@ -21,6 +21,7 @@
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:backfill-slugs": "node scripts/backfill-tenant-slugs.mjs",
+    "db:verify": "node scripts/verify-databases.mjs",
     "db:setup": "npx tsx scripts/setup-database.ts",
     "db:bootstrap:demo": "APP_MODE=demo RUN_SEED_ON_BUILD=true npx tsx scripts/setup-database.ts",
     "db:bootstrap:operation": "APP_MODE=operation RUN_SEED_ON_BUILD=false npx tsx scripts/setup-database.ts",

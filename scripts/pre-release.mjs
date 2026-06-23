@@ -24,13 +24,16 @@ const gitHead = () => {
 };
 
 console.log("╔══════════════════════════════════════════╗");
-console.log("║  Sistema Bibi — Pre-release (sem deploy) ║");
+console.log("║  ServiceOS Bibi — Pre-release (sem deploy) ║");
 console.log("╚══════════════════════════════════════════╝");
 console.log(`Commit: ${gitHead()}`);
 console.log("Este script NÃO publica na Netlify.\n");
 
 const steps = [
   { name: "lint", cmd: "npm run lint" },
+  { name: "docs-verify", cmd: "npm run docs:verify" },
+  { name: "db-verify", cmd: "npm run db:verify" },
+  { name: "test", cmd: "npm test" },
   { name: "netlify-build", cmd: "npm run netlify:build" },
 ];
 
@@ -45,7 +48,7 @@ for (const step of steps) {
 }
 
 // Lembrete do pacote pendente
-const releasesPath = join(root, "docs", "RELEASES.md");
+const releasesPath = join(root, "docs", "versoes", "RELEASES.md");
 try {
   const releases = readFileSync(releasesPath, "utf8");
   const match = releases.match(/### `(bibi-poc-[^`]+)` \*\(rascunho/);

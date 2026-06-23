@@ -62,6 +62,9 @@ npm run db:bootstrap:operation
 
 # Setup conforme .env
 npm run db:setup
+
+# Validar integridade demo + operação
+npm run db:verify
 ```
 
 **Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.

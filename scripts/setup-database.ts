@@ -7,7 +7,7 @@
  * Postgres: migrate deploy (modo operação legado).
  */
 import { execSync } from "node:child_process";
-import { copyFileSync, existsSync, unlinkSync } from "node:fs";
+import { copyFileSync, existsSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { PrismaClient } from "@prisma/client";
 import {
@@ -70,6 +70,10 @@ async function setupSqliteDualStore() {
 
   copyFileSync(demoDb, legacyDb);
   console.log("  ✓ dev.db espelha demo.db (compatibilidade local)");
+
+  const modeFile = join(prismaDir, ".data-store-mode");
+  writeFileSync(modeFile, "demo", "utf8");
+  console.log("  ✓ modo local definido como demo (prisma/.data-store-mode)");
 }
 
 function setupPostgres() {

@@ -129,7 +129,7 @@ describe("Estoque médico — APIs", () => {
 
     const slot = new Date();
     slot.setDate(slot.getDate() + 200);
-    slot.setHours(14, 30, 0, 0);
+    slot.setHours(10 + Math.floor(Math.random() * 8), 15, 0, 0);
 
     await setSessionForEmail("recepcao@bibi.health");
     const { POST: createAppointmentPost } = await import("@/app/api/interno/appointments/route");
@@ -145,6 +145,7 @@ describe("Estoque médico — APIs", () => {
         },
       }),
     );
+    expect(apptRes.status, await apptRes.clone().text()).toBe(200);
     const apptBody = await apptRes.json();
     const appointmentId = apptBody.appointment.id as string;
 
@@ -176,20 +177,21 @@ describe("Estoque médico — APIs", () => {
 
   it("cadastra produto novo via API", async () => {
     await setSessionForEmail("recepcao@bibi.health");
+    const sku = `TEST-PROD-${Date.now()}`;
     const res = await productsPost(
       jsonRequest("http://localhost/api/interno/stock/products", {
         method: "POST",
         body: {
-          sku: "TEST-PROD-99",
+          sku,
           name: "Produto teste automatizado",
           category: "INSUMO",
           minStock: 5,
         },
       }),
     );
-    expect(res.status).toBe(200);
+    expect(res.status, await res.clone().text()).toBe(200);
     const data = await res.json();
-    expect(data.product.sku).toBe("TEST-PROD-99");
+    expect(data.product.sku).toBe(sku);
   });
 
   it("vincula item ao kit de procedimento", async () => {
