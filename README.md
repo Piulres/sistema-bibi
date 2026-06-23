@@ -35,7 +35,7 @@ de valores e faturamento sem perdas de informação.
 
 | Portal | Público | Foco |
 |--------|---------|------|
-| **Portal do Prestador** | Médicos / profissionais de saúde | Agenda inteligente e prontuário eletrônico (PEP) |
+| **Portal do Prestador** | Médicos / profissionais de saúde | Agenda, Care Chart (prontuário estendido) e PEP |
 | **Portal Interno** | Equipe administrativa | Dashboard executivo, faturamento, CRM, recorrência e comunicação |
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
 | **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
@@ -102,7 +102,9 @@ Base local: **`http://localhost:3000`**
 | `/` | Landing page com seleção de portal | Público |
 | `/login` | Login do **Portal do Prestador** | Público |
 | `/prestador` | Dashboard do prestador (agenda do dia) | `PRESTADOR` |
-| `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP) | `PRESTADOR` |
+| `/prestador/pacientes` | Lista de pacientes com atendimentos do provider | `PRESTADOR` |
+| `/prestador/paciente/{id}` | Histórico do paciente + Care Chart | `PRESTADOR` |
+| `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP + Care Chart) | `PRESTADOR` |
 | `/interno/login` | Login do **Portal Interno** | Público |
 | `/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados do tenant | `INTERNO` |
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
@@ -206,6 +208,11 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 | `Appointment` | Agendamento; `modality` PRESENCIAL/TELE + `telemedicineUrl`. |
 | `ProcedureUsage` | **Uso efetivo de procedimento — núcleo do Pay Per Use** (preço congelado). |
 | `MedicalRecord` | Prontuário eletrônico (PEP) com `recordType` e templates. |
+| `PatientClinicalProfile` | Perfil Care Chart: alergias, comorbidades, tipo sanguíneo. |
+| `MedicationPrescription` | Prescrições com status (`ATIVA`/`SUSPENSA`/`ENCERRADA`) e posologia. |
+| `ExamOrder` | Pedidos de exame com status e resultado/laudo. |
+| `CareProtocolTemplate` | Template de protocolo de cuidado (checklist reutilizável). |
+| `PatientProtocolEnrollment` | Matrícula do beneficiário em um protocolo. |
 | `Invoice` / `InvoiceItem` | Fatura; item via `usageId` (Pay Per Use) ou `subscriptionChargeId`. |
 | `Payment` | Histórico de pagamento (PIX pendente/confirmado, manual). |
 | `Subscription` | Assinatura recorrente (ciclo + valor por beneficiário/empresa). |
@@ -252,6 +259,15 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `PATCH` | `/api/prestador/appointments/{id}` | Atualiza o status. Body: `{ status }`. |
 | `POST` | `/api/prestador/appointments/{id}/procedures` | Registra um procedimento (Pay Per Use). Body: `{ procedureId }`. |
 | `POST` | `/api/prestador/records` | Adiciona anotação ao PEP. Body: `{ patientId, appointmentId?, content, recordType?, title? }`. |
+| `GET` | `/api/prestador/patients` | Lista pacientes do provider (`?q=` busca por nome/CPF). |
+| `GET` | `/api/prestador/patients/{id}/clinical-overview` | Visão consolidada Care Chart. |
+| `GET`/`PUT` | `/api/prestador/patients/{id}/clinical-profile` | Perfil clínico (alergias, comorbidades). |
+| `GET`/`POST` | `/api/prestador/patients/{id}/medications` | Listar / prescrever medicação. |
+| `PATCH` | `/api/prestador/medications/{id}` | Alterar status da prescrição. |
+| `GET`/`POST` | `/api/prestador/patients/{id}/exam-orders` | Listar / solicitar exame. |
+| `PATCH` | `/api/prestador/exam-orders/{id}` | Atualizar status, agendamento ou resultado. |
+| `GET`/`POST` | `/api/prestador/patients/{id}/protocols` | Matrículas e templates de protocolo. |
+| `PATCH` | `/api/prestador/protocols/{id}` | Checklist e status da matrícula. |
 | `GET` | `/api/procedures` | Catálogo de procedimentos (também acessível ao `INTERNO`). |
 
 ### Portal Interno (`role: INTERNO`)
@@ -271,6 +287,7 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `POST` | `/api/interno/patients` | Cria beneficiário. |
 | `PATCH` | `/api/interno/patients/{id}` | Atualiza beneficiário. |
 | `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°**. |
+| `GET` | `/api/interno/patients/{id}/clinical` | Visão clínica Care Chart (somente leitura). |
 | `GET` | `/api/interno/patients/{id}/export` | Export JSON LGPD. |
 | `GET/POST` | `/api/interno/companies` | CRUD empresas. |
 | `PATCH` | `/api/interno/companies/{id}` | Atualiza empresa. |
@@ -291,6 +308,8 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `GET/POST` | `/api/interno/webhooks` | Webhooks B2B. |
 | `GET` | `/api/interno/webhooks/deliveries` | Log de entregas. |
 | `POST` | `/api/interno/webhooks/deliveries/{id}/retry` | Retry manual. |
+| `GET`/`POST` | `/api/interno/protocol-templates` | Templates de protocolo clínico. |
+| `PATCH`/`DELETE` | `/api/interno/protocol-templates/{id}` | Editar / desativar template. |
 
 ### Jobs agendados (cron)
 
@@ -309,6 +328,7 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `POST` | `/api/beneficiario/appointments` | Agenda consulta self-service. |
 | `POST` | `/api/beneficiario/invoices/{id}/pay` | Gera PIX para fatura. |
 | `PATCH` | `/api/beneficiario/invoices/{id}/pay` | Confirma pagamento PIX. |
+| `GET` | `/api/beneficiario/clinical` | Resumo clínico Care Chart (somente leitura). |
 
 ### Portal da Empresa (`role: PJ`)
 
@@ -445,6 +465,8 @@ sistema-bibi/
   [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
   [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Versão 1.1 — Care Chart (produção):**
+  [`docs/V1_1.md`](docs/V1_1.md)
 - **Workflow Cursor (dev sem deploy automático):**
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**
