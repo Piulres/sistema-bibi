@@ -16,16 +16,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Versão em produção** | **1.2.0** (`55481be`) |
 | **Deploy Netlify** | `6a39d446` (23/06/2026) |
 | `main` | `55481be` — release / produção |
-| `dev` | `55481be` — sincronizada com `main` |
+| `dev` | `e372c01` — **v1.3.0** Estoque Médico (**base para novas features**) |
 | **Tag git em produção** | **`v1.2.0`** |
-| Próximo pacote | **v1.3.0** — Estoque Médico (em `dev`) |
-| Validação | `npm run pre-release` — ver `docs/V1_3.md` |
+| Próximo release | **v1.3.0** — merge `dev` → `main` quando publicar |
+| Feature paralela | **v1.4.0** Voa Health — branch `integracao-voa` (PR aberto) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | Espelha produção — **novas atividades aqui** |
+| **Integração** | `dev` | **v1.3.0** Estoque — **novas features aqui** |
+| **Feature** | `integracao-voa` | **v1.4.0** Voa Health (isolado, PR → `dev`) |
 | **Release / produção** | `main` | Pacote **v1.2.0** completo |
 | **Netlify** | `main` | Espelha produção |
 
@@ -81,19 +82,21 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
-| **1.3.x** | [`V1_3.md`](V1_3.md) | 🚧 Pendente em `dev` |
+| **1.3.x** | [`V1_3.md`](V1_3.md) | ✅ Integrado em `dev` (`e372c01`) |
+| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` (PR aberto) |
 
 ---
 
-## Pacote pendente (`dev`)
+## Pacote integrado (`dev`)
 
 ### `v1.3.0` — Estoque Médico
 
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.3.0` (`package.json`) |
-| **Branch** | `cursor/estoque-medico-0f4a` → `dev` |
+| **Branch** | `cursor/estoque-medico-0f4a` → `dev` (`e372c01`) |
 | **Doc** | [`V1_3.md`](V1_3.md) |
+| **Validação** | `npm run pre-release` |
 
 **Inclui:**
 
