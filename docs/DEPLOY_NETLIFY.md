@@ -10,13 +10,13 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 
 ---
 
-## Status atual (22/06/2026)
+## Status atual (23/06/2026)
 
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v1.0.2`** → commit app `e30b2b0` · deploy 22/06/2026 ~15:08 |
-| `main` | `6a1f042` — alinhada com produção |
+| Pacote em produção | **`v1.1.0`** Care Chart → commit app `8c8cd01` · deploy Netlify `6a39d107` (23/06/2026) |
+| `main` | `70dba30` — release / produção |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Validação pré-deploy | `npm run pre-release` (lint + build, sem publicar) |
 | Deploy via CLI `npx netlify deploy --prod` | ⚠️ Só manual, quando cota permitir |
