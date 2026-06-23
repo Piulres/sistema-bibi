@@ -236,6 +236,11 @@ flowchart LR
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
 (ex.: TechCorp 0,85 → Consulta Clínica R$ 320 → **R$ 272** congelado em `priceCharged`).
 
+**Escopo multi-tenant (FATO — código):** `src/lib/pricing-rule-service.ts` filtra regras por
+`procedure.tenantId`; create/update valida que `procedureId` e `companyId` pertencem ao tenant da
+sessão. API: `GET/POST /api/interno/pricing-rules`, `PATCH/DELETE .../[id]`.
+Testes: `tests/api/audit-pricing.test.ts`, `tests/integration/pricing-db.test.ts`.
+
 ---
 
 ## 4. Portal Interno

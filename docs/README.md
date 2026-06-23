@@ -101,7 +101,9 @@ Transversal a todos os segmentos: [`pesquisa/README.md`](pesquisa/README.md)
 ## Verificação de consistência
 
 ```bash
-npm run docs:verify
+npm run docs:verify    # links, marca e estrutura de docs/
+npm run db:verify      # massa demo + operation.db (após bootstrap/seed)
+npm run pre-release    # lint → docs:verify → db:verify → test → netlify:build
 ```
 
-O script falha se encontrar caminhos obsoletos na raiz de `docs/` (ex.: `docs/OPERACOES.md`), stubs em `docs/pesquisa/nichos/`, menções a **ServiceOS Bibi** ou links quebrados para `OPERACOES.md` / `FLUXOS.md` sem `plataforma/` ou `produto/`.
+`docs:verify` (`scripts/verify-docs.mjs`) falha se encontrar caminhos obsoletos na raiz de `docs/` (ex.: `docs/OPERACOES.md`), stubs em `docs/pesquisa/nichos/`, menções a **ServiceOS Bibi** ou links quebrados para `OPERACOES.md` / `FLUXOS.md` sem `plataforma/` ou `produto/`.

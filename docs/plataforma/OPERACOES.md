@@ -79,9 +79,11 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run dev` | Next.js dev server (:3000) | Desenvolvimento diário |
 | `npm run netlify:dev` | Netlify Dev (:8888 → :3000) | Testar Blobs, headers, proxy |
 | `npm run lint` | ESLint | Antes de PR |
+| `npm run docs:verify` | Links, marca e estrutura de `docs/` | Parte do `pre-release` |
+| `npm run db:verify` | Integridade de `demo.db` + `operation.db` | Após bootstrap/seed ou no `pre-release` |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint → docs:verify → db:verify → test → netlify:build | **Validar pacote sem publicar** |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
@@ -210,7 +212,7 @@ Exemplo atual em produção: **`v2.0.0`** — **Sistema Bibi - ServiceOS**. Ver 
 
 **Produção:** https://sistema-bibi.netlify.app
 
-**Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+**Status conhecido (23/06/2026):** site pode retornar `503 usage_exceeded` se a cota Netlify esgotar — não é bug de código.
 
 **Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 

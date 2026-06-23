@@ -67,6 +67,16 @@ npm run db:setup
 npm run db:verify
 ```
 
+O script `scripts/verify-databases.mjs` falha se:
+
+| Banco | Verificações |
+|-------|--------------|
+| `demo.db` | 7 tenants (`horizonte`, `vitacare`, `petcare`, `smile`, `lex`, `zen`, `eduprime`); usuários demo-chave; ≥50 empresas PJ; ≥100 beneficiários; `horizonte` = `MEDICAL`; `operacao@petcare.demo` no tenant petcare |
+| `operation.db` | Tenant bootstrap `bibi-saude` (único, `MEDICAL`); usuários operação (prestador, faturamento, recepção, financeiro, segurança); ≥14 procedimentos; **sem** empresas PJ nem pacientes na massa inicial |
+| `dev.db` | Espelho byte-a-byte de `demo.db` após bootstrap |
+
+Integrado ao `npm run pre-release` após `docs:verify`.
+
 **Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.
 
 ```bash
