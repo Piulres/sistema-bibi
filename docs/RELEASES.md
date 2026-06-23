@@ -42,7 +42,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v1.1.0` |
 | **Commit** | `8c8cd01` |
 | **PR** | [#86](https://github.com/Piulres/sistema-bibi/pull/86) |
-| **Publicado em** | 22/06/2026 — deploy Netlify CLI `6a39d0ca` + auto-deploy Git `main@8c8cd01` |
+| **Publicado em** | 23/06/2026 — deploy Netlify CLI `6a39d107` (build completo) |
 | **Escopo** | Módulo clínico Care Chart — perfil, medicação, exames e protocolos |
 | **Docs** | [`V1_1.md`](V1_1.md) |
 
