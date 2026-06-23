@@ -7,6 +7,7 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { consumeProcedureKit } from "@/lib/stock-service";
 
 /**
  * Registra o uso de um procedimento no agendamento (Pay Per Use).
@@ -58,6 +59,15 @@ export async function POST(
       createdBy: user.id,
     });
 
+    const kitResult = await consumeProcedureKit({
+      tenantId: appointment.tenantId,
+      procedureId: body.procedureId,
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      procedureUsageId: usage.id,
+      createdBy: user.id,
+    });
+
     return NextResponse.json({
       usage: {
         id: usage.id,
@@ -66,6 +76,8 @@ export async function POST(
         priceCharged: usage.priceCharged,
         priceLabel: formatBRL(usage.priceCharged),
       },
+      stockConsumed: kitResult.consumed,
+      stockWarnings: kitResult.warnings,
     });
   } catch (error) {
     return authErrorResponse(error);

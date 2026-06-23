@@ -4,6 +4,7 @@ export const INTERNO_MODULES = [
   "billing",
   "agenda",
   "cadastros",
+  "estoque",
   "crm",
   "subscriptions",
   "comunicacao",
@@ -20,7 +21,7 @@ export type InternoModule = (typeof INTERNO_MODULES)[number];
 export const INTERNO_PROFILES = {
   ADMIN: [...INTERNO_MODULES],
   FATURAMENTO: ["dashboard", "billing", "subscriptions", "relatorios", "auditoria"],
-  RECEPCAO: ["dashboard", "agenda", "cadastros", "comunicacao"],
+  RECEPCAO: ["dashboard", "agenda", "cadastros", "estoque", "comunicacao"],
   READONLY: ["dashboard", "relatorios", "auditoria"],
 } as const satisfies Record<string, readonly InternoModule[]>;
 

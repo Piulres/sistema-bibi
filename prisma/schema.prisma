@@ -34,6 +34,10 @@ model Tenant {
   branding       TenantBranding?
   webhooks       WebhookEndpoint[]
   careProtocolTemplates CareProtocolTemplate[]
+  medicalProducts       MedicalProduct[]
+  stockLots             StockLot[]
+  stockMovements        StockMovement[]
+  procedureMaterialKits ProcedureMaterialKit[]
 }
 
 /// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
@@ -188,8 +192,103 @@ model Procedure {
   pricingRules PricingRule[]
   usages       ProcedureUsage[]
   examOrders   ExamOrder[]
+  materialKits ProcedureMaterialKit[]
 
   @@unique([tenantId, code])
+}
+
+/// Catálogo de produtos médicos (medicamentos, materiais, OPME, insumos).
+/// category: MEDICAMENTO | MATERIAL | OPME | INSUMO
+/// unit: UN | ML | CX | PC | FR
+model MedicalProduct {
+  id          String   @id @default(cuid())
+  sku         String
+  name        String
+  category    String
+  unit        String   @default("UN")
+  minStock    Float    @default(0)
+  /// Registro ANVISA / código de barras (opcional)
+  anvisaCode  String?
+  requiresLot Boolean  @default(true)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  lots      StockLot[]
+  movements StockMovement[]
+  kitItems  ProcedureMaterialKit[]
+
+  @@unique([tenantId, sku])
+  @@index([tenantId, category, active])
+}
+
+/// Lote em estoque — rastreabilidade (RDC 304/2019).
+/// status: DISPONIVEL | BLOQUEADO | VENCIDO | QUARENTENA
+model StockLot {
+  id         String   @id @default(cuid())
+  lotNumber  String
+  expiryDate DateTime
+  quantity   Float
+  unitCost   Float    @default(0)
+  status     String   @default("DISPONIVEL")
+  supplierRef String?
+  receivedAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+
+  tenantId  String
+  tenant    Tenant @relation(fields: [tenantId], references: [id])
+  productId String
+  product   MedicalProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  movements StockMovement[]
+
+  @@unique([productId, lotNumber])
+  @@index([tenantId, expiryDate])
+  @@index([productId, status])
+}
+
+/// Movimentação de estoque.
+/// type: ENTRADA | SAIDA | AJUSTE | DISPENSACAO | TRANSFERENCIA | PERDA | DEVOLUCAO
+model StockMovement {
+  id               String   @id @default(cuid())
+  type             String
+  quantity         Float
+  unitCost         Float?
+  reason           String?
+  appointmentId    String?
+  patientId        String?
+  procedureUsageId String?
+  createdAt        DateTime @default(now())
+  createdBy        String?
+
+  tenantId  String
+  tenant    Tenant @relation(fields: [tenantId], references: [id])
+  productId String
+  product   MedicalProduct @relation(fields: [productId], references: [id])
+  lotId     String?
+  lot       StockLot? @relation(fields: [lotId], references: [id])
+
+  @@index([tenantId, createdAt])
+  @@index([productId])
+  @@index([patientId])
+}
+
+/// Kit de materiais vinculado a procedimento (baixa automática no Pay Per Use).
+model ProcedureMaterialKit {
+  id       String @id @default(cuid())
+  quantity Float  @default(1)
+
+  tenantId    String
+  tenant      Tenant @relation(fields: [tenantId], references: [id])
+  procedureId String
+  procedure   Procedure @relation(fields: [procedureId], references: [id], onDelete: Cascade)
+  productId   String
+  product     MedicalProduct @relation(fields: [productId], references: [id])
+
+  @@unique([procedureId, productId])
 }
 
 /// Precificacao dinamica: ajusta o preco base por empresa (ex.: desconto corporativo).

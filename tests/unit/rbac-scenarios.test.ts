@@ -5,9 +5,9 @@ import {
 } from "@/lib/interno-permissions";
 
 describe("Cenários RBAC — matriz perfil × módulo", () => {
-  it("ADMIN acessa todos os 12 módulos", () => {
+  it("ADMIN acessa todos os 13 módulos", () => {
     const perms = resolveInternoPermissions("INTERNO", "ADMIN");
-    expect(perms).toHaveLength(12);
+    expect(perms).toHaveLength(13);
     expect(hasInternoPermission("INTERNO", "ADMIN", "billing")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "auditoria")).toBe(true);
   });
@@ -23,6 +23,7 @@ describe("Cenários RBAC — matriz perfil × módulo", () => {
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "agenda")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "comunicacao")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "cadastros")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "RECEPCAO", "estoque")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "billing")).toBe(false);
   });
 
@@ -36,7 +37,7 @@ describe("Cenários RBAC — matriz perfil × módulo", () => {
 
   it("perfil null em INTERNO equivale a ADMIN (seed legado)", () => {
     const perms = resolveInternoPermissions("INTERNO", null);
-    expect(perms).toHaveLength(12);
+    expect(perms).toHaveLength(13);
   });
 
   it("roles não-interno não recebem módulos", () => {

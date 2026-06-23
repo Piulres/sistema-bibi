@@ -94,7 +94,13 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
       },
       select: { id: true },
     });
-    return !joaoReceita;
+    if (!joaoReceita) return true;
+
+    const stockProduct = await prisma.medicalProduct.findFirst({
+      where: { sku: "MAT-LUVA-M" },
+      select: { id: true },
+    });
+    return !stockProduct;
   } finally {
     await prisma.$disconnect();
   }

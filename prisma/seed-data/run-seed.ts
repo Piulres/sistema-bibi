@@ -33,6 +33,7 @@ import { resolveSeedScale } from "./scale";
 import { seedVitacareTenant } from "./vitacare";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
+import { seedMedicalStock } from "./stock-demo";
 import { currentTotpCode, DEMO_MFA_SECRET } from "./totp-demo";
 
 const DEMO_PASSWORD = hashPassword("bibi123");
@@ -64,6 +65,10 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.invoiceItem.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.procedureUsage.deleteMany();
+  await prisma.stockMovement.deleteMany();
+  await prisma.procedureMaterialKit.deleteMany();
+  await prisma.stockLot.deleteMany();
+  await prisma.medicalProduct.deleteMany();
   await prisma.patientProtocolEnrollment.deleteMany();
   await prisma.examOrder.deleteMany();
   await prisma.medicationPrescription.deleteMany();
@@ -247,6 +252,9 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       });
     }
   }
+
+  console.log("Criando estoque medico (produtos, lotes, kits)...");
+  await seedMedicalStock(prisma, tenant.id, procedures);
 
   console.log("Criando beneficiarios...");
   const beneficiaries = ensureUniqueCpfs(generateBeneficiaries(SEED_COMPANIES));

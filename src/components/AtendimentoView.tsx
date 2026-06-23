@@ -50,11 +50,28 @@ type Procedure = {
   basePriceLabel: string;
 };
 
+type StockProduct = {
+  id: string;
+  name: string;
+  sku: string;
+  unit: string;
+  stockLabel: string;
+};
+
+type Dispensation = {
+  id: string;
+  productName: string;
+  quantity: number;
+  unit: string;
+  createdAt: string;
+};
+
 const currency = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const CARE_TABS = [
   { key: "procedimentos", label: "Procedimentos" },
+  { key: "materiais", label: "Materiais" },
   { key: "prontuario", label: "Prontuário" },
   { key: "medicacao", label: "Medicação" },
   { key: "exames", label: "Exames" },
@@ -80,6 +97,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const [careTab, setCareTab] = useState<CareTab>("procedimentos");
   const [clinicalSidebar, setClinicalSidebar] = useState<ClinicalSidebarData | null>(null);
   const [clinicalLoading, setClinicalLoading] = useState(true);
+  const [stockProducts, setStockProducts] = useState<StockProduct[]>([]);
+  const [dispensations, setDispensations] = useState<Dispensation[]>([]);
+  const [selectedMaterial, setSelectedMaterial] = useState("");
+  const [materialQty, setMaterialQty] = useState("1");
 
   const loadClinical = useCallback(async (patientId: string) => {
     setClinicalLoading(true);
@@ -98,6 +119,15 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       setClinicalLoading(false);
     }
   }, []);
+
+  const loadMaterials = useCallback(async () => {
+    const res = await fetch(`/api/prestador/appointments/${appointmentId}/materials`);
+    const data = await res.json();
+    if (res.ok) {
+      setStockProducts(data.products ?? []);
+      setDispensations(data.dispensations ?? []);
+    }
+  }, [appointmentId]);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/prestador/appointments/${appointmentId}`);
@@ -130,6 +160,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         }
       }
       if (procData.procedures) setProcedures(procData.procedures);
+      const matRes = await fetch(`/api/prestador/appointments/${appointmentId}/materials`);
+      const matData = await matRes.json();
+      if (active && matRes.ok) {
+        setStockProducts(matData.products ?? []);
+        setDispensations(matData.dispensations ?? []);
+      }
     })();
     return () => {
       active = false;
@@ -153,9 +189,17 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       if (!res.ok) {
         setMsg(data.error ?? "Erro ao registrar procedimento");
       } else {
-        setMsg(`Procedimento registrado: ${data.usage.procedure} (${data.usage.priceLabel})`);
+        let message = `Procedimento registrado: ${data.usage.procedure} (${data.usage.priceLabel})`;
+        if (data.stockConsumed?.length) {
+          message += ` · Estoque: ${data.stockConsumed.map((c: { productName: string; quantity: number }) => `${c.productName} (${c.quantity})`).join(", ")}`;
+        }
+        if (data.stockWarnings?.length) {
+          message += ` · Avisos: ${data.stockWarnings.join("; ")}`;
+        }
+        setMsg(message);
         setSelectedProc("");
         await load();
+        await loadMaterials();
       }
     } finally {
       setBusy(false);
@@ -184,6 +228,32 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         setNote("");
         setRecordTitle("");
         await load();
+      }
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function dispenseMaterial() {
+    if (!selectedMaterial) return;
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/prestador/appointments/${appointmentId}/materials`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: selectedMaterial,
+          quantity: Number(materialQty),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) setMsg(data.error ?? "Erro ao dispensar material");
+      else {
+        setMsg("Material dispensado e estoque atualizado.");
+        setSelectedMaterial("");
+        setMaterialQty("1");
+        await loadMaterials();
       }
     } finally {
       setBusy(false);
@@ -340,6 +410,55 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               <span className="text-lg font-bold text-[var(--brand-primary)]">{currency(total)}</span>
             </div>
           )}
+        </Card>
+          )}
+
+          {careTab === "materiais" && (
+        <Card padding="lg">
+          <SectionHeader
+            title="Dispensação de materiais"
+            description="Baixa de estoque vinculada ao paciente — rastreabilidade por lote (FIFO)."
+          />
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <select
+              value={selectedMaterial}
+              onChange={(e) => setSelectedMaterial(e.target.value)}
+              className={`flex-1 ${fieldClass}`}
+            >
+              <option value="">Selecione o material...</option>
+              {stockProducts.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name} ({p.sku}) — {p.stockLabel}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              value={materialQty}
+              onChange={(e) => setMaterialQty(e.target.value)}
+              className={`w-24 ${fieldClass}`}
+            />
+            <Button onClick={dispenseMaterial} disabled={busy || !selectedMaterial}>
+              Dispensar
+            </Button>
+          </div>
+          <ul className="mt-4 divide-y divide-[var(--border-default)]">
+            {dispensations.length === 0 && (
+              <li className="py-3 text-sm text-[var(--text-muted)]">
+                Nenhum material dispensado neste atendimento.
+              </li>
+            )}
+            {dispensations.map((d) => (
+              <li key={d.id} className="flex items-center justify-between py-3 text-sm">
+                <span className="font-medium text-[var(--text-secondary)]">{d.productName}</span>
+                <span className="text-[var(--text-muted)]">
+                  {d.quantity} {d.unit} · {new Date(d.createdAt).toLocaleString("pt-BR")}
+                </span>
+              </li>
+            ))}
+          </ul>
         </Card>
           )}
 

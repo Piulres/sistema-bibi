@@ -18,8 +18,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `main` | `55481be` — release / produção |
 | `dev` | `55481be` — sincronizada com `main` |
 | **Tag git em produção** | **`v1.2.0`** |
-| Próximo pacote | Features novas integram em `dev` |
-| Validação | `npm run pre-release` — 136 testes |
+| Próximo pacote | **v1.3.0** — Estoque Médico (em `dev`) |
+| Validação | `npm run pre-release` — ver `docs/V1_3.md` |
 
 ### Sincronização de ambientes
 
@@ -81,10 +81,27 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
+| **1.3.x** | [`V1_3.md`](V1_3.md) | 🚧 Pendente em `dev` |
 
 ---
 
-## Histórico de releases
+## Pacote pendente (`dev`)
+
+### `v1.3.0` — Estoque Médico
+
+| Campo | Valor |
+|-------|-------|
+| **Versão** | `1.3.0` (`package.json`) |
+| **Branch** | `cursor/estoque-medico-0f4a` → `dev` |
+| **Doc** | [`V1_3.md`](V1_3.md) |
+
+**Inclui:**
+
+- Gestão de estoque médico (produtos, lotes, validade, movimentações)
+- Alertas operacionais (estoque mínimo, vencimento, quarentena)
+- Kits de materiais por procedimento com baixa automática no Pay Per Use
+- Dispensação no atendimento do prestador
+- RBAC interno (`estoque` para ADMIN e RECEPCAO)
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|

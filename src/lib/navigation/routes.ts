@@ -7,6 +7,7 @@ export const INTERNO_NAV_TABS: NavTab[] = [
   { href: "/interno", label: "Faturamento", key: "billing" },
   { href: "/interno/agenda", label: "Agenda", key: "agenda" },
   { href: "/interno/cadastros", label: "Cadastros", key: "cadastros" },
+  { href: "/interno/estoque", label: "Estoque", key: "estoque" },
   { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
   { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
   { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
@@ -24,6 +25,7 @@ export const INTERNO_ROUTE_LABELS: Record<string, string> = {
   "/interno/faturamento": "Faturamento",
   "/interno/agenda": "Agenda",
   "/interno/cadastros": "Cadastros",
+  "/interno/estoque": "Estoque Médico",
   "/interno/crm": "CRM Corporativo",
   "/interno/assinaturas": "Recorrência",
   "/interno/comunicacao": "Comunicação",
@@ -40,6 +42,7 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
   if (pathname === "/interno" || pathname === "/interno/faturamento") return "billing";
   if (pathname.startsWith("/interno/agenda")) return "agenda";
   if (pathname.startsWith("/interno/cadastros")) return "cadastros";
+  if (pathname.startsWith("/interno/estoque")) return "estoque";
   if (pathname.startsWith("/interno/crm")) return "crm";
   if (pathname.startsWith("/interno/assinaturas")) return "subscriptions";
   if (pathname.startsWith("/interno/comunicacao")) return "comunicacao";

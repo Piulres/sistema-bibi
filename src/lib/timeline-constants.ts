@@ -18,6 +18,9 @@ export const TIMELINE_ENTITY_TYPES = {
   WEBHOOK: "Webhook",
   BRANDING: "Branding",
   SECURITY: "Security",
+  MEDICAL_PRODUCT: "MedicalProduct",
+  STOCK_LOT: "StockLot",
+  STOCK_MOVEMENT: "StockMovement",
 } as const;
 
 export const TIMELINE_ACTIONS = {
@@ -46,6 +49,11 @@ export const TIMELINE_ACTIONS = {
   MFA_DISABLED: "MFA_DISABLED",
   DATA_STORE_CHANGED: "DATA_STORE_CHANGED",
   DEMO_RESET: "DEMO_RESET",
+  STOCK_ENTRY: "STOCK_ENTRY",
+  STOCK_EXIT: "STOCK_EXIT",
+  STOCK_DISPENSED: "STOCK_DISPENSED",
+  STOCK_ADJUSTED: "STOCK_ADJUSTED",
+  STOCK_LOSS: "STOCK_LOSS",
 } as const;
 
 export type TimelineEntityType =
@@ -70,4 +78,7 @@ export const TIMELINE_ENTITY_LABELS: Record<string, string> = {
   Webhook: "Integração",
   Branding: "White Label",
   Security: "Segurança",
+  MedicalProduct: "Estoque — Produto",
+  StockLot: "Estoque — Lote",
+  StockMovement: "Estoque — Movimentação",
 };
