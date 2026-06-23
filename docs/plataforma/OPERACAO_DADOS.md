@@ -67,6 +67,18 @@ npm run db:setup
 npm run db:verify
 ```
 
+### Integridade (`db:verify`)
+
+Script: `scripts/verify-databases.mjs` — falha com mensagens explícitas se a massa estiver inconsistente.
+
+| Base | Validações |
+|------|------------|
+| **demo.db** | 7 slugs (`horizonte`, `vitacare`, `petcare`, `smile`, `lex`, `zen`, `eduprime`); ≥50 empresas PJ; ≥100 beneficiários; e-mails demo (`faturamento@bibi.health`, `dra.helena@bibi.health`, `operacao@petcare.demo`, etc.); `petcare` ↔ `operacao@petcare.demo` |
+| **operation.db** | 1 tenant (`bibi-saude`, MEDICAL); 5 usuários internos; ≥14 procedimentos; **sem** empresas PJ nem pacientes |
+| **dev.db** | Byte-idêntico a `demo.db` |
+
+**Quando rodar:** antes de `pre-release` (automático) ou após `db:bootstrap:demo` / `db:push && db:seed`. Se falhar por slugs vazios em banco legado: `npm run db:backfill-slugs`.
+
 **Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.
 
 ```bash

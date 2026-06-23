@@ -45,7 +45,7 @@ docs/
 | Bem-estar | [`segmentos/spa/`](segmentos/spa/) | Zen Studio | `operacao@zen.demo` |
 | Educação | [`segmentos/education/`](segmentos/education/) | EduPrime | `operacao@eduprime.demo` |
 
-Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LEGAL`, etc.
+Senha demo universal: **`bibi123`**. Preview landing: `/?tenant=petcare` (recomendado) ou `/?niche=VET`, `/?niche=LEGAL`, etc.
 
 ---
 

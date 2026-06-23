@@ -39,21 +39,29 @@ Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md
 
 ## 0. ServiceOS v2.0 — labels e landing
 
-### 0.1 Resolução de nicho
+### 0.1 Resolução de segmento
 
 ```mermaid
 flowchart LR
-  Host["Host / domínio customizado"] --> Resolve["resolveLandingNiche()"]
-  Query["?niche=VET"] --> Resolve
+  TenantQ["?tenant=petcare"] --> Resolve["resolveSegmentContext()"]
+  Cookie["cookie bibi_segment"] --> Resolve
+  Host["Host / domínio customizado"] --> Resolve
+  NicheQ["?niche=VET (fallback)"] --> Resolve
   Resolve --> Tenant["Tenant.niche + labels"]
   Tenant --> UI["Landing + Portais"]
 ```
 
-| Contexto | Como o nicho é definido | Arquivo |
-|----------|-------------------------|---------|
-| Landing pública | `?niche=` ou domínio customizado do tenant | `src/lib/niche/resolve.ts` |
+**Prioridade** (`src/lib/segment/resolve.ts`): `?tenant=` → cookie assinado → domínio customizado → `?niche=` → default MEDICAL.
+
+| Contexto | Como o segmento é definido | Arquivo |
+|----------|----------------------------|---------|
+| Landing pública | `?tenant=` (slug), cookie `bibi_segment`, domínio ou `?niche=` | `src/lib/segment/resolve.ts` |
+| Persistência cookie | `POST /api/segment/persist` (client `SegmentCookiePersist`) | `src/lib/segment/cookie.ts` |
+| Login | Body `tenantSlug` + `validateUserSegmentAccess()` — 403 se `user.tenantId ≠ segment` | `src/lib/segment/auth.ts` |
 | Portais autenticados | `tenantId` da sessão → `resolveNicheFromTenantId()` | `src/lib/session.ts` |
 | Defaults | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
+
+> `src/lib/niche/resolve.ts` é wrapper legado — delega para `segment/resolve`.
 
 ### 0.2 Fluxo de labels na UI
 
@@ -66,13 +74,13 @@ flowchart LR
 
 ### 0.3 Tenants demo multi-nicho (seed)
 
-| Nicho | Tenant | Login interno | Landing preview |
-|-------|--------|---------------|-----------------|
-| VET | PetCare | `operacao@petcare.demo` | `/?niche=VET` |
-| DENTAL | Smile Odonto | `operacao@smile.demo` | `/?niche=DENTAL` |
-| LEGAL | Lex & Partners | `operacao@lex.demo` | `/?niche=LEGAL` |
-| SPA | Zen Studio | `operacao@zen.demo` | `/?niche=SPA` |
-| EDUCATION | EduPrime | `operacao@eduprime.demo` | `/?niche=EDUCATION` |
+| Nicho | Tenant | Slug | Login interno | Landing preview |
+|-------|--------|------|---------------|-----------------|
+| VET | PetCare | `petcare` | `operacao@petcare.demo` | `/?tenant=petcare` |
+| DENTAL | Smile Odonto | `smile` | `operacao@smile.demo` | `/?tenant=smile` |
+| LEGAL | Lex & Partners | `lex` | `operacao@lex.demo` | `/?tenant=lex` |
+| SPA | Zen Studio | `zen` | `operacao@zen.demo` | `/?tenant=zen` |
+| EDUCATION | EduPrime | `eduprime` | `operacao@eduprime.demo` | `/?tenant=eduprime` |
 
 Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`.
 
@@ -140,7 +148,9 @@ flowchart TB
 
 **UI:** `LoginForm` em cada portal → **API:** `POST /api/auth/login`
 
-Body: `{ email, password, portal }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+Body: `{ email, password, portal, tenantSlug? }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+
+O campo opcional `tenantSlug` vem da landing (`?tenant=petcare`). Após validar credenciais, `validateUserSegmentAccess()` retorna **403** se o `user.tenantId` não pertence ao segmento ativo (impede login cross-tenant em demo multi-nicho).
 
 ```mermaid
 sequenceDiagram
@@ -149,11 +159,13 @@ sequenceDiagram
   participant DB as User (Prisma)
   participant S as session.ts
 
-  U->>API: email + password + portal
+  U->>API: email + password + portal + tenantSlug?
   API->>DB: findUnique(email)
   API->>API: verifyPassword (scrypt)
   alt role ≠ portal
     API-->>U: 403
+  else user.tenantId ≠ segmento ativo
+    API-->>U: 403 (segmento)
   else BENEFICIARIO sem patientId
     API-->>U: 403
   else mfaEnabled
@@ -242,7 +254,7 @@ flowchart LR
 | `dashboard` | `/interno/dashboard` | `ExecutiveDashboardView` | KPIs executivos |
 | `billing` | `/interno` | `BillingView` | Pay Per Use, faturas, PIX, TISS |
 | `agenda` | `/interno/agenda` | `AppointmentsView` | CRUD agenda |
-| `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, usuários |
+| `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, precificação, usuários |
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
 | `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
@@ -305,10 +317,13 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
+| **Precificação** | `/api/interno/pricing-rules` | `PUT .../pricing-rules/[id]` | `DELETE .../pricing-rules/[id]` | `PricingRule` por empresa+procedimento; escopo via `Procedure.tenantId` |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
+
+**Precificação (`?tab=pricing`):** aba em `CadastrosView` → `CadastrosPricingTab`. Serviço: `src/lib/pricing-rule-service.ts` — lista/cria/atualiza/exclui regras filtrando por `procedure.tenantId`; valida que empresa e procedimento pertencem ao tenant da sessão. Motor de cálculo: `src/lib/pricing.ts` (`computePrice()`). Timeline: eventos `PricingRule` via `recordTimelineEvent()`.
 
 ### 4.4 CRM (`CrmPipelineView`)
 
@@ -635,6 +650,9 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` ·
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
+### Segmento (público)
+`POST /api/segment/persist` — persiste cookie `bibi_segment` (HMAC, 7 dias)
+
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
 `POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
@@ -650,7 +668,7 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
-`companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
+`companies/*` · `procedures/*` · `pricing-rules/*` · `users/*` · `subscriptions/*` · `messages/*` ·
 `reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
 
 ### Cron (sistema)

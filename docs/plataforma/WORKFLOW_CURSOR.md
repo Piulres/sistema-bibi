@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Em desenvolvimento na `dev`:** pacote **v2.0 ServiceOS** (multi-nicho, labels) — ver [`V2_0.md`](V2_0.md). Produção permanece **v1.2.0** até deploy manual.
+**Produção atual:** **v2.0.0** — **Sistema Bibi - ServiceOS** (multi-nicho, labels) — ver [`RELEASES.md`](RELEASES.md) e [`V2_0.md`](V2_0.md).
 
 ---
 
@@ -87,10 +87,13 @@ Evidências gravadas: [`evidencias/`](evidencias/).
 npm run pre-release
 ```
 
-Executa, em sequência:
+Executa, em sequência (`scripts/pre-release.mjs`):
 
 1. `npm run lint`
-2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+2. `npm run docs:verify` — consistência de marca e caminhos em docs
+3. `npm run db:verify` — integridade de `demo.db` + `operation.db` + `dev.db`
+4. `npm test` — Vitest (unit, API, integração, segurança)
+5. `npm run netlify:build` — mesmo pipeline do CI Netlify
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 

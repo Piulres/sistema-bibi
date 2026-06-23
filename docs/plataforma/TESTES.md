@@ -25,7 +25,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 |--------|--------|-------|---------|
 | Unitário | Vitest | `tests/unit/` | `npm run test` |
 
-Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
+Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho. `tests/unit/segment.test.ts` — resolução por slug (`?tenant=`), prioridade de query params.
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
@@ -88,7 +88,7 @@ Teste: `tests/api/auth-and-cron.test.ts`.
 
 ### 6. Isolamento multi-tenant
 
-Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
+Queries Prisma usam `tenantId` na maioria dos serviços. Testes de isolamento existem para precificação (`tests/integration/pricing-db.test.ts` — `computePrice` rejeita procedimento de outro tenant) e CRUD de regras (`tests/api/audit-pricing.test.ts`). **Ainda não há** teste E2E de login cross-tenant nem cross-tenant genérico (prestador A acessando paciente B).
 
 ### 7. MFA bypass em rotas sem segundo fator
 
@@ -102,7 +102,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
-| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
+| Precificação dinâmica | `pricing.ts` + `pricing-rule-service.ts` | ✅ unit + integração DB + `audit-pricing.test.ts` | Regras edge (multiplier 0, arredondamento) |
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
