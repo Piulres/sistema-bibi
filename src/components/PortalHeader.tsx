@@ -2,6 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import ServiceOsBadges from "@/components/niche/ServiceOsBadges";
+import { useLabels } from "@/hooks/useLabels";
 
 type Props = {
   portalLabel: string;
@@ -18,9 +20,10 @@ export default function PortalHeader({
   logoUrl,
   userName,
   loginPath,
-  platformLabel = "Sistema Bibi",
+  platformLabel = "ServiceOS v2.0",
 }: Props) {
   const router = useRouter();
+  const { niche } = useLabels();
 
   async function logout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -54,6 +57,7 @@ export default function PortalHeader({
             <p className="truncate text-sm font-medium text-[var(--text-primary)]">
               {displayName}
             </p>
+            <ServiceOsBadges niche={niche} />
           </div>
         </div>
         <div className="flex items-center gap-3">

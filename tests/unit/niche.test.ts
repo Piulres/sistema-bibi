@@ -8,6 +8,8 @@ import {
 import { getNicheConfig, getDefaultLabels } from "@/lib/niche/defaults";
 import { mergeNicheLabels } from "@/lib/niche/labels";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
+import { NICHE_INTERNO_DEMOS } from "@/lib/niche/demo-accounts";
+import { buildInternoNavTabs } from "@/lib/navigation/niche-nav";
 import { isNicheId, NICHE_IDS } from "@/lib/niche/types";
 import { NICHE_DEMOS } from "../../prisma/seed-data/niche-tenants";
 
@@ -93,6 +95,24 @@ describe("niche.getNicheLandingContent", () => {
     const content = getNicheLandingContent("LEGAL");
     const prestador = content.portals.find((p) => p.key === "prestador");
     expect(prestador?.audience).toBe("Advogados");
+  });
+});
+
+describe("niche.buildInternoNavTabs", () => {
+  it("usa vocabulário do nicho nas abas internas", () => {
+    const vet = buildInternoNavTabs(getDefaultLabels("VET"), "VET");
+    expect(vet.find((t) => t.key === "cadastros")?.label).toContain("Tutores");
+    expect(vet.find((t) => t.key === "agenda")?.label).toBe("Atendimentos");
+    expect(vet.find((t) => t.key === "estoque")?.label).toBe("Estoque pet");
+  });
+});
+
+describe("niche.NICHE_INTERNO_DEMOS", () => {
+  it("lista contas internas para cada nicho demo", () => {
+    expect(NICHE_INTERNO_DEMOS.length).toBe(NICHE_IDS.length);
+    expect(NICHE_INTERNO_DEMOS.find((d) => d.niche === "VET")?.internoEmail).toBe(
+      "operacao@petcare.demo",
+    );
   });
 });
 

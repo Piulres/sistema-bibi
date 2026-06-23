@@ -21,7 +21,7 @@ export default function PrestadorPortalShell({ user, children }: Props) {
   return (
     <PortalShell
       portal="prestador"
-      portalLabel={portal.label}
+      portalLabel={user.labels.portalProvider}
       loginPath={portal.loginPath}
       userName={user.name}
       branding={user.branding}

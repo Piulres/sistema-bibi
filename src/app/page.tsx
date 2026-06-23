@@ -7,6 +7,7 @@ import { nicheLandingBranding } from "@/lib/niche/branding";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import TenantTheme from "@/components/layout/TenantTheme";
 import LandingHeader from "@/components/landing/LandingHeader";
+import LandingNicheSwitcherBar from "@/components/landing/LandingNicheSwitcherBar";
 import LandingHeroNiche from "@/components/landing/LandingHeroNiche";
 import LandingStats from "@/components/landing/LandingStats";
 import LandingFeatures from "@/components/landing/LandingFeatures";
@@ -74,6 +75,7 @@ export default async function Home({ searchParams }: PageProps) {
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
       <LandingJsonLd branding={branding} />
       <LandingHeader branding={branding} />
+      <LandingNicheSwitcherBar />
       <main id="conteudo-principal" className="flex-1">
         <LandingHeroNiche niche={resolved.niche} branding={branding} />
         <LandingStats />

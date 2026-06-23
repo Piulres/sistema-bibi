@@ -1,13 +1,13 @@
 "use client";
 
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import NavTabs from "@/components/ui/NavTabs";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
-import {
-  INTERNO_NAV_TABS,
-  resolveInternoActive,
-} from "@/lib/navigation";
+import { resolveInternoActive } from "@/lib/navigation";
+import { buildInternoNavTabs } from "@/lib/navigation/niche-nav";
+import { useLabels } from "@/hooks/useLabels";
 import type { InternoModule } from "@/lib/interno-permissions";
 
 export default function InternoNav({
@@ -20,11 +20,13 @@ export default function InternoNav({
   const pathname = usePathname();
   const theme = PORTAL_THEMES.interno;
   const resolvedActive = active ?? resolveInternoActive(pathname);
+  const { labels, niche } = useLabels();
+  const allTabs = useMemo(() => buildInternoNavTabs(labels, niche), [labels, niche]);
 
   const tabs =
     permissions && permissions.length > 0
-      ? INTERNO_NAV_TABS.filter((tab) => permissions.includes(tab.key as InternoModule))
-      : INTERNO_NAV_TABS;
+      ? allTabs.filter((tab) => permissions.includes(tab.key as InternoModule))
+      : allTabs;
 
   return (
     <div className="mt-6">

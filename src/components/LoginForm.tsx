@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { PortalKey } from "@/lib/roles";
+import type { NicheDemoAccount } from "@/lib/niche/demo-accounts";
+import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
 import TenantTheme from "@/components/layout/TenantTheme";
 import Card from "@/components/ui/Card";
@@ -19,6 +21,7 @@ type Props = {
   demoEmail: string;
   demoPassword: string;
   branding: BrandingTokens;
+  nicheDemos?: NicheDemoAccount[];
 };
 
 export default function LoginForm({
@@ -28,6 +31,7 @@ export default function LoginForm({
   demoEmail,
   demoPassword,
   branding,
+  nicheDemos,
 }: Props) {
   const router = useRouter();
   const [email, setEmail] = useState(demoEmail);
@@ -189,10 +193,35 @@ export default function LoginForm({
             )}
 
             {!mfaToken && (
-              <p className="mt-4 rounded-[var(--radius-button)] bg-[var(--surface-muted)] px-3 py-2 text-xs text-[var(--text-muted)]">
-                Demo: <span className="font-mono">{demoEmail}</span> / senha{" "}
-                <span className="font-mono">{demoPassword}</span>
-              </p>
+              <>
+                <p className="mt-4 rounded-[var(--radius-button)] bg-[var(--surface-muted)] px-3 py-2 text-xs text-[var(--text-muted)]">
+                  Demo: <span className="font-mono">{demoEmail}</span> / senha{" "}
+                  <span className="font-mono">{demoPassword}</span>
+                </p>
+                {nicheDemos && nicheDemos.length > 0 && (
+                  <div className="mt-3 space-y-2">
+                    <p className="text-xs font-medium text-[var(--text-secondary)]">
+                      ServiceOS v2.0 — experimente outro nicho:
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {nicheDemos.map((demo) => (
+                        <button
+                          key={demo.niche}
+                          type="button"
+                          onClick={() => setEmail(demo.internoEmail)}
+                          className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
+                            email === demo.internoEmail
+                              ? "border-[var(--brand-primary)] bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]"
+                              : "border-[var(--border-default)] text-[var(--text-secondary)]"
+                          }`}
+                        >
+                          {nicheDemoLabel(demo.niche)} · {demo.tenant}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             <p className="mt-2 text-center text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
               {portalTheme.label} · {branding.platformLabel}

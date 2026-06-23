@@ -4,7 +4,7 @@ import PortalShell from "@/components/layout/PortalShell";
 import SectionNav from "@/components/ui/SectionNav";
 import { PORTALS } from "@/lib/roles";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
-import { PJ_SECTION_NAV } from "@/lib/navigation";
+import { buildPjSectionNav } from "@/lib/navigation/niche-nav";
 import type { SessionUser } from "@/lib/session";
 
 type Props = {
@@ -19,11 +19,12 @@ export default function PjPortalShell({ user, children }: Props) {
 
   const portal = PORTALS.pj;
   const theme = PORTAL_THEMES.pj;
+  const sections = buildPjSectionNav(user.labels);
 
   return (
     <PortalShell
       portal="pj"
-      portalLabel={portal.label}
+      portalLabel={`Portal ${user.labels.company}`}
       loginPath={portal.loginPath}
       userName={user.name}
       branding={user.branding}
@@ -31,7 +32,7 @@ export default function PjPortalShell({ user, children }: Props) {
       labels={user.labels}
     >
       <SectionNav
-        sections={PJ_SECTION_NAV}
+        sections={sections}
         activeClass={theme.navActiveClass}
         idleClass={theme.navIdleClass}
         className="mt-6"

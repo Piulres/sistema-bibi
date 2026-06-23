@@ -1,5 +1,43 @@
 import type { NavTab } from "@/components/ui/NavTabs";
+import type { InternoModule } from "@/lib/interno-permissions";
 import type { NicheId, NicheLabels } from "@/lib/niche/types";
+
+function estoqueTabLabel(niche: NicheId): string {
+  switch (niche) {
+    case "MEDICAL":
+    case "DENTAL":
+      return "Estoque clínico";
+    case "VET":
+      return "Estoque pet";
+    case "LEGAL":
+      return "Insumos";
+    case "SPA":
+      return "Insumos spa";
+    case "EDUCATION":
+      return "Materiais";
+    default:
+      return "Estoque";
+  }
+}
+
+/** Abas do portal interno com termos do nicho. */
+export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab[] {
+  return [
+    { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" as InternoModule },
+    { href: "/interno", label: "Faturamento", key: "billing" },
+    { href: "/interno/agenda", label: labels.appointments, key: "agenda" },
+    { href: "/interno/cadastros", label: `Cadastros · ${labels.beneficiaries}`, key: "cadastros" },
+    { href: "/interno/estoque", label: estoqueTabLabel(niche), key: "estoque" },
+    { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
+    { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
+    { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
+    { href: "/interno/relatorios", label: "Relatórios", key: "relatorios" },
+    { href: "/interno/auditoria", label: "Auditoria", key: "auditoria" },
+    { href: "/interno/branding", label: "White Label", key: "branding" },
+    { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
+    { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
+  ];
+}
 
 /** Abas do prestador com termos do nicho. */
 export function buildPrestadorNavTabs(labels: NicheLabels): NavTab[] {

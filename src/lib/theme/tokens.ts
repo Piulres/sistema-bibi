@@ -15,7 +15,7 @@ const SHARED_BRAND_COLORS = {
 export const CLINIC_BRANDING_DEFAULTS = {
   ...SHARED_BRAND_COLORS,
   tagline: null as string | null,
-  platformLabel: "Powered by Sistema Bibi",
+  platformLabel: "ServiceOS v2.0 · Pay Per Use",
 } as const;
 
 /** Identidade comercial da plataforma (landing e marketing). */
@@ -31,7 +31,7 @@ export const LOGIN_PORTAL_BRANDING: BrandingTokens = {
   displayName: "Portal da clínica",
   tagline: null,
   ...SHARED_BRAND_COLORS,
-  platformLabel: "Powered by Sistema Bibi",
+  platformLabel: "ServiceOS v2.0 · demonstração",
 };
 
 /** @deprecated Prefer PLATFORM_BRANDING, CLINIC_BRANDING_DEFAULTS ou LOGIN_PORTAL_BRANDING. */

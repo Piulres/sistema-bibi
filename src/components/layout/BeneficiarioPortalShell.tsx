@@ -20,7 +20,7 @@ export default function BeneficiarioPortalShell({ user, children }: Props) {
   return (
     <PortalShell
       portal="beneficiario"
-      portalLabel={portal.label}
+      portalLabel={user.labels.portalBeneficiary}
       loginPath={portal.loginPath}
       userName={user.name}
       branding={user.branding}

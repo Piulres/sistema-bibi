@@ -29,7 +29,7 @@ export default function InternoPortalShell({ user, children }: Props) {
   return (
     <PortalShell
       portal="interno"
-      portalLabel={portal.label}
+      portalLabel={`Operação · ${user.labels.beneficiaries}`}
       loginPath={portal.loginPath}
       userName={user.name}
       branding={user.branding}
