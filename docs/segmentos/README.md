@@ -30,4 +30,11 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 | Domínio customizado | DNS verificado no branding | Tenant do domínio |
 | Cookie `bibi_segment` | Após landing/login | Persiste entre páginas |
 
+### Persistência do cookie (mobile)
+
+Em navegadores mobile, cookies `Set-Cookie` em Server Components podem falhar. O componente `SegmentCookiePersist` (landing e páginas públicas) chama **`POST /api/segment/persist`** com `?tenant=` / `?niche=` da URL; o Route Handler grava o cookie assinado via `persistSegmentCookie()`.
+
+- Código: `src/components/segment/SegmentCookiePersist.tsx` · `src/app/api/segment/persist/route.ts`
+- Login/MFA também persistem o segmento após autenticação (`src/app/api/auth/login/route.ts`)
+
 Senha: **`bibi123`**

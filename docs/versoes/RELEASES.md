@@ -33,7 +33,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque — **tag criada** |
-| `v1.2.0` | `485819a` | Care Chart, exports, homepage — **em produção hoje** |
+| `v1.2.0` | `485819a` | Care Chart, exports, homepage — **substituído por v2.0.0** |
 | `v1.1.0` | `8c8cd01` | Care Chart (substituído) |
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
 | `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |

@@ -81,7 +81,8 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint + docs:verify + db:verify + test + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run db:verify` | Valida integridade `demo.db` + `operation.db` | Incluído no `pre-release` |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
@@ -193,7 +194,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v1.2.0`** (`55481be`). Ver [`RELEASES.md`](RELEASES.md).
+Exemplo atual em produção: **`v2.0.0`** (`3e7b250`, deploy `6a3a87c9`). Ver [`RELEASES.md`](RELEASES.md).
 
 ---
 

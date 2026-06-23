@@ -50,7 +50,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 
 - URL: https://sistema-bibi.netlify.app
 - `503` + `usage_exceeded` = **cota Netlify**, não bug — dev local continua
-- Pacote no ar: `@docs/versoes/RELEASES.md` (`v1.2.0` @ `55481be`)
+- Pacote no ar: `@docs/versoes/RELEASES.md` (`v2.0.0` @ `3e7b250`, deploy `6a3a87c9`)
 
 ## Netlify — economia de cota (resumo)
 
