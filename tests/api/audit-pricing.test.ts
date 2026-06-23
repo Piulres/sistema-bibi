@@ -52,9 +52,17 @@ describe("Auditoria e precificação", () => {
 
   it("CRUD pricing rule e evento na timeline", async () => {
     const prisma = getTestPrisma();
-    const company = await prisma.company.findFirst();
+    const interno = await prisma.user.findUniqueOrThrow({
+      where: { email: "faturamento@bibi.health" },
+    });
+    const company = await prisma.company.findFirst({
+      where: { tenantId: interno.tenantId },
+    });
     const procedure = await prisma.procedure.findFirst({
-      where: { NOT: { pricingRules: { some: { companyId: company?.id ?? "" } } } },
+      where: {
+        tenantId: interno.tenantId,
+        NOT: { pricingRules: { some: { companyId: company?.id ?? "" } } },
+      },
     });
     if (!company || !procedure) return;
 
