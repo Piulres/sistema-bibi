@@ -1,7 +1,9 @@
 import "server-only";
+import { headers } from "next/headers";
 import { getPrisma } from "@/lib/db";
 import { resolveTenantIdFromHost } from "@/lib/tenant-resolver";
-import { getDefaultLabels, getNicheConfig } from "@/lib/niche/defaults";
+import { getDefaultLabels } from "@/lib/niche/defaults";
+import { mergeNicheLabels } from "@/lib/niche/labels";
 import { isNicheId, type NicheId, type NicheLabels } from "@/lib/niche/types";
 
 export type ResolvedNiche = {
@@ -11,14 +13,7 @@ export type ResolvedNiche = {
 };
 
 function parseTenantLabels(raw: string | null | undefined, niche: string): NicheLabels {
-  const defaults = getDefaultLabels(niche);
-  if (!raw) return defaults;
-  try {
-    const parsed = JSON.parse(raw) as Partial<NicheLabels>;
-    return { ...defaults, ...parsed };
-  } catch {
-    return defaults;
-  }
+  return mergeNicheLabels(niche, raw);
 }
 
 /** Resolve nicho e labels a partir do tenant (por id ou host). */
@@ -36,8 +31,19 @@ export async function resolveNicheFromTenantId(tenantId: string): Promise<Resolv
   };
 }
 
-/** Resolve nicho da landing pública (domínio customizado ou default MEDICAL). */
-export async function resolveLandingNiche(host: string | null): Promise<ResolvedNiche> {
+/** Resolve nicho da landing pública (domínio customizado, query ?niche= ou default MEDICAL). */
+export async function resolveLandingNiche(
+  host: string | null,
+  nicheOverride?: string | null,
+): Promise<ResolvedNiche> {
+  if (nicheOverride && isNicheId(nicheOverride)) {
+    return {
+      niche: nicheOverride,
+      labels: getDefaultLabels(nicheOverride),
+      tenantId: null,
+    };
+  }
+
   try {
     const tenantId = await resolveTenantIdFromHost(host);
     if (tenantId) return resolveNicheFromTenantId(tenantId);
@@ -51,9 +57,12 @@ export async function resolveLandingNiche(host: string | null): Promise<Resolved
   };
 }
 
-/** Mescla labels do tenant com defaults do nicho. */
-export function mergeNicheLabels(niche: string, rawLabels: string | null | undefined): NicheLabels {
-  return parseTenantLabels(rawLabels, niche);
+/** Atalho que lê Host dos headers da requisição. */
+export async function resolveLandingNicheFromHeaders(
+  nicheOverride?: string | null,
+): Promise<ResolvedNiche> {
+  const h = await headers();
+  return resolveLandingNiche(h.get("host"), nicheOverride);
 }
 
-export { getNicheConfig };
+export { getNicheConfig } from "@/lib/niche/defaults";

@@ -5,7 +5,7 @@ import { getPrisma } from "@/lib/db";
 import { CLINIC_BRANDING_DEFAULTS, type BrandingTokens } from "@/lib/theme/tokens";
 import { normalizeColorScheme } from "@/lib/theme/color-scheme";
 import { applyNicheBrandingDefaults } from "@/lib/niche/branding";
-import { mergeNicheLabels } from "@/lib/niche/resolve";
+import { mergeNicheLabels } from "@/lib/niche/labels";
 import { isNicheId, type NicheId, type NicheLabels } from "@/lib/niche/types";
 import {
   resolveInternoPermissions,

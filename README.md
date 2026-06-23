@@ -169,6 +169,20 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` | `bibi123` |
 
+### Tenants ServiceOS multi-nicho (v2.0)
+
+Senha única: **`bibi123`**. Cada tenant tem procedimentos e nomenclatura do nicho.
+
+| Nicho | Tenant demo | Login interno (ADMIN) |
+|-------|-------------|------------------------|
+| Veterinária | PetCare | `operacao@petcare.demo` |
+| Odontologia | Smile Odonto | `operacao@smile.demo` |
+| Jurídico | Lex & Partners | `operacao@lex.demo` |
+| Bem-estar | Zen Studio | `operacao@zen.demo` |
+| Educação | EduPrime | `operacao@eduprime.demo` |
+
+Preview de nicho na landing local: `/?niche=VET`, `/?niche=LEGAL`, etc.
+
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
 

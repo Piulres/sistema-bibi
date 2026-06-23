@@ -1,7 +1,15 @@
+import type { NicheId } from "@/lib/niche/types";
+import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import LandingFaqAccordion from "@/components/landing/LandingFaqAccordion";
 
-export default function LandingFaq() {
+type Props = {
+  niche: NicheId;
+};
+
+export default function LandingFaq({ niche }: Props) {
+  const { faq } = getNicheLandingContent(niche);
+
   return (
     <section
       id="faq"
@@ -15,7 +23,7 @@ export default function LandingFaq() {
           title="Perguntas frequentes"
           align="center"
         />
-        <LandingFaqAccordion />
+        <LandingFaqAccordion items={faq} />
       </div>
     </section>
   );

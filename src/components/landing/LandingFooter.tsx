@@ -1,10 +1,12 @@
 import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
-import { LANDING_PORTALS } from "@/lib/landing/content";
+import type { NicheId } from "@/lib/niche/types";
+import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
 
 type Props = {
   branding: BrandingTokens;
+  niche: NicheId;
 };
 
 const FOOTER_LINKS: { href: string; label: string; external?: boolean }[] = [
@@ -14,8 +16,9 @@ const FOOTER_LINKS: { href: string; label: string; external?: boolean }[] = [
   { href: "/api-docs.html", label: "Documentação API", external: true },
 ];
 
-export default function LandingFooter({ branding }: Props) {
+export default function LandingFooter({ branding, niche }: Props) {
   const year = new Date().getFullYear();
+  const { footerTagline, portals } = getNicheLandingContent(niche);
 
   return (
     <footer className="border-t border-[var(--border-default)] bg-[var(--surface-muted)]/80">
@@ -26,8 +29,7 @@ export default function LandingFooter({ branding }: Props) {
               {branding.displayName}
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-[var(--text-secondary)]">
-              SaaS HealthTech para clínicas e operadoras — Pay Per Use, operação
-              clínica e faturamento integrado.
+              {footerTagline}
             </p>
             <p className="mt-4 text-xs text-[var(--text-muted)]">
               {branding.platformLabel}
@@ -56,7 +58,7 @@ export default function LandingFooter({ branding }: Props) {
           <nav aria-label="Portais de acesso">
             <p className="text-sm font-semibold text-[var(--text-primary)]">Portais</p>
             <ul className="mt-4 space-y-2">
-              {LANDING_PORTALS.map((portal) => (
+              {portals.map((portal) => (
                 <li key={portal.href}>
                   <Link
                     href={portal.href}

@@ -1,30 +1,35 @@
-import { LANDING_FEATURES } from "@/lib/landing/content";
+import type { NicheId } from "@/lib/niche/types";
+import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import type { ComponentProps } from "react";
+import type { LandingFeature } from "@/lib/niche/landing-content";
 
-const ICON_MAP: Record<
-  (typeof LANDING_FEATURES)[number]["id"],
-  ComponentProps<typeof LandingIcon>["name"]
-> = {
+const ICON_MAP: Record<LandingFeature["id"], ComponentProps<typeof LandingIcon>["name"]> = {
   "pay-per-use": "pay-per-use",
   pricing: "pricing",
   portals: "portals",
-  pep: "pep",
+  operations: "pep",
   billing: "billing",
   enterprise: "enterprise",
 };
 
-const BENTO_SPANS: Record<(typeof LANDING_FEATURES)[number]["id"], string> = {
+const BENTO_SPANS: Record<LandingFeature["id"], string> = {
   "pay-per-use": "sm:col-span-2",
   pricing: "",
   portals: "",
-  pep: "",
+  operations: "",
   billing: "",
   enterprise: "sm:col-span-2",
 };
 
-export default function LandingFeatures() {
+type Props = {
+  niche: NicheId;
+};
+
+export default function LandingFeatures({ niche }: Props) {
+  const { featuresSection, features } = getNicheLandingContent(niche);
+
   return (
     <section
       id="recursos"
@@ -36,12 +41,12 @@ export default function LandingFeatures() {
       <LandingSectionHeader
         id="features-heading"
         eyebrow="Recursos"
-        title="Tudo que clínicas, hospitais e saúde corporativa precisam"
-        description="Da operação clínica ao faturamento Pay Per Use — uma plataforma unificada com portais segregados e dados conectados em tempo real."
+        title={featuresSection.title}
+        description={featuresSection.description}
       />
 
       <ul className="relative mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {LANDING_FEATURES.map((feature) => (
+        {features.map((feature) => (
           <li key={feature.id} className={BENTO_SPANS[feature.id]}>
             <article className="landing-card-hover group h-full rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
               <div

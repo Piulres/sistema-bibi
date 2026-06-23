@@ -1,10 +1,17 @@
 import Link from "next/link";
-import { LANDING_PORTALS } from "@/lib/landing/content";
+import type { NicheId } from "@/lib/niche/types";
+import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 
-export default function LandingPortals() {
+type Props = {
+  niche: NicheId;
+};
+
+export default function LandingPortals({ niche }: Props) {
+  const { portals } = getNicheLandingContent(niche);
+
   return (
     <section
       id="portais"
@@ -19,7 +26,7 @@ export default function LandingPortals() {
       />
 
       <ul className="mt-14 grid gap-5 sm:grid-cols-2">
-        {LANDING_PORTALS.map((portal) => {
+        {portals.map((portal) => {
           const theme = PORTAL_THEMES[portal.key];
           return (
             <li key={portal.href}>
@@ -75,6 +82,15 @@ export default function LandingPortals() {
           bibi123
         </code>{" "}
         com os e-mails de teste de cada portal.
+        {niche !== "MEDICAL" && (
+          <>
+            {" "}
+            Preview deste nicho:{" "}
+            <code className="rounded-md bg-[var(--surface-card)] px-1.5 py-0.5 font-mono text-xs text-[var(--text-secondary)]">
+              ?niche={niche}
+            </code>
+          </>
+        )}
       </p>
     </section>
   );

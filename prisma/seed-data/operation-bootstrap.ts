@@ -3,6 +3,7 @@
  * Sem massa PJ/beneficiários; dados reais entram pelo uso do sistema.
  */
 import { PrismaClient } from "@prisma/client";
+import { getNicheConfig } from "../../src/lib/niche/defaults";
 import { hashPassword } from "../../src/lib/password";
 import { ALL_SEED_PROCEDURES } from "./pricing-market";
 import { currentTotpCode, DEMO_MFA_SECRET } from "./totp-demo";
@@ -33,6 +34,8 @@ export async function runOperationBootstrap(
     data: {
       name: "Clínica Bibi Saúde",
       cnpj: "12.345.678/0001-90",
+      niche: "MEDICAL",
+      labels: JSON.stringify(getNicheConfig("MEDICAL").labels),
       branding: {
         create: {
           displayName: "Clínica Bibi Saúde",

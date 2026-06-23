@@ -12,6 +12,36 @@ e são renderizados automaticamente no GitHub.
 > **Deploy Netlify:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) · produção: https://sistema-bibi.netlify.app
 >
 > **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](RELEASES.md)
+>
+> **ServiceOS v2.0 (multi-nicho):** [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useNiche()`
+
+---
+
+## 0. ServiceOS v2.0 — multi-nicho
+
+A partir da v2.0, o mesmo código-core atende múltiplos verticais via parametrização por tenant:
+
+| Campo | Tipo | Função |
+|-------|------|--------|
+| `Tenant.niche` | `String` | `MEDICAL` \| `VET` \| `DENTAL` \| `LEGAL` \| `SPA` \| `EDUCATION` |
+| `Tenant.labels` | JSON (`String`) | Dicionário de termos da UI (ex.: paciente → "Pet" no VET) |
+| `Procedure.serviceType` | `String?` | Classificação livre por nicho |
+
+```mermaid
+flowchart LR
+  Tenant["Tenant<br/>niche + labels"]
+  UI["Landing + Portais<br/>useNiche()"]
+  Core["Motores compartilhados<br/>Agenda · ProcedureUsage · PIX"]
+  Tenant --> UI
+  Tenant --> Core
+  UI --> Core
+```
+
+- **Server:** `src/lib/niche/resolve.ts`, `src/lib/niche/labels.ts`
+- **Client:** `src/hooks/useNiche.tsx` via `NicheProvider` em `PortalShell`
+- **Landing:** `/?niche=VET` para preview local; domínio customizado em produção
+
+Detalhes: [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md).
 
 ---
 

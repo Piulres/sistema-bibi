@@ -1,16 +1,20 @@
 "use client";
 
 import { useId, useState } from "react";
-import { LANDING_FAQ } from "@/lib/landing/content";
+import type { LandingFaqItem } from "@/lib/niche/landing-content";
 import { cn } from "@/lib/utils/cn";
 
-export default function LandingFaqAccordion() {
+type Props = {
+  items: LandingFaqItem[];
+};
+
+export default function LandingFaqAccordion({ items }: Props) {
   const baseId = useId();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
     <dl className="mt-12 space-y-3">
-      {LANDING_FAQ.map((item, index) => {
+      {items.map((item, index) => {
         const isOpen = openIndex === index;
         const panelId = `${baseId}-panel-${index}`;
         const buttonId = `${baseId}-button-${index}`;

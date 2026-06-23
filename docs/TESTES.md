@@ -24,6 +24,8 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | Camada | Runner | Pasta | Comando |
 |--------|--------|-------|---------|
 | Unitário | Vitest | `tests/unit/` | `npm run test` |
+
+Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |

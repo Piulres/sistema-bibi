@@ -63,7 +63,7 @@ Exemplo para nicho `LEGAL`:
 
 ### Hook client-side
 
-`src/hooks/useNiche.ts` — `useNiche()` expõe `t(key)` para tradução nos portais.
+`src/hooks/useNiche.tsx` — `useNiche()` expõe `t(key)` para tradução nos portais.
 
 O `NicheProvider` é injetado em `PortalShell` e recebe `niche` + `labels` da sessão (`SessionUser`).
 
@@ -101,7 +101,7 @@ Paletas automáticas em `src/lib/niche/defaults.ts`:
 
 `applyNicheBrandingDefaults()` aplica a paleta quando o tenant usa cores padrão.
 
-A landing (`src/app/page.tsx`) detecta o nicho via domínio customizado (`resolveLandingNiche`) e renderiza `LandingHeroNiche`.
+A landing (`src/app/page.tsx`) detecta o nicho via domínio customizado (`resolveLandingNiche`) ou query `?niche=VET` e renderiza seções temáticas via `getNicheLandingContent()`.
 
 ---
 
@@ -132,7 +132,7 @@ O ServiceOS trata qualquer transação de serviço processada — consulta médi
 
 ## Referências
 
-- `src/lib/niche/` — tipos, defaults, resolução e branding
-- `src/hooks/useNiche.ts` — hook de tradução
+- `src/lib/niche/` — tipos, defaults, labels, landing-content e resolução
+- `src/hooks/useNiche.tsx` — hook de tradução
 - `prisma/schema.prisma` — `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`
 - `docs/RELEASES.md` — pacotes fechados (v2.0 em desenvolvimento na `dev`)

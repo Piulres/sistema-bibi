@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { buildLandingDescription } from "@/lib/landing/content";
 import { getSiteUrl } from "@/lib/landing/site-url";
-import { resolveLandingNiche } from "@/lib/niche/resolve";
+import { resolveLandingNicheFromHeaders } from "@/lib/niche/resolve";
 import { nicheLandingBranding } from "@/lib/niche/branding";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import TenantTheme from "@/components/layout/TenantTheme";
@@ -18,9 +17,13 @@ import LandingCta from "@/components/landing/LandingCta";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingJsonLd from "@/components/landing/LandingJsonLd";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const h = await headers();
-  const resolved = await resolveLandingNiche(h.get("host"));
+type PageProps = {
+  searchParams: Promise<{ niche?: string }>;
+};
+
+export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
+  const { niche: nicheParam } = await searchParams;
+  const resolved = await resolveLandingNicheFromHeaders(nicheParam);
   const config = getNicheConfig(resolved.niche);
   const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
   const siteUrl = getSiteUrl();
@@ -62,9 +65,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export default async function Home() {
-  const h = await headers();
-  const resolved = await resolveLandingNiche(h.get("host"));
+export default async function Home({ searchParams }: PageProps) {
+  const { niche: nicheParam } = await searchParams;
+  const resolved = await resolveLandingNicheFromHeaders(nicheParam);
   const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
 
   return (
@@ -74,13 +77,13 @@ export default async function Home() {
       <main id="conteudo-principal" className="flex-1">
         <LandingHeroNiche niche={resolved.niche} branding={branding} />
         <LandingStats />
-        <LandingFeatures />
-        <LandingHowItWorks />
-        <LandingPortals />
-        <LandingFaq />
-        <LandingCta branding={branding} />
+        <LandingFeatures niche={resolved.niche} />
+        <LandingHowItWorks niche={resolved.niche} />
+        <LandingPortals niche={resolved.niche} />
+        <LandingFaq niche={resolved.niche} />
+        <LandingCta branding={branding} niche={resolved.niche} />
       </main>
-      <LandingFooter branding={branding} />
+      <LandingFooter branding={branding} niche={resolved.niche} />
     </TenantTheme>
   );
 }

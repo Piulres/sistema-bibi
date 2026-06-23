@@ -1,12 +1,17 @@
 import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
+import type { NicheId } from "@/lib/niche/types";
+import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingIcon from "@/components/landing/LandingIcon";
 
 type Props = {
   branding: BrandingTokens;
+  niche: NicheId;
 };
 
-export default function LandingCta({ branding }: Props) {
+export default function LandingCta({ branding, niche }: Props) {
+  const { ctaDescription } = getNicheLandingContent(niche);
+
   return (
     <section aria-labelledby="cta-heading" className="mx-auto max-w-6xl px-6 py-24">
       <div className="landing-mesh-hero relative overflow-hidden rounded-3xl px-8 py-14 text-center text-[var(--text-inverse)] shadow-xl sm:px-14 sm:py-16">
@@ -35,8 +40,7 @@ export default function LandingCta({ branding }: Props) {
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/75">
-            Explore a demonstração com os quatro portais, fluxo Pay Per Use e white
-            label configurável para cada clínica cliente.
+            {ctaDescription}
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">

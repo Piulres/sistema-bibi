@@ -1,7 +1,14 @@
-import { LANDING_STEPS } from "@/lib/landing/content";
+import type { NicheId } from "@/lib/niche/types";
+import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 
-export default function LandingHowItWorks() {
+type Props = {
+  niche: NicheId;
+};
+
+export default function LandingHowItWorks({ niche }: Props) {
+  const { steps } = getNicheLandingContent(niche);
+
   return (
     <section
       id="como-funciona"
@@ -22,7 +29,7 @@ export default function LandingHowItWorks() {
             aria-hidden
           />
 
-          {LANDING_STEPS.map((item) => (
+          {steps.map((item) => (
             <li key={item.step} className="relative">
               <article className="landing-card-hover h-full rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
                 <span
