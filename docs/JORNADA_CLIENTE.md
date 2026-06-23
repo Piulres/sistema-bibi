@@ -6,7 +6,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: alinhada à `main` pós walk-in particular, edição CRUD em Cadastros e mapa `CRUD_OPERATIONS_MAP` (27 entidades).
+Última revisão: alinhada à `main` **v1.2.0** — exportações PDF/Excel, auditoria, cadastros B2B, rotas dedicadas beneficiário e homepage moderna.
 
 ---
 

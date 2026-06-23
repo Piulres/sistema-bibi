@@ -99,10 +99,13 @@ Base local: **`http://localhost:3000`**
 
 | URL | Página | Acesso |
 |-----|--------|--------|
-| `/` | Landing page com seleção de portal | Público |
+| `/` | Landing page moderna (Hero, portais, FAQ, SEO) | Público |
 | `/login` | Login do **Portal do Prestador** | Público |
-| `/prestador` | Dashboard do prestador (agenda do dia) | `PRESTADOR` |
-| `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP) | `PRESTADOR` |
+| `/prestador/dashboard` | Dashboard do prestador (KPIs do dia) | `PRESTADOR` |
+| `/prestador` | Agenda do prestador | `PRESTADOR` |
+| `/prestador/extrato` | Extrato financeiro + export | `PRESTADOR` |
+| `/prestador/relatorios` | Relatórios + export | `PRESTADOR` |
+| `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP + Care Chart) | `PRESTADOR` |
 | `/interno/login` | Login do **Portal Interno** | Público |
 | `/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados do tenant | `INTERNO` |
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
@@ -110,15 +113,20 @@ Base local: **`http://localhost:3000`**
 | `/interno/crm` | **CRM Corporativo** — pipeline de empresas | `INTERNO` |
 | `/interno/assinaturas` | **Recorrência** — assinaturas e cobranças futuras | `INTERNO` |
 | `/interno/comunicacao` | **Comunicação** — fila de e-mail, SMS e WhatsApp | `INTERNO` |
-| `/interno/cadastros` | **Cadastros** — beneficiários, empresas, procedimentos, usuários; aba **Mapa CRUD** | `INTERNO` |
+| `/interno/cadastros` | **Cadastros** — beneficiários, empresas, procedimentos, **precificação B2B**, usuários; aba **Mapa CRUD** | `INTERNO` |
+| `/interno/cadastros?tab=pricing` | **Precificação** — regras por empresa/procedimento | `INTERNO` |
 | `/interno/cadastros?tab=operations` | **Mapa CRUD** — 27 entidades, rotas API, filtro por portal | `INTERNO` |
 | `/interno/agenda` | **Agenda** — agendamentos, **walk-in particular** e check-in | `INTERNO` |
-| `/interno/relatorios` | **Relatórios** — exportação CSV (faturamento, CRM) | `INTERNO` |
+| `/interno/relatorios` | **Relatórios** — exportação PDF/Excel/CSV (faturamento, CRM) | `INTERNO` |
+| `/interno/auditoria` | **Auditoria** — timeline universal + export | `INTERNO` |
 | `/interno/branding` | **White label** — cores, logo, tema, domínio custom | `INTERNO` |
 | `/interno/integracoes` | **Integrações B2B** — webhooks outbound e log de entregas | `INTERNO` |
 | `/interno/seguranca` | **Segurança** — MFA TOTP; seletor **demo/operação**; restaurar demo | `INTERNO` (ADMIN para dados) |
 | `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
-| `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
+| `/beneficiario` | Redirect → `/beneficiario/resumo` | `BENEFICIARIO` |
+| `/beneficiario/resumo` | Resumo, próximo atendimento, export | `BENEFICIARIO` |
+| `/beneficiario/medicacoes` | Prescrições (Care Chart) | `BENEFICIARIO` |
+| `/beneficiario/exames` | Pedidos e resultados de exames | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
 | `/pj` | Dashboard corporativo (beneficiários e faturas) | `PJ` |
 
@@ -445,6 +453,8 @@ sistema-bibi/
   [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
   [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Versão em produção (`v1.2.0`):**
+  [`docs/V1_2.md`](docs/V1_2.md)
 - **Workflow Cursor (dev sem deploy automático):**
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**
