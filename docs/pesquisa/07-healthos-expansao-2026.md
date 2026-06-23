@@ -4,7 +4,7 @@
 
 | Meta | Valor |
 |------|-------|
-| Versão | 1.0 |
+| Versão | 1.1 |
 | Data | Junho/2026 |
 | Stack POC | Next.js 16, React 19, Prisma 6 |
 | Diferencial técnico | **Price Snapshot** (`priceCharged` congelado no ato do atendimento via `computePrice` + `PricingRule`) |
@@ -40,18 +40,26 @@
 
 **Interpretação da utilização:** 15% dos colaboradores realizam **1 consulta no mês** (75 consultas/mês).
 
+#### Cenário comercial recomendado (uso + taxa plataforma)
+
 | Indicador | Plano por vida | Bibi Pay Per Use | Δ |
 |-----------|----------------|------------------|---|
-| Base mensal | 500 × R$ 350 | 75 × R$ 153 | — |
+| Uso variável | 500 × R$ 350 | 75 × R$ 153 = R$ 11.475 | — |
+| Taxa plataforma | Inclusa na mensalidade | R$ 3.000 | — |
+| **Custo mensal total** | **R$ 175.000** | **R$ 14.475** | **−R$ 160.525** |
+| **Custo anual** | **R$ 2.100.000** | **R$ 173.700** | **−R$ 1.926.300** |
+| **Economia %** | — | — | **~91,7%** |
+
+#### Cenário uso puro (sem taxa plataforma — sensibilidade)
+
+| Indicador | Plano por vida | Bibi (só eventos) | Δ |
+|-----------|----------------|-------------------|---|
 | **Custo mensal** | **R$ 175.000** | **R$ 11.475** | **−R$ 163.525** |
-| **Custo anual** | **R$ 2.100.000** | **R$ 137.700** | **−R$ 1.962.300** |
 | **Economia %** | — | — | **~93,4%** |
-| Custo por colaborador/mês (média empresa) | R$ 350 | R$ 22,95 | −93,4% |
-| Custo por consulta efetiva | R$ 2.333* | R$ 153 | −93,4% |
 
-\* *INFERÊNCIA:* R$ 175.000 ÷ 75 consultas — custo efetivo por consulta no modelo fixo quando só 15% usam.
+\* *INFERÊNCIA:* Custo efetivo por consulta no modelo fixo: R$ 175.000 ÷ 75 ≈ **R$ 2.333/consulta** quando só 15% usam.
 
-**INFERÊNCIA (mensagem CFO):** No modelo fixo, os 85% que não usam subsidiam os 15% que usam. No Pay Per Use, o caixa acompanha a demanda real.
+**INFERÊNCIA (mensagem CFO):** No modelo fixo, os 85% que não usam subsidiam os 15% que usam. No Pay Per Use, o caixa acompanha a demanda real. Use **R$ 14.475/mês** (com taxa plataforma) em propostas comerciais — ver [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md).
 
 ---
 
@@ -184,16 +192,16 @@
 
 **Objetivo:** Confirmar dor real (sinistralidade opaca) e disposição a pagar por transparência + Pay Per Use.
 
-**Participantes ideais:** Diretor RH, BP Financeiro, às vezes C-level em empresas 100–1.000 colaboradores.
+**Roteiro rápido (síntese consultor):**
 
-| Bloco | Tempo | Roteiro |
-|-------|:-----:|---------|
-| Abertura | 5 min | “Não estou aqui para vender plano de saúde. Quero entender se vocês conseguem explicar, hoje, quanto cada área gastou em saúde no último trimestre.” |
-| Diagnóstico | 15 min | Perguntas abaixo (registrar verbatim) |
-| Demo Portal PJ | 10 min | Consumo por beneficiário, alertas, export CSV, precificação por empresa |
-| ROI | 10 min | Planilha seção 1 (customizar com vidas e utilização deles) |
-| Validação brutal | 10 min | “O que faria isso falhar na sua empresa?” |
-| Fechamento | 5 min | Piloto 90 dias / NDA / próxima reunião com CFO |
+| Momento | Fala-chave |
+|---------|------------|
+| Gancho | “Plano reajustou ~20% e você não sabe por quê?” |
+| Diferencial | “HealthOS Pay Per Use + Price Snapshot” |
+| Demo Portal PJ | Consumo por CPF, procedimento, desconto automático |
+| Fechamento | “Quanto de economia nos dados para trocar custo fixo por sob demanda?” |
+
+Detalhe completo em [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) §3.
 
 ---
 
@@ -296,6 +304,10 @@
 2. **Negociação contínua** — RH ajusta multiplier por procedimento sem esperar renovação anual.
 3. **Auditoria linha a linha** — cada `ProcedureUsage` na timeline vs boleto único operadora.
 4. **White label** — cada rede (ex. VitaCare) com tabela própria no mesmo HealthOS.
+
+**INFERÊNCIA:** Janela para o Bibi como **SaaS de infraestrutura** white-label (VitaCare, redes regionais) em vez de competir apenas head-on com Tier 1.
+
+**FATO (dados primários vs secundários):** Bibi coleta evento no PEP (`ProcedureUsage`); Pipo/Vitta dependem majoritariamente de dados de operadoras para sinistralidade agregada.
 
 **INFERÊNCIA — onde Tier 1 ainda vence:** previsão de **reajuste ANS** e **benchmark entre operadoras** (core corretagem Pipo/Vitta).
 

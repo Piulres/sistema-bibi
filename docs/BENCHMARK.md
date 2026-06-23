@@ -251,7 +251,7 @@ Escala: **0** ausente · **1** parcial/mock · **2** implementado alinhado ao me
 |-----------|---------------------|
 | [`pesquisa/README.md`](pesquisa/README.md) | Benchmark estratégico 2026 (matriz, mercado, roadmap, prompts) |
 | [`pesquisa/01-matriz-competitiva.md`](pesquisa/01-matriz-competitiva.md) | Bibi × Conexa, Vitta, Alice, Pipo, Feegow, iClinic, etc. |
-| [`pesquisa/07-healthos-expansao-2026.md`](pesquisa/07-healthos-expansao-2026.md) | ROI, interoperabilidade, scripts RH/CFO, Tier 1 |
+| [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) | Síntese executiva consultor — ROI, script CFO, Tier 1 |
 | [`FLUXOS.md`](FLUXOS.md) | Fluxos detalhados de cada ação |
 | [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) | Jornada UX nos 4 portais e backlog priorizado |
 | [`NOTEBOOKLM.md`](NOTEBOOKLM.md) | Tiers 1–4 e épicos |
