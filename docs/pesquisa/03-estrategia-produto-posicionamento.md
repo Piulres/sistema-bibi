@@ -4,39 +4,58 @@
 
 ## Posicionamento recomendado
 
-O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, beneficiários e prestadores em um modelo transparente de consumo, eliminando desperdícios e permitindo cobrança baseada em uso real.
+O Sistema Bibi é um **HealthOS para Saúde Corporativa Pay Per Use** — infraestrutura
+financeira e clínica que conecta empresas, beneficiários e prestadores em um modelo
+transparente de consumo. Não é corretora nem operadora: é o **sistema operacional**
+sobre o qual RH, prestadores e pacientes capitalizam confiança, com o **Price
+Snapshot** eliminando a “caixa preta” da sinistralidade.
+
+---
+
+## Regra 80/20 — foco da fase atual
+
+| Alocação | Foco | Atividades |
+|----------|------|------------|
+| **80%** | Validação comercial brutal | Entrevistas e demos com **RHs e CFOs**; scripts de ROI; prova do Portal PJ em tempo real; objeções de sinistralidade e reajuste ANS |
+| **20%** | Produto e engenharia | Price Snapshot, integrações críticas (Memed, WhatsApp), certificação SBIS, analytics |
+
+> **Princípio:** não escalar features antes de fechar a narrativa financeira com
+> quem aprova orçamento. Detalhes em
+> [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) §3 e
+> [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md).
 
 ---
 
 ## Proposta de valor
 
-### Para empresas
+### Para empresas (RH / CFO)
 
-- Redução de desperdícios
-- Transparência financeira
-- Controle de utilização
+- Redução de custos fixos em até **~91%** no cenário 500 vidas (Pay Per Use vs capitação)
+- Transparência financeira via Price Snapshot e Portal PJ
+- Controle de utilização individualizado (fim da caixa preta)
 
 ### Para beneficiários
 
 - Autoatendimento
 - Histórico clínico
 - Agendamento simples
+- Preço conhecido antes do atendimento
 
 ### Para prestadores
 
 - Agenda
 - Atendimento
-- Recebimento simplificado
+- Recebimento simplificado (uso registrado = preço congelado)
 
 ---
 
 ## Top 5 diferenciais
 
-1. Arquitetura de 4 portais
-2. Pay Per Use nativo
-3. Precificação por empresa
-4. White label
-5. Plataforma multi-tenant
+1. **HealthOS** — infraestrutura, não apenas gestão ou telemedicina
+2. **Pay Per Use nativo** com Price Snapshot (`ProcedureUsage.priceCharged`)
+3. Precificação dinâmica por empresa (`PricingRule`)
+4. Arquitetura de 4 portais segregados (capitalização independente por ator)
+5. Plataforma multi-tenant white-label
 
 ---
 
@@ -45,12 +64,14 @@ O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, ben
 ### Gap 1 — Prescrição digital regulada
 
 - **Prioridade:** Alta
-- **Sugestão:** Integração Memed
+- **Sugestão:** Integração **Memed** (Q2)
+- **Roadmap:** ver Q2 abaixo
 
-### Gap 2 — WhatsApp Business
+### Gap 2 — WhatsApp Business API
 
 - **Prioridade:** Alta
 - **Automação:** lembretes, agendamentos, cobranças
+- **Roadmap:** ver Q1 abaixo
 
 ### Gap 3 — Copiloto clínico
 
@@ -60,12 +81,13 @@ O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, ben
 ### Gap 4 — Motor de saúde populacional
 
 - **Prioridade:** Média
-- **Escopo:** Risco assistencial
+- **Escopo:** Risco assistencial · monetização Analytics Premium
 
-### Gap 5 — Certificação SBIS
+### Gap 5 — Certificação SBIS (PEP e Telessaúde)
 
-- **Prioridade:** Alta
-- **Motivo:** Essencial para contratos enterprise
+- **Prioridade:** Alta (requisito **enterprise**)
+- **Escopo:** PEP + módulo Telessaúde para RFPs de grandes empresas
+- **Meta:** Q3/Q4 do roadmap de 12 meses
 
 ---
 
@@ -84,37 +106,39 @@ O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, ben
 
 | Player | Motivo |
 |--------|--------|
-| Conexa | Mais próxima da proposta |
-| Vitta | Saúde corporativa |
-| Pipo Saúde | Benefícios corporativos |
-| ERPMed | Referência arquitetural |
+| Conexa | Telemedicina + B2B — competidor de serviço, não de infraestrutura |
+| Vitta | Saúde corporativa — corretora/gestão de benefícios |
+| Pipo Saúde | Benefícios corporativos — modelo de corretagem |
+| ERPMed | Referência arquitetural de ERP clínico |
+
+Ver matriz detalhada: [`01-matriz-competitiva.md`](01-matriz-competitiva.md)
 
 ---
 
 ## Roadmap 12 meses
 
-### Q1
+### Q1 — receita e engajamento
 
-- PIX real
-- WhatsApp
+- PIX real (gateway de produção)
+- **WhatsApp Business API** (lembretes, cobrança, confirmação de agenda)
 - Portal Beneficiário V2
 
-### Q2
+### Q2 — interoperabilidade clínica
 
-- Memed
-- Telemedicina
-- Assinatura digital
+- **Memed** (prescrição digital no Portal Prestador)
+- Telemedicina (salas + fluxo assinatura)
+- Assinatura digital de documentos clínicos
 
-### Q3
+### Q3 — inteligência e analytics
 
 - IA SOAP
 - IA resumo clínico
-- Analytics
+- Analytics · base do **Analytics Premium** ([`../MONETIZACAO.md`](../MONETIZACAO.md))
 
-### Q4
+### Q4 — enterprise e rede
 
-- Saúde populacional
-- Certificação SBIS
+- Saúde populacional (motor de risco assistencial)
+- **Certificação SBIS** (PEP + Telessaúde)
 - Marketplace de prestadores
 
 ---
@@ -123,16 +147,26 @@ O Sistema Bibi é uma plataforma de saúde corporativa que conecta empresas, ben
 
 > Pare de pagar por vidas que não utilizam seu benefício de saúde.
 >
-> Com o Sistema Bibi, sua empresa paga apenas pelo que realmente foi utilizado, com transparência total para RH, beneficiários e prestadores.
+> O Bibi é um HealthOS: sua empresa paga apenas pelo que realmente foi utilizado,
+> com preço congelado no ato do atendimento (**Price Snapshot**) e transparência
+> total para RH, beneficiários e prestadores.
 
 ---
 
 ## Pitch curto
 
-Sistema Bibi é uma plataforma SaaS de saúde corporativa que conecta empresas, beneficiários e prestadores em uma única operação digital.
+Sistema Bibi é um **HealthOS para Saúde Corporativa Pay Per Use** — infraestrutura
+que conecta empresas, beneficiários e prestadores em uma única operação digital.
 
-Diferente de ERPs clínicos tradicionais ou operadoras digitais, o Bibi oferece controle de consumo individualizado, cobrança Pay Per Use e arquitetura multi-tenant white-label preparada para escalar redes de saúde corporativa.
+Diferente de ERPs clínicos, corretoras (Pipo, Vitta) ou serviços de telemedicina
+(Conexa), o Bibi é o **sistema operacional**: controle de consumo individualizado,
+cobrança por uso real, Price Snapshot anti-sinistralidade e arquitetura multi-tenant
+white-label para escalar redes de saúde corporativa.
 
 ---
 
-Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) (ROI, scripts RH/CFO) · [`../BENCHMARK.md`](../BENCHMARK.md) (gaps técnicos na POC)
+Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) ·
+[`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) (ROI, scripts RH/CFO) ·
+[`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) ·
+[`../MONETIZACAO.md`](../MONETIZACAO.md) ·
+[`../BENCHMARK.md`](../BENCHMARK.md) (gaps técnicos na POC)

@@ -2,7 +2,7 @@
 
 Documentação de **pesquisa externa** e **posicionamento estratégico** do Sistema Bibi frente ao mercado HealthTech brasileiro.
 
-Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referências de código).
+Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referências de código) e [`../MONETIZACAO.md`](../MONETIZACAO.md) (take rate, SaaS enterprise, analytics premium).
 
 | Documento | Conteúdo |
 |-----------|----------|

@@ -1,8 +1,10 @@
 # Sistema Bibi
 
-> Plataforma SaaS **HealthTech** (POC) para gestão inteligente de clínicas e
-> hospitais, inspirada no modelo **ERPMed/Centtralmed**. Foco em **Pay Per Use**,
-> previsibilidade financeira, extinção da burocracia e fidelização de pacientes.
+> **HealthOS para Saúde Corporativa Pay Per Use** — infraestrutura financeira e
+> clínica que conecta empresas, beneficiários e prestadores em um modelo
+> transparente de consumo. Inspirado no modelo **ERPMed/Centtralmed**, com foco
+> em previsibilidade financeira, extinção da burocracia e fidelização de
+> pacientes.
 
 ---
 
@@ -27,11 +29,33 @@
 
 ## 1. Visão geral
 
-O Sistema Bibi é uma plataforma multi-tenant (cada clínica/hospital é um *tenant*)
-com **quatro portais segregados** por perfil de acesso. O objetivo da POC é
-demonstrar o modelo de negócio **Pay Per Use**: o beneficiário paga apenas pelos
-serviços (consultas e exames) efetivamente utilizados, com transparência prévia
-de valores e faturamento sem perdas de informação.
+O Sistema Bibi é um **HealthOS** — sistema operacional de saúde corporativa —
+multi-tenant (cada clínica/hospital é um *tenant*) com **quatro portais segregados**
+por perfil de acesso. Evoluiu de ferramenta de gestão para **infraestrutura de
+confiança** entre RH, CFO, beneficiários e prestadores: cada ator vê a mesma
+verdade financeira e clínica, sem a “caixa preta” da sinistralidade.
+
+O núcleo do modelo é **Pay Per Use**: o beneficiário (ou a empresa) paga apenas
+pelos serviços efetivamente utilizados. A tecnologia que garante essa
+transparência é o **Price Snapshot** — o preço é calculado e **congelado** no
+momento do atendimento (`ProcedureUsage.priceCharged`), após aplicar as
+`PricingRule` de precificação dinâmica por empresa. Nenhum reajuste retroativo;
+o valor exibido no ato é o valor faturado.
+
+### ROI Real (cenário 500 vidas)
+
+Para empresas de médio porte, o modelo elimina o desperdício de vidas ociosas
+no plano tradicional por capitação:
+
+| Dimensão | Plano tradicional | Sistema Bibi (Pay Per Use) |
+|----------|-------------------|----------------------------|
+| Modelo | Mensalidade fixa por colaborador | Pagamento por utilização efetiva |
+| Custo mensal (500 vidas, 15% uso) | **R$ 175.000** | **R$ 14.475** (uso + taxa plataforma) |
+| **Economia estimada** | — | **~91,7%** (~R$ 160.525/mês) |
+
+> Detalhamento, sensibilidade e scripts para RH/CFO:
+> [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) ·
+> [`docs/MONETIZACAO.md`](docs/MONETIZACAO.md)
 
 | Portal | Público | Foco |
 |--------|---------|------|
@@ -42,8 +66,12 @@ de valores e faturamento sem perdas de informação.
 
 ## 2. Pilares de negócio
 
-- **Pay Per Use** — cada procedimento utilizado é registrado com o preço
-  *congelado* no momento do uso (snapshot), garantindo transparência prévia.
+- **Price Snapshot** — mecanismo core que extingue a “caixa preta”: cada
+  procedimento registrado no atendimento congela o preço via `computePrice()` +
+  `PricingRule.multiplier` em `ProcedureUsage.priceCharged`, garantindo que RH,
+  CFO e beneficiário vejam o mesmo valor antes e depois do faturamento.
+- **Pay Per Use** — cobrança apenas pelo que foi efetivamente utilizado; sem
+  capitação ociosa nem sinistralidade opaca.
 - **Precificação dinâmica** — regras por empresa ajustam o preço base (ex.:
   desconto corporativo de 15% para a TechCorp em consultas clínicas).
 - **Previsibilidade financeira** — o faturamento agrega apenas o que foi usado e
@@ -428,6 +456,10 @@ sistema-bibi/
   [`docs/JORNADA_CLIENTE.md`](docs/JORNADA_CLIENTE.md)
 - **Auditoria de falhas nos quatro portais:**
   [`docs/AUDITORIA_FLUXOS.md`](docs/AUDITORIA_FLUXOS.md)
+- **Estratégia de monetização** (take rate, SaaS enterprise, analytics premium):
+  [`docs/MONETIZACAO.md`](docs/MONETIZACAO.md)
+- **Pesquisa competitiva e posicionamento HealthOS:**
+  [`docs/pesquisa/README.md`](docs/pesquisa/README.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
@@ -460,4 +492,5 @@ sistema-bibi/
 
 ---
 
-Construído como POC para validar o modelo de negócio do **Sistema Bibi**.
+Construído como POC para validar o **HealthOS** do Sistema Bibi — infraestrutura
+financeira e clínica para saúde corporativa Pay Per Use.
