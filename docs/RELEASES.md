@@ -40,7 +40,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v1.2.0` |
 | **Commit** | `485819a` |
 | **PRs** | [#72](https://github.com/Piulres/sistema-bibi/pull/72), [#83](https://github.com/Piulres/sistema-bibi/pull/83), [#84](https://github.com/Piulres/sistema-bibi/pull/84), [#85](https://github.com/Piulres/sistema-bibi/pull/85), [#86](https://github.com/Piulres/sistema-bibi/pull/86), [#88](https://github.com/Piulres/sistema-bibi/pull/88) |
-| **Escopo** | Care Chart + cadastros + portais + auditoria + exports + homepage |
+| **Publicado em** | 23/06/2026 — deploy Netlify `6a39d446` |
 
 **Inclui:**
 
