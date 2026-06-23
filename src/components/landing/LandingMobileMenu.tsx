@@ -2,7 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
+import { SEGMENT_TENANTS } from "@/lib/niche/demo-accounts";
+import { getNicheConfig } from "@/lib/niche/defaults";
+import { appendSegmentToPath } from "@/lib/segment/types";
+import { isNicheId, type NicheId } from "@/lib/niche/types";
 
 const NAV_LINKS = [
   { href: "#recursos", label: "Recursos" },
@@ -15,6 +20,15 @@ export default function LandingMobileMenu() {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const searchParams = useSearchParams();
+  const tenant = searchParams.get("tenant");
+  const nicheParam = searchParams.get("niche")?.toUpperCase() ?? null;
+  const niche: NicheId | null = nicheParam && isNicheId(nicheParam) ? nicheParam : null;
+
+  const loginHref = appendSegmentToPath("/beneficiario/login", {
+    tenantSlug: tenant,
+    niche,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -65,7 +79,7 @@ export default function LandingMobileMenu() {
             role="dialog"
             aria-modal="true"
             aria-label="Menu de navegação"
-            className="fixed inset-y-0 right-0 z-50 flex w-[min(100%,18rem)] flex-col bg-[var(--surface-card)] shadow-xl ds-nav-drawer-enter"
+            className="fixed inset-y-0 right-0 z-50 flex w-[min(100%,20rem)] flex-col bg-[var(--surface-card)] shadow-xl ds-nav-drawer-enter"
           >
             <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
               <p className="text-sm font-semibold text-[var(--text-primary)]">Menu</p>
@@ -96,14 +110,52 @@ export default function LandingMobileMenu() {
                     </a>
                   </li>
                 ))}
-                <li className="border-t border-[var(--border-default)] pt-2">
+              </ul>
+
+              <p className="mt-4 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+                Segmento demo
+              </p>
+              <ul className="mt-1 flex flex-wrap gap-1.5 px-2">
+                {SEGMENT_TENANTS.map((ref) => {
+                  const config = getNicheConfig(ref.niche);
+                  const isActive = tenant === ref.slug;
+                  return (
+                    <li key={ref.slug}>
+                      <Link
+                        href={`/?tenant=${ref.slug}`}
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "inline-block rounded-full px-2.5 py-1 text-xs font-medium",
+                          isActive
+                            ? "bg-[var(--brand-primary)] text-[var(--text-inverse)]"
+                            : "border border-[var(--border-default)] text-[var(--text-secondary)]",
+                        )}
+                      >
+                        {config.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+
+              <ul className="mt-4 space-y-1 border-t border-[var(--border-default)] pt-3">
+                <li>
                   <Link
-                    href="/beneficiario/login"
+                    href={loginHref}
                     onClick={() => setOpen(false)}
                     className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
                   >
                     Entrar
                   </Link>
+                </li>
+                <li>
+                  <a
+                    href="#portais"
+                    onClick={() => setOpen(false)}
+                    className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--surface-muted)]"
+                  >
+                    Acessar portais
+                  </a>
                 </li>
               </ul>
             </nav>

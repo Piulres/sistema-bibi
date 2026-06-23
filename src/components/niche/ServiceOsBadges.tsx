@@ -31,7 +31,8 @@ export default function ServiceOsBadges({ niche, variant = "header" }: Props) {
         ServiceOS v2.0
       </span>
       <span className="rounded-full border border-[var(--border-default)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">
-        Nicho: {nicheName}
+        <span className="hidden sm:inline">Nicho: </span>
+        {nicheName}
       </span>
     </div>
   );

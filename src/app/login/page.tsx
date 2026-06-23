@@ -1,7 +1,6 @@
 import LoginForm from "@/components/LoginForm";
 import { getLoginSegmentContext } from "@/lib/segment/login-context";
 import { segmentTenantByNiche } from "@/lib/niche/demo-accounts";
-import { persistSegmentCookie } from "@/lib/segment/cookie";
 
 type PageProps = {
   searchParams: Promise<{ tenant?: string; niche?: string }>;
@@ -10,7 +9,6 @@ type PageProps = {
 export default async function PrestadorLoginPage({ searchParams }: PageProps) {
   const { tenant: tenantParam, niche: nicheParam } = await searchParams;
   const context = await getLoginSegmentContext({ tenantSlug: tenantParam, nicheParam });
-  await persistSegmentCookie(context);
   const demo = segmentTenantByNiche(context.niche);
 
   return (

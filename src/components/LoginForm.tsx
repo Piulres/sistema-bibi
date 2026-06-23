@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
@@ -9,6 +9,7 @@ import type { NicheDemoAccount } from "@/lib/niche/demo-accounts";
 import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
 import type { LoginSegmentContext } from "@/lib/segment/login-context";
 import SegmentContextBanner from "@/components/segment/SegmentContextBanner";
+import SegmentCookiePersist from "@/components/segment/SegmentCookiePersist";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
 import TenantTheme from "@/components/layout/TenantTheme";
 import Card from "@/components/ui/Card";
@@ -110,6 +111,9 @@ export default function LoginForm({
 
   return (
     <TenantTheme branding={branding} portal={portal} className="flex flex-1 flex-col">
+      <Suspense fallback={null}>
+        <SegmentCookiePersist />
+      </Suspense>
       <main className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
           <Link

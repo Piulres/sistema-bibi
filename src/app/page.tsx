@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { buildLandingDescription } from "@/lib/landing/content";
 import { getSiteUrl } from "@/lib/landing/site-url";
@@ -17,7 +18,7 @@ import LandingFaq from "@/components/landing/LandingFaq";
 import LandingCta from "@/components/landing/LandingCta";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingJsonLd from "@/components/landing/LandingJsonLd";
-import { persistSegmentCookie } from "@/lib/segment/cookie";
+import SegmentCookiePersist from "@/components/segment/SegmentCookiePersist";
 
 type PageProps = {
   searchParams: Promise<{ niche?: string; tenant?: string }>;
@@ -70,12 +71,6 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 export default async function Home({ searchParams }: PageProps) {
   const { niche: nicheParam, tenant: tenantParam } = await searchParams;
   const resolved = await resolveLandingNicheFromHeaders(nicheParam, tenantParam);
-  await persistSegmentCookie({
-    niche: resolved.niche,
-    tenantId: resolved.tenantId,
-    tenantSlug: resolved.tenantSlug ?? null,
-    tenantName: resolved.tenantName ?? null,
-  });
   const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
   const segment = {
     tenantSlug: resolved.tenantSlug,
@@ -84,6 +79,9 @@ export default async function Home({ searchParams }: PageProps) {
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
+      <Suspense fallback={null}>
+        <SegmentCookiePersist />
+      </Suspense>
       <LandingJsonLd branding={branding} />
       <LandingHeader branding={branding} />
       <LandingNicheSwitcherBar />

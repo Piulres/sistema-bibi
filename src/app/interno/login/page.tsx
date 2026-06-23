@@ -1,7 +1,6 @@
 import LoginForm from "@/components/LoginForm";
 import { getLoginSegmentContext } from "@/lib/segment/login-context";
 import { SEGMENT_TENANTS, segmentTenantByNiche } from "@/lib/niche/demo-accounts";
-import { persistSegmentCookie } from "@/lib/segment/cookie";
 
 type PageProps = {
   searchParams: Promise<{ tenant?: string; niche?: string }>;
@@ -13,7 +12,6 @@ export default async function InternoLoginPage({ searchParams }: PageProps) {
     tenantSlug: tenantParam,
     nicheParam,
   });
-  await persistSegmentCookie(context);
 
   const defaultDemo = context.tenantSlug
     ? SEGMENT_TENANTS.find((t) => t.slug === context.tenantSlug) ?? segmentTenantByNiche(context.niche)

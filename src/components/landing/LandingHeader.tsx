@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { Suspense } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import LandingMobileMenu from "@/components/landing/LandingMobileMenu";
 
@@ -20,7 +21,7 @@ export default function LandingHeader({ branding }: Props) {
       <a href="#conteudo-principal" className="ds-skip-link">
         Ir para o conteúdo principal
       </a>
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-3.5">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-3.5">
         <Link
           href="/"
           className="flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2"
@@ -66,8 +67,10 @@ export default function LandingHeader({ branding }: Props) {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <LandingMobileMenu />
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <Suspense fallback={null}>
+            <LandingMobileMenu />
+          </Suspense>
           <Link
             href="/beneficiario/login"
             className="hidden rounded-full px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:inline-flex"
@@ -76,9 +79,10 @@ export default function LandingHeader({ branding }: Props) {
           </Link>
           <Link
             href="#portais"
-            className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-4 py-2 text-sm font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
           >
-            Acessar portais
+            <span className="sm:hidden">Portais</span>
+            <span className="hidden sm:inline">Acessar portais</span>
           </Link>
         </div>
       </div>

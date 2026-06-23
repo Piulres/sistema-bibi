@@ -34,7 +34,7 @@ export default function PortalHeader({
 
   return (
     <header className="border-b border-[var(--border-default)] bg-[var(--surface-card)]">
-      <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-3">
+      <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6">
         <div className="flex min-w-0 items-center gap-3">
           {logoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -61,8 +61,11 @@ export default function PortalHeader({
             <ServiceOsBadges niche={niche} />
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="hidden text-sm text-[var(--text-secondary)] sm:inline">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <span
+            className="max-w-[5.5rem] truncate text-xs text-[var(--text-secondary)] sm:max-w-none sm:text-sm"
+            title={userName}
+          >
             {userName}
           </span>
           <Button variant="secondary" size="sm" onClick={logout}>

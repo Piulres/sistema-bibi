@@ -20,7 +20,7 @@ export default function LandingNicheSwitcher({ className = "" }: Props) {
 
   return (
     <div
-      className={`flex flex-wrap items-center gap-1.5 ${className}`}
+      className={`flex w-max min-w-full flex-nowrap items-center gap-1.5 sm:w-auto sm:flex-wrap ${className}`}
       role="navigation"
       aria-label="Selecionar segmento de demonstração"
     >
