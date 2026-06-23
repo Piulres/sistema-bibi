@@ -88,7 +88,9 @@ Teste: `tests/api/auth-and-cron.test.ts`.
 
 ### 6. Isolamento multi-tenant
 
-Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
+Queries Prisma usam `tenantId` na maioria dos serviços. O CRUD de `PricingRule` (`audit-pricing.test.ts`) valida criação dentro do tenant da sessão — procedimento e empresa filtrados por `interno.tenantId`.
+
+**Gap:** ainda **não há teste negativo de cross-tenant** (prestador A acessando paciente B de outro tenant). Prioridade alta para integração.
 
 ### 7. MFA bypass em rotas sem segundo fator
 
@@ -102,7 +104,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
-| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
+| Precificação dinâmica | `pricing.ts` + `pricing-rule-service.ts` | ✅ unit + integração DB (`audit-pricing.test.ts`, escopo tenant) | Teste negativo cross-tenant; regras edge (multiplier 0) |
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
