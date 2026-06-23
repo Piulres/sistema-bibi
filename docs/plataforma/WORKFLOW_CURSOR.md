@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (jun/2026):** **v2.0.0** @ commit `49edb90` — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+**Produção (jun/2026):** **v2.0.0** @ commit `b661b39` — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 ---
 
@@ -87,10 +87,15 @@ Evidências gravadas: [`../evidencias/`](../evidencias/).
 npm run pre-release
 ```
 
-Executa, em sequência:
+Executa, em sequência (`scripts/pre-release.mjs`):
 
 1. `npm run lint`
-2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+2. `npm run docs:verify` — links obsoletos e marca legada em `docs/`
+3. `npm run db:verify` — integridade de `demo.db`, `operation.db` e espelho `dev.db`
+4. `npm test` — Vitest (unit + security + integration + api)
+5. `npm run netlify:build` — mesmo pipeline do CI Netlify
+
+**Pré-requisito:** se `db:verify` falhar por banco ausente, rode `npm run db:bootstrap:demo` antes.
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 

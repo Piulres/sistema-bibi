@@ -37,9 +37,9 @@ flowchart LR
   UI --> Core
 ```
 
-- **Server:** `src/lib/niche/resolve.ts`, `src/lib/niche/labels.ts`
+- **Server:** `src/lib/segment/resolve.ts`, `src/lib/niche/labels.ts`, `src/lib/segment/cookie.ts`
 - **Client:** `src/hooks/useLabels.tsx` via `NicheProvider` em `PortalShell`
-- **Landing:** `/?niche=VET` para preview local; domínio customizado em produção
+- **Landing:** `/?tenant=petcare` (recomendado) ou `/?niche=VET` para preview local; domínio customizado em produção
 
 Detalhes: [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md).
 

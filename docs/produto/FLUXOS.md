@@ -314,8 +314,11 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
+| Precificação | `/api/interno/pricing-rules` | `PUT .../pricing-rules/[id]` | `DELETE` | `PricingRule.multiplier` por empresa; escopo `user.tenantId`; timeline em mutações |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
+
+Serviço de regras: `src/lib/pricing-rule-service.ts` · cálculo: `computePrice(procedureId, companyId, tenantId?)` em `src/lib/pricing.ts`.
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 

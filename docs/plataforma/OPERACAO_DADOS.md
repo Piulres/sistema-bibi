@@ -67,6 +67,18 @@ npm run db:setup
 npm run db:verify
 ```
 
+### Contrato `db:verify` (`scripts/verify-databases.mjs`)
+
+Roda automaticamente no `npm run pre-release`. **Pré-requisito:** `npm run db:bootstrap:demo` (gera `demo.db`, `operation.db` e espelha `dev.db`).
+
+| Base | Asserções |
+|------|-----------|
+| **demo.db** | 7 tenants: `horizonte`, `vitacare`, `petcare`, `smile`, `lex`, `zen`, `eduprime` · e-mails demo (`faturamento@bibi.health`, `dra.helena@bibi.health`, `operacao@petcare.demo`, …) · ≥50 empresas PJ · ≥100 beneficiários · `horizonte` = `MEDICAL` · `operacao@petcare.demo` vinculado ao tenant `petcare` |
+| **operation.db** | Exatamente 1 tenant (`bibi-saude`, `MEDICAL`) · 5 usuários internos · ≥14 procedimentos · **zero** empresas e pacientes |
+| **dev.db** | Espelho byte-a-byte de `demo.db` |
+
+Falha típica: banco ausente → rode `db:bootstrap:demo`; seed desatualizado → `db:seed` após mudança no schema.
+
 **Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.
 
 ```bash

@@ -90,7 +90,14 @@ Teste: `tests/api/auth-and-cron.test.ts`.
 
 ### 6. Isolamento multi-tenant
 
-Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
+Queries Prisma usam `tenantId` na maioria dos serviços. Cobertura parcial em testes:
+
+| Área | Teste | O que valida |
+|------|-------|--------------|
+| Precificação | `tests/integration/pricing-db.test.ts` | `computePrice(procedureId, companyId, tenantId)` isola procedimento por tenant |
+| Regras de preço + auditoria | `tests/api/audit-pricing.test.ts` | CRUD `/api/interno/pricing-rules` escopado por `user.tenantId`; timeline em create/update/delete |
+
+**Lacuna:** ainda não há teste automatizado de cross-tenant em appointments, patients ou invoices (prestador A acessando paciente B).
 
 ### 7. MFA bypass em rotas sem segundo fator
 
@@ -104,7 +111,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
-| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
+| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB + `audit-pricing.test.ts` (CRUD regras por tenant) | Regras edge (multiplier 0, arredondamento) |
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
@@ -192,8 +199,8 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
-npm run lint && npm run test && npm run build
+# Validação completa de pacote (lint + docs + db + test + build Netlify)
+npm run pre-release
 ```
 
 ### Variáveis em testes

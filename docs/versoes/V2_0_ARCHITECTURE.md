@@ -59,7 +59,7 @@ Exemplo para nicho `LEGAL`:
 
 ### Resolução server-side
 
-`src/lib/niche/resolve.ts` — `mergeNicheLabels()` combina defaults do nicho com overrides do tenant.
+`src/lib/segment/resolve.ts` — `resolveSegmentContext()` com prioridade `?tenant=` → cookie `bibi_segment` → domínio → `?niche=` → default `MEDICAL`. Labels via `mergeNicheLabels()` em `src/lib/niche/labels.ts`.
 
 ### Hook client-side
 
