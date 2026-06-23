@@ -149,14 +149,24 @@ Quando `User.mfaEnabled = true`:
 
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
+| `/prestador/dashboard` | `PrestadorDashboardView` | KPIs do dia, fila, próximo atendimento |
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, Care Chart, marcar REALIZADO |
+| `/prestador/pacientes` | `PrestadorPatientsView` | Lista de pacientes do prestador |
+| `/prestador/paciente/[id]` | `PrestadorPatientHistoryView` | Histórico + exportações |
+| `/prestador/extrato` | `PrestadorExtratoView` | Extrato financeiro + export |
+| `/prestador/relatorios` | `PrestadorReportsView` | Relatórios procedimentos/agenda + export |
 
 ### APIs disparadas
 
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
+| Dashboard | `GET /api/prestador/dashboard` | KPIs (`prestador-dashboard.ts`) |
+| Export extrato | `GET /api/prestador/extrato/export?format=xlsx` | Período opcional `from`/`to` |
+| Export relatório | `GET /api/prestador/reports?type=procedures\|appointments` | CSV/XLSX/PDF |
+| Export paciente | `GET /api/prestador/patients/[id]/export` | `section`: summary, appointments, usages, records, timeline |
+| Export PEP | `GET /api/prestador/records/[recordId]/export` | **Somente PDF** |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
@@ -188,15 +198,16 @@ flowchart LR
 | `dashboard` | `/interno/dashboard` | `ExecutiveDashboardView` | KPIs executivos |
 | `billing` | `/interno` | `BillingView` | Pay Per Use, faturas, PIX, TISS |
 | `agenda` | `/interno/agenda` | `AppointmentsView` | CRUD agenda |
-| `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, usuários |
+| `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, **precificação**, usuários |
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
-| `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
+| `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas, cobranças e edição de valor |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
-| `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
+| `relatorios` | `/interno/relatorios` | `ReportsView` | Export faturamento/CRM (CSV, XLSX, PDF) |
+| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal + export |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
-| *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
+| *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD/PDF/Excel |
 
 Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
 
@@ -252,9 +263,16 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| **Precificação B2B** | `GET/POST /api/interno/pricing-rules` | `PUT/DELETE .../pricing-rules/[id]` | — | Uma regra por par procedimento+empresa; timeline `PricingRule` |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
-Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
+**Validação CPF/CNPJ:** `src/lib/validation/br-documents.ts` — checksum + unicidade no servidor (`patient-service`, `company-service`). Erros: `"CPF já cadastrado"` / `"CNPJ já cadastrado"`.
+
+**Campos B2B:** `CadastroExtraFields.tsx` — empresa (tradeName, contato, endereço), beneficiário (bondType, employeeId), prestador (conselho/CRM).
+
+**Precificação:** aba `?tab=pricing` → `CadastrosPricingTab` — `multiplier` por empresa (default form `0.85`).
+
+Export LGPD: `GET /api/interno/patients/[id]/export` — sem `section` → JSON (`patient-export.ts`); com `section` → tabular PDF/XLSX/CSV.
 
 ### 4.4 CRM (`CrmPipelineView`)
 
@@ -270,11 +288,24 @@ Status: `LEAD → PROPOSTA → NEGOCIACAO → ATIVO → INADIMPLENTE → CANCELA
 | Ação | API | Efeito |
 |------|-----|--------|
 | Criar | `POST /api/interno/subscriptions` | `Subscription` ATIVA |
-| Status | `PATCH /api/interno/subscriptions/[id]` | ATIVA / SUSPENSA / CANCELADA |
+| Editar | `PATCH /api/interno/subscriptions/[id]` | `status` (ATIVA/SUSPENSA/CANCELADA), `amount`, `billingCycle`, `description` |
 | Gerar cobranças | `POST .../generate-charges` | `SubscriptionCharge` PENDENTE |
 | Faturar cobrança | `POST .../charges/[chargeId]/invoice` | Charge FATURADA → Invoice FECHADA |
 
 Serviço: `src/lib/subscription-service.ts` + bridge em `invoice-service.ts`
+
+> **Edição de valor:** alterar `amount` atualiza cobranças `PENDENTE` sem `invoiceId`; cobranças já faturadas mantêm valor original. Evento `Subscription` + `UPDATED` na timeline.
+
+### 4.8 Auditoria (`AuditoriaView`)
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Listar eventos | `GET /api/interno/audit` | Filtros `entityType`, `action`, `search`, `from`/`to`; paginação (máx 100/página) |
+| Exportar | `GET /api/interno/audit/export` | XLSX/PDF/CSV — até 10.000 eventos filtrados |
+
+Serviço: `src/lib/timeline.ts` — `recordTimelineEvent()` grava em `TimelineEvent`; falhas são logadas sem interromper o fluxo principal.
+
+Timeline também visível no Cliente 360° (`getPatientTimelineEvents`) e em precificação/assinaturas (eventos automáticos em mutações).
 
 ### 4.6 Comunicação (`ComunicacaoView`)
 
@@ -319,7 +350,7 @@ Serviço: `src/lib/webhook-service.ts`
 | Ação | API | Serviço |
 |------|-----|---------|
 | Painel | `GET /api/pj/overview` | `pj-portal-service.ts` |
-| CSV | `GET /api/pj/reports` | Export corporativo |
+| CSV | `GET /api/pj/reports?format=csv\|xlsx\|pdf` | Export corporativo |
 
 ```mermaid
 flowchart LR
@@ -334,6 +365,25 @@ flowchart LR
 ## 6. Portal Beneficiário
 
 **Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR)
+
+**Rotas dedicadas** (layout persistente em `src/app/beneficiario/layout.tsx`):
+
+| Rota | Seção |
+|------|-------|
+| `/beneficiario` | redirect → `/beneficiario/resumo` |
+| `/beneficiario/agendar` | agendar consulta |
+| `/beneficiario/resumo` | resumo e próximo atendimento |
+| `/beneficiario/agenda` | lista + telemedicina |
+| `/beneficiario/consumo` | Pay Per Use |
+| `/beneficiario/faturas` | faturas + PIX |
+| `/beneficiario/medicacoes` | prescrições (Care Chart) |
+| `/beneficiario/exames` | pedidos e resultados |
+| `/beneficiario/plano` | protocolos de cuidado |
+| `/beneficiario/assinatura` | assinatura recorrente |
+| `/beneficiario/prontuario` | PEP somente leitura |
+| `/beneficiario/historico` | timeline do paciente |
+
+Cada página renderiza `BeneficiarioView` com prop `section`. Export: `GET /api/beneficiario/export?section=…&format=xlsx|pdf|csv`.
 
 | Seção (`BeneficiarioView`) | Ações |
 |----------------------------|-------|
@@ -479,6 +529,25 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
 
+### 8.8 Exportações (PDF / Excel / CSV)
+
+Infraestrutura: `src/lib/exports/` · UI: `ExportButtons.tsx` (links GET com `?format=`).
+
+| Portal | UI | API principal | Formatos |
+|--------|-----|---------------|----------|
+| Interno faturamento | `BillingView` | `/api/interno/billing/export`, `/api/interno/invoices/[id]/export` | xlsx, pdf, csv |
+| Interno relatórios | `ReportsView` | `/api/interno/reports?type=billing\|crm` | csv, xlsx, pdf |
+| Interno assinaturas | `SubscriptionsView` | `/api/interno/subscriptions/export` | xlsx |
+| Interno auditoria | `AuditoriaView` | `/api/interno/audit/export` | xlsx (até 10k eventos) |
+| Interno Cliente 360° | `PatientOverviewView` | `/api/interno/patients/[id]/export`, records, invoices | json, pdf, xlsx |
+| Prestador | extrato, relatórios, paciente, atendimento | `/api/prestador/*/export` | ver §3 |
+| PJ | `PjView` | `/api/pj/reports` | csv, xlsx |
+| Beneficiário | seções do portal | `/api/beneficiario/export`, invoices | xlsx, pdf |
+
+**Restrições:** downloads autenticados (sem GET anônimo); PEP prestador aceita somente `format=pdf`; escopo de dados limitado ao `patientId`/`providerId`/`companyId` da sessão.
+
+Detalhe: [`V1_2.md`](V1_2.md) · [`ARQUITETURA.md`](ARQUITETURA.md) §21
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo
@@ -495,6 +564,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
+| auditoria | ✓ | ✓ | ✗ | ✓ |
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
@@ -505,7 +575,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs (parcial)** | `requireInternoModule()` em: billing, invoices/export, TISS, CRM status, branding, integracoes, users (POST), cadastros/export LGPD, **auditoria**, pricing-rules, subscriptions |
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.
@@ -582,22 +652,26 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
 ### Prestador
-`GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`GET /api/prestador/dashboard` · `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
+`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
+`GET /api/prestador/extrato/export` · `GET /api/prestador/reports` ·
+`GET /api/prestador/patients/[id]/export` · `GET /api/prestador/records/[recordId]/export`
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
 `POST /api/beneficiario/appointments` ·
 `PATCH /api/beneficiario/appointments/[id]` ·
-`POST|PATCH /api/beneficiario/invoices/[id]/pay`
+`POST|PATCH /api/beneficiario/invoices/[id]/pay` ·
+`GET /api/beneficiario/export` · `GET /api/beneficiario/invoices/[id]/export`
 
 ### PJ
 `GET /api/pj/overview` · `GET /api/pj/reports`
 
 ### Interno (principais grupos)
-`dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
-`companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`dashboard` · `billing` · `billing/export` · `invoices/*/export` · `appointments/*` · `patients/*/export` ·
+`companies/*` · `procedures/*` · `pricing-rules/*` · `users/*` · `subscriptions/*/export` ·
+`messages/*` · `reminders` · `crm/pipeline` · `reports` · `audit` · `audit/export` ·
+`branding/*` · `webhooks/*`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`

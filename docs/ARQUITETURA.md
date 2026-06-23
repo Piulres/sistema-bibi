@@ -617,6 +617,40 @@ flowchart LR
 
 ---
 
+## 21. Exportações (`v1.2.0`)
+
+Camada compartilhada para PDF, Excel (XLSX) e CSV nos quatro portais.
+
+```mermaid
+flowchart LR
+  UI["ExportButtons.tsx<br/>(?format=)"] --> API["Route Handlers<br/>/api/*/export"]
+  API --> Auth["requireUser /<br/>requireInternoModule"]
+  API --> Build["builders.ts<br/>pep-pdf / invoice-pdf"]
+  API --> Tab["tabular.ts<br/>ExcelJS + PDFKit"]
+  Build --> Serve["serve.ts"]
+  Tab --> Serve
+  Serve --> DL["Content-Disposition<br/>download"]
+```
+
+**Arquivos:**
+
+| Camada | Path |
+|--------|------|
+| Formatos | `src/lib/exports/format.ts` |
+| Builders | `src/lib/exports/builders.ts`, `pep-pdf.ts`, `invoice-pdf.ts`, `pep-service.ts`, `invoice-export.ts` |
+| Tabular | `src/lib/exports/tabular.ts` |
+| Serving | `src/lib/exports/serve.ts` |
+| UI | `src/components/ExportButtons.tsx` |
+| Testes | `tests/api/exports.test.ts` |
+
+**Padrão:** rotas `GET` autenticadas; query `format=pdf|xlsx|csv|json`; PDFs tabulares incluem branding do tenant (`getTenantBranding`).
+
+**Escopo de dados:** beneficiário e prestador limitados ao `patientId`/`providerId` da sessão; PJ ao `companyId`; interno via RBAC por módulo (`billing`, `cadastros`, `auditoria`, `relatorios`, `subscriptions`).
+
+Detalhe de rotas e UI: [`FLUXOS.md`](FLUXOS.md) §8.8 · [`V1_2.md`](V1_2.md)
+
+---
+
 ## 20. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).

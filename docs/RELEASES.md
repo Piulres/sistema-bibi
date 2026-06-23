@@ -79,8 +79,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Versão | Doc | Estado |
 |--------|-----|--------|
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
+| **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
-| **1.2.x** | — | ✅ **`v1.2.0` em produção** |
 
 ---
 
