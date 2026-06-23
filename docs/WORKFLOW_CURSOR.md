@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Em desenvolvimento na `dev`:** pacote **v2.0 ServiceOS** (multi-nicho, labels) — ver [`V2_0.md`](V2_0.md). Produção permanece **v1.2.0** até deploy manual.
+**Pacote validado na `main`:** **v2.0.0** ServiceOS (tag `v2.0.0`, commit `e823fe4`) — ver [`V2_0.md`](V2_0.md). **Produção** permanece **v1.2.0** até `netlify deploy --prod` manual (runbook em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) § Publicar v2.0.0).
 
 ---
 

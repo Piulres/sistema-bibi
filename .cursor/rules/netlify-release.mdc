@@ -21,7 +21,9 @@ Referências: `@docs/DEPLOY_NETLIFY.md` · `@docs/RELEASES.md` · `@docs/OPERACO
 
 ## Fluxo de publicação (humano)
 
-Integração contínua em `dev`; release só quando fechar pacote:
+Integração contínua em `dev`; release só quando fechar pacote.
+
+**Estado atual (23/06/2026):** tag **`v2.0.0`** criada; produção ainda em **v1.2.0**. Próximo passo = deploy manual (ver `@docs/DEPLOY_NETLIFY.md` § Publicar v2.0.0).
 
 ```bash
 # 1. Garantir que dev está integrada
