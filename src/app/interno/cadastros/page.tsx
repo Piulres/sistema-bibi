@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import PageHeader from "@/components/layout/PageHeader";
+import InternoCadastrosHeader from "@/components/interno/InternoCadastrosHeader";
 import CadastrosView from "@/components/CadastrosView";
 import LoadingState from "@/components/ui/LoadingState";
 import { requireInternoPage } from "@/lib/interno-guard";
@@ -9,10 +9,7 @@ export default async function InternoCadastrosPage() {
 
   return (
     <>
-      <PageHeader
-        title="Cadastros"
-        description="Beneficiários, empresas, procedimentos e usuários do tenant."
-      />
+      <InternoCadastrosHeader />
       <Suspense fallback={<LoadingState message="Carregando cadastros..." />}>
         <CadastrosView />
       </Suspense>

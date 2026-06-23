@@ -14,13 +14,28 @@ segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`
 **Pay Per Use** sobre qualquer tipo de serviço (consulta médica, hora jurídica, aula de yoga…).
 
 **Multi-nicho (v2.0):** cada `Tenant` possui `niche` (`MEDICAL`|`VET`|`DENTAL`|`LEGAL`|`SPA`|`EDUCATION`)
-e `labels` (JSON) para tradução automática da UI. Hook `useNiche()` nos portais.
-Paletas white label por nicho. Ver `docs/V2_0_ARCHITECTURE.md`.
+e `labels` (JSON) para tradução automática da UI.
 
-**Dicionários por tenant para IAs:** o campo `Tenant.labels` armazena termos específicos
-do nicho (ex.: "Paciente" → "Pet" no VET, → "Cliente" no LEGAL). Agentes e RAG devem
-carregar `niche` + `labels` do tenant ativo ao gerar conteúdo contextualizado — ver
-`src/lib/niche/defaults.ts` para defaults e `src/hooks/useNiche.ts` para consumo na UI.
+**Dicionário mestre (obrigatório):** `src/constants/niches.ts` — `NICHE_MASTER_LABELS` com todas as chaves tipadas (`NicheLabelKey`). Novo nicho = novo bloco aqui; o TypeScript falha se faltar termo.
+
+**Hook de UI:** `useLabels()` em `src/hooks/useLabels.tsx` — use `labels.patient` em JSX, nunca strings fixas como "Paciente". Provider em `PortalShell`.
+
+**Regra para IAs:** ao criar qualquer tela nos portais autenticados, **consulte `NICHE_MASTER_LABELS` e use `useLabels()`** — a nomenclatura vem do tenant ativo.
+
+### Glossário por nicho (padrão)
+
+| Nicho | patient | provider | procedure | appointment | beneficiary |
+|-------|---------|----------|-----------|-------------|-------------|
+| MEDICAL | Paciente | Prestador | Procedimento | Consulta | Beneficiário |
+| VET | Pet | Veterinário | Serviço | Atendimento* | Tutor |
+| DENTAL | Paciente | Prestador | Proced. odontológico | Consulta odontológica | Beneficiário |
+| LEGAL | Cliente | Advogado | Serviço jurídico | Atendimento | Cliente |
+| SPA | Cliente | Profissional | Sessão | Agendamento | Cliente |
+| EDUCATION | Aluno | Instrutor | Aula | Aula | Aluno |
+
+\* Demo PetCare no seed sobrescreve `appointment` → "Banho/Tosa" via `Tenant.labels`.
+
+Paletas white label por nicho. Ver `docs/V2_0_ARCHITECTURE.md`.
 
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise

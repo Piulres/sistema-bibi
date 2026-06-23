@@ -1,27 +1,32 @@
 "use client";
 
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import NavTabs from "@/components/ui/NavTabs";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
-import { PRESTADOR_NAV_TABS, resolvePrestadorActive } from "@/lib/navigation";
+import { buildPrestadorNavTabs } from "@/lib/navigation/niche-nav";
+import { resolvePrestadorActive } from "@/lib/navigation";
+import { useLabels } from "@/hooks/useLabels";
 
 export default function PrestadorNav() {
   const pathname = usePathname();
   const theme = PORTAL_THEMES.prestador;
   const active = resolvePrestadorActive(pathname);
+  const { labels } = useLabels();
+  const tabs = useMemo(() => buildPrestadorNavTabs(labels), [labels]);
 
   return (
     <div className="mt-6">
       <MobileNavDrawer
-        tabs={PRESTADOR_NAV_TABS}
+        tabs={tabs}
         active={active}
         activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
         idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
         title="Módulos do prestador"
       />
       <NavTabs
-        tabs={PRESTADOR_NAV_TABS}
+        tabs={tabs}
         active={active}
         activeClass={theme.navActiveClass}
         idleClass={theme.navIdleClass}

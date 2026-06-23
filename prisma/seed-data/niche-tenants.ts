@@ -1,4 +1,5 @@
 import type { PrismaClient } from "@prisma/client";
+import { serializeTenantLabels } from "../../src/constants/niches";
 import { getNicheConfig } from "../../src/lib/niche/defaults";
 import type { NicheId } from "../../src/lib/niche/types";
 
@@ -100,12 +101,16 @@ export async function seedNicheTenants(
 
   for (const demo of NICHE_DEMOS) {
     const config = getNicheConfig(demo.niche);
+    const labelOverrides =
+      demo.niche === "VET"
+        ? { appointment: "Banho/Tosa", appointments: "Banhos e Tosas" }
+        : undefined;
     const tenant = await prisma.tenant.create({
       data: {
         name: demo.name,
         cnpj: demo.cnpj,
         niche: demo.niche,
-        labels: JSON.stringify(config.labels),
+        labels: serializeTenantLabels(demo.niche, labelOverrides),
         branding: {
           create: {
             displayName: demo.displayName,

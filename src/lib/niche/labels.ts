@@ -1,17 +1,16 @@
-import { getDefaultLabels } from "@/lib/niche/defaults";
+import { resolveNicheLabels } from "@/constants/niches";
 import type { NicheLabels } from "@/lib/niche/types";
 
-/** Mescla labels do tenant (JSON) com defaults do nicho. */
+/** Mescla `Tenant.labels` (JSON) com o dicionário mestre do nicho. */
 export function mergeNicheLabels(
   niche: string,
   rawLabels: string | null | undefined,
 ): NicheLabels {
-  const defaults = getDefaultLabels(niche);
-  if (!rawLabels) return defaults;
+  if (!rawLabels) return resolveNicheLabels(niche);
   try {
     const parsed = JSON.parse(rawLabels) as Partial<NicheLabels>;
-    return { ...defaults, ...parsed };
+    return resolveNicheLabels(niche, parsed);
   } catch {
-    return defaults;
+    return resolveNicheLabels(niche);
   }
 }

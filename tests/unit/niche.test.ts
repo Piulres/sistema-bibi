@@ -1,9 +1,38 @@
 import { describe, expect, it } from "vitest";
+import {
+  NICHE_GLOSSARY_SUMMARY,
+  NICHE_LABEL_KEYS,
+  NICHE_MASTER_LABELS,
+  resolveNicheLabels,
+} from "@/constants/niches";
 import { getNicheConfig, getDefaultLabels } from "@/lib/niche/defaults";
 import { mergeNicheLabels } from "@/lib/niche/labels";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { isNicheId, NICHE_IDS } from "@/lib/niche/types";
 import { NICHE_DEMOS } from "../../prisma/seed-data/niche-tenants";
+
+describe("constants.niches.NICHE_MASTER_LABELS", () => {
+  it("define todas as chaves obrigatórias para cada nicho", () => {
+    for (const niche of NICHE_IDS) {
+      for (const key of NICHE_LABEL_KEYS) {
+        expect(NICHE_MASTER_LABELS[niche][key], `${niche}.${key}`).toBeTruthy();
+      }
+    }
+  });
+
+  it("expõe glossário resumido para documentação", () => {
+    expect(NICHE_GLOSSARY_SUMMARY.VET.patient).toBe("Pet");
+    expect(NICHE_GLOSSARY_SUMMARY.LEGAL.patient).toBe("Cliente");
+  });
+});
+
+describe("constants.niches.resolveNicheLabels", () => {
+  it("aplica overrides parciais sobre o mestre", () => {
+    const labels = resolveNicheLabels("VET", { appointment: "Banho/Tosa" });
+    expect(labels.appointment).toBe("Banho/Tosa");
+    expect(labels.provider).toBe("Veterinário");
+  });
+});
 
 describe("niche.isNicheId", () => {
   it("aceita todos os nichos canônicos", () => {

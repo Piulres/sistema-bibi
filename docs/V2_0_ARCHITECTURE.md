@@ -63,7 +63,7 @@ Exemplo para nicho `LEGAL`:
 
 ### Hook client-side
 
-`src/hooks/useNiche.tsx` — `useNiche()` expõe `t(key)` para tradução nos portais.
+`src/hooks/useLabels.tsx` — `useLabels()` expõe `labels` e `t(key)` para tradução nos portais.
 
 O `NicheProvider` é injetado em `PortalShell` e recebe `niche` + `labels` da sessão (`SessionUser`).
 
@@ -135,6 +135,7 @@ O ServiceOS trata qualquer transação de serviço processada — consulta médi
 ## Referências
 
 - `src/lib/niche/` — tipos, defaults, labels, landing-content e resolução
-- `src/hooks/useNiche.tsx` — hook de tradução
+- `src/hooks/useLabels.tsx` — hook de tradução (`useLabels` / alias `useNiche`)
+- `src/constants/niches.ts` — dicionário mestre `NICHE_MASTER_LABELS`
 - `prisma/schema.prisma` — `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`
 - `docs/RELEASES.md` — pacotes fechados (v2.0 em desenvolvimento na `dev`)

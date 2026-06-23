@@ -6,6 +6,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Card from "@/components/ui/Card";
 import StatCard from "@/components/ui/StatCard";
+import { useLabels } from "@/hooks/useLabels";
 
 type Dashboard = {
   generatedAtLabel: string;
@@ -54,6 +55,7 @@ const quickLinks = [
 ];
 
 export default function ExecutiveDashboardView() {
+  const { labels } = useLabels();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -102,7 +104,7 @@ export default function ExecutiveDashboardView() {
           Operacional
         </h2>
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard label="Beneficiários" value={kpis.totalPatients} />
+          <StatCard label={labels.beneficiaries} value={kpis.totalPatients} />
           <StatCard
             label="Empresas (CRM)"
             value={kpis.totalCompanies}
@@ -182,7 +184,7 @@ export default function ExecutiveDashboardView() {
             <table className="w-full text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-2 font-medium">Beneficiário</th>
+                  <th className="px-4 py-2 font-medium">{labels.beneficiary}</th>
                   <th className="px-4 py-2 font-medium">Itens</th>
                   <th className="px-4 py-2 text-right font-medium">Valor</th>
                 </tr>

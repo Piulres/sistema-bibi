@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -24,18 +24,10 @@ import {
   emptyUserProfessional,
 } from "@/components/cadastros/CadastroExtraFields";
 import ProtocolTemplatesPanel from "@/components/ProtocolTemplatesPanel";
+import { useLabels } from "@/hooks/useLabels";
+import { buildCadastrosTabs } from "@/lib/navigation/niche-nav";
 
-const tabs = [
-  { key: "patients", label: "Beneficiários" },
-  { key: "companies", label: "Empresas" },
-  { key: "procedures", label: "Procedimentos" },
-  { key: "pricing", label: "Precificação" },
-  { key: "protocols", label: "Protocolos clínicos" },
-  { key: "users", label: "Usuários" },
-  { key: "operations", label: "Mapa CRUD" },
-] as const;
-
-type Tab = (typeof tabs)[number]["key"];
+type Tab = "patients" | "companies" | "procedures" | "pricing" | "protocols" | "users" | "operations";
 
 const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
@@ -102,6 +94,8 @@ type UserRow = {
 export default function CadastrosView() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { labels, niche } = useLabels();
+  const tabs = useMemo(() => buildCadastrosTabs(labels, niche), [labels, niche]);
   const tabFromUrl = searchParams.get("tab");
   const tab: Tab =
     tabFromUrl && tabs.some((t) => t.key === tabFromUrl) ? (tabFromUrl as Tab) : "patients";

@@ -30,7 +30,7 @@ A partir da v2.0, o mesmo código-core atende múltiplos verticais via parametri
 ```mermaid
 flowchart LR
   Tenant["Tenant<br/>niche + labels"]
-  UI["Landing + Portais<br/>useNiche()"]
+  UI["Landing + Portais<br/>useLabels()"]
   Core["Motores compartilhados<br/>Agenda · ProcedureUsage · PIX"]
   Tenant --> UI
   Tenant --> Core
@@ -38,14 +38,38 @@ flowchart LR
 ```
 
 - **Server:** `src/lib/niche/resolve.ts`, `src/lib/niche/labels.ts`
-- **Client:** `src/hooks/useNiche.tsx` via `NicheProvider` em `PortalShell`
+- **Client:** `src/hooks/useLabels.tsx` via `NicheProvider` em `PortalShell`
 - **Landing:** `/?niche=VET` para preview local; domínio customizado em produção
 
 Detalhes: [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md).
 
-### 0.1 Camada de tradução dinâmica de labels
+### 0.1 Camada de Abstração de Linguagem (Nichos)
 
-Cada tenant define **como a UI fala com o usuário** sem alterar código do servidor:
+O nicho deixa de ser "lembrança do desenvolvedor" e vira **regra nativa do sistema**:
+
+```mermaid
+flowchart TB
+  Master["src/constants/niches.ts<br/>NICHE_MASTER_LABELS"]
+  DB["Tenant.labels JSON<br/>(overrides opcionais)"]
+  Merge["mergeNicheLabels()"]
+  Session["SessionUser.labels"]
+  Hook["useLabels()"]
+  UI["Telas dos 4 portais"]
+  Master --> Merge
+  DB --> Merge
+  Merge --> Session --> Hook --> UI
+```
+
+| Camada | Responsabilidade |
+|--------|------------------|
+| **Prisma** | `Tenant.niche` + `Tenant.labels` — o "idioma" viaja com o cliente |
+| **Constants** | `NICHE_MASTER_LABELS` — guarda-corpo TypeScript; chaves em `NICHE_LABEL_KEYS` |
+| **Hook** | `useLabels()` — `{ labels, t, niche }` em componentes client |
+| **Nav** | `buildPrestadorNavTabs`, `buildCadastrosTabs`, etc. — menus dinâmicos |
+
+**Exemplo:** em vez de `<h1>Paciente</h1>`, use `<h1>{labels.patient}</h1>`. No nicho `LEGAL` → "Cliente"; no `VET` → "Pet".
+
+Seed demo: Clínica Horizonte (`MEDICAL`), PetCare (`VET` com override "Banho/Tosa"), Lex (`LEGAL`), etc. — ver `prisma/seed-data/niche-tenants.ts`.
 
 | Nicho | `patient` | `procedure` | `medicalRecord` |
 |-------|-----------|-------------|-----------------|
@@ -54,9 +78,9 @@ Cada tenant define **como a UI fala com o usuário** sem alterar código do serv
 | `LEGAL` | Cliente | Serviço jurídico | Dossiê |
 | `EDUCATION` | Aluno | Aula | Histórico pedagógico |
 
-Fluxo: `Tenant.labels` (JSON) → `mergeNicheLabels()` → `SessionUser` → `NicheProvider` → `useNiche().t('patient')`.
+Fluxo: `Tenant.labels` (JSON) → `mergeNicheLabels()` → `SessionUser` → `NicheProvider` → `useLabels().labels.patient`.
 
-Os **quatro portais segregados** são a base da transparência: cada nicho configura sua própria "estação de trabalho" (prestador, interno, PJ, beneficiário) com nomenclatura e branding isolados por tenant.
+Os **quatro portais segregados** são a base da transparência: cada nicho configura sua própria "estação de trabalho" com nomenclatura e branding isolados por tenant.
 
 ### 0.2 Identidade visual, design system e Blobs
 

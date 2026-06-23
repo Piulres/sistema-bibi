@@ -3,7 +3,7 @@ import type { PortalKey } from "@/lib/roles";
 import type { NicheId, NicheLabels } from "@/lib/niche/types";
 import TenantTheme from "@/components/layout/TenantTheme";
 import PortalHeader from "@/components/PortalHeader";
-import { NicheProvider } from "@/hooks/useNiche";
+import { NicheProvider } from "@/hooks/useLabels";
 
 type Props = {
   portal: PortalKey;

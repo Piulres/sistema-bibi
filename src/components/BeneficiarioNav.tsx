@@ -1,27 +1,32 @@
 "use client";
 
+import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import NavTabs from "@/components/ui/NavTabs";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
-import { BENEFICIARIO_NAV_TABS, resolveBeneficiarioActive } from "@/lib/navigation";
+import { buildBeneficiarioNavTabs } from "@/lib/navigation/niche-nav";
+import { resolveBeneficiarioActive } from "@/lib/navigation";
+import { useLabels } from "@/hooks/useLabels";
 
 export default function BeneficiarioNav() {
   const pathname = usePathname();
   const theme = PORTAL_THEMES.beneficiario;
   const active = resolveBeneficiarioActive(pathname);
+  const { labels } = useLabels();
+  const tabs = useMemo(() => buildBeneficiarioNavTabs(labels), [labels]);
 
   return (
     <div className="mt-6">
       <MobileNavDrawer
-        tabs={BENEFICIARIO_NAV_TABS}
+        tabs={tabs}
         active={active}
         activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
         idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
-        title="Módulos do beneficiário"
+        title="Módulos do portal"
       />
       <NavTabs
-        tabs={BENEFICIARIO_NAV_TABS}
+        tabs={tabs}
         active={active}
         activeClass={theme.navActiveClass}
         idleClass={theme.navIdleClass}

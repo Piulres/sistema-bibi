@@ -32,7 +32,7 @@ import {
 import { resolveSeedScale } from "./scale";
 import { seedVitacareTenant } from "./vitacare";
 import { seedNicheTenants } from "./niche-tenants";
-import { getNicheConfig } from "../../src/lib/niche/defaults";
+import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
 import { seedMedicalStock } from "./stock-demo";
@@ -91,7 +91,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       name: "Clínica Horizonte",
       cnpj: "12.345.678/0001-90",
       niche: "MEDICAL",
-      labels: JSON.stringify(getNicheConfig("MEDICAL").labels),
+      labels: serializeTenantLabels("MEDICAL"),
       branding: {
         create: {
           displayName: "Clínica Horizonte",
