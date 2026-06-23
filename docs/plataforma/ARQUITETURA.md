@@ -37,11 +37,13 @@ flowchart LR
   UI --> Core
 ```
 
-- **Server:** `src/lib/niche/resolve.ts`, `src/lib/niche/labels.ts`
+- **Segmento (server):** `src/lib/segment/resolve.ts` — prioridade `?tenant=` → cookie `bibi_segment` → domínio → `?niche=`
+- **Labels (server):** `src/lib/niche/labels.ts` — `mergeNicheLabels()` combina defaults + overrides do tenant
 - **Client:** `src/hooks/useLabels.tsx` via `NicheProvider` em `PortalShell`
-- **Landing:** `/?niche=VET` para preview local; domínio customizado em produção
+- **Landing:** `/?tenant=petcare` (recomendado) ou `/?niche=VET`; domínio customizado em produção
+- **Identidade plataforma:** `src/lib/platform.ts` — marca ServiceOS separada dos tenants clínicos
 
-Detalhes: [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md).
+Detalhes: [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) · roteamento: [`segmentos/README.md`](../segmentos/README.md).
 
 ### 0.1 Camada de Abstração de Linguagem (Nichos)
 

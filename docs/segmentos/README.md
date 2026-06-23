@@ -30,4 +30,36 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 | Domínio customizado | DNS verificado no branding | Tenant do domínio |
 | Cookie `bibi_segment` | Após landing/login | Persiste entre páginas |
 
+**Prioridade de resolução:** `?tenant=` → cookie → domínio → `?niche=` → default MEDICAL.
+
+Implementação: `src/lib/segment/resolve.ts`. Cookie assinado HMAC (`SESSION_SECRET`, 7 dias): `src/lib/segment/cookie.ts`.
+
+### Persistência do cookie (client)
+
+No Next.js 16, cookies httpOnly só podem ser gravados em Route Handlers. A landing monta `SegmentCookiePersist`, que chama:
+
+```
+POST /api/segment/persist
+Body: { "tenant": "petcare" }  // ou { "niche": "VET" }
+```
+
+Isso garante que mobile e navegação SPA mantenham o segmento entre landing → login → portais.
+
+### Login cross-tenant
+
+`POST /api/auth/login` valida `user.tenantId` contra o segmento ativo. Conta de outro tenant → **403** com URL do portal correto (`?tenant=…`). Ver `src/lib/segment/auth.ts` e [`FLUXOS.md`](../produto/FLUXOS.md) §2.1.
+
+### Contas demo por slug
+
+| Slug | Nicho | Login interno |
+|------|-------|---------------|
+| `horizonte` | MEDICAL | `faturamento@bibi.health` |
+| `petcare` | VET | `operacao@petcare.demo` |
+| `smile` | DENTAL | `operacao@smile.demo` |
+| `lex` | LEGAL | `operacao@lex.demo` |
+| `zen` | SPA | `operacao@zen.demo` |
+| `eduprime` | EDUCATION | `operacao@eduprime.demo` |
+
+Fonte canônica de slugs: `src/lib/niche/demo-accounts.ts` (`SEGMENT_TENANTS`).
+
 Senha: **`bibi123`**

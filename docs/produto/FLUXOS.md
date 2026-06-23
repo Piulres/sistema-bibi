@@ -39,21 +39,37 @@ Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md
 
 ## 0. ServiceOS v2.0 — labels e landing
 
-### 0.1 Resolução de nicho
+### 0.1 Roteamento por segmento
 
 ```mermaid
-flowchart LR
-  Host["Host / domínio customizado"] --> Resolve["resolveLandingNiche()"]
-  Query["?niche=VET"] --> Resolve
-  Resolve --> Tenant["Tenant.niche + labels"]
-  Tenant --> UI["Landing + Portais"]
+flowchart TD
+  TenantQ["?tenant=petcare"] --> Resolve["resolveSegmentContext()"]
+  Cookie["cookie bibi_segment"] --> Resolve
+  Host["domínio customizado"] --> Resolve
+  NicheQ["?niche=VET"] --> Resolve
+  Resolve --> Labels["mergeNicheLabels()"]
+  Labels --> UI["Landing + login + portais"]
+  Persist["POST /api/segment/persist"] --> Cookie
 ```
+
+| Prioridade | Entrada | Exemplo | Arquivo |
+|------------|---------|---------|---------|
+| 1 | `?tenant=` (slug) | `/?tenant=petcare` | `src/lib/segment/resolve.ts` |
+| 2 | Cookie `bibi_segment` | Após landing/login (HMAC, 7 dias) | `src/lib/segment/cookie.ts` |
+| 3 | Domínio customizado | DNS do tenant | `src/lib/tenant-resolver.ts` |
+| 4 | `?niche=` | `/?niche=LEGAL` → primeiro tenant LEGAL | `resolveTenantIdByNiche()` |
+| 5 | Default | Clínica Horizonte · MEDICAL | seed |
+
+**Persistência client:** `SegmentCookiePersist` → `POST /api/segment/persist` — grava cookie httpOnly via Route Handler (obrigatório no Next.js 16; corrige perda de segmento em mobile).
+
+**Links entre páginas:** `appendSegmentToPath("/interno/login", { tenantSlug: "zen" })` → `/interno/login?tenant=zen`.
 
 | Contexto | Como o nicho é definido | Arquivo |
 |----------|-------------------------|---------|
-| Landing pública | `?niche=` ou domínio customizado do tenant | `src/lib/niche/resolve.ts` |
-| Portais autenticados | `tenantId` da sessão → `resolveNicheFromTenantId()` | `src/lib/session.ts` |
-| Defaults | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
+| Landing pública | Prioridade acima | `src/lib/segment/resolve.ts` |
+| Login | Cookie + `?tenant=` no body; valida `user.tenantId` | `src/lib/segment/auth.ts` |
+| Portais autenticados | `tenantId` da sessão → labels do tenant | `src/lib/session.ts` |
+| Defaults de vocabulário | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
 
 ### 0.2 Fluxo de labels na UI
 
@@ -68,11 +84,11 @@ flowchart LR
 
 | Nicho | Tenant | Login interno | Landing preview |
 |-------|--------|---------------|-----------------|
-| VET | PetCare | `operacao@petcare.demo` | `/?niche=VET` |
-| DENTAL | Smile Odonto | `operacao@smile.demo` | `/?niche=DENTAL` |
-| LEGAL | Lex & Partners | `operacao@lex.demo` | `/?niche=LEGAL` |
-| SPA | Zen Studio | `operacao@zen.demo` | `/?niche=SPA` |
-| EDUCATION | EduPrime | `operacao@eduprime.demo` | `/?niche=EDUCATION` |
+| VET | PetCare | `operacao@petcare.demo` | `/?tenant=petcare` ou `/?niche=VET` |
+| DENTAL | Smile Odonto | `operacao@smile.demo` | `/?tenant=smile` |
+| LEGAL | Lex & Partners | `operacao@lex.demo` | `/?tenant=lex` |
+| SPA | Zen Studio | `operacao@zen.demo` | `/?tenant=zen` |
+| EDUCATION | EduPrime | `operacao@eduprime.demo` | `/?tenant=eduprime` |
 
 Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`.
 
@@ -140,19 +156,25 @@ flowchart TB
 
 **UI:** `LoginForm` em cada portal → **API:** `POST /api/auth/login`
 
-Body: `{ email, password, portal }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+Body: `{ email, password, portal, tenantSlug? }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+
+**Validação de segmento (v2.0):** se o site está em `?tenant=petcare`, contas de outro tenant retornam **403** com mensagem orientando o portal correto (`validateUserSegmentAccess` em `src/lib/segment/auth.ts`). Resposta de sucesso inclui `segment` (slug, nome, niche).
 
 ```mermaid
 sequenceDiagram
   participant U as Usuário
   participant API as POST /api/auth/login
+  participant Seg as segment/auth.ts
   participant DB as User (Prisma)
   participant S as session.ts
 
   U->>API: email + password + portal
+  API->>Seg: resolveSegmentFromLoginRequest()
   API->>DB: findUnique(email)
   API->>API: verifyPassword (scrypt)
-  alt role ≠ portal
+  alt user.tenantId ≠ segmento do site
+    API-->>U: 403 (portal correto)
+  else role ≠ portal
     API-->>U: 403
   else BENEFICIARIO sem patientId
     API-->>U: 403
@@ -160,8 +182,9 @@ sequenceDiagram
     API-->>U: { mfaRequired, mfaToken }
   else OK
     API->>S: createSession(userId)
+    API->>API: persistSegmentCookie(segment)
     API->>DB: Timeline LOGIN
-    API-->>U: { redirectTo: dashboardPath }
+    API-->>U: { redirectTo, segment }
   end
 ```
 
