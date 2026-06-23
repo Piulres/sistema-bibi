@@ -15,20 +15,20 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |------|-------|
 | **Versão em produção** | **1.2.0** (`55481be`) |
 | **Deploy Netlify** | `6a39d446` (23/06/2026) |
-| `main` | `55481be` — release / produção |
-| `dev` | `e372c01` — **v1.3.0** Estoque Médico (**base para novas features**) |
+| `main` | `6c1770a` — **v1.3.0** Estoque validado (`pre-release` OK) |
+| `dev` | `6c1770a` — sincronizada com `main` |
 | **Tag git em produção** | **`v1.2.0`** |
-| Próximo release | **v1.3.0** — merge `dev` → `main` quando publicar |
-| Feature paralela | **v1.4.0** Voa Health — branch `integracao-voa` (PR aberto) |
+| **Próximo deploy** | **v1.3.0** — `npx netlify deploy --prod` (humano) |
+| Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v1.3.0** Estoque — **novas features aqui** |
-| **Feature** | `integracao-voa` | **v1.4.0** Voa Health (isolado, PR → `dev`) |
-| **Release / produção** | `main` | Pacote **v1.2.0** completo |
-| **Netlify** | `main` | Espelha produção |
+| **Integração** | `dev` | **v1.3.0** — **novas features aqui** |
+| **Release** | `main` | **v1.3.0** validado — aguardando deploy |
+| **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
+| **Netlify** | `main` (último deploy) | Ainda **v1.2.0** em produção |
 
 ---
 
@@ -82,21 +82,22 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
-| **1.3.x** | [`V1_3.md`](V1_3.md) | ✅ Integrado em `dev` (`e372c01`) |
-| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` (PR aberto) |
+| **1.3.x** | [`V1_3.md`](V1_3.md) | ✅ Validado em `main` — **pendente deploy** |
+| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
 
-## Pacote integrado (`dev`)
+## Pacote validado (`main`) — pendente deploy
 
 ### `v1.3.0` — Estoque Médico
 
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.3.0` (`package.json`) |
-| **Branch** | `cursor/estoque-medico-0f4a` → `dev` (`e372c01`) |
+| **Commit** | `e372c01` (feat) + `6c1770a` (docs release) |
+| **PR** | [#93](https://github.com/Piulres/sistema-bibi/pull/93) |
 | **Doc** | [`V1_3.md`](V1_3.md) |
-| **Validação** | `npm run pre-release` |
+| **Validação** | `npm run pre-release` ✅ · `tests/api/stock.test.ts` 8/8 |
 
 **Inclui:**
 
@@ -108,6 +109,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
+| **`v1.3.0`** | `e372c01` | 23/06/2026 | ⏳ Validado — **pendente deploy** |
 | **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ **Em produção** |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
 | `v1.0.2` | `e30b2b0` | 22/06/2026 | ✅ Substituído |
