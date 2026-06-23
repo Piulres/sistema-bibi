@@ -17,6 +17,9 @@ import {
 import LoadingState from "@/components/ui/LoadingState";
 import FlowStepper from "@/components/ui/FlowStepper";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
+import TabBar from "@/components/ui/TabBar";
+import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
+import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
 
 type Usage = {
   id: string;
@@ -49,6 +52,17 @@ type Procedure = {
 const currency = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+const CARE_TABS = [
+  { key: "procedimentos", label: "Procedimentos" },
+  { key: "prontuario", label: "Prontuário" },
+  { key: "medicacao", label: "Medicação" },
+  { key: "exames", label: "Exames" },
+  { key: "protocolos", label: "Protocolos" },
+  { key: "perfil", label: "Perfil clínico" },
+] as const;
+
+type CareTab = (typeof CARE_TABS)[number]["key"];
+
 const fieldClass =
   "w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
 
@@ -62,6 +76,27 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [careTab, setCareTab] = useState<CareTab>("procedimentos");
+  const [clinicalSidebar, setClinicalSidebar] = useState<ClinicalSidebarData | null>(null);
+  const [clinicalLoading, setClinicalLoading] = useState(true);
+
+  const loadClinical = useCallback(async (patientId: string) => {
+    setClinicalLoading(true);
+    try {
+      const res = await fetch(`/api/prestador/patients/${patientId}/clinical-overview`);
+      const data = await res.json();
+      if (res.ok) {
+        setClinicalSidebar({
+          profile: data.overview.profile,
+          activeMedications: data.overview.activeMedications,
+          pendingExams: data.overview.pendingExams,
+          activeProtocols: data.overview.activeProtocols,
+        });
+      }
+    } finally {
+      setClinicalLoading(false);
+    }
+  }, []);
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/prestador/appointments/${appointmentId}`);
@@ -71,7 +106,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       return;
     }
     setDetail(data);
-  }, [appointmentId]);
+    if (data.patient?.id) {
+      await loadClinical(data.patient.id);
+    }
+  }, [appointmentId, loadClinical]);
 
   useEffect(() => {
     let active = true;
@@ -84,13 +122,18 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       const procData = await procRes.json();
       if (!active) return;
       if (!detailRes.ok) setError(detailData.error ?? "Erro ao carregar");
-      else setDetail(detailData);
+      else {
+        setDetail(detailData);
+        if (detailData.patient?.id) {
+          void loadClinical(detailData.patient.id);
+        }
+      }
       if (procData.procedures) setProcedures(procData.procedures);
     })();
     return () => {
       active = false;
     };
-  }, [appointmentId]);
+  }, [appointmentId, loadClinical]);
 
   async function addProcedure() {
     if (!selectedProc) return;
@@ -238,9 +281,15 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         </div>
       </Card>
 
-      {msg && <Alert tone="success">{msg}</Alert>}
+      {msg && <Alert tone={msg.startsWith("Erro") ? "danger" : "success"}>{msg}</Alert>}
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+        <ClinicalSidebar data={clinicalSidebar} loading={clinicalLoading} />
+
+        <div className="space-y-4">
+          <TabBar tabs={[...CARE_TABS]} active={careTab} onSelect={(k) => setCareTab(k as CareTab)} aria-label="Abas do atendimento clínico" />
+
+          {careTab === "procedimentos" && (
         <Card padding="lg">
           <SectionHeader
             title="Procedimentos (Pay Per Use)"
@@ -291,7 +340,9 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             </div>
           )}
         </Card>
+          )}
 
+          {careTab === "prontuario" && (
         <Card padding="lg">
           <SectionHeader title="Prontuário Eletrônico (PEP)" />
           <div className="mt-3 flex flex-wrap gap-2">
@@ -331,7 +382,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            rows={3}
+            rows={6}
             placeholder="Registrar evolução clínica, conduta, prescrição..."
             className={`mt-3 ${fieldClass}`}
           />
@@ -343,7 +394,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             {detail.records.map((r) => (
               <li key={r.id} className="rounded-[var(--radius-button)] bg-[var(--surface-muted)] p-3">
                 {r.title && <p className="text-xs font-semibold text-[var(--portal-accent)]">{r.title}</p>}
-                <p className="text-sm text-[var(--text-secondary)]">{r.content}</p>
+                <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">{r.content}</p>
                 <p className="mt-1 text-xs text-[var(--text-muted)]">
                   {new Date(r.createdAt).toLocaleString("pt-BR")}
                 </p>
@@ -351,6 +402,20 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             ))}
           </ul>
         </Card>
+          )}
+
+          {["medicacao", "exames", "protocolos", "perfil"].includes(careTab) && (
+            <Card padding="lg">
+              <ClinicalCarePanel
+                patientId={detail.patient.id}
+                appointmentId={appointmentId}
+                procedures={procedures}
+                tab={careTab as "medicacao" | "exames" | "protocolos" | "perfil"}
+                onChanged={() => loadClinical(detail.patient.id)}
+              />
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

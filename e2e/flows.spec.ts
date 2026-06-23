@@ -52,6 +52,7 @@ test.describe("Portal Beneficiário — self-service", () => {
 
   test("saudação personalizada e resumo", async ({ page }) => {
     await expect(page.getByRole("heading", { name: /Olá,/i })).toBeVisible();
+    await page.goto("/beneficiario/resumo");
     await expect(page.getByText("Próximo atendimento")).toBeVisible();
     await expect(page.getByText("Pendente (Pay Per Use)")).toBeVisible();
   });

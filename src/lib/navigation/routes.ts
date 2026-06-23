@@ -55,6 +55,7 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
 export const PRESTADOR_NAV_TABS: NavTab[] = [
   { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
   { href: "/prestador", label: "Agenda", key: "agenda" },
+  { href: "/prestador/pacientes", label: "Pacientes", key: "pacientes" },
   { href: "/prestador/extrato", label: "Extrato", key: "extrato" },
   { href: "/prestador/relatorios", label: "Relatórios", key: "relatorios" },
 ];
@@ -62,10 +63,11 @@ export const PRESTADOR_NAV_TABS: NavTab[] = [
 export function resolvePrestadorActive(pathname: string): string | undefined {
   if (pathname === "/prestador/dashboard") return "dashboard";
   if (pathname === "/prestador") return "agenda";
+  if (pathname.startsWith("/prestador/pacientes")) return "pacientes";
   if (pathname.startsWith("/prestador/extrato")) return "extrato";
   if (pathname.startsWith("/prestador/relatorios")) return "relatorios";
   if (pathname.startsWith("/prestador/atendimento/")) return "agenda";
-  if (pathname.startsWith("/prestador/paciente/")) return "agenda";
+  if (pathname.startsWith("/prestador/paciente/")) return "pacientes";
   return undefined;
 }
 
@@ -84,6 +86,9 @@ export const BENEFICIARIO_NAV_TABS: NavTab[] = [
   { href: "/beneficiario/agenda", label: "Agenda", key: "agenda" },
   { href: "/beneficiario/consumo", label: "Consumo", key: "consumo" },
   { href: "/beneficiario/faturas", label: "Faturas", key: "faturas" },
+  { href: "/beneficiario/medicacoes", label: "Medicações", key: "medicacoes" },
+  { href: "/beneficiario/exames", label: "Exames", key: "exames" },
+  { href: "/beneficiario/plano", label: "Plano", key: "plano" },
   { href: "/beneficiario/assinatura", label: "Assinatura", key: "assinatura" },
   { href: "/beneficiario/prontuario", label: "Prontuário", key: "prontuario" },
   { href: "/beneficiario/historico", label: "Histórico", key: "historico" },
@@ -95,6 +100,9 @@ export function resolveBeneficiarioActive(pathname: string): string | undefined 
   if (pathname.startsWith("/beneficiario/agenda")) return "agenda";
   if (pathname.startsWith("/beneficiario/consumo")) return "consumo";
   if (pathname.startsWith("/beneficiario/faturas")) return "faturas";
+  if (pathname.startsWith("/beneficiario/medicacoes")) return "medicacoes";
+  if (pathname.startsWith("/beneficiario/exames")) return "exames";
+  if (pathname.startsWith("/beneficiario/plano")) return "plano";
   if (pathname.startsWith("/beneficiario/assinatura")) return "assinatura";
   if (pathname.startsWith("/beneficiario/prontuario")) return "prontuario";
   if (pathname.startsWith("/beneficiario/historico")) return "historico";

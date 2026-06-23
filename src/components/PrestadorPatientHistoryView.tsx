@@ -7,6 +7,10 @@ import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import { buildPatientHistoryBreadcrumbs } from "@/lib/navigation";
+import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
+import TabBar from "@/components/ui/TabBar";
+import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
+import Card from "@/components/ui/Card";
 
 type Overview = {
   patient: {
@@ -61,19 +65,33 @@ type Overview = {
 
 export default function PrestadorPatientHistoryView({ patientId }: { patientId: string }) {
   const [overview, setOverview] = useState<Overview | null>(null);
+  const [clinicalSidebar, setClinicalSidebar] = useState<ClinicalSidebarData | null>(null);
+  const [historyTab, setHistoryTab] = useState<"historico" | "medicacao" | "exames" | "protocolos" | "perfil">("historico");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
     (async () => {
-      const res = await fetch(`/api/prestador/patients/${patientId}/overview`);
+      const [res, clinicalRes] = await Promise.all([
+        fetch(`/api/prestador/patients/${patientId}/overview`),
+        fetch(`/api/prestador/patients/${patientId}/clinical-overview`),
+      ]);
       const data = await res.json();
+      const clinicalData = await clinicalRes.json();
       if (!active) return;
       if (!res.ok) {
         setError(data.error ?? "Erro ao carregar histórico");
       } else {
         setOverview(data.overview);
+      }
+      if (clinicalRes.ok) {
+        setClinicalSidebar({
+          profile: clinicalData.overview.profile,
+          activeMedications: clinicalData.overview.activeMedications,
+          pendingExams: clinicalData.overview.pendingExams,
+          activeProtocols: clinicalData.overview.activeProtocols,
+        });
       }
       setLoading(false);
     })();
@@ -128,6 +146,24 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
         </div>
       </div>
 
+      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+        <ClinicalSidebar data={clinicalSidebar} />
+
+        <div className="space-y-4">
+          <TabBar
+            tabs={[
+              { key: "historico", label: "Histórico" },
+              { key: "medicacao", label: "Medicação" },
+              { key: "exames", label: "Exames" },
+              { key: "protocolos", label: "Protocolos" },
+              { key: "perfil", label: "Perfil clínico" },
+            ]}
+            active={historyTab}
+            onSelect={(k) => setHistoryTab(k as typeof historyTab)}
+          />
+
+          {historyTab === "historico" && (
+            <>
       <section>
         <h2 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atendimentos</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
@@ -282,6 +318,31 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
           </ol>
         </section>
       )}
+            </>
+          )}
+
+          {["medicacao", "exames", "protocolos", "perfil"].includes(historyTab) && (
+            <Card padding="lg">
+              <ClinicalCarePanel
+                patientId={patientId}
+                tab={historyTab as "medicacao" | "exames" | "protocolos" | "perfil"}
+                onChanged={async () => {
+                  const clinicalRes = await fetch(`/api/prestador/patients/${patientId}/clinical-overview`);
+                  const clinicalData = await clinicalRes.json();
+                  if (clinicalRes.ok) {
+                    setClinicalSidebar({
+                      profile: clinicalData.overview.profile,
+                      activeMedications: clinicalData.overview.activeMedications,
+                      pendingExams: clinicalData.overview.pendingExams,
+                      activeProtocols: clinicalData.overview.activeProtocols,
+                    });
+                  }
+                }}
+              />
+            </Card>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

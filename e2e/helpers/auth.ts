@@ -39,3 +39,23 @@ export function internoNav(page: Page) {
 export function internoNavDrawer(page: Page) {
   return page.getByRole("navigation", { name: "Módulos internos" });
 }
+
+/**
+ * Retorna o escopo de links do interno — abas desktop ou drawer mobile (abre se necessário).
+ */
+export async function openInternoNav(page: Page) {
+  const desktop = internoNav(page);
+  if (await desktop.isVisible()) {
+    return desktop;
+  }
+  const drawer = internoNavDrawer(page);
+  if (!(await drawer.isVisible())) {
+    await page.locator(".lg\\:hidden").getByRole("button").first().click();
+  }
+  return drawer;
+}
+
+/** Conteúdo principal de uma página de portal (evita texto oculto no header/nav). */
+export function portalMain(page: Page) {
+  return page.locator(".portal-page-content");
+}
