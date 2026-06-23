@@ -257,12 +257,18 @@ sequenceDiagram
 
 ---
 
-## 3.1 Price Snapshot — congelamento de preço no atendimento
+## 3.1 Price Snapshot — `ProcedureUsage` como coração do sistema
 
-O **Price Snapshot** é o mecanismo que extingue a “caixa preta” da sinistralidade:
-o valor cobrado é **calculado e persistido no momento do atendimento**, antes de
-qualquer faturamento ou pagamento. Alterações futuras em `Procedure.basePrice` ou
-em `PricingRule` **não retroagem** sobre usos já registrados.
+A entidade **`ProcedureUsage`** é o coração do HealthOS: cada linha representa um
+evento clínico-financeiro irreversível — procedimento utilizado, preço congelado,
+status de faturamento. Sem ela não há Pay Per Use, transparência para o RH nem
+margem auditável para a clínica. Todo o restante (fatura, PIX, Portal PJ) deriva
+deste snapshot.
+
+O **Price Snapshot** extingue a “caixa preta” da sinistralidade: o valor cobrado é
+**calculado e persistido no momento do atendimento**, antes de qualquer
+faturamento ou pagamento. Alterações futuras em `Procedure.basePrice` ou em
+`PricingRule` **não retroagem** sobre usos já registrados.
 
 ### Fluxo técnico
 
@@ -287,7 +293,7 @@ sequenceDiagram
 | Entidade / função | Papel no snapshot |
 |-------------------|-------------------|
 | `Procedure.basePrice` | Preço de tabela do tenant |
-| `PricingRule.multiplier` | Ajuste por empresa (ex.: 0,85 = 15% desconto TechCorp) |
+| `PricingRule.multiplier` | Ajuste por empresa (ex.: 0,85 → R$ 400 base = **R$ 340** TechCorp) |
 | `computePrice()` (`pricing.ts`) | Resolve preço efetivo antes da persistência |
 | `ProcedureUsage.priceCharged` | **Valor congelado** — fonte da verdade para faturamento |
 | `ProcedureUsage.billed` | `false` até virar `InvoiceItem` |
@@ -360,8 +366,9 @@ flowchart TB
 ```
 
 Nenhum portal “reescreve” o snapshot de outro: o prestador grava, o interno
-fatura, o PJ audita, o beneficiário paga. Essa segregação é o que permite ao CFO
-confiar que o número do Portal PJ é o mesmo que entrou na fatura.
+fatura, o PJ audita, o beneficiário paga. Essa segregação garante **transparência
+financeira total** — o CFO confia que o número do Portal PJ é o mesmo que entrou
+na fatura e na margem da clínica.
 
 ---
 

@@ -1,10 +1,7 @@
 # Sistema Bibi
 
-> **HealthOS para Saúde Corporativa Pay Per Use** — infraestrutura financeira e
-> clínica que conecta empresas, beneficiários e prestadores em um modelo
-> transparente de consumo. Inspirado no modelo **ERPMed/Centtralmed**, com foco
-> em previsibilidade financeira, extinção da burocracia e fidelização de
-> pacientes.
+> **HealthOS para Saúde Corporativa Pay Per Use:** infraestrutura disruptiva para
+> eliminar a caixa preta da sinistralidade.
 
 ---
 
@@ -30,32 +27,30 @@
 ## 1. Visão geral
 
 O Sistema Bibi é um **HealthOS** — sistema operacional de saúde corporativa —
-multi-tenant (cada clínica/hospital é um *tenant*) com **quatro portais segregados**
-por perfil de acesso. Evoluiu de ferramenta de gestão para **infraestrutura de
-confiança** entre RH, CFO, beneficiários e prestadores: cada ator vê a mesma
-verdade financeira e clínica, sem a “caixa preta” da sinistralidade.
+multi-tenant com **quatro portais segregados** por perfil de acesso. Evoluiu de
+POC de gestão para **infraestrutura de confiança** entre RH, CFO, beneficiários
+e prestadores. Mercado endereçável inicial (**SOM**): **~5 mil empresas** com 100
+a 1.000 colaboradores ([`docs/pesquisa/04-visao-executiva.md`](docs/pesquisa/04-visao-executiva.md)).
 
-O núcleo do modelo é **Pay Per Use**: o beneficiário (ou a empresa) paga apenas
-pelos serviços efetivamente utilizados. A tecnologia que garante essa
-transparência é o **Price Snapshot** — o preço é calculado e **congelado** no
-momento do atendimento (`ProcedureUsage.priceCharged`), após aplicar as
-`PricingRule` de precificação dinâmica por empresa. Nenhum reajuste retroativo;
-o valor exibido no ato é o valor faturado.
+O núcleo tecnológico é o **Price Snapshot**: no ato do atendimento, `computePrice()`
+aplica as `PricingRule` corporativas e persiste o valor em
+`ProcedureUsage.priceCharged` — congelado, auditável, sem reajuste retroativo.
+É isso que extingue a caixa preta da sinistralidade para o RH e garante margem
+previsível para a clínica.
 
 ### ROI Real (cenário 500 vidas)
-
-Para empresas de médio porte, o modelo elimina o desperdício de vidas ociosas
-no plano tradicional por capitação:
 
 | Dimensão | Plano tradicional | Sistema Bibi (Pay Per Use) |
 |----------|-------------------|----------------------------|
 | Modelo | Mensalidade fixa por colaborador | Pagamento por utilização efetiva |
-| Custo mensal (500 vidas, 15% uso) | **R$ 175.000** | **R$ 14.475** (uso + taxa plataforma) |
-| **Economia estimada** | — | **~91,7%** (~R$ 160.525/mês) |
+| **Custo mensal** | **R$ 175.000** | **R$ 14.500** |
+| **Economia** | — | **~91%** (~R$ 160.500/mês) |
 
-> Detalhamento, sensibilidade e scripts para RH/CFO:
-> [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) ·
-> [`docs/MONETIZACAO.md`](docs/MONETIZACAO.md)
+Premissas: ticket médio de consulta corporativa **R$ 340** (base **R$ 400** − 15%
+desconto TechCorp via `PricingRule`), ~34 atendimentos/mês (~7% de utilização)
++ taxa de plataforma. Detalhamento:
+[`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) ·
+[`docs/MONETIZACAO.md`](docs/MONETIZACAO.md)
 
 | Portal | Público | Foco |
 |--------|---------|------|
@@ -214,9 +209,10 @@ Referência de onde cada entidade pode ser criada, lida, alterada ou removida na
 
 Diagrama completo com sequência cross-portal: [`docs/FLUXOS.md`](docs/FLUXOS.md) §7.
 
-Exemplo de precificação dinâmica do seed: a Consulta Clínica (base R$ 180,00)
-para um beneficiário da **TechCorp** é cobrada por **R$ 153,00** (desconto
-corporativo de 15%).
+Exemplo de precificação dinâmica do seed (ticket médio mercado 2026): **Consulta
+Clínica** com base **R$ 400,00**; beneficiário **TechCorp** paga **R$ 340,00**
+(`PricingRule.multiplier` 0,85 = desconto corporativo de 15%), valor congelado
+em `ProcedureUsage.priceCharged` no ato do atendimento.
 
 ## 8. Modelo de dados
 

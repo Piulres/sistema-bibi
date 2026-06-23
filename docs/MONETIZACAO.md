@@ -37,10 +37,11 @@ flowchart TB
 
 ---
 
-## 1. Take Rate — percentual sobre transações
+## 1. Take Rate — 0,5% a 2% sobre transações
 
 **O quê:** percentual cobrado sobre cada transação processada pelo motor de
-cobrança (consultas, exames e demais procedimentos Pay Per Use).
+cobrança (consultas, exames e demais procedimentos Pay Per Use). Faixa comercial
+recomendada: **0,5% a 2%** do valor transacionado, configurável por tenant.
 
 **Como funciona na POC:**
 
@@ -58,16 +59,18 @@ cobrança (consultas, exames e demais procedimentos Pay Per Use).
 | Gateway | `src/lib/payments/charge-service.ts` | Strategy Pattern por `PAYMENT_GATEWAY` |
 | Persistência | `Payment` (Prisma) | Histórico por fatura |
 
-**Exemplo comercial (500 vidas, 15% uso):** custo de utilização ~R$ 11.475/mês;
-a take rate incide sobre esse volume transacionado — alinhada ao argumento de ROI
-para o CFO (pagar só pelo que foi usado, com taxa transparente sobre o fluxo real).
+**Exemplo comercial (500 vidas, ~7% uso, consulta R$ 340):** volume transacionado
+~R$ 11.560/mês; take rate de 1% ≈ R$ 116 — somado à taxa de plataforma compõe
+a receita do HealthOS sem inflar o custo do cliente (ROI ~91% vs plano tradicional
+de R$ 175.000/mês).
 
 ---
 
-## 2. SaaS Enterprise — mensalidade por volume de vidas
+## 2. SaaS Enterprise — taxa por vida/mês (Portal PJ)
 
-**O quê:** assinatura mensal escalonada pelo número de beneficiários (vidas)
-geridos no **Portal PJ**, independentemente do uso clínico.
+**O quê:** mensalidade escalonada pelo número de beneficiários (vidas) geridos no
+**Portal PJ** — independente do uso clínico. Modelo típico: **R$ X/vida/mês** ou
+pacote fixo por faixa de colaboradores.
 
 **Proposta de valor para o RH/CFO:**
 
@@ -129,9 +132,9 @@ A combinação das três fontes sustenta o argumento comercial principal:
 **Cenário 500 vidas (síntese consultor):**
 
 - Plano tradicional: **R$ 175.000/mês**
-- Bibi (uso + taxa plataforma): **R$ 14.475/mês**
-- Economia: **~91,7%** — o SaaS enterprise entra como linha explícita na proposta,
-  não escondida na mensalidade por vida.
+- Bibi (uso + taxa plataforma): **~R$ 14.500/mês**
+- Economia: **~91%** — SaaS enterprise e take rate são linhas explícitas na
+  proposta, não embutidas na mensalidade por vida do plano tradicional.
 
 ---
 
