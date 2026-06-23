@@ -13,9 +13,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** *(deploy em andamento)* |
-| **Commit release** | `3022d2e` — v2.0.0 + rename de marca + docs |
-| `main` / `dev` | Sincronizadas em **`3022d2e`** |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** — deploy `6a3a9973` @ `49edb90` |
+| **Commit release** | `49edb90` |
+| `main` / `dev` | Sincronizadas em **`49edb90`** |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
@@ -25,7 +25,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.0.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.0.0** — idem |
-| **Netlify** | **sistema-bibi.netlify.app** | Publicação única v2.0.0 completa |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3a9973` |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -48,9 +48,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.0.0` |
-| **Commit** | `3022d2e` |
+| **Commit** | `49edb90` |
 | **PRs** | [#101](https://github.com/Piulres/sistema-bibi/pull/101), [#106](https://github.com/Piulres/sistema-bibi/pull/106)–[#108](https://github.com/Piulres/sistema-bibi/pull/108), [#111](https://github.com/Piulres/sistema-bibi/pull/111) |
-| **Publicado em** | 23/06/2026 — deploy Netlify *(registrar ID abaixo após publicação)* |
+| **Publicado em** | 23/06/2026 — deploy Netlify `6a3a9973` |
 
 **Inclui (além de v1.3 estoque):**
 
@@ -144,7 +144,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v2.0.0`** | `3022d2e` | 23/06/2026 | ✅ **Em produção** — Sistema Bibi - ServiceOS |
+| **`v2.0.0`** | `49edb90` | 23/06/2026 | ✅ **Em produção** — deploy `6a3a9973` |
 | **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
 | **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ Substituído |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
