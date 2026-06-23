@@ -46,7 +46,7 @@ export default function LandingCta({ branding, niche }: Props) {
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/interno/login"
-              className="inline-flex min-w-[12rem] items-center justify-center gap-2 rounded-full bg-[var(--brand-accent)] px-7 py-3.5 text-base font-semibold text-[var(--surface-inverse)] shadow-lg shadow-teal-900/25 transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="inline-flex min-w-[12rem] items-center justify-center gap-2 rounded-full bg-[var(--brand-accent)] px-7 py-3.5 text-base font-semibold text-[var(--surface-inverse)] shadow-lg shadow-orange-900/25 transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
             >
               Acessar demonstração
               <LandingIcon name="arrow-right" className="h-5 w-5" />

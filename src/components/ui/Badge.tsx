@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/cn";
 
 type Props = React.HTMLAttributes<HTMLSpanElement> & {
-  tone?: "neutral" | "info" | "success" | "warning" | "danger" | "brand";
+  tone?: "neutral" | "info" | "success" | "warning" | "danger" | "brand" | "accent";
 };
 
 const toneClass = {
@@ -11,6 +11,7 @@ const toneClass = {
   warning: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
   danger: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
   brand: "bg-[var(--status-brand-bg)] text-[var(--status-brand-text)]",
+  accent: "bg-[var(--brand-accent)] text-[var(--text-inverse)]",
 };
 
 export default function Badge({

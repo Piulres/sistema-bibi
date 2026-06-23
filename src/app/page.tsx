@@ -11,9 +11,13 @@ import LandingHeader from "@/components/landing/LandingHeader";
 import LandingNicheSwitcherBar from "@/components/landing/LandingNicheSwitcherBar";
 import LandingHeroNiche from "@/components/landing/LandingHeroNiche";
 import LandingStats from "@/components/landing/LandingStats";
+import LandingProblem from "@/components/landing/LandingProblem";
+import LandingSolution from "@/components/landing/LandingSolution";
+import LandingRoi from "@/components/landing/LandingRoi";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingHowItWorks from "@/components/landing/LandingHowItWorks";
 import LandingPortals from "@/components/landing/LandingPortals";
+import LandingNiches from "@/components/landing/LandingNiches";
 import LandingFaq from "@/components/landing/LandingFaq";
 import LandingCta from "@/components/landing/LandingCta";
 import LandingFooter from "@/components/landing/LandingFooter";
@@ -88,9 +92,13 @@ export default async function Home({ searchParams }: PageProps) {
       <main id="conteudo-principal" className="flex-1">
         <LandingHeroNiche niche={resolved.niche} branding={branding} />
         <LandingStats />
+        <LandingProblem />
+        <LandingSolution />
+        <LandingRoi />
         <LandingFeatures niche={resolved.niche} />
         <LandingHowItWorks niche={resolved.niche} />
         <LandingPortals niche={resolved.niche} segment={segment} />
+        <LandingNiches />
         <LandingFaq niche={resolved.niche} />
         <LandingCta branding={branding} niche={resolved.niche} />
       </main>

@@ -60,7 +60,7 @@ export default function LandingHeader({ branding }: Props) {
             <a
               key={link.href}
               href={link.href}
-              className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+              className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             >
               {link.label}
             </a>
@@ -73,7 +73,7 @@ export default function LandingHeader({ branding }: Props) {
           </Suspense>
           <Link
             href="/beneficiario/login"
-            className="hidden rounded-full px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:inline-flex"
+            className="hidden rounded-full px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] transition hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:inline-flex"
           >
             Entrar
           </Link>
