@@ -13,29 +13,38 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção** | **1.2.0** (`55481be`) |
-| **Deploy Netlify** | `6a39d446` (23/06/2026) |
-| `main` | `6c1770a` — **v1.3.0** Estoque validado (`pre-release` OK) |
-| `dev` | Integração — **v2.0 ServiceOS** em merge (PR [#101](https://github.com/Piulres/sistema-bibi/pull/101)) |
-| **Tag git em produção** | **`v1.2.0`** |
-| **Próximo deploy** | **v1.3.0** — `npx netlify deploy --prod` (humano) |
-| **Em desenvolvimento** | **v2.0 ServiceOS** — multi-nicho, labels, landing segmentada |
+| **Versão em produção (Netlify)** | **1.2.0** — último deploy `6a39d446` *(atualizar após deploy v2.0)* |
+| **Versão validada na `main`** | **2.0.0** (`7f5d876` + bump `package.json`) |
+| `main` / `dev` | **v2.0.0 ServiceOS** — merge `dev` → `main` concluído |
+| **Tag git mais recente** | **`v2.0.0`** *(após tag)* — anterior: `v1.2.0` |
+| **Próximo passo** | `npm run pre-release` → `npx netlify deploy --prod --no-build` |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v1.3.0** — **novas features aqui** |
-| **Release** | `main` | **v1.3.0** validado — aguardando deploy |
+| **Integração** | `dev` | **v2.0.0** ServiceOS |
+| **Release** | `main` | **v2.0.0** — aguardando deploy Netlify |
+| **Netlify** | último deploy manual | Ainda **v1.2.0** até publicar v2.0 |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
-| **Netlify** | `main` (último deploy) | Ainda **v1.2.0** em produção |
+
+### Tags git (histórico)
+
+| Tag | Commit aprox. | Conteúdo |
+|-----|---------------|----------|
+| **`v2.0.0`** | `7f5d876` | ServiceOS multi-nicho + v1.3 estoque incorporado |
+| `v1.2.0` | `485819a` | Care Chart, exports, homepage — **em produção hoje** |
+| `v1.1.0` | `8c8cd01` | Care Chart (substituído) |
+| `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
+| `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |
+| `v1.0.0` | `685cc21` | POC inicial |
 
 ---
 
 ## Pacote em produção (fechado)
 
-### `v1.2.0` — integração completa
+### `v1.2.0` — integração completa *(substituído na Netlify após deploy v2.0)*
 
 | Campo | Valor |
 |-------|-------|
@@ -83,15 +92,38 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
-| **1.3.x** | [`V1_3.md`](V1_3.md) | ✅ Validado em `main` — **pendente deploy** |
-| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | 🚧 **Em desenvolvimento** na `dev` (ServiceOS multi-nicho) |
+| **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
+| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | ✅ Validado na `main` — **pendente deploy** |
 | **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
 
 ## Pacote validado (`main`) — pendente deploy
 
-### `v1.3.0` — Estoque Médico
+### `v2.0.0` — ServiceOS multi-nicho
+
+| Campo | Valor |
+|-------|-------|
+| **Versão** | `2.0.0` (`package.json`) |
+| **Commit** | `7f5d876` (ServiceOS) + merge v1.3 estoque |
+| **PR** | [#101](https://github.com/Piulres/sistema-bibi/pull/101) |
+| **Doc** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) |
+| **Tag** | `v2.0.0` |
+
+**Inclui (além de todo v1.3 estoque):**
+
+- `Tenant.niche` + `Tenant.labels` — dicionário por cliente
+- `useLabels()` + `NICHE_MASTER_LABELS` — vocabulário dinâmico na UI
+- Landing segmentada por nicho (`/?niche=VET`, domínio customizado)
+- Seed multi-nicho: PetCare, Smile, Lex, Zen, EduPrime
+- Procedimentos demo: Banho e Tosa (R$ 150), Consulta Odontológica (R$ 350), Hora Técnica (R$ 500)
+- Documentação ServiceOS alinhada (README, BENCHMARK, FLUXOS, pesquisa)
+
+**Testes:** `tests/unit/niche.test.ts` — 14 testes · `pre-release` obrigatório antes do deploy.
+
+---
+
+### `v1.3.0` — Estoque Médico *(incorporado em v2.0.0)*
 
 | Campo | Valor |
 |-------|-------|
@@ -111,8 +143,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v1.3.0`** | `e372c01` | 23/06/2026 | ⏳ Validado — **pendente deploy** |
-| **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ **Em produção** |
+| **`v2.0.0`** | `7f5d876` | 23/06/2026 | ⏳ Validado — **pendente deploy** |
+| **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
+| **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ **Em produção** (até deploy v2.0) |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
 | `v1.0.2` | `e30b2b0` | 22/06/2026 | ✅ Substituído |
 | `v1.0.1` | `e4d8a43` | 22/06/2026 | ✅ Substituído |
@@ -120,30 +153,46 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Pacote em desenvolvimento (`dev`) — v2.0 ServiceOS
+## Rollback para versão anterior
 
-### `v2.0.0` — ServiceOS multi-nicho
+A Netlify **não faz rollback automático de código** — é preciso **republicar** um build de uma tag/commit anterior.
 
-| Campo | Valor |
-|-------|-------|
-| **Codinome** | ServiceOS |
-| **PR** | [#101](https://github.com/Piulres/sistema-bibi/pull/101) |
-| **Doc** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) |
-| **Estado** | 🚧 Integrado na `dev` — **não publicado** |
+### Procedimento (humano)
 
-**Inclui:**
+```bash
+# 1. Escolher a tag (ex.: voltar de v2.0.0 para v1.2.0)
+git fetch --tags
+git checkout v1.2.0          # ou: git checkout 485819a
 
-- `Tenant.niche` + `Tenant.labels` (JSON) — dicionário por cliente
-- `useLabels()` + `NICHE_MASTER_LABELS` — vocabulário dinâmico na UI
-- Landing segmentada por nicho (`/?niche=VET`, domínio customizado)
-- Seed: PetCare, Smile Odonto, Lex & Partners, Zen Studio, EduPrime
-- Procedimentos demo: Banho e Tosa (R$ 150), Consulta Odontológica (R$ 350), Hora Técnica Jurídica (R$ 500)
-- Nav dinâmica (Prestador, Beneficiário, Cadastros internos)
-- Documentação alinhada: README, BENCHMARK, FLUXOS, JORNADA, pesquisa, OPERACOES
+# 2. Rebuild local (obrigatório — schema/seed podem diferir)
+npm ci
+npm run pre-release
 
-**Testes:** `tests/unit/niche.test.ts` — 14 testes.
+# 3. Deploy sem rebuild remoto (economiza cota)
+npx netlify deploy --prod --no-build --message "rollback: v1.2.0"
 
-**Não inclui (roadmap):** homepage 100% custom por tenant, migração completa de strings fixas, deploy produção.
+# 4. Atualizar este arquivo (RELEASES.md) e AGENTS.md com versão em produção
+# 5. Opcional: git checkout main && git push (main continua em v2.0; só produção volta)
+```
+
+### O que muda em cada rollback
+
+| De → Para | Código | Banco produção | Sessões / login |
+|-----------|--------|----------------|-----------------|
+| v2.0 → v1.2 | Perde multi-nicho, labels, landing por nicho | SQLite no Blobs **não reverte** sozinho — dados criados com schema v2 podem falhar | Cookies válidos se `SESSION_SECRET` igual |
+| v2.0 → v1.3 | Perde só ServiceOS; mantém estoque | Idem — `db:push` no build alinha schema do deploy | Idem |
+| Qualquer → anterior | Build da tag escolhida | **Modo demo:** restaurar via `/interno/seguranca` · **Operação:** backup manual | Usuários precisam relogar se schema de User mudar |
+
+### Riscos
+
+1. **Schema Prisma** — v2.0 adiciona `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`. Rollback para v1.2 **sem** reset do banco pode gerar erro se colunas forem obrigatórias no código antigo (v1.2 ignora campos extras no SQLite em geral, mas seed/bootstrap difere).
+2. **Dados de operação** — modo `operation` em Blobs persiste entre deploys; rollback de código **não** apaga dados.
+3. **Tags git** — `v1.2.0`, `v1.1.0`, etc. permanecem no repositório; rollback é checkout + rebuild + deploy.
+4. **Cota Netlify** — cada deploy consome minutos; usar `--no-build` após `pre-release` local.
+
+### Rollback “só documentação”
+
+Se o deploy falhar antes de publicar, basta **não** atualizar `RELEASES.md` como publicado — produção permanece na versão anterior.
 
 ---
 
