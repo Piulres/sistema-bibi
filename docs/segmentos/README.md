@@ -16,9 +16,18 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 
 ## Como validar um segmento em demo
 
-1. Landing: `/?niche=VET` (ou outro)
-2. Login interno: `/interno/login` → selecione o tenant do segmento
-3. Confirme badge **ServiceOS v2.0** + nicho no header
-4. Nav com vocabulário do segmento (ex.: Tutores, não Beneficiários)
+1. Landing: `/?tenant=petcare` (recomendado) ou `/?niche=VET`
+2. Clique em um portal — o link leva `?tenant=petcare` no login
+3. Entre com `operacao@petcare.demo` — contas de outro tenant são bloqueadas
+4. Confirme badge **ServiceOS v2.0** + nicho no header e nav do segmento
+
+## Roteamento por segmento
+
+| Entrada | Exemplo | Resolve |
+|---------|---------|---------|
+| Slug do tenant | `/?tenant=petcare` | PetCare · VET |
+| Nicho (fallback) | `/?niche=LEGAL` | Primeiro tenant LEGAL |
+| Domínio customizado | DNS verificado no branding | Tenant do domínio |
+| Cookie `bibi_segment` | Após landing/login | Persiste entre páginas |
 
 Senha: **`bibi123`**
