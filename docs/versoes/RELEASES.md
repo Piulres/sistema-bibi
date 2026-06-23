@@ -13,10 +13,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **1.2.0** — deploy `6a39d446` *(ainda não atualizado)* |
-| **Versão validada na `main` / tag** | **2.0.0** (`e823fe4`) — tag **`v2.0.0`** criada |
-| `main` / `dev` | Sincronizadas em **v2.0.0** |
-| **Deploy pendente** | `netlify link` ao site correto → `npx netlify deploy --prod --no-build` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — deploy `6a3a87c9` @ commit `3e7b250` |
+| **Versão validada na `main` / tag** | **2.0.0** — tag **`v2.0.0`** |
+| `main` / `dev` | Sincronizadas em **v2.0.0** (`3e7b250`) |
+| **Deploy** | `npx netlify build` → `npx netlify deploy --prod --no-build` (site `sistema-bibi`) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
@@ -24,8 +24,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.0.0** ServiceOS |
-| **Release** | `main` | **v2.0.0** — aguardando deploy Netlify |
-| **Netlify** | último deploy em **sistema-bibi.netlify.app** | **v1.2.0** — publicar v2.0 com CLI linkado |
+| **Release** | `main` | **v2.0.0** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3a87c9` |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -43,7 +43,29 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v1.2.0` — integração completa *(substituído na Netlify após deploy v2.0)*
+### `v2.0.0` — ServiceOS multi-nicho
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.0.0` |
+| **Commit** | `3e7b250` |
+| **PRs** | [#101](https://github.com/Piulres/sistema-bibi/pull/101), [#106](https://github.com/Piulres/sistema-bibi/pull/106)–[#108](https://github.com/Piulres/sistema-bibi/pull/108) |
+| **Publicado em** | 23/06/2026 — deploy Netlify `6a3a87c9` |
+
+**Inclui (além de v1.3 estoque):**
+
+- ServiceOS multi-nicho: `Tenant.niche`, `useLabels()`, landing por segmento
+- Roteamento por tenant slug (`bibi_segment`) da landing ao login
+- Tenants demo: PetCare, Smile, Lex, Zen, EduPrime + Horizonte Saúde
+- Branding ServiceOS no código ativo; `db:verify` no `pre-release`
+- Fix mobile: cookie de segmento via API client-side
+- Documentação reorganizada (`docs/segmentos/`, prompts ServiceOS)
+
+**Testes:** 163 Vitest · `db:verify` demo + operation · `pre-release` OK.
+
+---
+
+### `v1.2.0` — integração completa *(substituído)*
 
 | Campo | Valor |
 |-------|-------|
@@ -90,35 +112,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |--------|-----|--------|
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
-| **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
+| **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
-| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | ✅ Validado na `main` — **pendente deploy** |
+| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | ✅ **`v2.0.0` em produção** |
 | **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
 
-## Pacote validado (`main`) — pendente deploy
-
-### `v2.0.0` — ServiceOS multi-nicho
-
-| Campo | Valor |
-|-------|-------|
-| **Versão** | `2.0.0` (`package.json`) |
-| **Commit** | `7f5d876` (ServiceOS) + merge v1.3 estoque |
-| **PR** | [#101](https://github.com/Piulres/sistema-bibi/pull/101) |
-| **Doc** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) |
-| **Tag** | `v2.0.0` |
-
-**Inclui (além de todo v1.3 estoque):**
-
-- `Tenant.niche` + `Tenant.labels` — dicionário por cliente
-- `useLabels()` + `NICHE_MASTER_LABELS` — vocabulário dinâmico na UI
-- Landing segmentada por nicho (`/?niche=VET`, domínio customizado)
-- Seed multi-nicho: PetCare, Smile, Lex, Zen, EduPrime
-- Procedimentos demo: Banho e Tosa (R$ 150), Consulta Odontológica (R$ 350), Hora Técnica (R$ 500)
-- Documentação ServiceOS alinhada (README, BENCHMARK, FLUXOS, pesquisa)
-
-**Testes:** `tests/unit/niche.test.ts` — 14 testes · `pre-release` obrigatório antes do deploy.
+## Pacotes validados (histórico de integração)
 
 ---
 
@@ -142,9 +143,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v2.0.0`** | `e823fe4` | 23/06/2026 | ⏳ Tag + `main` — **deploy sistema-bibi pendente** |
+| **`v2.0.0`** | `3e7b250` | 23/06/2026 | ✅ **Em produção** — deploy `6a3a87c9` |
 | **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
-| **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ **Em produção** (até deploy v2.0) |
+| **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ Substituído |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
 | `v1.0.2` | `e30b2b0` | 22/06/2026 | ✅ Substituído |
 | `v1.0.1` | `e4d8a43` | 22/06/2026 | ✅ Substituído |
@@ -200,7 +201,8 @@ Se o deploy falhar antes de publicar, basta **não** atualizar `RELEASES.md` com
 ```bash
 git checkout dev && git pull && npm run pre-release
 git checkout main && git pull && git merge dev && npm run pre-release
-npx netlify deploy --prod --build --message "vX.Y.Z: descrição"
+npx netlify build
+npx netlify deploy --prod --no-build --message "vX.Y.Z: descrição"
 git tag -a vX.Y.Z -m "Release X.Y.Z"
 git push origin main && git push origin vX.Y.Z
 git checkout dev && git merge main && git push origin dev
