@@ -128,8 +128,10 @@ describe("Estoque médico — APIs", () => {
     const stockBefore = lotsBefore._sum.quantity ?? 0;
 
     const slot = new Date();
-    slot.setDate(slot.getDate() + 200);
-    slot.setHours(10 + Math.floor(Math.random() * 8), 15, 0, 0);
+    const dayOffset = 200 + (Date.now() % 40);
+    const minuteSlot = Math.floor(Date.now() / 100) % 48;
+    slot.setDate(slot.getDate() + dayOffset);
+    slot.setHours(7 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, 0, 0);
 
     await setSessionForEmail("recepcao@bibi.health");
     const { POST: createAppointmentPost } = await import("@/app/api/interno/appointments/route");
