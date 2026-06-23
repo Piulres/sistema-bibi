@@ -20,7 +20,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | Integrar | GitHub | **PR (draft) → `dev`** — nunca direto na `main` |
 | Release | GitHub | merge `dev` → `main` (humano, ao fechar pacote) |
 | Publicar | **só você** | `npx netlify deploy --prod` |
-| Registrar | git | atualizar `docs/RELEASES.md` |
+| Registrar | git | atualizar `docs/versoes/RELEASES.md` |
 
 ### Branches
 

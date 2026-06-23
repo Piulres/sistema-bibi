@@ -39,7 +39,7 @@ for (const step of steps) {
     run(step.cmd);
   } catch {
     console.error(`\n✗ Falhou em: ${step.name}`);
-    console.error("Corrija antes de fechar o pacote. Ver docs/RELEASES.md\n");
+    console.error("Corrija antes de fechar o pacote. Ver docs/versoes/RELEASES.md\n");
     process.exit(1);
   }
 }
@@ -58,4 +58,4 @@ try {
 
 console.log("\n✓ Pre-release OK — pacote validado localmente.");
 console.log("  Publicar só quando quiser: npx netlify deploy --prod");
-console.log("  Registrar em: docs/RELEASES.md\n");
+console.log("  Registrar em: docs/versoes/RELEASES.md\n");

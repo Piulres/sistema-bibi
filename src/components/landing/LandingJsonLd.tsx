@@ -1,5 +1,6 @@
 import { getSiteUrl } from "@/lib/landing/site-url";
 import { buildLandingDescription } from "@/lib/landing/content";
+import { PLATFORM } from "@/lib/platform";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 
 type Props = {
@@ -23,7 +24,7 @@ export default function LandingJsonLd({ branding }: Props) {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     name: branding.displayName,
-    applicationCategory: "HealthApplication",
+    applicationCategory: PLATFORM.applicationCategory,
     operatingSystem: "Web",
     description,
     url: siteUrl,
@@ -34,11 +35,11 @@ export default function LandingJsonLd({ branding }: Props) {
       description: "Demonstração POC — entre em contato para planos corporativos.",
     },
     featureList: [
-      "Pay Per Use",
+      "Pay Per Use multi-nicho",
       "Precificação dinâmica B2B",
-      "Prontuário eletrônico (PEP)",
-      "Portal corporativo PJ",
-      "White label multi-tenant",
+      "Quatro portais integrados",
+      "White label por tenant",
+      "Vocabulário adaptável por segmento",
       "Conformidade LGPD",
     ],
   };
@@ -49,7 +50,7 @@ export default function LandingJsonLd({ branding }: Props) {
     mainEntity: [
       {
         "@type": "Question",
-        name: "O que é Pay Per Use no Sistema Bibi?",
+        name: `O que é Pay Per Use no ${PLATFORM.shortName}?`,
         acceptedAnswer: {
           "@type": "Answer",
           text: "Modelo em que o beneficiário paga somente pelos serviços efetivamente utilizados, com valor transparente e preço congelado no atendimento.",
@@ -57,10 +58,10 @@ export default function LandingJsonLd({ branding }: Props) {
       },
       {
         "@type": "Question",
-        name: "A plataforma suporta saúde corporativa?",
+        name: "A plataforma suporta múltiplos segmentos?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Sim, com Portal PJ para RH acompanhar beneficiários, consumo, alertas e relatórios com precificação dinâmica por empresa.",
+          text: "Sim. O ServiceOS v2.0 adapta vocabulário e identidade por segmento — saúde, veterinária, odontologia, jurídico, bem-estar e educação — com Portal PJ para gestores corporativos.",
         },
       },
     ],

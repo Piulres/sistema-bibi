@@ -1,6 +1,6 @@
 # Template — Pesquisa de Nicho (ServiceOS Bibi)
 
-> **Como usar:** copie este arquivo para `docs/pesquisa/nichos/NN-nicho-{slug}.md`, preencha todas as seções e marque **FATO** vs **INFERÊNCIA**. Atualize `docs/pesquisa/nichos/README.md` e, se aplicável, `src/constants/niches.ts` + `prisma/seed-data/niche-tenants.ts`.
+> **Como usar:** copie o template para `docs/segmentos/{segmento}/pesquisa.md`, preencha todas as seções e marque **FATO** vs **INFERÊNCIA**. Atualize `docs/segmentos/README.md` e, se aplicável, `src/constants/niches.ts` + `prisma/seed-data/niche-tenants.ts`.
 
 | Meta | Valor |
 |------|-------|

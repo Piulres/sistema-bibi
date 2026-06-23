@@ -3,9 +3,9 @@ description: Operações Sistema Bibi — pacotes fechados, economia de tokens/c
 alwaysApply: true
 ---
 
-# Operações Sistema Bibi
+# Operações ServiceOS Bibi
 
-Fonte canônica: `@docs/OPERACOES.md` · Dados demo/operação: `@docs/OPERACAO_DADOS.md` · Pacotes: `@docs/RELEASES.md` · Workflow: `@docs/WORKFLOW_CURSOR.md`
+Fonte canônica: `@docs/plataforma/OPERACOES.md` · Dados demo/operação: `@docs/plataforma/OPERACAO_DADOS.md` · Pacotes: `@docs/versoes/RELEASES.md` · Workflow: `@docs/plataforma/WORKFLOW_CURSOR.md` · Índice: `@docs/README.md`
 
 ## Princípios (melhores práticas)
 
@@ -36,9 +36,9 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 | Feature / bugfix | `npm run dev`, testar local, `npm run lint`, PR → **`dev`** | deploy, PR → `main` |
 | Validar release | `npm run pre-release` | deploy |
 | Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
-| Publicar | Só com pedido explícito; seguir `@docs/OPERACOES.md` §5 | deploy autônomo |
-| Alternar demo/operação | Orientar `@docs/OPERACAO_DADOS.md` § produção | trocar `DATABASE_URL` manualmente |
-| Pós-deploy | Atualizar `@docs/RELEASES.md` | marcar publicado sem confirmação |
+| Publicar | Só com pedido explícito; seguir `@docs/plataforma/OPERACOES.md` §5 | deploy autônomo |
+| Alternar demo/operação | Orientar `@docs/plataforma/OPERACAO_DADOS.md` § produção | trocar `DATABASE_URL` manualmente |
+| Pós-deploy | Atualizar `@docs/versoes/RELEASES.md` | marcar publicado sem confirmação |
 
 ## Comandos
 
@@ -50,7 +50,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 
 - URL: https://sistema-bibi.netlify.app
 - `503` + `usage_exceeded` = **cota Netlify**, não bug — dev local continua
-- Pacote no ar: `@docs/RELEASES.md` (`v1.2.0` @ `55481be`)
+- Pacote no ar: `@docs/versoes/RELEASES.md` (`v1.2.0` @ `55481be`)
 
 ## Netlify — economia de cota (resumo)
 

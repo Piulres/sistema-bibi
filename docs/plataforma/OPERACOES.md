@@ -232,7 +232,7 @@ Detalhes também em `AGENTS.md`.
 
 | Ação | Motivo |
 |------|--------|
-| Ler `AGENTS.md` e `docs/OPERACOES.md` | Contexto do projeto |
+| Ler `AGENTS.md` e `docs/plataforma/OPERACOES.md` | Contexto do projeto |
 | `npm run dev` / testes locais | Validar sem custo |
 | `npm run lint` antes de finalizar | Qualidade |
 | Abrir PR com base **`dev`** | Integração antes de release |
@@ -240,7 +240,7 @@ Detalhes também em `AGENTS.md`.
 | Usar `db:push && db:seed` em VM nova | `db:reset` é bloqueado |
 | Consultar `RELEASES.md` para saber o que está em produção | Fonte única |
 | **`useLabels()` em telas novas dos portais** | v2.0 — ver `AGENTS.md` e `src/constants/niches.ts` |
-| Consultar `docs/V2_0.md` antes de features multi-nicho | Escopo canônico v2.0 |
+| Consultar `docs/versoes/V2_0.md` antes de features multi-nicho | Escopo canônico v2.0 |
 
 ### 7.2 Nunca fazer (salvo pedido explícito)
 
@@ -278,7 +278,7 @@ Pedido de validação
 
 | Quando | Atualizar |
 |--------|-----------|
-| Fechar pacote em produção | `docs/RELEASES.md` |
+| Fechar pacote em produção | `docs/versoes/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |

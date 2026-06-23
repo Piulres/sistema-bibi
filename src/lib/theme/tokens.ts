@@ -1,4 +1,5 @@
 import type { ColorScheme } from "@/lib/theme/color-scheme";
+import { PLATFORM } from "@/lib/platform";
 
 const SHARED_BRAND_COLORS = {
   logoUrl: null as string | null,
@@ -15,23 +16,23 @@ const SHARED_BRAND_COLORS = {
 export const CLINIC_BRANDING_DEFAULTS = {
   ...SHARED_BRAND_COLORS,
   tagline: null as string | null,
-  platformLabel: "ServiceOS v2.0 · Pay Per Use",
+  platformLabel: PLATFORM.poweredBy,
 } as const;
 
 /** Identidade comercial da plataforma (landing e marketing). */
 export const PLATFORM_BRANDING: BrandingTokens = {
-  displayName: "ServiceOS Bibi",
-  tagline: "Infraestrutura Pay Per Use multi-nicho para serviços profissionais",
+  displayName: PLATFORM.name,
+  tagline: PLATFORM.tagline,
   ...SHARED_BRAND_COLORS,
-  platformLabel: "ServiceOS · Pay Per Use Multi-Nicho",
+  platformLabel: `${PLATFORM.versionLabel} · Pay Per Use Multi-Nicho`,
 };
 
 /** Shell neutro dos logins públicos quando o tenant não é resolvido por domínio. */
 export const LOGIN_PORTAL_BRANDING: BrandingTokens = {
-  displayName: "Portal da clínica",
+  displayName: PLATFORM.loginDisplayName,
   tagline: null,
   ...SHARED_BRAND_COLORS,
-  platformLabel: "ServiceOS v2.0 · demonstração",
+  platformLabel: PLATFORM.poweredBy,
 };
 
 /** @deprecated Prefer PLATFORM_BRANDING, CLINIC_BRANDING_DEFAULTS ou LOGIN_PORTAL_BRANDING. */

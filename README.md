@@ -116,10 +116,10 @@ npm run dev            # inicia o servidor de desenvolvimento
 
 A aplicação sobe em **http://localhost:3000**.
 
-> Variáveis de ambiente: ver [`.env.example`](.env.example) e o mapa completo em [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md).
+> Variáveis de ambiente: ver [`.env.example`](.env.example) e o mapa completo em [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVEIS_AMBIENTE.md).
 > Principais: `DATABASE_URL`, `DUAL_DATA_STORE`, `DATA_STORE_MODE`, `SESSION_SECRET`, `PAYMENT_GATEWAY`, `COMMUNICATION_PROVIDER`, `CRON_SECRET`, `SEED_SCALE`, `ALLOW_DEMO_RESET`.
 >
-> Dual-store (demo + operação): `npm run db:bootstrap:demo` — ver [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
+> Dual-store (demo + operação): `npm run db:bootstrap:demo` — ver [`docs/plataforma/OPERACAO_DADOS.md`](docs/plataforma/OPERACAO_DADOS.md).
 
 ## 5. URLs de teste
 
@@ -128,7 +128,7 @@ Base local: **`http://localhost:3000`**
 
 **Produção (Netlify):** https://sistema-bibi.netlify.app — credenciais demo do seed.
 
-**Demo vs operação:** após deploy com dual-store, alterne em `/interno/seguranca` (ADMIN) — confirme `OPERAR` ou `DEMO`. Ver [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
+**Demo vs operação:** após deploy com dual-store, alterne em `/interno/seguranca` (ADMIN) — confirme `OPERAR` ou `DEMO`. Ver [`docs/plataforma/OPERACAO_DADOS.md`](docs/plataforma/OPERACAO_DADOS.md).
 
 ### Páginas (interface)
 
@@ -226,14 +226,14 @@ Paciente chega na clínica sem cadastro prévio nem vínculo corporativo:
 4. **Prestador** atende normalmente; preço **base** (sem desconto PJ).
 5. **Faturamento** gera fatura PPU; cobrança PIX ou manual.
 
-Demo particular: `pedro.almeida@email.com` / `bibi123`. Detalhe técnico: [`docs/FLUXOS.md`](docs/FLUXOS.md) §4.2 e §8.5.
+Demo particular: `pedro.almeida@email.com` / `bibi123`. Detalhe técnico: [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md) §4.2 e §8.5.
 
 ### 7.3 Mapa de operações CRUD
 
 Referência de onde cada entidade pode ser criada, lida, alterada ou removida na UI:
 `/interno/cadastros?tab=operations` — fonte em `src/lib/crud-operations-map.ts`.
 
-Diagrama completo com sequência cross-portal: [`docs/FLUXOS.md`](docs/FLUXOS.md) §7.
+Diagrama completo com sequência cross-portal: [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md) §7.
 
 Exemplo de precificação dinâmica do seed: a **Consulta Clínica Médica** (base **R$ 320,00**,
 faixa R$ 300–R$ 500) para um beneficiário da **TechCorp** é cobrada por **R$ 272,00**
@@ -449,7 +449,7 @@ sistema-bibi/
 
 > ⚠️ **POC**: senhas com hash **scrypt** no seed e novos usuários; adapters de
 > pagamento/comunicação usam **mock/console** para demonstração. Em produção:
-> HTTPS, gateways reais, auditoria de acesso e validação XSD TISS. Postgres opcional para escala — a POC opera com SQLite + Blobs (ver `docs/OPERACAO_DADOS.md`).
+> HTTPS, gateways reais, auditoria de acesso e validação XSD TISS. Postgres opcional para escala — a POC opera com SQLite + Blobs (ver `docs/plataforma/OPERACAO_DADOS.md`).
 
 ## 13. Notas técnicas e limitações da POC
 
@@ -459,53 +459,55 @@ sistema-bibi/
   `src/proxy.ts` (não há `middleware.ts`).
 - `params`, `searchParams` e `cookies()` são **assíncronos** (use `await`).
 - Banco **SQLite** local (`dev.db`, `demo.db`, `operation.db`); `.env` é *gitignored*.
-- **Demo vs operação:** mesmo site alterna entre massa de teste e dados reais via `/interno/seguranca` — [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
+- **Demo vs operação:** mesmo site alterna entre massa de teste e dados reais via `/interno/seguranca` — [`docs/plataforma/OPERACAO_DADOS.md`](docs/plataforma/OPERACAO_DADOS.md).
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
-  Ver [`docs/TESTES.md`](docs/TESTES.md) para o mapa completo e lacunas conhecidas.
+  Ver [`docs/plataforma/TESTES.md`](docs/plataforma/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
 - **Netlify em produção** — https://sistema-bibi.netlify.app (pode retornar **503** por cota).
-  Pacotes fechados: [`docs/RELEASES.md`](docs/RELEASES.md). Workflow Cursor:
-  [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
-  Deploy manual apenas quando necessário — ver [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md).
+  Pacotes fechados: [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md). Workflow Cursor:
+  [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
+  Deploy manual apenas quando necessário — ver [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md).
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres para alta escala, validação XSD TISS completa.
 
 ## 14. Documentação adicional
 
+- **Índice por segmento (ServiceOS v2.0):**
+  [`docs/README.md`](docs/README.md) · [`docs/segmentos/README.md`](docs/segmentos/README.md)
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
-  [`docs/FLUXOS.md`](docs/FLUXOS.md)
+  [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md)
 - **Jornada do cliente nos 4 portais (UX, gaps e melhorias):**
-  [`docs/JORNADA_CLIENTE.md`](docs/JORNADA_CLIENTE.md)
+  [`docs/produto/JORNADA_CLIENTE.md`](docs/produto/JORNADA_CLIENTE.md)
 - **Auditoria de falhas nos quatro portais:**
-  [`docs/AUDITORIA_FLUXOS.md`](docs/AUDITORIA_FLUXOS.md)
+  [`docs/produto/AUDITORIA_FLUXOS.md`](docs/produto/AUDITORIA_FLUXOS.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
-  [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
+  [`docs/plataforma/BENCHMARK.md`](docs/plataforma/BENCHMARK.md)
 - **Arquitetura ServiceOS v2.0 (multi-nicho):**
-  [`docs/V2_0.md`](docs/V2_0.md) · [`docs/V2_0_ARCHITECTURE.md`](docs/V2_0_ARCHITECTURE.md)
+  [`docs/versoes/V2_0.md`](docs/versoes/V2_0.md) · [`docs/versoes/V2_0_ARCHITECTURE.md`](docs/versoes/V2_0_ARCHITECTURE.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
-  [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
+  [`docs/plataforma/ARQUITETURA.md`](docs/plataforma/ARQUITETURA.md)
 - **Prompt mestre ServiceOS (IAs):**
   [`docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md`](docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md)
 - **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
-  [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
+  [`docs/plataforma/PAYMENTS.md`](docs/plataforma/PAYMENTS.md)
 - **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):
-  [`docs/COMMUNICATIONS.md`](docs/COMMUNICATIONS.md)
-- **Design system e white label:** [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md)
+  [`docs/plataforma/COMMUNICATIONS.md`](docs/plataforma/COMMUNICATIONS.md)
+- **Design system e white label:** [`docs/plataforma/DESIGN_SYSTEM.md`](docs/plataforma/DESIGN_SYSTEM.md)
 - **Base de conhecimento (NotebookLM / RAG):**
-  [`docs/NOTEBOOKLM.md`](docs/NOTEBOOKLM.md)
+  [`docs/plataforma/NOTEBOOKLM.md`](docs/plataforma/NOTEBOOKLM.md)
 - **Deploy Netlify (produção + troubleshooting):**
-  [`docs/DEPLOY_NETLIFY.md`](docs/DEPLOY_NETLIFY.md)
+  [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md)
 - **Variáveis de ambiente** (app, Netlify, CI, Cursor Cloud):
-  [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
+  [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
-  [`docs/RELEASES.md`](docs/RELEASES.md)
+  [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
 - **Workflow Cursor (dev sem deploy automático):**
-  [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
+  [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**
-  [`docs/OPERACOES.md`](docs/OPERACOES.md)
+  [`docs/plataforma/OPERACOES.md`](docs/plataforma/OPERACOES.md)
 - **Demo vs operação (dual SQLite + Blobs):**
-  [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md)
+  [`docs/plataforma/OPERACAO_DADOS.md`](docs/plataforma/OPERACAO_DADOS.md)
 - **Histórico do dia 21/06/2026** (PRs, deploys, commits):
-  [`docs/HISTORICO_2026-06-21.md`](docs/HISTORICO_2026-06-21.md)
+  [`docs/plataforma/HISTORICO_2026-06-21.md`](docs/plataforma/HISTORICO_2026-06-21.md)
 - **Evidências visuais dos fluxos** (vídeos e screenshots):
   [`docs/evidencias/README.md`](docs/evidencias/README.md)
 - **API interativa (Swagger UI):** http://localhost:3000/api-docs.html

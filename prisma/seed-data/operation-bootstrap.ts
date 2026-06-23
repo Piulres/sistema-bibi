@@ -44,7 +44,7 @@ export async function runOperationBootstrap(
           accentColor: "#14b8a6",
           heroFrom: "#0f172a",
           heroTo: "#134e4a",
-          platformLabel: "Powered by Sistema Bibi",
+          platformLabel: "Powered by ServiceOS v2.0",
           colorScheme: "light",
         },
       },

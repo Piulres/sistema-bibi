@@ -2,7 +2,7 @@
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 Última atualização: reflete **ServiceOS v2.0** (multi-nicho), **white label** (tema escuro, logos Blobs),
-**design system semântico**, Tiers 1–4 e fluxos em [`FLUXOS.md`](FLUXOS.md).
+**design system semântico**, Tiers 1–4 e fluxos em [`../produto/FLUXOS.md`](../produto/FLUXOS.md).
 
 ---
 
@@ -16,7 +16,7 @@ serviço — consulta médica, hora jurídica, banho e tosa — com **precifica�
 
 **Stack:** Next.js 16 (App Router + `proxy.ts`), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev), Netlify Blobs (logos).
 
-**Arquitetura v2.0:** [`docs/V2_0.md`](V2_0.md) · [`docs/V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md). Operações: [`docs/OPERACOES.md`](OPERACOES.md).
+**Arquitetura v2.0:** [`../versoes/V2_0.md`](../versoes/V2_0.md) · [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md). Operações: [`OPERACOES.md`](OPERACOES.md).
 
 ---
 
@@ -174,7 +174,7 @@ Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% descon
 - Contratos Strategy: PIX, boleto, cartão (`src/lib/payments/`)
 - **Adapter POC:** `MockPixAdapter` (`PAYMENT_GATEWAY=mock`) — Tier 1
 - Gateways reais previstos: Asaas, Efí, Banco Inter
-- Doc: `docs/PAYMENTS.md`
+- Doc: `docs/plataforma/PAYMENTS.md`
 - Serviço: `src/lib/invoice-service.ts` — PIX, marcar PAGA, bridge assinatura (Tier 1)
 
 ### Épico 5 — Recorrência
@@ -195,7 +195,7 @@ Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% descon
 - Contratos: EMAIL, SMS, WHATSAPP (`src/lib/communications/`)
 - **Adapter POC:** `ConsoleEmailAdapter` (`COMMUNICATION_PROVIDER=console`) — Tier 1
 - Provedores reais: SendGrid, Twilio, Meta
-- Doc: `docs/COMMUNICATIONS.md`
+- Doc: `docs/plataforma/COMMUNICATIONS.md`
 - Templates: APPOINTMENT_REMINDER, INVOICE_DUE, SUBSCRIPTION_DUE, GENERIC
 - **Tier 1:** `reminder-service.ts` + `POST /api/interno/reminders` + cron `POST /api/cron/reminders`
 
@@ -392,7 +392,7 @@ src/
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
 - Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção:
-  https://sistema-bibi.netlify.app (`docs/DEPLOY_NETLIFY.md`, `docs/RELEASES.md`, `docs/OPERACOES.md`).
+  https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
   Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual).
   Pode retornar **503 `usage_exceeded`** (cota Netlify — não é bug de código).
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
@@ -405,19 +405,20 @@ src/
 
 | Documento | Conteúdo |
 |-----------|----------|
-| `README.md` | Guia completo, URLs, scripts |
-| `docs/FLUXOS.md` | Fluxos de usuário e negócio (todos os portais) |
-| `docs/JORNADA_CLIENTE.md` | Jornada UX nos 4 portais, gaps e backlog priorizado |
-| `docs/BENCHMARK.md` | Matriz Ações × Benchmark (iClinic, Feegow, ERPMed) |
-| `docs/ARQUITETURA.md` | Diagramas Mermaid, épicos, checklists |
-| `docs/PAYMENTS.md` | Motor de cobrança Strategy |
-| `docs/COMMUNICATIONS.md` | Motor de comunicação Strategy |
-| `docs/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
-| `docs/DEPLOY_NETLIFY.md` | Deploy Netlify (produção + troubleshooting) |
-| `docs/RELEASES.md` | Pacotes fechados — o que está em produção vs pendente |
-| `docs/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy automático |
-| `docs/OPERACOES.md` | Mapa completo de operações + regras para agentes IA |
-| `docs/HISTORICO_2026-06-21.md` | Auditoria PRs, commits e deploys do dia |
+| `docs/README.md` | Índice da documentação por segmento |
+| `docs/segmentos/README.md` | Segmentos ServiceOS v2.0 |
+| `docs/produto/FLUXOS.md` | Fluxos de usuário e negócio (todos os portais) |
+| `docs/produto/JORNADA_CLIENTE.md` | Jornada UX nos 4 portais, gaps e backlog priorizado |
+| `docs/plataforma/BENCHMARK.md` | Matriz Ações × Benchmark (iClinic, Feegow, ERPMed) |
+| `docs/plataforma/ARQUITETURA.md` | Diagramas Mermaid, épicos, checklists |
+| `docs/plataforma/PAYMENTS.md` | Motor de cobrança Strategy |
+| `docs/plataforma/COMMUNICATIONS.md` | Motor de comunicação Strategy |
+| `docs/plataforma/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
+| `docs/plataforma/DEPLOY_NETLIFY.md` | Deploy Netlify (produção + troubleshooting) |
+| `docs/versoes/RELEASES.md` | Pacotes fechados — o que está em produção vs pendente |
+| `docs/plataforma/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy automático |
+| `docs/plataforma/OPERACOES.md` | Mapa completo de operações + regras para agentes IA |
+| `docs/plataforma/HISTORICO_2026-06-21.md` | Auditoria PRs, commits e deploys do dia |
 | `.cursor/rules/operacoes-bibi.mdc` | Regras core (always apply) |
 | `.cursor/rules/netlify-release.mdc` | Deploy/release (ativação inteligente) |
 | `.cursor/rules/stack-nextjs.mdc` | Stack e código (`src/**`) |
@@ -451,7 +452,7 @@ src/
 → `/interno` (Faturamento) → coluna **Ações** na tabela de faturas: botões **PIX** e **Marcar paga** (Tier 1). Beneficiário paga em `/beneficiario`.
 
 **Onde está o fluxo completo do sistema?**
-→ [`docs/FLUXOS.md`](FLUXOS.md) — diagramas Mermaid, RBAC, máquinas de estado e Pay Per Use E2E.
+→ [`docs/produto/FLUXOS.md`](FLUXOS.md) — diagramas Mermaid, RBAC, máquinas de estado e Pay Per Use E2E.
 
 **Por que dispatch de mensagem falha?**
 → Configure `COMMUNICATION_PROVIDER=console` (POC) ou registre adapter real (SendGrid, etc.).
@@ -484,13 +485,13 @@ src/
 → `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
 
 **Como valido um pacote antes de publicar na Netlify?**
-→ `npm run pre-release` (lint + build Netlify local, sem publicar). Ver `docs/OPERACOES.md`.
+→ `npm run pre-release` (lint + build Netlify local, sem publicar). Ver `docs/plataforma/OPERACOES.md`.
 
 **Por que produção retorna 503?**
 → Se o corpo for `usage_exceeded`, a cota Netlify esgotou — não é bug. Dev local continua normal.
 
 **Como publico em produção?**
-→ Após `npm run pre-release`: `npx netlify deploy --prod --no-build` (manual). Atualizar `docs/RELEASES.md`. O `--no-build` economiza cota Netlify.
+→ Após `npm run pre-release`: `npx netlify deploy --prod --no-build` (manual). Atualizar `docs/versoes/RELEASES.md`. O `--no-build` economiza cota Netlify.
 
 **Agentes Cursor podem fazer deploy?**
 → Não, salvo pedido explícito. Regras em `AGENTS.md` e `.cursor/rules/operacoes-bibi.mdc`.
@@ -508,7 +509,7 @@ src/
 - **Admin branding:** `/interno/branding` — CRUD visual, presets e upload de logo (Netlify Blobs).
 - Logos servidos em `/api/branding/logo/[tenantId]` com `Cache-Tag` para purge CDN.
 - **Tema escuro por tenant:** `colorScheme` (`light` | `dark` | `system`).
-- Ver `docs/DESIGN_SYSTEM.md`.
+- Ver `docs/plataforma/DESIGN_SYSTEM.md`.
 
 ---
 

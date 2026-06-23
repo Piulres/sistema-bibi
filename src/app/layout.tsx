@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getSiteUrl } from "@/lib/landing/site-url";
+import { PLATFORM } from "@/lib/platform";
 import NavigationProgress from "@/components/layout/NavigationProgress";
 import "./globals.css";
 
@@ -19,14 +20,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "Sistema Bibi — Gestão Inteligente em Saúde",
-    template: "%s | Sistema Bibi",
+    default: `${PLATFORM.name} — ${PLATFORM.tagline}`,
+    template: `%s | ${PLATFORM.shortName}`,
   },
-  description:
-    "Plataforma SaaS HealthTech com Pay Per Use, quatro portais integrados, faturamento previsível e white label para clínicas e saúde corporativa.",
-  applicationName: "Sistema Bibi",
-  authors: [{ name: "Sistema Bibi" }],
-  creator: "Sistema Bibi",
+  description: PLATFORM.description,
+  applicationName: PLATFORM.name,
+  authors: [{ name: PLATFORM.name }],
+  creator: PLATFORM.name,
   formatDetection: {
     email: false,
     address: false,

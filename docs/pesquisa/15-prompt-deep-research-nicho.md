@@ -67,8 +67,8 @@ Pesquise bem-estar corporativo Brasil 2026: IMARC US$1,6bi, Buddha Spa corporati
 
 Após a pesquisa:
 
-1. Salvar em `docs/pesquisa/nichos/NN-nicho-{slug}.md`
-2. Atualizar `docs/pesquisa/nichos/README.md`
+1. Salvar em `docs/segmentos/{segmento}/pesquisa.md`
+2. Atualizar `docs/segmentos/README.md`
 3. Revisar `src/constants/niches.ts` se glossário mudar
 4. Atualizar `prisma/seed-data/niche-tenants.ts` com preços = mediana
 5. Registrar em `docs/pesquisa/README.md`

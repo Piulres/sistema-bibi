@@ -1,6 +1,7 @@
 import "server-only";
 import ExcelJS from "exceljs";
 import PDFDocument from "pdfkit";
+import { PLATFORM } from "@/lib/platform";
 
 export type TabularColumn = {
   header: string;
@@ -40,7 +41,7 @@ export function buildCsvFromTabular(data: TabularExport): string {
 
 export async function buildXlsxBufferFromTabular(data: TabularExport): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "Sistema Bibi";
+  workbook.creator = PLATFORM.name;
   const sheet = workbook.addWorksheet(data.sheetName ?? data.title.slice(0, 31));
 
   sheet.addRow([data.title]);
@@ -87,7 +88,7 @@ export async function buildTablePdfBufferFromTabular(
 ): Promise<Buffer> {
   const doc = new PDFDocument({ margin: 48, size: "A4" });
   const clinic = branding?.clinicName ?? "Clínica";
-  const platform = branding?.platformLabel ?? "Sistema Bibi";
+  const platform = branding?.platformLabel ?? PLATFORM.name;
 
   doc.fontSize(16).fillColor("#0f172a").text(clinic, { align: "left" });
   doc.moveDown(0.3);

@@ -1,11 +1,11 @@
 ---
-description: Deploy, release e Netlify do Sistema Bibi. Use em tarefas de publicação, produção, cota 503, netlify.toml, CLI deploy ou pacotes fechados.
+description: Deploy, release e Netlify do ServiceOS Bibi. Use em tarefas de publicação, produção, cota 503, netlify.toml, CLI deploy ou pacotes fechados.
 alwaysApply: false
 ---
 
-# Netlify e release — Sistema Bibi
+# Netlify e release — ServiceOS Bibi
 
-Referências: `@docs/DEPLOY_NETLIFY.md` · `@docs/RELEASES.md` · `@docs/OPERACOES.md` §5–6
+Referências: `@docs/plataforma/DEPLOY_NETLIFY.md` · `@docs/versoes/RELEASES.md` · `@docs/plataforma/OPERACOES.md` §5–6
 
 ## Melhores práticas Netlify (POC)
 
@@ -31,7 +31,7 @@ git checkout main && git pull && git merge origin/dev
 npm run pre-release                              # lint + build local (obrigatório)
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
 npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
-# smoke test → atualizar docs/RELEASES.md → commit na main
+# smoke test → atualizar docs/versoes/RELEASES.md → commit na main
 ```
 
 > `--no-build`: usa artefatos já gerados pelo `pre-release`. Só omita se o build local falhou e o humano autorizar rebuild remoto.
@@ -59,4 +59,4 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Registrar em `@docs/RELEASES.md` após cada publicação manual.
+Registrar em `@docs/versoes/RELEASES.md` após cada publicação manual.

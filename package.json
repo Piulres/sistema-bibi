@@ -9,6 +9,7 @@
     "netlify:build": "npm run build:netlify",
     "netlify:dev": "netlify dev",
     "pre-release": "node scripts/pre-release.mjs",
+    "docs:verify": "node scripts/verify-docs.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",

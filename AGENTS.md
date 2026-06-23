@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Cursor Cloud specific instructions
 
-### O que é o Sistema Bibi (ServiceOS v2.0)
+### O que é o ServiceOS Bibi (v2.0)
 Infraestrutura horizontal **ServiceOS** (evolução da POC HealthTech) com **quatro portais**
 segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
@@ -35,7 +35,7 @@ e `labels` (JSON) para tradução automática da UI.
 
 \* Demo PetCare no seed sobrescreve `appointment` → "Banho/Tosa" via `Tenant.labels`.
 
-Paletas white label por nicho. Ver `docs/V2_0.md` e `docs/V2_0_ARCHITECTURE.md`.
+Paletas white label por nicho. Ver `docs/versoes/V2_0.md` e `docs/versoes/V2_0_ARCHITECTURE.md`.
 
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
@@ -43,13 +43,13 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v1.2.0`** @ `55481be` (site **sistema-bibi.netlify.app**); **`v2.0.0`** validada na `main` com tag `v2.0.0` — deploy pendente. Ver `docs/RELEASES.md`.
+(cota Netlify). Produção: **`v1.2.0`** @ `55481be` (site **sistema-bibi.netlify.app**); **`v2.0.0`** validada na `main` com tag `v2.0.0` — deploy pendente. Ver `docs/versoes/RELEASES.md`.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
-Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
+Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
 **Preferências IA:** `AGENTS.md` (esta seção) + `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
-**Histórico 21/06:** `docs/HISTORICO_2026-06-21.md`
+**Histórico 21/06:** `docs/plataforma/HISTORICO_2026-06-21.md`
 
 ### Stack e como rodar
 - **Next.js 16 (App Router) + React 19 + TypeScript + Tailwind v4**, **Prisma 6 + SQLite**.
@@ -86,7 +86,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 **Restaurar modo demo:** `/interno/seguranca` → botão “Restaurar estado original do seed” (somente ADMIN; em produção via `ALLOW_DEMO_RESET=true` no `netlify.toml`).
 ### Operações e preferências de IA
 
-**Manual completo:** `docs/OPERACOES.md` · **Regras Cursor:**
+**Manual completo:** `docs/plataforma/OPERACOES.md` · **Regras Cursor:**
 `.cursor/rules/operacoes-bibi.mdc` (core) · `netlify-release.mdc` (deploy) · `stack-nextjs.mdc` (código)
 
 | Operação | Comando | Agente pode? |
@@ -98,12 +98,12 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 | Setup banco VM nova | `db:push && db:seed` | ✅ Sim |
 | Reset banco | `npm run db:reset` | ❌ Bloqueado |
 | Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
-| Atualizar release | `docs/RELEASES.md` | ❌ Só após deploy confirmado |
+| Atualizar release | `docs/versoes/RELEASES.md` | ❌ Só após deploy confirmado |
 | Abrir PR | base **`dev`** | ❌ PR direto na `main` |
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/V1_0.md`. Produção: **`1.2.0`** — `docs/V1_2.md` · `docs/RELEASES.md`. **v2.0 ServiceOS** em desenvolvimento — `docs/V2_0.md`.
+**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`1.2.0`** — `docs/versoes/V1_2.md` · `docs/versoes/RELEASES.md`. **v2.0 ServiceOS** em desenvolvimento — `docs/versoes/V2_0.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
@@ -117,9 +117,9 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 ### Variáveis de ambiente relevantes (`.env.example`)
 
-Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclui Netlify, CI, testes e **Cursor Cloud Agent**).
+Mapa completo: [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVEIS_AMBIENTE.md) (inclui Netlify, CI, testes e **Cursor Cloud Agent**).
 
-- `DATABASE_URL` — SQLite (`file:./dev.db`); dual-store gera `demo.db` + `operation.db` no build — ver `docs/OPERACAO_DADOS.md`
+- `DATABASE_URL` — SQLite (`file:./dev.db`); dual-store gera `demo.db` + `operation.db` no build — ver `docs/plataforma/OPERACAO_DADOS.md`
 - `DUAL_DATA_STORE` — seletor demo/operação (`true` em dev e Netlify)
 - `DATA_STORE_MODE` — modo inicial (`demo` \| `operation`) se Blobs vazio
 - `SESSION_SECRET` — cookie de sessão + MFA
@@ -129,7 +129,7 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 - `TELEMEDICINE_BASE_URL` — salas de telemedicina mock
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
 - `ALLOW_DEMO_RESET` — restaurar demo na UI (somente modo **demo** ativo)
-- **Demo vs operação:** `/interno/seguranca` (ADMIN) — `docs/OPERACAO_DADOS.md`
+- **Demo vs operação:** `/interno/seguranca` (ADMIN) — `docs/plataforma/OPERACAO_DADOS.md`
 
 ### Navegação SPA (layouts persistentes)
 
@@ -151,7 +151,7 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 | Edição cadastros | `/interno/cadastros` → Editar em cada aba | `CadastrosView.tsx` |
 | Mapa CRUD (27 entidades) | `/interno/cadastros?tab=operations` | `src/lib/crud-operations-map.ts` |
 
-Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedro.almeida@email.com`.
+Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedro.almeida@email.com`.
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
@@ -168,25 +168,25 @@ Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedr
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
 - **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
-  build CI em `npm run netlify:build`; ver `docs/DEPLOY_NETLIFY.md` e `docs/WORKFLOW_CURSOR.md`.
+  build CI em `npm run netlify:build`; ver `docs/plataforma/DEPLOY_NETLIFY.md` e `docs/plataforma/WORKFLOW_CURSOR.md`.
   Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.
 - **Política de deploy (agentes):** **NUNCA** executar `netlify deploy --prod` nem investigar produção
   em loop, salvo pedido explícito do usuário. Testar com `npm run dev` / `npm run pre-release`.
-  Pacotes fechados: `docs/RELEASES.md`.
+  Pacotes fechados: `docs/versoes/RELEASES.md`.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
-  Ver `docs/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
+  Ver `docs/plataforma/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
   `src/app/{interno,prestador,pj,beneficiario}/layout.tsx` — shell persistente;
   páginas só renderizam `PageHeader` + conteúdo. Config central: `src/lib/navigation/`.
   Componentes: `Breadcrumbs`, `SectionNav`, `MobileNavDrawer`, `NavigationProgress`.
-- **Documentação completa:** `README.md`, `docs/FLUXOS.md` (fluxos), `docs/JORNADA_CLIENTE.md` (jornada UX nos 4 portais), `docs/AUDITORIA_FLUXOS.md` (falhas mapeadas por portal),
-  `docs/BENCHMARK.md` (posicionamento vs mercado),
-  `docs/ARQUITETURA.md`, `docs/TESTES.md` (estratégia e mapa de testes automatizados),
-  `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
-  `docs/VARIAVEIS_AMBIENTE.md` (mapa de env vars, CI, Netlify e Cursor),
-  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
-  `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
-  `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
-  `docs/V2_0.md` (escopo ServiceOS v2.0), `docs/V2_0_ARCHITECTURE.md` (arquitetura multi-nicho),
-  `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
+- **Documentação completa:** [`docs/README.md`](docs/README.md) (índice por segmento), `README.md`, `docs/produto/FLUXOS.md` (fluxos), `docs/produto/JORNADA_CLIENTE.md` (jornada UX nos 4 portais), `docs/produto/AUDITORIA_FLUXOS.md` (falhas mapeadas por portal),
+  `docs/plataforma/BENCHMARK.md` (posicionamento vs mercado),
+  `docs/plataforma/ARQUITETURA.md`, `docs/plataforma/TESTES.md` (estratégia e mapa de testes automatizados),
+  `docs/plataforma/NOTEBOOKLM.md` (RAG), `docs/plataforma/PAYMENTS.md`, `docs/plataforma/COMMUNICATIONS.md`,
+  `docs/plataforma/VARIAVEIS_AMBIENTE.md` (mapa de env vars, CI, Netlify e Cursor),
+  `docs/plataforma/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
+  `docs/plataforma/ARQUITETURA.md`, `docs/plataforma/NOTEBOOKLM.md` (RAG), `docs/plataforma/PAYMENTS.md`, `docs/plataforma/COMMUNICATIONS.md`,
+  `docs/plataforma/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/plataforma/OPERACOES.md` (mapa de operações),
+  `docs/versoes/V2_0.md` (escopo ServiceOS v2.0), `docs/versoes/V2_0_ARCHITECTURE.md` (arquitetura multi-nicho),
+  `docs/versoes/RELEASES.md` (pacotes fechados), `docs/plataforma/WORKFLOW_CURSOR.md` (dev sem deploy),
   `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).

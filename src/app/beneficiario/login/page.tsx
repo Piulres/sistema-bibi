@@ -8,7 +8,7 @@ export default async function BeneficiarioLoginPage() {
     <LoginForm
       portal="beneficiario"
       title="Portal do Beneficiário"
-      subtitle="Entre com as credenciais da sua clínica para agenda, consumo e faturas."
+      subtitle="Entre com as credenciais da sua operação para agenda, consumo e faturas."
       demoEmail="joao.pereira@email.com"
       demoPassword="bibi123"
       branding={branding}

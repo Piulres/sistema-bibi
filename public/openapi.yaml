@@ -1,19 +1,18 @@
 openapi: 3.0.3
 info:
-  title: Sistema Bibi — API
-  version: 0.2.0
+  title: ServiceOS Bibi — API
+  version: 2.0.0
   description: >
-    API da POC do Sistema Bibi (HealthTech SaaS). Multi-tenant, quatro portais
-    segregados por `role`, faturamento Pay Per Use, Tiers 1–4 (PIX, CRUD, RBAC,
-    MFA, webhooks, TISS, telemedicina).
+    API do ServiceOS Bibi v2.0 — plataforma Pay Per Use multi-nicho. Multi-tenant,
+    quatro portais segregados por `role`, vocabulário adaptável por segmento.
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
     HMAC-SHA256, obtido em `POST /api/auth/login`.
 
-    Fluxos de usuário: docs/FLUXOS.md · Arquitetura: docs/ARQUITETURA.md
+    Fluxos: docs/produto/FLUXOS.md · Arquitetura: docs/plataforma/ARQUITETURA.md
 externalDocs:
   description: Fluxos do sistema (Mermaid)
-  url: /docs/FLUXOS.md
+  url: /docs/produto/FLUXOS.md
 servers:
   - url: http://localhost:3000
     description: Desenvolvimento local

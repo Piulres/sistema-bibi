@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { PLATFORM } from "@/lib/platform";
 import Button from "@/components/ui/Button";
 import ServiceOsBadges from "@/components/niche/ServiceOsBadges";
 import { useLabels } from "@/hooks/useLabels";
@@ -20,7 +21,7 @@ export default function PortalHeader({
   logoUrl,
   userName,
   loginPath,
-  platformLabel = "ServiceOS v2.0",
+  platformLabel = PLATFORM.poweredBy,
 }: Props) {
   const router = useRouter();
   const { niche } = useLabels();

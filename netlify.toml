@@ -4,7 +4,7 @@
 # Dev com emulacao Netlify:    npm run netlify:dev
 # Publicar (manual):           npx netlify deploy --prod
 # Validar pacote (sem deploy): npm run pre-release
-# Operações:                   docs/OPERACOES.md
+# Operações:                   docs/plataforma/OPERACOES.md
 
 [build]
   command = "node scripts/netlify-build.mjs"
