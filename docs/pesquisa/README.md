@@ -16,7 +16,20 @@ Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referê
 | [`08-prompt-healthos-expansao.md`](08-prompt-healthos-expansao.md) | Prompt HealthOS Expansão 2026 |
 | [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) | **Síntese executiva** — ROI 91%, script CFO (1 página) |
 
-**Versão:** 2.0 (ServiceOS) · **Data:** Junho/2026
+### Pesquisa por nicho (ServiceOS v2.0)
+
+| Documento | Conteúdo |
+|-----------|----------|
+| [`TEMPLATE_PESQUISA_NICHO.md`](TEMPLATE_PESQUISA_NICHO.md) | **Template** para novos verticais |
+| [`15-prompt-deep-research-nicho.md`](15-prompt-deep-research-nicho.md) | Prompts Deep Research (web / IA) |
+| [`nichos/README.md`](nichos/README.md) | Índice dos relatórios por nicho |
+| [`nichos/10-nicho-vet.md`](nichos/10-nicho-vet.md) | VET — PetOS, auxílio pet, banho/tosa |
+| [`nichos/11-nicho-legal.md`](nichos/11-nicho-legal.md) | LEGAL — LawOS, hora técnica, LegalTech |
+| [`nichos/12-nicho-dental.md`](nichos/12-nicho-dental.md) | DENTAL — odonto, Pay Per Use vs plano |
+| [`nichos/13-nicho-education.md`](nichos/13-nicho-education.md) | EDUCATION — mentorias, aulas, Hotmart |
+| [`nichos/14-nicho-spa.md`](nichos/14-nicho-spa.md) | SPA — bem-estar corporativo, massagens |
+
+**Versão:** 2.1 (ServiceOS + pesquisa multi-nicho) · **Data:** Junho/2026
 
 ## Uso recomendado
 
@@ -25,5 +38,6 @@ Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referê
 3. **Pitch / visão** — doc 03 (mensagem curta) e doc 04 (ecossistema).
 4. **Arquitetura** — [`../V2_0_ARCHITECTURE.md`](../V2_0_ARCHITECTURE.md) + doc 01 (posicionamento vs mercado).
 5. **Implementação vs mercado** — cruzar doc 01 com [`../BENCHMARK.md`](../BENCHMARK.md).
+6. **Nicho específico** — [`nichos/README.md`](nichos/README.md) + template [`TEMPLATE_PESQUISA_NICHO.md`](TEMPLATE_PESQUISA_NICHO.md).
 
 *Documentos de pesquisa — não substituem due diligence comercial nem validação contratual.*
