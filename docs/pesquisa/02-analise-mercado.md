@@ -6,7 +6,7 @@
 
 ## Visão geral
 
-O mercado brasileiro de saúde e serviços profissionais movimenta mais de **R$ 800 bilhões** anuais só em saúde — e expande para veterinária, odontologia, jurídico corporativo, bem-estar e educação corporativa.
+**INFERÊNCIA:** o mercado brasileiro de saúde e serviços profissionais é de grande escala (ordem de centenas de bilhões de reais anuais em saúde suplementar e assistencial — **sem fonte primária citada neste documento**). A plataforma expande para veterinária, odontologia, jurídico corporativo, bem-estar e educação corporativa.
 
 A transformação digital acelerou após:
 
@@ -25,14 +25,16 @@ A transformação digital acelerou após:
 
 Empresas de médio porte buscam **uma infraestrutura** que cubra:
 
-| Vertical | Exemplo de serviço Pay Per Use | Faixa de preço (demo) |
-|----------|------------------------------|------------------------|
-| Saúde | Consulta clínica | R$ 300–R$ 500 |
-| Odontologia | Consulta odontológica | R$ 350 |
-| Veterinária | Banho e tosa | R$ 150 |
-| Jurídico | Hora técnica jurídica | R$ 500 |
-| Bem-estar | Aula de yoga / spa | R$ 120–R$ 220 |
-| Educação | Aula particular | R$ 150 |
+| Vertical | Exemplo de serviço Pay Per Use | Preço demo (seed) |
+|----------|------------------------------|-------------------|
+| Saúde | Consulta clínica (`CON-CLM`) | R$ 320 (R$ 272 c/ desconto TechCorp) |
+| Odontologia | Consulta (`DEN-CON`) | R$ 350 |
+| Veterinária | Consulta (`VET-CON`) | R$ 180 |
+| Jurídico | Hora técnica (`LEG-HT`) | R$ 500 |
+| Bem-estar | Massagem (`SPA-MSG`) | R$ 180 |
+| Educação | Aula (`EDU-AUL`) | R$ 150 |
+
+**FATO (seed):** preços em `prisma/seed-data/pricing-market.ts` e `niche-tenants.ts`.
 
 A tendência é **plataforma horizontal** com parametrização por nicho — não dez ERPs verticais isolados.
 
@@ -54,6 +56,8 @@ Todo fornecedor relevante já oferece isso.
 ### Diferenciais emergentes
 
 #### IA assistencial
+
+**INFERÊNCIA (tendência de mercado — não implementada na POC):**
 
 - Transcrição automática
 - Geração de SOAP
@@ -85,6 +89,8 @@ Programas corporativos migram de "plano fechado" para **créditos de consumo** e
 ---
 
 ## Fusões e aquisições relevantes
+
+**INFERÊNCIA (contexto público de mercado — sem validação nesta POC):**
 
 ### Afya
 

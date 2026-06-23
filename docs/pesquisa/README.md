@@ -4,6 +4,20 @@ Documentação de **pesquisa externa** e **posicionamento estratégico** do **Si
 
 Complementa [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md) (matriz técnica POC × referências de código), [`../versoes/V2_0.md`](../versoes/V2_0.md) (escopo v2.0) e [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) (arquitetura multi-nicho).
 
+## Política de veracidade
+
+| Tag | Uso nesta pasta |
+|-----|-----------------|
+| **FATO** | Implementado no código, dado do seed ou premissa explícita do exercício financeiro |
+| **INFERÊNCIA** | Tendência de mercado, posicionamento competitivo, projeção comercial — **não é garantia de resultado** |
+
+**Regras:**
+
+1. Números de ROI vêm de [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md) — cenário modelado, não promessa contratual.
+2. Avaliações de concorrentes (✅/🟡/❌) são **opinião estratégica** sem auditoria independente.
+3. Dados de mercado sem citação primária devem ser rotulados **INFERÊNCIA**.
+4. Funcionalidades da POC: validar em [`../produto/FLUXOS.md`](../produto/FLUXOS.md) e [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md).
+
 | Documento | Conteúdo |
 |-----------|----------|
 | [`01-matriz-competitiva.md`](01-matriz-competitiva.md) | Matriz comparativa ServiceOS × top 10 — anti caixa-preta, multi-nicho |
@@ -33,7 +47,7 @@ Complementa [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md) (matriz t
 | [`15-prompt-deep-research-nicho.md`](15-prompt-deep-research-nicho.md) | Prompts Deep Research (web / IA) |
 | [`../segmentos/README.md`](../segmentos/README.md) | Índice por segmento |
 
-**Versão:** 2.1 (ServiceOS + pesquisa multi-nicho) · **Data:** Junho/2026
+**Versão:** 2.2 (auditoria factual jun/2026) · **Data:** Junho/2026
 
 ## Uso recomendado
 

@@ -3,7 +3,7 @@
 Documentação da **experiência do usuário** em cada portal do Sistema Bibi - ServiceOS, com
 jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias priorizado.
 
-> **v2.0:** nomenclatura dinâmica por nicho (`useLabels()`). Escopo: [`V2_0.md`](V2_0.md).
+> **v2.0:** nomenclatura dinâmica por nicho (`useLabels()`). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
@@ -265,7 +265,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
-| Baixa | 11 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
+| Baixa | 13 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
 
 **Melhorias visuais implementadas (2026-06):** `StatCard` unificado em dashboard/PJ/beneficiário/faturamento; `FlowStepper` na jornada PPU; `CalloutCard` + `AppointmentCard` na agenda interna e prestador; `TabBar` em Cadastros; `EmptyState` com título e dica.
 
@@ -375,7 +375,7 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 | [`PAYMENTS.md`](../plataforma/PAYMENTS.md) | Motor PIX e ciclo de cobrança |
 | [`COMMUNICATIONS.md`](../plataforma/COMMUNICATIONS.md) | Lembretes e fila de mensagens |
 | [`DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md) | UI dos portais (`PortalShell`, tokens) |
-| [`evidencias/README.md`](evidencias/README.md) | Screenshots e vídeos dos fluxos validados |
+| [`../evidencias/README.md`](../evidencias/README.md) | Screenshots e vídeos dos fluxos validados |
 | [`OPERACOES.md`](../plataforma/OPERACOES.md) | Quando atualizar esta documentação |
 
 ---

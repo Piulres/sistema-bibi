@@ -7,6 +7,8 @@
 | Versão | 2.0 (ServiceOS) |
 | Data | Junho/2026 |
 
+> **Política de veracidade:** coluna **Bibi** = o que está **implementado nesta POC** (código em `src/`). Demais colunas = **INFERÊNCIA** estratégica sem auditoria independente — não tratar como FATO de mercado. Matriz técnica verificável: [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md). ROI modelado: [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
+
 ---
 
 ## Reposicionamento estratégico
@@ -54,14 +56,14 @@ Concorrentes tradicionais vendem **elegibilidade** (vidas). O Bibi vende **infra
 | White Label + tema escuro | ⭐✅ | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Agenda / operação | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | 🟡 | ✅ | ✅ |
 | Prontuário / registro clínico | ✅ | 🟡 | 🟡 | ✅ | ❌ | ✅ | ✅ | ❌ | 🟡 | 🟡 |
-| Telemedicina | ✅ | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | 🟡 | ✅ | ✅ |
+| Telemedicina | 🟡 URL mock | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ | 🟡 | ✅ | ✅ |
 | CRM B2B | ⭐✅ | 🟡 | 🟡 | ❌ | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | API Aberta | ⭐✅ | 🟡 | 🟡 | ❌ | ❌ | 🟡 | 🟡 | ❌ | ❌ | ❌ |
 | Webhooks | ⭐✅ | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| PIX Integrado | ⭐✅ | ❌ | ❌ | ❌ | ❌ | 🟡 | 🟡 | ❌ | ❌ | ❌ |
-| TISS | ✅ | 🟡 | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
-| IA assistencial | 🟡 | 🟡 | 🟡 | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
-| Gestão de Rede Credenciada | ⭐✅ | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| PIX Integrado | 🟡 mock | ❌ | ❌ | ❌ | ❌ | 🟡 | 🟡 | ❌ | ❌ | ❌ |
+| TISS | 🟡 XML mock | 🟡 | ❌ | ❌ | ❌ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| IA assistencial | ❌ | 🟡 | 🟡 | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| Gestão de Rede Credenciada | ❌ | 🟡 | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ |
 
 ---
 
@@ -71,12 +73,12 @@ O Sistema Bibi - ServiceOS ocupa um espaço pouco explorado:
 
 - **Infraestrutura transacional** B2B (não operadora, não ERP vertical)
 - Rede de prestadores com **cobrança por uso real**
-- **Transparência de consumo** — elimina desperdício de ~87% vs modelo por vida (referência 500 colaboradores, 15% utilização)
+- **Transparência de consumo** — cenário modelado ~87% vs plano por vida (500 colaboradores, 15% utilização) — ver [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md)
 - Portal corporativo + **white label multi-nicho**
 - Quatro portais como **estações de trabalho** configuráveis por tenant
 
-Hoje não existe um líder claro que combine simultaneamente Pay Per Use nativo, multi-nicho e transparência total de sinistralidade.
+**INFERÊNCIA:** o espaço de infraestrutura transacional B2B (Pay Per Use + multi-nicho + portais segregados) permanece pouco consolidado no mercado brasileiro — validar em pilotos comerciais.
 
 ---
 
-Ver também: [`02-analise-mercado.md`](02-analise-mercado.md) · [`../V2_0_ARCHITECTURE.md`](../V2_0_ARCHITECTURE.md) · [`../BENCHMARK.md`](../BENCHMARK.md)
+Ver também: [`02-analise-mercado.md`](02-analise-mercado.md) · [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) · [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md)

@@ -2,6 +2,8 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
+> **Última revisão factual:** junho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
+
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre seis. Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
 ---

@@ -59,16 +59,16 @@ Comparativo mensal entre o modelo tradicional (plano fechado por vida) e o Servi
 
 O take rate incide sobre **qualquer transação de serviço** processada na plataforma:
 
-| Nicho | Exemplo de serviço | Preço demo | Volume típico/mês* |
-|-------|-------------------|------------|-------------------|
-| Saúde | Consulta clínica | R$ 320 | 200+ atendimentos/clínica |
-| Veterinária | Banho e tosa | R$ 150 | 150+ serviços/pet shop |
-| Odontologia | Consulta odontológica | R$ 350 | 80+ consultas/consultório |
-| Jurídico | Hora técnica jurídica | R$ 500 | 40+ sessões/escritório |
-| Bem-estar | Aula de yoga | R$ 120 | 300+ sessões/estúdio |
-| Educação | Aula particular | R$ 150 | 120+ aulas/escola |
+| Nicho | Exemplo de serviço | Preço demo (seed) | Volume seed `medium`* |
+|-------|-------------------|-------------------|------------------------|
+| Saúde | Consulta clínica (`CON-CLM`) | R$ 320 | ~120 agendamentos de massa |
+| Veterinária | Banho e tosa (`VET-BAN`) | R$ 150 | 3 procedimentos/tenant nicho |
+| Odontologia | Consulta (`DEN-CON`) | R$ 350 | idem |
+| Jurídico | Hora técnica (`LEG-HT`) | R$ 500 | idem |
+| Bem-estar | Massagem (`SPA-MSG`) | R$ 180 | idem |
+| Educação | Aula (`EDU-AUL`) | R$ 150 | idem |
 
-\*Estimativas do seed operacional; faixa de referência **R$ 300–R$ 500** para consultas e serviços profissionais — ver `prisma/seed-data/niche-tenants.ts`.
+\* **FATO (seed):** `SEED_SCALE=medium` — ver `prisma/seed-data/scale.ts`. Volumes de mercado não são medidos nesta POC.
 
 **Um único deploy** atende de clínicas a escritórios de advocacia — reduzindo custo de
 infraestrutura e acelerando time-to-market para novos verticais sem fork de código.

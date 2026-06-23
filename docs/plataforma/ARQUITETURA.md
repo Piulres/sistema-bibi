@@ -13,7 +13,7 @@ e são renderizados automaticamente no GitHub.
 >
 > **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](../versoes/RELEASES.md)
 >
-> **ServiceOS v2.0 (multi-nicho):** [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useLabels()`
+> **ServiceOS v2.0 (multi-nicho):** [`V2_0.md`](../versoes/V2_0.md) · [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useLabels()`
 
 ---
 
@@ -41,7 +41,7 @@ flowchart LR
 - **Client:** `src/hooks/useLabels.tsx` via `NicheProvider` em `PortalShell`
 - **Landing:** `/?niche=VET` para preview local; domínio customizado em produção
 
-Detalhes: [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md).
+Detalhes: [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md).
 
 ### 0.1 Camada de Abstração de Linguagem (Nichos)
 

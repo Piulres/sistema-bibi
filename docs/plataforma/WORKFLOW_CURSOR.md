@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Em desenvolvimento na `dev`:** pacote **v2.0 ServiceOS** (multi-nicho, labels) — ver [`V2_0.md`](V2_0.md). Produção permanece **v1.2.0** até deploy manual.
+**Produção (jun/2026):** **v2.0.0** @ commit `49edb90` — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 ---
 
@@ -77,7 +77,7 @@ Senha única: **`bibi123`**. Portais e e-mails em [`README.md`](../README.md) e 
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` |
 
-Evidências gravadas: [`evidencias/`](evidencias/).
+Evidências gravadas: [`../evidencias/`](../evidencias/).
 
 ---
 

@@ -136,8 +136,8 @@ para ~R$ 23,4k/mês (Pay Per Use) = **~87% de economia**. Ver [`../plataforma/RO
 > Pare de pagar por vidas que não utilizam seu benefício.
 >
 > Com o Sistema Bibi - ServiceOS, sua empresa paga apenas pelo que foi efetivamente consumido —
-> com transparência total para RH, clientes e prestadores. Até **~87% de economia**
-> em empresas de médio porte.
+> com transparência total para RH, clientes e prestadores. No **cenário modelado** (500 vidas, 15% utilização),
+> economia de **~87%** vs plano por vida — ver [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
 
 ---
 

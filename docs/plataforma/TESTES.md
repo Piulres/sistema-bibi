@@ -3,6 +3,8 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
+**Ground truth (jun/2026):** **163** casos Vitest · **47** testes Playwright E2E · **~100** Route Handlers · **58** paths no OpenAPI (`public/openapi.yaml`).
+
 ---
 
 ## Pirâmide de testes
@@ -147,7 +149,9 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ---
 
-## Mapa das 58 rotas API
+## Mapa das rotas API
+
+**FATO:** existem **~100** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **58** paths — subconjunto intencional para integradores.
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -239,7 +243,7 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | 11 módulos admin |
+| `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 
@@ -250,5 +254,5 @@ Senha única: `bibi123`
 - Fluxos de negócio: [`FLUXOS.md`](../produto/FLUXOS.md)
 - Auditoria de falhas por portal: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md)
 - Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md)
-- Evidências manuais: [`evidencias/`](evidencias/)
+- Evidências manuais: [`../evidencias/`](../evidencias/)
 - CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)

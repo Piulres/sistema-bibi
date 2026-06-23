@@ -139,10 +139,10 @@ Mapa completo: [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVE
 
 | Portal | Layout | Nav | Breadcrumbs |
 |--------|--------|-----|-------------|
-| Interno | `src/app/interno/layout.tsx` | `InternoNav` — 11 abas + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
+| Interno | `src/app/interno/layout.tsx` | `InternoNav` — **13 abas** + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
 | Prestador | `src/app/prestador/layout.tsx` | `PrestadorNav` | Atendimento (`buildAtendimentoBreadcrumbs`) |
 | PJ | `src/app/pj/layout.tsx` | `SectionNav` — 4 seções | — |
-| Beneficiário | `src/app/beneficiario/layout.tsx` | `SectionNav` — 8 seções | — |
+| Beneficiário | `src/app/beneficiario/layout.tsx` | `SectionNav` — **11 abas** | — |
 | Landing | — | `LandingHeader` + `LandingMobileMenu` | — |
 
 **Config:** `src/lib/navigation/routes.ts` · **Padrão:** pages só com `PageHeader` + view (não repetir `PortalShell`/`InternoNav`).

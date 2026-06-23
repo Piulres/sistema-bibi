@@ -3,16 +3,18 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v2.0:** vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo completo: [`V2_0.md`](V2_0.md).
+> **ServiceOS v2.0** (produção jun/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
-Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
-ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado,
+Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
+ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
 ver [`BENCHMARK.md`](../plataforma/BENCHMARK.md). Para jornada do usuário e backlog de melhorias UX,
 ver [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md). Para **falhas mapeadas nos quatro portais**,
 ver [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md). Para evidências visuais dos fluxos,
-ver [`evidencias/README.md`](evidencias/README.md). Para operações (dev, release, deploy, IA),
-ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys do dia,
-ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
+ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev, release, deploy),
+ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
+ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
+
+**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (163).
 
 ---
 
@@ -39,21 +41,26 @@ Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md
 
 ## 0. ServiceOS v2.0 — labels e landing
 
-### 0.1 Resolução de nicho
+### 0.1 Resolução de segmento (tenant + nicho)
 
 ```mermaid
 flowchart LR
-  Host["Host / domínio customizado"] --> Resolve["resolveLandingNiche()"]
-  Query["?niche=VET"] --> Resolve
+  TenantQ["?tenant=slug"] --> Resolve["resolveSegmentContext()"]
+  Cookie["cookie bibi_segment"] --> Resolve
+  Host["domínio customizado"] --> Resolve
+  NicheQ["?niche=VET"] --> Resolve
   Resolve --> Tenant["Tenant.niche + labels"]
   Tenant --> UI["Landing + Portais"]
 ```
 
-| Contexto | Como o nicho é definido | Arquivo |
-|----------|-------------------------|---------|
-| Landing pública | `?niche=` ou domínio customizado do tenant | `src/lib/niche/resolve.ts` |
-| Portais autenticados | `tenantId` da sessão → `resolveNicheFromTenantId()` | `src/lib/session.ts` |
-| Defaults | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
+**Prioridade (FATO — código):** `?tenant=` → cookie `bibi_segment` → domínio customizado → `?niche=` → default `MEDICAL`.
+
+| Contexto | Como o segmento é definido | Arquivo |
+|----------|----------------------------|---------|
+| Landing / visitante | `resolveSegmentContext()` — ver prioridade acima | `src/lib/segment/resolve.ts` |
+| Persistência mobile | `POST /api/segment/persist` grava cookie após `?tenant=` | `SegmentCookiePersist.tsx` |
+| Portais autenticados | `tenantId` da sessão → labels do tenant | `src/lib/session.ts` |
+| Defaults por nicho | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
 
 ### 0.2 Fluxo de labels na UI
 
@@ -66,15 +73,15 @@ flowchart LR
 
 ### 0.3 Tenants demo multi-nicho (seed)
 
-| Nicho | Tenant | Login interno | Landing preview |
-|-------|--------|---------------|-----------------|
-| VET | PetCare | `operacao@petcare.demo` | `/?niche=VET` |
-| DENTAL | Smile Odonto | `operacao@smile.demo` | `/?niche=DENTAL` |
-| LEGAL | Lex & Partners | `operacao@lex.demo` | `/?niche=LEGAL` |
-| SPA | Zen Studio | `operacao@zen.demo` | `/?niche=SPA` |
-| EDUCATION | EduPrime | `operacao@eduprime.demo` | `/?niche=EDUCATION` |
+| Nicho | Tenant (slug) | Login interno | Preview landing |
+|-------|---------------|---------------|-----------------|
+| VET | PetCare (`petcare`) | `operacao@petcare.demo` | `/?tenant=petcare` ou `/?niche=VET` |
+| DENTAL | Smile Odonto (`smile`) | `operacao@smile.demo` | `/?tenant=smile` ou `/?niche=DENTAL` |
+| LEGAL | Lex & Partners (`lex`) | `operacao@lex.demo` | `/?tenant=lex` ou `/?niche=LEGAL` |
+| SPA | Zen Studio (`zen`) | `operacao@zen.demo` | `/?tenant=zen` ou `/?niche=SPA` |
+| EDUCATION | EduPrime (`eduprime`) | `operacao@eduprime.demo` | `/?tenant=eduprime` ou `/?niche=EDUCATION` |
 
-Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`.
+Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`. **FATO:** tenants de nicho têm apenas interno + prestador no seed (sem PJ/beneficiário dedicados).
 
 ### 0.4 Landing por nicho
 
@@ -243,16 +250,18 @@ flowchart LR
 | `billing` | `/interno` | `BillingView` | Pay Per Use, faturas, PIX, TISS |
 | `agenda` | `/interno/agenda` | `AppointmentsView` | CRUD agenda |
 | `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, usuários |
+| `estoque` | `/interno/estoque` | `StockView` | Produtos, lotes, movimentações, kits por procedimento, alertas |
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
 | `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
+| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal, export CSV/PDF |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
-| `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
+| `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
+Nav: **13 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.1 Faturamento (`BillingView`)
 
@@ -356,6 +365,37 @@ Eventos: `INVOICE_ISSUED`, `APPOINTMENT_CREATED`, `COMPANY_STATUS_CHANGED`, `PAT
 
 Serviço: `src/lib/webhook-service.ts`
 
+### 4.8 Estoque médico (`StockView`) — v1.3
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Produtos | `GET/POST /api/interno/stock/products`, `PATCH/DELETE .../[id]` | CRUD catálogo |
+| Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade e saldo |
+| Movimentações | `POST /api/interno/stock/movements` | Entrada/saída/ajuste |
+| Kits por procedimento | `GET/PUT /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento |
+| Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
+
+Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).
+
+### 4.9 Auditoria (`AuditoriaView`)
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis |
+| Export | `GET /api/interno/audit/export` | CSV/PDF via `exports/` |
+
+Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
+
+### 4.10 Segurança e dual-store (`SecurityView`)
+
+| Ação | API / UI | Efeito |
+|------|----------|--------|
+| MFA TOTP | `POST /api/auth/mfa/setup`, `verify` | Segundo fator para interno |
+| Alternar demo/operação | `GET/PATCH /api/interno/data-store` | Quando `DUAL_DATA_STORE=true` |
+| Restaurar seed demo | `POST /api/interno/demo/reset` | Somente ADMIN + modo demo + `ALLOW_DEMO_RESET` |
+
+Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
+
 ---
 
 ## 5. Portal PJ (Empresa)
@@ -389,14 +429,21 @@ flowchart LR
 
 **Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR)
 
-| Seção (`BeneficiarioView`) | Ações |
-|----------------------------|-------|
-| Agendar consulta | Prestador + data + slot + modalidade |
-| Resumo | Próximo atendimento, pendente PPU, assinatura |
-| Agenda | Lista + link telemedicina |
-| Consumo Pay Per Use | Procedimentos billed/não billed |
-| Faturas | Pagar com PIX (status FECHADA) |
-| Assinatura / PEP / Timeline | Somente leitura |
+**Nav:** 11 abas em `BENEFICIARIO_NAV_TABS` (`routes.ts`).
+
+| Aba | Rota | Função |
+|-----|------|--------|
+| Agendar | `/beneficiario/agendar` | Novo agendamento (prestador + slot) |
+| Resumo | `/beneficiario/resumo` | KPIs, próximo atendimento, pendências PPU |
+| Agenda | `/beneficiario/agenda` | Lista + link telemedicina |
+| Consumo | `/beneficiario/consumo` | Procedimentos billed/não billed |
+| Faturas | `/beneficiario/faturas` | PIX mock para faturas FECHADA |
+| Medicações | `/beneficiario/medicacoes` | Care Chart — prescrições ativas |
+| Exames | `/beneficiario/exames` | Pedidos de exame |
+| Plano | `/beneficiario/plano` | Benefícios corporativos |
+| Assinatura | `/beneficiario/assinatura` | Planos recorrentes |
+| Prontuário | `/beneficiario/prontuario` | PEP somente leitura |
+| Histórico | `/beneficiario/historico` | Timeline clínica |
 
 | Ação | API | Serviço |
 |------|-----|---------|
@@ -519,7 +566,22 @@ Fonte canônica: `src/lib/crud-operations-map.ts` · UI: `/interno/cadastros?tab
 Cobre **27 entidades** nos portais Interno, Prestador, Beneficiário, PJ, Auth e Sistema —
 cada operação com tela, rota API e tipo de exposição (UI, Download, API-only, Cron).
 
-### 8.7 Melhorias de fluxo (jornada clínica)
+### 8.7 Dual-store demo / operação
+
+Quando `DUAL_DATA_STORE=true` (dev e Netlify):
+
+1. Build gera `demo.db` + `operation.db` (`scripts/netlify-build.mjs`).
+2. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local.
+3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
+4. APIs usam `getPrisma()` → banco conforme modo ativo.
+
+### 8.8 Persistência de segmento (landing)
+
+1. Visitante abre `/?tenant=petcare` (ou outro slug).
+2. Cliente chama `POST /api/segment/persist` → cookie `bibi_segment`.
+3. Navegação subsequente mantém tenant sem repetir query string.
+
+### 8.9 Melhorias de fluxo (jornada clínica)
 
 Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?tab=operations` (aba Mapa CRUD).
 
@@ -545,10 +607,12 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | billing | ✓ | ✓ | ✗ | ✗ |
 | agenda | ✓ | ✗ | ✓ | ✗ |
 | cadastros | ✓ | ✗ | ✓ | ✗ |
+| estoque | ✓ | ✗ | ✓ | ✗ |
 | crm | ✓ | ✗ | ✗ | ✗ |
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
+| auditoria | ✓ | ✓ | ✗ | ✓ |
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |

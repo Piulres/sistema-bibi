@@ -52,7 +52,7 @@ Senha **`bibi123`**. Landing preview: `/?niche=VET`, `/?niche=LEGAL`, etc.
 | SPA | Zen Studio | `operacao@zen.demo` |
 | EDUCATION | EduPrime | `operacao@eduprime.demo` |
 
-Escopo: [`V2_0.md`](V2_0.md). Labels: `useLabels()` — nunca hardcodar "Paciente" em novas telas.
+Escopo: [`V2_0.md`](../versoes/V2_0.md). Labels: `useLabels()` — nunca hardcodar "Paciente" em novas telas.
 
 ---
 
@@ -143,6 +143,7 @@ Exemplo seed: Consulta Clínica base R$ 320 → TechCorp paga R$ 272 (15% descon
 | `/interno` | Faturamento Pay Per Use (+ PIX/pagar — Tier 1) | core / T1 |
 | `/interno/agenda` | Agendamentos (criar, status) | T2 |
 | `/interno/cadastros` | CRUD: beneficiários, empresas, procedimentos, usuários | T2 |
+| `/interno/estoque` | Estoque médico (produtos, lotes, movimentações, kits) | v1.3 |
 | `/interno/crm` | Pipeline CRM corporativo | 3 |
 | `/interno/assinaturas` | Recorrência (+ faturar cobrança — Tier 1) | 5 / T1 |
 | `/interno/comunicacao` | Fila de mensagens (+ lembretes automáticos — Tier 1) | 7 / T1 |

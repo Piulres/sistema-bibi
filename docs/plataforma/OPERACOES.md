@@ -4,7 +4,7 @@ Manual único de **como operar** o projeto no dia a dia: desenvolvimento local,
 validação de pacotes, publicação em produção, banco de dados e regras para
 agentes de IA (Cursor / Cloud Agent).
 
-> **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Labels:** `useLabels()` + `src/constants/niches.ts`
+> **Escopo v2.0:** [`V2_0.md`](../versoes/V2_0.md) · **Labels:** `useLabels()` + `src/constants/niches.ts`
 
 **Leitura rápida:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Pacotes:** [`RELEASES.md`](../versoes/RELEASES.md) · **Deploy:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 

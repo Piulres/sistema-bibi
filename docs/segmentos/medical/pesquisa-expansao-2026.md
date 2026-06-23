@@ -6,7 +6,7 @@
 
 | Meta | Valor |
 |------|-------|
-| Versão | 1.1 |
+| Versão | 1.2 (revisão factual jun/2026) |
 | Data | Junho/2026 |
 | Stack POC | Next.js 16, React 19, Prisma 6 |
 | Diferencial técnico | **Price Snapshot** (`priceCharged` congelado no ato do atendimento via `computePrice` + `PricingRule`) |
@@ -15,8 +15,8 @@
 
 | Tag | Significado |
 |-----|-------------|
-| **FATO** | Dado público, implementado na POC ou premissa explícita do modelo |
-| **INFERÊNCIA** | Projeção estratégica — validar em pilotos comerciais |
+| **FATO** | Implementado na POC (`src/`), dado do seed ou premissa explícita do exercício financeiro |
+| **INFERÊNCIA** | Projeção estratégica / mercado — **validar em pilotos**; ver [`../../pesquisa/README.md`](../../pesquisa/README.md#política-de-veracidade) |
 
 ---
 

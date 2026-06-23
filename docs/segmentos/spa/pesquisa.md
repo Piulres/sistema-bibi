@@ -35,7 +35,7 @@ O **bem-estar corporativo** no Brasil atingiu **US$ 1,6 bilhão em 2025**, com p
 |--------------|-----------|------------|-------------------|-------|
 | **Aula de yoga** (grupo) | `SESSAO` | **R$ 120** | R$ 80–200/sessão | Mercado studios |
 | Quick massage (20 min) | `SESSAO` | **R$ 90** | R$ 74–121 | Vittae Spa |
-| Massagem relaxante (1h) | `SESSAO` | **R$ 189** | R$ 180–280 | Vittae, Cercano |
+| Massagem relaxante (1h) | `SESSAO` | **R$ 180** | R$ 180–280 (mercado) | Vittae, Cercano — **INFERÊNCIA** |
 | Massagem terapêutica (1h) | `SESSAO` | R$ 220 | R$ 121–250 | Vittae |
 | Drenagem linfática (1h) | `SESSAO` | R$ 189 | R$ 189–280 | Vittae |
 | Day spa (pacote) | `SERVICO` | R$ 450 | R$ 350–950 | Hotéis/spas premium |
@@ -43,7 +43,7 @@ O **bem-estar corporativo** no Brasil atingiu **US$ 1,6 bilhão em 2025**, com p
 
 **Seed atual:** Aula de Yoga **R$ 120** — alinhado à faixa studios urbanos.
 
-**Recomendação seed:** adicionar **Quick Massage R$ 90** (B2B corporativo) e **Massagem Relaxante R$ 189**.
+**FATO (seed Zen Studio):** `SPA-MSG` = R$ 180 em `prisma/seed-data/niche-tenants.ts`. Faixas de mercado acima são **INFERÊNCIA**.
 
 ---
 

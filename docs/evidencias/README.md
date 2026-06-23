@@ -10,7 +10,7 @@ evidência ao código que a implementa.
 > Ambiente validado: `npm install` → `cp .env.example .env` → `npm run db:push` →
 > `npm run db:seed` → `npm run pre-release` (lint + build Netlify, sem publicar) →
 > `npm run dev` (servidor em `http://localhost:3000`). Operações completas em
-> [`../OPERACOES.md`](../OPERACOES.md). Credenciais de demonstração em
+> [`../plataforma/OPERACOES.md`](../plataforma/OPERACOES.md). Credenciais de demonstração em
 > [`../../AGENTS.md`](../../AGENTS.md) e [`../../README.md`](../../README.md).
 
 ---

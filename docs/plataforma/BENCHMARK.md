@@ -3,7 +3,7 @@
 Comparativo entre **o que a plataforma implementa hoje** (ações/funcionalidades no código)
 e **referências de mercado** citadas no projeto.
 
-> **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Arquitetura multi-nicho:** [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) · **Pesquisa estratégica:** [`pesquisa/README.md`](pesquisa/README.md)
+> **Escopo v2.0:** [`V2_0.md`](../versoes/V2_0.md) · **Arquitetura multi-nicho:** [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) · **Pesquisa estratégica:** [`pesquisa/README.md`](../pesquisa/README.md)
 
 | Referência | Perfil | Uso neste documento |
 |------------|--------|---------------------|
@@ -266,9 +266,9 @@ Escala: **0** ausente · **1** parcial/mock · **2** implementado alinhado ao me
 
 | Documento | Conteúdo relacionado |
 |-----------|---------------------|
-| [`V2_0.md`](V2_0.md) | Escopo e changelog ServiceOS v2.0 |
-| [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Arquitetura técnica multi-nicho |
-| [`pesquisa/README.md`](pesquisa/README.md) | Benchmark estratégico 2026 (matriz, mercado, roadmap, prompts) |
+| [`V2_0.md`](../versoes/V2_0.md) | Escopo e changelog ServiceOS v2.0 |
+| [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) | Arquitetura técnica multi-nicho |
+| [`pesquisa/README.md`](../pesquisa/README.md) | Benchmark estratégico 2026 (matriz, mercado, roadmap, prompts) |
 | [`pesquisa/01-matriz-competitiva.md`](pesquisa/01-matriz-competitiva.md) | Bibi × Conexa, Vitta, Alice, Pipo, Feegow, iClinic, etc. |
 | [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) | Síntese executiva consultor — ROI, script CFO, Tier 1 |
 | [`FLUXOS.md`](../produto/FLUXOS.md) | Fluxos detalhados de cada ação |
