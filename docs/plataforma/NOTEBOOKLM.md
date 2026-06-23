@@ -83,7 +83,11 @@ Scripts úteis: `npm run db:reset`, `npm run netlify:build`, `npm run lint`.
 ## 4. Segurança e multi-tenancy
 
 - **Cookie httpOnly** `bibi_session` assinado com HMAC-SHA256 (`src/lib/session.ts`)
-- **Proxy otimista** (`src/proxy.ts`) — redireciona ao login se não houver cookie
+- **Cookie de segmento** `bibi_segment` — HMAC-SHA256, 7 dias, `SESSION_SECRET` (`src/lib/segment/cookie.ts`)
+  - Prioridade de resolução: `?tenant=` → cookie → domínio → `?niche=` → default `MEDICAL` (`src/lib/segment/resolve.ts`)
+  - Persistência client-side: `POST /api/segment/persist` via `SegmentCookiePersist.tsx` (Next.js 16 — cookies só em Route Handlers)
+  - Login bloqueia tenant errado: `validateUserSegmentAccess()` → 403 (`src/lib/segment/auth.ts`)
+- **Proxy otimista** (`src/proxy.ts`) — redireciona ao login se não houver cookie de sessão
 - **Validação real** em cada página/API via `getSessionUser()` / `requireUser([roles])`
 - **Senhas:** hash **scrypt** via `src/lib/password.ts` (seed e novos usuários); login aceita legado texto puro durante migração
 - Dados isolados por `tenantId` em todas as queries de negócio
@@ -247,12 +251,16 @@ Alinha com iClinic/Feegow no dia a dia:
 - `GET/POST /api/interno/patients`, `PATCH /api/interno/patients/[id]`
 - `GET/POST /api/interno/companies`, `PATCH /api/interno/companies/[id]`
 - `GET/POST /api/interno/procedures`, `PUT/DELETE /api/interno/procedures/[id]`
+- `GET/POST /api/interno/pricing-rules`, `PUT/DELETE /api/interno/pricing-rules/[id]` — precificação dinâmica por empresa (escopo `tenantId`)
 - `GET/POST /api/interno/users`, `PATCH /api/interno/users/[id]`
 - `GET/POST /api/interno/appointments`, `PATCH /api/interno/appointments/[id]`
+- `GET /api/interno/audit` — timeline filtrável (`entityType`, `action`, `search`, `from`, `to`, paginação); RBAC módulo `auditoria`
+- `GET /api/interno/audit/export` — CSV/PDF
 - `GET /api/interno/reports?type=billing|crm` — download CSV
 - `GET /api/beneficiario/providers`, `GET /api/beneficiario/slots`, `POST /api/beneficiario/appointments`
+- `POST /api/segment/persist` — grava cookie `bibi_segment` (mobile/landing)
 
-**Serviços:** `patient-service`, `company-service`, `procedure-service`, `user-service`, `appointment-service`, `scheduling-service`, `pep-templates`.
+**Serviços:** `patient-service`, `company-service`, `procedure-service`, `pricing-rule-service`, `user-service`, `appointment-service`, `scheduling-service`, `pep-templates`.
 
 ---
 
@@ -297,11 +305,13 @@ Alinha com iClinic/Feegow no dia a dia:
 
 Base: `http://localhost:3000/api`
 
-**Auth:** `POST /auth/login` body `{ email, password, portal }` — portal: `prestador|interno|pj|beneficiario`
+**Auth:** `POST /auth/login` body `{ email, password, portal, tenantSlug? }` — portal: `prestador|interno|pj|beneficiario`; resposta inclui `segment` quando aplicável
+
+**Segmento:** `POST /segment/persist` — persiste `bibi_segment` (HMAC, 7 dias)
 
 **Prestador:** agenda, atendimentos, procedimentos, PEP (com `recordType`)
 
-**Interno:** dashboard, billing, invoices, cadastros (patients/companies/procedures/users), appointments, reports, crm, subscriptions, messages, branding
+**Interno:** dashboard, billing, invoices, cadastros (patients/companies/procedures/pricing-rules/users), appointments, reports, crm, subscriptions, messages, branding, **auditoria** (`/audit`, `/audit/export`), **segurança** (`/data-store`, `/demo/reset`)
 
 **Beneficiário:** overview, providers, slots, appointments (agendar), invoices/pay (Tier 1)
 
@@ -322,6 +332,11 @@ src/
 │   ├── api-auth.ts             # requireUser, requireBeneficiary
 │   ├── roles.ts                # PORTALS e ROLES
 │   ├── pricing.ts              # Pay Per Use + tenant scope
+│   ├── pricing-rule-service.ts # CRUD regras por empresa (Tier 2)
+│   ├── segment/                # Roteamento multi-nicho v2.0
+│   │   ├── resolve.ts          # ?tenant= → cookie → host → ?niche=
+│   │   ├── cookie.ts           # bibi_segment HMAC
+│   │   └── auth.ts             # validateUserSegmentAccess (login 403)
 │   ├── interno-permissions.ts  # RBAC portal interno (Tier 3)
 │   ├── interno-guard.ts        # Proteção páginas interno (Tier 3)
 │   ├── webhook-service.ts      # Webhooks B2B (Tier 3)
@@ -367,9 +382,9 @@ src/
 
 ## 15. Dados de demonstração (seed)
 
-**Tenants:** Clínica Horizonte (teal) + VitaCare demo (white label azul)
+**Tenants demo (7 slugs — `db:verify`):** `horizonte` (MEDICAL), `vitacare`, `petcare` (VET), `smile` (DENTAL), `lex` (LEGAL), `zen` (SPA), `eduprime` (EDUCATION)
 
-**Empresa ativa:** TechCorp Benefícios LTDA (desconto 15% consulta clínica)
+**Empresa ativa (Horizonte):** TechCorp Benefícios LTDA (desconto 15% consulta clínica)
 
 **Beneficiários:**
 - João Pereira (TechCorp) — atendimento hoje, 2 procedimentos pendentes, assinatura mensal

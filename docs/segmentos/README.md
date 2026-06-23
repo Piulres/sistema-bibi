@@ -23,11 +23,40 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 
 ## Roteamento por segmento
 
+**Resolver canônico:** `src/lib/segment/resolve.ts` — `resolveSegmentContext()` e variantes para headers/login.
+
+### Prioridade de resolução
+
+```
+?tenant=slug  →  cookie bibi_segment  →  domínio customizado  →  ?niche=  →  default MEDICAL
+```
+
 | Entrada | Exemplo | Resolve |
 |---------|---------|---------|
 | Slug do tenant | `/?tenant=petcare` | PetCare · VET |
-| Nicho (fallback) | `/?niche=LEGAL` | Primeiro tenant LEGAL |
+| Cookie `bibi_segment` | Após landing/login | Persiste entre páginas (HMAC, 7 dias, `SESSION_SECRET`) |
 | Domínio customizado | DNS verificado no branding | Tenant do domínio |
-| Cookie `bibi_segment` | Após landing/login | Persiste entre páginas |
+| Nicho (fallback) | `/?niche=LEGAL` | Primeiro tenant LEGAL cadastrado |
+| Default | `/` sem parâmetros | Primeiro tenant `MEDICAL` (Horizonte) |
+
+### Persistência do cookie (mobile / Next.js 16)
+
+Cookies assinados só podem ser gravados em **Route Handlers**. O cliente chama:
+
+```
+POST /api/segment/persist  { "tenant": "petcare" }
+```
+
+Componente: `src/components/segment/SegmentCookiePersist.tsx` (landing e formulários de login).
+
+Cookie: `src/lib/segment/cookie.ts` — assinatura HMAC-SHA256 com `SESSION_SECRET`, validade 7 dias.
+
+### Guarda no login
+
+`validateUserSegmentAccess()` (`src/lib/segment/auth.ts`) bloqueia contas de outro tenant com **403** — ex.: `faturamento@bibi.health` em `/?tenant=petcare`.
+
+O login aceita `tenantSlug` no body; em sucesso persiste `bibi_segment` e retorna `segment` no JSON.
+
+**Deprecado:** `src/lib/niche/resolve.ts` — wrapper legado da landing; use `src/lib/segment/resolve.ts`.
 
 Senha: **`bibi123`**
