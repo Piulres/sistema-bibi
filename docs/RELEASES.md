@@ -18,8 +18,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `main` | `55481be` — release / produção |
 | `dev` | `55481be` — sincronizada com `main` |
 | **Tag git em produção** | **`v1.2.0`** |
-| Próximo pacote | Features novas integram em `dev` |
-| Validação | `npm run pre-release` — 136 testes |
+| Próximo pacote | **v1.4.0** — Voa Health (branch `cursor/voa-health-integration-0f4a`) |
+| Validação | `npm run pre-release` — ver `docs/PLANO_V1_4_VOA.md` |
 
 ### Sincronização de ambientes
 
@@ -81,6 +81,26 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
+| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Fase 1 em desenvolvimento |
+
+---
+
+## Pacote pendente (`dev` / feature branch)
+
+### `v1.4.0` — Integração Voa Health
+
+| Campo | Valor |
+|-------|-------|
+| **Versão** | `1.4.0` (`package.json`) |
+| **Branch** | `cursor/voa-health-integration-0f4a` |
+| **Doc** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) |
+
+**Inclui (Fase 1):**
+
+- Plugin Voa Health no atendimento prestador (aba Assistente IA)
+- Importação automática de documentos no PEP (`VOA_DOCUMENT_IMPORTED`)
+- APIs `/api/prestador/appointments/[id]/voa` e `/voa/import`
+- Env `VOA_ENABLED` + `VOA_INTEGRATION_TOKEN`
 
 ---
 
