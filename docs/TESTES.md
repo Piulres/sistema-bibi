@@ -9,9 +9,9 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E (41)   │  Playwright — 5 specs (smoke, flows, interno, rbac, walk-in)
+                    │  E2E        │  Playwright — 9 specs
                     ├─────────────┤
-                    │ API (6)     │  Handlers Next.js + auth/cron + exportações
+                    │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
                     │ Integração  │  Prisma + adapters mock
                     ├─────────────┤

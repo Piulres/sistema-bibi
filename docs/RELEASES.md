@@ -13,10 +13,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção** | **1.2.0** (`485819a`) |
-| **Deploy Netlify** | `main` — ver histórico abaixo |
-| `main` | `485819a` — release / produção |
-| `dev` | `485819a` — sincronizada com `main` |
+| **Versão em produção** | **1.2.0** (`55481be`) |
+| **Deploy Netlify** | `6a39d446` (23/06/2026) |
+| `main` | `55481be` — release / produção |
+| `dev` | `55481be` — sincronizada com `main` |
 | **Tag git em produção** | **`v1.2.0`** |
 | Próximo pacote | Features novas integram em `dev` |
 | Validação | `npm run pre-release` — 136 testes |
@@ -80,7 +80,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |--------|-----|--------|
 | **1.0.x** | [`V1_0.md`](V1_0.md) | Histórico |
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
-| **1.2.x** | — | ✅ **`v1.2.0` em produção** |
+| **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
 
 ---
 
