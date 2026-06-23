@@ -625,3 +625,44 @@ Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
 
 - **Swagger UI:** http://localhost:3000/api-docs.html
 - **Spec (YAML):** http://localhost:3000/openapi.yaml
+
+---
+
+## 21. Exportações PDF / Excel / CSV (v1.2.0)
+
+Subsistema unificado para downloads em todos os portais — PR #85, integrado em `v1.2.0`.
+
+```mermaid
+flowchart LR
+  UI["ExportButtons<br/>(query format)"] --> RH["Route Handler<br/>/api/*/export"]
+  RH --> Builders["builders.ts<br/>(dados tabulares)"]
+  RH --> PepPdf["pep-pdf.ts / invoice-pdf.ts"]
+  Builders --> Serve["serve.ts"]
+  PepPdf --> Serve
+  Serve --> Out["PDF · XLSX · CSV · JSON"]
+```
+
+| Camada | Arquivo | Função |
+|--------|---------|--------|
+| Formato | `src/lib/exports/format.ts` | `parseExportFormat`, MIME types |
+| Tabular | `src/lib/exports/tabular.ts` | CSV, XLSX (`exceljs`), PDF tabular |
+| Builders | `src/lib/exports/builders.ts` | Dados por portal/seção |
+| PEP | `src/lib/exports/pep-pdf.ts` | PDF clínico customizado |
+| Fatura | `src/lib/exports/invoice-pdf.ts` | PDF de boleto/fatura |
+| Resposta | `src/lib/exports/serve.ts` | `serveTabularExport`, `serveBufferExport` |
+| UI | `src/components/ExportButtons.tsx` | Botões reutilizáveis |
+
+**Query `format`:** `pdf` · `xlsx` · `csv` · `json` (nem todas as rotas aceitam todos).
+
+**Cobertura por portal:** ver tabela em [`FLUXOS.md`](FLUXOS.md) §4.9.
+
+**Testes:** `tests/api/exports.test.ts` — auditoria, faturamento, PEP, extrato prestador, seções beneficiário, PJ.
+
+### Checklist de homologação (Exportações)
+
+- [x] Serviço centralizado em `src/lib/exports/`
+- [x] Exportações nos 4 portais + Cliente 360°
+- [x] PDF PEP com branding do tenant
+- [x] `ExportButtons` reutilizável
+- [x] Testes API (`exports.test.ts`)
+- [x] Documentação em `FLUXOS.md` e `README.md`
