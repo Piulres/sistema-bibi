@@ -13,11 +13,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (Netlify)** | **1.2.0** — último deploy `6a39d446` *(atualizar após deploy v2.0)* |
-| **Versão validada na `main`** | **2.0.0** (`7f5d876` + bump `package.json`) |
-| `main` / `dev` | **v2.0.0 ServiceOS** — merge `dev` → `main` concluído |
-| **Tag git mais recente** | **`v2.0.0`** *(após tag)* — anterior: `v1.2.0` |
-| **Próximo passo** | `npm run pre-release` → `npx netlify deploy --prod --no-build` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **1.2.0** — deploy `6a39d446` *(ainda não atualizado)* |
+| **Versão validada na `main` / tag** | **2.0.0** (`e823fe4`) — tag **`v2.0.0`** criada |
+| `main` / `dev` | Sincronizadas em **v2.0.0** |
+| **Deploy pendente** | `netlify link` ao site correto → `npx netlify deploy --prod --no-build` |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
@@ -26,14 +25,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.0.0** ServiceOS |
 | **Release** | `main` | **v2.0.0** — aguardando deploy Netlify |
-| **Netlify** | último deploy manual | Ainda **v1.2.0** até publicar v2.0 |
+| **Netlify** | último deploy em **sistema-bibi.netlify.app** | **v1.2.0** — publicar v2.0 com CLI linkado |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.0.0`** | `7f5d876` | ServiceOS multi-nicho + v1.3 estoque incorporado |
+| **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque — **tag criada** |
 | `v1.2.0` | `485819a` | Care Chart, exports, homepage — **em produção hoje** |
 | `v1.1.0` | `8c8cd01` | Care Chart (substituído) |
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
@@ -143,7 +142,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v2.0.0`** | `7f5d876` | 23/06/2026 | ⏳ Validado — **pendente deploy** |
+| **`v2.0.0`** | `e823fe4` | 23/06/2026 | ⏳ Tag + `main` — **deploy sistema-bibi pendente** |
 | **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
 | **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ **Em produção** (até deploy v2.0) |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
