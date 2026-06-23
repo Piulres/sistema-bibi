@@ -1,7 +1,9 @@
-# Ações × Benchmark — Sistema Bibi
+# Ações × Benchmark — ServiceOS Bibi v2.0
 
-Comparativo entre **o que a POC implementa hoje** (ações/funcionalidades no código)
+Comparativo entre **o que a plataforma implementa hoje** (ações/funcionalidades no código)
 e **referências de mercado** citadas no projeto.
+
+> **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Arquitetura multi-nicho:** [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) · **Pesquisa estratégica:** [`pesquisa/README.md`](pesquisa/README.md)
 
 | Referência | Perfil | Uso neste documento |
 |------------|--------|---------------------|
@@ -18,7 +20,22 @@ e **referências de mercado** citadas no projeto.
 | ❌ | Não implementado (roadmap) |
 | ⭐ | Diferencial do Bibi vs benchmark típico de clínica |
 
-Última revisão: alinhada à `main` pós PRs #1–#28 (Tiers 1–4, docs, PIX faturamento, deploy Netlify).
+Última revisão: **ServiceOS v2.0** — multi-nicho, `useLabels()`, landing por nicho, seed VET/DENTAL/LEGAL/SPA/EDUCATION (PR [#101](https://github.com/Piulres/sistema-bibi/pull/101)).
+
+---
+
+## 0. ServiceOS multi-nicho — diferencial vs mercado
+
+| Capability | Bibi v2.0 | iClinic / Feegow | ERPMed | Conexa / Vitta |
+|------------|:---------:|:----------------:|:------:|:--------------:|
+| Mesmo deploy para saúde + vet + jurídico + educação | ⭐ ✅ | ❌ | ❌ | ❌ |
+| Dicionário de termos por tenant (`labels`) | ⭐ ✅ | ❌ | ❌ | ❌ |
+| Landing segmentada por nicho | ⭐ ✅ | ❌ | 🟡 | 🟡 |
+| White label (logo, cores, domínio) | ✅ | 🟡 | ✅ | ✅ |
+| Pay Per Use + Price Snapshot | ⭐ ✅ | ❌ | ✅ | 🟡 |
+| Portal PJ + beneficiário self-service | ⭐ ✅ | ❌ | ✅ | ✅ |
+
+**Leitura:** o v2.0 não compete em profundidade clínica (receituário CFM, grade flexível) — compete em **infraestrutura transacional horizontal** com vocabulário e marca do cliente. Ver [`pesquisa/01-matriz-competitiva.md`](pesquisa/01-matriz-competitiva.md).
 
 ---
 
@@ -249,6 +266,8 @@ Escala: **0** ausente · **1** parcial/mock · **2** implementado alinhado ao me
 
 | Documento | Conteúdo relacionado |
 |-----------|---------------------|
+| [`V2_0.md`](V2_0.md) | Escopo e changelog ServiceOS v2.0 |
+| [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Arquitetura técnica multi-nicho |
 | [`pesquisa/README.md`](pesquisa/README.md) | Benchmark estratégico 2026 (matriz, mercado, roadmap, prompts) |
 | [`pesquisa/01-matriz-competitiva.md`](pesquisa/01-matriz-competitiva.md) | Bibi × Conexa, Vitta, Alice, Pipo, Feegow, iClinic, etc. |
 | [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) | Síntese executiva consultor — ROI, script CFO, Tier 1 |

@@ -16,9 +16,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Versão em produção** | **1.2.0** (`55481be`) |
 | **Deploy Netlify** | `6a39d446` (23/06/2026) |
 | `main` | `6c1770a` — **v1.3.0** Estoque validado (`pre-release` OK) |
-| `dev` | `6c1770a` — sincronizada com `main` |
+| `dev` | Integração — **v2.0 ServiceOS** em merge (PR [#101](https://github.com/Piulres/sistema-bibi/pull/101)) |
 | **Tag git em produção** | **`v1.2.0`** |
 | **Próximo deploy** | **v1.3.0** — `npx netlify deploy --prod` (humano) |
+| **Em desenvolvimento** | **v2.0 ServiceOS** — multi-nicho, labels, landing segmentada |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
@@ -83,6 +84,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | ✅ Validado em `main` — **pendente deploy** |
+| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | 🚧 **Em desenvolvimento** na `dev` (ServiceOS multi-nicho) |
 | **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
@@ -115,6 +117,33 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `v1.0.2` | `e30b2b0` | 22/06/2026 | ✅ Substituído |
 | `v1.0.1` | `e4d8a43` | 22/06/2026 | ✅ Substituído |
 | `v1.0.0` | `685cc21` | 22/06/2026 | ✅ Substituído |
+
+---
+
+## Pacote em desenvolvimento (`dev`) — v2.0 ServiceOS
+
+### `v2.0.0` — ServiceOS multi-nicho
+
+| Campo | Valor |
+|-------|-------|
+| **Codinome** | ServiceOS |
+| **PR** | [#101](https://github.com/Piulres/sistema-bibi/pull/101) |
+| **Doc** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) |
+| **Estado** | 🚧 Integrado na `dev` — **não publicado** |
+
+**Inclui:**
+
+- `Tenant.niche` + `Tenant.labels` (JSON) — dicionário por cliente
+- `useLabels()` + `NICHE_MASTER_LABELS` — vocabulário dinâmico na UI
+- Landing segmentada por nicho (`/?niche=VET`, domínio customizado)
+- Seed: PetCare, Smile Odonto, Lex & Partners, Zen Studio, EduPrime
+- Procedimentos demo: Banho e Tosa (R$ 150), Consulta Odontológica (R$ 350), Hora Técnica Jurídica (R$ 500)
+- Nav dinâmica (Prestador, Beneficiário, Cadastros internos)
+- Documentação alinhada: README, BENCHMARK, FLUXOS, JORNADA, pesquisa, OPERACOES
+
+**Testes:** `tests/unit/niche.test.ts` — 14 testes.
+
+**Não inclui (roadmap):** homepage 100% custom por tenant, migração completa de strings fixas, deploy produção.
 
 ---
 

@@ -13,7 +13,7 @@ e são renderizados automaticamente no GitHub.
 >
 > **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](RELEASES.md)
 >
-> **ServiceOS v2.0 (multi-nicho):** [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useNiche()`
+> **ServiceOS v2.0 (multi-nicho):** [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useLabels()`
 
 ---
 

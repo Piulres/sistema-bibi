@@ -1,7 +1,9 @@
-# Fluxos do Sistema Bibi
+# Fluxos do ServiceOS Bibi
 
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
+
+> **ServiceOS v2.0:** vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo completo: [`V2_0.md`](V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](ARQUITETURA.md). Para posicionamento vs mercado,
@@ -16,6 +18,7 @@ ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 
 ## Índice
 
+0. [ServiceOS v2.0 — labels e landing](#0-serviceos-v20--labels-e-landing)
 1. [Visão geral](#1-visão-geral)
 2. [Autenticação e MFA](#2-autenticação-e-mfa)
 3. [Portal Prestador](#3-portal-prestador)
@@ -31,6 +34,57 @@ ver [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
 
 Jornada do cliente (UX, gaps e melhorias por portal): [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md).  
 Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md).
+
+---
+
+## 0. ServiceOS v2.0 — labels e landing
+
+### 0.1 Resolução de nicho
+
+```mermaid
+flowchart LR
+  Host["Host / domínio customizado"] --> Resolve["resolveLandingNiche()"]
+  Query["?niche=VET"] --> Resolve
+  Resolve --> Tenant["Tenant.niche + labels"]
+  Tenant --> UI["Landing + Portais"]
+```
+
+| Contexto | Como o nicho é definido | Arquivo |
+|----------|-------------------------|---------|
+| Landing pública | `?niche=` ou domínio customizado do tenant | `src/lib/niche/resolve.ts` |
+| Portais autenticados | `tenantId` da sessão → `resolveNicheFromTenantId()` | `src/lib/session.ts` |
+| Defaults | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
+
+### 0.2 Fluxo de labels na UI
+
+1. Servidor carrega `mergeNicheLabels(niche, tenant.labels)`.
+2. `PortalShell` injeta `NicheProvider` com `niche` + `labels`.
+3. Componentes client usam `useLabels()` → `labels.patient`, `t("appointment")`, etc.
+4. Navegação dinâmica: `buildPrestadorNavTabs(labels)`, `buildCadastrosTabs(labels, niche)`.
+
+**Regra:** não hardcodar "Paciente" / "Beneficiário" em novos componentes dos portais.
+
+### 0.3 Tenants demo multi-nicho (seed)
+
+| Nicho | Tenant | Login interno | Landing preview |
+|-------|--------|---------------|-----------------|
+| VET | PetCare | `operacao@petcare.demo` | `/?niche=VET` |
+| DENTAL | Smile Odonto | `operacao@smile.demo` | `/?niche=DENTAL` |
+| LEGAL | Lex & Partners | `operacao@lex.demo` | `/?niche=LEGAL` |
+| SPA | Zen Studio | `operacao@zen.demo` | `/?niche=SPA` |
+| EDUCATION | EduPrime | `operacao@eduprime.demo` | `/?niche=EDUCATION` |
+
+Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`.
+
+### 0.4 Landing por nicho
+
+Fluxo em `src/app/page.tsx`:
+
+1. `resolveLandingNicheFromHeaders(nicheParam)` → nicho + labels.
+2. `nicheLandingBranding()` aplica paleta do nicho.
+3. `getNicheLandingContent(niche)` — features, FAQ, descrição dos portais com vocabulário correto.
+
+O motor Pay Per Use (§7) **não muda** entre nichos — apenas rótulos e copy.
 
 ---
 

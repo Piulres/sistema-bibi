@@ -1,17 +1,20 @@
-# Jornada do Cliente — Quatro Portais
+# Jornada do Cliente — ServiceOS (Quatro Portais)
 
-Documentação da **experiência do usuário** em cada portal do Sistema Bibi, com
+Documentação da **experiência do usuário** em cada portal do ServiceOS Bibi, com
 jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias priorizado.
+
+> **v2.0:** nomenclatura dinâmica por nicho (`useLabels()`). Escopo: [`V2_0.md`](V2_0.md).
 
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: alinhada à `main` pós walk-in particular, edição CRUD em Cadastros e mapa `CRUD_OPERATIONS_MAP` (27 entidades).
+Última revisão: **ServiceOS v2.0** — labels por tenant, landing segmentada, tenants demo multi-nicho.
 
 ---
 
 ## Índice
 
+0. [Personalização por nicho (v2.0)](#0-personalização-por-nicho-v20)
 1. [Visão macro](#1-visão-macro)
 2. [Portal Beneficiário](#2-portal-beneficiário)
 3. [Portal PJ (Empresa)](#3-portal-pj-empresa)
@@ -21,6 +24,35 @@ Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md
 7. [Matriz de maturidade](#7-matriz-de-maturidade)
 8. [Backlog priorizado](#8-backlog-priorizado)
 9. [Referências cruzadas](#9-referências-cruzadas)
+
+---
+
+## 0. Personalização por nicho (v2.0)
+
+O cliente (clínica, pet shop, escritório) **não vê um ERP genérico** — vê o vocabulário do seu setor.
+
+| Camada | O que o usuário percebe | Implementação |
+|--------|-------------------------|---------------|
+| **Linguagem** | "Pet" vs "Cliente" vs "Aluno" | `useLabels()` nos portais |
+| **Marca** | Logo e cores da clínica | `TenantBranding` + Blobs |
+| **Landing** | Proposta de valor do setor | `getNicheLandingContent(niche)` |
+| **Navegação** | Abas com termos corretos | `niche-nav.ts` |
+
+### Gatilhos de conversão para quem está iniciando
+
+1. **"Sua marca, seu sistema"** — white label sem fork de código.
+2. **Price Snapshot** — nunca esquece de cobrar; cliente sem surpresa na fatura.
+3. **Portal self-service** — paciente/tutor/cliente agenda e paga sozinho.
+4. **Anti over-engineering** — fluxos curtos (agenda → atendimento → faturamento).
+
+### Roadmap de personalização
+
+| Item | Status |
+|------|--------|
+| Copy da landing por nicho | ✅ |
+| Labels dinâmicos em nav/cadastros | ✅ parcial |
+| Homepage 100% custom por tenant | 🟡 tagline + branding |
+| Wizard onboarding (escolher nicho) | ❌ roadmap |
 
 ---
 

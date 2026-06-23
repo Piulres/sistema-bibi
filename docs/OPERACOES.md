@@ -1,8 +1,10 @@
-# Operações — Sistema Bibi
+# Operações — ServiceOS Bibi
 
 Manual único de **como operar** o projeto no dia a dia: desenvolvimento local,
 validação de pacotes, publicação em produção, banco de dados e regras para
 agentes de IA (Cursor / Cloud Agent).
+
+> **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Labels:** `useLabels()` + `src/constants/niches.ts`
 
 **Leitura rápida:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Pacotes:** [`RELEASES.md`](RELEASES.md) · **Deploy:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md)
 
@@ -110,13 +112,23 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 
 | Portal | URL | Login demo |
 |--------|-----|------------|
-| Landing | http://localhost:3000/ | — |
+| Landing | http://localhost:3000/ | Preview: `/?niche=VET`, `/?niche=LEGAL` |
 | Prestador | `/login` | `dra.helena@bibi.health` |
 | Interno | `/interno/login` | `faturamento@bibi.health` |
 | PJ | `/pj/login` | `rh@techcorp.com` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` |
 | VitaCare WL | `/interno/login` | `operacao@vitacare.demo` |
+
+**Tenants multi-nicho (v2.0)** — senha `bibi123`:
+
+| Nicho | Login interno |
+|-------|---------------|
+| VET (PetCare) | `operacao@petcare.demo` |
+| DENTAL (Smile) | `operacao@smile.demo` |
+| LEGAL (Lex) | `operacao@lex.demo` |
+| SPA (Zen) | `operacao@zen.demo` |
+| EDUCATION (EduPrime) | `operacao@eduprime.demo` |
 
 Evidências gravadas: [`evidencias/README.md`](evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](FLUXOS.md).
 
@@ -227,6 +239,8 @@ Detalhes também em `AGENTS.md`.
 | `npm run pre-release` se pedirem “validar release” | Sem publicar |
 | Usar `db:push && db:seed` em VM nova | `db:reset` é bloqueado |
 | Consultar `RELEASES.md` para saber o que está em produção | Fonte única |
+| **`useLabels()` em telas novas dos portais** | v2.0 — ver `AGENTS.md` e `src/constants/niches.ts` |
+| Consultar `docs/V2_0.md` antes de features multi-nicho | Escopo canônico v2.0 |
 
 ### 7.2 Nunca fazer (salvo pedido explícito)
 

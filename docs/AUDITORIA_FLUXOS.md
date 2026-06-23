@@ -1,12 +1,16 @@
-# Auditoria de fluxos — quatro portais
+# Auditoria de fluxos — ServiceOS (quatro portais)
 
 Mapeamento de **falhas e lacunas** nos fluxos de usuário dos quatro portais do
-Sistema Bibi, com evidências de código, testes automatizados e validação manual
+ServiceOS Bibi, com evidências de código, testes automatizados e validação manual
 via API.
 
-**Data da auditoria:** 2026-06-22  
-**Commit de referência:** `93f466a` (HEAD no momento da auditoria)  
-**Relacionado:** [`FLUXOS.md`](FLUXOS.md) (fluxos esperados) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) (jornada UX e backlog) · [`TESTES.md`](TESTES.md) (cobertura e riscos)
+> **Nota v2.0:** migração para `useLabels()` está **parcial** — várias strings fixas
+> ("Paciente", "Beneficiário") permanecem em `routes.ts`, breadcrumbs e APIs.
+> Ver backlog em [`V2_0.md`](V2_0.md) §7.
+
+**Data da auditoria:** 2026-06-22 (fluxos core) · atualização v2.0: 2026-06-23  
+**Commit de referência (auditoria original):** `93f466a`  
+**Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](TESTES.md)
 
 ---
 

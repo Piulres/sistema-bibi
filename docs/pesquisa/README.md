@@ -2,7 +2,7 @@
 
 Documentação de **pesquisa externa** e **posicionamento estratégico** do **ServiceOS Bibi v2.0** — infraestrutura transacional Pay Per Use multi-nicho.
 
-Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referências de código) e [`../V2_0_ARCHITECTURE.md`](../V2_0_ARCHITECTURE.md) (arquitetura multi-nicho).
+Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referências de código), [`../V2_0.md`](../V2_0.md) (escopo v2.0) e [`../V2_0_ARCHITECTURE.md`](../V2_0_ARCHITECTURE.md) (arquitetura multi-nicho).
 
 | Documento | Conteúdo |
 |-----------|----------|

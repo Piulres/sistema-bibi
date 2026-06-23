@@ -1,16 +1,20 @@
-# Design System & White Label — Sistema Bibi
+# Design System & White Label — ServiceOS Bibi
 
-Plataforma visual unificada com identidade configurável por tenant (white label).
+Plataforma visual unificada com identidade configurável por tenant (white label)
+e **vocabulário dinâmico por nicho** (`useLabels()`).
+
+> **Escopo v2.0:** [`V2_0.md`](V2_0.md) · **Arquitetura:** [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md)
 
 > Fluxos de administração de branding: [`FLUXOS.md`](FLUXOS.md) §4 (módulo `branding`).
 
 ## Visão geral
 
-O design system separa três camadas:
+O design system separa **quatro camadas**:
 
 1. **Tokens globais** (`src/app/globals.css`) — superfícies, texto, bordas, status e variáveis de marca.
 2. **Branding por tenant** (`TenantBranding` + `TenantTheme`) — cores, nome de exibição, tagline e logo injetados em runtime via CSS variables.
 3. **Tema por portal** (`src/lib/theme/portals.ts`) — acentos visuais dos quatro portais (Prestador, Interno, PJ, Beneficiário).
+4. **Labels por nicho** (`useLabels()` + `NICHE_MASTER_LABELS`) — texto da UI ("Paciente" → "Pet", "Cliente", "Aluno").
 
 ## Modelo de dados
 
@@ -161,6 +165,24 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 **Domínio customizado (`customDomain`):** configurável em `/interno/branding` (Tier 3). Resolução via `src/lib/tenant-resolver.ts`; verificação manual na POC (sem challenge DNS automático).
 
 **Validação** em `src/lib/theme/branding-validation.ts` (cores hex, URL/data URL do logo).
+
+## Labels por nicho (v2.0)
+
+Complementa o white label visual com **vocabulário do setor**:
+
+| Nicho | Cor primária | Exemplo `labels.patient` |
+|-------|--------------|--------------------------|
+| MEDICAL | `#2563eb` | Paciente |
+| VET | `#059669` | Pet |
+| DENTAL | `#0891b2` | Paciente |
+| LEGAL | `#475569` | Cliente |
+| SPA | `#a78bfa` | Cliente |
+| EDUCATION | `#d97706` | Aluno |
+
+- Defaults: `src/lib/niche/defaults.ts` + `src/constants/niches.ts`
+- Hook: `useLabels()` em componentes client — **nunca** hardcodar "Paciente" em novas telas
+- Paleta automática: `applyNicheBrandingDefaults()` quando tenant usa cores padrão teal
+- Landing: `nicheLandingBranding()` em `src/lib/niche/branding.ts`
 
 ## Componentes auxiliares
 

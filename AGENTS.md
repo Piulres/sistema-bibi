@@ -35,7 +35,7 @@ e `labels` (JSON) para tradução automática da UI.
 
 \* Demo PetCare no seed sobrescreve `appointment` → "Banho/Tosa" via `Tenant.labels`.
 
-Paletas white label por nicho. Ver `docs/V2_0_ARCHITECTURE.md`.
+Paletas white label por nicho. Ver `docs/V2_0.md` e `docs/V2_0_ARCHITECTURE.md`.
 
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
@@ -103,7 +103,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/V1_0.md`. Produção: **`1.2.0`** — `docs/V1_2.md` · `docs/RELEASES.md`.
+**Versões:** `1.0.x` histórico — `docs/V1_0.md`. Produção: **`1.2.0`** — `docs/V1_2.md` · `docs/RELEASES.md`. **v2.0 ServiceOS** em desenvolvimento — `docs/V2_0.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
@@ -187,5 +187,6 @@ Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedr
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/evidencias/` (capturas dos fluxos).
   `docs/ARQUITETURA.md`, `docs/NOTEBOOKLM.md` (RAG), `docs/PAYMENTS.md`, `docs/COMMUNICATIONS.md`,
   `docs/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/OPERACOES.md` (mapa de operações),
+  `docs/V2_0.md` (escopo ServiceOS v2.0), `docs/V2_0_ARCHITECTURE.md` (arquitetura multi-nicho),
   `docs/RELEASES.md` (pacotes fechados), `docs/WORKFLOW_CURSOR.md` (dev sem deploy),
   `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).

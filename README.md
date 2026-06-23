@@ -480,9 +480,11 @@ sistema-bibi/
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
 - **Arquitetura ServiceOS v2.0 (multi-nicho):**
-  [`docs/V2_0_ARCHITECTURE.md`](docs/V2_0_ARCHITECTURE.md)
+  [`docs/V2_0.md`](docs/V2_0.md) · [`docs/V2_0_ARCHITECTURE.md`](docs/V2_0_ARCHITECTURE.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
   [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
+- **Prompt mestre ServiceOS (IAs):**
+  [`docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md`](docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md)
 - **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
   [`docs/PAYMENTS.md`](docs/PAYMENTS.md)
 - **Motor de comunicação** (e-mail, SMS, WhatsApp, fila de mensagens):

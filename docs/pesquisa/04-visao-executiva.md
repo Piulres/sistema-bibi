@@ -1,26 +1,29 @@
-# Sistema Bibi — Mapa Estratégico do Mercado HealthTech Brasil 2026
+# ServiceOS Bibi — Mapa Estratégico do Mercado 2026
 
 | Meta | Valor |
 |------|-------|
-| Versão | 1.0 |
+| Versão | **2.0 (ServiceOS)** |
 | Data | Junho/2026 |
+
+> Escopo técnico v2.0: [`../V2_0.md`](../V2_0.md) · Matriz competitiva: [`01-matriz-competitiva.md`](01-matriz-competitiva.md)
 
 ---
 
 ## Resumo executivo
 
-O Sistema Bibi não compete diretamente com ERPs hospitalares tradicionais nem com operadoras de saúde.
+O **ServiceOS Bibi** não compete diretamente com ERPs hospitalares tradicionais nem com operadoras de saúde.
 
 Sua posição natural encontra-se na interseção entre:
 
-- Saúde corporativa
-- Gestão de benefícios
-- Rede credenciada
-- Operação clínica
-- Transparência de consumo
-- Pay Per Use
+- **Infraestrutura transacional** multi-nicho (saúde, vet, jurídico, educação…)
+- Saúde corporativa e gestão de benefícios
+- Rede credenciada e operação de serviços
+- Transparência de consumo e **Pay Per Use**
+- White label — "sua marca, seu sistema"
 
 Essa combinação cria um espaço competitivo relativamente pouco ocupado no mercado brasileiro.
+
+**ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) → ~R$ 14,5k/mês (Pay Per Use) = **~91% economia**.
 
 ---
 
