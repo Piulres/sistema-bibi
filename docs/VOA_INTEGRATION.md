@@ -153,6 +153,7 @@ O token de integração **nunca** vai em `NEXT_PUBLIC_*`; o client obtém via GE
 |----------|-------------|---------|-----------|
 | `VOA_ENABLED` | Não | `false` | Habilita UI e APIs Voa |
 | `VOA_INTEGRATION_TOKEN` | Sim (se enabled) | — | Token fornecido pela Voa (`init`) |
+| `VOA_ENV` | Não | `homologacao` | `homologacao` (`sk_user_*`) ou `producao` (futuro) |
 | `VOA_PLUGIN_SCRIPT_URL` | Não | `https://integration.voa.health/plugin.js` | URL do script |
 | `VOA_IDENTIFY_URL` | Não | `https://api.voa.health/integration/identify/` | API identify (fase 2) |
 
