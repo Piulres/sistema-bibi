@@ -71,11 +71,11 @@ describe("niche seed demos", () => {
   it("define procedimentos com preços esperados", () => {
     const dental = NICHE_DEMOS.find((d) => d.niche === "DENTAL");
     const legal = NICHE_DEMOS.find((d) => d.niche === "LEGAL");
-    const spa = NICHE_DEMOS.find((d) => d.niche === "SPA");
+    const vet = NICHE_DEMOS.find((d) => d.niche === "VET");
 
     expect(dental?.procedures.find((p) => p.code === "DEN-CON")?.basePrice).toBe(350);
-    expect(legal?.procedures.find((p) => p.code === "LEG-PAR")?.basePrice).toBe(600);
-    expect(spa?.procedures.find((p) => p.code === "SPA-YOG")?.basePrice).toBe(120);
+    expect(legal?.procedures.find((p) => p.code === "LEG-HT")?.basePrice).toBe(500);
+    expect(vet?.procedures.find((p) => p.code === "VET-BAN")?.basePrice).toBe(150);
   });
 
   it("cobre os cinco nichos além de MEDICAL", () => {

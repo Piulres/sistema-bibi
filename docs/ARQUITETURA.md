@@ -1,4 +1,4 @@
-# Arquitetura — Sistema Bibi
+# Arquitetura — ServiceOS Bibi v2.0
 
 Documento técnico com os diagramas de arquitetura, modelo de dados (ER) e os
 principais fluxos do sistema. Os diagramas usam [Mermaid](https://mermaid.js.org/)
@@ -43,6 +43,60 @@ flowchart LR
 
 Detalhes: [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md).
 
+### 0.1 Camada de tradução dinâmica de labels
+
+Cada tenant define **como a UI fala com o usuário** sem alterar código do servidor:
+
+| Nicho | `patient` | `procedure` | `medicalRecord` |
+|-------|-----------|-------------|-----------------|
+| `MEDICAL` | Paciente | Procedimento | Prontuário |
+| `VET` | Pet | Serviço | Ficha clínica |
+| `LEGAL` | Cliente | Serviço jurídico | Dossiê |
+| `EDUCATION` | Aluno | Aula | Histórico pedagógico |
+
+Fluxo: `Tenant.labels` (JSON) → `mergeNicheLabels()` → `SessionUser` → `NicheProvider` → `useNiche().t('patient')`.
+
+Os **quatro portais segregados** são a base da transparência: cada nicho configura sua própria "estação de trabalho" (prestador, interno, PJ, beneficiário) com nomenclatura e branding isolados por tenant.
+
+### 0.2 Identidade visual, design system e Blobs
+
+**Design system semântico** (`docs/DESIGN_SYSTEM.md`):
+
+- Tokens em `src/app/globals.css`: `--brand-primary`, `--surface-card`, `--text-secondary`, etc.
+- Primitivos em `src/components/ui/`; composição via `TenantTheme` + `data-theme`.
+- **`colorScheme`** por tenant: `light` | `dark` | `system` — superfícies e status adaptam-se automaticamente.
+
+**White label performático:**
+
+```mermaid
+flowchart LR
+  Upload["POST /api/interno/branding/logo"]
+  Blobs["Netlify Blobs<br/>bibi-tenant-logos"]
+  Local["public/tenant-logos<br/>(dev)"]
+  CDN["GET /api/branding/logo/:tenantId"]
+  UI["PortalHeader · exports PDF"]
+  Upload --> Blobs
+  Upload --> Local
+  Blobs --> CDN
+  Local --> CDN
+  CDN --> UI
+```
+
+- Implementação: `src/lib/storage/tenant-logo.ts` — store `bibi-tenant-logos`, consistência `strong` na escrita.
+- Views migradas para o padrão de cores semânticas; paletas automáticas por `niche` quando o tenant não customiza (`src/lib/niche/branding.ts`).
+
+### 0.3 Segurança — proxy e sessão HMAC
+
+| Camada | Mecanismo | Arquivo |
+|--------|-----------|---------|
+| **Edge/Proxy** | Checagem otimista de cookie antes do App Router | `src/proxy.ts` |
+| **Servidor** | Validação HMAC-SHA256 + `role` + RBAC interno | `src/lib/session.ts`, `interno-guard.ts` |
+| **API** | `requireUser()` / `requireInternoModule()` em cada handler | `src/lib/api-auth.ts` |
+
+O `proxy.ts` é o substituto do middleware no **Next.js 16** — exclusivo desta versão do framework. A validação real da sessão **nunca** confia apenas no proxy; Server Components e Route Handlers revalidam assinatura e perfil.
+
+Cookie `bibi_session`: `userId` + HMAC com `SESSION_SECRET`; `httpOnly`, `sameSite=lax`, 8h de validade.
+
 ---
 
 ## 1. Visão de componentes
@@ -72,6 +126,8 @@ flowchart TB
       Webhooks["webhook-service.ts<br/>(B2B + retry Tier 3/4)"]
       RBAC["interno-permissions.ts<br/>(RBAC Tier 3)"]
       MFA["mfa.ts · tiss-service.ts<br/>(Tier 4)"]
+      Niche["niche/* · useNiche.tsx<br/>(labels dinâmicos v2.0)"]
+      Brand["theme/* · tenant-logo.ts<br/>(Blobs + design system)"]
       Dashboard["executive-dashboard.ts"]
       DB["db.ts (Prisma Client)"]
     end

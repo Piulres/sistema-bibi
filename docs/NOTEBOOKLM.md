@@ -1,23 +1,22 @@
-# Sistema Bibi — Base de Conhecimento (NotebookLM)
+# ServiceOS Bibi v2.0 — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
-Última atualização: reflete os **8 épicos comerciais**, **Tiers 1–4**, **design system / white label**,
-preparação Netlify e **fluxos completos** documentados em [`FLUXOS.md`](FLUXOS.md).
+Última atualização: reflete **ServiceOS v2.0** (multi-nicho), **white label** (tema escuro, logos Blobs),
+**design system semântico**, Tiers 1–4 e fluxos em [`FLUXOS.md`](FLUXOS.md).
 
 ---
 
-## 1. O que é o Sistema Bibi
+## 1. O que é o ServiceOS Bibi
 
-POC de plataforma **SaaS HealthTech multi-tenant** inspirada no modelo ERPMed/Centtralmed.
-Cada clínica/hospital é um **tenant**. O núcleo de negócio é **Pay Per Use**: cobrar
-apenas procedimentos efetivamente utilizados, com **precificação dinâmica** por empresa.
+Infraestrutura **SaaS multi-tenant multi-nicho** (evolução da POC HealthTech). Cada operação é um **tenant**
+com `niche` e `labels` (JSON) para tradução automática da UI. Núcleo: **Pay Per Use** sobre qualquer
+serviço — consulta médica, hora jurídica, banho e tosa — com **precificação dinâmica** por empresa.
 
-**Stack:** Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev).
+**ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) → ~R$ 14,5k/mês (Pay Per Use) = **~91% economia**.
 
-**PRs mergeados em `main`:** #1–#39 (scaffold → Tier 4 → docs → deploy → pacotes fechados).
-Mapa de fluxos: [`docs/FLUXOS.md`](FLUXOS.md). Operações: [`docs/OPERACOES.md`](OPERACOES.md).
-Histórico do dia: [`docs/HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md).
-Evidências visuais: [`docs/evidencias/README.md`](evidencias/README.md). Ver seção 21 (roadmap).
+**Stack:** Next.js 16 (App Router + `proxy.ts`), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev), Netlify Blobs (logos).
+
+**Arquitetura v2.0:** [`docs/V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md). Operações: [`docs/OPERACOES.md`](OPERACOES.md).
 
 ---
 

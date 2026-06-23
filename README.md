@@ -1,9 +1,8 @@
-# Bibi v2.0: ServiceOS — Infraestrutura Pay Per Use Multi-Nicho
+# Bibi v2.0: ServiceOS — Infraestrutura de Confiança para Serviços Pay Per Use
 
-> Plataforma SaaS **ServiceOS** para gestão inteligente de serviços profissionais em
-> múltiplos nichos (Saúde, Veterinária, Odontologia, Jurídico, Bem-estar e Educação).
-> Inspirada no modelo **ERPMed/Centtralmed**, com foco em **Pay Per Use**, previsibilidade
-> financeira e white label por tenant.
+> Plataforma **ServiceOS** multi-nicho para faturamento Pay Per Use em saúde, veterinária,
+> odontologia, jurídico, bem-estar e educação. White label por tenant, quatro portais segregados
+> e transparência total de consumo — sem a "caixa preta" da sinistralidade.
 
 ---
 
@@ -44,6 +43,18 @@ horas técnicas jurídicas ou aulas de yoga.
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários/clientes |
 | **Portal do Beneficiário** | Clientes finais | Agenda, consumo Pay Per Use e faturas |
 
+### ROI de 91% — empresa de médio porte (500 colaboradores)
+
+Comparativo mensal entre o modelo tradicional (plano fechado por vida) e o ServiceOS Pay Per Use:
+
+| Modelo | Custo mensal (500 vidas) | Lógica |
+|--------|--------------------------|--------|
+| **Tradicional** | ~**R$ 175.000** | R$ 350/vida × 500 — paga por elegibilidade, não por uso |
+| **ServiceOS Bibi** | ~**R$ 14.500** | Pay Per Use + take rate sobre transações efetivas |
+| **Economia** | **~91%** | Transparência de consumo; RH audita cada procedimento |
+
+> Referência comercial: [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) e [`docs/pesquisa/07-healthos-expansao-2026.md`](docs/pesquisa/07-healthos-expansao-2026.md).
+
 ### ROI demonstrável multi-nicho
 
 O take rate incide sobre **qualquer transação de serviço** processada na plataforma:
@@ -51,13 +62,13 @@ O take rate incide sobre **qualquer transação de serviço** processada na plat
 | Nicho | Exemplo de serviço | Preço demo | Volume típico/mês* |
 |-------|-------------------|------------|-------------------|
 | Saúde | Consulta clínica | R$ 320 | 200+ atendimentos/clínica |
-| Veterinária | Banho e tosa | R$ 95 | 150+ serviços/pet shop |
+| Veterinária | Banho e tosa | R$ 150 | 150+ serviços/pet shop |
 | Odontologia | Consulta odontológica | R$ 350 | 80+ consultas/consultório |
-| Jurídico | Parecer jurídico | R$ 600 | 40+ entregas/escritório |
+| Jurídico | Hora técnica jurídica | R$ 500 | 40+ sessões/escritório |
 | Bem-estar | Aula de yoga | R$ 120 | 300+ sessões/estúdio |
 | Educação | Aula particular | R$ 150 | 120+ aulas/escola |
 
-\*Estimativas do seed operacional; ver `prisma/seed-data/niche-tenants.ts`.
+\*Estimativas do seed operacional; faixa de referência **R$ 300–R$ 500** para consultas e serviços profissionais — ver `prisma/seed-data/niche-tenants.ts`.
 
 **Um único deploy** atende de clínicas a escritórios de advocacia — reduzindo custo de
 infraestrutura e acelerando time-to-market para novos verticais sem fork de código.
@@ -83,8 +94,10 @@ infraestrutura e acelerando time-to-market para novos verticais sem fork de cód
 | UI | **React 19** + **Tailwind CSS v4** (mobile-first) |
 | Linguagem | **TypeScript** |
 | ORM / Banco | **Prisma 6** + **SQLite** (dev) |
-| Autenticação | Cookie de sessão **httpOnly** assinado com **HMAC-SHA256** |
-| Proteção de rotas | `src/proxy.ts` (o "Proxy" do Next 16, antigo middleware) |
+| Autenticação | Cookie de sessão **httpOnly** assinado com **HMAC-SHA256** (`src/lib/session.ts`) |
+| Proteção de rotas | `src/proxy.ts` — Proxy exclusivo do **Next.js 16** (checagem otimista + validação server-side) |
+| White label | `TenantBranding` + logos em **Netlify Blobs**; tema `light` \| `dark` \| `system` |
+| Design system | Tokens semânticos em `globals.css` — `--brand-*`, `--surface-*`, `--text-*` |
 
 A API é exposta via **Route Handlers** (`src/app/api/**`). As páginas de dashboard
 são *Server Components* que validam a sessão e o `role` no servidor antes de
@@ -222,9 +235,9 @@ Referência de onde cada entidade pode ser criada, lida, alterada ou removida na
 
 Diagrama completo com sequência cross-portal: [`docs/FLUXOS.md`](docs/FLUXOS.md) §7.
 
-Exemplo de precificação dinâmica do seed: a Consulta Clínica (base R$ 180,00)
-para um beneficiário da **TechCorp** é cobrada por **R$ 153,00** (desconto
-corporativo de 15%).
+Exemplo de precificação dinâmica do seed: a **Consulta Clínica Médica** (base **R$ 320,00**,
+faixa R$ 300–R$ 500) para um beneficiário da **TechCorp** é cobrada por **R$ 272,00**
+(desconto corporativo de 15%). O valor é **congelado** em `ProcedureUsage.priceCharged` no ato do registro.
 
 ## 8. Modelo de dados
 
@@ -232,8 +245,8 @@ Definido em [`prisma/schema.prisma`](prisma/schema.prisma). Principais entidades
 
 | Modelo | Descrição |
 |--------|-----------|
-| `Tenant` | Cliente do SaaS (clínica/hospital). Base do multi-tenancy. |
-| `TenantBranding` | White label: cores, logo, `colorScheme`, `customDomain`. |
+| `Tenant` | Cliente do SaaS. `niche` (ServiceOS) + `labels` (JSON) + multi-tenancy. |
+| `TenantBranding` | White label: cores, logo (Blobs), `colorScheme`, `customDomain`. |
 | `User` | Usuário; `role` define o portal; `internoProfile` (RBAC); MFA TOTP. |
 | `Company` | Empresa contratante (PJ). |
 | `Patient` | Beneficiário/paciente; `consentAt` (LGPD). |
@@ -466,6 +479,8 @@ sistema-bibi/
   [`docs/AUDITORIA_FLUXOS.md`](docs/AUDITORIA_FLUXOS.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/BENCHMARK.md`](docs/BENCHMARK.md)
+- **Arquitetura ServiceOS v2.0 (multi-nicho):**
+  [`docs/V2_0_ARCHITECTURE.md`](docs/V2_0_ARCHITECTURE.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
   [`docs/ARQUITETURA.md`](docs/ARQUITETURA.md)
 - **Motor de cobrança** (contratos PIX/boleto/cartão, Strategy Pattern):
@@ -496,4 +511,4 @@ sistema-bibi/
 
 ---
 
-Construído como POC para validar o modelo de negócio do **Sistema Bibi**.
+Construído como POC evoluindo para **ServiceOS Bibi v2.0** — infraestrutura horizontal de confiança para serviços Pay Per Use.

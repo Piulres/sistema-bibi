@@ -28,7 +28,7 @@ const NICHE_DEMOS: NicheDemo[] = [
     providerEmail: "dr.rafael@petcare.demo",
     procedures: [
       { code: "VET-CON", name: "Consulta Veterinária", category: "CONSULTA", serviceType: "CLINICA", basePrice: 180 },
-      { code: "VET-BAN", name: "Banho e Tosa", category: "SERVICO", serviceType: "ESTETICA", basePrice: 95 },
+      { code: "VET-BAN", name: "Banho e Tosa", category: "SERVICO", serviceType: "ESTETICA", basePrice: 150 },
       { code: "VET-VAC", name: "Vacinação", category: "SERVICO", serviceType: "PREVENTIVO", basePrice: 120 },
     ],
   },
@@ -53,7 +53,7 @@ const NICHE_DEMOS: NicheDemo[] = [
     internoEmail: "operacao@lex.demo",
     providerEmail: "dr.andre@lex.demo",
     procedures: [
-      { code: "LEG-HT", name: "Hora Técnica Jurídica", category: "SESSAO", serviceType: "JURIDICO", basePrice: 450 },
+      { code: "LEG-HT", name: "Hora Técnica Jurídica", category: "SESSAO", serviceType: "JURIDICO", basePrice: 500 },
       { code: "LEG-PAR", name: "Parecer Jurídico", category: "SERVICO", serviceType: "JURIDICO", basePrice: 600 },
       { code: "LEG-CON", name: "Consulta Inicial", category: "CONSULTA", serviceType: "JURIDICO", basePrice: 350 },
     ],

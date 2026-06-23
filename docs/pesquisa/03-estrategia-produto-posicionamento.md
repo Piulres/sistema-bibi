@@ -1,4 +1,4 @@
-# Sistema Bibi — Estratégia Competitiva e Roadmap
+# ServiceOS Bibi — Estratégia Competitiva e Roadmap
 
 ---
 
@@ -6,8 +6,11 @@
 
 O ServiceOS Bibi é uma **infraestrutura horizontal Pay Per Use** que conecta empresas,
 clientes finais e prestadores em múltiplos nichos (saúde, veterinária, odontologia,
-jurídico, bem-estar e educação) — eliminando desperdícios e permitindo cobrança baseada
-em uso real, com a mesma stack técnica para todos os verticais.
+jurídico, bem-estar e educação) — eliminando a **caixa preta da sinistralidade** e
+permitindo cobrança baseada em uso real, com a mesma stack técnica para todos os verticais.
+
+**ROI de referência:** empresa com 500 colaboradores — de ~R$ 175k/mês (modelo tradicional)
+para ~R$ 14,5k/mês (Pay Per Use) = **~91% de economia**.
 
 ---
 
@@ -15,31 +18,33 @@ em uso real, com a mesma stack técnica para todos os verticais.
 
 ### Para empresas
 
-- Redução de desperdícios
-- Transparência financeira
-- Controle de utilização
+- Redução de desperdícios (~91% em cenário de referência)
+- Transparência financeira item a item
+- Controle de utilização por colaborador/cliente
+- Um contrato, múltiplos nichos de serviço (ServiceOS)
 
-### Para beneficiários
+### Para beneficiários / clientes finais
 
 - Autoatendimento
-- Histórico clínico
+- Histórico de consumo
 - Agendamento simples
+- Preço transparente antes do atendimento
 
 ### Para prestadores
 
 - Agenda
-- Atendimento
-- Recebimento simplificado
+- Atendimento com registro de serviço
+- Recebimento simplificado (snapshot de preço)
 
 ---
 
 ## Top 5 diferenciais
 
-1. Arquitetura de 4 portais
-2. Pay Per Use nativo
-3. Precificação por empresa
-4. White label
-5. Plataforma multi-tenant
+1. Arquitetura de **4 portais segregados** (estações de trabalho por perfil)
+2. Pay Per Use nativo com congelamento de preço
+3. Precificação dinâmica por empresa
+4. White label + tema escuro + logos via Netlify Blobs
+5. Plataforma multi-tenant **multi-nicho** (ServiceOS v2.0)
 
 ---
 
@@ -48,12 +53,12 @@ em uso real, com a mesma stack técnica para todos os verticais.
 ### Gap 1 — Prescrição digital regulada
 
 - **Prioridade:** Alta
-- **Sugestão:** Integração Memed
+- **Sugestão:** Integração **Memed** (roadmap Q2)
 
-### Gap 2 — WhatsApp Business
+### Gap 2 — WhatsApp Business API
 
 - **Prioridade:** Alta
-- **Automação:** lembretes, agendamentos, cobranças
+- **Automação:** lembretes, agendamentos, cobranças (roadmap Q1)
 
 ### Gap 3 — Copiloto clínico
 
@@ -68,7 +73,7 @@ em uso real, com a mesma stack técnica para todos os verticais.
 ### Gap 5 — Certificação SBIS
 
 - **Prioridade:** Alta
-- **Motivo:** Essencial para contratos enterprise
+- **Motivo:** Essencial para contratos enterprise (meta Q2–Q4)
 
 ---
 
@@ -87,10 +92,10 @@ em uso real, com a mesma stack técnica para todos os verticais.
 
 | Player | Motivo |
 |--------|--------|
-| Conexa | Mais próxima da proposta |
+| Conexa | Mais próxima da proposta transacional |
 | Vitta | Saúde corporativa |
 | Pipo Saúde | Benefícios corporativos |
-| ERPMed | Referência arquitetural |
+| ERPMed | Referência arquitetural Pay Per Use |
 
 ---
 
@@ -98,19 +103,21 @@ em uso real, com a mesma stack técnica para todos os verticais.
 
 ### Q1
 
-- PIX real
-- WhatsApp
+- **WhatsApp Business API** — lembretes, agendamento, cobrança
+- PIX real (gateway de produção)
 - Portal Beneficiário V2
+- Início trilha **Certificação SBIS** (documentação e gaps)
 
 ### Q2
 
-- Memed
-- Telemedicina
-- Assinatura digital
+- **Integração Memed** — prescrição digital regulada
+- **Certificação SBIS** — submissão PEP (meta)
+- Telemedicina ampliada
+- Assinatura digital ICP-Brasil
 
 ### Q3
 
-- **Expansão comercial Vet, Dental e Legal** — tenants demo ServiceOS v2.0
+- **Expansão comercial Vet, Dental e Legal** — tenants demo ServiceOS v2.0 (entregue na POC)
 - IA SOAP
 - IA resumo clínico
 - Analytics multi-nicho
@@ -118,7 +125,7 @@ em uso real, com a mesma stack técnica para todos os verticais.
 ### Q4
 
 - Saúde populacional
-- Certificação SBIS
+- **Certificação SBIS** — conclusão e contratos enterprise
 - Marketplace de prestadores
 - **SPA e Educação** — verticais bem-estar e capacitação corporativa
 
@@ -126,9 +133,11 @@ em uso real, com a mesma stack técnica para todos os verticais.
 
 ## Mensagem comercial
 
-> Pare de pagar por vidas que não utilizam seu benefício de saúde.
+> Pare de pagar por vidas que não utilizam seu benefício.
 >
-> Com o Sistema Bibi, sua empresa paga apenas pelo que realmente foi utilizado, com transparência total para RH, beneficiários e prestadores.
+> Com o ServiceOS Bibi, sua empresa paga apenas pelo que foi efetivamente consumido —
+> com transparência total para RH, clientes e prestadores. Até **91% de economia**
+> em empresas de médio porte.
 
 ---
 
@@ -143,4 +152,4 @@ para escalar qualquer nicho de serviços profissionais.
 
 ---
 
-Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) (ROI, scripts RH/CFO) · [`../BENCHMARK.md`](../BENCHMARK.md) (gaps técnicos na POC)
+Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) (ROI, scripts RH/CFO) · [`../V2_0_ARCHITECTURE.md`](../V2_0_ARCHITECTURE.md)

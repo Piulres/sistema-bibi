@@ -1,12 +1,12 @@
-# Sistema Bibi — Análise de Mercado
+# ServiceOS Bibi — Análise de Mercado
 
-**HealthTech SaaS Brasil 2026**
+**Infraestrutura transacional e serviços sob demanda — Brasil 2026**
 
 ---
 
 ## Visão geral
 
-O mercado brasileiro de saúde movimenta mais de R$ 800 bilhões anuais.
+O mercado brasileiro de saúde e serviços profissionais movimenta mais de **R$ 800 bilhões** anuais só em saúde — e expande para veterinária, odontologia, jurídico corporativo, bem-estar e educação corporativa.
 
 A transformação digital acelerou após:
 
@@ -15,10 +15,26 @@ A transformação digital acelerou após:
 - PIX
 - Escassez de profissionais
 - Pressão de custos corporativos
+- **Convergência saúde + bem-estar + serviços sob demanda**
 
 ---
 
 ## Tendências 2025–2026
+
+### Convergência multi-vertical (ServiceOS)
+
+Empresas de médio porte buscam **uma infraestrutura** que cubra:
+
+| Vertical | Exemplo de serviço Pay Per Use | Faixa de preço (demo) |
+|----------|------------------------------|------------------------|
+| Saúde | Consulta clínica | R$ 300–R$ 500 |
+| Odontologia | Consulta odontológica | R$ 350 |
+| Veterinária | Banho e tosa | R$ 150 |
+| Jurídico | Hora técnica jurídica | R$ 500 |
+| Bem-estar | Aula de yoga / spa | R$ 120–R$ 220 |
+| Educação | Aula particular | R$ 150 |
+
+A tendência é **plataforma horizontal** com parametrização por nicho — não dez ERPs verticais isolados.
 
 ### Table stakes
 
@@ -54,13 +70,17 @@ Todo fornecedor relevante já oferece isso.
 
 Empresas estão migrando de **"plano de saúde"** para **"gestão de saúde"**.
 
-#### Pay Per Use
+#### Pay Per Use e transparência de sinistralidade
 
 Tendência crescente. Empresas desejam:
 
 - Previsibilidade
-- Auditoria
-- Redução de desperdícios
+- Auditoria item a item (fim da "caixa preta")
+- Redução de desperdícios — **ROI de até 91%** vs modelo por vida (500 colaboradores: R$ 175k → R$ 14,5k/mês)
+
+#### Bem-estar e serviços sob demanda
+
+Programas corporativos migram de "plano fechado" para **créditos de consumo** em yoga, psicologia, nutrição e teleconsulta — mesmo motor de faturamento do ServiceOS.
 
 ---
 
@@ -132,11 +152,11 @@ Expansão da plataforma hospitalar (incl. Tasy).
 
 ## Conclusão
 
-O mercado está migrando para plataformas integradas.
+O mercado está migrando para **plataformas integradas e transacionais**.
 
-O maior espaço competitivo atual está entre **ERP clínico tradicional** e **operadoras digitais**.
+O maior espaço competitivo atual está entre **ERP vertical tradicional**, **operadoras digitais** e **infraestrutura Pay Per Use multi-nicho** (ServiceOS).
 
-O Sistema Bibi posiciona-se exatamente nesse intervalo.
+O ServiceOS Bibi posiciona-se como camada de **confiança transacional** — transparência total, quatro portais e white label por tenant.
 
 ---
 
