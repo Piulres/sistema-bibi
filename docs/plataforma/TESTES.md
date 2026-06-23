@@ -24,13 +24,15 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | Camada | Runner | Pasta | Comando |
 |--------|--------|-------|---------|
 | Unitário | Vitest | `tests/unit/` | `npm run test` |
-
-Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
 | E2E | Playwright | `e2e/` | `npm run test:e2e` |
 | CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
+
+**Cobertura v2.0 ServiceOS:**
+- `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho
+- `tests/unit/segment.test.ts` — slugs demo (`SEGMENT_TENANTS`), `buildSegmentSearchParams`, `appendSegmentToPath`
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
@@ -42,6 +44,20 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 | Maria Souza | `maria.souza@email.com` | Fatura FECHADA + PIX pendente |
 | Pedro Almeida | `pedro.almeida@email.com` | Particular, fatura PAGA |
 | Dra. Helena | `dra.helena@bibi.health` | Prestador com CRM/SP, export PEP |
+
+### Slots de agendamento em testes paralelos
+
+Testes que **criam** `Appointment` (ex.: `tests/api/stock.test.ts` — kit PPU + estoque) usam horário derivado de `Date.now()` para evitar colisão de unique constraint quando a suite roda em paralelo:
+
+```typescript
+const slot = new Date();
+const dayOffset = 200 + (Date.now() % 40);
+const minuteSlot = Math.floor(Date.now() / 100) % 48;
+slot.setDate(slot.getDate() + dayOffset);
+slot.setHours(7 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, 0, 0);
+```
+
+**Regra:** não reutilizar `scheduledAt` fixo em testes que inserem agendamentos — prefira offset determinístico a partir do timestamp do runner.
 
 ---
 
@@ -152,11 +168,14 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
 ### Auth (público / sessão)
-- `POST /api/auth/login` — 🌐 ✅ testado
+- `POST /api/auth/login` — 🌐 ✅ testado (inclui validação de segmento v2.0)
 - `POST /api/auth/logout` — sessão
 - `GET /api/auth/me` — sessão
 - `GET/POST /api/auth/mfa/setup` — sessão
 - `POST /api/auth/mfa/verify` — 🌐
+
+### Segmento (público)
+- `POST /api/segment/persist` — 🌐 — grava cookie `bibi_segment` (client `SegmentCookiePersist`)
 
 ### Cron
 - `POST /api/cron/reminders` — ⏰ ✅ testado
@@ -188,9 +207,11 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
-npm run lint && npm run test && npm run build
+# Validação completa de pacote (lint + docs + db + test + build Netlify)
+npm run pre-release
 ```
+
+O `pre-release` executa, em ordem: `lint` → `docs:verify` → `db:verify` → `test` → `netlify:build`. O passo `db:verify` exige `demo.db` e `operation.db` consistentes — rode `npm run db:bootstrap:demo` antes se necessário (ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md)).
 
 ### Variáveis em testes
 

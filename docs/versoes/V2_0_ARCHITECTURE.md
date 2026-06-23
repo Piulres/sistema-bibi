@@ -57,9 +57,33 @@ Exemplo para nicho `LEGAL`:
 }
 ```
 
-### Resolução server-side
+### Resolução de segmento (server)
 
-`src/lib/niche/resolve.ts` — `mergeNicheLabels()` combina defaults do nicho com overrides do tenant.
+Módulo `src/lib/segment/` — resolve **qual tenant/nicho** está ativo na requisição:
+
+| Prioridade | Entrada | Exemplo |
+|------------|---------|---------|
+| 1 | Query `?tenant=` | `/?tenant=petcare` → PetCare · VET |
+| 2 | Cookie `bibi_segment` | Assinado HMAC (`SESSION_SECRET`), 7 dias |
+| 3 | Domínio customizado | DNS verificado no branding do tenant |
+| 4 | Query `?niche=` | `/?niche=LEGAL` → primeiro tenant LEGAL |
+| 5 | Default | Clínica Horizonte · MEDICAL |
+
+| Arquivo | Função |
+|---------|--------|
+| `resolve.ts` | `resolveSegmentContext()`, `resolveSegmentFromHeaders()` |
+| `cookie.ts` | `persistSegmentCookie()`, `readSegmentCookie()` |
+| `auth.ts` | `validateUserSegmentAccess()` — bloqueia login cross-tenant |
+| `types.ts` | `buildSegmentSearchParams()`, `appendSegmentToPath()` |
+| `login-context.ts` | Payload `segment` na resposta de login |
+
+**Persistência client-side:** `SegmentCookiePersist` chama `POST /api/segment/persist` com `{ tenant, niche }` — necessário no Next.js 16 porque cookies httpOnly só podem ser gravados em Route Handlers (fix mobile).
+
+**Login:** `POST /api/auth/login` valida `user.tenantId` contra o segmento ativo; resposta inclui `segment` para a UI exibir o contexto correto.
+
+### Merge de labels (server)
+
+`src/lib/niche/labels.ts` — `mergeNicheLabels()` combina `NICHE_MASTER_LABELS` com overrides JSON do tenant.
 
 ### Hook client-side
 
@@ -134,9 +158,12 @@ O ServiceOS trata qualquer transação de serviço processada — consulta médi
 
 ## Referências
 
-- `src/lib/niche/` — tipos, defaults, labels, landing-content e resolução
+- `src/lib/segment/` — resolução de segmento, cookie assinado, validação de login
+- `src/lib/niche/` — tipos, defaults, labels e landing-content
+- `src/lib/platform.ts` — identidade da plataforma (ServiceOS Bibi v2.0)
 - `src/hooks/useLabels.tsx` — hook de tradução (`useLabels` / alias `useNiche`)
 - `src/constants/niches.ts` — dicionário mestre `NICHE_MASTER_LABELS`
 - `prisma/schema.prisma` — `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`
+- `docs/segmentos/README.md` — validação demo por vertical
 - `docs/versoes/RELEASES.md` — pacotes fechados (v2.0 em desenvolvimento na `dev`)
 - `docs/versoes/V2_0.md` — escopo e changelog v2.0

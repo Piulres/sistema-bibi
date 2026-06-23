@@ -81,7 +81,9 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint → docs:verify → db:verify → test → netlify:build | **Validar pacote sem publicar** |
+| `npm run db:verify` | Valida `demo.db` + `operation.db` | Após bootstrap; incluso no pre-release |
+| `npm run docs:verify` | Checa paths e marca obsoletos nos docs | Antes de PR de documentação |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
