@@ -22,6 +22,8 @@ const STALE_PATTERNS = [
   { pattern: /Sistema Bibi — Gestão Inteligente em Saúde/g, hint: "metadata layout — use ServiceOS" },
   { pattern: /applicationCategory:\s*"HealthApplication"/g, hint: "LandingJsonLd — use BusinessApplication" },
   { pattern: /Entre com as credenciais da sua clínica/g, hint: "login pages — copy genérica multi-segmento" },
+  { pattern: /Powered by Sistema Bibi/g, hint: "platformLabel — use ServiceOS Bibi" },
+  { pattern: /issuer = "Sistema Bibi"/g, hint: "MFA issuer — use ServiceOS Bibi" },
 ];
 
 /** HealthOS só em histórico v1.x ou notas explícitas de migração */
@@ -48,7 +50,7 @@ const SISTEMA_BIBI_ALLOWLIST = [
   "sistema-bibi.netlify.app",
 ];
 
-const SCAN_DIRS = ["docs", ".cursor/rules"];
+const SCAN_DIRS = ["docs", ".cursor/rules", "src"];
 const SCAN_FILES = ["AGENTS.md", "README.md", "CLAUDE.md"];
 
 function walk(dir, files = []) {
@@ -56,7 +58,7 @@ function walk(dir, files = []) {
     if (entry === "node_modules" || entry === ".git" || entry === ".next") continue;
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) walk(full, files);
-    else if (/\.(md|mdc)$/.test(entry)) files.push(full);
+    else if (/\.(md|mdc|tsx?)$/.test(entry)) files.push(full);
   }
   return files;
 }
@@ -98,6 +100,7 @@ for (const file of filesToScan) {
   const content = readFileSync(file, "utf8");
 
   for (const { pattern, hint } of STALE_PATTERNS) {
+    if (isAllowed(rel, [...HEALTHOS_ALLOWLIST, "docs/versoes/"])) continue;
     if (pattern.test(content)) {
       errors.push(`${rel}: ${hint}`);
       pattern.lastIndex = 0;

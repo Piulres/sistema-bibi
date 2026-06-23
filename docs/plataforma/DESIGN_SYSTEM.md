@@ -39,7 +39,7 @@ Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 - **Clínica Horizonte** — clínica cliente demo (teal)
 - **VitaCare** — white label corporativo (azul)
 
-**ServiceOS Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts`. Legado v1.x ainda pode exibir *Sistema Bibi* em `platformLabel` até migração completa.
+**ServiceOS Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` e `PLATFORM` em `src/lib/platform.ts`.
 
 ## Tokens CSS
 

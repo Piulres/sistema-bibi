@@ -56,7 +56,7 @@ export function verifyTotp(secret: string, token: string): boolean {
   return false;
 }
 
-export function buildOtpAuthUrl(email: string, secret: string, issuer = "Sistema Bibi"): string {
+export function buildOtpAuthUrl(email: string, secret: string, issuer = "ServiceOS Bibi"): string {
   const label = encodeURIComponent(`${issuer}:${email}`);
   const params = new URLSearchParams({
     secret,

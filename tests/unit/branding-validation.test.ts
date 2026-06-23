@@ -11,7 +11,7 @@ const validInput = {
   accentColor: "#14b8a6",
   heroFrom: "#0f172a",
   heroTo: "#134e4a",
-  platformLabel: "Sistema Bibi",
+  platformLabel: "Powered by ServiceOS Bibi",
 };
 
 describe("branding-validation", () => {

@@ -93,7 +93,7 @@ flowchart TB
 | **Interno** | Equipe administrativa | `/interno/login` | `/interno/dashboard` | Operação, faturamento e backoffice |
 
 **Entrada pública:** landing (`/`) → seção Portais → login dedicado por perfil.
-Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
+Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandingContent`).
 
 ---
 

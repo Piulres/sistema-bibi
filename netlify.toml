@@ -1,4 +1,4 @@
-# Sistema Bibi — Netlify (Next.js 16 + Prisma/SQLite POC)
+# ServiceOS Bibi — Netlify (Next.js 16 + Prisma/SQLite POC)
 #
 # Build local (sem publicar): npm run netlify:build
 # Dev com emulacao Netlify:    npm run netlify:dev
