@@ -39,21 +39,38 @@ Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md
 
 ## 0. ServiceOS v2.0 — labels e landing
 
-### 0.1 Resolução de nicho
+### 0.1 Resolução de segmento
+
+Prioridade em `resolveSegmentContext()` (`src/lib/segment/resolve.ts`):
+
+1. `?tenant=slug` → 2. cookie `bibi_segment` → 3. domínio customizado → 4. `?niche=` → 5. default `MEDICAL`
 
 ```mermaid
 flowchart LR
-  Host["Host / domínio customizado"] --> Resolve["resolveLandingNiche()"]
-  Query["?niche=VET"] --> Resolve
-  Resolve --> Tenant["Tenant.niche + labels"]
-  Tenant --> UI["Landing + Portais"]
+  TenantQ["?tenant=petcare"] --> Resolve["resolveSegmentContext()"]
+  Cookie["bibi_segment"] --> Resolve
+  Host["Domínio customizado"] --> Resolve
+  NicheQ["?niche=VET"] --> Resolve
+  Resolve --> Out["niche + labels + tenantId"]
 ```
 
-| Contexto | Como o nicho é definido | Arquivo |
-|----------|-------------------------|---------|
-| Landing pública | `?niche=` ou domínio customizado do tenant | `src/lib/niche/resolve.ts` |
+| Contexto | Como o segmento é definido | Arquivo |
+|----------|--------------------------|---------|
+| Landing pública | Prioridade acima via `resolveSegmentFromHeaders()` | `src/lib/segment/resolve.ts` |
+| Login | `tenantSlug` no body + cookie + `resolveSegmentFromLoginRequest()` | `src/app/api/auth/login/route.ts` |
 | Portais autenticados | `tenantId` da sessão → `resolveNicheFromTenantId()` | `src/lib/session.ts` |
-| Defaults | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
+| Defaults de labels | `NICHE_MASTER_LABELS` | `src/constants/niches.ts` |
+
+**Compatibilidade:** `resolveLandingNicheFromHeaders()` em `src/lib/niche/resolve.ts` delega para `resolveSegmentFromHeaders()`.
+
+#### Cookie de segmento (Next.js 16)
+
+`cookies().set()` não funciona em Server Components. O cookie assinado `bibi_segment` é gravado via:
+
+1. Cliente `SegmentCookiePersist` → `POST /api/segment/persist` (landing e `LoginForm`).
+2. Login bem-sucedido → `persistSegmentCookie()` no Route Handler de auth.
+
+Detalhes operacionais: [`segmentos/README.md`](../segmentos/README.md#persistência-do-cookie-bibi_segment).
 
 ### 0.2 Fluxo de labels na UI
 
@@ -80,9 +97,12 @@ Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`.
 
 Fluxo em `src/app/page.tsx`:
 
-1. `resolveLandingNicheFromHeaders(nicheParam)` → nicho + labels.
-2. `nicheLandingBranding()` aplica paleta do nicho.
-3. `getNicheLandingContent(niche)` — features, FAQ, descrição dos portais com vocabulário correto.
+1. `resolveLandingNicheFromHeaders(nicheParam, tenantParam)` → segmento + labels (delega para `resolveSegmentFromHeaders`).
+2. `<SegmentCookiePersist />` sincroniza `?tenant=` / `?niche=` com o cookie via API.
+3. `nicheLandingBranding()` aplica paleta do nicho.
+4. `getNicheLandingContent(niche)` — features, FAQ, descrição dos portais com vocabulário correto.
+
+Menu mobile (`LandingMobileMenu`) inclui seletor de segmento; barra de nichos com scroll horizontal (`LandingNicheSwitcherBar`).
 
 O motor Pay Per Use (§7) **não muda** entre nichos — apenas rótulos e copy.
 
@@ -140,26 +160,33 @@ flowchart TB
 
 **UI:** `LoginForm` em cada portal → **API:** `POST /api/auth/login`
 
-Body: `{ email, password, portal }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+Body: `{ email, password, portal, tenantSlug? }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+
+O campo opcional `tenantSlug` vem do contexto de segmento (`SegmentContextBanner`). A API valida que `user.tenantId` corresponde ao tenant resolvido (`validateUserSegmentAccess` em `src/lib/segment/auth.ts`) — conta de outro segmento retorna **403** com mensagem orientando `?tenant=`.
 
 ```mermaid
 sequenceDiagram
   participant U as Usuário
   participant API as POST /api/auth/login
   participant DB as User (Prisma)
+  participant Seg as segment/auth
   participant S as session.ts
 
-  U->>API: email + password + portal
+  U->>API: email + password + portal + tenantSlug?
   API->>DB: findUnique(email)
   API->>API: verifyPassword (scrypt)
   alt role ≠ portal
     API-->>U: 403
+  else tenantId ≠ segmento ativo
+    API->>Seg: validateUserSegmentAccess
+    Seg-->>U: 403 (outro tenant)
   else BENEFICIARIO sem patientId
     API-->>U: 403
   else mfaEnabled
     API-->>U: { mfaRequired, mfaToken }
   else OK
     API->>S: createSession(userId)
+    API->>API: persistSegmentCookie
     API->>DB: Timeline LOGIN
     API-->>U: { redirectTo: dashboardPath }
   end
@@ -228,6 +255,8 @@ flowchart LR
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
 (ex.: TechCorp 0,85 → Consulta Clínica R$ 180 → **R$ 153** congelado em `priceCharged`).
+
+CRUD de regras (`src/lib/pricing-rule-service.ts`, `GET|POST /api/interno/pricing-rules`) filtra por `user.tenantId` — procedimento e empresa devem pertencer ao mesmo tenant da sessão.
 
 ---
 

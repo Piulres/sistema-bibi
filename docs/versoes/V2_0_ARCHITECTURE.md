@@ -101,7 +101,19 @@ Paletas automáticas em `src/lib/niche/defaults.ts`:
 
 `applyNicheBrandingDefaults()` aplica a paleta quando o tenant usa cores padrão.
 
-A landing (`src/app/page.tsx`) detecta o nicho via domínio customizado (`resolveLandingNiche`) ou query `?niche=VET` e renderiza seções temáticas via `getNicheLandingContent()`.
+### Roteamento de segmento (landing → login)
+
+A landing (`src/app/page.tsx`) resolve o segmento via `resolveSegmentFromHeaders()` (prioridade: `?tenant=` > cookie `bibi_segment` > domínio > `?niche=` > `MEDICAL`).
+
+| Entrada demo | Exemplo |
+|--------------|---------|
+| Tenant explícito | `/?tenant=petcare` |
+| Preview por nicho | `/?niche=VET` |
+| Domínio customizado | DNS do tenant em produção |
+
+O cookie `bibi_segment` é gravado por `POST /api/segment/persist` (componente client `SegmentCookiePersist`) — **não** em Server Components (restrição Next.js 16). Login valida `user.tenantId` contra o segmento ativo (`src/lib/segment/auth.ts`).
+
+Copy e seções temáticas: `getNicheLandingContent()`. Detalhes: [`segmentos/README.md`](../segmentos/README.md) · [`FLUXOS.md`](../produto/FLUXOS.md) §0.
 
 ---
 
@@ -109,7 +121,7 @@ A landing (`src/app/page.tsx`) detecta o nicho via domínio customizado (`resolv
 
 Invariantes preservados da v1.x:
 
-1. **Precificação dinâmica** — `PricingRule.multiplier` por empresa.
+1. **Precificação dinâmica** — `PricingRule.multiplier` por empresa; CRUD escopado por `tenantId` da sessão (`pricing-rule-service.ts`).
 2. **Congelamento de preço** — `chargePrice()` → `ProcedureUsage.priceCharged`.
 3. **Strategy Pattern de pagamentos** — `PAYMENT_GATEWAY=mock` (PIX) funciona para qualquer setor.
 4. **Categorias elegíveis a desconto B2B** — `CONSULTA`, `OCUPACIONAL`, `SERVICO`, `SESSAO`.

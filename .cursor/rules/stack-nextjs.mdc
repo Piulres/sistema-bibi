@@ -33,6 +33,7 @@ Referências: `@AGENTS.md` · `@docs/plataforma/ARQUITETURA.md` · `@docs/plataf
 - Validação de sessão no servidor: `src/lib/session.ts` (HMAC + role)
 - RBAC interno: `interno-permissions.ts` / `interno-guard.ts`
 - Adapters mock por padrão: `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`
+- **Cookie de segmento:** gravar `bibi_segment` só em Route Handlers (`POST /api/segment/persist`, login) — nunca `cookies().set()` em Server Component; client usa `SegmentCookiePersist`
 
 ## Antes de finalizar PR
 
