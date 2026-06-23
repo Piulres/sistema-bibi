@@ -90,7 +90,17 @@ Teste: `tests/api/auth-and-cron.test.ts`.
 
 ### 6. Isolamento multi-tenant
 
-Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
+Queries Prisma usam `tenantId` na maioria dos serviços. Cobertura automatizada **parcial**:
+
+| Área | Escopo `tenantId` | Teste |
+|------|-------------------|-------|
+| `computePrice()` | Rejeita procedimento de outro tenant | ✅ `tests/integration/pricing-db.test.ts` |
+| CRUD `/api/interno/pricing-rules` | Lista/cria/atualiza só regras do tenant da sessão | ✅ `tests/api/audit-pricing.test.ts` |
+| Appointments, patients, invoices | — | ❌ cross-tenant ainda não coberto |
+
+Serviço de referência: `src/lib/pricing-rule-service.ts` — filtra por `procedure.tenantId` em list/update/delete e valida `procedureId` + `companyId` no create.
+
+**Prioridade:** testes cross-tenant em appointments, patients e invoices.
 
 ### 7. MFA bypass em rotas sem segundo fator
 
@@ -104,7 +114,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
-| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
+| Precificação dinâmica | `pricing.ts` + `pricing-rule-service.ts` | ✅ unit + integração DB + API CRUD | Regras edge (multiplier 0, arredondamento) |
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
@@ -192,8 +202,11 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
+# Lint + test + build (espelha parte do pre-release)
 npm run lint && npm run test && npm run build
+
+# Validação completa de pacote (sem publicar)
+npm run pre-release
 ```
 
 ### Variáveis em testes
@@ -214,7 +227,7 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 ## Roadmap sugerido (prioridade)
 
 1. **P0 — Segurança:** `requireInternoModule` em todas as rotas internas sensíveis + testes de negação por perfil
-2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
+2. **P0 — Multi-tenant:** expandir testes cross-tenant em appointments, patients, invoices (precificação já coberta)
 3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
 4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
 5. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
