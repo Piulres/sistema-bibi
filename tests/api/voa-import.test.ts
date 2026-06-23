@@ -32,6 +32,27 @@ describe("Voa Health — APIs", () => {
     clearSessionMock();
   });
 
+  it("GET /voa retorna token de homologação quando configurado", async () => {
+    process.env.VOA_INTEGRATION_TOKEN = "sk_user_test_homolog";
+    const prisma = getTestPrisma();
+    const provider = await prisma.user.findUniqueOrThrow({
+      where: { email: "dra.helena@bibi.health" },
+    });
+    const appointment = await prisma.appointment.findFirst({
+      where: { providerId: provider.id },
+    });
+    expect(appointment).toBeTruthy();
+
+    await setSessionForEmail("dra.helena@bibi.health");
+    const res = await voaSessionGet(new Request("http://localhost"), {
+      params: Promise.resolve({ id: appointment!.id }),
+    });
+    const data = await res.json();
+    expect(data.enabled).toBe(true);
+    expect(data.configured).toBe(true);
+    expect(data.token).toBe("sk_user_test_homolog");
+  });
+
   it("GET /voa retorna mount config para prestador", async () => {
     const prisma = getTestPrisma();
     const provider = await prisma.user.findUniqueOrThrow({
