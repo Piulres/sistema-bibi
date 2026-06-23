@@ -226,8 +226,18 @@ flowchart LR
   C --> F[(billed=false)]
 ```
 
-**Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
-(ex.: TechCorp 0,85 → Consulta Clínica R$ 180 → **R$ 153** congelado em `priceCharged`).
+**Precificação dinâmica (Price Snapshot):**
+
+| Etapa | Módulo | Comportamento |
+|-------|--------|---------------|
+| Cálculo | `src/lib/pricing.ts` → `computePrice()` | `basePrice × multiplier`; `tenantId` opcional isola procedimento |
+| Regra B2B | `PricingRule` | Um multiplicador por par `procedureId` + `companyId` (ex.: TechCorp 0,85) |
+| Congelamento | `ProcedureUsage.priceCharged` | Valor calculado no ato do atendimento — **não muda** se a regra for editada depois |
+| CRUD interno | `src/lib/pricing-rule-service.ts` | Cadastros → aba **Precificação**; APIs em `/api/interno/pricing-rules` |
+
+Exemplo: Consulta Clínica R$ 180 × 0,85 (TechCorp) → **R$ 153** persistido em `priceCharged`.
+
+**Isolamento multi-tenant:** listagem, criação, edição e exclusão de regras filtram por `user.tenantId` da sessão — procedimento e empresa devem pertencer ao mesmo tenant; regra de outro tenant retorna 404.
 
 ---
 
@@ -242,11 +252,13 @@ flowchart LR
 | `dashboard` | `/interno/dashboard` | `ExecutiveDashboardView` | KPIs executivos |
 | `billing` | `/interno` | `BillingView` | Pay Per Use, faturas, PIX, TISS |
 | `agenda` | `/interno/agenda` | `AppointmentsView` | CRUD agenda |
-| `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, usuários |
+| `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, **precificação**, usuários |
+| `estoque` | `/interno/estoque` | `StockView` | Produtos, lotes e movimentações |
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
 | `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
+| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal do tenant (filtros + paginação) |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
@@ -304,11 +316,27 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 |-----|--------------|-----------|---------|-------------|
 | Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
-| Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
+| Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant; alteração de preço gera evento na timeline |
+| **Precificação** | `POST /api/interno/pricing-rules` | `PUT .../pricing-rules/[id]` | `DELETE .../pricing-rules/[id]` | Multiplicador por empresa; ver §4.3.1 |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
+
+#### 4.3.1 Precificação B2B (`CadastrosPricingTab`)
+
+UI: `/interno/cadastros?tab=pricing` · Serviço: `src/lib/pricing-rule-service.ts` · Guard API: `requireInternoModule("cadastros")`
+
+| Ação | API | Validações / efeito |
+|------|-----|---------------------|
+| Listar | `GET /api/interno/pricing-rules` | Regras cujo `procedure.tenantId` = tenant da sessão |
+| Criar | `POST /api/interno/pricing-rules` | `{ procedureId, companyId, multiplier, description? }`; procedimento e empresa do mesmo tenant; par único; `multiplier > 0` |
+| Editar | `PUT /api/interno/pricing-rules/[id]` | `{ multiplier?, description? }`; 404 se regra fora do tenant |
+| Excluir | `DELETE /api/interno/pricing-rules/[id]` | 404 se regra fora do tenant |
+
+Cada mutação registra `TimelineEvent` (`entityType: PricingRule`, ações `CREATED` / `UPDATED` / `DELETED`). Regras existentes **não retroagem** — só afetam novos `ProcedureUsage`.
+
+**Multiplicador:** `1` = preço cheio; `0,85` = 15% desconto; valores > 1 = acréscimo. Descrição auto-gerada se omitida.
 
 ### 4.4 CRM (`CrmPipelineView`)
 
@@ -324,11 +352,14 @@ Status: `LEAD → PROPOSTA → NEGOCIACAO → ATIVO → INADIMPLENTE → CANCELA
 | Ação | API | Efeito |
 |------|-----|--------|
 | Criar | `POST /api/interno/subscriptions` | `Subscription` ATIVA |
-| Status | `PATCH /api/interno/subscriptions/[id]` | ATIVA / SUSPENSA / CANCELADA |
+| Status | `PATCH /api/interno/subscriptions/[id]` `{ status }` | ATIVA / SUSPENSA / CANCELADA |
+| **Editar valor/ciclo** | `PATCH /api/interno/subscriptions/[id]` `{ amount?, billingCycle?, description? }` | Atualiza assinatura; cobranças **PENDENTE sem fatura** recebem novo `amount` |
 | Gerar cobranças | `POST .../generate-charges` | `SubscriptionCharge` PENDENTE |
 | Faturar cobrança | `POST .../charges/[chargeId]/invoice` | Charge FATURADA → Invoice FECHADA |
 
 Serviço: `src/lib/subscription-service.ts` + bridge em `invoice-service.ts`
+
+> Cobranças já faturadas (`invoiceId` preenchido) **não** são recalculadas ao editar o valor da assinatura.
 
 ### 4.6 Comunicação (`ComunicacaoView`)
 
@@ -343,7 +374,20 @@ Serviço: `src/lib/subscription-service.ts` + bridge em `invoice-service.ts`
 
 Templates: `APPOINTMENT_REMINDER`, `INVOICE_DUE`, `SUBSCRIPTION_DUE`, `GENERIC`
 
-### 4.7 Integrações (`IntegracoesView`)
+### 4.7 Auditoria (`AuditoriaView`)
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Listar eventos | `GET /api/interno/audit` | Paginação (`page`, `limit`); filtros: `entityType`, `action`, `search`, `from`, `to` |
+| Exportar | `GET /api/interno/audit/export` | Excel/CSV da timeline do tenant |
+
+Guard: `requireInternoModule("auditoria")` · Serviço: `getTenantAuditEvents()` em `src/lib/timeline.ts`
+
+Perfis com acesso: **ADMIN**, **FATURAMENTO**, **READONLY** (RECEPCAO → 403). Constantes de entidade/ação em `src/lib/timeline-constants.ts` (importável em Client Components).
+
+Eventos recentes incluem: `PricingRule`, webhooks, branding, MFA, data-store, demo reset, além dos fluxos clínicos e financeiros já existentes.
+
+### 4.8 Integrações (`IntegracoesView`)
 
 | Ação | API |
 |------|-----|
@@ -545,10 +589,12 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | billing | ✓ | ✓ | ✗ | ✗ |
 | agenda | ✓ | ✗ | ✓ | ✗ |
 | cadastros | ✓ | ✗ | ✓ | ✗ |
+| estoque | ✓ | ✗ | ✓ | ✗ |
 | crm | ✓ | ✗ | ✗ | ✗ |
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
+| auditoria | ✓ | ✓ | ✗ | ✓ |
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
@@ -559,7 +605,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), **auditoria**, **pricing-rules**, CRM status, branding, integracoes, users (POST), export LGPD |
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.

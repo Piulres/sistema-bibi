@@ -142,7 +142,8 @@ flowchart TB
     subgraph Lib["src/lib"]
       Sess["session.ts<br/>(HMAC + cookie httpOnly)"]
       Auth["api-auth.ts<br/>(requireUser/role)"]
-      Price["pricing.ts<br/>(precificação dinâmica)"]
+      Price["pricing.ts<br/>(computePrice + tenant scope)"]
+      PriceRules["pricing-rule-service.ts<br/>(CRUD PricingRule)"]
       Overview["patient-overview.ts<br/>(Cliente 360°)"]
       Timeline["timeline.ts<br/>(auditoria universal)"]
       Payments["payments/* + invoice-service<br/>(PIX mock Tier 1)"]
@@ -439,12 +440,17 @@ flowchart LR
 - `PROCEDURE_REGISTERED` — Pay Per Use
 - `MEDICAL_RECORD_CREATED` — PEP
 - `INVOICE_ISSUED` — faturamento
+- `CREATED` / `UPDATED` / `DELETED` — `PricingRule`, webhooks, branding, MFA, data-store
 - `CREATED` — seed e futuros cadastros
+
+**Consulta tenant-wide:** `GET /api/interno/audit` → `getTenantAuditEvents(tenantId)` — módulo `/interno/auditoria` (RBAC: ADMIN, FATURAMENTO, READONLY).
 
 **Arquivos:**
 - `prisma/schema.prisma` — model `TimelineEvent`
-- `src/lib/timeline.ts` — `recordTimelineEvent`, `getPatientTimelineEvents`
-- Hooks nos handlers de login, atendimento, procedimentos, PEP e faturas
+- `src/lib/timeline.ts` — `recordTimelineEvent`, `getPatientTimelineEvents`, `getTenantAuditEvents`
+- `src/lib/timeline-constants.ts` — tipos/ações (safe para Client Components)
+- `src/lib/pricing-rule-service.ts` — CRUD de regras com escopo `tenantId`
+- Hooks nos handlers de login, atendimento, procedimentos, PEP, faturas e precificação
 
 ### Checklist de homologação (Épico 2)
 

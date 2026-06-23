@@ -319,7 +319,8 @@ src/
 │   ├── password.ts             # Hash scrypt (Tier 2)
 │   ├── api-auth.ts             # requireUser, requireBeneficiary
 │   ├── roles.ts                # PORTALS e ROLES
-│   ├── pricing.ts              # Pay Per Use + tenant scope
+│   ├── pricing.ts              # computePrice (Pay Per Use + tenant scope)
+│   ├── pricing-rule-service.ts # CRUD PricingRule (escopo tenantId)
 │   ├── interno-permissions.ts  # RBAC portal interno (Tier 3)
 │   ├── interno-guard.ts        # Proteção páginas interno (Tier 3)
 │   ├── webhook-service.ts      # Webhooks B2B (Tier 3)
@@ -443,7 +444,10 @@ src/
 → Portal Interno: Cliente 360° em `/interno/beneficiarios/[id]`. Beneficiário: `/beneficiario`.
 
 **Como funciona o desconto corporativo?**
-→ `PricingRule` com `multiplier` (ex.: 0.85 = 15% desconto) por `procedureId` + `companyId`.
+→ `PricingRule` com `multiplier` (ex.: 0.85 = 15% desconto) por `procedureId` + `companyId`. CRUD em Cadastros → Precificação (`/interno/cadastros?tab=pricing`); APIs `/api/interno/pricing-rules`. Escopo por `tenantId` — regras não vazam entre tenants. Valor congelado em `ProcedureUsage.priceCharged` no atendimento.
+
+**Onde vejo a auditoria do tenant?**
+→ `/interno/auditoria` — timeline paginada com filtros por entidade, ação e período. API: `GET /api/interno/audit`. Perfis: ADMIN, FATURAMENTO, READONLY.
 
 **Como faturar uma cobrança de assinatura?**
 → `/interno/assinaturas` → Ver cobranças → **Faturar** (Tier 1).

@@ -88,7 +88,14 @@ Teste: `tests/api/auth-and-cron.test.ts`.
 
 ### 6. Isolamento multi-tenant
 
-Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
+Queries Prisma usam `tenantId` na maioria dos serviços. **Cobertura parcial em testes:**
+
+| Domínio | Arquivo | O que valida |
+|---------|---------|--------------|
+| Precificação (`computePrice`) | `tests/integration/pricing-db.test.ts` | Procedimento inexistente com `tenantId` errado → erro |
+| CRUD `PricingRule` | `tests/api/audit-pricing.test.ts` | Fixtures (empresa + procedimento) filtradas por `tenantId` da sessão interno |
+
+**Lacuna aberta:** cross-tenant em appointments, patients, invoices (prestador A acessando paciente B). Prioridade alta para integração.
 
 ### 7. MFA bypass em rotas sem segundo fator
 
@@ -102,10 +109,12 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
-| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
+| Precificação dinâmica | `pricing.ts` + `pricing-rule-service.ts` | ✅ unit + integração DB + API (`audit-pricing.test.ts`) | Cross-tenant negativo (404 em regra de outro tenant) |
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
+| Auditoria interna | `timeline.ts` + `/api/interno/audit` | ✅ `audit-pricing.test.ts` | RBAC RECEPCAO negado; filtros/paginação |
+| Assinatura — editar valor | `subscription-service.ts` | ✅ `audit-pricing.test.ts` | Cobranças PENDENTE sem fatura ajustadas |
 | TISS XML | `tiss-service.ts` | ❌ | Snapshot XML |
 
 ### Autenticação e sessão
@@ -122,10 +131,10 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Perfil | Módulos UI | APIs protegidas |
 |--------|------------|-----------------|
-| ADMIN | todos | parcial |
-| FATURAMENTO | billing, subscriptions… | invoices POST ✅, billing GET ❌ |
-| RECEPCAO | agenda, cadastros… | appointments ✅ (só role) |
-| READONLY | dashboard, relatórios | **pode chamar billing via API** |
+| ADMIN | todos (13 abas) | parcial |
+| FATURAMENTO | billing, subscriptions, auditoria… | invoices POST ✅, audit GET ✅, billing GET ❌ |
+| RECEPCAO | agenda, cadastros, estoque… | appointments ✅ (só role); audit GET ❌ (403) |
+| READONLY | dashboard, relatórios, auditoria | **pode chamar billing via API** |
 
 ### Portais B2B / beneficiário
 
@@ -210,7 +219,7 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 ## Roadmap sugerido (prioridade)
 
 1. **P0 — Segurança:** `requireInternoModule` em todas as rotas internas sensíveis + testes de negação por perfil
-2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
+2. **P0 — Multi-tenant:** testes cross-tenant negativos em appointments, patients, invoices (precificação parcialmente coberta)
 3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
 4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
 5. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
@@ -239,7 +248,8 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | 11 módulos admin |
+| `interno-modules.spec.ts` | 13 módulos admin (incl. auditoria) |
+| `audit-pricing.test.ts` | Auditoria paginada, RBAC, CRUD pricing rule + timeline, PATCH assinatura |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 
