@@ -1,4 +1,4 @@
-# Bibi v2.0: ServiceOS — Infraestrutura de Confiança para Serviços Pay Per Use
+# Sistema Bibi - ServiceOS v2.0 — Infraestrutura Pay Per Use Multi-Nicho
 
 > Plataforma **ServiceOS** multi-nicho para faturamento Pay Per Use em saúde, veterinária,
 > odontologia, jurídico, bem-estar e educação. White label por tenant, quatro portais segregados

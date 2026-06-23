@@ -13,19 +13,19 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — deploy `6a3a87c9` @ commit `3e7b250` |
-| **Versão validada na `main` / tag** | **2.0.0** — tag **`v2.0.0`** |
-| `main` / `dev` | Sincronizadas em **v2.0.0** (`3e7b250`) |
-| **Deploy** | `npx netlify build` → `npx netlify deploy --prod --no-build` (site `sistema-bibi`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** *(deploy em andamento)* |
+| **Commit release** | `3022d2e` — v2.0.0 + rename de marca + docs |
+| `main` / `dev` | Sincronizadas em **`3022d2e`** |
+| **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.0.0** ServiceOS |
-| **Release** | `main` | **v2.0.0** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3a87c9` |
+| **Integração** | `dev` | **v2.0.0** — Sistema Bibi - ServiceOS |
+| **Release** | `main` | **v2.0.0** — idem |
+| **Netlify** | **sistema-bibi.netlify.app** | Publicação única v2.0.0 completa |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -33,7 +33,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque — **tag criada** |
-| `v1.2.0` | `485819a` | Care Chart, exports, homepage — **em produção hoje** |
+| `v1.2.0` | `485819a` | Care Chart, exports, homepage — substituído por v2.0 |
 | `v1.1.0` | `8c8cd01` | Care Chart (substituído) |
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
 | `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |
@@ -43,23 +43,24 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.0.0` — ServiceOS multi-nicho
+### `v2.0.0` — Sistema Bibi - ServiceOS (multi-nicho)
 
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.0.0` |
-| **Commit** | `3e7b250` |
-| **PRs** | [#101](https://github.com/Piulres/sistema-bibi/pull/101), [#106](https://github.com/Piulres/sistema-bibi/pull/106)–[#108](https://github.com/Piulres/sistema-bibi/pull/108) |
-| **Publicado em** | 23/06/2026 — deploy Netlify `6a3a87c9` |
+| **Commit** | `3022d2e` |
+| **PRs** | [#101](https://github.com/Piulres/sistema-bibi/pull/101), [#106](https://github.com/Piulres/sistema-bibi/pull/106)–[#108](https://github.com/Piulres/sistema-bibi/pull/108), [#111](https://github.com/Piulres/sistema-bibi/pull/111) |
+| **Publicado em** | 23/06/2026 — deploy Netlify *(registrar ID abaixo após publicação)* |
 
 **Inclui (além de v1.3 estoque):**
 
+- Marca oficial **Sistema Bibi - ServiceOS** (`src/lib/platform.ts`)
 - ServiceOS multi-nicho: `Tenant.niche`, `useLabels()`, landing por segmento
 - Roteamento por tenant slug (`bibi_segment`) da landing ao login
 - Tenants demo: PetCare, Smile, Lex, Zen, EduPrime + Horizonte Saúde
-- Branding ServiceOS no código ativo; `db:verify` no `pre-release`
+- `db:verify` no `pre-release` · massas demo + operation validadas
 - Fix mobile: cookie de segmento via API client-side
-- Documentação reorganizada (`docs/segmentos/`, prompts ServiceOS)
+- Documentação reorganizada (`docs/segmentos/`, prompts, índice)
 
 **Testes:** 163 Vitest · `db:verify` demo + operation · `pre-release` OK.
 
@@ -143,7 +144,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v2.0.0`** | `3e7b250` | 23/06/2026 | ✅ **Em produção** — deploy `6a3a87c9` |
+| **`v2.0.0`** | `3022d2e` | 23/06/2026 | ✅ **Em produção** — Sistema Bibi - ServiceOS |
 | **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
 | **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ Substituído |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |

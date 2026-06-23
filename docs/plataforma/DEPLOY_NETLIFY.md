@@ -15,11 +15,11 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v1.2.0`** → deploy Netlify `6a39d446` · tag `v1.2.0` |
-| `main` / `dev` | `55481be` — sincronizadas |
+| Pacote em produção | **`v2.0.0`** — **Sistema Bibi - ServiceOS** (ver [`RELEASES.md`](../versoes/RELEASES.md)) |
+| `main` / `dev` | Sincronizadas em **`3022d2e`** |
 | Build local `npm run netlify:build` | ✅ Passa |
-| Validação pré-deploy | `npm run pre-release` (lint + build, sem publicar) |
-| Deploy via CLI `npx netlify deploy --prod` | ⚠️ Só manual, quando cota permitir |
+| Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
+| Deploy produção | `npx netlify build` → `npx netlify deploy --prod --no-build` (site `sistema-bibi`) |
 | Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
