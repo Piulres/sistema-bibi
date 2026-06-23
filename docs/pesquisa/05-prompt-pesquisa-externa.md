@@ -11,7 +11,7 @@ Complementa os documentos em [`README.md`](README.md). Após rodar a pesquisa, a
 ```markdown
 # Contexto
 
-Estou fazendo benchmark competitivo do **ServiceOS Bibi v2.0**, infraestrutura SaaS **multi-segmento** brasileira com **Pay Per Use** (cobrança por serviços efetivamente usados, precificação dinâmica por empresa). Segmentos: saúde, veterinária, odontologia, jurídico, bem-estar, educação.
+Estou fazendo benchmark competitivo do **Sistema Bibi - ServiceOS v2.0**, infraestrutura SaaS **multi-segmento** brasileira com **Pay Per Use** (cobrança por serviços efetivamente usados, precificação dinâmica por empresa). Segmentos: saúde, veterinária, odontologia, jurídico, bem-estar, educação.
 
 O produto tem **4 portais segregados por role**:
 - Prestador (agenda, atendimento, PEP)
@@ -65,12 +65,12 @@ Para cada empresa, preencha:
 | Diferencial competitivo | 1–2 frases |
 | Usabilidade / UX | Trial grátis? onboarding? app? NPS? |
 | Integrações | Memed, WhatsApp, TISS, APIs, etc. |
-| Relação com ServiceOS Bibi | Concorrente direto / indireto / parceiro / fora de escopo |
+| Relação com Sistema Bibi - ServiceOS | Concorrente direto / indireto / parceiro / fora de escopo |
 | Fontes | Links consultados |
 
 ## 2. Matriz comparativa
 
-Compare **ServiceOS Bibi** vs top 10 concorrentes mais relevantes nas dimensões:
+Compare **Sistema Bibi - ServiceOS** vs top 10 concorrentes mais relevantes nas dimensões:
 
 - Pay Per Use / cobrança por uso
 - Portal corporativo (RH/PJ)
@@ -96,7 +96,7 @@ Use escala: ✅ forte | 🟡 parcial | ❌ ausente | ⭐ diferencial ServiceOS
 - Faixas de preço por segmento
 - Players que fazem **Pay Per Use** ou modelo similar
 
-## 4. Gaps e recomendações para o ServiceOS Bibi
+## 4. Gaps e recomendações para o Sistema Bibi - ServiceOS
 
 - Top 5 gaps vs mercado (priorizados)
 - Top 5 diferenciais a comunicar comercialmente
@@ -136,7 +136,7 @@ Comece pela pesquisa e entregue o catálogo expandido.
 ## Prompt curto (pesquisa rápida)
 
 ```markdown
-Benchmark competitivo do **ServiceOS Bibi** (SaaS multi-segmento BR, Pay Per Use, 4 portais: colaborador/interno/PJ/cliente final).
+Benchmark competitivo do **Sistema Bibi - ServiceOS** (SaaS multi-segmento BR, Pay Per Use, 4 portais: colaborador/interno/PJ/cliente final).
 
 Já mapeados: iClinic, Feegow, Salutem, Memed, Voa, Prontmed, ERPMed, Conexa, Tasy, HiDoctor, Clínica nas Nuvens, Amplimed, Shosp, ProDoctor, Pipo Saúde, Vitta, Alice, Sami, QSaúde.
 

@@ -1,4 +1,4 @@
-# Operações — ServiceOS Bibi
+# Operações — Sistema Bibi - ServiceOS
 
 Manual único de **como operar** o projeto no dia a dia: desenvolvimento local,
 validação de pacotes, publicação em produção, banco de dados e regras para

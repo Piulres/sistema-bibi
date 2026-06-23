@@ -1,6 +1,6 @@
 # Síntese Executiva — ServiceOS segmento saúde
 
-**ServiceOS Bibi · Pay Per Use · Saúde corporativa 2026**
+**Sistema Bibi - ServiceOS · Pay Per Use · Saúde corporativa 2026**
 
 > Documento do vertical `MEDICAL`. Marca canônica v2.0: **ServiceOS** (v1.x usava codinome *HealthOS*).
 
@@ -20,7 +20,7 @@ Transição do modelo de **capitação** (pagar por vida) para **Pay Per Use** d
 
 ### Tabela executiva (cenário comercial recomendado)
 
-| Dimensão financeira | Plano digital tradicional (mercado) | ServiceOS Bibi (Pay Per Use) |
+| Dimensão financeira | Plano digital tradicional (mercado) | Sistema Bibi - ServiceOS (Pay Per Use) |
 |---------------------|-------------------------------------|----------------------------|
 | Modelo de cobrança | Mensalidade fixa por colaborador | Pagamento por utilização efetiva |
 | Custo mensal por vida/uso | R$ 350,00 (ticket médio PME) | R$ 153,00 (preço com desconto corporativo) |
@@ -101,7 +101,7 @@ O Bibi **não compete por agenda** — compete por **gestão inteligente de cons
 
 ### Matriz estratégica
 
-| Funcionalidade | ServiceOS Bibi | Pipo / Vitta / Conexa |
+| Funcionalidade | Sistema Bibi - ServiceOS | Pipo / Vitta / Conexa |
 |----------------|:------------:|:---------------------:|
 | Core business | ServiceOS Pay Per Use | Gestão de benefícios / telessaúde |
 | Precificação dinâmica | Multiplicador por empresa nativo (`PricingRule`) | Tabelas de rede fixas / corretagem |

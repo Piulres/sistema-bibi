@@ -1,4 +1,4 @@
-# Estratégia de Testes Automatizados — ServiceOS Bibi
+# Estratégia de Testes Automatizados — Sistema Bibi - ServiceOS
 
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.

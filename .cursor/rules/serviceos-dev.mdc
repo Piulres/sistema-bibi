@@ -9,7 +9,7 @@ Fonte: `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` · Segmentos: `docs/segment
 
 ## Nomenclatura (obrigatório em código/docs novos)
 
-- Produto: **ServiceOS Bibi** / **ServiceOS v2.0** — não *HealthOS*, não *Sistema Bibi* como marca
+- Produto: **Sistema Bibi - ServiceOS** / **ServiceOS v2.0** — não *HealthOS*, não *ServiceOS Bibi*
 - Saúde = segmento `MEDICAL`, um entre seis — não assumir HealthTech em copy genérica
 - Tenant: `Tenant.slug` (`?tenant=petcare`) + `Tenant.niche` + `Tenant.labels`
 

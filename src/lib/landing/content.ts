@@ -1,3 +1,5 @@
+import { PLATFORM } from "@/lib/platform";
+
 export const LANDING_STATS = [
   { value: "4", label: "portais integrados", suffix: "" },
   { value: "Pay Per Use", label: "cobrança por uso real", suffix: "" },
@@ -7,7 +9,7 @@ export const LANDING_STATS = [
 
 export const LANDING_TRUST_BADGES = [
   "Multi-tenant SaaS",
-  "ServiceOS v2.0",
+  PLATFORM.versionLabel,
   "API REST",
   "White label",
   "MFA TOTP",
@@ -16,6 +18,6 @@ export const LANDING_TRUST_BADGES = [
 export function buildLandingDescription(tagline: string | null): string {
   return (
     tagline ??
-    "Infraestrutura ServiceOS Pay Per Use para operações de serviços profissionais — quatro portais integrados, faturamento previsível e white label por tenant."
+    `${PLATFORM.name}: infraestrutura Pay Per Use para operações de serviços profissionais — quatro portais integrados, faturamento previsível e white label por tenant.`
   );
 }

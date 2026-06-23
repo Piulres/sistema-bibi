@@ -1,4 +1,4 @@
-# Variáveis de ambiente — ServiceOS Bibi
+# Variáveis de ambiente — Sistema Bibi - ServiceOS
 
 Referência única de **todas as variáveis** usadas pelo projeto: runtime da aplicação,
 seed, deploy Netlify, CI, testes e restrições do **Cursor Cloud Agent**.

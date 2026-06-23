@@ -5,9 +5,9 @@ Copie este bloco ao **iniciar uma sessão** no Cursor para alinhar contexto e ev
 ---
 
 ```markdown
-# Contexto — ServiceOS Bibi v2.0
+# Contexto — Sistema Bibi - ServiceOS v2.0
 
-Você trabalha no **ServiceOS Bibi v2.0** — infraestrutura SaaS **multi-segmento** Pay Per Use.
+Você trabalha no **Sistema Bibi - ServiceOS v2.0** — infraestrutura SaaS **multi-segmento** Pay Per Use.
 Não é mais uma POC HealthTech única: saúde é o segmento `MEDICAL`; há também VET, DENTAL, LEGAL, SPA, EDUCATION.
 
 ## Antes de codificar

@@ -62,7 +62,7 @@ export async function seedVitacareTenant(
           accentColor: "#3b82f6",
           heroFrom: "#1e3a8a",
           heroTo: "#1d4ed8",
-          platformLabel: "Powered by ServiceOS v2.0",
+          platformLabel: "Powered by Sistema Bibi - ServiceOS",
           colorScheme: "dark",
         },
       },

@@ -1,4 +1,4 @@
-// ServiceOS Bibi v2.0 — multi-nicho (POC)
+// Sistema Bibi - ServiceOS v2.0 — multi-nicho (POC)
 // Infraestrutura horizontal Pay Per Use: Saúde, Veterinária, Odontologia,
 // Jurídico, Bem-estar e Educação via parametrização por tenant (niche + labels).
 //
@@ -61,7 +61,7 @@ model TenantBranding {
   heroFrom       String @default("#0f172a")
   heroTo         String @default("#134e4a")
   /// Nome da plataforma quando exibido como produto white-label (ex. "Powered by Bibi").
-  platformLabel  String @default("Powered by ServiceOS Bibi")
+  platformLabel  String @default("Powered by Sistema Bibi - ServiceOS")
   /// colorScheme: light | dark | system
   colorScheme    String @default("light")
   /// Dominio customizado white-label (ex.: saude.cliente.com.br) — DNS manual na POC

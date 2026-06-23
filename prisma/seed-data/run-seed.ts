@@ -101,7 +101,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
           accentColor: "#14b8a6",
           heroFrom: "#0f172a",
           heroTo: "#134e4a",
-          platformLabel: "Powered by ServiceOS v2.0",
+          platformLabel: "Powered by Sistema Bibi - ServiceOS",
           colorScheme: "light",
         },
       },

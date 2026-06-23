@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
-  title: ServiceOS Bibi — API
+  title: Sistema Bibi - ServiceOS — API
   version: 2.0.0
   description: >
-    API do ServiceOS Bibi v2.0 — plataforma Pay Per Use multi-nicho. Multi-tenant,
+    API do Sistema Bibi - ServiceOS v2.0 — plataforma Pay Per Use multi-nicho. Multi-tenant,
     quatro portais segregados por `role`, vocabulário adaptável por segmento.
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via

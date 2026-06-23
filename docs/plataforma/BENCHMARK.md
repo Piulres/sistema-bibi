@@ -1,4 +1,4 @@
-# Ações × Benchmark — ServiceOS Bibi v2.0
+# Ações × Benchmark — Sistema Bibi - ServiceOS v2.0
 
 Comparativo entre **o que a plataforma implementa hoje** (ações/funcionalidades no código)
 e **referências de mercado** citadas no projeto.

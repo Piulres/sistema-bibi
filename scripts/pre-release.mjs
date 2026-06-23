@@ -24,7 +24,7 @@ const gitHead = () => {
 };
 
 console.log("╔══════════════════════════════════════════╗");
-console.log("║  ServiceOS Bibi — Pre-release (sem deploy) ║");
+console.log("║  Sistema Bibi - ServiceOS — Pre-release (sem deploy) ║");
 console.log("╚══════════════════════════════════════════╝");
 console.log(`Commit: ${gitHead()}`);
 console.log("Este script NÃO publica na Netlify.\n");

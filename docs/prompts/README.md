@@ -39,7 +39,7 @@
 
 | Usar | Não usar em código/docs novos |
 |------|-------------------------------|
-| **ServiceOS Bibi** / **ServiceOS v2.0** | HealthOS, Sistema Bibi (como produto) |
+| **Sistema Bibi - ServiceOS** / **ServiceOS v2.0** | HealthOS, Sistema Bibi (como produto) |
 | **Segmento** / `niche` / `Tenant.slug` | "clínica" genérico quando multi-segmento |
 | `useLabels()` / `labels.patient` | "Paciente" hardcoded |
 | `?tenant=petcare` | só `?niche=` sem tenant quando há demo |

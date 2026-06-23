@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Cursor Cloud specific instructions
 
-### O que é o ServiceOS Bibi (v2.0)
+### O que é o Sistema Bibi - ServiceOS (v2.0)
 Infraestrutura horizontal **ServiceOS** — plataforma **multi-segmento** Pay Per Use com **quatro portais**
 segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**

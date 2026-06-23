@@ -15,7 +15,7 @@ Resultado canônico: [`../segmentos/medical/pesquisa-expansao-2026.md`](../segme
 
 Atue como Consultor Sênior de Estratégia em plataformas de serviços profissionais.
 
-Estamos escalando o **ServiceOS Bibi v2.0** — infraestrutura SaaS multi-tenant **Pay Per Use**, com foco inicial no segmento **saúde corporativa** (`MEDICAL`).
+Estamos escalando o **Sistema Bibi - ServiceOS v2.0** — infraestrutura SaaS multi-tenant **Pay Per Use**, com foco inicial no segmento **saúde corporativa** (`MEDICAL`).
 
 - **4 portais:** Prestador, Interno, Empresa PJ, Beneficiário (vocabulário adaptável por segmento)
 - **Stack:** Next.js 16, React 19, Prisma 6

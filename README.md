@@ -27,7 +27,7 @@
 
 ## 1. Visão geral
 
-O **ServiceOS Bibi** é uma infraestrutura multi-tenant horizontal: o mesmo código-core
+O **Sistema Bibi - ServiceOS** é uma infraestrutura multi-tenant horizontal: o mesmo código-core
 suporta clínicas, pet shops, consultórios odontológicos, escritórios de advocacia,
 spas e escolas — alterando apenas nomenclatura (labels) e identidade visual por nicho.
 
@@ -50,7 +50,7 @@ Comparativo mensal entre o modelo tradicional (plano fechado por vida) e o Servi
 | Modelo | Custo mensal (500 vidas) | Lógica |
 |--------|--------------------------|--------|
 | **Tradicional** | ~**R$ 175.000** | R$ 350/vida × 500 — paga por elegibilidade, não por uso |
-| **ServiceOS Bibi** | ~**R$ 14.500** | Pay Per Use + take rate sobre transações efetivas |
+| **Sistema Bibi - ServiceOS** | ~**R$ 14.500** | Pay Per Use + take rate sobre transações efetivas |
 | **Economia** | **~91%** | Transparência de consumo; RH audita cada procedimento |
 
 > Referência comercial (segmento saúde): [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) e [`docs/segmentos/medical/pesquisa-expansao-2026.md`](docs/segmentos/medical/pesquisa-expansao-2026.md).
@@ -515,4 +515,4 @@ sistema-bibi/
 
 ---
 
-Construído como POC evoluindo para **ServiceOS Bibi v2.0** — infraestrutura horizontal de confiança para serviços Pay Per Use.
+Construído como POC evoluindo para **Sistema Bibi - ServiceOS v2.0** — infraestrutura horizontal de confiança para serviços Pay Per Use.

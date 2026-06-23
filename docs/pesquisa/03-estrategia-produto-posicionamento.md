@@ -1,10 +1,10 @@
-# ServiceOS Bibi — Estratégia Competitiva e Roadmap
+# Sistema Bibi - ServiceOS — Estratégia Competitiva e Roadmap
 
 ---
 
 ## Posicionamento recomendado
 
-O ServiceOS Bibi é uma **infraestrutura horizontal Pay Per Use** que conecta empresas,
+O Sistema Bibi - ServiceOS é uma **infraestrutura horizontal Pay Per Use** que conecta empresas,
 clientes finais e prestadores em múltiplos nichos (saúde, veterinária, odontologia,
 jurídico, bem-estar e educação) — eliminando a **caixa preta da sinistralidade** e
 permitindo cobrança baseada em uso real, com a mesma stack técnica para todos os verticais.
@@ -135,7 +135,7 @@ para ~R$ 14,5k/mês (Pay Per Use) = **~91% de economia**.
 
 > Pare de pagar por vidas que não utilizam seu benefício.
 >
-> Com o ServiceOS Bibi, sua empresa paga apenas pelo que foi efetivamente consumido —
+> Com o Sistema Bibi - ServiceOS, sua empresa paga apenas pelo que foi efetivamente consumido —
 > com transparência total para RH, clientes e prestadores. Até **91% de economia**
 > em empresas de médio porte.
 
@@ -143,7 +143,7 @@ para ~R$ 14,5k/mês (Pay Per Use) = **~91% de economia**.
 
 ## Pitch curto
 
-ServiceOS Bibi é uma infraestrutura SaaS multi-nicho que conecta empresas, clientes
+Sistema Bibi - ServiceOS é uma infraestrutura SaaS multi-nicho que conecta empresas, clientes
 e prestadores em uma única operação digital — de clínicas a escritórios de advocacia.
 
 Diferente de ERPs verticais ou operadoras digitais, o Bibi oferece controle de consumo

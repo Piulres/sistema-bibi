@@ -1,4 +1,4 @@
-# Arquitetura — ServiceOS Bibi v2.0
+# Arquitetura — Sistema Bibi - ServiceOS v2.0
 
 Documento técnico com os diagramas de arquitetura, modelo de dados (ER) e os
 principais fluxos do sistema. Os diagramas usam [Mermaid](https://mermaid.js.org/)

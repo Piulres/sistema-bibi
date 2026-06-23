@@ -1,4 +1,4 @@
-# Fluxos do ServiceOS Bibi
+# Fluxos do Sistema Bibi - ServiceOS
 
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).

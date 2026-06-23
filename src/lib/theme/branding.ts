@@ -70,7 +70,7 @@ export async function getTenantBranding(
   return tenantBrandingFallback(tenantId, tenant?.name ?? "Clínica");
 }
 
-/** Branding da plataforma ServiceOS Bibi — landing e páginas comerciais. */
+/** Branding da plataforma Sistema Bibi - ServiceOS — landing e páginas comerciais. */
 export function getPlatformBranding(): BrandingTokens {
   return { ...PLATFORM_BRANDING };
 }

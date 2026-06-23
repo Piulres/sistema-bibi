@@ -1,6 +1,6 @@
 # Pesquisa e benchmark competitivo
 
-Documentação de **pesquisa externa** e **posicionamento estratégico** do **ServiceOS Bibi v2.0** — infraestrutura transacional Pay Per Use multi-nicho.
+Documentação de **pesquisa externa** e **posicionamento estratégico** do **Sistema Bibi - ServiceOS v2.0** — infraestrutura transacional Pay Per Use multi-nicho.
 
 Complementa [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md) (matriz técnica POC × referências de código), [`../versoes/V2_0.md`](../versoes/V2_0.md) (escopo v2.0) e [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) (arquitetura multi-nicho).
 

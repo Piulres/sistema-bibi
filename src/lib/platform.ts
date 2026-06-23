@@ -1,14 +1,14 @@
 /** Identidade da plataforma — fonte única para UI, exports e metadados. */
 export const PLATFORM = {
-  name: "ServiceOS Bibi",
+  name: "Sistema Bibi - ServiceOS",
   shortName: "ServiceOS",
   version: "2.0",
-  versionLabel: "ServiceOS v2.0",
+  versionLabel: "Sistema Bibi - ServiceOS v2.0",
   tagline: "Infraestrutura Pay Per Use multi-nicho para serviços profissionais",
   description:
-    "Plataforma ServiceOS com Pay Per Use, quatro portais integrados, white label por tenant e vocabulário adaptável por segmento (saúde, veterinária, odontologia, jurídico, bem-estar e educação).",
+    "Sistema Bibi - ServiceOS: plataforma Pay Per Use com quatro portais integrados, white label por tenant e vocabulário adaptável por segmento (saúde, veterinária, odontologia, jurídico, bem-estar e educação).",
   applicationCategory: "BusinessApplication",
-  poweredBy: "ServiceOS v2.0 · Pay Per Use",
+  poweredBy: "Sistema Bibi - ServiceOS · Pay Per Use",
   loginDisplayName: "Portal da operação",
 } as const;
 

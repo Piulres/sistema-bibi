@@ -1,4 +1,4 @@
-# Design System & White Label — ServiceOS Bibi
+# Design System & White Label — Sistema Bibi - ServiceOS
 
 Plataforma visual unificada com identidade configurável por tenant (white label)
 e **vocabulário dinâmico por nicho** (`useLabels()`).
@@ -27,7 +27,7 @@ model TenantBranding {
   accentColor    String
   heroFrom       String   // gradiente do hero
   heroTo         String
-  platformLabel  String   // ex. "Powered by ServiceOS Bibi"
+  platformLabel  String   // ex. "Powered by Sistema Bibi - ServiceOS"
   colorScheme    String   // light | dark | system
   customDomain   String?  // ex. saude.cliente.com.br (Tier 3)
   customDomainVerified Boolean
@@ -39,7 +39,7 @@ Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 - **Clínica Horizonte** — clínica cliente demo (teal)
 - **VitaCare** — white label corporativo (azul)
 
-**ServiceOS Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` e `PLATFORM` em `src/lib/platform.ts`.
+**Sistema Bibi - ServiceOS** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` e `PLATFORM` em `src/lib/platform.ts`.
 
 ## Tokens CSS
 
@@ -106,7 +106,7 @@ export default async function InternoBillingPage() {
   );
 }
 
-// Landing / marketing — identidade da plataforma (ServiceOS Bibi)
+// Landing / marketing — identidade da plataforma (Sistema Bibi - ServiceOS)
 const branding = getPlatformBranding();
 
 // Login público — tenant por domínio ou shell "Portal da clínica"

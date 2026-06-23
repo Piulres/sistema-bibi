@@ -1,6 +1,6 @@
 # Jornada do Cliente — ServiceOS (Quatro Portais)
 
-Documentação da **experiência do usuário** em cada portal do ServiceOS Bibi, com
+Documentação da **experiência do usuário** em cada portal do Sistema Bibi - ServiceOS, com
 jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias priorizado.
 
 > **v2.0:** nomenclatura dinâmica por nicho (`useLabels()`). Escopo: [`V2_0.md`](V2_0.md).
@@ -58,7 +58,7 @@ O cliente (clínica, pet shop, escritório) **não vê um ERP genérico** — v�
 
 ## 1. Visão macro
 
-O **ServiceOS Bibi** organiza a experiência em **quatro portais segregados por `role`**,
+O **Sistema Bibi - ServiceOS** organiza a experiência em **quatro portais segregados por `role`**,
 todos alimentados pelo mesmo núcleo **Pay Per Use** (`ProcedureUsage` → `Invoice` → `Payment`).
 
 ```mermaid

@@ -8,6 +8,7 @@ import type { PortalKey } from "@/lib/roles";
 import type { NicheDemoAccount } from "@/lib/niche/demo-accounts";
 import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
 import type { LoginSegmentContext } from "@/lib/segment/login-context";
+import { PLATFORM } from "@/lib/platform";
 import SegmentContextBanner from "@/components/segment/SegmentContextBanner";
 import SegmentCookiePersist from "@/components/segment/SegmentCookiePersist";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
@@ -219,7 +220,7 @@ export default function LoginForm({
                 {nicheDemos && nicheDemos.length > 0 && (
                   <div className="mt-3 space-y-2">
                     <p className="text-xs font-medium text-[var(--text-secondary)]">
-                      ServiceOS v2.0 — experimente outro nicho:
+                      {PLATFORM.versionLabel} — experimente outro nicho:
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {nicheDemos.map((demo) => (

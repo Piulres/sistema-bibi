@@ -1,4 +1,4 @@
-# Evidências dos fluxos funcionais — ServiceOS Bibi
+# Evidências dos fluxos funcionais — Sistema Bibi - ServiceOS
 
 Material completo (vídeos e imagens) capturado durante a validação do ambiente de
 desenvolvimento, demonstrando os fluxos funcionais ponta a ponta e vinculando cada

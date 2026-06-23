@@ -1,6 +1,6 @@
 # Operação de dados — Demo vs Operação
 
-Como o **ServiceOS Bibi** gerencia **massa demo** e **dados reais** no mesmo site Netlify, **sem Postgres**.
+Como o **Sistema Bibi - ServiceOS** gerencia **massa demo** e **dados reais** no mesmo site Netlify, **sem Postgres**.
 
 Complementa [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) e [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md).
 

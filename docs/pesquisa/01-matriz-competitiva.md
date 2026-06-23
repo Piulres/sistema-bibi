@@ -1,4 +1,4 @@
-# ServiceOS Bibi — Matriz Competitiva
+# Sistema Bibi - ServiceOS — Matriz Competitiva
 
 **Benchmark competitivo estratégico 2026 — infraestrutura transacional multi-nicho**
 
@@ -11,7 +11,7 @@
 
 ## Reposicionamento estratégico
 
-O **ServiceOS Bibi** não compete como mais um ERP clínico. Posiciona-se como **infraestrutura transacional** que:
+O **Sistema Bibi - ServiceOS** não compete como mais um ERP clínico. Posiciona-se como **infraestrutura transacional** que:
 
 - Elimina a **"caixa preta" da sinistralidade** — cada procedimento/serviço é rastreado e cobrado por uso real.
 - Oferece **transparência total** via quatro portais segregados (prestador, interno, PJ, beneficiário).
@@ -67,7 +67,7 @@ Concorrentes tradicionais vendem **elegibilidade** (vidas). O Bibi vende **infra
 
 ## Conclusão
 
-O ServiceOS Bibi ocupa um espaço pouco explorado:
+O Sistema Bibi - ServiceOS ocupa um espaço pouco explorado:
 
 - **Infraestrutura transacional** B2B (não operadora, não ERP vertical)
 - Rede de prestadores com **cobrança por uso real**

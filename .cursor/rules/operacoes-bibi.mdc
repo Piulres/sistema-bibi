@@ -1,9 +1,9 @@
 ---
-description: Operações ServiceOS Bibi — pacotes fechados, economia de tokens/cota, deploy só manual. Ativa em tarefas de infra, release, produção ou Netlify.
+description: Operações Sistema Bibi - ServiceOS — pacotes fechados, economia de tokens/cota, deploy só manual. Ativa em tarefas de infra, release, produção ou Netlify.
 alwaysApply: true
 ---
 
-# Operações ServiceOS Bibi
+# Operações Sistema Bibi - ServiceOS
 
 Fonte canônica: `@docs/plataforma/OPERACOES.md` · Dados demo/operação: `@docs/plataforma/OPERACAO_DADOS.md` · Pacotes: `@docs/versoes/RELEASES.md` · Workflow: `@docs/plataforma/WORKFLOW_CURSOR.md` · Índice: `@docs/README.md`
 

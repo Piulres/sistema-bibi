@@ -202,7 +202,7 @@ export default function BrandingView() {
               label="Rótulo da plataforma"
               value={form.platformLabel}
               onChange={(e) => updateField("platformLabel", e.target.value)}
-              hint='Ex.: "Powered by ServiceOS Bibi"'
+              hint='Ex.: "Powered by Sistema Bibi - ServiceOS"'
               required
             />
             <label className="block text-sm">

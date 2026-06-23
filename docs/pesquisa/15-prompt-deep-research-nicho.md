@@ -9,7 +9,7 @@ Use em **Cursor**, **Perplexity**, **NotebookLM** ou consultor externo para repl
 ```text
 Atue como analista de mercado sênior especializado em [NICHO: Veterinário | Jurídico | Odontológico | Educação | Spa/Bem-estar] no Brasil.
 
-Contexto: O ServiceOS Bibi é uma infraestrutura SaaS multi-tenant Pay Per Use (cobrança por uso real com preço congelado no ato — Price Snapshot). Precisamos de pesquisa para alimentar dicionário de labels, preços do seed e benchmark competitivo.
+Contexto: O Sistema Bibi - ServiceOS é uma infraestrutura SaaS multi-tenant Pay Per Use (cobrança por uso real com preço congelado no ato — Price Snapshot). Precisamos de pesquisa para alimentar dicionário de labels, preços do seed e benchmark competitivo.
 
 Entregáveis obrigatórios (markdown):
 

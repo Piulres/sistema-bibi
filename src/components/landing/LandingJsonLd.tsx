@@ -61,7 +61,7 @@ export default function LandingJsonLd({ branding }: Props) {
         name: "A plataforma suporta múltiplos segmentos?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Sim. O ServiceOS v2.0 adapta vocabulário e identidade por segmento — saúde, veterinária, odontologia, jurídico, bem-estar e educação — com Portal PJ para gestores corporativos.",
+          text: `Sim. O ${PLATFORM.name} adapta vocabulário e identidade por segmento — saúde, veterinária, odontologia, jurídico, bem-estar e educação — com Portal PJ para gestores corporativos.`,
         },
       },
     ],

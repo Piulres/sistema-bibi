@@ -1,4 +1,4 @@
-# ServiceOS Bibi — Mapa Estratégico do Mercado 2026
+# Sistema Bibi - ServiceOS — Mapa Estratégico do Mercado 2026
 
 | Meta | Valor |
 |------|-------|
@@ -11,7 +11,7 @@
 
 ## Resumo executivo
 
-O **ServiceOS Bibi** não compete diretamente com ERPs hospitalares tradicionais nem com operadoras de saúde.
+O **Sistema Bibi - ServiceOS** não compete diretamente com ERPs hospitalares tradicionais nem com operadoras de saúde.
 
 Sua posição natural encontra-se na interseção entre:
 
@@ -244,7 +244,7 @@ Memed, Mevo, Laura, Portal Telemedicina, Noa Notes
 
 ## Posicionamento final recomendado
 
-> O **ServiceOS Bibi** é uma infraestrutura SaaS multi-segmento que conecta empresas, clientes finais e colaboradores em uma única operação digital — no segmento saúde, gestão transparente do consumo e cobrança baseada no uso real.
+> O **Sistema Bibi - ServiceOS** é uma infraestrutura SaaS multi-segmento que conecta empresas, clientes finais e colaboradores em uma única operação digital — no segmento saúde, gestão transparente do consumo e cobrança baseada no uso real.
 
 ### Três mensagens-chave
 

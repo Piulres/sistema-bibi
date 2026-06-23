@@ -1,4 +1,4 @@
-# ServiceOS Bibi v2.0 — Base de Conhecimento (NotebookLM)
+# Sistema Bibi - ServiceOS v2.0 — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 Última atualização: reflete **ServiceOS v2.0** (multi-nicho), **white label** (tema escuro, logos Blobs),
@@ -6,7 +6,7 @@ Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 
 ---
 
-## 1. O que é o ServiceOS Bibi
+## 1. O que é o Sistema Bibi - ServiceOS
 
 Infraestrutura **SaaS multi-tenant multi-segmento** (ServiceOS v2.0). Cada operação é um **tenant**
 com `niche` e `labels` (JSON) para tradução automática da UI. Núcleo: **Pay Per Use** sobre qualquer
@@ -539,4 +539,4 @@ src/
 
 ---
 
-*Fim do documento — ServiceOS Bibi v2.0 (corpus RAG)*
+*Fim do documento — Sistema Bibi - ServiceOS v2.0 (corpus RAG)*

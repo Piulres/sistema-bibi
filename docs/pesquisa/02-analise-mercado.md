@@ -1,4 +1,4 @@
-# ServiceOS Bibi — Análise de Mercado
+# Sistema Bibi - ServiceOS — Análise de Mercado
 
 **Infraestrutura transacional e serviços sob demanda — Brasil 2026**
 
@@ -156,7 +156,7 @@ O mercado está migrando para **plataformas integradas e transacionais**.
 
 O maior espaço competitivo atual está entre **ERP vertical tradicional**, **operadoras digitais** e **infraestrutura Pay Per Use multi-nicho** (ServiceOS).
 
-O ServiceOS Bibi posiciona-se como camada de **confiança transacional** — transparência total, quatro portais e white label por tenant.
+O Sistema Bibi - ServiceOS posiciona-se como camada de **confiança transacional** — transparência total, quatro portais e white label por tenant.
 
 ---
 

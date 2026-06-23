@@ -1,7 +1,7 @@
 # Auditoria de fluxos — ServiceOS (quatro portais)
 
 Mapeamento de **falhas e lacunas** nos fluxos de usuário dos quatro portais do
-ServiceOS Bibi, com evidências de código, testes automatizados e validação manual
+Sistema Bibi - ServiceOS, com evidências de código, testes automatizados e validação manual
 via API.
 
 > **Nota v2.0:** migração para `useLabels()` está **parcial** — várias strings fixas

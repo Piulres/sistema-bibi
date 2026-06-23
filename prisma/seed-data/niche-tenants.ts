@@ -126,7 +126,7 @@ export async function seedNicheTenants(
             accentColor: config.branding.accentColor,
             heroFrom: config.branding.heroFrom,
             heroTo: config.branding.heroTo,
-            platformLabel: "Powered by ServiceOS Bibi",
+            platformLabel: "Powered by Sistema Bibi - ServiceOS",
             colorScheme: "light",
           },
         },

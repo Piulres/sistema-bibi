@@ -1,4 +1,4 @@
-# Deploy na Netlify — ServiceOS Bibi
+# Deploy na Netlify — Sistema Bibi - ServiceOS
 
 Guia para publicar e manter a POC na Netlify.
 

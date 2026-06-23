@@ -1,4 +1,4 @@
-# ServiceOS Bibi — Expansão segmento saúde 2026
+# Sistema Bibi - ServiceOS — Expansão segmento saúde 2026
 
 **Consultoria estratégica:** posicionamento **ServiceOS** no vertical `MEDICAL` (saúde corporativa)
 
@@ -333,7 +333,7 @@ Detalhe completo em [`09-sintese-consultor-senior.md`](09-sintese-consultor-seni
 
 ### Mensagem única (INFERÊNCIA)
 
-> **ServiceOS Bibi transforma saúde corporativa de custo fixo opaco em consumo auditável por evento — com preço congelado no atendimento e quatro portais na mesma operação.**
+> **Sistema Bibi - ServiceOS transforma saúde corporativa de custo fixo opaco em consumo auditável por evento — com preço congelado no atendimento e quatro portais na mesma operação.**
 
 ### Prioridades imediatas (alinhado roadmap)
 

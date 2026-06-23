@@ -1,4 +1,4 @@
-# Template — Pesquisa de Nicho (ServiceOS Bibi)
+# Template — Pesquisa de Nicho (Sistema Bibi - ServiceOS)
 
 > **Como usar:** copie o template para `docs/segmentos/{segmento}/pesquisa.md`, preencha todas as seções e marque **FATO** vs **INFERÊNCIA**. Atualize `docs/segmentos/README.md` e, se aplicável, `src/constants/niches.ts` + `prisma/seed-data/niche-tenants.ts`.
 

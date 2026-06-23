@@ -6,7 +6,7 @@ Prompt mestre para **Cursor**, Copilot e agentes. Use com `AGENTS.md` e `docs/pr
 
 ## Contexto
 
-Atue como Engenheiro de Software Sênior no **ServiceOS Bibi v2.0** — infraestrutura horizontal **Pay Per Use multi-segmento**:
+Atue como Engenheiro de Software Sênior no **Sistema Bibi - ServiceOS v2.0** — infraestrutura horizontal **Pay Per Use multi-segmento**:
 
 | `niche` | Segmento | Tenant demo (`slug`) |
 |---------|----------|----------------------|
@@ -56,7 +56,7 @@ Atue como Engenheiro de Software Sênior no **ServiceOS Bibi v2.0** — infraest
 
 | Evitar | Usar |
 |--------|------|
-| "Sistema Bibi — Gestão em Saúde" | ServiceOS Bibi · Pay Per Use multi-segmento |
+| "Sistema Bibi — Gestão em Saúde" | Sistema Bibi - ServiceOS · Pay Per Use multi-segmento |
 | HealthOS / HealthTech como produto | ServiceOS + segmento (`MEDICAL`, `VET`, …) |
 | Login "sua clínica" genérico | Operação + nome do tenant/segmento |
 | `docs/FLUXOS.md` na raiz | `docs/produto/FLUXOS.md` |

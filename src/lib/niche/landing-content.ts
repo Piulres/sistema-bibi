@@ -1,6 +1,7 @@
 import type { PortalKey } from "@/lib/roles";
 import { getDefaultLabels, getNicheConfig } from "@/lib/niche/defaults";
 import type { NicheId } from "@/lib/niche/types";
+import { PLATFORM } from "@/lib/platform";
 import { appendSegmentToPath } from "@/lib/segment/types";
 
 export type LandingFeature = {
@@ -157,7 +158,7 @@ export function getNicheLandingContent(
     portals: buildPortals(labels, { tenantSlug: segment?.tenantSlug, niche }),
     faq: [
       {
-        question: "O que é Pay Per Use no ServiceOS Bibi?",
+        question: `O que é Pay Per Use no ${PLATFORM.name}?`,
         answer: `É o modelo em que o ${labels.beneficiary.toLowerCase()} paga somente pelos serviços efetivamente utilizados — ${labels.procedures.toLowerCase()} — com valor transparente antes do atendimento e preço congelado no momento do uso.`,
       },
       {
@@ -166,7 +167,7 @@ export function getNicheLandingContent(
       },
       {
         question: "Posso usar minha própria marca (white label)?",
-        answer: `Sim. Cada operação configura logo, cores, nome de exibição e domínio customizado. Os dados são do cliente; a infraestrutura é ServiceOS Bibi.`,
+        answer: `Sim. Cada operação configura logo, cores, nome de exibição e domínio customizado. Os dados são do cliente; a infraestrutura é ${PLATFORM.name}.`,
       },
       {
         question: "A solução está em conformidade com a LGPD?",
@@ -175,10 +176,10 @@ export function getNicheLandingContent(
       {
         question: "O mesmo sistema atende outros nichos além de saúde?",
         answer:
-          "Sim. O ServiceOS v2.0 parametriza nomenclatura e identidade visual por nicho — veterinária, odontologia, jurídico, bem-estar e educação — sem alterar o motor de faturamento Pay Per Use.",
+          `Sim. O ${PLATFORM.name} parametriza nomenclatura e identidade visual por nicho — veterinária, odontologia, jurídico, bem-estar e educação — sem alterar o motor de faturamento Pay Per Use.`,
       },
     ],
-    footerTagline: `ServiceOS Pay Per Use para ${sector} — operação, ${labels.procedures.toLowerCase()} e faturamento integrados.`,
+    footerTagline: `${PLATFORM.name} Pay Per Use para ${sector} — operação, ${labels.procedures.toLowerCase()} e faturamento integrados.`,
     ctaDescription: `Explore a demonstração com os quatro portais, fluxo Pay Per Use e white label configurável para cada operação de ${sector}.`,
   };
 }
