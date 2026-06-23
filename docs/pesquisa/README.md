@@ -12,14 +12,17 @@ Complementa [`../BENCHMARK.md`](../BENCHMARK.md) (matriz técnica POC × referê
 | [`04-visao-executiva.md`](04-visao-executiva.md) | Ecossistema, TAM/SAM/SOM, SWOT, radar de inovação |
 | [`05-prompt-pesquisa-externa.md`](05-prompt-pesquisa-externa.md) | Prompts para pesquisa externa (IA, consultores, entrevistas) |
 | [`06-catalogo-players.md`](06-catalogo-players.md) | Catálogo expandido por camada de mercado (agente + desk research) |
+| [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) | ROI, interoperabilidade, scripts RH/CFO, Tier 1 (Pipo/Vitta/Conexa) |
+| [`08-prompt-healthos-expansao.md`](08-prompt-healthos-expansao.md) | Prompt HealthOS Expansão 2026 (pesquisa externa) |
 
-**Versão:** 1.0 · **Data:** Junho/2026
+**Versão:** 1.1 · **Data:** Junho/2026
 
 ## Uso recomendado
 
 1. **Produto / roadmap** — `03-estrategia-produto-posicionamento.md` (gaps e Q1–Q4).
-2. **Comercial / pitch** — mensagem e pitch curto no doc 03; visão executiva no doc 04.
-3. **Atualização contínua** — rodar [`05-prompt-pesquisa-externa.md`](05-prompt-pesquisa-externa.md) em Perplexity/Claude e revisar matriz no doc 01.
-4. **Implementação vs mercado** — cruzar doc 01 com [`../BENCHMARK.md`](../BENCHMARK.md) (o que a POC já cobre no código).
+2. **Comercial / CFO** — `07-healthos-expansao-2026.md` (ROI, validação brutal, Tier 1).
+3. **Pitch / visão** — doc 03 (mensagem curta) e doc 04 (ecossistema, TAM/SAM/SOM).
+4. **Atualização contínua** — [`05-prompt-pesquisa-externa.md`](05-prompt-pesquisa-externa.md) e [`08-prompt-healthos-expansao.md`](08-prompt-healthos-expansao.md).
+5. **Implementação vs mercado** — cruzar doc 01 com [`../BENCHMARK.md`](../BENCHMARK.md) (o que a POC já cobre no código).
 
 *Documentos de pesquisa — não substituem due diligence comercial nem validação contratual.*

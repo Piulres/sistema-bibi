@@ -135,4 +135,4 @@ Diferente de ERPs clínicos tradicionais ou operadoras digitais, o Bibi oferece 
 
 ---
 
-Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`../BENCHMARK.md`](../BENCHMARK.md) (gaps técnicos na POC)
+Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) (ROI, scripts RH/CFO) · [`../BENCHMARK.md`](../BENCHMARK.md) (gaps técnicos na POC)
