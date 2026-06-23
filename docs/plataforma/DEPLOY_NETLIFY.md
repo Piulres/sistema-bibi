@@ -15,8 +15,8 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.0.0`** — deploy `6a3a9973` @ `49edb90` |
-| `main` / `dev` | Sincronizadas em **`49edb90`** |
+| Pacote em produção | **`v2.0.0`** — deploy `6a3abdc1` @ `b661b39` |
+| `main` / `dev` | Sincronizadas em **`b661b39`** |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify build` → `npx netlify deploy --prod --no-build` (site `sistema-bibi`) |

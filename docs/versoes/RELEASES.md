@@ -13,10 +13,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** — deploy `6a3a9973` @ `49edb90` |
-| **Commit release** | `49edb90` |
-| `main` / `dev` | Sincronizadas em **`49edb90`** |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** — deploy `6a3abdc1` @ `b661b39` |
+| **Commit release** | `b661b39` |
+| `main` / `dev` | Sincronizadas em **`b661b39`** |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
+| **Pacote anterior** | deploy `6a3a9973` @ `49edb90` (23/06/2026 manhã) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
@@ -25,7 +26,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.0.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.0.0** — idem |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3a9973` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3abdc1` @ `b661b39` |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -48,9 +49,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.0.0` |
-| **Commit** | `49edb90` |
-| **PRs** | [#101](https://github.com/Piulres/sistema-bibi/pull/101), [#106](https://github.com/Piulres/sistema-bibi/pull/106)–[#108](https://github.com/Piulres/sistema-bibi/pull/108), [#111](https://github.com/Piulres/sistema-bibi/pull/111) |
-| **Publicado em** | 23/06/2026 — deploy Netlify `6a3a9973` |
+| **Commit** | `b661b39` |
+| **PRs** | [#101](https://github.com/Piulres/sistema-bibi/pull/101), [#106](https://github.com/Piulres/sistema-bibi/pull/106)–[#108](https://github.com/Piulres/sistema-bibi/pull/108), [#111](https://github.com/Piulres/sistema-bibi/pull/111), [#115](https://github.com/Piulres/sistema-bibi/pull/115), [#116](https://github.com/Piulres/sistema-bibi/pull/116) |
+| **Publicado em** | 23/06/2026 — deploy Netlify `6a3abdc1` (redeploy docs/ROI) |
 
 **Inclui (além de v1.3 estoque):**
 
@@ -61,8 +62,12 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - `db:verify` no `pre-release` · massas demo + operation validadas
 - Fix mobile: cookie de segmento via API client-side
 - Documentação reorganizada (`docs/segmentos/`, prompts, índice)
+- **ROI recalculado (~87%)** — `docs/plataforma/ROI_REFERENCIA.md`
+- **Auditoria de veracidade** — pesquisa FATO/INFERÊNCIA, fluxos 13 módulos interno
 
 **Testes:** 163 Vitest · `db:verify` demo + operation · `pre-release` OK.
+
+**Deploy anterior (mesmo v2.0.0):** `6a3a9973` @ `49edb90`.
 
 ---
 
