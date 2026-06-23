@@ -7,7 +7,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Cursor Cloud specific instructions
 
 ### O que é o ServiceOS Bibi (v2.0)
-Infraestrutura horizontal **ServiceOS** (evolução da POC HealthTech) com **quatro portais**
+Infraestrutura horizontal **ServiceOS** — plataforma **multi-segmento** Pay Per Use com **quatro portais**
 segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
 (`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
@@ -20,7 +20,11 @@ e `labels` (JSON) para tradução automática da UI.
 
 **Hook de UI:** `useLabels()` em `src/hooks/useLabels.tsx` — use `labels.patient` em JSX, nunca strings fixas como "Paciente". Provider em `PortalShell`.
 
-**Regra para IAs:** ao criar qualquer tela nos portais autenticados, **consulte `NICHE_MASTER_LABELS` e use `useLabels()`** — a nomenclatura vem do tenant ativo.
+**Regra para IAs:** consulte `docs/prompts/README.md` e `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` antes de features novas. Não usar *HealthOS* nem posicionamento só-saúde em código/docs v2.0.
+
+**Roteamento por segmento:** `?tenant=petcare` · cookie `bibi_segment` · `docs/segmentos/README.md`
+
+**Regra labels:** ao criar qualquer tela nos portais autenticados, **consulte `NICHE_MASTER_LABELS` e use `useLabels()`** — a nomenclatura vem do tenant ativo.
 
 ### Glossário por nicho (padrão)
 
@@ -47,7 +51,7 @@ fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
-**Preferências IA:** `AGENTS.md` (esta seção) + `.cursor/rules/operacoes-bibi.mdc`.
+**Preferências IA:** `AGENTS.md` · `docs/prompts/README.md` · `.cursor/rules/serviceos-dev.mdc` · `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/plataforma/HISTORICO_2026-06-21.md`
 

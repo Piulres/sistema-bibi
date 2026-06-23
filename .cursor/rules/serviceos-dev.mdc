@@ -1,0 +1,31 @@
+---
+description: ServiceOS v2.0 — labels, segmentos e nomenclatura em código novo. Complementa AGENTS.md e docs/prompts/.
+alwaysApply: true
+---
+
+# ServiceOS v2.0 — desenvolvimento
+
+Fonte: `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` · Segmentos: `docs/segmentos/README.md` · Escopo: `docs/versoes/V2_0.md`
+
+## Nomenclatura (obrigatório em código/docs novos)
+
+- Produto: **ServiceOS Bibi** / **ServiceOS v2.0** — não *HealthOS*, não *Sistema Bibi* como marca
+- Saúde = segmento `MEDICAL`, um entre seis — não assumir HealthTech em copy genérica
+- Tenant: `Tenant.slug` (`?tenant=petcare`) + `Tenant.niche` + `Tenant.labels`
+
+## UI nos portais autenticados
+
+- `useLabels()` — nunca strings fixas de paciente/beneficiário/procedimento
+- Nav: `src/lib/navigation/niche-nav.ts`
+- Shell: `PortalShell` + `NicheProvider`
+
+## Segmento no fluxo de acesso
+
+- Resolver: `src/lib/segment/resolve.ts`
+- Cookie: `bibi_segment`
+- Login valida `user.tenantId` contra tenant do site
+
+## Documentação
+
+- Índice: `docs/README.md` · Prompts: `docs/prompts/README.md`
+- Histórico v1.x / HealthOS: só em `docs/versoes/V1_*.md` — não copiar para features novas

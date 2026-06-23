@@ -1,6 +1,8 @@
-# Sistema Bibi — HealthOS Expansão 2026
+# ServiceOS Bibi — Expansão segmento saúde 2026
 
-**Consultoria estratégica:** posicionamento *HealthOS para Saúde Corporativa*
+**Consultoria estratégica:** posicionamento **ServiceOS** no vertical `MEDICAL` (saúde corporativa)
+
+> **Arquivo histórico v1.x:** redigido quando o codinome interno era *HealthOS*. Mantido para ROI e scripts comerciais do segmento saúde; novos desenvolvimentos usam a marca **ServiceOS v2.0**.
 
 | Meta | Valor |
 |------|-------|
@@ -197,7 +199,7 @@
 | Momento | Fala-chave |
 |---------|------------|
 | Gancho | “Plano reajustou ~20% e você não sabe por quê?” |
-| Diferencial | “HealthOS Pay Per Use + Price Snapshot” |
+| Diferencial | “ServiceOS Pay Per Use + Price Snapshot” |
 | Demo Portal PJ | Consumo por CPF, procedimento, desconto automático |
 | Fechamento | “Quanto de economia nos dados para trocar custo fixo por sob demanda?” |
 
@@ -303,7 +305,7 @@ Detalhe completo em [`09-sintese-consultor-senior.md`](09-sintese-consultor-seni
 1. **Elimina subsídio cruzado** entre não-usuários e usuários (ver ROI §1).
 2. **Negociação contínua** — RH ajusta multiplier por procedimento sem esperar renovação anual.
 3. **Auditoria linha a linha** — cada `ProcedureUsage` na timeline vs boleto único operadora.
-4. **White label** — cada rede (ex. VitaCare) com tabela própria no mesmo HealthOS.
+4. **White label** — cada rede (ex. VitaCare) com tabela própria no mesmo ServiceOS.
 
 **INFERÊNCIA:** Janela para o Bibi como **SaaS de infraestrutura** white-label (VitaCare, redes regionais) em vez de competir apenas head-on com Tier 1.
 
@@ -327,11 +329,11 @@ Detalhe completo em [`09-sintese-consultor-senior.md`](09-sintese-consultor-seni
 
 ---
 
-## 5. Síntese estratégica HealthOS
+## 5. Síntese estratégica ServiceOS
 
 ### Mensagem única (INFERÊNCIA)
 
-> **Bibi é o HealthOS que transforma saúde corporativa de custo fixo opaco em consumo auditável por evento — com preço congelado no atendimento e quatro portais na mesma operação.**
+> **ServiceOS Bibi transforma saúde corporativa de custo fixo opaco em consumo auditável por evento — com preço congelado no atendimento e quatro portais na mesma operação.**
 
 ### Prioridades imediatas (alinhado roadmap)
 

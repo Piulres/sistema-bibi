@@ -11,7 +11,7 @@
 
 ## Reposicionamento estratégico
 
-O **ServiceOS Bibi** não compete como mais um ERP clínico. Posiciona-se como **infraestrutura transacional** (HealthOS/ServiceOS) que:
+O **ServiceOS Bibi** não compete como mais um ERP clínico. Posiciona-se como **infraestrutura transacional** que:
 
 - Elimina a **"caixa preta" da sinistralidade** — cada procedimento/serviço é rastreado e cobrado por uso real.
 - Oferece **transparência total** via quatro portais segregados (prestador, interno, PJ, beneficiário).

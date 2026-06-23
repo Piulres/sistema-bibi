@@ -1,5 +1,5 @@
 ---
-description: Convenções de código Next.js 16, React 19 e Prisma 6 do Sistema Bibi. Padrões de componentes, proxy, ESLint e APIs.
+description: Convenções Next.js 16, React 19 e Prisma 6 do ServiceOS Bibi v2.0. Padrões de componentes, proxy, labels e APIs.
 globs:
   - "src/**/*.ts"
   - "src/**/*.tsx"
@@ -7,9 +7,9 @@ globs:
 alwaysApply: false
 ---
 
-# Stack — Sistema Bibi
+# Stack — ServiceOS Bibi v2.0
 
-Referências: `@AGENTS.md` · `@docs/ARQUITETURA.md` · `@docs/DESIGN_SYSTEM.md`
+Referências: `@AGENTS.md` · `@docs/plataforma/ARQUITETURA.md` · `@docs/plataforma/DESIGN_SYSTEM.md` · `@docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md`
 
 ## Invariantes (não quebrar)
 

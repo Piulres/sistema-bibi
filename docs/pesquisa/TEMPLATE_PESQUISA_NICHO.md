@@ -48,7 +48,7 @@ Valores para `prisma/seed-data/niche-tenants.ts` e catálogo `Procedure`.
 
 ## 4. Dicionário de termos (labels)
 
-Mapeamento HealthTech genérico → vocabulário do nicho.
+Mapeamento ServiceOS genérico → vocabulário do segmento.
 
 | Chave (`NicheLabelKey`) | Termo atual no código | Termo recomendado | Alternativas mercado | Ação |
 |-------------------------|----------------------|-------------------|---------------------|------|

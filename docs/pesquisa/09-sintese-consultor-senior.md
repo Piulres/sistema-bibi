@@ -1,12 +1,14 @@
-# Síntese Executiva — Consultor Sênior HealthTech
+# Síntese Executiva — ServiceOS segmento saúde
 
-**Sistema Bibi · HealthOS para Saúde Corporativa 2026**
+**ServiceOS Bibi · Pay Per Use · Saúde corporativa 2026**
+
+> Documento do vertical `MEDICAL`. Marca canônica v2.0: **ServiceOS** (v1.x usava codinome *HealthOS*).
 
 | Meta | Valor |
 |------|-------|
 | Versão | 1.0 |
 | Data | Junho/2026 |
-| Documento detalhado | [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) |
+| Documento detalhado | [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) |
 
 Análise integrada de **dados de mercado**, **projeções financeiras** e **mapeamento técnico**, com separação explícita entre **FATO** e **INFERÊNCIA**.
 
@@ -18,7 +20,7 @@ Transição do modelo de **capitação** (pagar por vida) para **Pay Per Use** d
 
 ### Tabela executiva (cenário comercial recomendado)
 
-| Dimensão financeira | Plano digital tradicional (mercado) | Sistema Bibi (Pay Per Use) |
+| Dimensão financeira | Plano digital tradicional (mercado) | ServiceOS Bibi (Pay Per Use) |
 |---------------------|-------------------------------------|----------------------------|
 | Modelo de cobrança | Mensalidade fixa por colaborador | Pagamento por utilização efetiva |
 | Custo mensal por vida/uso | R$ 350,00 (ticket médio PME) | R$ 153,00 (preço com desconto corporativo) |
@@ -36,7 +38,7 @@ Transição do modelo de **capitação** (pagar por vida) para **Pay Per Use** d
 
 **FATO (demo):** TechCorp no seed usa `clinicalDiscount: 0.85` — desconto corporativo de 15% aplicado via multiplier ([`prisma/seed-data/companies.ts`](../../prisma/seed-data/companies.ts)).
 
-> Detalhamento: sensibilidade 5%–100%, break-even e cenário sem taxa de plataforma em [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) §1.
+> Detalhamento: sensibilidade 5%–100%, break-even e cenário sem taxa de plataforma em [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) §1.
 
 ---
 
@@ -77,7 +79,7 @@ Foco: destruir a **“caixa preta”** da sinistralidade via **Portal PJ**.
 | Etapa | Script | Tipo |
 |-------|--------|------|
 | **O gancho (dor)** | “Seu plano reajustou ~20% este ano e você não sabe exatamente por quê, certo?” | INFERÊNCIA (reajuste ANS típico) |
-| **O diferencial** | “O Bibi é um HealthOS que cobra só pelo que seus funcionários usam, com preço congelado no ato (**Price Snapshot**).” | FATO produto + INFERÊNCIA posicionamento |
+| **O diferencial** | “O ServiceOS cobra só pelo que seus funcionários usam, com preço congelado no ato (**Price Snapshot**).” | FATO produto + INFERÊNCIA posicionamento |
 | **A demonstração (Portal PJ)** | “Aqui você vê em tempo real quem usou, qual procedimento e o desconto corporativo aplicado pela **Precificação Dinâmica**.” | **FATO** (`/pj`, `pj-portal-service.ts`) |
 | **A pergunta de R$ 10 milhões** | “Quanto de economia garantida nos dados você precisa ver para substituir parte do custo fixo por este modelo sob demanda?” | INFERÊNCIA fechamento |
 
@@ -87,7 +89,7 @@ Foco: destruir a **“caixa preta”** da sinistralidade via **Portal PJ**.
 
 **INFERÊNCIA:** A venda depende de convencer o CFO de que o risco de alta utilização é menor que o custo fixo da ineficiência atual.
 
-> Perguntas de diagnóstico, objeções e piloto 90 dias: [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) §3.
+> Perguntas de diagnóstico, objeções e piloto 90 dias: [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) §3.
 
 ---
 
@@ -99,9 +101,9 @@ O Bibi **não compete por agenda** — compete por **gestão inteligente de cons
 
 ### Matriz estratégica
 
-| Funcionalidade | Sistema Bibi | Pipo / Vitta / Conexa |
+| Funcionalidade | ServiceOS Bibi | Pipo / Vitta / Conexa |
 |----------------|:------------:|:---------------------:|
-| Core business | HealthOS Pay Per Use | Gestão de benefícios / telessaúde |
+| Core business | ServiceOS Pay Per Use | Gestão de benefícios / telessaúde |
 | Precificação dinâmica | Multiplicador por empresa nativo (`PricingRule`) | Tabelas de rede fixas / corretagem |
 | Transparência de uso | Portal PJ + Timeline universal | Relatórios sinistralidade (mensais/posteriores) |
 | Snapshot de preço | Sim — congela no uso (`priceCharged`) | Não — sujeito a glosa/ajuste posterior |
@@ -129,10 +131,10 @@ O Bibi **não compete por agenda** — compete por **gestão inteligente de cons
 |-------|----------|
 | Financeiro | Pague pelo uso; economia ~92% no cenário 500 vidas / 15% utilização |
 | Operacional | 4 portais + Price Snapshot + Portal PJ transparente |
-| Estratégico | HealthOS entre ERP clínico e operadora digital — infraestrutura Pay Per Use |
+| Estratégico | ServiceOS entre ERP clínico e operadora digital — infraestrutura Pay Per Use |
 
 **Próximo passo recomendado (INFERÊNCIA):** Piloto 90 dias com 1 empresa 100–500 vidas; medir utilização real vs contrafactual R$ 350/vida; validar gancho CFO com planilha desta síntese.
 
 ---
 
-*Síntese executiva — complementa [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md). Não substitui due diligence comercial.*
+*Síntese executiva — complementa [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md). Não substitui due diligence comercial.*

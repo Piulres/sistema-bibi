@@ -27,7 +27,7 @@ model TenantBranding {
   accentColor    String
   heroFrom       String   // gradiente do hero
   heroTo         String
-  platformLabel  String   // ex. "Powered by Sistema Bibi"
+  platformLabel  String   // ex. "Powered by ServiceOS Bibi"
   colorScheme    String   // light | dark | system
   customDomain   String?  // ex. saude.cliente.com.br (Tier 3)
   customDomainVerified Boolean
@@ -39,7 +39,7 @@ Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 - **Clínica Horizonte** — clínica cliente demo (teal)
 - **VitaCare** — white label corporativo (azul)
 
-**Sistema Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` (v1.0.2+).
+**ServiceOS Bibi** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts`. Legado v1.x ainda pode exibir *Sistema Bibi* em `platformLabel` até migração completa.
 
 ## Tokens CSS
 
@@ -106,7 +106,7 @@ export default async function InternoBillingPage() {
   );
 }
 
-// Landing / marketing — identidade da plataforma (Sistema Bibi)
+// Landing / marketing — identidade da plataforma (ServiceOS Bibi)
 const branding = getPlatformBranding();
 
 // Login público — tenant por domínio ou shell "Portal da clínica"

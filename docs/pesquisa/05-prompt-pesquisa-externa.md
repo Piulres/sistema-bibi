@@ -11,7 +11,7 @@ Complementa os documentos em [`README.md`](README.md). Após rodar a pesquisa, a
 ```markdown
 # Contexto
 
-Estou fazendo benchmark competitivo do **Sistema Bibi**, uma POC SaaS HealthTech multi-tenant brasileira com foco em **Pay Per Use** (cobrança apenas por procedimentos efetivamente usados, com precificação dinâmica por empresa).
+Estou fazendo benchmark competitivo do **ServiceOS Bibi v2.0**, infraestrutura SaaS **multi-segmento** brasileira com **Pay Per Use** (cobrança por serviços efetivamente usados, precificação dinâmica por empresa). Segmentos: saúde, veterinária, odontologia, jurídico, bem-estar, educação.
 
 O produto tem **4 portais segregados por role**:
 - Prestador (agenda, atendimento, PEP)
@@ -21,7 +21,7 @@ O produto tem **4 portais segregados por role**:
 
 Stack: Next.js, multi-tenant, white label, webhooks, OpenAPI, TISS simplificado (mock), PIX mock, MFA TOTP, RBAC interno.
 
-**Posicionamento:** não é ERP hospitalar nem prontuário de consultório solo — é plataforma de **saúde corporativa B2B + rede de prestadores + transparência de consumo**.
+**Posicionamento:** infraestrutura transacional **ServiceOS** — não ERP clínico solo nem operadora tradicional. Saúde (`MEDICAL`) é um segmento; o mesmo motor atende outros verticais.
 
 Já mapeamos (análise inicial):
 - Clínica SMB: iClinic, Feegow, HiDoctor, Clínica nas Nuvens, Prontmed, Amplimed, GestãoDS, Shosp, ProDoctor, Ninsaúde, Medsystem, Versatilis, ByDoctor, 4Medic
@@ -65,12 +65,12 @@ Para cada empresa, preencha:
 | Diferencial competitivo | 1–2 frases |
 | Usabilidade / UX | Trial grátis? onboarding? app? NPS? |
 | Integrações | Memed, WhatsApp, TISS, APIs, etc. |
-| Relação com Sistema Bibi | Concorrente direto / indireto / parceiro / fora de escopo |
+| Relação com ServiceOS Bibi | Concorrente direto / indireto / parceiro / fora de escopo |
 | Fontes | Links consultados |
 
 ## 2. Matriz comparativa
 
-Compare **Sistema Bibi** vs top 10 concorrentes mais relevantes nas dimensões:
+Compare **ServiceOS Bibi** vs top 10 concorrentes mais relevantes nas dimensões:
 
 - Pay Per Use / cobrança por uso
 - Portal corporativo (RH/PJ)
@@ -86,7 +86,7 @@ Compare **Sistema Bibi** vs top 10 concorrentes mais relevantes nas dimensões:
 - Certificações (SBIS, LGPD)
 - Preço / modelo comercial
 
-Use escala: ✅ forte | 🟡 parcial | ❌ ausente | ⭐ diferencial Bibi
+Use escala: ✅ forte | 🟡 parcial | ❌ ausente | ⭐ diferencial ServiceOS
 
 ## 3. Análise de mercado
 
@@ -96,7 +96,7 @@ Use escala: ✅ forte | 🟡 parcial | ❌ ausente | ⭐ diferencial Bibi
 - Faixas de preço por segmento
 - Players que fazem **Pay Per Use** ou modelo similar
 
-## 4. Gaps e recomendações para o Sistema Bibi
+## 4. Gaps e recomendações para o ServiceOS Bibi
 
 - Top 5 gaps vs mercado (priorizados)
 - Top 5 diferenciais a comunicar comercialmente
@@ -122,7 +122,7 @@ Use escala: ✅ forte | 🟡 parcial | ❌ ausente | ⭐ diferencial Bibi
 
 # Perguntas específicas a responder
 
-1. Quem são os **3 concorrentes mais próximos** do modelo Pay Per Use + portal corporativo do Bibi?
+1. Quem são os **3 concorrentes mais próximos** do modelo Pay Per Use + portal corporativo do ServiceOS?
 2. Existe algum player brasileiro com **4 portais** ou arquitetura similar?
 3. Qual o **preço médio** de software de clínica por médico/mês em 2026?
 4. Quais certificações (SBIS, etc.) são exigidas em RFPs de hospitais e operadoras?
@@ -136,13 +136,13 @@ Comece pela pesquisa e entregue o catálogo expandido.
 ## Prompt curto (pesquisa rápida)
 
 ```markdown
-Benchmark competitivo do Sistema Bibi (SaaS HealthTech BR, Pay Per Use, 4 portais: prestador/interno/PJ/beneficiário).
+Benchmark competitivo do **ServiceOS Bibi** (SaaS multi-segmento BR, Pay Per Use, 4 portais: colaborador/interno/PJ/cliente final).
 
 Já mapeados: iClinic, Feegow, Salutem, Memed, Voa, Prontmed, ERPMed, Conexa, Tasy, HiDoctor, Clínica nas Nuvens, Amplimed, Shosp, ProDoctor, Pipo Saúde, Vitta, Alice, Sami, QSaúde.
 
-Liste +20 empresas NOVAS do ecossistema saúde digital BR (clínica, hospitalar, B2B corporativo, prescrição, IA, telessaúde, fintech saúde) com: URL, funcionalidades, preços se públicos, modelo de receita, escala, e relação com Bibi (concorrente/parceiro/fora de escopo).
+Liste +20 empresas NOVAS do ecossistema saúde digital BR (clínica, hospitalar, B2B corporativo, prescrição, IA, telessaúde, fintech saúde) com: URL, funcionalidades, preços se públicos, modelo de receita, escala, e relação com ServiceOS (concorrente/parceiro/fora de escopo).
 
-Monte matriz Bibi vs top 10, gaps prioritários e fontes. Português BR. Não inventar dados.
+Monte matriz ServiceOS vs top 10, gaps prioritários e fontes. Português BR. Não inventar dados.
 ```
 
 ---

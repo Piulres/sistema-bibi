@@ -1,4 +1,4 @@
-# Releases — Pacotes fechados do Sistema Bibi
+# Releases — Pacotes fechados do ServiceOS Bibi
 
 Registro oficial do que está **em produção**, do que está **pendente na `dev`**
 e do histórico de publicações. Use este arquivo como fonte única de verdade.

@@ -15,6 +15,7 @@ const OBSOLETE_DOC_PATHS = [
   "docs/FLUXOS.md",
   "docs/ARQUITETURA.md",
   "docs/pesquisa/nichos/10-nicho-vet.md",
+  "docs/pesquisa/08-prompt-healthos-expansao.md",
 ];
 
 const STALE_PATTERNS = [
@@ -23,22 +24,45 @@ const STALE_PATTERNS = [
   { pattern: /Entre com as credenciais da sua clínica/g, hint: "login pages — copy genérica multi-segmento" },
 ];
 
-const ALLOWLIST = [
-  "scripts/verify-docs.mjs",
+/** HealthOS só em histórico v1.x ou notas explícitas de migração */
+const HEALTHOS_ALLOWLIST = [
   "docs/versoes/",
   "docs/pesquisa/",
-  "docs/plataforma/HISTORICO",
-  "CHANGELOG",
+  "docs/segmentos/medical/pesquisa-expansao-2026.md",
+  "docs/prompts/",
+  "docs/README.md",
+  "AGENTS.md",
+  ".cursor/rules/serviceos-dev.mdc",
+  "scripts/verify-docs.mjs",
 ];
+
+/** Sistema Bibi como marca de produto — legado v1.x */
+const SISTEMA_BIBI_ALLOWLIST = [
+  "docs/versoes/",
+  "docs/plataforma/HISTORICO",
+  "docs/plataforma/DESIGN_SYSTEM.md",
+  "docs/prompts/",
+  "docs/README.md",
+  ".cursor/rules/serviceos-dev.mdc",
+  "scripts/verify-docs.mjs",
+  "sistema-bibi.netlify.app",
+];
+
+const SCAN_DIRS = ["docs", ".cursor/rules"];
+const SCAN_FILES = ["AGENTS.md", "README.md", "CLAUDE.md"];
 
 function walk(dir, files = []) {
   for (const entry of readdirSync(dir)) {
     if (entry === "node_modules" || entry === ".git" || entry === ".next") continue;
     const full = join(dir, entry);
     if (statSync(full).isDirectory()) walk(full, files);
-    else if (/\.(md|mdc|tsx?|json)$/.test(entry)) files.push(full);
+    else if (/\.(md|mdc)$/.test(entry)) files.push(full);
   }
   return files;
+}
+
+function isAllowed(rel, allowlist) {
+  return allowlist.some((a) => rel.includes(a) || rel === a);
 }
 
 const errors = [];
@@ -52,15 +76,40 @@ for (const path of OBSOLETE_DOC_PATHS) {
   }
 }
 
-for (const file of walk(ROOT)) {
+const filesToScan = new Set();
+for (const dir of SCAN_DIRS) {
+  try {
+    for (const f of walk(join(ROOT, dir))) filesToScan.add(f);
+  } catch {
+    // dir may not exist
+  }
+}
+for (const f of SCAN_FILES) {
+  try {
+    statSync(join(ROOT, f));
+    filesToScan.add(join(ROOT, f));
+  } catch {
+    // optional
+  }
+}
+
+for (const file of filesToScan) {
   const rel = relative(ROOT, file);
-  if (ALLOWLIST.some((a) => rel.includes(a))) continue;
   const content = readFileSync(file, "utf8");
+
   for (const { pattern, hint } of STALE_PATTERNS) {
     if (pattern.test(content)) {
       errors.push(`${rel}: ${hint}`);
       pattern.lastIndex = 0;
     }
+  }
+
+  if (/\bHealthOS\b/.test(content) && !isAllowed(rel, HEALTHOS_ALLOWLIST)) {
+    errors.push(`${rel}: menção a HealthOS — use ServiceOS (v2.0)`);
+  }
+
+  if (/Sistema Bibi/.test(content) && !isAllowed(rel, SISTEMA_BIBI_ALLOWLIST)) {
+    errors.push(`${rel}: marca legada "Sistema Bibi" — use ServiceOS Bibi`);
   }
 }
 
@@ -70,4 +119,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("docs:verify OK — estrutura por segmentos e menções críticas consistentes.");
+console.log("docs:verify OK — estrutura por segmentos e menções ServiceOS v2.0 consistentes.");

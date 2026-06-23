@@ -1,6 +1,6 @@
 # ServiceOS v2.0 — Arquitetura Multi-Nicho
 
-> Documentação da evolução do Sistema Bibi de POC HealthTech para **ServiceOS** —
+> Documentação da evolução da POC HealthTech para **ServiceOS Bibi v2.0** —
 > infraestrutura horizontal Pay Per Use que suporta múltiplos nichos via parametrização.
 
 ---

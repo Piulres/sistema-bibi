@@ -152,4 +152,4 @@ para escalar qualquer nicho de serviços profissionais.
 
 ---
 
-Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`07-healthos-expansao-2026.md`](07-healthos-expansao-2026.md) (ROI, scripts RH/CFO) · [`../V2_0_ARCHITECTURE.md`](../V2_0_ARCHITECTURE.md)
+Ver também: [`01-matriz-competitiva.md`](01-matriz-competitiva.md) · [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) (ROI, scripts RH/CFO) · [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md)

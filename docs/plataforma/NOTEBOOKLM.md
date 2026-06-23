@@ -8,7 +8,7 @@ Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 
 ## 1. O que é o ServiceOS Bibi
 
-Infraestrutura **SaaS multi-tenant multi-nicho** (evolução da POC HealthTech). Cada operação é um **tenant**
+Infraestrutura **SaaS multi-tenant multi-segmento** (ServiceOS v2.0). Cada operação é um **tenant**
 com `niche` e `labels` (JSON) para tradução automática da UI. Núcleo: **Pay Per Use** sobre qualquer
 serviço — consulta médica, hora jurídica, banho e tosa — com **precificação dinâmica** por empresa.
 
@@ -539,4 +539,4 @@ src/
 
 ---
 
-*Fim do documento — Sistema Bibi POC*
+*Fim do documento — ServiceOS Bibi v2.0 (corpus RAG)*

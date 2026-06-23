@@ -1,5 +1,5 @@
 ---
-description: Operações Sistema Bibi — pacotes fechados, economia de tokens/cota, deploy só manual. Ativa em tarefas de infra, release, produção ou Netlify.
+description: Operações ServiceOS Bibi — pacotes fechados, economia de tokens/cota, deploy só manual. Ativa em tarefas de infra, release, produção ou Netlify.
 alwaysApply: true
 ---
 

@@ -10,7 +10,7 @@
 
 | Perfil | Documento |
 |--------|-----------|
-| Desenvolvedor / agente IA | [`AGENTS.md`](../AGENTS.md) |
+| Desenvolvedor / agente IA | [`AGENTS.md`](../AGENTS.md) · [`prompts/README.md`](prompts/README.md) |
 | Operações e deploy | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) |
 | Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
@@ -28,7 +28,7 @@ docs/
 ├── produto/                  ← fluxos, jornada UX, auditoria
 ├── versoes/                  ← V1_x, V2_0, RELEASES
 ├── pesquisa/                 ← benchmark de mercado (transversal)
-├── prompts/                  ← prompts de implementação IA
+├── prompts/                  ← prompts ServiceOS v2.0 (implementação e sessão Cursor)
 └── evidencias/               ← capturas e vídeos de validação
 ```
 
@@ -101,4 +101,4 @@ Transversal a todos os segmentos: [`pesquisa/README.md`](pesquisa/README.md)
 npm run docs:verify
 ```
 
-O script falha se encontrar caminhos de documentação obsoletos (`docs/OPERACOES.md` na raiz) ou menções desatualizadas à marca **Sistema Bibi** fora de contexto histórico.
+O script falha se encontrar caminhos de documentação obsoletos (`docs/OPERACOES.md` na raiz), arquivo `08-prompt-healthos-expansao.md` (renomeado) ou menções desatualizadas a **HealthOS** / **Sistema Bibi** fora do contexto histórico v1.x.

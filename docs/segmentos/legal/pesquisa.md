@@ -93,7 +93,7 @@ Empresas médias contratam **assessoria jurídica externalizada** (compliance, t
 - RH/Financeiro auditar horas por área (trabalhista vs cível).
 - Portal PJ vê consumo por "cliente interno" (filial, departamento).
 
-**INFERÊNCIA:** ROI semelhante ao HealthOS quando retainer mensal fixo (R$ 8k) substituído por uso real (R$ 1,5–3k/mês em baixa demanda).
+**INFERÊNCIA:** ROI semelhante ao ServiceOS (segmento `MEDICAL`) quando retainer mensal fixo (R$ 8k) substituído por uso real (R$ 1,5–3k/mês em baixa demanda).
 
 ---
 

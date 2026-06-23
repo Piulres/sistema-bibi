@@ -53,7 +53,7 @@ Comparativo mensal entre o modelo tradicional (plano fechado por vida) e o Servi
 | **ServiceOS Bibi** | ~**R$ 14.500** | Pay Per Use + take rate sobre transações efetivas |
 | **Economia** | **~91%** | Transparência de consumo; RH audita cada procedimento |
 
-> Referência comercial: [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) e [`docs/pesquisa/07-healthos-expansao-2026.md`](docs/pesquisa/07-healthos-expansao-2026.md).
+> Referência comercial (segmento saúde): [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) e [`docs/segmentos/medical/pesquisa-expansao-2026.md`](docs/segmentos/medical/pesquisa-expansao-2026.md).
 
 ### ROI demonstrável multi-nicho
 

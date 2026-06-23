@@ -12,8 +12,8 @@ Complementa [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md) (matriz t
 | [`04-visao-executiva.md`](04-visao-executiva.md) | Ecossistema, TAM/SAM/SOM, SWOT, radar de inovação |
 | [`05-prompt-pesquisa-externa.md`](05-prompt-pesquisa-externa.md) | Prompts para pesquisa externa (IA, consultores, entrevistas) |
 | [`06-catalogo-players.md`](06-catalogo-players.md) | Catálogo expandido por camada de mercado |
-| [`07-healthos-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) | ROI 500 vidas, scripts RH/CFO, Tier 1 (segmento saúde) |
-| [`08-prompt-healthos-expansao.md`](08-prompt-healthos-expansao.md) | Prompt HealthOS Expansão 2026 |
+| [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) | ROI 500 vidas, scripts RH/CFO, Tier 1 (segmento saúde) |
+| [`08-prompt-serviceos-medical.md`](08-prompt-serviceos-medical.md) | Prompt ROI/expansão **segmento saúde** (ex-HealthOS) |
 | [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) | **Síntese executiva** — ROI 91%, script CFO (1 página) |
 
 ### Pesquisa por segmento (ServiceOS v2.0)

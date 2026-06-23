@@ -244,7 +244,7 @@ Memed, Mevo, Laura, Portal Telemedicina, Noa Notes
 
 ## Posicionamento final recomendado
 
-> O Sistema Bibi é uma plataforma SaaS de saúde corporativa que conecta empresas, beneficiários e prestadores em uma única operação digital, permitindo gestão transparente do consumo de saúde e cobrança baseada no uso real.
+> O **ServiceOS Bibi** é uma infraestrutura SaaS multi-segmento que conecta empresas, clientes finais e colaboradores em uma única operação digital — no segmento saúde, gestão transparente do consumo e cobrança baseada no uso real.
 
 ### Três mensagens-chave
 
