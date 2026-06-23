@@ -445,6 +445,8 @@ sistema-bibi/
   [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
   [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Versão 1.1 — Care Chart (produção):**
+  [`docs/V1_1.md`](docs/V1_1.md)
 - **Workflow Cursor (dev sem deploy automático):**
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**

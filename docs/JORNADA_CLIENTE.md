@@ -150,13 +150,16 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 | 1. Entrada | Login prestador | `/login` | Sessão `PRESTADOR` |
 | 2. Agenda do dia | Vê consultas de hoje | `/prestador` | `GET /api/prestador/agenda` |
 | 3. Abrir atendimento | Clica no card do paciente | `/prestador/atendimento/[id]` | Detalhe: paciente, empresa, procedimentos |
+| 3b. Lista de pacientes | Busca histórico clínico | `/prestador/pacientes` → `/prestador/paciente/[id]` | Care Chart fora do atendimento |
 | 4. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
 | 5. PEP | Salva evolução/receita/atestado | Templates PEP | `MedicalRecord` + timeline |
+| 5b. Care Chart | Perfil, medicação, exames, protocolos | Sidebar + painel no atendimento | APIs `/api/prestador/patients/[id]/clinical-*` |
 | 6. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
 
 ### 4.2 Pontos fortes
 
-- Fluxo clínico enxuto: agenda → atendimento → PEP → conclusão.
+- Fluxo clínico enxuto: agenda → atendimento → PEP → Care Chart → conclusão.
+- Care Chart (v1.1.0): alergias, medicações, exames e protocolos no atendimento e em `/prestador/paciente/[id]`.
 - Preço congelado no momento do uso (Pay Per Use).
 - Templates PEP (`pep-templates.ts`) aceleram documentação.
 
@@ -167,7 +170,7 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 | Alta | Só exibe agenda do dia | Calendário semanal/mensal + filtros |
 | Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
-| Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
+| Média | ~~Sem histórico clínico no atendimento~~ | ✅ **Parcial (v1.1.0):** sidebar Care Chart com alergias, meds, exames e protocolos; falta PEP anterior inline |
 | Média | Sem assinatura digital em receitas/atestados | Conformidade CFM + PDF |
 | Baixa | Sem fila automática de atendimento | “Próximo paciente” após marcar REALIZADO |
 

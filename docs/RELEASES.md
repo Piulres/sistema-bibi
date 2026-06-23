@@ -9,13 +9,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Status agora (22/06/2026)
+## Status agora (23/06/2026)
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção** | **1.1.0** — Care Chart (`8c8cd01`) |
-| **Deploy Netlify** | Auto-deploy da `main` (publicado `main@8c8cd01`) |
-| `main` | `8c8cd01` — release / produção |
+| **Deploy Netlify** | CLI `6a39d107` (build completo, 23/06/2026) |
+| `main` | `8c8cd01` — release / produção (doc head `70dba30`) |
 | `dev` | Integração — cadastros, auditoria, homepage + sync `main` |
 | **Tag git em produção** | **`v1.1.0`** |
 | Próximo pacote | Integração `dev` (auditoria #84, homepage #88, exports #85, cadastros) |

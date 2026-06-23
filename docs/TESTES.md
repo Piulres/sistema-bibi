@@ -39,7 +39,27 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 > **Auditoria completa (2026-06-22):** falhas mapeadas nos quatro portais com
 > evidências de código, testes e `curl` — [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md).
 
-### 1. RBAC inconsistente entre UI e API
+### 1. Care Chart (v1.1.0) — sem testes automatizados
+
+O módulo clínico em produção (`v1.1.0`, PR #86) expõe **14 Route Handlers** em
+`/api/prestador/patients/*`, `/api/prestador/medications|exam-orders|protocols/*`,
+`/api/interno/patients/[id]/clinical`, `/api/interno/protocol-templates/*` e
+`/api/beneficiario/clinical`. Nenhum spec Vitest ou Playwright cobre esses fluxos.
+
+| Área | Rotas | Teste atual |
+|------|-------|-------------|
+| Perfil clínico | `GET|PUT .../clinical-profile` | ❌ |
+| Medicação | `GET|POST .../medications`, `PATCH .../medications/[id]` | ❌ |
+| Exames | `GET|POST .../exam-orders`, `PATCH .../exam-orders/[id]` | ❌ |
+| Protocolos | `GET|POST .../protocols`, `PATCH .../protocols/[id]` | ❌ |
+| Visão interna/beneficiário | `GET .../clinical` | ❌ |
+| Templates interno | `GET|POST|PATCH .../protocol-templates` | ❌ |
+
+**Massa demo:** `prisma/seed-data/clinical-demo.ts` (João Pereira — alergia Dipirona, Losartana, HbA1c, protocolo HAS).
+
+> **Ação recomendada:** API tests para CRUD prestador + negação cross-tenant; E2E smoke em `/prestador/atendimento/[id]` com sidebar clínica.
+
+### 2. RBAC inconsistente entre UI e API
 
 | Onde | Comportamento |
 |------|---------------|
@@ -53,39 +73,49 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 > **Ação recomendada:** alinhar todas as rotas internas à matriz `INTERNO_PROFILES`.
 
-### 2. Proxy só verifica presença do cookie
+### 3. Proxy só verifica presença do cookie
 
 `src/proxy.ts` redireciona se **não há** cookie `bibi_session`. Um cookie forjado (`fake-token`) passa pelo proxy; a validação HMAC só ocorre no servidor (`session.ts`).
 
 Teste: `tests/unit/proxy.test.ts` — documenta o comportamento intencional (otimista).
 
-### 3. SESSION_SECRET padrão em dev
+### 4. SESSION_SECRET padrão em dev
 
 Se `SESSION_SECRET` não estiver definido, usa `bibi-poc-dev-secret-change-me`. Em produção isso **deve** ser sobrescrito. Os testes fixam um secret via `vitest.config.ts`.
 
-### 4. Senha legada em plaintext
+### 5. Senha legada em plaintext
 
 `password.ts` aceita hash sem prefixo `scrypt:` como comparação direta (migração). Risco se algum registro antigo existir.
 
 Teste: `tests/unit/password.test.ts` — marca como comportamento documentado.
 
-### 5. CRON_SECRET comparação simples
+### 6. CRON_SECRET comparação simples
 
 `/api/cron/*` usa `secret !== expected` (não timing-safe). Aceitável para secret longo, mas diferente do padrão HMAC das sessões.
 
 Teste: `tests/api/auth-and-cron.test.ts`.
 
-### 6. Isolamento multi-tenant
+### 7. Isolamento multi-tenant
 
 Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
 
-### 7. MFA bypass em rotas sem segundo fator
+### 8. MFA bypass em rotas sem segundo fator
 
 Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam MFA a cada request (padrão de mercado, mas vale documentar).
 
 ---
 
 ## Mapa por domínio de negócio
+
+### Care Chart (v1.1.0)
+
+| Etapa | Módulo | Teste atual | Próximo |
+|-------|--------|-------------|---------|
+| Perfil clínico | `clinical-profile-service.ts` | ❌ | API CRUD + JSON allergies |
+| Prescrições | `medication-service.ts` | ❌ | Status machine + timeline |
+| Pedidos de exame | `exam-order-service.ts` | ❌ | Workflow SOLICITADO→LAUDADO |
+| Protocolos | `care-protocol-service.ts` | ❌ | Checklist + templates |
+| UI prestador | `ClinicalCarePanel` | ❌ | E2E sidebar no atendimento |
 
 ### Pay Per Use (receita)
 

@@ -88,6 +88,24 @@ erDiagram
   Patient ||--o{ Appointment : "agenda"
   Patient ||--o{ MedicalRecord : "prontuário"
   Patient ||--o{ Invoice : "faturado"
+  Patient ||--o| PatientClinicalProfile : "perfil clínico"
+  Patient ||--o{ MedicationPrescription : "medicações"
+  Patient ||--o{ ExamOrder : "exames"
+  Patient ||--o{ PatientProtocolEnrollment : "protocolos"
+
+  Tenant ||--o{ CareProtocolTemplate : "templates"
+
+  CareProtocolTemplate ||--o{ PatientProtocolEnrollment : "matrículas"
+
+  User ||--o{ MedicationPrescription : "prescreve"
+  User ||--o{ ExamOrder : "solicita"
+  User ||--o{ PatientProtocolEnrollment : "matricula"
+
+  Appointment ||--o{ MedicationPrescription : "vincula"
+  Appointment ||--o{ ExamOrder : "vincula"
+  Appointment ||--o{ PatientProtocolEnrollment : "vincula"
+
+  Procedure ||--o{ ExamOrder : "exame catálogo"
 
   Procedure ||--o{ PricingRule : "ajustado por"
   Procedure ||--o{ ProcedureUsage : "usado em"
@@ -168,6 +186,45 @@ erDiagram
     string recordType "EVOLUCAO|ANAMNESE|RECEITA|ATESTADO"
     string content
     string patientId FK
+    string providerId FK
+  }
+  PatientClinicalProfile {
+    string id PK
+    string patientId FK "unique"
+    string allergies "JSON"
+    string chronicConditions "JSON"
+    string bloodType "nullable"
+  }
+  MedicationPrescription {
+    string id PK
+    string status "ATIVA|SUSPENSA|ENCERRADA"
+    string medication
+    string dosage
+    string frequency
+    string patientId FK
+    string providerId FK
+  }
+  ExamOrder {
+    string id PK
+    string status "SOLICITADO|AGENDADO|REALIZADO|LAUDADO|CANCELADO"
+    string examName
+    string patientId FK
+    string providerId FK
+    string procedureId FK "nullable"
+  }
+  CareProtocolTemplate {
+    string id PK
+    string name
+    string checklist "JSON"
+    boolean active
+    string tenantId FK
+  }
+  PatientProtocolEnrollment {
+    string id PK
+    string status "ATIVO|CONCLUIDO|SUSPENSO"
+    string checklistState "JSON"
+    string patientId FK
+    string templateId FK
     string providerId FK
   }
   Invoice {
@@ -302,6 +359,7 @@ flowchart LR
 - [x] Ver histórico de atendimentos (seed: João, Maria, Pedro)
 - [x] Ver procedimentos realizados com preços congelados
 - [x] Ver PEP (João tem registro no seed)
+- [x] Ver visão clínica Care Chart (alergias, meds, exames, protocolos — seed João)
 - [ ] Ver faturas (após gerar via billing — fluxo manual)
 - [x] Tentar acessar paciente inexistente → 404
 - [x] Prestador/PJ não acessam rota interno → redirect/403 (via RBAC)
@@ -614,6 +672,58 @@ flowchart LR
 - [x] UI `/interno/dashboard` + aba no `InternoNav`
 - [x] Links para módulos e Cliente 360°
 - [x] Build passando
+
+---
+
+## 21. Care Chart (v1.1.0)
+
+Módulo clínico estruturado além do PEP textual (`MedicalRecord`). Cinco entidades
+Prisma + serviços dedicados, expostos nos portais Prestador, Interno e Beneficiário.
+
+```mermaid
+flowchart TB
+  subgraph Serviços
+    CP["clinical-profile-service"]
+    MS["medication-service"]
+    ES["exam-order-service"]
+    PS["care-protocol-service"]
+    CO["clinical-overview"]
+  end
+  subgraph UI
+    AV["AtendimentoView"]
+    PH["PrestadorPatientHistoryView"]
+    PO["PatientOverviewView"]
+    BV["BeneficiarioView"]
+  end
+  AV --> CO
+  PH --> CO
+  PO --> CO
+  BV --> CO
+  CO --> CP & MS & ES & PS
+  CP & MS & ES & PS --> DB[("SQLite via Prisma")]
+```
+
+| Camada | Arquivo | Função |
+|--------|---------|--------|
+| Constantes | `src/lib/clinical/constants.ts` | Status, labels, parse JSON |
+| Perfil | `src/lib/clinical-profile-service.ts` | Alergias, comorbidades, tipo sanguíneo |
+| Medicação | `src/lib/medication-service.ts` | CRUD prescrições + timeline |
+| Exames | `src/lib/exam-order-service.ts` | Pedidos, agendamento, laudo |
+| Protocolos | `src/lib/care-protocol-service.ts` | Templates + matrículas + checklist |
+| Agregador | `src/lib/clinical-overview.ts` | Visão consolidada para sidebar |
+| UI | `ClinicalSidebar`, `ClinicalCarePanel` | Painéis reutilizáveis |
+| Seed | `prisma/seed-data/clinical-demo.ts` | João Pereira (HAS + diabetes demo) |
+
+**APIs por portal:**
+
+| Portal | Endpoint | Escrita |
+|--------|----------|---------|
+| Prestador | `/api/prestador/patients/[id]/clinical-*` | ✅ perfil, meds, exames, protocolos |
+| Interno | `/api/interno/patients/[id]/clinical` | ❌ somente leitura |
+| Interno | `/api/interno/protocol-templates` | ✅ templates (cadastros) |
+| Beneficiário | `/api/beneficiario/clinical` | ❌ somente leitura (escopo `patientId`) |
+
+Detalhes de fluxo: [`FLUXOS.md`](FLUXOS.md) §3, §4, §6, §10.6 · Release: [`V1_1.md`](V1_1.md).
 
 ---
 
