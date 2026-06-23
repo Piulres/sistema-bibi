@@ -10,7 +10,7 @@ jurídico, bem-estar e educação) — eliminando a **caixa preta da sinistralid
 permitindo cobrança baseada em uso real, com a mesma stack técnica para todos os verticais.
 
 **ROI de referência:** empresa com 500 colaboradores — de ~R$ 175k/mês (modelo tradicional)
-para ~R$ 14,5k/mês (Pay Per Use) = **~91% de economia**.
+para ~R$ 23,4k/mês (Pay Per Use) = **~87% de economia**. Ver [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
 
 ---
 
@@ -18,7 +18,7 @@ para ~R$ 14,5k/mês (Pay Per Use) = **~91% de economia**.
 
 ### Para empresas
 
-- Redução de desperdícios (~91% em cenário de referência)
+- Redução de desperdícios (~87% em cenário de referência — 15% utilização)
 - Transparência financeira item a item
 - Controle de utilização por colaborador/cliente
 - Um contrato, múltiplos nichos de serviço (ServiceOS)
@@ -136,7 +136,7 @@ para ~R$ 14,5k/mês (Pay Per Use) = **~91% de economia**.
 > Pare de pagar por vidas que não utilizam seu benefício.
 >
 > Com o Sistema Bibi - ServiceOS, sua empresa paga apenas pelo que foi efetivamente consumido —
-> com transparência total para RH, clientes e prestadores. Até **91% de economia**
+> com transparência total para RH, clientes e prestadores. Até **~87% de economia**
 > em empresas de médio porte.
 
 ---

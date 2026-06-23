@@ -28,7 +28,7 @@
 |----------|-------|------|
 | Colaboradores elegíveis | 500 | INFERÊNCIA (cenário pedido) |
 | Plano digital tradicional (por vida) | R$ 350,00/mês/colaborador | INFERÊNCIA (benchmark mercado médio) |
-| Consulta Pay Per Use Bibi | R$ 153,00/consulta | INFERÊNCIA (preço unitário do exercício) |
+| Consulta Pay Per Use Bibi | R$ 272,00/consulta | **FATO** (seed: `CON-CLM` R$ 320 × 0,85 TechCorp) |
 | Taxa de utilização | 15% | INFERÊNCIA (premissa do exercício) |
 | Price Snapshot Bibi | Preço travado no registro do procedimento | **FATO** (`ProcedureUsage.priceCharged`) |
 
@@ -46,39 +46,41 @@
 
 | Indicador | Plano por vida | Bibi Pay Per Use | Δ |
 |-----------|----------------|------------------|---|
-| Uso variável | 500 × R$ 350 | 75 × R$ 153 = R$ 11.475 | — |
+| Uso variável | 500 × R$ 350 | 75 × R$ 272 = R$ 20.400 | — |
 | Taxa plataforma | Inclusa na mensalidade | R$ 3.000 | — |
-| **Custo mensal total** | **R$ 175.000** | **R$ 14.475** | **−R$ 160.525** |
-| **Custo anual** | **R$ 2.100.000** | **R$ 173.700** | **−R$ 1.926.300** |
-| **Economia %** | — | — | **~91,7%** |
+| **Custo mensal total** | **R$ 175.000** | **R$ 23.400** | **−R$ 151.600** |
+| **Custo anual** | **R$ 2.100.000** | **R$ 280.800** | **−R$ 1.819.200** |
+| **Economia %** | — | — | **~86,6%** |
 
 #### Cenário uso puro (sem taxa plataforma — sensibilidade)
 
 | Indicador | Plano por vida | Bibi (só eventos) | Δ |
 |-----------|----------------|-------------------|---|
-| **Custo mensal** | **R$ 175.000** | **R$ 11.475** | **−R$ 163.525** |
-| **Economia %** | — | — | **~93,4%** |
+| **Custo mensal** | **R$ 175.000** | **R$ 20.400** | **−R$ 154.600** |
+| **Economia %** | — | — | **~88,3%** |
 
 \* *INFERÊNCIA:* Custo efetivo por consulta no modelo fixo: R$ 175.000 ÷ 75 ≈ **R$ 2.333/consulta** quando só 15% usam.
 
-**INFERÊNCIA (mensagem CFO):** No modelo fixo, os 85% que não usam subsidiam os 15% que usam. No Pay Per Use, o caixa acompanha a demanda real. Use **R$ 14.475/mês** (com taxa plataforma) em propostas comerciais — ver [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md).
+**INFERÊNCIA (mensagem CFO):** No modelo fixo, os 85% que não usam subsidiam os 15% que usam. No Pay Per Use, o caixa acompanha a demanda real. Use **R$ 23.400/mês** (com taxa plataforma) em propostas comerciais — ver [`09-sintese-consultor-senior.md`](../../pesquisa/09-sintese-consultor-senior.md) e [`../../plataforma/ROI_REFERENCIA.md`](../../plataforma/ROI_REFERENCIA.md).
 
 ---
 
 ### 1.3 Análise de sensibilidade — utilização mensal (1 consulta/usuário ativo)
 
-| Utilização | Usuários ativos/mês | Consultas/mês | Custo Bibi/mês | Economia vs R$ 175k | Economia % |
-|:--------:|:-------------------:|:-------------:|:--------------:|:-------------------:|:----------:|
-| 5% | 25 | 25 | R$ 3.825 | R$ 171.175 | 97,8% |
-| 10% | 50 | 50 | R$ 7.650 | R$ 167.350 | 95,6% |
-| **15%** | **75** | **75** | **R$ 11.475** | **R$ 163.525** | **93,4%** |
-| 25% | 125 | 125 | R$ 19.125 | R$ 155.875 | 89,1% |
-| 40% | 200 | 200 | R$ 30.600 | R$ 144.400 | 82,5% |
-| 60% | 300 | 300 | R$ 45.900 | R$ 129.100 | 73,8% |
-| 100% | 500 | 500 | R$ 76.500 | R$ 98.500 | 56,3% |
+| Utilização | Usuários ativos/mês | Consultas/mês | Custo Bibi/mês* | Economia vs R$ 175k | Economia % |
+|:--------:|:-------------------:|:-------------:|:---------------:|:-------------------:|:----------:|
+| 5% | 25 | 25 | R$ 9.800 | R$ 165.200 | 94,4% |
+| 10% | 50 | 50 | R$ 16.600 | R$ 158.400 | 90,5% |
+| **15%** | **75** | **75** | **R$ 23.400** | **R$ 151.600** | **86,6%** |
+| 25% | 125 | 125 | R$ 37.000 | R$ 138.000 | 78,9% |
+| 40% | 200 | 200 | R$ 57.400 | R$ 117.600 | 67,2% |
+| 60% | 300 | 300 | R$ 84.600 | R$ 90.400 | 51,7% |
+| 100% | 500 | 500 | R$ 139.000 | R$ 36.000 | 20,6% |
 
-**FATO (matemática):** Ponto de equilíbrio mensal (1 consulta/colaborador que usa):  
-`175.000 ÷ 153 ≈ 1.144 consultas/mês` → **~229% de “vida-consulta”** sobre 500 vidas (todos precisariam de ~2,3 consultas/mês em média).
+\* *Inclui taxa plataforma R$ 3.000/mês + consultas a R$ 272 (preço congelado).*
+
+**FATO (matemática):** Ponto de equilíbrio mensal (só variável, sem taxa plataforma):  
+`175.000 ÷ 272 ≈ 644 consultas/mês` → **~129% de “vida-consulta”** sobre 500 vidas (todos precisariam de ~1,3 consultas/mês em média).
 
 **INFERÊNCIA:** Pay Per Use vence em caixa enquanto a utilização real permanecer abaixo do break-even — típico em programas de atenção primária corporativa (ANS: utilização ambulatorial frequentemente &lt; 40% da carteira em modelos mistos).
 
@@ -88,8 +90,10 @@
 
 | Indicador | Plano por vida (12 meses) | Bibi (75 consultas/ano) |
 |-----------|---------------------------|-------------------------|
-| Custo total | R$ 2.100.000 | R$ 11.475 |
-| Economia anual | — | R$ 2.088.525 (~99,5%) |
+| Uso variável anual | R$ 2.100.000 | 75 × R$ 272 = **R$ 20.400** |
+| Taxa plataforma (12 meses) | Inclusa | R$ 36.000 |
+| **Custo total anual** | **R$ 2.100.000** | **R$ 56.400** |
+| **Economia anual** | — | **R$ 2.043.600 (~97,3%)** |
 
 **INFERÊNCIA:** Se a empresa paga plano 12 meses mas só 15% usam 1x/ano, o desperdício estrutural do modelo fixo é máximo. O Portal PJ do Bibi torna esse desperdício **visível** (não só teórico).
 
@@ -105,7 +109,7 @@
 | Custo de implementação | Corretagem | Onboarding SaaS | INFERÊNCIA |
 | Taxa plataforma Bibi | — | Adicionar fee mensal em proposta real | INFERÊNCIA |
 
-**INFERÊNCIA (modelo comercial sugerido):** Fee plataforma R$ 3–8/colaborador/mês + Pay Per Use mantém economia mesmo com fee — ex.: R$ 5 × 500 = R$ 2.500 + R$ 11.475 = **R$ 13.975/mês** (92% abaixo de R$ 175k).
+**INFERÊNCIA (modelo comercial sugerido):** Fee plataforma R$ 3–8/colaborador/mês + Pay Per Use mantém economia mesmo com fee — ex.: R$ 5 × 500 = R$ 2.500 + R$ 20.400 = **R$ 22.900/mês** (~87% abaixo de R$ 175k).
 
 ---
 

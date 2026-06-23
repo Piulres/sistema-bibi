@@ -23,18 +23,20 @@ Transição do modelo de **capitação** (pagar por vida) para **Pay Per Use** d
 | Dimensão financeira | Plano digital tradicional (mercado) | Sistema Bibi - ServiceOS (Pay Per Use) |
 |---------------------|-------------------------------------|----------------------------|
 | Modelo de cobrança | Mensalidade fixa por colaborador | Pagamento por utilização efetiva |
-| Custo mensal por vida/uso | R$ 350,00 (ticket médio PME) | R$ 153,00 (preço com desconto corporativo) |
+| Custo mensal por vida/uso | R$ 350,00 (ticket médio PME) | R$ 272,00 (preço com desconto corporativo — seed) |
 | Base de cálculo (mensal) | 500 vidas ativas | 75 atendimentos (15% de uso) |
 | Custo fixo de software | Já incluso na mensalidade | R$ 3.000,00 (taxa plataforma est.) |
-| **Total mensal** | **R$ 175.000,00** | **R$ 14.475,00** |
-| **Economia mensal / anual** | — | **R$ 160.525,00 / R$ 1,92 mi** |
-| **Economia %** | — | **~91,7%** |
+| **Total mensal** | **R$ 175.000,00** | **R$ 23.400,00** |
+| **Economia mensal / anual** | — | **R$ 151.600,00 / R$ 1,82 mi** |
+| **Economia %** | — | **~87%** (86,6%) |
 
 **FATO:** O modelo tradicional cobra independentemente da utilização, gerando desperdício em vidas ociosas.
 
 **FATO:** O Bibi utiliza **Price Snapshot** — `priceCharged` congela o valor no ato do atendimento após `computePrice()` + `PricingRule.multiplier` ([`src/lib/pricing.ts`](../../src/lib/pricing.ts)).
 
-**INFERÊNCIA:** Redução de custos de ~91% é o principal gatilho de aprovação do CFO em empresas de médio porte (100–1.000 colaboradores), desde que o escopo (ambulatorial vs internação) esteja alinhado.
+**INFERÊNCIA:** Redução de custos de ~87% é o principal gatilho de aprovação do CFO em empresas de médio porte (100–1.000 colaboradores), desde que o escopo (ambulatorial vs internação) esteja alinhado.
+
+**FATO (preço unitário):** Consulta `CON-CLM` base R$ 320 × multiplier 0,85 (TechCorp) = **R$ 272** — ver [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
 
 **FATO (demo):** TechCorp no seed usa `clinicalDiscount: 0.85` — desconto corporativo de 15% aplicado via multiplier ([`prisma/seed-data/companies.ts`](../../prisma/seed-data/companies.ts)).
 
@@ -129,7 +131,7 @@ O Bibi **não compete por agenda** — compete por **gestão inteligente de cons
 
 | Pilar | Mensagem |
 |-------|----------|
-| Financeiro | Pague pelo uso; economia ~92% no cenário 500 vidas / 15% utilização |
+| Financeiro | Pague pelo uso; economia ~87% no cenário 500 vidas / 15% utilização |
 | Operacional | 4 portais + Price Snapshot + Portal PJ transparente |
 | Estratégico | ServiceOS entre ERP clínico e operadora digital — infraestrutura Pay Per Use |
 

@@ -128,7 +128,7 @@ Credenciais: senha `bibi123`, e-mails `operacao@{niche}.demo`.
 
 O ServiceOS trata qualquer transação de serviço processada — consulta médica, hora jurídica ou aula de yoga — como evento faturável com take rate sobre o volume transacionado, independentemente do nicho escolhido pelo cliente.
 
-**ROI de referência (500 colaboradores):** modelo tradicional ~R$ 175k/mês vs ServiceOS ~R$ 14,5k/mês — **~91% de economia**. Ver `docs/pesquisa/09-sintese-consultor-senior.md`.
+**ROI de referência (500 colaboradores):** modelo tradicional ~R$ 175k/mês vs ServiceOS ~R$ 23,4k/mês — **~87% de economia**. Ver [`docs/plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
 
 ---
 

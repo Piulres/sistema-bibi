@@ -43,17 +43,17 @@ horas técnicas jurídicas ou aulas de yoga.
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários/clientes |
 | **Portal do Beneficiário** | Clientes finais | Agenda, consumo Pay Per Use e faturas |
 
-### ROI de 91% — empresa de médio porte (500 colaboradores)
+### ROI de ~87% — empresa de médio porte (500 colaboradores)
 
-Comparativo mensal entre o modelo tradicional (plano fechado por vida) e o ServiceOS Pay Per Use:
+Comparativo mensal entre o modelo tradicional (plano fechado por vida) e o ServiceOS Pay Per Use (15% de utilização — 75 consultas/mês a R$ 272 com desconto corporativo):
 
 | Modelo | Custo mensal (500 vidas) | Lógica |
 |--------|--------------------------|--------|
 | **Tradicional** | ~**R$ 175.000** | R$ 350/vida × 500 — paga por elegibilidade, não por uso |
-| **Sistema Bibi - ServiceOS** | ~**R$ 14.500** | Pay Per Use + take rate sobre transações efetivas |
-| **Economia** | **~91%** | Transparência de consumo; RH audita cada procedimento |
+| **Sistema Bibi - ServiceOS** | ~**R$ 23.400** | 75 × R$ 272 (uso) + R$ 3.000 (plataforma) |
+| **Economia** | **~87%** (86,6%) | Transparência de consumo; RH audita cada procedimento |
 
-> Referência comercial (segmento saúde): [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) e [`docs/segmentos/medical/pesquisa-expansao-2026.md`](docs/segmentos/medical/pesquisa-expansao-2026.md).
+> Fonte canônica com fórmulas e sensibilidade: [`docs/plataforma/ROI_REFERENCIA.md`](docs/plataforma/ROI_REFERENCIA.md). Detalhamento comercial: [`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) e [`docs/segmentos/medical/pesquisa-expansao-2026.md`](docs/segmentos/medical/pesquisa-expansao-2026.md).
 
 ### ROI demonstrável multi-nicho
 

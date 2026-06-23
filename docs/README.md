@@ -63,6 +63,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 | [`plataforma/PAYMENTS.md`](plataforma/PAYMENTS.md) | Motor PIX / Strategy |
 | [`plataforma/COMMUNICATIONS.md`](plataforma/COMMUNICATIONS.md) | Motor de comunicação |
 | [`plataforma/BENCHMARK.md`](plataforma/BENCHMARK.md) | Matriz POC × mercado |
+| [`plataforma/ROI_REFERENCIA.md`](plataforma/ROI_REFERENCIA.md) | ROI Pay Per Use — fórmulas e sensibilidade (saúde) |
 | [`plataforma/NOTEBOOKLM.md`](plataforma/NOTEBOOKLM.md) | Corpus RAG |
 | [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md) | Dev sem deploy automático |
 

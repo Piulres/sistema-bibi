@@ -27,7 +27,7 @@ Estamos escalando o **Sistema Bibi - ServiceOS v2.0** — infraestrutura SaaS mu
 ## 1. Análise de ROI comparativa (500 colaboradores)
 
 - Plano tradicional: R$ 350/mês/vida
-- ServiceOS Pay Per Use: R$ 153/consulta @ 15% utilização
+- ServiceOS Pay Per Use: R$ 272/consulta @ 15% utilização (seed: R$ 320 × 0,85)
 - Tabela de sensibilidade, break-even, fee plataforma R$ 3–8/vida
 - Marcar FATO vs INFERÊNCIA
 

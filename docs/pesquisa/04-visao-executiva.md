@@ -23,7 +23,7 @@ Sua posição natural encontra-se na interseção entre:
 
 Essa combinação cria um espaço competitivo relativamente pouco ocupado no mercado brasileiro.
 
-**ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) → ~R$ 14,5k/mês (Pay Per Use) = **~91% economia**.
+**ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) → ~R$ 23,4k/mês (Pay Per Use) = **~87% economia**.
 
 ---
 

@@ -71,7 +71,7 @@ O Sistema Bibi - ServiceOS ocupa um espaço pouco explorado:
 
 - **Infraestrutura transacional** B2B (não operadora, não ERP vertical)
 - Rede de prestadores com **cobrança por uso real**
-- **Transparência de consumo** — elimina desperdício de ~91% vs modelo por vida (referência 500 colaboradores)
+- **Transparência de consumo** — elimina desperdício de ~87% vs modelo por vida (referência 500 colaboradores, 15% utilização)
 - Portal corporativo + **white label multi-nicho**
 - Quatro portais como **estações de trabalho** configuráveis por tenant
 

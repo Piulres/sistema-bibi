@@ -76,7 +76,7 @@ Tendência crescente. Empresas desejam:
 
 - Previsibilidade
 - Auditoria item a item (fim da "caixa preta")
-- Redução de desperdícios — **ROI de até 91%** vs modelo por vida (500 colaboradores: R$ 175k → R$ 14,5k/mês)
+- Redução de desperdícios — **ROI de até ~87%** vs modelo por vida (500 colaboradores: R$ 175k → R$ 23,4k/mês)
 
 #### Bem-estar e serviços sob demanda
 

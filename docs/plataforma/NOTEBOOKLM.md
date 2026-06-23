@@ -12,7 +12,7 @@ Infraestrutura **SaaS multi-tenant multi-segmento** (ServiceOS v2.0). Cada opera
 com `niche` e `labels` (JSON) para tradução automática da UI. Núcleo: **Pay Per Use** sobre qualquer
 serviço — consulta médica, hora jurídica, banho e tosa — com **precificação dinâmica** por empresa.
 
-**ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) → ~R$ 14,5k/mês (Pay Per Use) = **~91% economia**.
+**ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) → ~R$ 23,4k/mês (Pay Per Use) = **~87% economia**. Detalhes: [`ROI_REFERENCIA.md`](ROI_REFERENCIA.md).
 
 **Stack:** Next.js 16 (App Router + `proxy.ts`), React 19, TypeScript, Tailwind v4, Prisma 6, SQLite (dev), Netlify Blobs (logos).
 
@@ -131,7 +131,7 @@ SQLite não suporta enums Prisma — `role`, `status`, `category` são `String`.
 6. **PJ** acompanha consumo em `/pj`
 7. **Beneficiário** vê consumo transparente e pode **agendar consulta** em `/beneficiario`
 
-Exemplo seed: Consulta Clínica base R$ 180 → TechCorp paga R$ 153 (15% desconto).
+Exemplo seed: Consulta Clínica base R$ 320 → TechCorp paga R$ 272 (15% desconto).
 
 ---
 
