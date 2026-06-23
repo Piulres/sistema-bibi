@@ -101,7 +101,7 @@ Paletas automáticas em `src/lib/niche/defaults.ts`:
 
 `applyNicheBrandingDefaults()` aplica a paleta quando o tenant usa cores padrão.
 
-A landing (`src/app/page.tsx`) detecta o nicho via domínio customizado (`resolveLandingNiche`) ou query `?niche=VET` e renderiza seções temáticas via `getNicheLandingContent()`.
+A landing (`src/app/page.tsx`) resolve o segmento via `resolveSegmentContext()` (`src/lib/segment/resolve.ts`): prioridade `?tenant=petcare` → cookie `bibi_segment` → domínio customizado → `?niche=VET`. Renderiza seções temáticas via `getNicheLandingContent()`.
 
 ---
 
@@ -138,5 +138,5 @@ O ServiceOS trata qualquer transação de serviço processada — consulta médi
 - `src/hooks/useLabels.tsx` — hook de tradução (`useLabels` / alias `useNiche`)
 - `src/constants/niches.ts` — dicionário mestre `NICHE_MASTER_LABELS`
 - `prisma/schema.prisma` — `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`
-- `docs/versoes/RELEASES.md` — pacotes fechados (v2.0 em desenvolvimento na `dev`)
+- `docs/versoes/RELEASES.md` — pacotes fechados (v2.0.0 em produção)
 - `docs/versoes/V2_0.md` — escopo e changelog v2.0

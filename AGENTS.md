@@ -22,7 +22,9 @@ e `labels` (JSON) para tradução automática da UI.
 
 **Regra para IAs:** consulte `docs/prompts/README.md` e `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` antes de features novas. Não usar *HealthOS* nem posicionamento só-saúde em código/docs v2.0.
 
-**Roteamento por segmento:** `?tenant=petcare` · cookie `bibi_segment` · `docs/segmentos/README.md`
+**Roteamento por segmento:** `?tenant=petcare` · cookie `bibi_segment` · `POST /api/segment/persist` · login valida `user.tenantId` (`src/lib/segment/auth.ts`) · `docs/segmentos/README.md`
+
+**Marca oficial:** `src/lib/platform.ts` (`PLATFORM.name` = "Sistema Bibi - ServiceOS") — não hardcodar em componentes novos.
 
 **Regra labels:** ao criar qualquer tela nos portais autenticados, **consulte `NICHE_MASTER_LABELS` e use `useLabels()`** — a nomenclatura vem do tenant ativo.
 
@@ -99,6 +101,8 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 | Emular Netlify | `npm run netlify:dev` | ✅ Sim |
 | Lint | `npm run lint` | ✅ Sim |
 | Validar pacote | `npm run pre-release` | ✅ Sim (não publica) |
+| Verificar docs | `npm run docs:verify` | ✅ Sim (incluído no pre-release) |
+| Verificar bancos | `npm run db:verify` | ✅ Sim (incluído no pre-release) |
 | Setup banco VM nova | `db:push && db:seed` | ✅ Sim |
 | Reset banco | `npm run db:reset` | ❌ Bloqueado |
 | Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
@@ -112,6 +116,8 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
 **503 `usage_exceeded`:** cota Netlify, não bug. Não investigar em loop nem redeployar automaticamente.
+
+**`pre-release`** executa: lint → docs:verify → db:verify → test → netlify:build (`scripts/pre-release.mjs`).
 
 **Árvore rápida:**
 - Feature/bug → dev local + lint → PR → `dev`

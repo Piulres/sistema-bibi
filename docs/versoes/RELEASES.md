@@ -60,6 +60,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - Tenants demo: PetCare, Smile, Lex, Zen, EduPrime + Horizonte Saúde
 - `db:verify` no `pre-release` · massas demo + operation validadas
 - Fix mobile: cookie de segmento via API client-side
+- Precificação multi-tenant: CRUD de `PricingRule` escopado por `Procedure.tenantId` (`pricing-rule-service.ts`)
 - Documentação reorganizada (`docs/segmentos/`, prompts, índice)
 
 **Testes:** 163 Vitest · `db:verify` demo + operation · `pre-release` OK.
