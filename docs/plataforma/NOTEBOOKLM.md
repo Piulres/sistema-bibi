@@ -148,10 +148,11 @@ Exemplo seed: Consulta Clínica base R$ 320 → TechCorp paga R$ 272 (15% descon
 | `/interno/assinaturas` | Recorrência (+ faturar cobrança — Tier 1) | 5 / T1 |
 | `/interno/comunicacao` | Fila de mensagens (+ lembretes automáticos — Tier 1) | 7 / T1 |
 | `/interno/relatorios` | Exportação CSV (faturamento, CRM) | T2 |
+| `/interno/auditoria` | Timeline universal + export CSV/PDF | T2 |
 | `/interno/branding` | White label (cores, logo, tema escuro, domínio custom) | design / T3 |
 | `/interno/beneficiarios/[id]` | Cliente 360° | 1 |
 | `/interno/integracoes` | Webhooks B2B + log de entregas | T3 / T4 |
-| `/interno/seguranca` | MFA TOTP | T4 |
+| `/interno/seguranca` | MFA TOTP, dual-store demo/operação, reset demo | T4 |
 
 ---
 
