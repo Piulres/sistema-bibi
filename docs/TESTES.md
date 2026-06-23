@@ -56,7 +56,7 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 | **API** (maioria das rotas `/api/interno/*`) | Só exige `role === INTERNO` — **qualquer perfil** acessa billing, cadastros, PIX… |
 | **Teste** | `tests/security/rbac-gaps.test.ts` documenta e falha se a correção for aplicada |
 
-**Rotas com guard correto (`requireInternoModule`):** invoices POST, TISS, users, branding, webhooks, CRM status, export LGPD.
+**Rotas com guard correto (`requireInternoModule`):** invoices POST, TISS, users, branding, webhooks, CRM status, export LGPD, **estoque (`/api/interno/stock/*`)**.
 
 **Rotas expostas sem guard de módulo (exemplos):** `/interno/billing`, `/interno/procedures`, `/interno/invoices/[id]/pix`, `/interno/dashboard`.
 
@@ -122,7 +122,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 |--------|------------|-----------------|
 | ADMIN | todos | parcial |
 | FATURAMENTO | billing, subscriptions… | invoices POST ✅, billing GET ❌ |
-| RECEPCAO | agenda, cadastros… | appointments ✅ (só role) |
+| RECEPCAO | agenda, cadastros, **estoque**… | appointments ✅ (só role); **estoque ✅** (`requireInternoModule`) |
 | READONLY | dashboard, relatórios | **pode chamar billing via API** |
 
 ### Portais B2B / beneficiário
@@ -143,11 +143,26 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | Comunicação console | ❌ |
 | Branding validation | ✅ unit |
 
+### Estoque médico (v1.3.0)
+
+| Etapa | Módulo | Teste atual |
+|-------|--------|-------------|
+| Catálogo + overview | `stock/products` | ✅ `stock.test.ts` |
+| Entrada de lote | `stock/lots` | ✅ `stock.test.ts` |
+| Saída / ajuste FIFO | `stock/movements` | ✅ `stock.test.ts` |
+| Alertas (validade, mínimo) | `stock/alerts` | ✅ `stock.test.ts` |
+| Kit + Pay Per Use | `consumeProcedureKit` | ✅ `stock.test.ts` |
+| RBAC (FATURAMENTO negado) | `requireInternoModule("estoque")` | ✅ `stock.test.ts` |
+| Dispensação prestador | `.../materials` | ❌ |
+| UI estoque (E2E) | `/interno/estoque` | ✅ `interno-modules.spec.ts` |
+
 ---
 
-## Mapa das 58 rotas API
+## Mapa das rotas API
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
+
+> Contagem aproximada: **~99** route handlers em `src/app/api/` (inclui estoque v1.3 e Care Chart).
 
 ### Auth (público / sessão)
 - `POST /api/auth/login` — 🌐 ✅ testado
@@ -160,10 +175,10 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 - `POST /api/cron/reminders` — ⏰ ✅ testado
 - `POST /api/cron/webhooks` — ⏰
 
-### Prestador (5 rotas) — 🔑 PRESTADOR
-- agenda, appointments, procedures, records
+### Prestador (6 rotas) — 🔑 PRESTADOR
+- agenda, appointments, procedures, **materials**, records
 
-### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
+### Interno (~46 rotas) — 🔑 INTERNO (**17+ com 🔒**, inclui `stock/*`)
 - Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
 
 ### PJ (2) — 🔑 PJ
@@ -237,7 +252,7 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | 11 módulos admin |
+| `interno-modules.spec.ts` | 13 módulos admin (inclui estoque) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 

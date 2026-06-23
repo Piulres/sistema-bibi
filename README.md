@@ -36,7 +36,7 @@ de valores e faturamento sem perdas de informação.
 | Portal | Público | Foco |
 |--------|---------|------|
 | **Portal do Prestador** | Médicos / profissionais de saúde | Agenda inteligente e prontuário eletrônico (PEP) |
-| **Portal Interno** | Equipe administrativa | Dashboard executivo, faturamento, CRM, recorrência e comunicação |
+| **Portal Interno** | Equipe administrativa | Dashboard executivo, faturamento, **estoque médico**, CRM, recorrência e comunicação |
 | **Portal da Empresa (PJ)** | RH / gestores corporativos | Contratos e beneficiários corporativos |
 | **Portal do Beneficiário** | Pacientes / beneficiários | Agenda, consumo Pay Per Use, faturas e assinatura |
 
@@ -445,6 +445,8 @@ sistema-bibi/
   [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
   [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Versão 1.3 — Estoque médico** (validada na `main`, pendente deploy):
+  [`docs/V1_3.md`](docs/V1_3.md)
 - **Workflow Cursor (dev sem deploy automático):**
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**

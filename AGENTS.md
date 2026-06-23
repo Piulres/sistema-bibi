@@ -20,7 +20,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v1.2.0`** @ `55481be`; `main` e `dev` sincronizadas. Ver `docs/RELEASES.md`.
+(cota Netlify). **Produção:** **`v1.2.0`** @ `55481be` · **`main`/`dev`:** **`v1.3.0`** validado (`8833507`), pendente deploy. Ver `docs/RELEASES.md`.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/WORKFLOW_CURSOR.md` e **`docs/OPERACOES.md`** (mapa completo de operações).
@@ -80,7 +80,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/V1_0.md`. Produção: **`1.2.0`** — `docs/V1_2.md` · `docs/RELEASES.md`.
+**Versões:** `1.0.x` histórico — `docs/V1_0.md`. Produção: **`1.2.0`** — `docs/V1_2.md`. **`main` validada:** **`1.3.0`** — `docs/V1_3.md` · `docs/RELEASES.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
@@ -112,7 +112,7 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 
 | Portal | Layout | Nav | Breadcrumbs |
 |--------|--------|-----|-------------|
-| Interno | `src/app/interno/layout.tsx` | `InternoNav` — 11 abas + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
+| Interno | `src/app/interno/layout.tsx` | `InternoNav` — 13 abas + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
 | Prestador | `src/app/prestador/layout.tsx` | `PrestadorNav` | Atendimento (`buildAtendimentoBreadcrumbs`) |
 | PJ | `src/app/pj/layout.tsx` | `SectionNav` — 4 seções | — |
 | Beneficiário | `src/app/beneficiario/layout.tsx` | `SectionNav` — 8 seções | — |
@@ -126,9 +126,11 @@ Mapa completo: [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md) (inclu
 |---------|------|-------|
 | Walk-in particular | `/interno/agenda` → seção walk-in | `AppointmentsView.tsx` |
 | Edição cadastros | `/interno/cadastros` → Editar em cada aba | `CadastrosView.tsx` |
+| Estoque médico | `/interno/estoque` | `StockView.tsx` |
+| Dispensação no atendimento | `/prestador/atendimento/[id]` → aba Materiais | `AtendimentoView.tsx` |
 | Mapa CRUD (27 entidades) | `/interno/cadastros?tab=operations` | `src/lib/crud-operations-map.ts` |
 
-Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §8.5–8.6 · Demo particular: `pedro.almeida@email.com`.
+Detalhe de fluxos: `docs/FLUXOS.md` §4.2, §4.4, §8.5–8.6 · Demo particular: `pedro.almeida@email.com` · Estoque: `recepcao@bibi.health`.
 
 ### Notas não óbvias
 - **Prisma 7** quebra o schema atual (remove `url` do datasource e exige driver
