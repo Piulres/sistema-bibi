@@ -36,6 +36,7 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
 | `VOA_ENABLED` | Não | `false` | Assistente IA Voa no atendimento |
 | `VOA_INTEGRATION_TOKEN` | Se Voa ativo | — | Token plugin Voa Health |
+| `VOA_ENV` | Não | `homologacao` | `homologacao` \| `producao` (referência operacional) |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
 | `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
 | `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
@@ -237,11 +238,13 @@ Ver [`docs/VOA_INTEGRATION.md`](VOA_INTEGRATION.md).
 |----------|-------------|--------|-----------|
 | `VOA_ENABLED` | Não | `false` | Habilita aba Assistente IA no portal prestador |
 | `VOA_INTEGRATION_TOKEN` | Sim (se enabled) | — | Token fornecido pela Voa (`init` do plugin) |
+| `VOA_ENV` | Não | `homologacao` | Referência: `homologacao` (chave `sk_user_*`) ou `producao` |
 | `VOA_PLUGIN_SCRIPT_URL` | Não | `https://integration.voa.health/plugin.js` | URL do script |
 
 ```env
+VOA_ENV=homologacao
 VOA_ENABLED=false
-# VOA_INTEGRATION_TOKEN=
+# VOA_INTEGRATION_TOKEN=   # homologação: sk_user_* — só no .env local / Netlify
 # VOA_PLUGIN_SCRIPT_URL=https://integration.voa.health/plugin.js
 ```
 
