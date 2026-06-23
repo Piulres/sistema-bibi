@@ -15,8 +15,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |------|-------|
 | **Versão em produção** | **1.2.0** (`55481be`) |
 | **Deploy Netlify** | `6a39d446` (23/06/2026) |
-| `main` | `6c1770a` — **v1.3.0** Estoque validado (`pre-release` OK) |
-| `dev` | `6c1770a` — sincronizada com `main` |
+| `main` | `8833507` — **v1.3.0** Estoque validado (`pre-release` OK) |
+| `dev` | `8833507` — sincronizada com `main` |
 | **Tag git em produção** | **`v1.2.0`** |
 | **Próximo deploy** | **v1.3.0** — `npx netlify deploy --prod` (humano) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
@@ -94,7 +94,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Versão** | `1.3.0` (`package.json`) |
-| **Commit** | `e372c01` (feat) + `6c1770a` (docs release) |
+| **Commit** | `e372c01` (feat) + `8833507` (docs release) |
 | **PR** | [#93](https://github.com/Piulres/sistema-bibi/pull/93) |
 | **Doc** | [`V1_3.md`](V1_3.md) |
 | **Validação** | `npm run pre-release` ✅ · `tests/api/stock.test.ts` 8/8 |

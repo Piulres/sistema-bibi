@@ -150,7 +150,7 @@ Quando `User.mfaEnabled = true`:
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, **dispensar materiais**, PEP, marcar REALIZADO |
 
 ### APIs disparadas
 
@@ -159,7 +159,8 @@ Quando `User.mfaEnabled = true`:
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
-| Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
+| Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`); **baixa automática do kit** via `consumeProcedureKit()` |
+| Aba Materiais | `GET|POST .../appointments/[id]/materials` | Dispensação manual (`DISPENSACAO`) vinculada ao agendamento/paciente |
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
@@ -167,10 +168,18 @@ Quando `User.mfaEnabled = true`:
 flowchart LR
   A[Agenda do dia] --> B[Atendimento]
   B --> C[Registrar ProcedureUsage]
+  B --> M[Dispensar materiais]
   B --> D[Salvar PEP]
   B --> E[Marcar REALIZADO]
   C --> F[(billed=false)]
+  C --> K[Baixa kit FIFO]
+  M --> K
 ```
+
+**Estoque no atendimento:** ao registrar um procedimento com kit configurado (`ProcedureMaterialKit`),
+`stock-service.ts` consome lotes em **FIFO** (validade mais próxima) e retorna `stockConsumed` /
+`stockWarnings` na resposta. Dispensação adicional na aba **Materiais** não exige perfil interno —
+apenas `role === PRESTADOR` e vínculo com o agendamento.
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
 (ex.: TechCorp 0,85 → Consulta Clínica R$ 180 → **R$ 153** congelado em `priceCharged`).
@@ -189,7 +198,9 @@ flowchart LR
 | `billing` | `/interno` | `BillingView` | Pay Per Use, faturas, PIX, TISS |
 | `agenda` | `/interno/agenda` | `AppointmentsView` | CRUD agenda |
 | `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, usuários |
+| `estoque` | `/interno/estoque` | `StockView` | Catálogo, lotes, movimentações, kits, alertas |
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
+| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal + export |
 | `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
 | `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
@@ -256,7 +267,43 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
-### 4.4 CRM (`CrmPipelineView`)
+### 4.4 Estoque (`StockView`)
+
+**RBAC:** `ADMIN` e `RECEPCAO` · APIs com `requireInternoModule("estoque")`.
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Overview + catálogo | `GET /api/interno/stock/products` | Produtos, saldo agregado, KPIs; `refreshExpiredLots()` |
+| Criar produto | `POST /api/interno/stock/products` | `MedicalProduct` (SKU único por tenant) |
+| Atualizar produto | `PATCH .../stock/products/[id]` | `minStock`, categoria, status ativo |
+| Listar / entrada de lote | `GET|POST /api/interno/stock/lots` | `StockLot` + movimento `ENTRADA` |
+| Status do lote | `PATCH .../stock/lots/[id]` | `DISPONIVEL` \| `BLOQUEADO` \| `VENCIDO` \| `QUARENTENA` |
+| Movimentação manual | `GET|POST /api/interno/stock/movements` | `SAIDA`, `PERDA`, `AJUSTE`, `DEVOLUCAO` (FIFO) |
+| Alertas | `GET /api/interno/stock/alerts` | Estoque mínimo, vencimento (90 dias), bloqueados |
+| Kit por procedimento | `GET|POST .../stock/procedure-kits/[procedureId]` | `ProcedureMaterialKit` — baixa no Pay Per Use |
+
+Categorias: `MEDICAMENTO`, `MATERIAL`, `OPME`, `INSUMO` · Unidades: `UN`, `ML`, `CX`, `PC`, `FR`.
+
+Serviço: `src/lib/stock-service.ts` · Constantes: `src/lib/stock-constants.ts` ·
+Auditoria: timeline `STOCK_*` (`timeline-constants.ts`).
+
+```mermaid
+sequenceDiagram
+  participant R as Recepção
+  participant API as /api/interno/stock/*
+  participant S as stock-service
+  participant P as Prestador
+
+  R->>API: POST /lots (entrada)
+  API->>S: registerStockLot + ENTRADA
+  R->>API: POST /procedure-kits/{procedureId}
+  Note over R: Kit vinculado ao procedimento
+  P->>API: POST .../procedures
+  API->>S: consumeProcedureKit (FIFO)
+  S-->>P: stockConsumed / stockWarnings
+```
+
+### 4.5 CRM (`CrmPipelineView`)
 
 | Ação | API | Efeito |
 |------|-----|--------|
@@ -265,7 +312,7 @@ Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
 Status: `LEAD → PROPOSTA → NEGOCIACAO → ATIVO → INADIMPLENTE → CANCELADO`
 
-### 4.5 Recorrência (`SubscriptionsView`)
+### 4.6 Recorrência (`SubscriptionsView`)
 
 | Ação | API | Efeito |
 |------|-----|--------|
@@ -276,7 +323,7 @@ Status: `LEAD → PROPOSTA → NEGOCIACAO → ATIVO → INADIMPLENTE → CANCELA
 
 Serviço: `src/lib/subscription-service.ts` + bridge em `invoice-service.ts`
 
-### 4.6 Comunicação (`ComunicacaoView`)
+### 4.7 Comunicação (`ComunicacaoView`)
 
 | Ação | API | Status Message |
 |------|-----|----------------|
@@ -289,7 +336,7 @@ Serviço: `src/lib/subscription-service.ts` + bridge em `invoice-service.ts`
 
 Templates: `APPOINTMENT_REMINDER`, `INVOICE_DUE`, `SUBSCRIPTION_DUE`, `GENERIC`
 
-### 4.7 Integrações (`IntegracoesView`)
+### 4.8 Integrações (`IntegracoesView`)
 
 | Ação | API |
 |------|-----|
@@ -373,6 +420,7 @@ sequenceDiagram
 
   Note over P: 2. Atendimento
   P->>P: POST .../procedures → ProcedureUsage
+  P->>P: consumeProcedureKit (baixa FIFO, se kit configurado)
   P->>P: POST /prestador/records (PEP)
   P->>P: PATCH status REALIZADO
 
@@ -400,7 +448,7 @@ sequenceDiagram
 **Passos resumidos:**
 
 1. **Agendar** — recepção (`/interno/agenda`) ou beneficiário (`/beneficiario`).
-2. **Atender** — prestador registra procedimentos (preço congelado) e PEP.
+2. **Atender** — prestador registra procedimentos (preço congelado + **baixa de kit** se configurado), dispensação manual opcional e PEP.
 3. **Faturar** — interno agrupa usages não faturados → `Invoice` FECHADA.
 4. **Cobrar** — PIX mock ou marcação manual → `Invoice` PAGA.
 5. **Acompanhar** — beneficiário (self-service) e PJ (corporativo).
@@ -491,10 +539,12 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | billing | ✓ | ✓ | ✗ | ✗ |
 | agenda | ✓ | ✗ | ✓ | ✗ |
 | cadastros | ✓ | ✗ | ✓ | ✗ |
+| estoque | ✓ | ✗ | ✓ | ✗ |
 | crm | ✓ | ✗ | ✗ | ✗ |
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
+| auditoria | ✓ | ✓ | ✗ | ✓ |
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
@@ -505,7 +555,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD, **estoque (`/api/interno/stock/*`)** |
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.
@@ -583,7 +633,7 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`POST .../procedures` · `GET|POST .../materials` · `POST /api/prestador/records` · `GET /api/procedures`
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
@@ -597,7 +647,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
 `companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*` ·
+`stock/*` (produtos, lotes, movimentações, alertas, kits) · `audit/*`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`

@@ -22,7 +22,7 @@ flowchart TB
   subgraph Cliente["Navegador (Mobile-first)"]
     Land["Landing /"]
     PortP["Portal Prestador<br/>/login · /prestador"]
-    PortI["Portal Interno<br/>/interno/login · /interno/dashboard<br/>/interno · cadastros · agenda · crm<br/>/interno/assinaturas · comunicacao · relatorios<br/>/interno/branding · integracoes · seguranca"]
+    PortI["Portal Interno<br/>/interno/login · /interno/dashboard<br/>/interno · cadastros · agenda · estoque · crm<br/>/interno/assinaturas · comunicacao · relatorios<br/>/interno/branding · integracoes · seguranca"]
     PortPJ["Portal Empresa (PJ)<br/>/pj/login · /pj"]
     PortBen["Portal Beneficiário<br/>/beneficiario/login · /beneficiario"]
   end
@@ -41,6 +41,7 @@ flowchart TB
       Comms["communications/* + reminder-service<br/>(console adapter Tier 1)"]
       Webhooks["webhook-service.ts<br/>(B2B + retry Tier 3/4)"]
       RBAC["interno-permissions.ts<br/>(RBAC Tier 3)"]
+      Stock["stock-service.ts<br/>(estoque médico v1.3)"]
       MFA["mfa.ts · tiss-service.ts<br/>(Tier 4)"]
       Dashboard["executive-dashboard.ts"]
       DB["db.ts (Prisma Client)"]
@@ -59,6 +60,7 @@ flowchart TB
   API --> Comms
   API --> Webhooks
   API --> RBAC
+  API --> Stock
   API --> MFA
   API --> DB --> SQLite
   Sess --> DB
@@ -76,6 +78,7 @@ erDiagram
   Tenant ||--o{ Procedure : possui
   Tenant ||--o{ Appointment : possui
   Tenant ||--o{ Invoice : possui
+  Tenant ||--o{ MedicalProduct : "estoque"
 
   Company ||--o{ User : "vincula (PJ)"
   Company ||--o{ Patient : "beneficiários"
@@ -91,9 +94,16 @@ erDiagram
 
   Procedure ||--o{ PricingRule : "ajustado por"
   Procedure ||--o{ ProcedureUsage : "usado em"
+  Procedure ||--o{ ProcedureMaterialKit : "kit de materiais"
 
   Appointment ||--o{ ProcedureUsage : "registra (Pay Per Use)"
   Appointment ||--o{ MedicalRecord : "gera"
+  Appointment ||--o{ StockMovement : "dispensação"
+
+  MedicalProduct ||--o{ StockLot : "lotes"
+  MedicalProduct ||--o{ StockMovement : "movimentações"
+  MedicalProduct ||--o{ ProcedureMaterialKit : "itens do kit"
+  StockLot ||--o{ StockMovement : "rastreio FIFO"
 
   ProcedureUsage |o--o| InvoiceItem : "faturado como"
   Invoice ||--o{ InvoiceItem : "contém"
@@ -162,6 +172,38 @@ erDiagram
     boolean billed
     string appointmentId FK
     string procedureId FK
+  }
+  MedicalProduct {
+    string id PK
+    string sku
+    string category "MEDICAMENTO|MATERIAL|OPME|INSUMO"
+    string unit "UN|ML|CX|PC|FR"
+    float minStock
+    boolean active
+    string tenantId FK
+  }
+  StockLot {
+    string id PK
+    string lotNumber
+    datetime expiryDate
+    float quantity
+    string status "DISPONIVEL|BLOQUEADO|VENCIDO|QUARENTENA"
+    string productId FK
+  }
+  StockMovement {
+    string id PK
+    string type "ENTRADA|SAIDA|DISPENSACAO|..."
+    float quantity
+    string appointmentId FK "nullable"
+    string procedureUsageId FK "nullable"
+    string lotId FK "nullable"
+    string productId FK
+  }
+  ProcedureMaterialKit {
+    string id PK
+    float quantity
+    string procedureId FK
+    string productId FK
   }
   MedicalRecord {
     string id PK
@@ -237,7 +279,8 @@ sequenceDiagram
   P->>API: POST /appointments/{id}/procedures {procedureId}
   API->>DB: computePrice (precificação dinâmica)
   API->>DB: cria ProcedureUsage (preço congelado, billed=false)
-  API-->>P: procedimento registrado
+  API->>DB: consumeProcedureKit (baixa FIFO, se kit configurado)
+  API-->>P: procedimento registrado (+ stockConsumed)
 
   P->>API: POST /api/prestador/records (PEP)
   P->>API: PATCH /appointments/{id} {status: REALIZADO}
