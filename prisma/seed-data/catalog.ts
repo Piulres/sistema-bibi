@@ -1,19 +1,41 @@
 /** Prestadores adicionais além da Dra. Helena (demo principal). */
+export const DEMO_PRESTADOR_HELENA = {
+  email: "dra.helena@bibi.health",
+  name: "Dra. Helena Martins",
+  specialty: "Cardiologia",
+  councilType: "CRM",
+  councilNumber: "123456",
+  councilUf: "SP",
+  phone: "(11) 3456-7890",
+} as const;
+
 export const SEED_PROVIDERS = [
   {
     email: "dr.ricardo@bibi.health",
     name: "Dr. Ricardo Cardoso",
     specialty: "Cardiologia",
+    councilType: "CRM",
+    councilNumber: "234567",
+    councilUf: "SP",
+    phone: "(11) 3456-7891",
   },
   {
     email: "dra.fernanda@bibi.health",
     name: "Dra. Fernanda Lima",
     specialty: "Clínica Geral",
+    councilType: "CRM",
+    councilNumber: "345678",
+    councilUf: "RJ",
+    phone: "(21) 3456-7892",
   },
   {
     email: "dr.paulo@bibi.health",
     name: "Dr. Paulo Mendes",
     specialty: "Dermatologia",
+    councilType: "CRM",
+    councilNumber: "456789",
+    councilUf: "MG",
+    phone: "(31) 3456-7893",
   },
 ] as const;
 

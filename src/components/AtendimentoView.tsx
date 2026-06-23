@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import ExportButtons from "@/components/ExportButtons";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -393,11 +394,20 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           <ul className="mt-4 space-y-3">
             {detail.records.map((r) => (
               <li key={r.id} className="rounded-[var(--radius-button)] bg-[var(--surface-muted)] p-3">
-                {r.title && <p className="text-xs font-semibold text-[var(--portal-accent)]">{r.title}</p>}
-                <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">{r.content}</p>
-                <p className="mt-1 text-xs text-[var(--text-muted)]">
-                  {new Date(r.createdAt).toLocaleString("pt-BR")}
-                </p>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0 flex-1">
+                    {r.title && <p className="text-xs font-semibold text-[var(--portal-accent)]">{r.title}</p>}
+                    <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">{r.content}</p>
+                    <p className="mt-1 text-xs text-[var(--text-muted)]">
+                      {new Date(r.createdAt).toLocaleString("pt-BR")}
+                    </p>
+                  </div>
+                  <ExportButtons
+                    baseUrl={`/api/prestador/records/${r.id}/export`}
+                    formats={["pdf"]}
+                    variant="ghost"
+                  />
+                </div>
               </li>
             ))}
           </ul>

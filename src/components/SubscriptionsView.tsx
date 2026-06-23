@@ -8,6 +8,7 @@ import Alert from "@/components/ui/Alert";
 import LoadingState from "@/components/ui/LoadingState";
 import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
+import ExportButtons from "@/components/ExportButtons";
 
 type Subscription = {
   id: string;
@@ -264,7 +265,10 @@ export default function SubscriptionsView() {
       </Card>
 
       <section>
-        <SectionHeader title="Assinaturas ativas" />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeader title="Assinaturas ativas" />
+          <ExportButtons baseUrl="/api/interno/subscriptions/export" />
+        </div>
         {subscriptions.length === 0 ? (
           <EmptyState message="Nenhuma assinatura cadastrada." />
         ) : (

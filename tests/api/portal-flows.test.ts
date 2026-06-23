@@ -131,7 +131,7 @@ describe("API — fluxos por portal", () => {
     });
 
     it("GET /api/pj/reports exporta CSV", async () => {
-      const res = await pjReportsGet();
+      const res = await pjReportsGet(new Request("http://localhost/api/pj/reports"));
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("text/csv");
       const text = await res.text();

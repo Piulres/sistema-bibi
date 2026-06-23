@@ -1,8 +1,8 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import Button from "@/components/ui/Button";
 import SectionHeader from "@/components/ui/SectionHeader";
+import ExportButtons from "@/components/ExportButtons";
 import InfoTooltip from "@/components/ui/InfoTooltip";
 
 export default function PrestadorReportsView() {
@@ -11,15 +11,25 @@ export default function PrestadorReportsView() {
       <Card>
         <SectionHeader
           title="Exportar relatórios"
-          description="Downloads em CSV dos seus atendimentos e procedimentos."
+          description="Downloads em PDF, Excel ou CSV dos seus atendimentos e procedimentos."
         />
-        <div className="mt-6 flex flex-wrap gap-4">
-          <a href="/api/prestador/reports?type=procedures" download>
-            <Button variant="portal">Procedimentos (CSV)</Button>
-          </a>
-          <a href="/api/prestador/reports?type=appointments" download>
-            <Button variant="secondary">Atendimentos (CSV)</Button>
-          </a>
+        <div className="mt-6 space-y-4">
+          <div>
+            <p className="mb-2 text-sm font-medium text-[var(--text-secondary)]">Procedimentos</p>
+            <ExportButtons
+              baseUrl="/api/prestador/reports"
+              query={{ type: "procedures" }}
+              formats={["pdf", "xlsx", "csv"]}
+            />
+          </div>
+          <div>
+            <p className="mb-2 text-sm font-medium text-[var(--text-secondary)]">Atendimentos</p>
+            <ExportButtons
+              baseUrl="/api/prestador/reports"
+              query={{ type: "appointments" }}
+              formats={["pdf", "xlsx", "csv"]}
+            />
+          </div>
         </div>
       </Card>
 

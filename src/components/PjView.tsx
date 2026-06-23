@@ -8,7 +8,7 @@ import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
-import Button from "@/components/ui/Button";
+import ExportButtons from "@/components/ExportButtons";
 
 type AlertItem = {
   tone: "warning" | "danger" | "info";
@@ -121,11 +121,10 @@ export default function PjView() {
           {" · "}
           Faturas em aberto: {company.pendingInvoicesLabel}
         </p>
-        <a href="/api/pj/reports" download>
-          <Button variant="secondary" size="sm">
-            Exportar relatório CSV
-          </Button>
-        </a>
+        <ExportButtons
+          baseUrl="/api/pj/reports"
+          formats={["pdf", "xlsx", "csv"]}
+        />
       </div>
 
       <section id="resumo">

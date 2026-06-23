@@ -10,6 +10,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import StatCard from "@/components/ui/StatCard";
+import ExportButtons from "@/components/ExportButtons";
 
 type PendingItem = { id: string; procedure: string; priceLabel: string };
 type PendingGroup = {
@@ -216,10 +217,13 @@ export default function BillingView() {
       </div>
 
       <section>
-        <SectionHeader
-          title="Procedimentos a faturar (Pay Per Use)"
-          description="Itens utilizados e ainda não faturados, agrupados por beneficiário."
-        />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionHeader
+            title="Procedimentos a faturar (Pay Per Use)"
+            description="Itens utilizados e ainda não faturados, agrupados por beneficiário."
+          />
+          <ExportButtons baseUrl="/api/interno/billing/export" />
+        </div>
 
         {pending.length === 0 && (
           <EmptyState message="Nenhum procedimento pendente de faturamento." />
@@ -271,7 +275,10 @@ export default function BillingView() {
       </section>
 
       <section>
-        <SectionHeader title="Faturas emitidas" />
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <SectionHeader title="Faturas emitidas" />
+          <ExportButtons baseUrl="/api/interno/billing/export" />
+        </div>
         {invoices.length === 0 && (
           <EmptyState message="Nenhuma fatura emitida ainda." />
         )}
@@ -284,7 +291,7 @@ export default function BillingView() {
                 <th className="px-4 py-2 font-medium">Itens</th>
                 <th className="px-4 py-2 font-medium">Status</th>
                 <th className="px-4 py-2 text-right font-medium">Total</th>
-                <th className="px-4 py-2 text-right font-medium">TISS</th>
+                <th className="px-4 py-2 text-right font-medium">Exportar</th>
                 <th className="px-4 py-2 text-right font-medium">Ações</th>
               </tr>
             </thead>
@@ -310,13 +317,19 @@ export default function BillingView() {
                     {inv.totalLabel}
                   </td>
                   <td className="px-4 py-2 text-right">
-                    <a
-                      href={`/api/interno/invoices/${inv.id}/tiss`}
-                      download
-                      className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
-                    >
-                      XML
-                    </a>
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <ExportButtons
+                        baseUrl={`/api/interno/invoices/${inv.id}/export`}
+                        formats={["pdf", "xlsx"]}
+                      />
+                      <a
+                        href={`/api/interno/invoices/${inv.id}/tiss`}
+                        download
+                        className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                      >
+                        XML
+                      </a>
+                    </div>
                   </td>
                   <td className="px-4 py-2 text-right">
                     {inv.status !== "PAGA" && (

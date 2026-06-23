@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
+import ExportButtons from "@/components/ExportButtons";
 
 type Overview = {
   patient: {
@@ -111,13 +112,18 @@ export default function PatientOverviewView({
 
   return (
     <div className="space-y-8">
-      <div>
+      <div className="flex flex-wrap items-center gap-3">
+        <ExportButtons
+          baseUrl={`/api/interno/patients/${patientId}/export`}
+          query={{ section: "summary" }}
+          formats={["pdf", "xlsx"]}
+        />
         <a
-          href={`/api/interno/patients/${patientId}/export`}
+          href={`/api/interno/patients/${patientId}/export?format=json`}
           download
-          className="inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
+          className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
         >
-          Exportar dados (LGPD JSON)
+          LGPD (JSON)
         </a>
       </div>
 
@@ -165,7 +171,13 @@ export default function PatientOverviewView({
       </div>
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Timeline universal</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Timeline universal</h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "timeline" }}
+          />
+        </div>
         <p className="mt-1 text-sm text-[var(--text-muted)]">
           Histórico auditável de eventos relacionados a este beneficiário.
         </p>
@@ -193,7 +205,13 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Atendimentos</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Atendimentos</h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "appointments" }}
+          />
+        </div>
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum atendimento registrado.</p>
         ) : (
@@ -227,7 +245,13 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "usages" }}
+          />
+        </div>
         {overview.usages.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
         ) : (
@@ -264,9 +288,15 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-          Prontuário eletrônico ({summary.totalRecords})
-        </h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+            Prontuário eletrônico ({summary.totalRecords})
+          </h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "records" }}
+          />
+        </div>
         {overview.medicalRecords.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma anotação clínica.</p>
         ) : (
@@ -278,7 +308,14 @@ export default function PatientOverviewView({
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
                   <span>{record.providerName}</span>
-                  <span>{record.createdAtLabel}</span>
+                  <div className="flex items-center gap-2">
+                    <span>{record.createdAtLabel}</span>
+                    <ExportButtons
+                      baseUrl={`/api/interno/patients/${patientId}/records/${record.id}/export`}
+                      formats={["pdf"]}
+                      variant="ghost"
+                    />
+                  </div>
                 </div>
                 {record.appointmentDateLabel && (
                   <p className="mt-1 text-xs text-[var(--text-muted)]">
@@ -329,7 +366,13 @@ export default function PatientOverviewView({
       )}
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Faturas</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Faturas</h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "invoices" }}
+          />
+        </div>
         {overview.invoices.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhuma fatura emitida.</p>
         ) : (
@@ -346,7 +389,14 @@ export default function PatientOverviewView({
                       {invoice.createdAtLabel} · {invoice.company ?? "Particular"}
                     </p>
                   </div>
-                  <StatusBadge value={invoice.status} map="invoice" />
+                  <div className="flex flex-wrap items-center gap-2">
+                    <StatusBadge value={invoice.status} map="invoice" />
+                    <ExportButtons
+                      baseUrl={`/api/interno/invoices/${invoice.id}/export`}
+                      formats={["pdf", "xlsx"]}
+                      variant="ghost"
+                    />
+                  </div>
                 </div>
                 <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-[var(--border-default)]">
                   {invoice.items.map((item) => (

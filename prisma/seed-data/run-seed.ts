@@ -16,7 +16,7 @@ import {
   firstDayOfMonthFromNow,
   daysAgo,
 } from "./helpers";
-import { SEED_PROVIDERS } from "./catalog";
+import { SEED_PROVIDERS, DEMO_PRESTADOR_HELENA } from "./catalog";
 import {
   ALL_SEED_PROCEDURES,
   CORPORATE_BENEFIT_PRODUCTS,
@@ -117,11 +117,16 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("Criando usuarios dos portais...");
   const prestador = await prisma.user.create({
     data: {
-      email: "dra.helena@bibi.health",
+      email: DEMO_PRESTADOR_HELENA.email,
       password: DEMO_PASSWORD,
-      name: "Dra. Helena Martins",
+      name: DEMO_PRESTADOR_HELENA.name,
       role: "PRESTADOR",
       tenantId: tenant.id,
+      specialty: DEMO_PRESTADOR_HELENA.specialty,
+      councilType: DEMO_PRESTADOR_HELENA.councilType,
+      councilNumber: DEMO_PRESTADOR_HELENA.councilNumber,
+      councilUf: DEMO_PRESTADOR_HELENA.councilUf,
+      phone: DEMO_PRESTADOR_HELENA.phone,
     },
   });
   const providerIds = [prestador.id];
@@ -133,6 +138,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
         name: p.name,
         role: "PRESTADOR",
         tenantId: tenant.id,
+        specialty: p.specialty,
+        councilType: p.councilType,
+        councilNumber: p.councilNumber,
+        councilUf: p.councilUf,
+        phone: p.phone,
       },
     });
     providerIds.push(created.id);
@@ -392,6 +402,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
 
   const recordJoao = await prisma.medicalRecord.create({
     data: {
+      recordType: "EVOLUCAO",
+      title: "Evolução — dor torácica",
       content:
         "Paciente refere melhora da dor torácica após ajuste medicamentoso. ECG sem alterações agudas. Mantida conduta.",
       patientId: joaoId,
@@ -406,6 +418,28 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       entityId: recordJoao.id,
       action: TIMELINE_ACTIONS.MEDICAL_RECORD_CREATED,
       description: "Anotação clínica registrada no prontuário de João Pereira",
+      createdBy: prestador.id,
+    },
+  });
+
+  const recordJoaoReceita = await prisma.medicalRecord.create({
+    data: {
+      recordType: "RECEITA",
+      title: "Receituário — anti-hipertensivo",
+      content:
+        "Losartana 50mg — 1 comprimido pela manhã.\nAtenolol 25mg — 1 comprimido à noite.\nRetorno em 30 dias.",
+      patientId: joaoId,
+      providerId: prestador.id,
+      appointmentId: ag1.id,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.MEDICAL_RECORD,
+      entityId: recordJoaoReceita.id,
+      action: TIMELINE_ACTIONS.MEDICAL_RECORD_CREATED,
+      description: "Receituário emitido para João Pereira",
       createdBy: prestador.id,
     },
   });
@@ -434,6 +468,51 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
       action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED,
       description: `Hemograma Completo registrado para Maria Souza (${formatBrl(procedures["EXA-HEM"].basePrice)})`,
       createdBy: prestador.id,
+    },
+  });
+
+  const invMaria = await prisma.invoice.create({
+    data: {
+      tenantId: tenant.id,
+      patientId: mariaId,
+      companyId: techCorpId,
+      total: procedures["EXA-HEM"].basePrice,
+      status: "FECHADA",
+      items: {
+        create: [
+          {
+            description: procedures["EXA-HEM"].name,
+            amount: procedures["EXA-HEM"].basePrice,
+            usageId: usageMaria.id,
+          },
+        ],
+      },
+    },
+  });
+  await prisma.procedureUsage.update({
+    where: { id: usageMaria.id },
+    data: { billed: true },
+  });
+  await prisma.payment.create({
+    data: {
+      invoiceId: invMaria.id,
+      method: "PIX",
+      amount: procedures["EXA-HEM"].basePrice,
+      status: "PENDING",
+      gatewayId: "mock",
+      externalId: `seed-pix-maria-${invMaria.id.slice(-8)}`,
+      pixCopyPaste: `00020126580014br.gov.bcb.pix0136maria-${invMaria.id.slice(-12)}`,
+      createdBy: interno.id,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.INVOICE,
+      entityId: invMaria.id,
+      action: TIMELINE_ACTIONS.INVOICE_ISSUED,
+      description: `Fatura Pay Per Use emitida para Maria Souza (${formatBrl(procedures["EXA-HEM"].basePrice)})`,
+      createdBy: interno.id,
     },
   });
 
@@ -614,6 +693,19 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
           },
         ],
       },
+    },
+  });
+  await prisma.payment.create({
+    data: {
+      invoiceId: invPedro.id,
+      method: "PIX",
+      amount: procedures["CON-DER"].basePrice,
+      status: "CONFIRMED",
+      gatewayId: "mock",
+      externalId: `seed-pix-pedro-${invPedro.id.slice(-8)}`,
+      pixCopyPaste: `00020126580014br.gov.bcb.pix0136pedro-${invPedro.id.slice(-12)}`,
+      paidAt: daysAgo(28),
+      createdBy: interno.id,
     },
   });
   await prisma.timelineEvent.create({
