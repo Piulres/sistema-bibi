@@ -101,8 +101,13 @@ Base local: **`http://localhost:3000`**
 |-----|--------|--------|
 | `/` | Landing page com seleção de portal | Público |
 | `/login` | Login do **Portal do Prestador** | Público |
-| `/prestador` | Dashboard do prestador (agenda do dia) | `PRESTADOR` |
-| `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP) | `PRESTADOR` |
+| `/prestador/dashboard` | Dashboard do prestador (KPIs e atalhos) | `PRESTADOR` |
+| `/prestador` | Agenda do dia | `PRESTADOR` |
+| `/prestador/atendimento/{id}` | Detalhe do atendimento (procedimentos + PEP + Care Chart) | `PRESTADOR` |
+| `/prestador/pacientes` | Lista de pacientes do prestador | `PRESTADOR` |
+| `/prestador/paciente/{id}` | Histórico clínico do paciente (Care Chart) | `PRESTADOR` |
+| `/prestador/extrato` | Extrato financeiro de procedimentos | `PRESTADOR` |
+| `/prestador/relatorios` | Relatórios clínicos com export PDF/Excel | `PRESTADOR` |
 | `/interno/login` | Login do **Portal Interno** | Público |
 | `/interno/dashboard` | **Dashboard Executivo** — KPIs consolidados do tenant | `INTERNO` |
 | `/interno` | Dashboard de faturamento (Pay Per Use) | `INTERNO` |
@@ -113,12 +118,24 @@ Base local: **`http://localhost:3000`**
 | `/interno/cadastros` | **Cadastros** — beneficiários, empresas, procedimentos, usuários; aba **Mapa CRUD** | `INTERNO` |
 | `/interno/cadastros?tab=operations` | **Mapa CRUD** — 27 entidades, rotas API, filtro por portal | `INTERNO` |
 | `/interno/agenda` | **Agenda** — agendamentos, **walk-in particular** e check-in | `INTERNO` |
-| `/interno/relatorios` | **Relatórios** — exportação CSV (faturamento, CRM) | `INTERNO` |
+| `/interno/relatorios` | **Relatórios** — exportação CSV/PDF/Excel (faturamento, CRM) | `INTERNO` |
+| `/interno/auditoria` | **Auditoria** — timeline universal de eventos do tenant | `INTERNO` |
 | `/interno/branding` | **White label** — cores, logo, tema, domínio custom | `INTERNO` |
 | `/interno/integracoes` | **Integrações B2B** — webhooks outbound e log de entregas | `INTERNO` |
 | `/interno/seguranca` | **Segurança** — MFA TOTP; seletor **demo/operação**; restaurar demo | `INTERNO` (ADMIN para dados) |
 | `/beneficiario/login` | Login do **Portal do Beneficiário** | Público |
-| `/beneficiario` | Self-service: agenda, consumo, faturas e assinatura | `BENEFICIARIO` |
+| `/beneficiario` | Redireciona para `/beneficiario/resumo` | `BENEFICIARIO` |
+| `/beneficiario/resumo` | Resumo: próximo atendimento, pendências PPU, assinatura | `BENEFICIARIO` |
+| `/beneficiario/agendar` | Agendar consulta self-service | `BENEFICIARIO` |
+| `/beneficiario/agenda` | Minha agenda (cancelar consultas futuras) | `BENEFICIARIO` |
+| `/beneficiario/consumo` | Consumo Pay Per Use | `BENEFICIARIO` |
+| `/beneficiario/faturas` | Faturas e pagamento PIX | `BENEFICIARIO` |
+| `/beneficiario/medicacoes` | Medicações ativas (Care Chart) | `BENEFICIARIO` |
+| `/beneficiario/exames` | Pedidos de exame (Care Chart) | `BENEFICIARIO` |
+| `/beneficiario/plano` | Dados do plano corporativo | `BENEFICIARIO` |
+| `/beneficiario/assinatura` | Assinatura recorrente | `BENEFICIARIO` |
+| `/beneficiario/prontuario` | Prontuário eletrônico (somente leitura) | `BENEFICIARIO` |
+| `/beneficiario/historico` | Timeline de eventos | `BENEFICIARIO` |
 | `/pj/login` | Login do **Portal da Empresa (PJ)** | Público |
 | `/pj` | Dashboard corporativo (beneficiários e faturas) | `PJ` |
 
@@ -248,6 +265,14 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | `GET` | `/api/prestador/agenda` | Agenda do dia do prestador logado. |
+| `GET` | `/api/prestador/dashboard` | KPIs do prestador (atendimentos, pacientes). |
+| `GET` | `/api/prestador/patients` | Lista de pacientes do prestador. |
+| `GET` | `/api/prestador/patients/{id}/overview` | Histórico clínico (Care Chart). |
+| `GET` | `/api/prestador/patients/{id}/export` | Export por seção (`appointments`, …) — PDF/Excel. |
+| `GET` | `/api/prestador/extrato` | Extrato de procedimentos realizados. |
+| `GET` | `/api/prestador/extrato/export` | Export do extrato (PDF/Excel). |
+| `GET` | `/api/prestador/reports` | Relatórios clínicos (`type=procedures`, …). |
+| `GET` | `/api/prestador/records/{recordId}/export` | Export PDF de registro PEP. |
 | `GET` | `/api/prestador/appointments/{id}` | Detalhe do atendimento (procedimentos + PEP). |
 | `PATCH` | `/api/prestador/appointments/{id}` | Atualiza o status. Body: `{ status }`. |
 | `POST` | `/api/prestador/appointments/{id}/procedures` | Registra um procedimento (Pay Per Use). Body: `{ procedureId }`. |
@@ -267,11 +292,17 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `POST` | `/api/interno/invoices/{id}/pix` | Gera cobrança PIX mock. |
 | `POST` | `/api/interno/invoices/{id}/confirm-pix` | Confirma pagamento PIX pendente. |
 | `GET` | `/api/interno/invoices/{id}/tiss` | Exporta guia TISS/ANS em XML. |
+| `GET` | `/api/interno/invoices/{id}/export` | Export PDF da fatura. |
+| `GET` | `/api/interno/billing/export` | Export do painel de faturamento (PDF/Excel). |
+| `GET` | `/api/interno/audit` | Lista eventos da timeline universal. |
+| `GET` | `/api/interno/audit/export` | Export da auditoria (PDF/Excel). |
+| `GET` | `/api/interno/subscriptions/export` | Export de assinaturas (PDF/Excel). |
 | `GET` | `/api/interno/patients` | Lista beneficiários. |
 | `POST` | `/api/interno/patients` | Cria beneficiário. |
 | `PATCH` | `/api/interno/patients/{id}` | Atualiza beneficiário. |
 | `GET` | `/api/interno/patients/{id}/overview` | Visão **Cliente 360°**. |
-| `GET` | `/api/interno/patients/{id}/export` | Export JSON LGPD. |
+| `GET` | `/api/interno/patients/{id}/export` | Export LGPD por seção (`timeline`, `records`, …) — PDF/Excel/JSON. |
+| `GET` | `/api/interno/patients/{id}/records/{recordId}/export` | Export PDF de registro PEP. |
 | `GET/POST` | `/api/interno/companies` | CRUD empresas. |
 | `PATCH` | `/api/interno/companies/{id}` | Atualiza empresa. |
 | `GET/POST` | `/api/interno/procedures` | CRUD procedimentos. |
@@ -280,7 +311,7 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 | `PATCH` | `/api/interno/users/{id}` | Atualiza usuário. |
 | `GET/POST` | `/api/interno/appointments` | Agenda interna. |
 | `PATCH` | `/api/interno/appointments/{id}` | Altera status/modalidade. |
-| `GET` | `/api/interno/reports?type=billing\|crm` | Download CSV. |
+| `GET` | `/api/interno/reports?type=billing\|crm` | Download CSV (padrão), PDF ou Excel (`format=pdf\|xlsx`). |
 | `GET` | `/api/interno/crm/pipeline` | Pipeline CRM. |
 | `PATCH` | `/api/interno/companies/{id}/status` | Atualiza status CRM. |
 | `GET/POST` | `/api/interno/subscriptions` | Assinaturas recorrentes. |
@@ -303,19 +334,23 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
-| `GET` | `/api/beneficiario/overview` | Self-service: agenda, consumo, faturas, assinatura e PEP. |
+| `GET` | `/api/beneficiario/overview` | Self-service: resumo consolidado. |
+| `GET` | `/api/beneficiario/clinical` | Dados clínicos (medicações, exames). |
+| `GET` | `/api/beneficiario/export` | Export por seção (`resumo`, `agenda`, `consumo`, `faturas`, `prontuario`, …) — PDF/Excel. |
 | `GET` | `/api/beneficiario/providers` | Prestadores disponíveis para agendamento. |
 | `GET` | `/api/beneficiario/slots` | Slots de 30 min (query: `providerId`, `date`). |
 | `POST` | `/api/beneficiario/appointments` | Agenda consulta self-service. |
+| `PATCH` | `/api/beneficiario/appointments/{id}` | Cancela consulta futura (`action: "cancel"`). |
 | `POST` | `/api/beneficiario/invoices/{id}/pay` | Gera PIX para fatura. |
 | `PATCH` | `/api/beneficiario/invoices/{id}/pay` | Confirma pagamento PIX. |
+| `GET` | `/api/beneficiario/invoices/{id}/export` | Export PDF da fatura. |
 
 ### Portal da Empresa (`role: PJ`)
 
 | Método | Endpoint | Descrição |
 |--------|----------|-----------|
 | `GET` | `/api/pj/overview` | Contrato, beneficiários, faturas, alertas e MRR. |
-| `GET` | `/api/pj/reports` | Export CSV corporativo. |
+| `GET` | `/api/pj/reports` | Export corporativo — CSV (padrão), PDF ou Excel (`format=pdf\|xlsx`). |
 
 ### Documentação interativa (Swagger UI)
 
@@ -445,6 +480,8 @@ sistema-bibi/
   [`docs/VARIAVEIS_AMBIENTE.md`](docs/VARIAVEIS_AMBIENTE.md)
 - **Pacotes fechados / releases:**
   [`docs/RELEASES.md`](docs/RELEASES.md)
+- **Versão em produção (`v1.2.0`):**
+  [`docs/V1_2.md`](docs/V1_2.md)
 - **Workflow Cursor (dev sem deploy automático):**
   [`docs/WORKFLOW_CURSOR.md`](docs/WORKFLOW_CURSOR.md)
 - **Operações (mapa completo + regras IA):**

@@ -143,25 +143,38 @@ Quando `User.mfaEnabled = true`:
 
 ## 3. Portal Prestador
 
-**Role:** `PRESTADOR` · **Guard:** `getSessionUser()` + redirect `/login`
+**Role:** `PRESTADOR` · **Guard:** `getSessionUser()` + redirect `/login` · **Nav SPA:** `PRESTADOR_NAV_TABS` em `src/lib/navigation/routes.ts`
 
 ### Rotas e ações
 
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
+| `/prestador/dashboard` | `PrestadorDashboardView` | KPIs, atalhos para agenda e pacientes |
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, Care Chart, marcar REALIZADO |
+| `/prestador/pacientes` | `PrestadorPatientsView` | Buscar pacientes por nome/CPF |
+| `/prestador/paciente/[id]` | `PrestadorPatientHistoryView` | Histórico clínico (Care Chart: medicação, exames, protocolos) |
+| `/prestador/extrato` | `PrestadorExtratoView` | Extrato de procedimentos realizados |
+| `/prestador/relatorios` | `PrestadorReportsView` | Relatórios clínicos com export PDF/Excel |
 
 ### APIs disparadas
 
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
+| Dashboard | `GET /api/prestador/dashboard` | KPIs do prestador |
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
+| Listar pacientes | `GET /api/prestador/patients` | Pacientes com atendimentos do prestador |
+| Histórico clínico | `GET /api/prestador/patients/[id]/overview` | Care Chart + timeline |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
+| Care Chart | `GET|PATCH .../patients/[id]/clinical-profile` · medicações/exames/protocolos | Serviços em `src/lib/*-service.ts` |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
+| Export extrato | `GET /api/prestador/extrato/export?format=` | PDF/Excel |
+| Export relatórios | `GET /api/prestador/reports?type=&format=` | PDF/Excel |
+| Export PEP | `GET /api/prestador/records/[recordId]/export?format=pdf` | PDF customizado |
+| Export paciente | `GET /api/prestador/patients/[id]/export?section=&format=` | PDF/Excel por seção |
 
 ```mermaid
 flowchart LR
@@ -192,7 +205,8 @@ flowchart LR
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
 | `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
-| `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
+| `relatorios` | `/interno/relatorios` | `ReportsView` | CSV/PDF/Excel faturamento/CRM |
+| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal do tenant |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP |
@@ -248,13 +262,47 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 
 | Aba | Criar (POST) | Atualizar | Excluir | Observações |
 |-----|--------------|-----------|---------|-------------|
-| Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
-| Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
+| Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; validação CPF (`br-documents.ts`) |
+| Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM; validação CNPJ |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
-Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
+Export LGPD: `GET /api/interno/patients/[id]/export?section=&format=` → `patient-export.ts` + `src/lib/exports/`
+
+### 4.8 Auditoria (`AuditoriaView`)
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Listar eventos | `GET /api/interno/audit` | Timeline universal do tenant (filtros por tipo/data) |
+| Export | `GET /api/interno/audit/export?format=` | PDF/Excel da auditoria |
+
+Perfis com acesso: ADMIN, FATURAMENTO, READONLY (`interno-permissions.ts`).
+
+### 4.9 Exportações (PDF / Excel / CSV)
+
+Subsistema centralizado em `src/lib/exports/` — `serve.ts`, `tabular.ts`, `builders.ts`, `pep-pdf.ts`, `invoice-pdf.ts`.
+
+| Portal | Endpoint | Formatos | Uso |
+|--------|----------|----------|-----|
+| Interno | `GET /api/interno/billing/export` | PDF, Excel | Painel de faturamento |
+| Interno | `GET /api/interno/reports?type=billing\|crm` | CSV (padrão), PDF, Excel | Relatórios operacionais |
+| Interno | `GET /api/interno/audit/export` | PDF, Excel | Auditoria |
+| Interno | `GET /api/interno/subscriptions/export` | PDF, Excel | Assinaturas |
+| Interno | `GET /api/interno/invoices/[id]/export` | PDF | Fatura individual |
+| Interno | `GET /api/interno/patients/[id]/export` | PDF, Excel, JSON | Cliente 360° por seção |
+| Interno | `GET /api/interno/patients/[id]/records/[recordId]/export` | PDF | PEP |
+| Prestador | `GET /api/prestador/extrato/export` | PDF, Excel | Extrato |
+| Prestador | `GET /api/prestador/reports` | PDF, Excel | Relatórios clínicos |
+| Prestador | `GET /api/prestador/records/[recordId]/export` | PDF | PEP |
+| Prestador | `GET /api/prestador/patients/[id]/export` | PDF, Excel | Histórico por seção |
+| Beneficiário | `GET /api/beneficiario/export?section=` | PDF, Excel | Self-service por seção |
+| Beneficiário | `GET /api/beneficiario/invoices/[id]/export` | PDF | Fatura |
+| PJ | `GET /api/pj/reports` | CSV (padrão), PDF, Excel | Relatório corporativo |
+
+UI: componente `ExportButtons` — query `format=pdf|xlsx|csv|json` conforme rota.
+
+Testes: `tests/api/exports.test.ts` (136 testes Vitest no pacote).
 
 ### 4.4 CRM (`CrmPipelineView`)
 
@@ -319,7 +367,7 @@ Serviço: `src/lib/webhook-service.ts`
 | Ação | API | Serviço |
 |------|-----|---------|
 | Painel | `GET /api/pj/overview` | `pj-portal-service.ts` |
-| CSV | `GET /api/pj/reports` | Export corporativo |
+| CSV | `GET /api/pj/reports` | Export corporativo (CSV padrão; `format=pdf\|xlsx`) |
 
 ```mermaid
 flowchart LR
@@ -333,25 +381,36 @@ flowchart LR
 
 ## 6. Portal Beneficiário
 
-**Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR)
+**Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR) · **Nav SPA:** `BENEFICIARIO_NAV_TABS` em `src/lib/navigation/routes.ts`
 
-| Seção (`BeneficiarioView`) | Ações |
-|----------------------------|-------|
-| Agendar consulta | Prestador + data + slot + modalidade |
-| Resumo | Próximo atendimento, pendente PPU, assinatura |
-| Agenda | Lista + link telemedicina |
-| Consumo Pay Per Use | Procedimentos billed/não billed |
-| Faturas | Pagar com PIX (status FECHADA) |
-| Assinatura / PEP / Timeline | Somente leitura |
+Layout persistente em `src/app/beneficiario/layout.tsx` — 10 seções + redirect `/beneficiario` → `/beneficiario/resumo`.
+
+| Rota | Seção | Conteúdo |
+|------|-------|----------|
+| `/beneficiario/resumo` | Resumo | Próximo atendimento, pendente PPU, assinatura |
+| `/beneficiario/agendar` | Agendar | Prestador + data + slot + modalidade |
+| `/beneficiario/agenda` | Agenda | Lista + link telemedicina; cancelar consultas futuras |
+| `/beneficiario/consumo` | Consumo | Procedimentos billed/não billed (Pay Per Use) |
+| `/beneficiario/faturas` | Faturas | Pagar com PIX (status FECHADA) |
+| `/beneficiario/medicacoes` | Medicações | Care Chart — medicações ativas |
+| `/beneficiario/exames` | Exames | Care Chart — pedidos de exame |
+| `/beneficiario/plano` | Plano | Dados do plano corporativo |
+| `/beneficiario/assinatura` | Assinatura | Assinatura recorrente |
+| `/beneficiario/prontuario` | Prontuário | PEP somente leitura |
+| `/beneficiario/historico` | Histórico | Timeline de eventos |
 
 | Ação | API | Serviço |
 |------|-----|---------|
 | Overview | `GET /api/beneficiario/overview` | `beneficiary-overview.ts` |
+| Dados clínicos | `GET /api/beneficiario/clinical` | Medicações e exames |
 | Prestadores | `GET /api/beneficiario/providers` | Users PRESTADOR |
 | Slots | `GET /api/beneficiario/slots?providerId&date` | `scheduling-service.ts` (8h–18h, 30 min) |
 | Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
+| Cancelar | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` | Somente `AGENDADO` futuro |
 | PIX | `POST /api/beneficiario/invoices/[id]/pay` | `createInvoicePixCharge()` |
 | Confirmar PIX | `PATCH .../pay` `{ paymentId }` | `confirmInvoicePixPayment()` |
+| Export seção | `GET /api/beneficiario/export?section=&format=` | PDF/Excel por seção |
+| Export fatura | `GET /api/beneficiario/invoices/[id]/export` | PDF da fatura |
 
 ---
 
@@ -471,10 +530,10 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 
 | Melhoria | Portal | UI | API |
 |----------|--------|-----|-----|
-| Cancelar consulta | Beneficiário | `/beneficiario` → Minha agenda | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` |
+| Cancelar consulta | Beneficiário | `/beneficiario/agenda` | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` |
 | Confirmar presença | Prestador | `/prestador/atendimento/[id]` | `PATCH …/prestador/appointments/[id]` `{ status: "CONFIRMADO" }` |
 | Stepper PPU | Beneficiário / Prestador | FlowStepper no resumo e atendimento | `care-journey.ts` |
-| QR PIX mock | Beneficiário | `/beneficiario` → Faturas | `POST …/invoices/[id]/pay` |
+| QR PIX mock | Beneficiário | `/beneficiario/faturas` | `POST …/invoices/[id]/pay` |
 | Walk-in + check-in | Interno | `/interno/agenda` | §8.5 |
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
@@ -495,6 +554,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
+| auditoria | ✓ | ✓ | ✗ | ✓ |
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
@@ -582,21 +642,27 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
 ### Prestador
-`GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`GET /api/prestador/dashboard` · `GET /api/prestador/agenda` ·
+`GET /api/prestador/patients` · `GET /api/prestador/patients/[id]/*` ·
+`GET|PATCH /api/prestador/appointments/[id]` ·
+`POST .../procedures` · `POST /api/prestador/records` ·
+`GET /api/prestador/extrato` · `GET /api/prestador/extrato/export` ·
+`GET /api/prestador/reports` · `GET /api/procedures`
 
 ### Beneficiário
-`GET /api/beneficiario/overview|providers|slots` ·
+`GET /api/beneficiario/overview|clinical|providers|slots` ·
 `POST /api/beneficiario/appointments` ·
 `PATCH /api/beneficiario/appointments/[id]` ·
-`POST|PATCH /api/beneficiario/invoices/[id]/pay`
+`POST|PATCH /api/beneficiario/invoices/[id]/pay` ·
+`GET /api/beneficiario/export` · `GET /api/beneficiario/invoices/[id]/export`
 
 ### PJ
-`GET /api/pj/overview` · `GET /api/pj/reports`
+`GET /api/pj/overview` · `GET /api/pj/reports` (CSV/PDF/Excel)
 
 ### Interno (principais grupos)
-`dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
-`companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
+`dashboard` · `billing` · `billing/export` · `invoices/*` · `audit` · `audit/export` ·
+`appointments/*` · `patients/*` · `companies/*` · `procedures/*` · `users/*` ·
+`subscriptions/*` · `subscriptions/export` · `messages/*` ·
 `reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
 
 ### Cron (sistema)

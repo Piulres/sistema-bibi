@@ -67,45 +67,50 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 
 ## 2. Portal Beneficiário
 
-**Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR) · **View:** `BeneficiarioView`
+**Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR) · **Layout SPA:** `src/app/beneficiario/layout.tsx` + `SectionNav` (10 seções)
 
 ### 2.1 Jornada típica
 
 | Etapa | Ação do usuário | Onde na UI | Efeito no sistema |
 |-------|-----------------|------------|-------------------|
 | 1. Entrada | Login com e-mail + senha | `/beneficiario/login` | Sessão escopada ao `patientId` |
-| 2. Agendar | Escolhe prestador, data, slot, modalidade | Card “Agendar consulta” | `Appointment` AGENDADO; webhook `APPOINTMENT_CREATED` |
-| 3. Consulta | Acessa link telemedicina (TELE) ou comparece presencial | Tabela “Minha agenda” | — |
-| 4. Pós-atendimento | Consulta consumo Pay Per Use | Seção “Consumo Pay Per Use” | Vê procedimentos `billed` / não `billed` |
-| 5. Faturamento | Aguarda fatura emitida pelo interno | KPI “Total faturado” | — |
-| 6. Pagamento | Gera PIX → confirma pagamento | Seção “Faturas” | `Invoice` PAGA |
-| 7. Acompanhamento | Consulta PEP, assinatura, timeline | Seções inferiores | Somente leitura |
+| 2. Resumo | Vê próximo atendimento e pendências | `/beneficiario/resumo` | KPIs consolidados |
+| 3. Agendar | Escolhe prestador, data, slot, modalidade | `/beneficiario/agendar` | `Appointment` AGENDADO; webhook `APPOINTMENT_CREATED` |
+| 4. Consulta | Acessa link telemedicina ou comparece | `/beneficiario/agenda` | — |
+| 5. Cancelar | Cancela consulta futura (se AGENDADO) | `/beneficiario/agenda` | `PATCH …/appointments/[id]` libera slot |
+| 6. Pós-atendimento | Consulta consumo Pay Per Use | `/beneficiario/consumo` | Procedimentos `billed` / não `billed` |
+| 7. Care Chart | Vê medicações e exames | `/beneficiario/medicacoes` · `/beneficiario/exames` | Somente leitura |
+| 8. Faturamento | Aguarda fatura emitida pelo interno | `/beneficiario/faturas` | — |
+| 9. Pagamento | Gera PIX → confirma pagamento | `/beneficiario/faturas` | `Invoice` PAGA |
+| 10. Export | Baixa seção em PDF/Excel | Botões em cada seção | `GET /api/beneficiario/export?section=` |
+| 11. Acompanhamento | PEP, assinatura, timeline | `/beneficiario/prontuario` · `/beneficiario/historico` | Somente leitura |
 
 ### 2.2 Pontos fortes
 
-- Self-service completo: agendar + pagar + ver consumo.
+- Self-service completo: agendar, cancelar, pagar e ver consumo.
+- Navegação SPA por seção (sem scroll infinito).
 - Transparência Pay Per Use com preço congelado (`priceCharged`).
+- Export PDF/Excel por seção (consumo, agenda, prontuário, …).
 - Escopo estrito por `patientId` — sem acesso a dados de terceiros.
 
 ### 2.3 Gaps e melhorias
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | Não pode cancelar nem reagendar consulta | Ações com regras de antecedência (ex.: até 24 h antes) |
 | Alta | PIX em dois passos manuais (gerar + confirmar) | Webhook do gateway ou polling; exibir QR Code |
-| Média | Página única longa (scroll) | Abas: Agenda · Consumo · Faturas · Prontuário |
+| Média | Reagendar consulta | Fluxo cancelar + novo agendamento |
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
 | Média | Notificações mock (`COMMUNICATION_PROVIDER=console`) | Adapter real (e-mail/SMS/WhatsApp) |
 | Baixa | Sem carteirinha digital | Card com QR + dados do plano corporativo |
 | Baixa | Sem PWA / app nativo | PWA instalável com push de lembrete |
 
-**Código:** `src/components/BeneficiarioView.tsx` · APIs em `src/app/api/beneficiario/`
+**Código:** views em `src/app/beneficiario/*/page.tsx` · APIs em `src/app/api/beneficiario/` · nav em `src/lib/navigation/routes.ts`
 
 ---
 
 ## 3. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export CSV
+**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export (CSV/PDF/Excel)
 
 ### 3.1 Jornada típica
 
@@ -115,13 +120,13 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 | 2. Alertas | Lê avisos de inadimplência, faturas abertas, cobranças vencidas | Topo da página | Alertas com âncoras (`#assinaturas`) |
 | 3. KPIs | Vê contrato, beneficiários, consumo PPU, MRR | Cards de resumo | `getPjPortalOverview()` |
 | 4. Drill-down | Analisa consumo por colaborador | Tabela “Beneficiários” | Consumo e pendente por CPF |
-| 5. Export | Baixa relatório CSV | Botão “Exportar relatório CSV” | `GET /api/pj/reports` |
+| 5. Export | Baixa relatório | Botão export | `GET /api/pj/reports` (CSV padrão; `format=pdf\|xlsx`) |
 
 ### 3.2 Pontos fortes
 
 - Alertas proativos (inadimplência, negociação, faturas abertas).
 - Consumo granular por beneficiário — core B2B.
-- Export CSV para integração com ERP/planilha.
+- Export CSV, PDF e Excel para integração com ERP/planilha.
 
 ### 3.3 Gaps e melhorias
 
@@ -141,37 +146,40 @@ Descrições de cada portal: `src/lib/landing/content.ts` (`LANDING_PORTALS`).
 
 ## 4. Portal Prestador
 
-**Role:** `PRESTADOR` · **Views:** `AgendaView` → `AtendimentoView`
+**Role:** `PRESTADOR` · **Nav SPA:** `PRESTADOR_NAV_TABS` · **Views:** dashboard, agenda, pacientes, extrato, relatórios, atendimento
 
 ### 4.1 Jornada típica
 
 | Etapa | Ação do usuário | Onde na UI | Efeito |
 |-------|-----------------|------------|--------|
 | 1. Entrada | Login prestador | `/login` | Sessão `PRESTADOR` |
-| 2. Agenda do dia | Vê consultas de hoje | `/prestador` | `GET /api/prestador/agenda` |
-| 3. Abrir atendimento | Clica no card do paciente | `/prestador/atendimento/[id]` | Detalhe: paciente, empresa, procedimentos |
-| 4. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
-| 5. PEP | Salva evolução/receita/atestado | Templates PEP | `MedicalRecord` + timeline |
-| 6. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
+| 2. Dashboard | Vê KPIs e atalhos | `/prestador/dashboard` | `GET /api/prestador/dashboard` |
+| 3. Agenda do dia | Vê consultas de hoje | `/prestador` | `GET /api/prestador/agenda` |
+| 4. Abrir atendimento | Clica no card do paciente | `/prestador/atendimento/[id]` | Detalhe: paciente, empresa, procedimentos, Care Chart |
+| 5. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
+| 6. PEP / Care Chart | Salva evolução; medicações/exames | Templates PEP + sidebar clínica | `MedicalRecord` + timeline |
+| 7. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
+| 8. Histórico | Consulta paciente fora do dia | `/prestador/pacientes` → `/prestador/paciente/[id]` | Care Chart completo |
+| 9. Extrato / relatórios | Exporta produção | `/prestador/extrato` · `/prestador/relatorios` | PDF/Excel |
 
 ### 4.2 Pontos fortes
 
 - Fluxo clínico enxuto: agenda → atendimento → PEP → conclusão.
+- Care Chart integrado (medicação, exames, protocolos).
 - Preço congelado no momento do uso (Pay Per Use).
+- Export PDF/Excel de extrato, relatórios e PEP.
 - Templates PEP (`pep-templates.ts`) aceleram documentação.
 
 ### 4.3 Gaps e melhorias
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | Só exibe agenda do dia | Calendário semanal/mensal + filtros |
-| Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
+| Alta | Só exibe agenda do dia na aba Agenda | Calendário semanal/mensal + filtros |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
-| Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
 | Média | Sem assinatura digital em receitas/atestados | Conformidade CFM + PDF |
 | Baixa | Sem fila automática de atendimento | “Próximo paciente” após marcar REALIZADO |
 
-**Código:** `src/components/AgendaView.tsx` · `src/components/AtendimentoView.tsx`
+**Código:** `src/app/prestador/*/page.tsx` · `AgendaView` · `AtendimentoView` · nav em `src/lib/navigation/routes.ts`
 
 ---
 
@@ -201,6 +209,7 @@ flowchart LR
     D3[Dashboard] --> B2[Faturamento]
     D3 --> SUB2[Recorrência]
     D3 --> REL[Relatórios]
+    D3 --> AUD[Auditoria]
   end
 ```
 
@@ -214,7 +223,9 @@ flowchart LR
 | CRM | `/interno/crm` | Pipeline lead → ativo (kanban) |
 | Recorrência | `/interno/assinaturas` | Assinaturas → gerar cobranças → faturar |
 | Comunicação | `/interno/comunicacao` | Fila de mensagens + lembretes automáticos |
-| Cliente 360° | `/interno/beneficiarios/[id]` | Visão unificada + export LGPD |
+| Relatórios | `/interno/relatorios` | Export CSV/PDF/Excel (faturamento, CRM) |
+| Auditoria | `/interno/auditoria` | Timeline universal do tenant + export |
+| Cliente 360° | `/interno/beneficiarios/[id]` | Visão unificada + export LGPD/PDF |
 
 Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 
@@ -233,7 +244,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
-| Baixa | 11 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
+| Baixa | 12 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
 
 **Melhorias visuais implementadas (2026-06):** `StatCard` unificado em dashboard/PJ/beneficiário/faturamento; `FlowStepper` na jornada PPU; `CalloutCard` + `AppointmentCard` na agenda interna e prestador; `TabBar` em Cadastros; `EmptyState` com título e dica.
 
