@@ -19,7 +19,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `dev` | `e372c01` — **v1.3.0** Estoque Médico (**base para novas features**) |
 | **Tag git em produção** | **`v1.2.0`** |
 | Próximo release | **v1.3.0** — merge `dev` → `main` quando publicar |
-| Feature paralela | **v1.4.0** Voa Health — branch `integracao-voa` (PR aberto) |
+| Feature paralela | **v1.4.0** Voa Health — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
 
@@ -83,7 +83,28 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | ✅ **`v1.2.0` em produção** |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | ✅ Integrado em `dev` (`e372c01`) |
-| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` (PR aberto) |
+| **1.4.x** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) · [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md) | 🚧 Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
+
+---
+
+## Pacote pendente (`integracao-voa`)
+
+### `v1.4.0` — Integração Voa Health
+
+| Campo | Valor |
+|-------|-------|
+| **Versão** | `1.4.0` (`package.json`) |
+| **Branch** | `integracao-voa` |
+| **Base** | `dev` (v1.3.0 Estoque) |
+| **Doc** | [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md) |
+| **Validação** | `npm run pre-release` + `node scripts/voa-live-smoke.mjs` |
+
+**Inclui (Fase 1):**
+
+- Plugin Voa Health no atendimento prestador (aba Assistente IA)
+- Importação automática de documentos no PEP (`VOA_DOCUMENT_IMPORTED`)
+- APIs `/api/prestador/appointments/[id]/voa` e `/voa/import`
+- Env `VOA_ENABLED` + `VOA_INTEGRATION_TOKEN`
 
 ---
 
