@@ -100,7 +100,19 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
       where: { sku: "MAT-LUVA-M" },
       select: { id: true },
     });
-    return !stockProduct;
+    if (!stockProduct) return true;
+
+    const horizonte = await prisma.tenant.findFirst({
+      where: { cnpj: "12.345.678/0001-90" },
+      select: { slug: true, niche: true },
+    });
+    if (!horizonte?.slug || horizonte.niche !== "MEDICAL") return true;
+
+    const petcare = await prisma.tenant.findFirst({
+      where: { slug: "petcare" },
+      select: { id: true },
+    });
+    return !petcare;
   } finally {
     await prisma.$disconnect();
   }

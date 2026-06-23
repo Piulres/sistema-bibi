@@ -7,6 +7,8 @@ import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { PortalKey } from "@/lib/roles";
 import type { NicheDemoAccount } from "@/lib/niche/demo-accounts";
 import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
+import type { LoginSegmentContext } from "@/lib/segment/login-context";
+import SegmentContextBanner from "@/components/segment/SegmentContextBanner";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
 import TenantTheme from "@/components/layout/TenantTheme";
 import Card from "@/components/ui/Card";
@@ -21,6 +23,7 @@ type Props = {
   demoEmail: string;
   demoPassword: string;
   branding: BrandingTokens;
+  segmentContext?: LoginSegmentContext;
   nicheDemos?: NicheDemoAccount[];
 };
 
@@ -31,6 +34,7 @@ export default function LoginForm({
   demoEmail,
   demoPassword,
   branding,
+  segmentContext,
   nicheDemos,
 }: Props) {
   const router = useRouter();
@@ -50,7 +54,12 @@ export default function LoginForm({
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, portal }),
+        body: JSON.stringify({
+          email,
+          password,
+          portal,
+          tenantSlug: segmentContext?.tenantSlug ?? undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -79,7 +88,11 @@ export default function LoginForm({
       const res = await fetch("/api/auth/mfa/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mfaToken, code: mfaCode }),
+        body: JSON.stringify({
+          mfaToken,
+          code: mfaCode,
+          tenantSlug: segmentContext?.tenantSlug ?? undefined,
+        }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -131,6 +144,7 @@ export default function LoginForm({
             </div>
             <h1 className="mt-4 text-2xl font-bold text-[var(--text-primary)]">{title}</h1>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>
+            {segmentContext && <SegmentContextBanner context={segmentContext} />}
 
             {!mfaToken ? (
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">

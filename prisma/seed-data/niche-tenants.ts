@@ -5,6 +5,7 @@ import type { NicheId } from "../../src/lib/niche/types";
 
 type NicheDemo = {
   niche: NicheId;
+  slug: string;
   name: string;
   cnpj: string;
   displayName: string;
@@ -22,6 +23,7 @@ type NicheDemo = {
 const NICHE_DEMOS: NicheDemo[] = [
   {
     niche: "VET",
+    slug: "petcare",
     name: "PetCare Clínica Veterinária",
     cnpj: "11.111.111/0001-11",
     displayName: "PetCare",
@@ -35,6 +37,7 @@ const NICHE_DEMOS: NicheDemo[] = [
   },
   {
     niche: "DENTAL",
+    slug: "smile",
     name: "Smile Odontologia",
     cnpj: "22.222.222/0001-22",
     displayName: "Smile Odonto",
@@ -48,6 +51,7 @@ const NICHE_DEMOS: NicheDemo[] = [
   },
   {
     niche: "LEGAL",
+    slug: "lex",
     name: "Lex & Partners Advocacia",
     cnpj: "33.333.333/0001-33",
     displayName: "Lex & Partners",
@@ -61,6 +65,7 @@ const NICHE_DEMOS: NicheDemo[] = [
   },
   {
     niche: "SPA",
+    slug: "zen",
     name: "Zen Studio Bem-estar",
     cnpj: "44.444.444/0001-44",
     displayName: "Zen Studio",
@@ -74,6 +79,7 @@ const NICHE_DEMOS: NicheDemo[] = [
   },
   {
     niche: "EDUCATION",
+    slug: "eduprime",
     name: "EduPrime Cursos",
     cnpj: "55.555.555/0001-55",
     displayName: "EduPrime",
@@ -108,6 +114,7 @@ export async function seedNicheTenants(
     const tenant = await prisma.tenant.create({
       data: {
         name: demo.name,
+        slug: demo.slug,
         cnpj: demo.cnpj,
         niche: demo.niche,
         labels: serializeTenantLabels(demo.niche, labelOverrides),

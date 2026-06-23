@@ -1,17 +1,25 @@
 import LoginForm from "@/components/LoginForm";
-import { getLoginBrandingFromHeaders } from "@/lib/theme/branding";
+import { getLoginSegmentContext } from "@/lib/segment/login-context";
+import { persistSegmentCookie } from "@/lib/segment/cookie";
 
-export default async function PjLoginPage() {
-  const branding = await getLoginBrandingFromHeaders();
+type PageProps = {
+  searchParams: Promise<{ tenant?: string; niche?: string }>;
+};
+
+export default async function PjLoginPage({ searchParams }: PageProps) {
+  const { tenant: tenantParam, niche: nicheParam } = await searchParams;
+  const context = await getLoginSegmentContext({ tenantSlug: tenantParam, nicheParam });
+  await persistSegmentCookie(context);
 
   return (
     <LoginForm
       portal="pj"
-      title="Portal da Empresa (PJ)"
-      subtitle="Entre com as credenciais da sua operação para gestão de contratos e beneficiários."
+      title={`Portal ${context.labels.company}`}
+      subtitle={`Gestão de contratos e ${context.labels.beneficiaries.toLowerCase()} — ${context.tenantName ?? context.nicheName}.`}
       demoEmail="rh@techcorp.com"
       demoPassword="bibi123"
-      branding={branding}
+      branding={context.branding}
+      segmentContext={context}
     />
   );
 }

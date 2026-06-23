@@ -89,6 +89,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   const tenant = await prisma.tenant.create({
     data: {
       name: "Clínica Horizonte",
+      slug: "horizonte",
       cnpj: "12.345.678/0001-90",
       niche: "MEDICAL",
       labels: serializeTenantLabels("MEDICAL"),

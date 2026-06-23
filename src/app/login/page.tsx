@@ -1,17 +1,27 @@
 import LoginForm from "@/components/LoginForm";
-import { getLoginBrandingFromHeaders } from "@/lib/theme/branding";
+import { getLoginSegmentContext } from "@/lib/segment/login-context";
+import { segmentTenantByNiche } from "@/lib/niche/demo-accounts";
+import { persistSegmentCookie } from "@/lib/segment/cookie";
 
-export default async function PrestadorLoginPage() {
-  const branding = await getLoginBrandingFromHeaders();
+type PageProps = {
+  searchParams: Promise<{ tenant?: string; niche?: string }>;
+};
+
+export default async function PrestadorLoginPage({ searchParams }: PageProps) {
+  const { tenant: tenantParam, niche: nicheParam } = await searchParams;
+  const context = await getLoginSegmentContext({ tenantSlug: tenantParam, nicheParam });
+  await persistSegmentCookie(context);
+  const demo = segmentTenantByNiche(context.niche);
 
   return (
     <LoginForm
       portal="prestador"
-      title="Portal do Prestador"
-      subtitle="Entre com as credenciais da sua operação para acessar agenda e registros de serviços."
-      demoEmail="dra.helena@bibi.health"
+      title={`Portal do ${context.labels.portalProvider.replace("Portal do ", "")}`}
+      subtitle={`Acesse agenda e registros de ${context.labels.procedures.toLowerCase()} da operação ${context.tenantName ?? context.nicheName}.`}
+      demoEmail={demo.providerEmail}
       demoPassword="bibi123"
-      branding={branding}
+      branding={context.branding}
+      segmentContext={context}
     />
   );
 }

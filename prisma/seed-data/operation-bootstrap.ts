@@ -33,6 +33,7 @@ export async function runOperationBootstrap(
   const tenant = await prisma.tenant.create({
     data: {
       name: "Clínica Bibi Saúde",
+      slug: "bibi-saude",
       cnpj: "12.345.678/0001-90",
       niche: "MEDICAL",
       labels: serializeTenantLabels("MEDICAL"),

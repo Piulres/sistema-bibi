@@ -17,14 +17,15 @@ import LandingFaq from "@/components/landing/LandingFaq";
 import LandingCta from "@/components/landing/LandingCta";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingJsonLd from "@/components/landing/LandingJsonLd";
+import { persistSegmentCookie } from "@/lib/segment/cookie";
 
 type PageProps = {
-  searchParams: Promise<{ niche?: string }>;
+  searchParams: Promise<{ niche?: string; tenant?: string }>;
 };
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const { niche: nicheParam } = await searchParams;
-  const resolved = await resolveLandingNicheFromHeaders(nicheParam);
+  const { niche: nicheParam, tenant: tenantParam } = await searchParams;
+  const resolved = await resolveLandingNicheFromHeaders(nicheParam, tenantParam);
   const config = getNicheConfig(resolved.niche);
   const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
   const siteUrl = getSiteUrl();
@@ -67,9 +68,19 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
 }
 
 export default async function Home({ searchParams }: PageProps) {
-  const { niche: nicheParam } = await searchParams;
-  const resolved = await resolveLandingNicheFromHeaders(nicheParam);
+  const { niche: nicheParam, tenant: tenantParam } = await searchParams;
+  const resolved = await resolveLandingNicheFromHeaders(nicheParam, tenantParam);
+  await persistSegmentCookie({
+    niche: resolved.niche,
+    tenantId: resolved.tenantId,
+    tenantSlug: resolved.tenantSlug ?? null,
+    tenantName: resolved.tenantName ?? null,
+  });
   const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
+  const segment = {
+    tenantSlug: resolved.tenantSlug,
+    niche: resolved.niche,
+  };
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
@@ -81,7 +92,7 @@ export default async function Home({ searchParams }: PageProps) {
         <LandingStats />
         <LandingFeatures niche={resolved.niche} />
         <LandingHowItWorks niche={resolved.niche} />
-        <LandingPortals niche={resolved.niche} />
+        <LandingPortals niche={resolved.niche} segment={segment} />
         <LandingFaq niche={resolved.niche} />
         <LandingCta branding={branding} niche={resolved.niche} />
       </main>

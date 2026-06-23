@@ -1,6 +1,7 @@
 import type { PortalKey } from "@/lib/roles";
 import { getDefaultLabels, getNicheConfig } from "@/lib/niche/defaults";
 import type { NicheId } from "@/lib/niche/types";
+import { appendSegmentToPath } from "@/lib/segment/types";
 
 export type LandingFeature = {
   id: "pay-per-use" | "pricing" | "portals" | "operations" | "billing" | "enterprise";
@@ -36,28 +37,32 @@ export type NicheLandingContent = {
   ctaDescription: string;
 };
 
-function buildPortals(labels: ReturnType<typeof getDefaultLabels>): LandingPortal[] {
+function buildPortals(
+  labels: ReturnType<typeof getDefaultLabels>,
+  segment?: { tenantSlug?: string | null; niche?: NicheId },
+): LandingPortal[] {
+  const segmentOpts = segment ?? {};
   return [
     {
-      href: "/login",
+      href: appendSegmentToPath("/login", segmentOpts),
       key: "prestador",
       audience: labels.providers,
       description: `Agenda inteligente, registro de ${labels.procedures.toLowerCase()} e fluxo de atendimento integrado.`,
     },
     {
-      href: "/interno/login",
+      href: appendSegmentToPath("/interno/login", segmentOpts),
       key: "interno",
       audience: "Equipe administrativa",
       description: "Dashboard, faturamento, CRM, assinaturas, comunicação e integrações.",
     },
     {
-      href: "/pj/login",
+      href: appendSegmentToPath("/pj/login", segmentOpts),
       key: "pj",
       audience: `RH e gestores — ${labels.company.toLowerCase()}`,
       description: `Contratos, ${labels.beneficiaries.toLowerCase()}, consumo Pay Per Use e relatórios exportáveis.`,
     },
     {
-      href: "/beneficiario/login",
+      href: appendSegmentToPath("/beneficiario/login", segmentOpts),
       key: "beneficiario",
       audience: labels.beneficiaries,
       description: `Agendamento self-service, faturas, assinatura e histórico de consumo.`,
@@ -66,7 +71,10 @@ function buildPortals(labels: ReturnType<typeof getDefaultLabels>): LandingPorta
 }
 
 /** Conteúdo da landing parametrizado por nicho (ServiceOS v2.0). */
-export function getNicheLandingContent(niche: NicheId): NicheLandingContent {
+export function getNicheLandingContent(
+  niche: NicheId,
+  segment?: { tenantSlug?: string | null },
+): NicheLandingContent {
   const config = getNicheConfig(niche);
   const labels = config.labels;
   const sector = config.name.toLowerCase();
@@ -146,7 +154,7 @@ export function getNicheLandingContent(niche: NicheId): NicheLandingContent {
           "Faturamento Pay Per Use, PIX e assinaturas recorrentes — sem perda de informação entre operação e financeiro.",
       },
     ],
-    portals: buildPortals(labels),
+    portals: buildPortals(labels, { tenantSlug: segment?.tenantSlug, niche }),
     faq: [
       {
         question: "O que é Pay Per Use no ServiceOS Bibi?",

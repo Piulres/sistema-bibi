@@ -55,6 +55,7 @@ export type SessionUser = {
   email: string;
   role: string;
   tenantId: string;
+  tenantSlug: string;
   companyId: string | null;
   patientId: string | null;
   tenantName: string;
@@ -109,6 +110,7 @@ export async function getSessionUser(): Promise<SessionUser | null> {
     email: user.email,
     role: user.role,
     tenantId: user.tenantId,
+    tenantSlug: user.tenant.slug,
     companyId: user.companyId,
     patientId: user.patientId,
     tenantName: user.tenant.name,

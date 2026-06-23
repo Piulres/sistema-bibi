@@ -51,6 +51,7 @@ export async function seedVitacareTenant(
   const tenant = await prisma.tenant.create({
     data: {
       name: "Rede VitaCare",
+      slug: "vitacare",
       cnpj: "99.888.777/0001-11",
       niche: "MEDICAL",
       branding: {

@@ -7,10 +7,11 @@ import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 
 type Props = {
   niche: NicheId;
+  segment?: { tenantSlug?: string | null; niche?: NicheId };
 };
 
-export default function LandingPortals({ niche }: Props) {
-  const { portals } = getNicheLandingContent(niche);
+export default function LandingPortals({ niche, segment }: Props) {
+  const { portals } = getNicheLandingContent(niche, segment);
 
   return (
     <section

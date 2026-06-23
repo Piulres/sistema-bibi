@@ -20,6 +20,8 @@ model Tenant {
   id        String   @id @default(cuid())
   name      String
   cnpj      String   @unique
+  /// Slug único para roteamento (?tenant=petcare) e identificação do segmento
+  slug      String   @unique
   /// Nicho operacional: MEDICAL | VET | DENTAL | LEGAL | SPA | EDUCATION
   niche     String   @default("MEDICAL")
   /// JSON — dicionário de termos da UI (ex.: patient → "Pet" no nicho VET)

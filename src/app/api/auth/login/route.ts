@@ -5,17 +5,24 @@ import { createSession } from "@/lib/session";
 import { PORTALS, type PortalKey } from "@/lib/roles";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { createMfaChallengeToken } from "@/lib/mfa";
+import { isNicheId } from "@/lib/niche/types";
+import { getNicheConfig } from "@/lib/niche/defaults";
+import {
+  buildLoginSegmentResponse,
+  validateUserSegmentAccess,
+} from "@/lib/segment/auth";
+import { persistSegmentCookie } from "@/lib/segment/cookie";
 
 export async function POST(request: Request) {
   const prisma = await getPrisma();
-  let body: { email?: string; password?: string; portal?: string };
+  let body: { email?: string; password?: string; portal?: string; tenantSlug?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
   }
 
-  const { email, password, portal } = body;
+  const { email, password, portal, tenantSlug } = body;
   if (!email || !password || !portal) {
     return NextResponse.json(
       { error: "Informe e-mail, senha e portal" },
@@ -30,6 +37,7 @@ export async function POST(request: Request) {
 
   const user = await prisma.user.findUnique({
     where: { email: email.toLowerCase().trim() },
+    include: { tenant: { select: { slug: true, name: true, niche: true } } },
   });
 
   if (!user || !verifyPassword(password, user.password)) {
@@ -53,6 +61,11 @@ export async function POST(request: Request) {
     );
   }
 
+  const segmentCheck = await validateUserSegmentAccess(request, user, { tenantSlug });
+  if (!segmentCheck.ok) {
+    return NextResponse.json({ error: segmentCheck.message }, { status: segmentCheck.status });
+  }
+
   if (user.mfaEnabled && user.mfaSecret) {
     return NextResponse.json({
       mfaRequired: true,
@@ -62,17 +75,37 @@ export async function POST(request: Request) {
 
   await createSession(user.id);
 
+  const niche =
+    user.tenant.niche && isNicheId(user.tenant.niche) ? user.tenant.niche : "MEDICAL";
+  await persistSegmentCookie({
+    niche,
+    tenantId: user.tenantId,
+    tenantSlug: user.tenant.slug,
+    tenantName: user.tenant.name,
+  });
+
   await recordTimelineEvent({
     tenantId: user.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.USER,
     entityId: user.id,
     action: TIMELINE_ACTIONS.LOGIN,
-    description: `Login no ${portalConfig.label}`,
+    description: `Login no ${portalConfig.label} · segmento ${getNicheConfig(niche).name} (${user.tenant.slug})`,
     createdBy: user.id,
   });
 
+  const segment = await buildLoginSegmentResponse(user.id);
+
   return NextResponse.json({
-    user: { id: user.id, name: user.name, role: user.role },
+    user: {
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      tenantId: user.tenantId,
+      tenantSlug: user.tenant.slug,
+      tenantName: user.tenant.name,
+      niche,
+    },
+    segment,
     redirectTo: portalConfig.dashboardPath,
   });
 }

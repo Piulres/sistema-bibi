@@ -6,7 +6,7 @@ Use este prompt em **Cursor**, **Copilot** ou outro assistente ao evoluir o Sist
 
 ## Contexto
 
-Atue como Engenheiro de Software Sênior. O Sistema Bibi evoluiu de POC HealthTech para **ServiceOS v2.0** — infraestrutura horizontal Pay Per Use multi-nicho (Saúde, Vet, Odonto, Jurídico, Bem-estar, Educação).
+Atue como Engenheiro de Software Sênior. O Sistema Bibi evoluiu para **ServiceOS v2.0** — infraestrutura horizontal Pay Per Use multi-nicho (Saúde, Vet, Odonto, Jurídico, Bem-estar, Educação).
 
 **ROI de referência:** 500 colaboradores — ~R$ 175k/mês (tradicional) vs ~R$ 14,5k/mês (Pay Per Use) = **~91% economia**.
 
