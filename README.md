@@ -126,7 +126,7 @@ A aplicação sobe em **http://localhost:3000**.
 Base local: **`http://localhost:3000`**
 (na rede interna da VM o servidor também responde em `http://172.30.0.2:3000`).
 
-**Produção (Netlify):** https://sistema-bibi.netlify.app — credenciais demo do seed.
+**Produção (Netlify):** https://sistema-bibi.netlify.app — **v1.2.0** no ar; **v2.0.0** validada na `main` (tag criada, deploy pendente). Ver [`docs/RELEASES.md`](docs/RELEASES.md). Credenciais demo do seed.
 
 **Demo vs operação:** após deploy com dual-store, alterne em `/interno/seguranca` (ADMIN) — confirme `OPERAR` ou `DEMO`. Ver [`docs/OPERACAO_DADOS.md`](docs/OPERACAO_DADOS.md).
 

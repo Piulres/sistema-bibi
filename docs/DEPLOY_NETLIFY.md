@@ -15,14 +15,25 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](FLUXOS.
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v1.2.0`** → deploy Netlify `6a39d446` · tag `v1.2.0` |
-| `main` / `dev` | `55481be` — sincronizadas |
+| Pacote em produção | **`v1.2.0`** → deploy Netlify `6a39d446` · tag `v1.2.0` (`485819a`) |
+| `main` / `dev` | **`v2.0.0`** (`e823fe4`) — tag **`v2.0.0`** criada |
+| Deploy pendente | Publicar v2.0 no site **sistema-bibi** (ver § abaixo) |
 | Build local `npm run netlify:build` | ✅ Passa |
 | Validação pré-deploy | `npm run pre-release` (lint + build, sem publicar) |
 | Deploy via CLI `npx netlify deploy --prod` | ⚠️ Só manual, quando cota permitir |
 | Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
+
+### Três fontes de verdade (tag ≠ deploy)
+
+| Fonte | v2.0.0 hoje | v1.2.0 hoje |
+|-------|-------------|-------------|
+| **Git** (`main`/`dev`) | `e823fe4` — tag `v2.0.0` | tag `v1.2.0` em `485819a` |
+| **Netlify** (sistema-bibi.netlify.app) | ❌ ainda não publicado | ✅ deploy `6a39d446` |
+| **Docs canônicos** | [`RELEASES.md`](RELEASES.md) | idem |
+
+`main` à frente de produção é **esperado** no modelo de pacotes fechados. A tag git marca o semver no repositório; só o `netlify deploy --prod` altera o que os usuários veem.
 
 > **Pacotes fechados:** [`RELEASES.md`](RELEASES.md) · **Workflow Cursor:** [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) · **Operações:** [`OPERACOES.md`](OPERACOES.md)
 >
@@ -90,6 +101,36 @@ npm run netlify:build
 # Emular Netlify Dev (porta 8888 → Next :3000)
 npm run netlify:dev
 ```
+
+---
+
+## Publicar v2.0.0 (próximo pacote)
+
+Checklist quando a cota Netlify permitir — **só humano**:
+
+```bash
+# 1. Garantir branch e tag corretas
+git checkout main && git pull
+git describe --tags          # deve mostrar v2.0.0
+
+# 2. Linkar ao site correto (se CLI ainda não linkado)
+npx netlify link             # escolher projeto sistema-bibi
+
+# 3. Validar build local (obrigatório — economiza cota)
+npm run pre-release
+
+# 4. Verificar cota (uma vez)
+curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/
+# 503 usage_exceeded → aguardar reset; não é bug de código
+
+# 5. Publicar sem rebuild remoto
+npx netlify deploy --prod --no-build --message "v2.0.0: ServiceOS multi-nicho"
+
+# 6. Smoke test: landing ?niche=VET + login interno PetCare
+# 7. Atualizar docs/RELEASES.md (mover v2.0.0 → Pacote em produção)
+```
+
+Rollback: ver [`RELEASES.md`](RELEASES.md) § Rollback.
 
 ---
 

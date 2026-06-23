@@ -171,9 +171,12 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 | Estado | Onde ver | Significado |
 |--------|----------|-------------|
 | Em desenvolvimento | branch `dev` | Features integradas, ainda não em release |
-| Em produção | `RELEASES.md` → Pacote em produção | O que está (ou estava) no ar |
-| Pendente release | `RELEASES.md` → Próximo pacote | `main` ainda não publicada |
-| Validado | `npm run pre-release` passou | Pronto para publicar, mas não publicado |
+| Em produção | `RELEASES.md` → Pacote em produção | O que está no ar na Netlify |
+| Validado na `main` | `RELEASES.md` → Pacote validado | Código + tag git; **Netlify ainda não atualizada** |
+| Tag criada | `git tag -l` | Versão semver fixada no repositório (≠ deploy) |
+| Pronto para publicar | `npm run pre-release` passou | Build local OK; aguarda `netlify deploy --prod` |
+
+> **Três fontes de verdade:** `main`/`dev` (código), tag git (semver) e deploy Netlify (produção) podem divergir — é o modelo de pacotes fechados. Exemplo atual (23/06/2026): tag **`v2.0.0`** em `e823fe4`, produção ainda em **v1.2.0** (`6a39d446`).
 
 ### 5.2 Checklist — publicar pacote
 
@@ -193,7 +196,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v1.2.0`** (`55481be`). Ver [`RELEASES.md`](RELEASES.md).
+Exemplo atual: produção **`v1.2.0`** (deploy `6a39d446`); próximo pacote **`v2.0.0`** (tag `e823fe4`, deploy pendente). Ver [`RELEASES.md`](RELEASES.md).
 
 ---
 
@@ -210,7 +213,7 @@ Exemplo atual em produção: **`v1.2.0`** (`55481be`). Ver [`RELEASES.md`](RELEA
 
 **Produção:** https://sistema-bibi.netlify.app
 
-**Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+**Status conhecido (23/06/2026):** `main`/`dev` em **v2.0.0** com tag; Netlify ainda em **v1.2.0**. `503 usage_exceeded` = cota esgotada, não é bug de código.
 
 **Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 

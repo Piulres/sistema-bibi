@@ -138,5 +138,5 @@ O ServiceOS trata qualquer transação de serviço processada — consulta médi
 - `src/hooks/useLabels.tsx` — hook de tradução (`useLabels` / alias `useNiche`)
 - `src/constants/niches.ts` — dicionário mestre `NICHE_MASTER_LABELS`
 - `prisma/schema.prisma` — `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`
-- `docs/RELEASES.md` — pacotes fechados (v2.0 em desenvolvimento na `dev`)
+- `docs/RELEASES.md` — pacotes fechados (v2.0.0 tag criada; deploy Netlify pendente)
 - `docs/V2_0.md` — escopo e changelog v2.0
