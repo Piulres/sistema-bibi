@@ -6,6 +6,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
+import ExportButtons from "@/components/ExportButtons";
 import { buildPatientHistoryBreadcrumbs } from "@/lib/navigation";
 
 type Overview = {
@@ -106,9 +107,15 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
               {patient.company ? `Empresa: ${patient.company}` : "Particular"}
             </p>
           </div>
-          <div className="text-right text-sm text-[var(--text-muted)]">
-            {summary.lastVisitLabel && <p>Última consulta: {summary.lastVisitLabel}</p>}
-            {summary.nextVisitLabel && <p>Próxima consulta: {summary.nextVisitLabel}</p>}
+          <div className="flex flex-col items-end gap-3">
+            <ExportButtons
+              baseUrl={`/api/prestador/patients/${patientId}/export`}
+              query={{ section: "summary" }}
+            />
+            <div className="text-right text-sm text-[var(--text-muted)]">
+              {summary.lastVisitLabel && <p>Última consulta: {summary.lastVisitLabel}</p>}
+              {summary.nextVisitLabel && <p>Próxima consulta: {summary.nextVisitLabel}</p>}
+            </div>
           </div>
         </div>
       </section>
@@ -129,10 +136,18 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
       </div>
 
       <section>
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atendimentos</h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Todas as consultas deste paciente com você, do mais recente ao mais antigo.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atendimentos</h2>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              Todas as consultas deste paciente com você, do mais recente ao mais antigo.
+            </p>
+          </div>
+          <ExportButtons
+            baseUrl={`/api/prestador/patients/${patientId}/export`}
+            query={{ section: "appointments" }}
+          />
+        </div>
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Nenhum atendimento registrado.
@@ -179,7 +194,13 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h2>
+          <ExportButtons
+            baseUrl={`/api/prestador/patients/${patientId}/export`}
+            query={{ section: "usages" }}
+          />
+        </div>
         {overview.usages.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Nenhum procedimento registrado.
@@ -219,12 +240,20 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
       </section>
 
       <section>
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
-          Prontuário eletrônico ({summary.totalRecords})
-        </h2>
-        <p className="mt-1 text-sm text-[var(--text-muted)]">
-          Evoluções, anamneses e demais registros clínicos dos seus atendimentos.
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+              Prontuário eletrônico ({summary.totalRecords})
+            </h2>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              Evoluções, anamneses e demais registros clínicos dos seus atendimentos.
+            </p>
+          </div>
+          <ExportButtons
+            baseUrl={`/api/prestador/patients/${patientId}/export`}
+            query={{ section: "records" }}
+          />
+        </div>
         {overview.medicalRecords.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Nenhuma anotação clínica.
@@ -238,7 +267,14 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
               >
                 <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-muted)]">
                   <StatusBadge value={record.recordType} map="timeline" />
-                  <span>{record.createdAtLabel}</span>
+                  <div className="flex items-center gap-2">
+                    <span>{record.createdAtLabel}</span>
+                    <ExportButtons
+                      baseUrl={`/api/prestador/records/${record.id}/export`}
+                      formats={["pdf"]}
+                      variant="ghost"
+                    />
+                  </div>
                 </div>
                 {record.title && (
                   <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">{record.title}</p>

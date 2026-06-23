@@ -7,5 +7,8 @@ test.describe("portal interno — relatórios", () => {
     await page.goto("/interno/relatorios");
     await expect(page.getByRole("heading", { name: "Relatórios", exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /faturamento/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: "PDF" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "Excel" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "CSV" }).first()).toBeVisible();
   });
 });

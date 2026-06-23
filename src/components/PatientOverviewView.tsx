@@ -194,7 +194,13 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Atendimentos</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Atendimentos</h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "appointments" }}
+          />
+        </div>
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum atendimento registrado.</p>
         ) : (
@@ -228,7 +234,13 @@ export default function PatientOverviewView({
       </section>
 
       <section>
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <h3 className="text-lg font-semibold text-[var(--text-primary)]">Procedimentos realizados</h3>
+          <ExportButtons
+            baseUrl={`/api/interno/patients/${patientId}/export`}
+            query={{ section: "usages" }}
+          />
+        </div>
         {overview.usages.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
         ) : (

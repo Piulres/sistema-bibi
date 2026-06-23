@@ -427,10 +427,13 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("agenda") && (
       <section id="agenda">
-        <SectionHeader
-          title="Minha agenda"
-          description="Consultas agendadas e histórico recente."
-        />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <SectionHeader
+            title="Minha agenda"
+            description="Consultas agendadas e histórico recente."
+          />
+          <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "agenda" }} />
+        </div>
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
             Nenhum atendimento registrado.

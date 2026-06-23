@@ -9,6 +9,7 @@ import { GET as invoiceExportGet } from "@/app/api/interno/invoices/[id]/export/
 import { GET as prestadorExtratoExportGet } from "@/app/api/prestador/extrato/export/route";
 import { GET as prestadorReportsGet } from "@/app/api/prestador/reports/route";
 import { GET as prestadorPepExportGet } from "@/app/api/prestador/records/[recordId]/export/route";
+import { GET as prestadorPatientExportGet } from "@/app/api/prestador/patients/[id]/export/route";
 import { GET as beneficiarioExportGet } from "@/app/api/beneficiario/export/route";
 import { GET as pjReportsGet } from "@/app/api/pj/reports/route";
 import {
@@ -172,6 +173,18 @@ describe("API — exportações PDF/Excel", () => {
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toBe("application/pdf");
     });
+
+    it("GET export paciente do prestador retorna Excel de atendimentos", async () => {
+      const joao = await getDemoJoao();
+      const res = await prestadorPatientExportGet(
+        new Request(
+          `http://localhost/api/prestador/patients/${joao.id}/export?section=appointments&format=xlsx`,
+        ),
+        { params: Promise.resolve({ id: joao.id }) },
+      );
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toContain("spreadsheetml");
+    });
   });
 
   describe("Beneficiário", () => {
@@ -193,6 +206,14 @@ describe("API — exportações PDF/Excel", () => {
       );
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("spreadsheetml");
+    });
+
+    it("GET /api/beneficiario/export retorna PDF da agenda", async () => {
+      const res = await beneficiarioExportGet(
+        new Request("http://localhost/api/beneficiario/export?section=agenda&format=pdf"),
+      );
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toBe("application/pdf");
     });
   });
 

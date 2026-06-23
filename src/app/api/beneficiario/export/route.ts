@@ -11,6 +11,7 @@ import { getTenantBranding } from "@/lib/theme/branding";
 
 const VALID_SECTIONS = new Set<BeneficiaryExportSection>([
   "resumo",
+  "agenda",
   "consumo",
   "faturas",
   "historico",

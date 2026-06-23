@@ -3,6 +3,7 @@ import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { getBeneficiaryOverview } from "@/lib/beneficiary-overview";
 import { getPatientOverview, type PatientOverviewData } from "@/lib/patient-overview";
+import { getProviderPatientOverview, type ProviderPatientOverviewData } from "@/lib/provider-patient-overview";
 import { getPjPortalOverview } from "@/lib/pj-portal-service";
 import { getPrestadorExtrato } from "@/lib/prestador-extrato";
 import { listSubscriptions } from "@/lib/subscription-service";
@@ -32,6 +33,7 @@ export type PatientExportSection =
 
 export type BeneficiaryExportSection =
   | "resumo"
+  | "agenda"
   | "consumo"
   | "faturas"
   | "historico"
@@ -350,6 +352,7 @@ export async function buildBeneficiarySectionTabularExport(
 
   const sectionMap: Record<BeneficiaryExportSection, PatientExportSection | "assinatura"> = {
     resumo: "summary",
+    agenda: "appointments",
     consumo: "usages",
     faturas: "invoices",
     historico: "timeline",
@@ -611,4 +614,126 @@ export async function buildInvoiceItemsTabularExport(
       amount: formatBRL(item.amount),
     })),
   };
+}
+
+export type ProviderPatientExportSection =
+  | "summary"
+  | "appointments"
+  | "usages"
+  | "records"
+  | "timeline";
+
+export function buildProviderPatientSectionTabularExport(
+  overview: ProviderPatientOverviewData,
+  section: ProviderPatientExportSection,
+): TabularExport {
+  const patientName = overview.patient.name;
+
+  switch (section) {
+    case "timeline":
+      return {
+        title: `Histórico — ${patientName} (prestador)`,
+        sheetName: "Timeline",
+        columns: [
+          { header: "Data", key: "createdAt", width: 18 },
+          { header: "Ação", key: "action", width: 14 },
+          { header: "Descrição", key: "description", width: 40 },
+          { header: "Responsável", key: "actorName", width: 18 },
+        ],
+        rows: overview.timeline.map((event) => ({
+          createdAt: event.createdAtLabel,
+          action: event.action,
+          description: event.description,
+          actorName: event.actorName ?? "Sistema",
+        })),
+      };
+    case "appointments":
+      return {
+        title: `Atendimentos — ${patientName} (prestador)`,
+        sheetName: "Atendimentos",
+        columns: [
+          { header: "Data", key: "scheduledAt", width: 18 },
+          { header: "Status", key: "status", width: 12 },
+          { header: "Modalidade", key: "modality", width: 12 },
+          { header: "Motivo", key: "reason", width: 24 },
+          { header: "Procedimentos", key: "usagesCount", width: 14 },
+        ],
+        rows: overview.appointments.map((appointment) => ({
+          scheduledAt: appointment.scheduledAtLabel,
+          status: appointment.status,
+          modality: appointment.modality,
+          reason: appointment.reason ?? "",
+          usagesCount: appointment.usagesCount,
+        })),
+      };
+    case "usages":
+      return {
+        title: `Procedimentos — ${patientName} (prestador)`,
+        sheetName: "Procedimentos",
+        columns: [
+          { header: "Procedimento", key: "procedure", width: 24 },
+          { header: "Categoria", key: "category", width: 14 },
+          { header: "Atendimento", key: "appointmentDate", width: 18 },
+          { header: "Realizado em", key: "performedAt", width: 18 },
+        ],
+        rows: overview.usages.map((usage) => ({
+          procedure: usage.procedure,
+          category: usage.category,
+          appointmentDate: usage.appointmentDateLabel,
+          performedAt: usage.performedAtLabel,
+        })),
+      };
+    case "records":
+      return {
+        title: `Prontuário — ${patientName} (prestador)`,
+        sheetName: "Prontuário",
+        columns: [
+          { header: "Data", key: "createdAt", width: 18 },
+          { header: "Tipo", key: "recordType", width: 14 },
+          { header: "Título", key: "title", width: 20 },
+          { header: "Atendimento", key: "appointmentDate", width: 18 },
+          { header: "Conteúdo", key: "content", width: 50 },
+        ],
+        rows: overview.medicalRecords.map((record) => ({
+          createdAt: record.createdAtLabel,
+          recordType: record.recordType,
+          title: record.title ?? "",
+          appointmentDate: record.appointmentDateLabel ?? "",
+          content: record.content,
+        })),
+      };
+    case "summary":
+    default:
+      return {
+        title: `Resumo — ${patientName} (prestador)`,
+        sheetName: "Resumo",
+        columns: [
+          { header: "Campo", key: "field", width: 24 },
+          { header: "Valor", key: "value", width: 36 },
+        ],
+        rows: [
+          { field: "Nome", value: overview.patient.name },
+          { field: "CPF", value: overview.patient.cpf },
+          { field: "Nascimento", value: overview.patient.birthDateLabel },
+          { field: "Telefone", value: overview.patient.phone ?? "—" },
+          { field: "Empresa", value: overview.patient.company ?? "Particular" },
+          { field: "Atendimentos", value: overview.summary.totalAppointments },
+          { field: "Procedimentos", value: overview.summary.totalUsages },
+          { field: "Registros clínicos", value: overview.summary.totalRecords },
+          { field: "Última visita", value: overview.summary.lastVisitLabel ?? "—" },
+          { field: "Próxima visita", value: overview.summary.nextVisitLabel ?? "—" },
+        ],
+      };
+  }
+}
+
+export async function buildProviderPatientTabularExport(
+  patientId: string,
+  providerId: string,
+  tenantId: string,
+  section: ProviderPatientExportSection,
+): Promise<TabularExport | null> {
+  const overview = await getProviderPatientOverview(patientId, providerId, tenantId);
+  if (!overview) return null;
+  return buildProviderPatientSectionTabularExport(overview, section);
 }

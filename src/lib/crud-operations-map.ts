@@ -327,6 +327,7 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
       ui("Registros do atendimento", "/prestador/atendimento/[id]", "GET …/prestador/appointments/[id]"),
       ui("Cliente 360°", "/interno/beneficiarios/[id]", "GET …/patients/[id]/overview"),
       download("PDF PEP", "/prestador/atendimento/[id]", "GET /api/prestador/records/[recordId]/export"),
+      download("PDF/Excel histórico paciente", "/prestador/paciente/[id]", "GET /api/prestador/patients/[id]/export?section="),
       download("PDF/Excel extrato", "/prestador/extrato", "GET /api/prestador/extrato/export"),
       download("PDF/Excel relatórios", "/prestador/relatorios", "GET /api/prestador/reports?format="),
     ],

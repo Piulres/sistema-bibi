@@ -40,8 +40,10 @@ test.describe("Portal PJ — fluxo corporativo", () => {
     await expect(page.getByRole("heading", { name: "Faturas da empresa" })).toBeVisible();
   });
 
-  test("botão exportar relatório CSV presente", async ({ page }) => {
-    await expect(page.getByRole("button", { name: /exportar relatório csv/i })).toBeVisible();
+  test("botões de exportação PDF e Excel presentes", async ({ page }) => {
+    await expect(page.getByRole("button", { name: "PDF" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Excel" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "CSV" })).toBeVisible();
   });
 });
 
