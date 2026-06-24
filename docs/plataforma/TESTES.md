@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **163** casos Vitest · **47** testes Playwright E2E · **~100** Route Handlers · **58** paths no OpenAPI (`public/openapi.yaml`).
+**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~121** Route Handlers · **73** paths no OpenAPI (`public/openapi.yaml`).
 
 ---
 
@@ -11,7 +11,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E        │  Playwright — 9 specs
+                    │  E2E        │  Playwright — 10 specs (desktop + mobile)
                     ├─────────────┤
                     │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
@@ -32,7 +32,7 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
 | E2E | Playwright | `e2e/` | `npm run test:e2e` |
-| CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
+| CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main`, `dev`, `cursor/**` |
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
@@ -90,17 +90,7 @@ Teste: `tests/api/auth-and-cron.test.ts`.
 
 ### 6. Isolamento multi-tenant
 
-Queries Prisma usam `tenantId` na maioria dos serviços. Cobertura automatizada **parcial**:
-
-| Área | Escopo `tenantId` | Teste |
-|------|-------------------|-------|
-| `computePrice()` | Rejeita procedimento de outro tenant | ✅ `tests/integration/pricing-db.test.ts` |
-| CRUD `/api/interno/pricing-rules` | Lista/cria/atualiza só regras do tenant da sessão | ✅ `tests/api/audit-pricing.test.ts` |
-| Appointments, patients, invoices | — | ❌ cross-tenant ainda não coberto |
-
-Serviço de referência: `src/lib/pricing-rule-service.ts` — filtra por `procedure.tenantId` em list/update/delete e valida `procedureId` + `companyId` no create.
-
-**Prioridade:** testes cross-tenant em appointments, patients e invoices.
+Queries Prisma usam `tenantId` na maioria dos serviços, mas **não há teste automatizado de cross-tenant** (prestador A acessando paciente B). Prioridade alta para integração.
 
 ### 7. MFA bypass em rotas sem segundo fator
 
@@ -114,7 +104,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Etapa | Módulo | Teste atual | Próximo |
 |-------|--------|-------------|---------|
-| Precificação dinâmica | `pricing.ts` + `pricing-rule-service.ts` | ✅ unit + integração DB + API CRUD | Regras edge (multiplier 0, arredondamento) |
+| Precificação dinâmica | `pricing.ts` | ✅ unit + integração DB | Regras edge (multiplier 0, arredondamento) |
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
@@ -202,11 +192,8 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha parte do pre-release)
+# Lint + test + build (espelha CI local)
 npm run lint && npm run test && npm run build
-
-# Validação completa de pacote (sem publicar)
-npm run pre-release
 ```
 
 ### Variáveis em testes
@@ -227,7 +214,7 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 ## Roadmap sugerido (prioridade)
 
 1. **P0 — Segurança:** `requireInternoModule` em todas as rotas internas sensíveis + testes de negação por perfil
-2. **P0 — Multi-tenant:** expandir testes cross-tenant em appointments, patients, invoices (precificação já coberta)
+2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
 3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
 4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
 5. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
@@ -259,6 +246,37 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+
+---
+
+## CI (GitHub Actions)
+
+Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
+
+1. **unit-integration-api** — `lint` → `docs:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
+2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)
+
+**Variáveis globais do workflow** (obrigatórias — Prisma falha sem `DATABASE_URL`):
+
+| Variável | Valor CI |
+|----------|----------|
+| `DATABASE_URL` | `file:./dev.db` (relativo ao `schema.prisma`) |
+| `SESSION_SECRET` | secret de 32+ chars para testes |
+| `CRON_SECRET` | secret de 32+ chars para testes |
+| `SEED_SCALE` | `small` (seed rápido) |
+
+**Espelhar CI localmente:**
+
+```bash
+npm run lint && npm run docs:verify
+SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
+npm run test && npm run build
+CI=true npm run test:e2e
+```
+
+`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+
+> Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
 ---
 
