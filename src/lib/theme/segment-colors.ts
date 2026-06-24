@@ -32,10 +32,10 @@ export const SEGMENT_COLORS: Record<NicheId, SegmentColorPreset> = {
     label: "Odontologia",
   },
   LEGAL: {
-    primaryColor: "#475569",
-    accentColor: "#d97706",
-    heroFrom: "#334155",
-    heroTo: "#d97706",
+    primaryColor: "#1e3a5f",
+    accentColor: "#c9a227",
+    heroFrom: "#0f2744",
+    heroTo: "#2d4a6f",
     label: "Jurídico",
   },
   SPA: {
