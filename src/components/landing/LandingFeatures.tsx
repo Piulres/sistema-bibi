@@ -24,15 +24,25 @@ const BENTO_SPANS: Record<LandingFeature["id"], string> = {
 };
 
 type Props = {
-  niche: NicheId;
+  niche?: NicheId;
+  sectionId?: string;
+  featuresSection?: { title: string; description: string };
+  features?: LandingFeature[];
 };
 
-export default function LandingFeatures({ niche }: Props) {
-  const { featuresSection, features } = getNicheLandingContent(niche);
+export default function LandingFeatures({
+  niche = "MEDICAL",
+  sectionId = "recursos",
+  featuresSection: featuresSectionOverride,
+  features: featuresOverride,
+}: Props) {
+  const nicheContent = getNicheLandingContent(niche);
+  const featuresSection = featuresSectionOverride ?? nicheContent.featuresSection;
+  const features = featuresOverride ?? nicheContent.features;
 
   return (
     <section
-      id="recursos"
+      id={sectionId}
       aria-labelledby="features-heading"
       className="relative mx-auto max-w-6xl px-6 py-24"
     >

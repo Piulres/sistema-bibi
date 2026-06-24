@@ -4,14 +4,13 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import NavTabs from "@/components/ui/NavTabs";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
-import { PORTAL_THEMES } from "@/lib/theme/portals";
+import { PORTAL_MOBILE_ACTIVE_CLASS, PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
 import { buildBeneficiarioNavTabs } from "@/lib/navigation/niche-nav";
 import { resolveBeneficiarioActive } from "@/lib/navigation";
 import { useLabels } from "@/hooks/useLabels";
 
 export default function BeneficiarioNav() {
   const pathname = usePathname();
-  const theme = PORTAL_THEMES.beneficiario;
   const active = resolveBeneficiarioActive(pathname);
   const { labels } = useLabels();
   const tabs = useMemo(() => buildBeneficiarioNavTabs(labels), [labels]);
@@ -21,15 +20,15 @@ export default function BeneficiarioNav() {
       <MobileNavDrawer
         tabs={tabs}
         active={active}
-        activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
+        activeClass={PORTAL_MOBILE_ACTIVE_CLASS}
         idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
         title="Módulos do portal"
       />
       <NavTabs
         tabs={tabs}
         active={active}
-        activeClass={theme.navActiveClass}
-        idleClass={theme.navIdleClass}
+        activeClass={PORTAL_NAV_ACTIVE_CLASS}
+        idleClass={PORTAL_NAV_IDLE_CLASS}
         className="hidden lg:flex"
       />
     </div>

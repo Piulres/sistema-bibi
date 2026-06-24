@@ -36,10 +36,26 @@ model TenantBranding {
 
 Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 
-- **Clínica Horizonte** — clínica cliente demo (teal)
+- **Clínica Horizonte** — clínica cliente demo (Energia Brasileira: Dark Slate + Orange)
 - **VitaCare** — white label corporativo (azul)
 
 **Sistema Bibi - ServiceOS** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` e `PLATFORM` em `src/lib/platform.ts`.
+
+## Identidade visual — Energia Brasileira
+
+Paleta padrão da plataforma (v2.0):
+
+| Token | Cor | Uso |
+|-------|-----|-----|
+| `--brand-primary` | `#1e293b` (Dark Slate) | Botões primários, logo fallback, confiança |
+| `--brand-accent` | `#f97316` (Orange) | CTAs, hover de navegação, destaques |
+| `--brand-hero-to` | `#f59e0b` (Amber) | Transição suave nos gradientes hero |
+| `--ring-focus` | `#fb923c` | Focus ring acessível (WCAG AA) |
+| `--border-accent` | `#fed7aa` | Bordas de destaque em cards |
+
+Presets por nicho: `src/lib/theme/presets-energia-brasileira.ts` — cada segmento mantém cor primária própria com **Orange universal** como accent.
+
+Guia completo: [`BRANDING.md`](BRANDING.md).
 
 ## Tokens CSS
 
@@ -59,10 +75,10 @@ Localizados em `src/components/ui/`:
 
 | Componente | Descrição |
 |------------|-----------|
-| `Button` | Variantes: primary, secondary, portal, ghost, danger |
+| `Button` | Variantes: primary, secondary, portal, ghost, accent, danger |
 | `Input` | Campo com label e focus ring semântico |
-| `Card` | Container padrão (`.ds-card`) |
-| `Badge` | Pill de status com tons semânticos |
+| `Card` | Container padrão (`.ds-card`) — prop `accent` para borda orange |
+| `Badge` | Pill de status com tons semânticos — tom `accent` para orange |
 | `Alert` | Mensagens info/success/warning/danger |
 | `NavTabs` | Navegação horizontal entre rotas — `ScrollableNavRail` (`aria-label="Navegação por abas"`) |
 | `Breadcrumbs` | Trilha hierárquica (`Cliente 360°`, atendimento prestador) |

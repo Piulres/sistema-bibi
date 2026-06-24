@@ -6,6 +6,7 @@ export const appointmentStatusClass: Record<string, string> = {
   REALIZADO: "bg-[var(--status-success-bg)] text-[var(--status-success-text)]",
   FALTOU: "bg-[var(--status-warning-bg)] text-[var(--status-warning-text)]",
   CANCELADO: "bg-[var(--status-danger-bg)] text-[var(--status-danger-text)]",
+  PENDENTE_FATURAMENTO: "bg-[var(--status-brand-bg)] text-[var(--status-brand-text)]",
 };
 
 export const invoiceStatusClass: Record<string, string> = {

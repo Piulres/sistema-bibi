@@ -95,7 +95,7 @@ components:
             displayName: { type: string }
             tagline: { type: string, nullable: true }
             logoUrl: { type: string, nullable: true }
-            primaryColor: { type: string, example: '#0d9488' }
+            primaryColor: { type: string, example: '#1e293b' }
             accentColor: { type: string }
             heroFrom: { type: string }
             heroTo: { type: string }
@@ -109,7 +109,7 @@ components:
         displayName: { type: string }
         tagline: { type: string, nullable: true }
         logoUrl: { type: string, nullable: true }
-        primaryColor: { type: string, example: '#0d9488' }
+        primaryColor: { type: string, example: '#1e293b' }
         accentColor: { type: string }
         heroFrom: { type: string }
         heroTo: { type: string }

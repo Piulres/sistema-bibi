@@ -17,7 +17,7 @@ type Props = {
 export default function MobileNavDrawer({
   tabs,
   active,
-  activeClass = "bg-[var(--surface-muted)] text-[var(--portal-accent)]",
+  activeClass = "bg-[var(--surface-muted)] text-[var(--brand-accent)]",
   idleClass = "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]",
   title = "Menu",
 }: Props) {

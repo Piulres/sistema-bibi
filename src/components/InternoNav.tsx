@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import NavTabs from "@/components/ui/NavTabs";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
-import { PORTAL_THEMES } from "@/lib/theme/portals";
+import { PORTAL_MOBILE_ACTIVE_CLASS, PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
 import { resolveInternoActive } from "@/lib/navigation";
 import { buildInternoNavTabs } from "@/lib/navigation/niche-nav";
 import { useLabels } from "@/hooks/useLabels";
@@ -18,7 +18,6 @@ export default function InternoNav({
   permissions?: InternoModule[];
 }) {
   const pathname = usePathname();
-  const theme = PORTAL_THEMES.interno;
   const resolvedActive = active ?? resolveInternoActive(pathname);
   const { labels, niche } = useLabels();
   const allTabs = useMemo(() => buildInternoNavTabs(labels, niche), [labels, niche]);
@@ -33,15 +32,15 @@ export default function InternoNav({
       <MobileNavDrawer
         tabs={tabs}
         active={resolvedActive}
-        activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
+        activeClass={PORTAL_MOBILE_ACTIVE_CLASS}
         idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
         title="Módulos internos"
       />
       <NavTabs
         tabs={tabs}
         active={resolvedActive}
-        activeClass={theme.navActiveClass}
-        idleClass={theme.navIdleClass}
+        activeClass={PORTAL_NAV_ACTIVE_CLASS}
+        idleClass={PORTAL_NAV_IDLE_CLASS}
         className="hidden lg:flex"
       />
     </div>

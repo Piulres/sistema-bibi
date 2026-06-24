@@ -7,10 +7,10 @@ import {
 
 const validInput = {
   displayName: "Clínica Demo",
-  primaryColor: "#0d9488",
-  accentColor: "#14b8a6",
-  heroFrom: "#0f172a",
-  heroTo: "#134e4a",
+  primaryColor: "#1e293b",
+  accentColor: "#f97316",
+  heroFrom: "#1e293b",
+  heroTo: "#f59e0b",
   platformLabel: "Powered by Sistema Bibi - ServiceOS",
 };
 
