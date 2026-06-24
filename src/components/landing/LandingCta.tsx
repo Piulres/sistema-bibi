@@ -6,11 +6,12 @@ import LandingIcon from "@/components/landing/LandingIcon";
 
 type Props = {
   branding: BrandingTokens;
-  niche: NicheId;
+  niche?: NicheId;
+  description?: string;
 };
 
-export default function LandingCta({ branding, niche }: Props) {
-  const { ctaDescription } = getNicheLandingContent(niche);
+export default function LandingCta({ branding, niche = "MEDICAL", description }: Props) {
+  const ctaDescription = description ?? getNicheLandingContent(niche).ctaDescription;
 
   return (
     <section aria-labelledby="cta-heading" className="mx-auto max-w-6xl px-6 py-24">

@@ -60,8 +60,8 @@ Página comercial separada da demonstração por segmento: `/venda`
 
 | Rota | Papel |
 |------|-------|
-| `/` | Landing padrão (Saúde / tenant resolvido) |
-| `/segmentos/*` | Landing dedicada por segmento |
+| `/` | Landing do **produto** — visão, valores, segmentos, 4 portais |
+| `/segmentos/*` | Landing **por segmento** — como funciona no nicho, switcher, portais segmentados |
 | `/plataforma` | Mapa hierárquico da estrutura |
 | `/venda` | Site comercial (propósitos, missão, valor) |
 | `/interno/login` | Portal Interno |

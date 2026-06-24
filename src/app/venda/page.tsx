@@ -19,7 +19,7 @@ export default async function VendaPage() {
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
-      <LandingHeader branding={branding} />
+      <LandingHeader branding={branding} context="home" />
       <main id="conteudo-principal" className="flex-1">
         <section className="landing-mesh-hero px-6 py-20 text-[var(--text-inverse)]">
           <div className="mx-auto max-w-4xl text-center">

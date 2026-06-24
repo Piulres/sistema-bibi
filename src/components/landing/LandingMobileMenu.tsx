@@ -2,35 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
+import type { LandingNavContext } from "@/lib/landing/navigation";
+import {
+  landingNavItems,
+  SEGMENT_ACCESS_HREF,
+} from "@/lib/landing/navigation";
 import { SEGMENT_LANDING_PAGES } from "@/lib/platform/structure";
 import { getNicheConfig } from "@/lib/niche/defaults";
-import { appendSegmentToPath } from "@/lib/segment/types";
-import { isNicheId, type NicheId } from "@/lib/niche/types";
 
-const NAV_LINKS = [
-  { href: "/plataforma", label: "Plataforma" },
-  { href: "/venda", label: "Venda" },
-  { href: "#recursos", label: "Recursos" },
-  { href: "#como-funciona", label: "Como funciona" },
-  { href: "#portais", label: "Portais" },
-  { href: "#faq", label: "FAQ" },
-] as const;
+type Props = {
+  context?: LandingNavContext;
+};
 
-export default function LandingMobileMenu() {
+export default function LandingMobileMenu({ context = "home" }: Props) {
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const searchParams = useSearchParams();
-  const tenant = searchParams.get("tenant");
-  const nicheParam = searchParams.get("niche")?.toUpperCase() ?? null;
-  const niche: NicheId | null = nicheParam && isNicheId(nicheParam) ? nicheParam : null;
+  const pathname = usePathname();
+  const anchors = landingNavItems(context);
 
-  const loginHref = appendSegmentToPath("/beneficiario/login", {
-    tenantSlug: tenant,
-    niche,
-  });
+  const activeSegmentSlug = pathname.startsWith("/segmentos/")
+    ? pathname.replace("/segmentos/", "")
+    : null;
 
   useEffect(() => {
     if (!open) return;
@@ -52,7 +47,7 @@ export default function LandingMobileMenu() {
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         ref={triggerRef}
         type="button"
@@ -98,65 +93,78 @@ export default function LandingMobileMenu() {
             </div>
             <nav className="flex-1 overflow-y-auto p-3" aria-label="Seções da landing">
               <ul className="space-y-1">
-                {NAV_LINKS.map((link) => (
+                {context === "segment" && (
+                  <li>
+                    <Link
+                      href="/"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]"
+                    >
+                      Início
+                    </Link>
+                  </li>
+                )}
+                {context === "home" && (
+                  <li>
+                    <Link
+                      href={SEGMENT_ACCESS_HREF}
+                      onClick={() => setOpen(false)}
+                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]"
+                    >
+                      Segmentos
+                    </Link>
+                  </li>
+                )}
+                {anchors.map((link) => (
                   <li key={link.href}>
-                    {link.href.startsWith("#") ? (
-                      <a
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className={cn(
-                          "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium",
-                          "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]",
-                        )}
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className={cn(
-                          "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium",
-                          "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]",
-                        )}
-                      >
-                        {link.label}
-                      </Link>
-                    )}
+                    <a
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className={cn(
+                        "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium",
+                        "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]",
+                      )}
+                    >
+                      {link.label}
+                    </a>
                   </li>
                 ))}
               </ul>
 
-              <p className="mt-4 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
-                Segmento demo
-              </p>
-              <ul className="mt-1 flex flex-wrap gap-1.5 px-2">
-                {SEGMENT_LANDING_PAGES.map((page) => {
-                  const config = getNicheConfig(page.niche);
-                  const isActive = tenant === page.tenantSlug;
-                  return (
-                    <li key={page.slug}>
-                      <Link
-                        href={page.href}
-                        onClick={() => setOpen(false)}
-                        className={cn(
-                          "inline-block rounded-full px-2.5 py-1 text-xs font-medium",
-                          isActive
-                            ? "bg-[var(--brand-primary)] text-[var(--text-inverse)]"
-                            : "border border-[var(--border-default)] text-[var(--text-secondary)]",
-                        )}
-                      >
-                        {config.name}
-                      </Link>
-                    </li>
-                  );
-                })}
-              </ul>
+              {context === "segment" && (
+                <>
+                  <p className="mt-4 px-3 text-[10px] font-semibold uppercase tracking-widest text-[var(--text-muted)]">
+                    Alternar segmento
+                  </p>
+                  <ul className="mt-1 flex flex-wrap gap-1.5 px-2">
+                    {SEGMENT_LANDING_PAGES.map((page) => {
+                      const config = getNicheConfig(page.niche);
+                      const isActive = activeSegmentSlug === page.slug;
+                      return (
+                        <li key={page.slug}>
+                          <Link
+                            href={page.href}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "inline-block rounded-full px-2.5 py-1 text-xs font-medium",
+                              isActive
+                                ? "bg-[var(--brand-primary)] text-[var(--text-inverse)]"
+                                : "border border-[var(--border-default)] text-[var(--text-secondary)]",
+                            )}
+                          >
+                            {config.name}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </>
+              )}
 
               <ul className="mt-4 space-y-1 border-t border-[var(--border-default)] pt-3">
                 <li>
                   <Link
-                    href={loginHref}
+                    href="/beneficiario/login"
                     onClick={() => setOpen(false)}
                     className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
                   >

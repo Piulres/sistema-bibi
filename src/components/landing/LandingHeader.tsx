@@ -2,25 +2,22 @@ import Link from "next/link";
 import Image from "next/image";
 import { Suspense } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
+import type { LandingNavContext } from "@/lib/landing/navigation";
+import {
+  landingNavItems,
+  SEGMENT_ACCESS_HREF,
+} from "@/lib/landing/navigation";
 import LandingMobileMenu from "@/components/landing/LandingMobileMenu";
 
 type Props = {
   branding: BrandingTokens;
+  context?: LandingNavContext;
 };
 
-const NAV_LINKS = [
-  { href: "#recursos", label: "Recursos" },
-  { href: "#como-funciona", label: "Como funciona" },
-  { href: "#portais", label: "Portais" },
-  { href: "#faq", label: "FAQ" },
-] as const;
+export default function LandingHeader({ branding, context = "home" }: Props) {
+  const anchors = landingNavItems(context);
+  const portalsHref = context === "home" ? "#portais" : "#portais";
 
-const PLATFORM_LINKS = [
-  { href: "/plataforma", label: "Plataforma" },
-  { href: "/venda", label: "Venda" },
-] as const;
-
-export default function LandingHeader({ branding }: Props) {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-default)]/60 bg-[var(--surface-page)]/80 backdrop-blur-xl">
       <a href="#conteudo-principal" className="ds-skip-link">
@@ -59,18 +56,25 @@ export default function LandingHeader({ branding }: Props) {
 
         <nav
           aria-label="Navegação principal"
-          className="hidden items-center gap-0.5 rounded-full border border-[var(--border-default)] bg-[var(--surface-card)]/80 p-1 shadow-sm md:flex"
+          className="hidden items-center gap-0.5 rounded-full border border-[var(--border-default)] bg-[var(--surface-card)]/80 p-1 shadow-sm lg:flex"
         >
-          {PLATFORM_LINKS.map((link) => (
+          {context === "segment" && (
             <Link
-              key={link.href}
-              href={link.href}
+              href="/"
               className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             >
-              {link.label}
+              Início
             </Link>
-          ))}
-          {NAV_LINKS.map((link) => (
+          )}
+          {context === "home" && (
+            <Link
+              href={SEGMENT_ACCESS_HREF}
+              className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            >
+              Segmentos
+            </Link>
+          )}
+          {anchors.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -83,7 +87,7 @@ export default function LandingHeader({ branding }: Props) {
 
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
           <Suspense fallback={null}>
-            <LandingMobileMenu />
+            <LandingMobileMenu context={context} />
           </Suspense>
           <Link
             href="/beneficiario/login"
@@ -91,13 +95,13 @@ export default function LandingHeader({ branding }: Props) {
           >
             Entrar
           </Link>
-          <Link
-            href="#portais"
+          <a
+            href={portalsHref}
             className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
           >
             <span className="sm:hidden">Portais</span>
             <span className="hidden sm:inline">Acessar portais</span>
-          </Link>
+          </a>
         </div>
       </div>
     </header>

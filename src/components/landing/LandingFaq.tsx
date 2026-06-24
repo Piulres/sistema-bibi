@@ -1,14 +1,16 @@
+import type { LandingFaqItem } from "@/lib/niche/landing-content";
 import type { NicheId } from "@/lib/niche/types";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import LandingFaqAccordion from "@/components/landing/LandingFaqAccordion";
 
 type Props = {
-  niche: NicheId;
+  niche?: NicheId;
+  items?: LandingFaqItem[];
 };
 
-export default function LandingFaq({ niche }: Props) {
-  const { faq } = getNicheLandingContent(niche);
+export default function LandingFaq({ niche = "MEDICAL", items }: Props) {
+  const faq = items ?? getNicheLandingContent(niche).faq;
 
   return (
     <section

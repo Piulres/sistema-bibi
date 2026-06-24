@@ -25,7 +25,7 @@ export default async function PlataformaPage() {
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
-      <LandingHeader branding={branding} />
+      <LandingHeader branding={branding} context="home" />
       <main id="conteudo-principal" className="mx-auto w-full max-w-6xl flex-1 px-6 py-16">
         <div className="mb-12">
           <p className="text-sm font-semibold uppercase tracking-wider text-[var(--brand-accent)]">
