@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import PortalShell from "@/components/layout/PortalShell";
+import AssistantShell from "@/components/assistant/AssistantShell";
 import InternoNav from "@/components/InternoNav";
 import { PORTALS } from "@/lib/roles";
 import { INTERNO_PUBLIC_PATHS } from "@/lib/navigation";
@@ -37,7 +38,9 @@ export default function InternoPortalShell({ user, children }: Props) {
       labels={user.labels}
     >
       <InternoNav permissions={user.internoPermissions} />
-      <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      <AssistantShell>
+        <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      </AssistantShell>
     </PortalShell>
   );
 }
