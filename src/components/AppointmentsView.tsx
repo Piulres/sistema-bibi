@@ -74,6 +74,8 @@ export default function AppointmentsView() {
     time: "",
     reason: "Consulta walk-in",
     createPortalUser: false,
+    petName: "",
+    petSpecies: "CANINO",
   });
 
   const load = useCallback(async () => {
@@ -160,11 +162,36 @@ export default function AppointmentsView() {
         `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`;
       const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
 
+      let petId: string | null = null;
+      if (isVet) {
+        if (!walkIn.petName.trim()) {
+          setMsg("Informe o nome do pet para agendar no segmento veterinário");
+          return;
+        }
+        const petRes = await fetch("/api/interno/pets", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            patientId: patientData.patient.id,
+            name: walkIn.petName.trim(),
+            species: walkIn.petSpecies,
+          }),
+        });
+        const petData = await petRes.json();
+        if (!petRes.ok) {
+          setMsg(petData.error ?? "Paciente cadastrado, mas falha ao cadastrar pet");
+          await load();
+          return;
+        }
+        petId = petData.pet.id;
+      }
+
       const apptRes = await fetch("/api/interno/appointments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientId: patientData.patient.id,
+          petId,
           providerId: walkIn.providerId,
           scheduledAt,
           reason: walkIn.reason,
@@ -211,6 +238,8 @@ export default function AppointmentsView() {
         time: "",
         reason: "Consulta walk-in",
         createPortalUser: false,
+        petName: "",
+        petSpecies: "CANINO",
       });
       await load();
     } finally {
@@ -330,6 +359,35 @@ export default function AppointmentsView() {
               onChange={(e) => setWalkIn({ ...walkIn, time: e.target.value })}
             />
           </label>
+          {isVet && (
+            <>
+              <label className="block text-sm" htmlFor="walkin-pet-name">
+                <span className="text-[var(--text-secondary)]">Nome do {labels.patient.toLowerCase()}</span>
+                <input
+                  id="walkin-pet-name"
+                  required
+                  className={fieldClass}
+                  value={walkIn.petName}
+                  onChange={(e) => setWalkIn({ ...walkIn, petName: e.target.value })}
+                />
+              </label>
+              <label className="block text-sm" htmlFor="walkin-pet-species">
+                <span className="text-[var(--text-secondary)]">Espécie</span>
+                <select
+                  id="walkin-pet-species"
+                  required
+                  className={fieldClass}
+                  value={walkIn.petSpecies}
+                  onChange={(e) => setWalkIn({ ...walkIn, petSpecies: e.target.value })}
+                >
+                  <option value="CANINO">Canino</option>
+                  <option value="FELINO">Felino</option>
+                  <option value="AVES">Aves</option>
+                  <option value="OUTRO">Outro</option>
+                </select>
+              </label>
+            </>
+          )}
           <label className="block text-sm sm:col-span-2">
             <span className="text-[var(--text-secondary)]">Motivo</span>
             <input

@@ -81,7 +81,7 @@ function mapExamOrder(
 export async function listPatientExamOrders(
   patientId: string,
   tenantId: string,
-  options?: { status?: ExamOrderStatus; appointmentId?: string; petId?: string },
+  options?: { status?: ExamOrderStatus; appointmentId?: string; petId?: string; tutorOnly?: boolean },
 ): Promise<ExamOrderView[]> {
   const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
@@ -95,6 +95,7 @@ export async function listPatientExamOrders(
       ...(options?.status ? { status: options.status } : {}),
       ...(options?.appointmentId ? { appointmentId: options.appointmentId } : {}),
       ...(options?.petId ? { petId: options.petId } : {}),
+      ...(options?.tutorOnly ? { petId: null } : {}),
     },
     include: {
       provider: { select: { name: true } },

@@ -299,7 +299,7 @@ async function seedSingleNicheOperational(
     companyIdByIndex,
     discountByCompanyIndex,
     patients: patientRefs,
-    excludePatientIds: starPatientIds,
+    excludePatientIds: new Set<string>(),
     companies: companiesForMass,
     scale: nicheScale,
     pickProcedureCode: (companyIndex, companies, salt) =>

@@ -22,15 +22,18 @@ export async function GET() {
       select: { niche: true },
     });
 
+    const isVetNiche = requiresPet(tenant?.niche);
+    const listOpts = isVetNiche ? { tutorOnly: true as const } : undefined;
+
     const [overview, medications, examOrders, protocols] = await Promise.all([
       getPatientClinicalOverview(user.patientId, user.tenantId),
-      listPatientMedications(user.patientId, user.tenantId),
-      listPatientExamOrders(user.patientId, user.tenantId),
+      listPatientMedications(user.patientId, user.tenantId, listOpts),
+      listPatientExamOrders(user.patientId, user.tenantId, listOpts),
       listPatientProtocolEnrollments(user.patientId, user.tenantId),
     ]);
 
     let petsClinical: Awaited<ReturnType<typeof getPetClinicalOverview>>[] = [];
-    if (requiresPet(tenant?.niche)) {
+    if (isVetNiche) {
       const pets = await listPets(user.tenantId, { patientId: user.patientId });
       const overviews = await Promise.all(
         pets.map((p) => getPetClinicalOverview(p.id, user.tenantId)),

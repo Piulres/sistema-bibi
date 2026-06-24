@@ -74,7 +74,7 @@ function mapMedication(
 export async function listPatientMedications(
   patientId: string,
   tenantId: string,
-  options?: { status?: MedicationStatus; activeOnly?: boolean; petId?: string },
+  options?: { status?: MedicationStatus; activeOnly?: boolean; petId?: string; tutorOnly?: boolean },
 ): Promise<MedicationView[]> {
   const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
@@ -88,7 +88,11 @@ export async function listPatientMedications(
       ? { status: "ATIVA" }
       : {};
 
-  const petFilter = options?.petId ? { petId: options.petId } : {};
+  const petFilter = options?.petId
+    ? { petId: options.petId }
+    : options?.tutorOnly
+      ? { petId: null }
+      : {};
 
   const rows = await prisma.medicationPrescription.findMany({
     where: { patientId, ...statusFilter, ...petFilter },
