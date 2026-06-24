@@ -57,10 +57,10 @@ model TenantBranding {
   tagline      String?
   logoUrl      String?
   /// Cores em hex (#RRGGBB). Injetadas como CSS variables em runtime.
-  primaryColor   String @default("#0d9488")
-  accentColor    String @default("#14b8a6")
-  heroFrom       String @default("#0f172a")
-  heroTo         String @default("#134e4a")
+  primaryColor   String @default("#1e293b")
+  accentColor    String @default("#f97316")
+  heroFrom       String @default("#1e293b")
+  heroTo         String @default("#f59e0b")
   /// Nome da plataforma quando exibido como produto white-label (ex. "Powered by Bibi").
   platformLabel  String @default("Powered by Sistema Bibi - ServiceOS")
   /// colorScheme: light | dark | system

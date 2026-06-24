@@ -102,7 +102,9 @@ export async function getSessionUser(): Promise<SessionUser | null> {
       }
     : { displayName: user.tenant.name, ...CLINIC_BRANDING_DEFAULTS };
 
-  const branding = applyNicheBrandingDefaults(niche, baseBranding);
+  const branding = brandingRow
+    ? applyNicheBrandingDefaults(niche, baseBranding, { fromDatabase: true })
+    : applyNicheBrandingDefaults(niche, baseBranding);
 
   return {
     id: user.id,

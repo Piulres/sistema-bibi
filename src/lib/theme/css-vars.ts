@@ -10,6 +10,10 @@ export function brandingToCssVars(
     "--brand-accent": branding.accentColor,
     "--brand-hero-from": branding.heroFrom,
     "--brand-hero-to": branding.heroTo,
+    /* Portal espelha whitelabel do tenant — nav, links e botões portal */
+    "--portal-accent": branding.accentColor,
+    "--portal-accent-from": branding.heroFrom,
+    "--portal-accent-to": branding.heroTo,
     ...extra,
   };
 }
