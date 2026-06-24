@@ -19,6 +19,9 @@ const dateOnly = (value: Date) =>
   });
 
 export type ProviderPatientOverviewData = {
+  subjectType: "patient" | "pet";
+  /** Tutor/paciente real quando subjectType=pet */
+  tutorPatientId?: string;
   patient: {
     id: string;
     name: string;
@@ -156,6 +159,7 @@ export async function getProviderPatientOverview(
   });
 
   return {
+    subjectType: "patient",
     patient: {
       id: patient.id,
       name: patient.name,
@@ -269,6 +273,8 @@ export async function getProviderPetOverview(
   const speciesDetail = [pet.species, pet.breed, pet.size].filter(Boolean).join(" · ");
 
   return {
+    subjectType: "pet",
+    tutorPatientId: pet.patientId,
     patient: {
       id: pet.id,
       name: pet.name,

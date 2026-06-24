@@ -24,6 +24,7 @@ import {
   type ProcedureRef,
   type SeedMassStats,
 } from "./scenarios";
+import { seedPetClinicalDemo } from "./pet-clinical-demo";
 
 export type NicheOperationalSummary = {
   niche: string;
@@ -215,6 +216,7 @@ async function seedSingleNicheOperational(
   }
 
   const petsByPatientId = new Map<string, string[]>();
+  const starPetsForClinical: Array<{ id: string; name: string; patientId: string }> = [];
 
   if (config.niche === "VET") {
     for (const starPet of config.starPets ?? []) {
@@ -233,6 +235,7 @@ async function seedSingleNicheOperational(
           status: "ATIVO",
         },
       });
+      starPetsForClinical.push({ id: pet.id, name: pet.name, patientId: tutorId });
       const list = petsByPatientId.get(tutorId) ?? [];
       list.push(pet.id);
       petsByPatientId.set(tutorId, list);
@@ -318,6 +321,14 @@ async function seedSingleNicheOperational(
           }
         : undefined,
   });
+
+  if (config.niche === "VET" && starPetsForClinical.length > 0) {
+    await seedPetClinicalDemo(prisma, {
+      tenantId: tenant.id,
+      providerId: providerIds[0]!,
+      pets: starPetsForClinical,
+    });
+  }
 
   const portalUsers = await seedBeneficiaryPortalUsers({
     prisma,

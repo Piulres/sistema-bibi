@@ -111,6 +111,7 @@ model User {
   medicationPrescriptions MedicationPrescription[] @relation("ProviderPrescriptions")
   examOrders     ExamOrder[]     @relation("ProviderExamOrders")
   protocolEnrollments PatientProtocolEnrollment[] @relation("ProviderProtocolEnrollments")
+  petVaccineRecords PetVaccineRecord[] @relation("ProviderPetVaccines")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -209,6 +210,9 @@ model Pet {
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
   clinicalProfile PetClinicalProfile?
+  medicationPrescriptions MedicationPrescription[]
+  examOrders     ExamOrder[]
+  vaccineRecords PetVaccineRecord[]
 
   @@index([tenantId, patientId])
   @@index([tenantId, status])
@@ -224,6 +228,28 @@ model PetClinicalProfile {
   /// JSON: [{ condition, since, notes }]
   chronicConditions String?
   updatedAt         DateTime @updatedAt
+}
+
+/// Registro de vacinação do pet.
+/// status: APLICADA | PENDENTE | VENCIDA
+model PetVaccineRecord {
+  id            String   @id @default(cuid())
+  petId         String
+  pet           Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  vaccineName   String
+  doseLabel     String?
+  appliedAt     DateTime?
+  nextDueAt     DateTime?
+  batchNumber   String?
+  status        String   @default("APLICADA")
+  notes         String?
+  providerId    String?
+  provider      User?    @relation("ProviderPetVaccines", fields: [providerId], references: [id])
+  appointmentId String?
+  createdAt     DateTime @default(now())
+
+  @@index([petId, status])
+  @@index([petId, nextDueAt])
 }
 
 /// Catálogo de serviços agnóstico — consulta médica, hora técnica jurídica, banho e tosa, etc.
@@ -451,6 +477,8 @@ model MedicationPrescription {
   id            String   @id @default(cuid())
   patientId     String
   patient       Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  petId         String?
+  pet           Pet?     @relation(fields: [petId], references: [id])
   providerId    String
   provider      User     @relation("ProviderPrescriptions", fields: [providerId], references: [id])
   appointmentId String?
@@ -467,6 +495,7 @@ model MedicationPrescription {
   createdAt     DateTime @default(now())
 
   @@index([patientId, status])
+  @@index([petId, status])
 }
 
 /// Pedido de exame (workflow clínico).
@@ -475,6 +504,8 @@ model ExamOrder {
   id                  String   @id @default(cuid())
   patientId           String
   patient             Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  petId               String?
+  pet                 Pet?     @relation(fields: [petId], references: [id])
   providerId          String
   provider            User     @relation("ProviderExamOrders", fields: [providerId], references: [id])
   appointmentId       String?
@@ -491,6 +522,7 @@ model ExamOrder {
   createdAt           DateTime @default(now())
 
   @@index([patientId, status])
+  @@index([petId, status])
 }
 
 /// Template de protocolo de cuidado por tenant.

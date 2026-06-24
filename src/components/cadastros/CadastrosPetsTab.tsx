@@ -274,7 +274,10 @@ export default function CadastrosPetsTab() {
       </Card>
 
       {pets.length === 0 ? (
-        <EmptyState title={`Nenhum ${labels.patient.toLowerCase()} cadastrado`} />
+        <EmptyState
+          title={`Nenhum ${labels.patient.toLowerCase()} cadastrado`}
+          message={`Cadastre o primeiro ${labels.patient.toLowerCase()} vinculado a um tutor.`}
+        />
       ) : (
         <div className="overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-muted)]">
           <table className="min-w-full text-sm">
@@ -295,7 +298,7 @@ export default function CadastrosPetsTab() {
                   <td className="px-4 py-2">{p.speciesLabel}{p.breed ? ` · ${p.breed}` : ""}</td>
                   <td className="px-4 py-2">{p.tutorName}</td>
                   <td className="px-4 py-2">{p.sizeLabel ?? "—"}</td>
-                  <td className="px-4 py-2"><StatusBadge status={p.status} /></td>
+                  <td className="px-4 py-2"><StatusBadge value={p.status} /></td>
                   <td className="px-4 py-2">
                     <Button type="button" variant="ghost" size="sm" onClick={() => startEdit(p)}>
                       Editar

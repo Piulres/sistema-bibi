@@ -128,6 +128,21 @@ type ClinicalData = {
     progressPercent: number;
     nextReviewAtLabel: string | null;
   }[];
+  petsClinical?: {
+    petId: string;
+    petName: string;
+    activeMedications: { id: string; medication: string; dosage: string; frequency: string }[];
+    pendingExams: { id: string; examName: string; statusLabel: string }[];
+    vaccines: {
+      id: string;
+      vaccineName: string;
+      doseLabel: string | null;
+      statusLabel: string;
+      appliedAtLabel: string | null;
+      nextDueAtLabel: string | null;
+    }[];
+    upcomingVaccines: { id: string; vaccineName: string; nextDueAtLabel: string | null }[];
+  }[];
 };
 
 type PixState = {
@@ -743,8 +758,50 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("plano") && (
       <section id="plano">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu plano de cuidado</h3>
-        {!clinical?.protocols?.filter((p) => p.statusLabel === "Ativo").length ? (
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+          {isVet ? "Plano de cuidado dos pets" : "Meu plano de cuidado"}
+        </h3>
+        {isVet ? (
+          clinical?.petsClinical && clinical.petsClinical.length > 0 ? (
+          <div className="mt-3 space-y-4">
+            {clinical.petsClinical.map((pet) => (
+              <article key={pet.petId} className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">
+                <h4 className="font-semibold text-[var(--text-primary)]">{pet.petName}</h4>
+                <div className="mt-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Carteira vacinal</p>
+                  {pet.vaccines.length === 0 ? (
+                    <p className="mt-2 text-sm text-[var(--text-muted)]">Nenhuma vacina registrada.</p>
+                  ) : (
+                    <ul className="mt-2 space-y-2">
+                      {pet.vaccines.map((v) => (
+                        <li key={v.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                          <span>
+                            {v.vaccineName}{v.doseLabel ? ` (${v.doseLabel})` : ""}
+                            {v.nextDueAtLabel ? ` · reforço ${v.nextDueAtLabel}` : ""}
+                          </span>
+                          <StatusBadge value={v.statusLabel} label={v.statusLabel} />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {pet.activeMedications.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Medicações ativas</p>
+                    <ul className="mt-1 text-sm text-[var(--text-secondary)]">
+                      {pet.activeMedications.map((m) => (
+                        <li key={m.id}>{m.medication} — {m.dosage}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+          ) : (
+            <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Cadastre um pet para acompanhar vacinas e medicações.</p>
+          )
+        ) : !clinical?.protocols?.filter((p) => p.statusLabel === "Ativo").length ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum protocolo ativo.</p>
         ) : (
           <div className="mt-3 space-y-3">
