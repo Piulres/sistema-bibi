@@ -11,6 +11,7 @@ type AssistantContextValue = {
   loading: boolean;
   error: string | null;
   sendMessage: (content: string) => Promise<void>;
+  confirmAction: (pendingActionId: string, confirmed: boolean, password?: string) => Promise<void>;
   clearError: () => void;
 };
 
@@ -70,6 +71,34 @@ export default function AssistantProvider({ pageContext, children }: Props) {
     [loading, messages, pageContext],
   );
 
+  const confirmAction = useCallback(
+    async (pendingActionId: string, confirmed: boolean, password?: string) => {
+      if (loading) return;
+      setLoading(true);
+      setError(null);
+
+      try {
+        const res = await fetch("/api/assistant/confirm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pendingActionId, confirmed, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          setError(data.error ?? "Erro ao confirmar ação");
+          return;
+        }
+        setMessages((prev) => [...prev, data.message]);
+        setActions([]);
+      } catch {
+        setError("Falha de conexão ao confirmar.");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [loading],
+  );
+
   const value = useMemo(
     () => ({
       open,
@@ -79,9 +108,10 @@ export default function AssistantProvider({ pageContext, children }: Props) {
       loading,
       error,
       sendMessage,
+      confirmAction,
       clearError: () => setError(null),
     }),
-    [open, messages, actions, loading, error, sendMessage],
+    [open, messages, actions, loading, error, sendMessage, confirmAction],
   );
 
   return <AssistantContext.Provider value={value}>{children}</AssistantContext.Provider>;

@@ -6,8 +6,13 @@ import { useAssistant } from "@/components/assistant/AssistantProvider";
 import AssistantMessageList from "@/components/assistant/AssistantMessageList";
 import AssistantActionCard from "@/components/assistant/AssistantActionCard";
 import AssistantComposer from "@/components/assistant/AssistantComposer";
+import type { PortalKey } from "@/lib/roles";
 
-export default function AssistantPanel() {
+type Props = {
+  portal: PortalKey;
+};
+
+export default function AssistantPanel({ portal }: Props) {
   const { open, setOpen, messages, actions, loading, error } = useAssistant();
   const panelRef = useRef<HTMLDivElement>(null);
 
@@ -59,7 +64,7 @@ export default function AssistantPanel() {
 
         <AssistantMessageList messages={messages} loading={loading} />
         <AssistantActionCard actions={actions} />
-        <AssistantComposer />
+        <AssistantComposer portal={portal} />
       </aside>
     </>
   );

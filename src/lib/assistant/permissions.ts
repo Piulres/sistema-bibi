@@ -11,22 +11,12 @@ export class AssistantPermissionError extends Error {
 }
 
 export function assertToolPermission(user: SessionUser, tool: AssistantToolDefinition): void {
-  if (user.role !== "INTERNO") {
-    throw new AssistantPermissionError("Assistente disponível apenas no portal interno nesta fase.");
+  if (tool.requiredRoles && !tool.requiredRoles.includes(user.role)) {
+    throw new AssistantPermissionError("Ação não disponível neste portal.");
   }
-  if (!tool.requiredModule) return;
-  if (!hasInternoPermission(user.role, user.internoProfile, tool.requiredModule)) {
-    throw new AssistantPermissionError(`Sem permissão para a ação: ${tool.name}`);
+  if (user.role === "INTERNO" && tool.requiredModule) {
+    if (!hasInternoPermission(user.role, user.internoProfile, tool.requiredModule)) {
+      throw new AssistantPermissionError(`Sem permissão para a ação: ${tool.name}`);
+    }
   }
-}
-
-export function filterToolsForUser(
-  tools: AssistantToolDefinition[],
-  user: SessionUser,
-): AssistantToolDefinition[] {
-  if (user.role !== "INTERNO") return [];
-  return tools.filter((tool) => {
-    if (!tool.requiredModule) return true;
-    return hasInternoPermission(user.role, user.internoProfile, tool.requiredModule);
-  });
 }

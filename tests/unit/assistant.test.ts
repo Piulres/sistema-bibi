@@ -1,9 +1,17 @@
 import { describe, expect, it } from "vitest";
 import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
-import { filterToolsForUser, assertToolPermission } from "@/lib/assistant/permissions";
-import { AssistantPermissionError } from "@/lib/assistant/permissions";
+import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
+import { filterToolsForUser } from "@/lib/assistant/tools/registry";
 import { internoReadTools } from "@/lib/assistant/tools/interno/read";
+import { internoWriteTools } from "@/lib/assistant/tools/interno/write";
+import { prestadorReadTools } from "@/lib/assistant/tools/prestador/read";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
+import { searchKnowledge } from "@/lib/assistant/rag/knowledge";
+import {
+  createPendingAction,
+  consumePendingAction,
+  cancelPendingAction,
+} from "@/lib/assistant/pending-actions";
 import type { SessionUser } from "@/lib/session";
 import { CLINIC_BRANDING_DEFAULTS } from "@/lib/theme/tokens";
 import { NICHE_MASTER_LABELS } from "@/constants/niches";
@@ -52,13 +60,13 @@ describe("assistant RBAC", () => {
     expect(names).not.toContain("list_users");
   });
 
-  it("bloqueia execução sem permissão", () => {
+  it("READONLY não executa draft_create_user", () => {
     const user = baseUser();
-    const tool = internoReadTools.find((t) => t.name === "list_debtors")!;
+    const tool = internoWriteTools.find((t) => t.name === "draft_create_user")!;
     expect(() => assertToolPermission(user, tool)).toThrow(AssistantPermissionError);
   });
 
-  it("ADMIN tem todas as tools read-only", () => {
+  it("ADMIN tem tools read e write", () => {
     const user = baseUser({
       internoProfile: "ADMIN",
       internoPermissions: [
@@ -77,35 +85,97 @@ describe("assistant RBAC", () => {
         "seguranca",
       ],
     });
-    const tools = filterToolsForUser(internoReadTools, user);
-    expect(tools).toHaveLength(internoReadTools.length);
+    const read = filterToolsForUser(internoReadTools, user);
+    const write = filterToolsForUser(internoWriteTools, user);
+    expect(read.length).toBe(internoReadTools.length);
+    expect(write.length).toBe(internoWriteTools.length);
+  });
+
+  it("prestador tem tools próprias", () => {
+    const user = baseUser({ role: "PRESTADOR", internoPermissions: [] });
+    const tools = filterToolsForUser(prestadorReadTools, user);
+    expect(tools.map((t) => t.name)).toContain("get_prestador_dashboard");
   });
 });
 
 describe("assistant mock provider", () => {
-  const tools = internoReadTools;
+  const user = baseUser({
+    internoProfile: "ADMIN",
+    internoPermissions: [
+      "dashboard",
+      "billing",
+      "agenda",
+      "cadastros",
+      "relatorios",
+      "auditoria",
+      "estoque",
+      "crm",
+      "subscriptions",
+      "comunicacao",
+      "branding",
+      "integracoes",
+      "seguranca",
+    ],
+  });
+  const tools = [...internoReadTools, ...internoWriteTools];
 
   it("roteia agendamentos de hoje", () => {
     const plan = planMockAssistant(
       [{ role: "user", content: "Quantos agendamentos temos hoje?" }],
       tools,
+      user,
     );
     expect(plan.toolCalls[0]?.name).toBe("count_appointments");
   });
 
-  it("roteia receita", () => {
+  it("roteia criação de usuário", () => {
     const plan = planMockAssistant(
-      [{ role: "user", content: "Qual a receita de ontem?" }],
+      [{ role: "user", content: "Criar usuário João Silva joao@test.com senha bibi123 prestador" }],
       tools,
+      user,
     );
-    expect(plan.toolCalls[0]?.name).toBe("get_revenue_summary");
+    expect(plan.toolCalls[0]?.name).toBe("draft_create_user");
   });
 
-  it("roteia devedores", () => {
+  it("roteia explicação (RAG)", () => {
     const plan = planMockAssistant(
-      [{ role: "user", content: "Quem está devendo?" }],
+      [{ role: "user", content: "Como faturar um paciente?" }],
       tools,
+      user,
     );
-    expect(plan.toolCalls[0]?.name).toBe("list_debtors");
+    expect(plan.toolCalls[0]?.name).toBe("explain_capability");
+  });
+});
+
+describe("assistant pending actions", () => {
+  it("cria e consome ação pendente", () => {
+    const id = createPendingAction("u1", "t1", {
+      type: "create_user",
+      data: {
+        name: "João",
+        email: "joao@test.com",
+        password: "bibi123",
+        role: "PRESTADOR",
+      },
+    });
+    const payload = consumePendingAction(id, "u1", "t1");
+    expect(payload?.type).toBe("create_user");
+    expect(consumePendingAction(id, "u1", "t1")).toBeNull();
+  });
+
+  it("cancela ação pendente", () => {
+    const id = createPendingAction("u1", "t1", {
+      type: "create_patient",
+      data: { name: "Ana", cpf: "52998224725", birthDate: "1990-01-01" },
+    });
+    expect(cancelPendingAction(id, "u1", "t1")).toBe(true);
+    expect(consumePendingAction(id, "u1", "t1")).toBeNull();
+  });
+});
+
+describe("assistant RAG", () => {
+  it("encontra trechos sobre faturamento", () => {
+    const chunks = searchKnowledge("faturamento pay per use");
+    expect(chunks.length).toBeGreaterThan(0);
   });
 });

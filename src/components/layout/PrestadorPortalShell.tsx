@@ -1,6 +1,7 @@
 "use client";
 
 import PortalShell from "@/components/layout/PortalShell";
+import AssistantShell from "@/components/assistant/AssistantShell";
 import PrestadorNav from "@/components/PrestadorNav";
 import { PORTALS } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
@@ -29,7 +30,9 @@ export default function PrestadorPortalShell({ user, children }: Props) {
       labels={user.labels}
     >
       <PrestadorNav />
-      <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      <AssistantShell portal="prestador">
+        <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      </AssistantShell>
     </PortalShell>
   );
 }

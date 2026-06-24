@@ -1,6 +1,7 @@
 "use client";
 
 import PortalShell from "@/components/layout/PortalShell";
+import AssistantShell from "@/components/assistant/AssistantShell";
 import SectionNav from "@/components/ui/SectionNav";
 import { PORTALS } from "@/lib/roles";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
@@ -38,7 +39,9 @@ export default function PjPortalShell({ user, children }: Props) {
         className="mt-6"
         drawerTitle="Seções da empresa"
       />
-      <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      <AssistantShell portal="pj">
+        <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      </AssistantShell>
     </PortalShell>
   );
 }

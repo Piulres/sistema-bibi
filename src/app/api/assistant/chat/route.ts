@@ -3,6 +3,14 @@ import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { isAssistantEnabled } from "@/lib/assistant/config";
 import { runAssistantChat } from "@/lib/assistant/runner";
 import type { AssistantChatRequest, AssistantMessage } from "@/lib/assistant/types";
+import { ROLES } from "@/lib/roles";
+
+const ALLOWED_ROLES = new Set<string>([
+  ROLES.INTERNO,
+  ROLES.PRESTADOR,
+  ROLES.PJ,
+  ROLES.BENEFICIARIO,
+]);
 
 function parseMessages(raw: unknown): AssistantMessage[] {
   if (!Array.isArray(raw)) return [];
@@ -19,7 +27,7 @@ function parseMessages(raw: unknown): AssistantMessage[] {
     .slice(-20);
 }
 
-/** Chat do assistente operacional — portal autenticado, tools server-side. */
+/** Chat do assistente operacional — todos os portais autenticados. */
 export async function POST(request: Request) {
   try {
     if (!isAssistantEnabled()) {
@@ -27,11 +35,8 @@ export async function POST(request: Request) {
     }
 
     const user = await requireUser();
-    if (user.role !== "INTERNO") {
-      return NextResponse.json(
-        { error: "Assistente disponível apenas no portal interno nesta fase." },
-        { status: 403 },
-      );
+    if (!ALLOWED_ROLES.has(user.role)) {
+      return NextResponse.json({ error: "Portal não suportado pelo assistente." }, { status: 403 });
     }
 
     const body = (await request.json()) as AssistantChatRequest;
