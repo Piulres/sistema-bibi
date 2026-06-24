@@ -38,7 +38,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 | Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
 | Publicar | Só com pedido explícito; seguir `@docs/plataforma/OPERACOES.md` §5 | deploy autônomo |
 | Alternar demo/operação | Orientar `@docs/plataforma/OPERACAO_DADOS.md` § produção | trocar `DATABASE_URL` manualmente |
-| Pós-deploy | Atualizar `@docs/versoes/RELEASES.md` | marcar publicado sem confirmação |
+| Pós-deploy | Atualizar `@docs/versoes/RELEASES.md` + changelog landing (`@docs/plataforma/LANDING_CHANGELOG.md`) | marcar publicado sem confirmação |
 
 ## Comandos
 

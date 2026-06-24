@@ -15,7 +15,15 @@ export type ChangelogRelease = {
   testStats?: string;
 };
 
-/** Curado de docs/versoes/RELEASES.md e V2_1.md — atualizar ao fechar pacote. */
+/**
+ * Changelog curado da landing (#novidades).
+ *
+ * Fonte de verdade da UI — não parsear RELEASES.md em runtime.
+ * Manutenção obrigatória ao fechar pacote: docs/plataforma/LANDING_CHANGELOG.md
+ *
+ * Sincronizar com: package.json, src/lib/platform.ts, docs/versoes/RELEASES.md, VX_Y.md
+ * Validar: npm run docs:verify
+ */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
     version: "2.1.0",
