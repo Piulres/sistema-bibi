@@ -2,6 +2,7 @@ import "server-only";
 import ExcelJS from "exceljs";
 import PDFDocument from "pdfkit";
 import { PLATFORM } from "@/lib/platform";
+import { buildInterchangeDataset, serializeInterchangeDataset } from "@/lib/imports/interchange";
 
 export type TabularColumn = {
   header: string;
@@ -24,19 +25,12 @@ function cellValue(value: string | number | boolean | null | undefined): string 
 }
 
 export function buildCsvFromTabular(data: TabularExport): string {
-  const header = data.columns.map((c) => c.header).join(",");
-  const lines = data.rows.map((row) =>
-    data.columns
-      .map((col) => {
-        const str = cellValue(row[col.key]);
-        if (str.includes(",") || str.includes('"') || str.includes("\n")) {
-          return `"${str.replace(/"/g, '""')}"`;
-        }
-        return str;
-      })
-      .join(","),
-  );
-  return [header, ...lines].join("\n");
+  const dataset = buildInterchangeDataset({
+    entity: "export",
+    columns: data.columns.map((column) => ({ key: column.key, header: column.header })),
+    rows: data.rows,
+  });
+  return serializeInterchangeDataset(dataset, "csv");
 }
 
 export async function buildXlsxBufferFromTabular(data: TabularExport): Promise<Buffer> {
