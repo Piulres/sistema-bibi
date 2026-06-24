@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v2.0** (produção jun/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v2.1** (produção jun/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo: [`../versoes/V2_1.md`](../versoes/V2_1.md) · base v2.0: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -14,7 +14,7 @@ ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev,
 ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
 ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
 
-**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384).
+**Última revisão factual:** 24/06/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384). Inclui fluxos v2.1 (assistente, VET/Pet, change-mgmt, importação, agendamento flexível).
 
 ---
 
@@ -29,6 +29,10 @@ ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21
 6. [Portal Beneficiário](#6-portal-beneficiário)
 7. [Fluxo master Pay Per Use (E2E)](#7-fluxo-master-pay-per-use-e2e)
 8. [Fluxos auxiliares](#8-fluxos-auxiliares)
+   - [8.10 Assistente operacional](#810-assistente-operacional-v21)
+   - [8.11 Change management](#811-change-management-v21)
+   - [8.12 Importação JSON/CSV](#812-importação-jsoncsv-v21)
+   - [8.13 Agendamento flexível e VET/Pet](#813-agendamento-flexível-e-vetpet-v21)
 9. [RBAC — matriz perfil × módulo](#9-rbac--matriz-perfil--módulo)
 10. [Máquinas de estado](#10-máquinas-de-estado)
 11. [Mapa de APIs por portal](#11-mapa-de-apis-por-portal)
@@ -81,7 +85,9 @@ flowchart LR
 | SPA | Zen Studio (`zen`) | `operacao@zen.demo` | `/?tenant=zen` ou `/?niche=SPA` |
 | EDUCATION | EduPrime (`eduprime`) | `operacao@eduprime.demo` | `/?tenant=eduprime` ou `/?niche=EDUCATION` |
 
-Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`. **FATO:** tenants de nicho têm apenas interno + prestador no seed (sem PJ/beneficiário dedicados).
+Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts` + `niche-catalogs.ts`.
+
+**FATO (v2.1):** PetCare (`petcare`) inclui tutor (`tutor@petcare.demo`), PJ (`rh@techpet.demo`) e pets no seed. Demais nichos têm interno + prestador; PJ/beneficiário dedicados variam por catálogo (`niche-operational.ts`).
 
 ### 0.4 Landing por nicho
 
@@ -123,7 +129,7 @@ flowchart TB
 |----------|----------------|
 | Multi-tenant | `Tenant.tenantId` em todas as queries |
 | Sessão | Cookie `bibi_session` — HMAC em `src/lib/session.ts` (8h) |
-| Proteção otimista | `src/proxy.ts` — redireciona sem cookie |
+| Proteção edge | `src/proxy.ts` — valida HMAC do cookie; redireciona se ausente ou inválido |
 | Validação real | `getSessionUser()` / `requireUser()` em páginas e APIs |
 | Auditoria | `TimelineEvent` via `recordTimelineEvent()` |
 | Integrações B2B | `webhook-service.ts` + cron retry |
@@ -286,6 +292,9 @@ Serviço: `src/lib/invoice-service.ts`
 | Listar | `GET /api/interno/appointments?date=` | Por data |
 | Criar | `POST /api/interno/appointments` | `createAppointment()`; TELE → `telemedicineUrl`; webhook `APPOINTMENT_CREATED` |
 | Alterar | `PATCH /api/interno/appointments/[id]` | Status/modalidade |
+| **Procedimento + auto-assign** | `POST /api/interno/appointments` `{ procedureId, autoAssignProvider: true }` | Escolhe prestador disponível para o procedimento (v2.1) |
+| **Sem prestador** | `POST /api/interno/appointments` `{ procedureId }` (sem `providerId`) | Agenda com procedimento; prestador pode ser atribuído depois |
+| **Walk-in VET** | `POST /api/interno/appointments` `{ petId, ... }` | Obrigatório `petId` quando `niche === VET` |
 | **Walk-in particular** | `POST /api/interno/patients` + `POST /api/interno/appointments` | Cadastro sem `companyId` + agendamento `AGENDADO` na mesma tela |
 | **Check-in** | `PATCH .../appointments/[id]` `{ status: "CONFIRMADO" }` | Paciente chegou à clínica (AGENDADO → CONFIRMADO) |
 
@@ -312,9 +321,11 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Aba | Criar (POST) | Atualizar | Excluir | Observações |
 |-----|--------------|-----------|---------|-------------|
 | Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
+| **Pets (VET)** | `/api/interno/pets` | `PATCH .../pets/[id]` | — | Aba visível quando `niche === VET`; tutor em `Patient` |
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| **Importação** | `POST /api/interno/import/{entity}` | — | — | Painel `ImportInterchangePanel` nas abas patients/companies/procedures |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
@@ -381,8 +392,13 @@ Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`i
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis |
+| Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis (metadata before/after) |
 | Export | `GET /api/interno/audit/export` | CSV/PDF via `exports/` |
+| **Desfazer recente** | `POST /api/interno/change/revert-recent` | Reverte última mutação elegível (toast na UI) |
+| **Restore por evento** | `POST /api/interno/audit/[eventId]/restore` | Restaura estado anterior; exige confirmação `RESTAURAR` quando `CHANGE_RESTORE_REQUIRES_CONFIRM=true` |
+| Revisões | `GET /api/interno/revisions` | Histórico de revisões por entidade |
+
+Janela de desfazer: `CHANGE_RESTORE_WINDOW_MS` (padrão 5 min). Detalhes: [`../plataforma/CHANGE_MANAGEMENT_DEPLOY.md`](../plataforma/CHANGE_MANAGEMENT_DEPLOY.md).
 
 Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 
@@ -450,7 +466,8 @@ flowchart LR
 | Overview | `GET /api/beneficiario/overview` | `beneficiary-overview.ts` |
 | Prestadores | `GET /api/beneficiario/providers` | Users PRESTADOR |
 | Slots | `GET /api/beneficiario/slots?providerId&date` | `scheduling-service.ts` (8h–18h, 30 min) |
-| Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
+| Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()`; VET exige `petId` |
+| Pets (VET) | `GET /api/beneficiario/pets` | Lista pets do tutor; vacinas em `.../pets/[id]/vaccines` |
 | PIX | `POST /api/beneficiario/invoices/[id]/pay` | `createInvoicePixCharge()` |
 | Confirmar PIX | `PATCH .../pay` `{ paymentId }` | `confirmInvoicePixPayment()` |
 
@@ -595,6 +612,53 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
 
+### 8.10 Assistente operacional (v2.1)
+
+Chat flutuante nos 4 portais autenticados (`AssistantShell` nos layouts). Feature flag: `ASSISTANT_ENABLED` (padrão ligado).
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Chat | `POST /api/assistant/chat` | `{ messages, pageContext? }` → resposta mock ou gateway |
+| Confirmar ação | `POST /api/assistant/confirm` | Executa tool após confirmação do usuário |
+
+Provider: `ASSISTANT_PROVIDER=mock` (dev) ou `netlify-gateway` (produção). Mock com 350+ cenários em `src/lib/assistant/scenarios.ts`. Testes: `tests/api/assistant.test.ts`, `e2e/assistant.spec.ts`.
+
+### 8.11 Change management (v2.1)
+
+Reversão de mutações recentes com auditoria enriquecida:
+
+| Pacote | Escopo | API principal |
+|--------|--------|---------------|
+| A–C | Faturas, PPU, estoque | `POST /api/interno/change/revert-recent` |
+| D–F | Timeline restore | `POST /api/interno/audit/[eventId]/restore` |
+
+Serviço: `src/lib/change-management/`. Política: `src/lib/change-management/policy.ts`. Testes: `tests/unit/change-management.test.ts`.
+
+### 8.12 Importação JSON/CSV (v2.1)
+
+Painel em `/interno/cadastros` (abas beneficiários, empresas, procedimentos):
+
+| Passo | API | Efeito |
+|-------|-----|--------|
+| Converter arquivo | `POST /api/interno/import/convert` | Normaliza CSV/JSON para formato interchange |
+| Importar | `POST /api/interno/import/{entity}` | `entity`: `patients` \| `providers` \| `companies` \| `procedures` |
+
+Serviço: `src/lib/interchange/`. Testes: `tests/api/import-interchange.test.ts`.
+
+### 8.13 Agendamento flexível e VET/Pet (v2.1)
+
+**Agendamento flexível:** `createAppointment()` aceita `procedureId` sem `providerId`. Com `autoAssignProvider: true`, escolhe prestador disponível para o slot/procedimento (`appointment-service.ts`).
+
+**VET/Pet:** entidade `Pet` vinculada a `Patient` (tutor). Agendamentos exigem `petId` quando `niche === VET`.
+
+| Portal | UI | APIs |
+|--------|-----|------|
+| Interno | `CadastrosPetsTab`, walk-in com seletor de pet | `GET/POST /api/interno/pets` |
+| Beneficiário | Seletor de pet ao agendar; plano de cuidado | `GET /api/beneficiario/pets`, `.../vaccines` |
+| Prestador | Ficha clínica por pet no atendimento | `GET /api/prestador/pets`, `.../clinical-overview`, `.../vaccines`, `.../medications`, `.../exam-orders` |
+
+Segmento: [`../segmentos/vet/README.md`](../segmentos/vet/README.md).
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo
@@ -699,23 +763,29 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` ·
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
+### Assistente (todos os portais autenticados, v2.1)
+`POST /api/assistant/chat` · `POST /api/assistant/confirm` — requer `ASSISTANT_ENABLED=true`
+
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
+`GET /api/prestador/pets` · `GET .../pets/[id]/clinical-overview|vaccines|medications|exam-orders|clinical-profile` (VET)
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
 `POST /api/beneficiario/appointments` ·
 `PATCH /api/beneficiario/appointments/[id]` ·
-`POST|PATCH /api/beneficiario/invoices/[id]/pay`
+`POST|PATCH /api/beneficiario/invoices/[id]/pay` ·
+`GET /api/beneficiario/pets` · `GET .../pets/[id]/vaccines` (VET)
 
 ### PJ
 `GET /api/pj/overview` · `GET /api/pj/reports`
 
 ### Interno (principais grupos)
-`dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
+`dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` · `pets/*` ·
 `companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*` ·
+`import/convert` · `import/{entity}` · `change/revert-recent` · `audit/[eventId]/restore` · `revisions`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`
@@ -726,7 +796,7 @@ Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml)
 
 ## 12. Observações da POC
 
-1. **Proxy ≠ RBAC** — `src/proxy.ts` só verifica cookie; role e perfil validados no servidor.
+1. **Proxy ≠ RBAC** — `src/proxy.ts` valida assinatura HMAC do cookie (rejeita `fake-token`); `role` e perfil interno validados no servidor (`session.ts`, `interno-guard.ts`).
 2. **SQLite + Prisma 6** — status são `String`, não enums Prisma.
 3. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
 4. **TISS** — XML simplificado; validação XSD pendente (Tier 5).

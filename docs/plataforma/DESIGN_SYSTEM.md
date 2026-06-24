@@ -104,9 +104,21 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 | `MobileNavDrawer` | Drawer de rotas (interno) |
 | `MobileSectionDrawer` | Drawer de seções (PJ, beneficiário) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
-| `LandingMobileMenu` | Menu hamburger da landing |
+| `LandingMobileMenu` | Menu hamburger da landing — **portal** em `document.body` (ver abaixo) |
 
 Config de menus e rótulos: `src/lib/navigation/routes.ts`.
+
+### Overlays mobile (portal)
+
+Drawers com `position: fixed` devem renderizar **fora** de ancestrais com `backdrop-filter` / `backdrop-blur`. O header da landing (`LandingHeader`) usa `backdrop-blur-xl`; sem portal, o menu fixo fica preso ao contexto de empilhamento e não cobre a tela inteira.
+
+| Componente | Portal em `document.body` | Contexto |
+|------------|:-------------------------:|----------|
+| `LandingMobileMenu` | ✅ `createPortal` | Landing pública — fix em `40e2dfc` |
+| `MobileSectionDrawer` | ✅ `createPortal` | PJ e Beneficiário |
+| `MobileNavDrawer` | ❌ inline `fixed` | Shells autenticados sem blur no header |
+
+**Padrão:** quando o overlay precisa cobrir a viewport inteira e há `backdrop-blur` em ancestrais, use `createPortal(drawer, document.body)` (ver `LandingMobileMenu.tsx`).
 
 ## Uso em páginas
 

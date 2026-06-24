@@ -41,6 +41,19 @@ e `labels` (JSON) para tradução automática da UI.
 
 Paletas white label por nicho. Ver `docs/versoes/V2_0.md` e `docs/versoes/V2_0_ARCHITECTURE.md`.
 
+### Capacidades v2.1 (produção)
+
+Além do núcleo v2.0 multi-nicho, a **v2.1.0** adiciona:
+
+- **Assistente operacional** — chat nos 4 portais (`ASSISTANT_ENABLED`); ver `docs/produto/FLUXOS.md` §8.10
+- **VET / Pet** — entidade `Pet`, ficha clínica, agendamento com `petId`; ver `docs/segmentos/vet/README.md`
+- **Change management** — reversão de faturas/PPU/estoque + restore na timeline; ver `FLUXOS.md` §8.11
+- **Importação JSON/CSV** — interchange de cadastros; ver `FLUXOS.md` §8.12
+- **Agendamento flexível** — procedimento sem prestador obrigatório; `autoAssignProvider`
+- **Segurança pós-POC** — proxy valida HMAC, rate limit login/MFA, CSP/HSTS ([#131](https://github.com/Piulres/sistema-bibi/pull/131))
+
+Changelog completo: `docs/versoes/V2_1.md` · fluxos operacionais: `docs/produto/FLUXOS.md`.
+
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.

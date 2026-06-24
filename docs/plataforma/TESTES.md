@@ -66,11 +66,11 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 > **Ação recomendada:** alinhar todas as rotas internas à matriz `INTERNO_PROFILES`.
 
-### 2. Proxy só verifica presença do cookie
+### 2. Proxy valida HMAC do cookie (v2.1)
 
-`src/proxy.ts` redireciona se **não há** cookie `bibi_session`. Um cookie forjado (`fake-token`) passa pelo proxy; a validação HMAC só ocorre no servidor (`session.ts`).
+`src/proxy.ts` redireciona se **não há** cookie `bibi_session` **ou** se a assinatura HMAC é inválida. Cookie forjado (`fake-token`) é **rejeitado** no proxy (redirect ao login). A validação de `role` e perfil interno continua no servidor (`session.ts`, `interno-guard.ts`).
 
-Teste: `tests/unit/proxy.test.ts` — documenta o comportamento intencional (otimista).
+Teste: `tests/unit/proxy.test.ts` — cobre cookie ausente, inválido e assinado válido.
 
 ### 3. SESSION_SECRET padrão em dev
 

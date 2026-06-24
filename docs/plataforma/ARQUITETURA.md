@@ -113,11 +113,12 @@ flowchart LR
 
 | Camada | Mecanismo | Arquivo |
 |--------|-----------|---------|
-| **Edge/Proxy** | Checagem otimista de cookie antes do App Router | `src/proxy.ts` |
-| **Servidor** | Validação HMAC-SHA256 + `role` + RBAC interno | `src/lib/session.ts`, `interno-guard.ts` |
+| **Edge/Proxy** | Valida assinatura HMAC do cookie `bibi_session`; redireciona se ausente ou inválido | `src/proxy.ts` |
+| **Servidor** | Revalida HMAC + `role` + RBAC interno | `src/lib/session.ts`, `interno-guard.ts` |
 | **API** | `requireUser()` / `requireInternoModule()` em cada handler | `src/lib/api-auth.ts` |
+| **Rate limit** | Login e MFA — desligado em `CI=true` ou `DISABLE_RATE_LIMIT=true` | `src/lib/security/rate-limit.ts` |
 
-O `proxy.ts` é o substituto do middleware no **Next.js 16** — exclusivo desta versão do framework. A validação real da sessão **nunca** confia apenas no proxy; Server Components e Route Handlers revalidam assinatura e perfil.
+O `proxy.ts` é o substituto do middleware no **Next.js 16** — exclusivo desta versão do framework. Desde **v2.1** ([#131](https://github.com/Piulres/sistema-bibi/pull/131)), o proxy **não** aceita cookie forjado (`fake-token` → redirect). Server Components e Route Handlers ainda revalidam `role` e perfil interno.
 
 Cookie `bibi_session`: `userId` + HMAC com `SESSION_SECRET`; `httpOnly`, `sameSite=lax`, 8h de validade.
 
@@ -379,9 +380,10 @@ flowchart LR
   R -.->|role incorreto| D["403 / redirect ao login"]
 ```
 
-A validação ocorre em duas camadas: `src/proxy.ts` (checagem otimista do cookie,
-redireciona ao login) e o servidor (`requireUser([...roles])` em cada handler e
-`getSessionUser()` em cada página), que valida assinatura HMAC e `role`.
+A validação ocorre em duas camadas: `src/proxy.ts` (valida HMAC do cookie —
+redireciona ao login se ausente ou inválido) e o servidor (`requireUser([...roles])`
+em cada handler e `getSessionUser()` em cada página), que revalida assinatura HMAC,
+`role` e perfil interno.
 
 ---
 

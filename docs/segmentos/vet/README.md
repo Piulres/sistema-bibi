@@ -28,6 +28,24 @@ Catálogo demo: consulta, vacinação, exames, cirurgia, internação e estétic
 
 **Modelo Pet:** tutores em `Patient`; animais em `Pet` (espécie, raça, porte) vinculados ao tutor. Agendamentos VET exigem `petId`.
 
+## Fluxos (v2.1)
+
+```mermaid
+flowchart LR
+  Tutor["Tutor (beneficiário)"] --> Pets["GET /api/beneficiario/pets"]
+  Pets --> Agendar["POST /api/beneficiario/appointments com petId"]
+  Recepção["Interno / agenda"] --> WalkIn["Walk-in com petId"]
+  Vet["Prestador"] --> Ficha["clinical-overview, vacinas, medicação, exames"]
+```
+
+| Portal | UI | APIs principais |
+|--------|-----|-----------------|
+| Interno | `CadastrosPetsTab`, walk-in em `/interno/agenda` | `GET/POST /api/interno/pets`, `PATCH .../pets/[id]` |
+| Beneficiário | Seletor de pet ao agendar; plano de cuidado | `GET /api/beneficiario/pets`, `GET .../pets/[id]/vaccines` |
+| Prestador | Ficha clínica no atendimento VET | `GET /api/prestador/pets`, `.../clinical-overview`, `.../vaccines`, `.../medications`, `.../exam-orders`, `.../clinical-profile` |
+
+Fluxo completo: [`../../produto/FLUXOS.md`](../../produto/FLUXOS.md) §8.13.
+
 ## Pesquisa
 
 - [Pesquisa de mercado VET](./pesquisa.md)
