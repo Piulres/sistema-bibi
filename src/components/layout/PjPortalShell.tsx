@@ -10,10 +10,11 @@ import type { SessionUser } from "@/lib/session";
 
 type Props = {
   user: SessionUser | null;
+  assistantEnabled?: boolean;
   children: React.ReactNode;
 };
 
-export default function PjPortalShell({ user, children }: Props) {
+export default function PjPortalShell({ user, assistantEnabled = true, children }: Props) {
   if (!user || user.role !== "PJ") {
     return children;
   }
@@ -39,7 +40,7 @@ export default function PjPortalShell({ user, children }: Props) {
         className="mt-6"
         drawerTitle="Seções da empresa"
       />
-      <AssistantShell portal="pj">
+      <AssistantShell portal="pj" enabled={assistantEnabled}>
         <div className="portal-page-content mt-8 min-w-0">{children}</div>
       </AssistantShell>
     </PortalShell>

@@ -8,11 +8,12 @@ import type { SessionUser } from "@/lib/session";
 
 type Props = {
   user: SessionUser | null;
+  assistantEnabled?: boolean;
   children: React.ReactNode;
 };
 
 /** Mantém shell do prestador entre agenda e atendimento. */
-export default function PrestadorPortalShell({ user, children }: Props) {
+export default function PrestadorPortalShell({ user, assistantEnabled = true, children }: Props) {
   if (!user || user.role !== "PRESTADOR") {
     return children;
   }
@@ -30,7 +31,7 @@ export default function PrestadorPortalShell({ user, children }: Props) {
       labels={user.labels}
     >
       <PrestadorNav />
-      <AssistantShell portal="prestador">
+      <AssistantShell portal="prestador" enabled={assistantEnabled}>
         <div className="portal-page-content mt-8 min-w-0">{children}</div>
       </AssistantShell>
     </PortalShell>

@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import type { AssistantAction, AssistantMessage } from "@/lib/assistant/types";
+import { filterAssistantActions } from "@/lib/assistant/types";
 
 type AssistantContextValue = {
   open: boolean;
@@ -61,7 +62,7 @@ export default function AssistantProvider({ pageContext, children }: Props) {
           return;
         }
         setMessages((prev) => [...prev, data.message]);
-        if (data.actions) setActions(data.actions);
+        if (data.actions) setActions(filterAssistantActions(data.actions));
       } catch {
         setError("Falha de conexão com o assistente.");
       } finally {

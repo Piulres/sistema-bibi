@@ -197,3 +197,41 @@ export type AssistantConfirmRequest = {
   confirmed: boolean;
   password?: string;
 };
+
+/** Valida action vinda da API antes de renderizar no cliente (dev/serialização). */
+export function isAssistantAction(value: unknown): value is AssistantAction {
+  if (!value || typeof value !== "object" || !("type" in value)) return false;
+  const action = value as AssistantAction;
+  switch (action.type) {
+    case "link":
+      return typeof action.label === "string" && typeof action.href === "string";
+    case "table":
+      return (
+        typeof action.title === "string" &&
+        Array.isArray(action.columns) &&
+        Array.isArray(action.rows)
+      );
+    case "confirm":
+      return (
+        typeof action.title === "string" &&
+        typeof action.pendingActionId === "string" &&
+        typeof action.summary === "object" &&
+        action.summary !== null
+      );
+    case "choice":
+      return (
+        typeof action.title === "string" &&
+        typeof action.field === "string" &&
+        Array.isArray(action.options)
+      );
+    case "form_draft":
+      return typeof action.label === "string" && typeof action.href === "string";
+    default:
+      return false;
+  }
+}
+
+export function filterAssistantActions(actions: unknown): AssistantAction[] {
+  if (!Array.isArray(actions)) return [];
+  return actions.filter(isAssistantAction);
+}

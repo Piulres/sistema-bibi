@@ -21,7 +21,7 @@ async function main() {
   const { resolveInternoPermissions } = await import("../src/lib/interno-permissions");
   const { mergeNicheLabels } = await import("../src/lib/niche/labels");
   const { applyNicheBrandingDefaults } = await import("../src/lib/niche/branding");
-  const { CLINIC_BRANDING_DEFAULTS } = await import("../src/lib/theme/tokens");
+  const { LOGIN_PORTAL_BRANDING } = await import("../src/lib/theme/tokens");
   const { isNicheId } = await import("../src/lib/niche/types");
   type AssistantMessage = import("../src/lib/assistant/types").AssistantMessage;
   type SessionUser = import("../src/lib/session").SessionUser;
@@ -56,16 +56,10 @@ async function main() {
     patientName: null,
     internoProfile: dbUser.internoProfile,
     internoPermissions: resolveInternoPermissions(dbUser.role, dbUser.internoProfile),
-    branding: applyNicheBrandingDefaults(
-      niche,
-      dbUser.tenant.branding
-        ? {
-            primary: dbUser.tenant.branding.primaryColor,
-            accent: dbUser.tenant.branding.accentColor,
-            scheme: dbUser.tenant.branding.colorScheme,
-          }
-        : CLINIC_BRANDING_DEFAULTS,
-    ),
+    branding: applyNicheBrandingDefaults(niche, {
+      ...LOGIN_PORTAL_BRANDING,
+      displayName: dbUser.tenant.name,
+    }),
     niche,
     labels: mergeNicheLabels(niche, dbUser.tenant.labels),
   };

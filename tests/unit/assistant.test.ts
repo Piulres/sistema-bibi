@@ -24,6 +24,7 @@ import { applyNicheBrandingDefaults } from "@/lib/niche/branding";
 import { isNicheId } from "@/lib/niche/types";
 import { resolveFromOptions } from "@/lib/assistant/resolve-entities";
 import { parseChoiceSelection, extractCreateAppointmentArgs } from "@/lib/assistant/provider/mock-extractors";
+import { filterAssistantActions, isAssistantAction } from "@/lib/assistant/types";
 import { DEMO_EMAILS } from "../helpers/seed-fixtures";
 import { getTestPrisma } from "../helpers/db";
 
@@ -71,6 +72,29 @@ describe("mock trigger catalog", () => {
   it("tem centenas de gatilhos únicos", () => {
     const count = countMockTriggers();
     expect(count).toBeGreaterThanOrEqual(350);
+  });
+});
+
+describe("assistant action guards", () => {
+  it("filtra actions malformadas da API", () => {
+    const filtered = filterAssistantActions([
+      { type: "link", label: "Ver agenda", href: "/interno/agenda" },
+      { type: "table", title: "Sem colunas" },
+      { type: "unknown", foo: 1 },
+    ]);
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0].type).toBe("link");
+  });
+
+  it("aceita table com columns e rows", () => {
+    expect(
+      isAssistantAction({
+        type: "table",
+        title: "Pendências",
+        columns: ["A", "B"],
+        rows: [["1", "2"]],
+      }),
+    ).toBe(true);
   });
 });
 

@@ -8,12 +8,18 @@ import type { PortalKey } from "@/lib/roles";
 
 type Props = {
   portal: PortalKey;
+  /** Desliga UI quando ASSISTANT_ENABLED=false no servidor (dev/prod). */
+  enabled?: boolean;
   children: React.ReactNode;
 };
 
 /** Envolve portal autenticado com provider + painel + trigger do assistente. */
-export default function AssistantShell({ portal, children }: Props) {
+export default function AssistantShell({ portal, enabled = true, children }: Props) {
   const pathname = usePathname();
+
+  if (!enabled) {
+    return <>{children}</>;
+  }
 
   return (
     <AssistantProvider pageContext={pathname}>
