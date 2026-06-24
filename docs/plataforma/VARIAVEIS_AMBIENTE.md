@@ -293,15 +293,39 @@ Guia completo: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 ## 8. CI / GitHub Actions
 
-Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml). Dispara em push/PR em `main`, `dev` e `cursor/**`.
 
-| Variável | Job | Valor no CI |
-|----------|-----|-------------|
-| `SESSION_SECRET` | unit + e2e | `ci-test-session-secret-32chars` |
-| `CRON_SECRET` | unit + e2e | `ci-cron-secret` |
-| `DATABASE_URL` | unit (integração) | `file:./prisma/test.db` |
-| `CI` | e2e Playwright | `true` |
-| `PLAYWRIGHT_PORT` | e2e | `3100` |
+### Variáveis globais (`env` do workflow)
+
+O Prisma **falha** em qualquer comando que toca o schema sem `DATABASE_URL`. Por isso o workflow define `env` no topo — não apenas no step de testes.
+
+| Variável | Valor no CI | Uso |
+|----------|-------------|-----|
+| `DATABASE_URL` | `file:./dev.db` | Bootstrap dual-store (`db:bootstrap:demo`) e `prisma generate` |
+| `SESSION_SECRET` | `ci-github-actions-session-secret-32chars-min` | HMAC de sessão/MFA nos steps que sobem o app |
+| `CRON_SECRET` | `ci-cron-secret-32-characters-min` | Jobs `/api/cron/*` em testes de API |
+| `SEED_SCALE` | `small` | Seed rápido em `db:bootstrap:demo` |
+| `ALLOW_DEMO_RESET` | `true` | Permite reset demo via UI em testes E2E |
+
+### Overrides por step
+
+| Variável | Job / step | Valor |
+|----------|------------|-------|
+| `DATABASE_URL` | `unit-integration-api` → testes Vitest | `file:./test.db` (isolado — ver `tests/helpers/db.ts`) |
+| `CI` | `e2e` | `true` |
+| `PLAYWRIGHT_PORT` | `e2e` | `3100` |
+
+### Bootstrap dual-store no CI
+
+O pipeline **não** usa `db:push && db:seed`. Usa `db:bootstrap:demo` → `db:verify`:
+
+1. Gera `prisma/demo.db` (schema + seed) e `prisma/operation.db` (bootstrap mínimo)
+2. Espelha `demo.db` → `dev.db` (compatibilidade com código legado)
+3. `db:verify` valida tenants, usuários demo e espelho `dev.db` ↔ `demo.db`
+
+> **Pitfall:** `db:push && db:seed` só cria `dev.db` — `db:verify` falha por ausência de `demo.db` + `operation.db`.
+
+Detalhes do pipeline: [`TESTES.md`](TESTES.md) § CI.
 
 ---
 

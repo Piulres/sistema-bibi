@@ -84,10 +84,12 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
-| `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
+| `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed + espelho `dev.db` | Setup dual-store local **e CI GitHub** |
 | `npm run db:bootstrap:operation` | Só `operation.db` (bootstrap mínimo) | Piloto operação local |
+| `npm run db:verify` | Valida `demo.db`, `operation.db` e espelho `dev.db` | Após bootstrap; step do CI |
 | `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
+| `npm run docs:verify` | Links e referências em `docs/` | Step do CI antes dos testes |
 
 ---
 
@@ -155,6 +157,40 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
+### 4.4 CI GitHub Actions (não confundir com `pre-release`)
+
+O workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) valida PRs e pushes em `main`, `dev` e `cursor/**`. **Não publica** na Netlify.
+
+| Job | Sequência |
+|-----|-----------|
+| `unit-integration-api` | `lint` → `docs:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build` |
+| `e2e` | `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`) |
+
+**Espelhar CI localmente** (com `DATABASE_URL` e secrets definidos — ver [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) §8):
+
+```bash
+export DATABASE_URL="file:./dev.db"
+export SESSION_SECRET="ci-github-actions-session-secret-32chars-min"
+export CRON_SECRET="ci-cron-secret-32-characters-min"
+export SEED_SCALE=small
+
+npm run lint && npm run docs:verify
+npm run db:bootstrap:demo && npm run db:verify
+DATABASE_URL="file:./test.db" npm run test && npm run build
+CI=true npm run test:e2e
+```
+
+| Validação | CI GitHub | `npm run pre-release` |
+|-----------|-----------|------------------------|
+| Lint | ✅ | ✅ |
+| Docs links | ✅ `docs:verify` | ❌ |
+| Dual-store bootstrap | ✅ `db:bootstrap:demo` | ❌ (usa `netlify:build`) |
+| Testes Vitest | ✅ | ❌ |
+| E2E Playwright | ✅ | ❌ |
+| Build Netlify completo | ❌ (`next build` puro) | ✅ `netlify:build` |
+
+Mapa completo de testes: [`TESTES.md`](TESTES.md).
 
 ---
 
