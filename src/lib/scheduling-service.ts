@@ -72,6 +72,7 @@ export async function getAvailableSlots(input: {
 export async function bookBeneficiaryAppointment(input: {
   tenantId: string;
   patientId: string;
+  petId?: string | null;
   providerId: string;
   scheduledAt: Date;
   reason?: string | null;
@@ -93,6 +94,7 @@ export async function bookBeneficiaryAppointment(input: {
   return createAppointment({
     tenantId: input.tenantId,
     patientId: input.patientId,
+    petId: input.petId,
     providerId: input.providerId,
     scheduledAt: input.scheduledAt,
     reason: input.reason,

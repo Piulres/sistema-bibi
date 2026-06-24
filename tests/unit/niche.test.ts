@@ -9,7 +9,7 @@ import { getNicheConfig, getDefaultLabels } from "@/lib/niche/defaults";
 import { mergeNicheLabels } from "@/lib/niche/labels";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { NICHE_INTERNO_DEMOS } from "@/lib/niche/demo-accounts";
-import { buildInternoNavTabs } from "@/lib/navigation/niche-nav";
+import { buildInternoNavTabs, buildCadastrosTabs } from "@/lib/navigation/niche-nav";
 import { isNicheId, NICHE_IDS } from "@/lib/niche/types";
 import { NICHE_DEMOS } from "../../prisma/seed-data/niche-tenants";
 
@@ -104,6 +104,12 @@ describe("niche.buildInternoNavTabs", () => {
     expect(vet.find((t) => t.key === "cadastros")?.label).toContain("Tutores");
     expect(vet.find((t) => t.key === "agenda")?.label).toBe("Atendimentos");
     expect(vet.find((t) => t.key === "estoque")?.label).toBe("Estoque pet");
+  });
+
+  it("inclui aba Pets nos cadastros VET", () => {
+    const tabs = buildCadastrosTabs(getDefaultLabels("VET"), "VET");
+    expect(tabs.find((t) => t.key === "pets")?.label).toBe("Pets");
+    expect(tabs.find((t) => t.key === "patients")?.label).toBe("Tutores");
   });
 });
 

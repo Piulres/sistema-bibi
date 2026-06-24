@@ -26,6 +26,8 @@ Senha: **`bibi123`**
 
 Catálogo demo: consulta, vacinação, exames, cirurgia, internação e estética (banho/tosa). Massa operacional com histórico e agendamentos futuros.
 
+**Modelo Pet:** tutores em `Patient`; animais em `Pet` (espécie, raça, porte) vinculados ao tutor. Agendamentos VET exigem `petId`.
+
 ## Pesquisa
 
 - [Pesquisa de mercado VET](./pesquisa.md)

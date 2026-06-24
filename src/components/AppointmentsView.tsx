@@ -11,6 +11,7 @@ import CalloutCard from "@/components/ui/CalloutCard";
 import AppointmentCard from "@/components/ui/AppointmentCard";
 import FlowStepper from "@/components/ui/FlowStepper";
 import { CARE_JOURNEY_STEPS } from "@/lib/care-journey";
+import { useLabels } from "@/hooks/useLabels";
 
 type Appointment = {
   id: string;
@@ -19,11 +20,20 @@ type Appointment = {
   modality: string;
   telemedicineUrl: string | null;
   patientName: string;
+  petName: string | null;
   providerName: string;
   reason: string | null;
 };
 
 type Option = { id: string; name: string };
+
+type PetOption = {
+  id: string;
+  name: string;
+  patientId: string;
+  speciesLabel: string;
+  tutorName: string;
+};
 
 const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
@@ -34,16 +44,20 @@ function timeFromScheduleLabel(label: string): string {
 }
 
 export default function AppointmentsView() {
+  const { niche, labels } = useLabels();
+  const isVet = niche === "VET";
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [providers, setProviders] = useState<Option[]>([]);
   const [patients, setPatients] = useState<Option[]>([]);
+  const [pets, setPets] = useState<PetOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     patientId: "",
+    petId: "",
     providerId: "",
     time: "09:00",
     reason: "Consulta",
@@ -68,6 +82,7 @@ export default function AppointmentsView() {
     setAppointments(data.appointments ?? []);
     setProviders(data.providers ?? []);
     setPatients(data.patients ?? []);
+    setPets(data.pets ?? []);
     setLoading(false);
   }, [date]);
 
@@ -80,6 +95,7 @@ export default function AppointmentsView() {
       setAppointments(data.appointments ?? []);
       setProviders(data.providers ?? []);
       setPatients(data.patients ?? []);
+      setPets(data.pets ?? []);
       setLoading(false);
     })();
     return () => {
@@ -98,6 +114,7 @@ export default function AppointmentsView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientId: form.patientId,
+          petId: isVet ? form.petId : null,
           providerId: form.providerId,
           scheduledAt,
           reason: form.reason,
@@ -365,12 +382,12 @@ export default function AppointmentsView() {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-[var(--text-secondary)]">Beneficiário</span>
+            <span className="text-[var(--text-secondary)]">{isVet ? labels.beneficiary : "Beneficiário"}</span>
             <select
               required
               className="mt-1 w-full rounded border px-3 py-2"
               value={form.patientId}
-              onChange={(e) => setForm({ ...form, patientId: e.target.value })}
+              onChange={(e) => setForm({ ...form, patientId: e.target.value, petId: "" })}
             >
               <option value="">Selecione...</option>
               {patients.map((p) => (
@@ -380,6 +397,26 @@ export default function AppointmentsView() {
               ))}
             </select>
           </label>
+          {isVet && (
+            <label className="block text-sm">
+              <span className="text-[var(--text-secondary)]">{labels.patient}</span>
+              <select
+                required
+                className="mt-1 w-full rounded border px-3 py-2"
+                value={form.petId}
+                onChange={(e) => setForm({ ...form, petId: e.target.value })}
+              >
+                <option value="">Selecione...</option>
+                {pets
+                  .filter((p) => !form.patientId || p.patientId === form.patientId)
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.speciesLabel}) — {p.tutorName}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          )}
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Prestador</span>
             <select
@@ -437,7 +474,7 @@ export default function AppointmentsView() {
               <AppointmentCard
                 key={a.id}
                 time={timeFromScheduleLabel(a.scheduledAtLabel)}
-                title={a.patientName}
+                title={isVet && a.petName ? `${a.petName} · ${labels.beneficiary}: ${a.patientName}` : a.patientName}
                 subtitle={`${a.providerName}${a.modality === "TELE" ? " · Telemedicina" : ""}`}
                 status={a.status}
                 meta={

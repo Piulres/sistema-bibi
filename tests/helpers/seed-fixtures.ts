@@ -124,6 +124,11 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
     });
     if (vetProcedures < 15) return true;
 
+    const petCount = await prisma.pet.count({
+      where: { tenantId: petcare.id },
+    });
+    if (petCount < 10) return true;
+
     return false;
   } finally {
     await prisma.$disconnect();

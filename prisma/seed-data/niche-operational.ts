@@ -132,6 +132,7 @@ async function seedSingleNicheOperational(
 
   const patientRefs: PatientRef[] = [];
   const starPatientIds = new Set<string>();
+  const tutorEmailToPatientId = new Map<string, string>();
   let patientSeq = 0;
 
   for (const star of config.starPatients) {
@@ -172,6 +173,7 @@ async function seedSingleNicheOperational(
       companyIndex: star.companyIndex,
     });
     starPatientIds.add(patient.id);
+    tutorEmailToPatientId.set(star.email, patient.id);
     patientSeq += 1;
   }
 
@@ -209,6 +211,60 @@ async function seedSingleNicheOperational(
         companyId,
         companyIndex,
       });
+    }
+  }
+
+  const petsByPatientId = new Map<string, string[]>();
+
+  if (config.niche === "VET") {
+    for (const starPet of config.starPets ?? []) {
+      const tutorId = tutorEmailToPatientId.get(starPet.tutorEmail);
+      if (!tutorId) continue;
+      const pet = await prisma.pet.create({
+        data: {
+          tenantId: tenant.id,
+          patientId: tutorId,
+          name: starPet.name,
+          species: starPet.species,
+          breed: starPet.breed,
+          size: starPet.size,
+          sex: starPet.sex ?? null,
+          weightKg: starPet.weightKg ?? null,
+          status: "ATIVO",
+        },
+      });
+      const list = petsByPatientId.get(tutorId) ?? [];
+      list.push(pet.id);
+      petsByPatientId.set(tutorId, list);
+    }
+
+    const bulkPetNames = ["Rex", "Nina", "Simba", "Pipoca", "Zeus", "Mia", "Max", "Buddy", "Lola", "Charlie"];
+    const bulkBreeds = ["SRD", "Labrador", "Persa", "Shih Tzu", "Maine Coon", "Bulldog", "Husky", "Siamese"];
+    const bulkSpecies = ["CANINO", "FELINO"] as const;
+    const bulkSizes = ["PEQUENO", "MEDIO", "GRANDE"] as const;
+
+    for (let pi = 0; pi < patientRefs.length; pi++) {
+      const patient = patientRefs[pi]!;
+      if ((petsByPatientId.get(patient.id)?.length ?? 0) > 0) continue;
+      const petCount = 1 + (pi % 2);
+      for (let k = 0; k < petCount; k++) {
+        const pet = await prisma.pet.create({
+          data: {
+            tenantId: tenant.id,
+            patientId: patient.id,
+            name: `${pick(bulkPetNames, pi + k)} ${patient.name.split(" ")[0]}`,
+            species: pick(bulkSpecies, pi + k),
+            breed: pick(bulkBreeds, pi + k),
+            size: pick(bulkSizes, pi + k),
+            sex: (pi + k) % 2 === 0 ? "M" : "F",
+            weightKg: 3 + ((pi + k) % 28),
+            status: "ATIVO",
+          },
+        });
+        const list = petsByPatientId.get(patient.id) ?? [];
+        list.push(pet.id);
+        petsByPatientId.set(patient.id, list);
+      }
     }
   }
 
@@ -253,6 +309,14 @@ async function seedSingleNicheOperational(
     medicalRecordSnippets: config.recordSnippets,
     benefitProductPicker: (sector, salt) =>
       nicheBenefitProduct(config.niche, sector, salt),
+    resolvePetId:
+      config.niche === "VET"
+        ? (patient, salt) => {
+            const ids = petsByPatientId.get(patient.id);
+            if (!ids?.length) return null;
+            return ids[salt % ids.length] ?? null;
+          }
+        : undefined,
   });
 
   const portalUsers = await seedBeneficiaryPortalUsers({

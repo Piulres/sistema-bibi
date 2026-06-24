@@ -7,6 +7,8 @@ import {
   isAppointmentModality,
   type AppointmentModality,
 } from "@/lib/telemedicine";
+import { validatePetForAppointment } from "@/lib/pet-service";
+import { requiresPet } from "@/lib/vet-niche";
 
 const dateTime = (value: Date) =>
   value.toLocaleString("pt-BR", {
@@ -39,6 +41,8 @@ export type AppointmentView = {
   reason: string | null;
   patientId: string;
   patientName: string;
+  petId: string | null;
+  petName: string | null;
   providerId: string;
   providerName: string;
   companyName: string | null;
@@ -52,8 +56,10 @@ function mapAppointment(a: {
   telemedicineUrl: string | null;
   reason: string | null;
   patientId: string;
+  petId: string | null;
   providerId: string;
   patient: { name: string; company: { name: string } | null };
+  pet: { name: string } | null;
   provider: { name: string };
 }): AppointmentView {
   return {
@@ -66,6 +72,8 @@ function mapAppointment(a: {
     reason: a.reason,
     patientId: a.patientId,
     patientName: a.patient.name,
+    petId: a.petId,
+    petName: a.pet?.name ?? null,
     providerId: a.providerId,
     providerName: a.provider.name,
     companyName: a.patient.company?.name ?? null,
@@ -99,6 +107,7 @@ export async function listAppointments(input: {
     where,
     include: {
       patient: { include: { company: true } },
+      pet: { select: { name: true } },
       provider: { select: { name: true } },
     },
     orderBy: { scheduledAt: "asc" },
@@ -119,6 +128,7 @@ export async function listProviders(tenantId: string) {
 export async function createAppointment(input: {
   tenantId: string;
   patientId: string;
+  petId?: string | null;
   providerId: string;
   scheduledAt: Date;
   reason?: string | null;
@@ -127,10 +137,29 @@ export async function createAppointment(input: {
   createdBy: string;
 }) {
   const prisma = await getPrisma();
+  const tenant = await prisma.tenant.findFirst({
+    where: { id: input.tenantId },
+    select: { niche: true },
+  });
+  if (!tenant) return { error: "Tenant não encontrado" as const };
+
   const patient = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
   });
   if (!patient) return { error: "Paciente não encontrado" as const };
+
+  const vetNiche = requiresPet(tenant.niche);
+  if (vetNiche) {
+    if (!input.petId) return { error: "Selecione o pet para agendar" as const };
+    const petCheck = await validatePetForAppointment({
+      tenantId: input.tenantId,
+      patientId: input.patientId,
+      petId: input.petId,
+    });
+    if ("error" in petCheck) return { error: petCheck.error as string };
+  } else if (input.petId) {
+    return { error: "Pet não aplicável neste segmento" as const };
+  }
 
   const provider = await prisma.user.findFirst({
     where: { id: input.providerId, tenantId: input.tenantId, role: "PRESTADOR" },
@@ -154,6 +183,7 @@ export async function createAppointment(input: {
     data: {
       tenantId: input.tenantId,
       patientId: input.patientId,
+      petId: input.petId ?? null,
       providerId: input.providerId,
       scheduledAt: input.scheduledAt,
       reason: input.reason?.trim() || null,
@@ -163,6 +193,7 @@ export async function createAppointment(input: {
     },
     include: {
       patient: { include: { company: true } },
+      pet: { select: { name: true } },
       provider: { select: { name: true } },
     },
   });
@@ -175,6 +206,7 @@ export async function createAppointment(input: {
       data: { telemedicineUrl: teleUrl },
       include: {
         patient: { include: { company: true } },
+        pet: { select: { name: true } },
         provider: { select: { name: true } },
       },
     });
@@ -185,7 +217,9 @@ export async function createAppointment(input: {
     entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
     entityId: finalAppointment.id,
     action: TIMELINE_ACTIONS.CREATED,
-    description: `Consulta agendada: ${patient.name} com ${provider.name} (${dateTime(finalAppointment.scheduledAt)})`,
+    description: vetNiche && finalAppointment.pet
+      ? `Atendimento agendado: ${finalAppointment.pet.name} (tutor ${patient.name}) com ${provider.name} (${dateTime(finalAppointment.scheduledAt)})`
+      : `Consulta agendada: ${patient.name} com ${provider.name} (${dateTime(finalAppointment.scheduledAt)})`,
     createdBy: input.createdBy,
   });
 
@@ -243,6 +277,7 @@ export async function updateAppointment(input: {
     },
     include: {
       patient: { include: { company: true } },
+      pet: { select: { name: true } },
       provider: { select: { name: true } },
     },
   });

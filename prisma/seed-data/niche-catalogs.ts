@@ -39,6 +39,16 @@ export type NicheStarPatient = {
   companyIndex: number;
 };
 
+export type NicheStarPet = {
+  name: string;
+  species: string;
+  breed: string;
+  size: string;
+  tutorEmail: string;
+  sex?: string;
+  weightKg?: number;
+};
+
 export type NicheOperationalConfig = {
   niche: NicheId;
   slug: string;
@@ -48,6 +58,7 @@ export type NicheOperationalConfig = {
   appointmentReasons: readonly string[];
   recordSnippets: readonly string[];
   starPatients: NicheStarPatient[];
+  starPets?: NicheStarPet[];
   pjEmail: string;
   pjName: string;
   telemedicineRatio: number;
@@ -226,6 +237,12 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
         phone: "(11) 97654-3210",
         companyIndex: 2,
       },
+    ],
+    starPets: [
+      { name: "Thor", species: "CANINO", breed: "Golden Retriever", size: "GRANDE", tutorEmail: "tutor@petcare.demo", sex: "M", weightKg: 32 },
+      { name: "Luna", species: "FELINO", breed: "SRD", size: "PEQUENO", tutorEmail: "tutor@petcare.demo", sex: "F", weightKg: 4.2 },
+      { name: "Bob", species: "CANINO", breed: "Poodle", size: "PEQUENO", tutorEmail: "fernanda.tutor@petcare.demo", sex: "M", weightKg: 6.5 },
+      { name: "Mel", species: "FELINO", breed: "Persa", size: "MEDIO", tutorEmail: "fernanda.tutor@petcare.demo", sex: "F", weightKg: 5.1 },
     ],
     pjEmail: "rh@techpet.demo",
     pjName: "RH TechPet",

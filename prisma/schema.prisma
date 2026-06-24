@@ -31,6 +31,7 @@ model Tenant {
   users        User[]
   companies    Company[]
   patients     Patient[]
+  pets         Pet[]
   procedures   Procedure[]
   appointments Appointment[]
   invoices     Invoice[]
@@ -169,6 +170,7 @@ model Patient {
   company   Company? @relation(fields: [companyId], references: [id])
 
   users          User[]
+  pets           Pet[]
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
   clinicalProfile PatientClinicalProfile?
@@ -178,6 +180,50 @@ model Patient {
   invoices       Invoice[]
   subscriptions  Subscription[]
   messages       Message[]
+}
+
+/// Animal de estimação (nicho VET) — vinculado ao tutor (`Patient`).
+/// species: CANINO | FELINO | AVES | OUTRO
+/// sex: M | F | NI
+/// size: PEQUENO | MEDIO | GRANDE
+/// status: ATIVO | FALECIDO | TRANSFERIDO
+model Pet {
+  id        String   @id @default(cuid())
+  name      String
+  species   String
+  breed     String?
+  sex       String?
+  birthDate DateTime?
+  size      String?
+  weightKg  Float?
+  microchip String?
+  status    String   @default("ATIVO")
+  notes     String?
+  createdAt DateTime @default(now())
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  clinicalProfile PetClinicalProfile?
+
+  @@index([tenantId, patientId])
+  @@index([tenantId, status])
+}
+
+/// Perfil clínico do pet (alergias, condições crônicas).
+model PetClinicalProfile {
+  id                String   @id @default(cuid())
+  petId             String   @unique
+  pet               Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  /// JSON: [{ substance, severity, notes }]
+  allergies         String?
+  /// JSON: [{ condition, since, notes }]
+  chronicConditions String?
+  updatedAt         DateTime @updatedAt
 }
 
 /// Catálogo de serviços agnóstico — consulta médica, hora técnica jurídica, banho e tosa, etc.
@@ -332,6 +378,10 @@ model Appointment {
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
 
+  /// Pet atendido (obrigatório no nicho VET)
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
+
   providerId String
   provider   User   @relation("ProviderAppointments", fields: [providerId], references: [id])
 
@@ -371,6 +421,9 @@ model MedicalRecord {
 
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
+
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
 
   providerId String
   provider   User   @relation("ProviderRecords", fields: [providerId], references: [id])

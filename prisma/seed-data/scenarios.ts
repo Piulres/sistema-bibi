@@ -53,6 +53,8 @@ export type SeedMassContext = {
   excludePatientIds: Set<string>;
   companies: SeedCompany[];
   scale: ScaleConfig;
+  /** Retorna petId para agendamentos (nicho VET). */
+  resolvePetId?: (patient: PatientRef, salt: number) => string | null;
   /** Substituem pickers médicos quando informados (tenants multi-nicho). */
   pickProcedureCode?: (companyIndex: number, companies: SeedCompany[], salt: number) => string;
   pickAppointmentReason?: (companyIndex: number, companies: SeedCompany[], salt: number) => string;
@@ -161,6 +163,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
         reason,
         tenantId: ctx.tenantId,
         patientId: patient.id,
+        petId: ctx.resolvePetId?.(patient, i) ?? null,
         providerId,
       },
     });
@@ -237,6 +240,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
           title: i % 7 === 0 ? "Atestado médico" : null,
           content: pick(ctx.medicalRecordSnippets ?? MEDICAL_RECORD_SNIPPETS, i),
           patientId: appt.patient.id,
+          petId: ctx.resolvePetId?.(appt.patient, i) ?? null,
           providerId: appt.providerId,
           appointmentId: appt.id,
           createdAt: appt.scheduledAt,
