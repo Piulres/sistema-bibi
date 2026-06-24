@@ -16,7 +16,18 @@ const OBSOLETE_DOC_PATHS = [
   "docs/ARQUITETURA.md",
   "docs/pesquisa/nichos/10-nicho-vet.md",
   "docs/pesquisa/08-prompt-healthos-expansao.md",
+  "docs/pesquisa/nichos/README.md",
 ];
+
+/** Links quebrados: doc de plataforma referenciado sem ../plataforma/ */
+const LEGACY_PLATAFORMA_DOC_LINK =
+  /\]\((OPERACOES|ARQUITETURA|BENCHMARK|TESTES|DESIGN_SYSTEM|NOTEBOOKLM|WORKFLOW_CURSOR|DEPLOY_NETLIFY|PAYMENTS|COMMUNICATIONS)\.md\)/;
+
+/** Links para versoes/ sem prefixo correto */
+const LEGACY_VERSOES_DOC_LINK =
+  /\]\((V2_0\.md|V2_0_ARCHITECTURE\.md)\)/;
+
+const LEGACY_EVIDENCIAS_LINK = /\]\((evidencias\/|HISTORICO_2026-06-21\.md)\)/;
 
 const STALE_PATTERNS = [
   { pattern: /Sistema Bibi — Gestão Inteligente em Saúde/g, hint: "metadata layout — use Sistema Bibi - ServiceOS" },
@@ -106,6 +117,35 @@ for (const file of filesToScan) {
 
   if (/\bHealthOS\b/.test(content) && !isAllowed(rel, HEALTHOS_ALLOWLIST)) {
     errors.push(`${rel}: menção a HealthOS — use Sistema Bibi - ServiceOS`);
+  }
+
+  if (
+    (rel.startsWith("docs/versoes/") ||
+      rel.startsWith("docs/pesquisa/") ||
+      rel.startsWith("docs/produto/")) &&
+    LEGACY_PLATAFORMA_DOC_LINK.test(content)
+  ) {
+    errors.push(
+      `${rel}: link obsoleto para doc de plataforma — use ../plataforma/<arquivo>.md`,
+    );
+    LEGACY_PLATAFORMA_DOC_LINK.lastIndex = 0;
+  }
+
+  if (
+    (rel.startsWith("docs/plataforma/") || rel.startsWith("docs/produto/")) &&
+    LEGACY_VERSOES_DOC_LINK.test(content)
+  ) {
+    errors.push(
+      `${rel}: link obsoleto para doc de versão — use ../versoes/<arquivo>.md`,
+    );
+    LEGACY_VERSOES_DOC_LINK.lastIndex = 0;
+  }
+
+  if (rel.startsWith("docs/produto/") && LEGACY_EVIDENCIAS_LINK.test(content)) {
+    errors.push(
+      `${rel}: link obsoleto — use ../evidencias/ ou ../plataforma/HISTORICO_2026-06-21.md`,
+    );
+    LEGACY_EVIDENCIAS_LINK.lastIndex = 0;
   }
 }
 
