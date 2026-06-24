@@ -8,6 +8,7 @@ import {
 } from "@/lib/landing/navigation";
 import LandingMobileMenu from "@/components/landing/LandingMobileMenu";
 import LandingLogoLink from "@/components/landing/LandingLogoLink";
+import { landingCtaClasses } from "@/components/landing/landing-cta";
 
 type Props = {
   branding: BrandingTokens;
@@ -62,7 +63,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
           {portalsHref.startsWith("/") ? (
             <Link
               href={portalsHref}
-              className="landing-btn-primary px-3 py-2 text-xs sm:px-4 sm:text-sm"
+              className={landingCtaClasses("surface", "sm")}
             >
               <span className="sm:hidden">Portais</span>
               <span className="hidden sm:inline">Acessar portais</span>
@@ -70,7 +71,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
           ) : (
             <a
               href={portalsHref}
-              className="landing-btn-primary px-3 py-2 text-xs sm:px-4 sm:text-sm"
+              className={landingCtaClasses("surface", "sm")}
             >
               <span className="sm:hidden">Portais</span>
               <span className="hidden sm:inline">Acessar portais</span>

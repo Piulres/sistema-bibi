@@ -3,6 +3,7 @@ import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { NicheId } from "@/lib/niche/types";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingIcon from "@/components/landing/LandingIcon";
+import { landingCtaClasses } from "@/components/landing/landing-cta";
 
 type Props = {
   branding: BrandingTokens;
@@ -48,14 +49,14 @@ export default function LandingCta({ branding, niche = "MEDICAL", description }:
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
               href="/interno/login"
-              className="landing-btn-primary-hero min-w-[12rem] rounded-full px-7 py-3.5 text-base"
+              className={landingCtaClasses("hero", "lg", "min-w-[12rem]")}
             >
               Acessar demonstração
               <LandingIcon name="arrow-right" className="h-5 w-5" />
             </Link>
             <a
               href="/openapi.yaml"
-              className="landing-btn-secondary-hero min-w-[12rem] rounded-full px-7 py-3.5 text-base"
+              className={landingCtaClasses("hero-ghost", "lg", "min-w-[12rem]")}
             >
               Ver API (OpenAPI)
             </a>

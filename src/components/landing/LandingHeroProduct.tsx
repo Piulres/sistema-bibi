@@ -5,6 +5,7 @@ import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { HOME_HERO } from "@/lib/landing/home-content";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
 import { SEGMENT_ACCESS_HREF } from "@/lib/landing/navigation";
+import { landingCtaClasses } from "@/components/landing/landing-cta";
 
 type Props = {
   branding?: BrandingTokens;
@@ -50,7 +51,7 @@ export default function LandingHeroProduct(_props: Props) {
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <a
               href="#portais"
-              className="landing-btn-primary-hero group px-6 py-3.5 text-base"
+              className={landingCtaClasses("hero", "lg", "group")}
             >
               Acessar portais
               <LandingIcon
@@ -60,7 +61,7 @@ export default function LandingHeroProduct(_props: Props) {
             </a>
             <Link
               href={SEGMENT_ACCESS_HREF}
-              className="landing-btn-secondary-hero px-6 py-3.5 text-base"
+              className={landingCtaClasses("hero-ghost", "lg")}
             >
               Acesso segmentado
             </Link>

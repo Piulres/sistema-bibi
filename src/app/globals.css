@@ -268,72 +268,94 @@ body {
   color: transparent;
 }
 
-/* Landing — CTAs (superfície clara: header, cards) */
-.landing-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background: var(--brand-accent);
-  color: var(--text-inverse);
-  font-weight: 600;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: filter 0.15s ease;
-}
-
-.landing-btn-primary:hover {
-  filter: brightness(1.08);
-}
-
-.landing-btn-primary:focus-visible {
-  outline: 2px solid var(--ring-focus);
-  outline-offset: 2px;
-}
-
-/* Landing — CTA primário em hero escuro */
-.landing-btn-primary-hero {
+/* Landing — CTAs unificados */
+.landing-cta {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   border-radius: var(--radius-button);
-  background: var(--brand-accent);
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.landing-cta--sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.landing-cta--md {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.landing-cta--lg {
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+}
+
+/* Superfície clara — header e nav */
+.landing-cta--surface {
+  background: var(--brand-primary);
   color: var(--text-inverse);
-  font-weight: 600;
-  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15);
-  transition: filter 0.15s ease;
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
 }
 
-.landing-btn-primary-hero:hover {
-  filter: brightness(1.1);
+.landing-cta--surface:hover {
+  background: var(--brand-primary-hover);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 28%, transparent);
 }
 
-.landing-btn-primary-hero:focus-visible {
-  outline: 2px solid white;
-  outline-offset: 2px;
+/* Hero escuro — primário (alto contraste) */
+.landing-cta--hero {
+  background: rgb(255 255 255 / 0.98);
+  color: var(--brand-primary);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.2);
 }
 
-/* Landing — CTA secundário em hero escuro */
-.landing-btn-secondary-hero {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-button);
-  border: 1px solid rgb(255 255 255 / 0.2);
-  background: rgb(255 255 255 / 0.08);
+.landing-cta--hero:hover {
+  background: white;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.24);
+}
+
+/* Hero escuro — secundário */
+.landing-cta--hero-ghost {
+  border-color: rgb(255 255 255 / 0.32);
+  background: rgb(255 255 255 / 0.06);
+  color: rgb(255 255 255 / 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.landing-cta--hero-ghost:hover {
+  border-color: rgb(255 255 255 / 0.5);
+  background: rgb(255 255 255 / 0.11);
   color: white;
-  font-weight: 600;
-  backdrop-filter: blur(4px);
-  transition: background 0.15s ease;
 }
 
-.landing-btn-secondary-hero:hover {
-  background: rgb(255 255 255 / 0.12);
-}
-
-.landing-btn-secondary-hero:focus-visible {
-  outline: 2px solid white;
+.landing-cta:focus-visible {
+  outline: 2px solid var(--ring-focus);
   outline-offset: 2px;
+}
+
+.landing-cta--hero:focus-visible,
+.landing-cta--hero-ghost:focus-visible {
+  outline-color: white;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-cta:active {
+    transform: scale(0.98);
+  }
 }
 
 .landing-glass {
