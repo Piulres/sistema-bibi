@@ -6,7 +6,7 @@ import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { PortalKey } from "@/lib/roles";
 import type { NicheDemoAccount } from "@/lib/niche/demo-accounts";
-import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
+import { nicheDemoLabel, SEGMENT_TENANTS } from "@/lib/niche/demo-accounts";
 import type { LoginSegmentContext } from "@/lib/segment/login-context";
 import { PLATFORM } from "@/lib/platform";
 import SegmentContextBanner from "@/components/segment/SegmentContextBanner";
@@ -42,11 +42,25 @@ export default function LoginForm({
   const router = useRouter();
   const [email, setEmail] = useState(demoEmail);
   const [password, setPassword] = useState(demoPassword);
+  const [activeTenantSlug, setActiveTenantSlug] = useState(segmentContext?.tenantSlug ?? null);
   const [mfaToken, setMfaToken] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const portalTheme = PORTAL_THEMES[portal];
+
+  function selectNicheDemo(demo: NicheDemoAccount) {
+    const tenant = SEGMENT_TENANTS.find((entry) => entry.niche === demo.niche);
+    setEmail(demo.internoEmail);
+    if (tenant) {
+      setActiveTenantSlug(tenant.slug);
+      void fetch("/api/segment/persist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tenant: tenant.slug }),
+      });
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -60,7 +74,7 @@ export default function LoginForm({
           email,
           password,
           portal,
-          tenantSlug: segmentContext?.tenantSlug ?? undefined,
+          tenantSlug: activeTenantSlug ?? segmentContext?.tenantSlug ?? undefined,
         }),
       });
       const data = await res.json();
@@ -93,7 +107,7 @@ export default function LoginForm({
         body: JSON.stringify({
           mfaToken,
           code: mfaCode,
-          tenantSlug: segmentContext?.tenantSlug ?? undefined,
+          tenantSlug: activeTenantSlug ?? segmentContext?.tenantSlug ?? undefined,
         }),
       });
       const data = await res.json();
@@ -227,7 +241,7 @@ export default function LoginForm({
                         <button
                           key={demo.niche}
                           type="button"
-                          onClick={() => setEmail(demo.internoEmail)}
+                          onClick={() => selectNicheDemo(demo)}
                           className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
                             email === demo.internoEmail
                               ? "border-[var(--brand-primary)] bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]"

@@ -11,6 +11,7 @@ import {
   nicheFromSegmentSlug,
   SEGMENT_LANDING_PAGES,
 } from "@/lib/platform/structure";
+import { ensureDemoDataStoreForSegmentAccess } from "@/lib/data-store/ensure-demo-for-segment";
 import TenantTheme from "@/components/layout/TenantTheme";
 import LandingSegmentPageView from "@/components/landing/LandingSegmentPageView";
 
@@ -59,6 +60,7 @@ export default async function SegmentLandingPage({ params }: PageProps) {
 
   const niche = nicheFromSegmentSlug(slug)!;
   const tenantSlug = segmentTenantByNiche(niche).slug;
+  await ensureDemoDataStoreForSegmentAccess({ segmentLanding: true, tenantSlug });
   const branding = nicheLandingBranding(niche, getPlatformBranding());
 
   return (

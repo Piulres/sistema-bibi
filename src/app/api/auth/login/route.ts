@@ -7,6 +7,7 @@ import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/
 import { createMfaChallengeToken } from "@/lib/mfa";
 import { isNicheId } from "@/lib/niche/types";
 import { getNicheConfig } from "@/lib/niche/defaults";
+import { ensureDemoDataStoreForSegmentAccess } from "@/lib/data-store/ensure-demo-for-segment";
 import {
   buildLoginSegmentResponse,
   validateUserSegmentAccess,
@@ -14,7 +15,6 @@ import {
 import { persistSegmentCookie } from "@/lib/segment/cookie";
 
 export async function POST(request: Request) {
-  const prisma = await getPrisma();
   let body: { email?: string; password?: string; portal?: string; tenantSlug?: string };
   try {
     body = await request.json();
@@ -29,6 +29,10 @@ export async function POST(request: Request) {
       { status: 400 },
     );
   }
+
+  await ensureDemoDataStoreForSegmentAccess({ tenantSlug, email });
+
+  const prisma = await getPrisma();
 
   const portalConfig = PORTALS[portal as PortalKey];
   if (!portalConfig) {
