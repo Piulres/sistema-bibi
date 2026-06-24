@@ -1,5 +1,6 @@
 import "server-only";
 import type { AssistantPlan, AssistantToolCall } from "@/lib/assistant/types";
+import type { Role } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
 import {
   MOCK_INTENTS,
@@ -44,6 +45,10 @@ import {
   scoreTriggers,
   splitCompositeQuery,
 } from "@/lib/assistant/provider/mock-normalize";
+
+function portalRole(user: SessionUser): Role {
+  return user.role as Role;
+}
 
 function buildDefaultArgs(tool: string, raw: string, text: string): Record<string, unknown> {
   switch (tool) {
@@ -179,7 +184,7 @@ function matchIntentOnSegment(
         arguments: buildDefaultArgs(lastTool, rawSegment, text || segment),
       };
     }
-    const switched = resolvePortalFollowUpTool(user.role, text, lastTool);
+    const switched = resolvePortalFollowUpTool(portalRole(user), text, lastTool);
     if (switched && toolNames.has(switched)) {
       return { name: switched, arguments: buildDefaultArgs(switched, rawSegment, text) };
     }
@@ -266,7 +271,7 @@ export function planMockFromIntents(
     }
     return {
       toolCalls: [],
-      fallback: buildPortalHelpFallback(user.role, user.labels, toolNames, activeDraft?.tool),
+      fallback: buildPortalHelpFallback(portalRole(user), user.labels, toolNames, activeDraft?.tool),
     };
   }
 

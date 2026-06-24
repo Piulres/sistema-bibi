@@ -1,4 +1,5 @@
 import "server-only";
+import type { Role } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
 import { formatDateLabel } from "@/lib/assistant/dates";
 import { buildPortalPromptSection } from "@/lib/assistant/portal-concepts";
@@ -15,7 +16,7 @@ export function buildAssistantSystemPrompt(user: SessionUser, pageContext?: stri
     `Portal: ${user.role} · Tenant: ${user.tenantName}`,
     `Nicho: ${user.niche}`,
     ...buildPortalPromptSection({
-      role: user.role,
+      role: user.role as Role,
       labels: user.labels,
       tenantName: user.tenantName,
       companyName: user.companyName,

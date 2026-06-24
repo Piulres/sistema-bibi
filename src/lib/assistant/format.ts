@@ -299,17 +299,17 @@ export function buildActions(
     ];
   }
 
-  const links: Record<string, { label: string; href: string }> = {
-    count_appointments: { label: "Ver agenda", href: "/interno/agenda" },
-    get_revenue_summary: { label: "Ver relatórios", href: "/interno/relatorios" },
-    get_dashboard_kpis: { label: "Dashboard", href: "/interno/dashboard" },
-    list_users: { label: "Cadastros", href: "/interno/cadastros" },
-    get_prestador_dashboard: { label: "Minha agenda", href: "/prestador" },
-    get_extrato_summary: { label: "Extrato", href: "/prestador/extrato" },
-    get_pj_overview: { label: "Portal PJ", href: "/pj" },
-    get_open_invoices: { label: "Faturas", href: "/pj#faturas" },
-    get_my_overview: { label: "Meu resumo", href: "/beneficiario/resumo" },
-    list_available_slots: { label: "Agendar", href: "/beneficiario/agendar" },
+  const links: Record<string, { type: "link"; label: string; href: string }> = {
+    count_appointments: { type: "link", label: "Ver agenda", href: "/interno/agenda" },
+    get_revenue_summary: { type: "link", label: "Ver relatórios", href: "/interno/relatorios" },
+    get_dashboard_kpis: { type: "link", label: "Dashboard", href: "/interno/dashboard" },
+    list_users: { type: "link", label: "Cadastros", href: "/interno/cadastros" },
+    get_prestador_dashboard: { type: "link", label: "Minha agenda", href: "/prestador" },
+    get_extrato_summary: { type: "link", label: "Extrato", href: "/prestador/extrato" },
+    get_pj_overview: { type: "link", label: "Portal PJ", href: "/pj" },
+    get_open_invoices: { type: "link", label: "Faturas", href: "/pj#faturas" },
+    get_my_overview: { type: "link", label: "Meu resumo", href: "/beneficiario/resumo" },
+    list_available_slots: { type: "link", label: "Agendar", href: "/beneficiario/agendar" },
   };
 
   if (toolName === "list_my_appointments") {

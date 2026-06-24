@@ -243,6 +243,7 @@ export async function createAppointment(input: {
       include: {
         patient: { include: { company: true } },
         provider: { select: { name: true } },
+        procedure: { select: { name: true } },
       },
     });
   }

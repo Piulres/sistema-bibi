@@ -10,6 +10,8 @@ import {
   resolveAppointmentDraft,
   type AppointmentDraftArgs,
 } from "@/lib/assistant/appointment-draft";
+import { buildIncompleteDraftResult } from "@/lib/assistant/draft-response";
+import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
 
 function draftResult(input: {
   userId: string;
@@ -175,7 +177,7 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         data,
         tool: "draft_create_appointment",
       });
-      if (!("ok" in resolved) || !resolved.ok) {
+      if ("result" in resolved) {
         return resolved.result;
       }
 

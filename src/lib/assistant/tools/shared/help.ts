@@ -1,5 +1,6 @@
 import "server-only";
 import type { AssistantToolDefinition } from "@/lib/assistant/types";
+import type { Role } from "@/lib/roles";
 import { formatKnowledgeAnswer } from "@/lib/assistant/rag/knowledge";
 import { searchPortalKnowledge } from "@/lib/assistant/portal-knowledge";
 
@@ -16,7 +17,7 @@ export const explainCapabilityTool: AssistantToolDefinition = {
   },
   handler: async (ctx, args) => {
     const topic = ((args as { topic?: string }).topic ?? "").trim();
-    const chunks = searchPortalKnowledge(ctx.user.role, topic, ctx.labels, 3);
+    const chunks = searchPortalKnowledge(ctx.user.role as Role, topic, ctx.labels, 3);
     return {
       topic,
       answer: formatKnowledgeAnswer(topic, chunks),

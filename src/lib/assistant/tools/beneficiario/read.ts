@@ -128,7 +128,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         fixedPatientId: ctx.user.patientId,
         fixedPatientName: ctx.user.patientName ?? undefined,
       });
-      if (!("ok" in resolved) || !resolved.ok) {
+      if ("result" in resolved) {
         return resolved.result;
       }
 

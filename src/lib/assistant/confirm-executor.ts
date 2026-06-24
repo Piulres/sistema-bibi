@@ -19,6 +19,10 @@ export type ConfirmResult =
   | { ok: true; message: string; href?: string; entityId?: string }
   | { ok: false; error: string };
 
+function failFromService(result: { error?: string }): ConfirmResult {
+  return { ok: false, error: result.error ?? "Não foi possível concluir a operação." };
+}
+
 export async function executePendingAction(
   user: SessionUser,
   payload: PendingActionPayload,
@@ -41,7 +45,7 @@ export async function executePendingAction(
         createdBy: user.id,
       });
 
-      if ("error" in result) return { ok: false, error: result.error };
+      if ("error" in result) return failFromService(result);
       return {
         ok: true,
         message: confirmSuccessUser(result.user.name, result.user.email),
@@ -62,7 +66,7 @@ export async function executePendingAction(
         createdBy: user.id,
       });
 
-      if ("error" in result) return { ok: false, error: result.error };
+      if ("error" in result) return failFromService(result);
       return {
         ok: true,
         message: confirmSuccessPatient(user.labels, result.patient.name),
@@ -83,7 +87,7 @@ export async function executePendingAction(
         createdBy: user.id,
       });
 
-      if ("error" in result) return { ok: false, error: result.error };
+      if ("error" in result) return failFromService(result);
       const appt = result.appointment;
       return {
         ok: true,
@@ -110,7 +114,7 @@ export async function executePendingAction(
         createdBy: user.id,
       });
 
-      if ("error" in result) return { ok: false, error: result.error };
+      if ("error" in result) return failFromService(result);
       const appt = result.appointment;
       return {
         ok: true,
