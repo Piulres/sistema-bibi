@@ -258,10 +258,82 @@ body {
 }
 
 .landing-gradient-text {
-  background: linear-gradient(135deg, #f97316, #fb923c 60%, #fbbf24);
+  background: linear-gradient(
+    135deg,
+    var(--brand-accent),
+    color-mix(in srgb, var(--brand-accent) 70%, white)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Landing — CTAs (superfície clara: header, cards) */
+.landing-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--brand-accent);
+  color: var(--text-inverse);
+  font-weight: 600;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: filter 0.15s ease;
+}
+
+.landing-btn-primary:hover {
+  filter: brightness(1.08);
+}
+
+.landing-btn-primary:focus-visible {
+  outline: 2px solid var(--ring-focus);
+  outline-offset: 2px;
+}
+
+/* Landing — CTA primário em hero escuro */
+.landing-btn-primary-hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-button);
+  background: var(--brand-accent);
+  color: var(--text-inverse);
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.15);
+  transition: filter 0.15s ease;
+}
+
+.landing-btn-primary-hero:hover {
+  filter: brightness(1.1);
+}
+
+.landing-btn-primary-hero:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+/* Landing — CTA secundário em hero escuro */
+.landing-btn-secondary-hero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-button);
+  border: 1px solid rgb(255 255 255 / 0.2);
+  background: rgb(255 255 255 / 0.08);
+  color: white;
+  font-weight: 600;
+  backdrop-filter: blur(4px);
+  transition: background 0.15s ease;
+}
+
+.landing-btn-secondary-hero:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+.landing-btn-secondary-hero:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
 }
 
 .landing-glass {

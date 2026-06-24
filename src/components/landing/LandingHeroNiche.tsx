@@ -57,7 +57,7 @@ export default function LandingHeroNiche({ niche, branding }: Props) {
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href="#portais"
-              className="group inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--brand-accent)] px-6 py-3.5 text-base font-semibold text-[var(--surface-inverse)] shadow-lg transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="landing-btn-primary-hero group px-6 py-3.5 text-base"
             >
               Explorar portais
               <LandingIcon
@@ -67,7 +67,7 @@ export default function LandingHeroNiche({ niche, branding }: Props) {
             </Link>
             <Link
               href="#recursos"
-              className="inline-flex items-center justify-center rounded-[var(--radius-button)] border border-white/20 bg-white/8 px-6 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className="landing-btn-secondary-hero px-6 py-3.5 text-base"
             >
               Ver recursos
             </Link>

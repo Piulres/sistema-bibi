@@ -11,6 +11,7 @@ import {
 } from "@/lib/landing/navigation";
 import { SEGMENT_LANDING_PAGES } from "@/lib/platform/structure";
 import { getNicheConfig } from "@/lib/niche/defaults";
+import { segmentPillStyle } from "@/lib/theme/segment-colors";
 
 type Props = {
   context?: LandingNavContext;
@@ -135,11 +136,10 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                             href={page.href}
                             onClick={() => setOpen(false)}
                             className={cn(
-                              "inline-block rounded-full px-2.5 py-1 text-xs font-medium",
-                              isActive
-                                ? "bg-[var(--brand-primary)] text-[var(--text-inverse)]"
-                                : "border border-[var(--border-default)] text-[var(--text-secondary)]",
+                              "inline-block rounded-full border px-2.5 py-1 text-xs font-medium",
+                              isActive && "shadow-sm",
                             )}
+                            style={segmentPillStyle(page.niche, isActive)}
                           >
                             {config.name}
                           </Link>
@@ -165,7 +165,7 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                     <Link
                       href={SEGMENT_ACCESS_HREF}
                       onClick={() => setOpen(false)}
-                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--surface-muted)]"
+                      className="landing-btn-primary mx-3 mt-2 w-[calc(100%-1.5rem)] px-3 py-2.5 text-sm"
                     >
                       Acessar portais
                     </Link>
@@ -173,7 +173,7 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                     <a
                       href="#portais"
                       onClick={() => setOpen(false)}
-                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--surface-muted)]"
+                      className="landing-btn-primary mx-3 mt-2 w-[calc(100%-1.5rem)] px-3 py-2.5 text-sm"
                     >
                       Acessar portais
                     </a>

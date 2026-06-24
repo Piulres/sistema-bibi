@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Image from "next/image";
 import { Suspense } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { LandingNavContext } from "@/lib/landing/navigation";
@@ -8,6 +7,7 @@ import {
   SEGMENT_ACCESS_HREF,
 } from "@/lib/landing/navigation";
 import LandingMobileMenu from "@/components/landing/LandingMobileMenu";
+import LandingLogoLink from "@/components/landing/LandingLogoLink";
 
 type Props = {
   branding: BrandingTokens;
@@ -24,35 +24,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
         Ir para o conteúdo principal
       </a>
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6 sm:py-3.5">
-        <Link
-          href="/"
-          className="flex min-w-0 items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2"
-          aria-label={`${branding.displayName} — página inicial`}
-        >
-          {branding.logoUrl ? (
-            <Image
-              src={branding.logoUrl}
-              alt=""
-              width={40}
-              height={40}
-              className="h-10 w-10 rounded-xl object-contain"
-              priority
-            />
-          ) : (
-            <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-[var(--text-inverse)] shadow-sm"
-              style={{
-                background: `linear-gradient(135deg, var(--brand-hero-from), var(--brand-hero-to))`,
-              }}
-              aria-hidden
-            >
-              {branding.displayName.charAt(0)}
-            </span>
-          )}
-          <span className="truncate text-base font-semibold tracking-tight text-[var(--text-primary)]">
-            {branding.displayName}
-          </span>
-        </Link>
+        <LandingLogoLink branding={branding} />
 
         <nav
           aria-label="Navegação principal"
@@ -90,7 +62,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
           {portalsHref.startsWith("/") ? (
             <Link
               href={portalsHref}
-              className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+              className="landing-btn-primary px-3 py-2 text-xs sm:px-4 sm:text-sm"
             >
               <span className="sm:hidden">Portais</span>
               <span className="hidden sm:inline">Acessar portais</span>
@@ -98,7 +70,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
           ) : (
             <a
               href={portalsHref}
-              className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+              className="landing-btn-primary px-3 py-2 text-xs sm:px-4 sm:text-sm"
             >
               <span className="sm:hidden">Portais</span>
               <span className="hidden sm:inline">Acessar portais</span>
