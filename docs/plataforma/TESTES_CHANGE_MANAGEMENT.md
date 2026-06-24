@@ -85,7 +85,7 @@ npm run pre-release
 1. Todos os testes Vitest passando
 2. `prisma db push` aplicado sem erro (novas colunas + `EntityRevision`)
 3. Lint sem erros novos
-4. `pre-release` (build local) OK
+4. `pre-release` OK (lint + docs + bootstrap dual-store + `db:verify` + test + build)
 5. Documento `CHANGE_MANAGEMENT_DEPLOY.md` revisado pelo humano antes de publicar em ambiente integrado
 
 ---

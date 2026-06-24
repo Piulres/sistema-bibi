@@ -81,7 +81,7 @@ Credenciais de gateways reais: ver [`PAYMENTS.md`](PAYMENTS.md) e [`COMMUNICATIO
 ## Comandos locais (sem publicar)
 
 ```bash
-# Validar pacote fechado (lint + build Netlify) — RECOMENDADO antes de publicar
+# Validar pacote fechado (lint + docs + dual-store + test + build Netlify) — RECOMENDADO
 npm run pre-release
 
 # Validar só o build Netlify (mesmo pipeline do CI)

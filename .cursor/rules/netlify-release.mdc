@@ -28,7 +28,7 @@ Integração contínua em `dev`; release só quando fechar pacote:
 git checkout main && git pull && git merge origin/dev
 
 # 2. Validar e publicar
-npm run pre-release                              # lint + build local (obrigatório)
+npm run pre-release                              # validação completa (ver OPERACOES.md §4.4)
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
 npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"
 # smoke test: chunk CSS em /_next/static/ deve retornar 200

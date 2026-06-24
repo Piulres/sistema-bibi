@@ -81,7 +81,9 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint → docs → bootstrap dual-store → `db:verify` → test → `netlify:build` | **Validar pacote sem publicar** (espelha CI) |
+| `npm run docs:verify` | Links e referências em `docs/` | Chamado pelo `pre-release` |
+| `npm run db:verify` | Integridade de `demo.db` + `operation.db` + espelho `dev.db` | Após `db:bootstrap:demo` |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
@@ -155,6 +157,30 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
+### 4.4 Validar pacote (`npm run pre-release`)
+
+Script: `scripts/pre-release.mjs` — **não publica** na Netlify.
+
+| Etapa | Comando | Notas |
+|-------|---------|-------|
+| 1 | `npm run lint` | ESLint |
+| 2 | `npm run docs:verify` | Links quebrados em `docs/` |
+| 3 | `npm run db:bootstrap:demo` | `SEED_SCALE=small` (padrão) — gera `demo.db`, `operation.db`, espelho `dev.db` |
+| 4 | `npm run db:verify` | Tenants, usuários demo e bootstrap de operação |
+| 5 | `npm test` | Vitest (unit + API) |
+| 6 | `npm run netlify:build` | Mesmo pipeline do deploy Netlify |
+
+**Pitfalls:**
+
+| Sintoma | Causa provável | Correção |
+|---------|----------------|----------|
+| Falha em `db-verify` sem bootstrap | Só `db:push && db:seed` (legado) | Rodar `npm run pre-release` inteiro ou `SEED_SCALE=small npm run db:bootstrap:demo` antes |
+| `dev.db ausente` | Bootstrap incompleto | `npm run db:bootstrap:demo` |
+| `demo.db: falta tenant slug` | Seed antigo ou schema desatualizado | `npm run db:bootstrap:demo` após `db:push` |
+| Testes lentos no pre-release | `SEED_SCALE=medium` no `.env` | O script força `small`; E2E separado: `CI=true npm run test:e2e` |
+
+Detalhes de `db:verify` e CI: [`TESTES.md`](TESTES.md) · workflow: [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md).
 
 ---
 

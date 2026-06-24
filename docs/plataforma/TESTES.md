@@ -249,6 +249,42 @@ Senha única: `bibi123`
 
 ---
 
+## Pre-release (`npm run pre-release`)
+
+Validação local de pacote fechado **antes** de publicar na Netlify. Implementação: `scripts/pre-release.mjs`.
+
+| Etapa | Comando | O que valida |
+|-------|---------|----------------|
+| 1 | `lint` | ESLint |
+| 2 | `docs:verify` | Referências em `docs/` |
+| 3 | `db:bootstrap:demo` | Gera `demo.db`, `operation.db` e espelho `dev.db` (`SEED_SCALE=small`) |
+| 4 | `db:verify` | Integridade dual-store (ver abaixo) |
+| 5 | `test` | Vitest (unit + API) |
+| 6 | `netlify:build` | Build Netlify (`setup-database.ts` + `next build`) |
+
+**Alinhamento com CI:** as etapas 1–5 espelham o job `unit-integration-api` em `.github/workflows/ci.yml`. A etapa 6 substitui `npm run build` do CI pelo pipeline Netlify completo.
+
+**E2E:** Playwright roda em job separado no CI. Localmente: `CI=true npm run test:e2e` (requer bootstrap prévio).
+
+### O que `db:verify` checa (`scripts/verify-databases.mjs`)
+
+| Base | Asserts principais |
+|------|-------------------|
+| `demo.db` | 7 tenants (`horizonte`, `vitacare`, `petcare`, …), ≥50 PJ, ≥100 pacientes, usuários demo (`faturamento@bibi.health`, `joao.pereira@email.com`, …) |
+| `operation.db` | 1 tenant `bibi-saude`, usuários internos (admin, recepção, MFA), ≥14 procedimentos, **sem** PJ/pacientes iniciais |
+| `dev.db` | Espelho byte-a-byte de `demo.db` (compatibilidade legado / `DATABASE_URL`) |
+
+**Troubleshooting:**
+
+```bash
+# Falhou em db-verify? Regenerar dual-store e tentar de novo
+SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
+```
+
+> Não usar só `db:push && db:seed` antes de `db:verify` — o verify exige `demo.db` **e** `operation.db`.
+
+---
+
 ## CI (GitHub Actions)
 
 Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
@@ -268,13 +304,15 @@ Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 **Espelhar CI localmente:**
 
 ```bash
+npm run pre-release   # etapas 1–6 acima (recomendado)
+# ou passo a passo:
 npm run lint && npm run docs:verify
 SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
 npm run test && npm run build
 CI=true npm run test:e2e
 ```
 
-`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+`npm run pre-release` executa o bootstrap dual-store antes de `db:verify` (mesma ordem do CI + build Netlify).
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
