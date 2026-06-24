@@ -540,22 +540,32 @@ model Payment {
 
 /// Auditoria universal de eventos do sistema (Timeline).
 /// entityType: User | Patient | Appointment | ProcedureUsage | MedicalRecord | Invoice | Company
-/// action: LOGIN | CREATED | UPDATED | APPOINTMENT_COMPLETED | PROCEDURE_REGISTERED |
-///         MEDICAL_RECORD_CREATED | INVOICE_ISSUED | CHARGE_SENT | CONTRACT_CHANGED
+/// action: LOGIN | CREATED | UPDATED | REVERTED | RESTORED | CANCELLED | APPOINTMENT_COMPLETED |
+///         PROCEDURE_REGISTERED | MEDICAL_RECORD_CREATED | INVOICE_ISSUED | CHARGE_SENT | CONTRACT_CHANGED
+/// metadata: JSON opcional — { before, after, fieldsChanged } para restore e diff na auditoria
 model TimelineEvent {
-  id          String   @id @default(cuid())
-  tenantId    String
-  entityType  String
-  entityId    String
-  action      String
-  description String
-  createdAt   DateTime @default(now())
-  createdBy   String?
+  id            String   @id @default(cuid())
+  tenantId      String
+  entityType    String
+  entityId      String
+  action        String
+  description   String
+  /// JSON: { before?, after?, fieldsChanged? }
+  metadata      String?
+  /// Agrupa operações compostas (ex.: walk-in = patient + appointment)
+  correlationId String?
+  /// Evento original que esta operação desfez/compensou
+  reversesId    String?
+  /// Indica se restore administrativo é permitido (Pacote C+)
+  reversible    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  createdBy     String?
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId, createdAt])
   @@index([entityType, entityId])
+  @@index([correlationId])
 }
 
 /// Assinatura recorrente vinculada a beneficiario e/ou empresa.

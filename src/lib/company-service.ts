@@ -1,6 +1,8 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { companyStatusLabel, isCompanyStatus } from "@/lib/company-crm";
+import { buildChangeMetadata } from "@/lib/change-management";
+import { snapshotCompany } from "@/lib/change-management/snapshots";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { isValidCnpj, normalizeCnpj } from "@/lib/validation/br-documents";
 
@@ -176,6 +178,8 @@ export async function updateCompany(
     if (dup) return { error: "CNPJ já cadastrado" as const };
   }
 
+  const beforeSnapshot = snapshotCompany(existing);
+
   const company = await prisma.company.update({
     where: { id: existing.id },
     data: {
@@ -195,6 +199,8 @@ export async function updateCompany(
     action: TIMELINE_ACTIONS.UPDATED,
     description: `Empresa ${company.name} atualizada`,
     createdBy: input.createdBy,
+    metadata: buildChangeMetadata(beforeSnapshot, snapshotCompany(company)),
+    reversible: true,
   });
 
   return { company: mapCompany(company) };
