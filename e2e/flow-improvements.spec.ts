@@ -22,19 +22,19 @@ test.describe("Portal Prestador — confirmar presença", () => {
 
   test("botão Paciente presente na tela de atendimento", async ({ page }) => {
     await page.goto("/prestador");
-    const link = page.getByRole("link").filter({ hasText: /atendimento|consulta|\d{2}:\d{2}/i }).first();
-    if (!(await link.isVisible())) {
-      test.skip();
-      return;
-    }
+    await expect(page.getByRole("heading", { name: /Agenda de hoje/i })).toBeVisible();
+
+    const agendadoCard = page.locator("li").filter({ hasText: "AGENDADO" }).first();
+    await expect(agendadoCard).toBeVisible({ timeout: 15_000 });
+
+    const link = agendadoCard.getByRole("link", { name: /Abrir atendimento/i });
     await link.click();
     await expect(page).toHaveURL(/\/prestador\/atendimento\//);
 
     const presentBtn = page.getByRole("button", { name: /Paciente presente/i });
-    if (await presentBtn.isVisible()) {
-      await presentBtn.click();
-      await expect(page.getByText(/presença do paciente confirmada/i)).toBeVisible();
-    }
+    await expect(presentBtn).toBeVisible();
+    await presentBtn.click();
+    await expect(page.getByText(/presença do paciente confirmada/i)).toBeVisible();
   });
 });
 

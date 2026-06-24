@@ -13,7 +13,13 @@ export async function POST(request: Request) {
     }
 
     const user = await requireUser();
-    const body = (await request.json()) as AssistantConfirmRequest;
+
+    let body: AssistantConfirmRequest;
+    try {
+      body = (await request.json()) as AssistantConfirmRequest;
+    } catch {
+      return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
+    }
 
     if (!body.pendingActionId?.trim()) {
       return NextResponse.json({ error: "pendingActionId obrigatório." }, { status: 400 });

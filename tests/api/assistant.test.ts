@@ -62,6 +62,19 @@ describe("API — /api/assistant/chat", () => {
     expect(res.status).toBe(400);
   });
 
+  it("rejeita corpo JSON inválido", async () => {
+    await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
+    const res = await chatPost(
+      new Request("http://localhost/api/assistant/chat", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "",
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toBe("Requisição inválida");
+  });
+
   it("retorna 503 quando assistente desabilitado", async () => {
     vi.stubEnv("ASSISTANT_ENABLED", "false");
     await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
@@ -200,6 +213,19 @@ describe("API — /api/assistant/confirm", () => {
       }),
     );
     expect(res.status).toBe(400);
+  });
+
+  it("rejeita corpo JSON inválido", async () => {
+    await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
+    const res = await confirmPost(
+      new Request("http://localhost/api/assistant/confirm", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: "",
+      }),
+    );
+    expect(res.status).toBe(400);
+    expect((await res.json()).error).toBe("Requisição inválida");
   });
 
   it("cancela ação pendente", async () => {

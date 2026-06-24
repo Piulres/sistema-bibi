@@ -39,7 +39,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Portal não suportado pelo assistente." }, { status: 403 });
     }
 
-    const body = (await request.json()) as AssistantChatRequest;
+    let body: AssistantChatRequest;
+    try {
+      body = (await request.json()) as AssistantChatRequest;
+    } catch {
+      return NextResponse.json({ error: "Requisição inválida" }, { status: 400 });
+    }
     const messages = parseMessages(body.messages);
     if (messages.length === 0 || messages[messages.length - 1]?.role !== "user") {
       return NextResponse.json({ error: "Envie ao menos uma mensagem do usuário." }, { status: 400 });
