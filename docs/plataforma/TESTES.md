@@ -246,6 +246,9 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `mobile-nav.spec.ts` | Landing drawer (altura full-screen, links CTAs) + drawers mobile interno, PJ, beneficiário e prestador |
+
+Helpers: `e2e/helpers/auth.ts` — `internoNav`, `internoNavDrawer` (abre drawer se necessário).
 
 ---
 
