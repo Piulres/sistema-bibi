@@ -19,8 +19,12 @@ Consultórios e redes odontológicas corporativas.
 |-------|--------|--------|
 | Interno | `operacao@smile.demo` | Smile Odonto |
 | Prestador | `dra.camila@smile.demo` | Smile Odonto |
+| Beneficiário | `paciente@smile.demo` | Smile Odonto |
+| Empresa PJ | `rh@corpodont.demo` | Smile Odonto |
 
 Senha: **`bibi123`**
+
+Catálogo demo: consulta, profilaxia, canal, ortodontia, implante, clareamento e cirurgia oral. Massa operacional com histórico e agendamentos futuros.
 
 ## Pesquisa
 
@@ -28,4 +32,5 @@ Senha: **`bibi123`**
 
 ## Código
 
-- Landing: `/?niche=DENTAL`
+- Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`
+- Landing: `/?tenant=smile`

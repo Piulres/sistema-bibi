@@ -125,11 +125,26 @@ describe("niche seed demos", () => {
     expect(dental?.procedures.find((p) => p.code === "DEN-CON")?.basePrice).toBe(350);
     expect(legal?.procedures.find((p) => p.code === "LEG-HT")?.basePrice).toBe(500);
     expect(vet?.procedures.find((p) => p.code === "VET-BAN")?.basePrice).toBe(150);
+    expect(vet?.procedures.find((p) => p.code === "VET-CIR-CAS")?.basePrice).toBe(450);
+  });
+
+  it("cobre catálogos expandidos em todos os nichos demo", () => {
+    for (const demo of NICHE_DEMOS) {
+      expect(demo.procedures.length).toBeGreaterThanOrEqual(12);
+      expect(demo.providers.length).toBeGreaterThanOrEqual(3);
+    }
   });
 
   it("cobre os cinco nichos além de MEDICAL", () => {
     expect(NICHE_DEMOS.map((d) => d.niche).sort()).toEqual(
       ["DENTAL", "EDUCATION", "LEGAL", "SPA", "VET"].sort(),
     );
+  });
+
+  it("PetCare não usa override Banho/Tosa na agenda", () => {
+    const vet = NICHE_DEMOS.find((d) => d.niche === "VET");
+    expect(vet?.slug).toBe("petcare");
+    expect(vet?.procedures.some((p) => p.code === "VET-CON")).toBe(true);
+    expect(vet?.procedures.some((p) => p.code === "VET-EMER")).toBe(true);
   });
 });
