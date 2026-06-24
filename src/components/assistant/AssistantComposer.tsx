@@ -1,55 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Button from "@/components/ui/Button";
 import { useAssistant } from "@/components/assistant/AssistantProvider";
+import { useLabels } from "@/hooks/useLabels";
+import { buildPortalUiCopy } from "@/lib/assistant/portal-ui";
 import type { PortalKey } from "@/lib/roles";
-
-const SUGGESTIONS: Record<PortalKey, string[]> = {
-  interno: [
-    "Agendamentos de hoje",
-    "Quantas consultas temos hoje?",
-    "Receita de ontem",
-    "Quanto faturamos hoje?",
-    "Quem está devendo?",
-    "Pendências financeiras",
-    "Resumo do dashboard",
-    "Panorama da operação",
-    "Listar usuários",
-    "Como criar um paciente?",
-    "Como faturar?",
-    "Agendamentos hoje e quem deve",
-  ],
-  prestador: [
-    "Minha agenda de hoje",
-    "O que tenho hoje?",
-    "Resumo do dashboard",
-    "Meus pacientes",
-    "Carteira de pacientes",
-    "Extrato do mês",
-    "Quanto recebi?",
-    "Próximos pacientes",
-  ],
-  pj: [
-    "Resumo da empresa",
-    "Visão geral",
-    "Beneficiários da empresa",
-    "Colaboradores ativos",
-    "Faturas em aberto",
-    "O que devemos?",
-    "Boletos pendentes",
-  ],
-  beneficiario: [
-    "Meu resumo",
-    "Como estou?",
-    "Próximos agendamentos",
-    "Minha agenda",
-    "Minhas faturas",
-    "O que devo?",
-    "Horários disponíveis hoje",
-    "Quero agendar",
-  ],
-};
 
 type Props = {
   portal: PortalKey;
@@ -57,7 +13,10 @@ type Props = {
 
 export default function AssistantComposer({ portal }: Props) {
   const { sendMessage, loading } = useAssistant();
+  const { labels } = useLabels();
   const [input, setInput] = useState("");
+
+  const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -67,12 +26,10 @@ export default function AssistantComposer({ portal }: Props) {
     await sendMessage(value);
   }
 
-  const chips = SUGGESTIONS[portal] ?? SUGGESTIONS.interno;
-
   return (
     <div className="border-t border-[var(--border-muted)] bg-[var(--surface-card)] p-3">
       <div className="mb-2 flex max-h-24 flex-wrap gap-1.5 overflow-y-auto">
-        {chips.map((chip) => (
+        {copy.suggestions.map((chip) => (
           <button
             key={chip}
             type="button"
@@ -88,7 +45,7 @@ export default function AssistantComposer({ portal }: Props) {
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Pergunte ou peça uma ação…"
+          placeholder={copy.placeholder}
           disabled={loading}
           className="min-w-0 flex-1 rounded-lg border border-[var(--border-muted)] bg-[var(--surface-page)] px-3 py-2 text-sm text-[var(--text-primary)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
           aria-label="Mensagem para o assistente"

@@ -8,7 +8,6 @@ import { getRevenueSummary } from "@/lib/assistant/queries/revenue";
 import { listDebtors } from "@/lib/assistant/queries/debtors";
 import { dayRange, formatDateLabel, parseAssistantDate } from "@/lib/assistant/dates";
 
-import { searchKnowledge, formatKnowledgeAnswer } from "@/lib/assistant/rag/knowledge";
 import { formatChoiceQuestion, resolveFromOptions } from "@/lib/assistant/resolve-entities";
 
 export const internoReadTools: AssistantToolDefinition[] = [
@@ -215,26 +214,6 @@ export const internoReadTools: AssistantToolDefinition[] = [
           name: p.label,
           detail: p.detail ?? null,
         })),
-      };
-    },
-  },
-  {
-    name: "explain_capability",
-    description: "Explica como fazer algo na plataforma (fluxos, cadastros, faturamento) usando a base de conhecimento.",
-    parameters: {
-      type: "object",
-      properties: {
-        topic: { type: "string", description: "Tópico ou pergunta (ex: como faturar, criar paciente)" },
-      },
-      required: ["topic"],
-    },
-    handler: async (_ctx, args) => {
-      const topic = ((args as { topic?: string }).topic ?? "").trim();
-      const chunks = searchKnowledge(topic, 3);
-      return {
-        topic,
-        answer: formatKnowledgeAnswer(topic, chunks),
-        sources: chunks.map((c) => ({ title: c.title, source: c.source })),
       };
     },
   },

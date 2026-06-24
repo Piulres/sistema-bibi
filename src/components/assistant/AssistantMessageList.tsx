@@ -1,6 +1,10 @@
 "use client";
 
+import { useMemo } from "react";
 import type { AssistantMessage } from "@/lib/assistant/types";
+import { useLabels } from "@/hooks/useLabels";
+import { buildPortalUiCopy } from "@/lib/assistant/portal-ui";
+import type { PortalKey } from "@/lib/roles";
 
 function renderInlineMarkdown(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -34,20 +38,23 @@ function MessageBlock({ message }: { message: AssistantMessage }) {
 }
 
 type Props = {
+  portal: PortalKey;
   messages: AssistantMessage[];
   loading: boolean;
 };
 
-export default function AssistantMessageList({ messages, loading }: Props) {
+export default function AssistantMessageList({ portal, messages, loading }: Props) {
+  const { labels } = useLabels();
+  const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
+
   if (messages.length === 0 && !loading) {
     return (
       <div className="flex flex-1 flex-col justify-end gap-3 p-4 text-sm text-[var(--text-muted)]">
-        <p>Pergunte em linguagem natural, por exemplo:</p>
+        <p>{copy.emptyIntro}</p>
         <ul className="list-disc space-y-1 pl-4">
-          <li>Quantos agendamentos temos hoje?</li>
-          <li>Qual a receita de ontem?</li>
-          <li>Quem está devendo?</li>
-          <li>Resumo do dashboard</li>
+          {copy.emptyExamples.map((example) => (
+            <li key={example}>{example}</li>
+          ))}
         </ul>
       </div>
     );
@@ -60,7 +67,7 @@ export default function AssistantMessageList({ messages, loading }: Props) {
       ))}
       {loading && (
         <div className="text-sm text-[var(--text-muted)]" aria-live="polite">
-          Consultando dados…
+          {copy.loading}
         </div>
       )}
     </div>

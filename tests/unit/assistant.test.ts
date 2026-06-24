@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeEach } from "vitest";
 import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
-import { filterToolsForUser } from "@/lib/assistant/tools/registry";
+import { filterToolsForUser, getToolsForUser } from "@/lib/assistant/tools/registry";
 import { internoReadTools } from "@/lib/assistant/tools/interno/read";
 import { internoWriteTools } from "@/lib/assistant/tools/interno/write";
 import { prestadorReadTools } from "@/lib/assistant/tools/prestador/read";
@@ -113,7 +113,7 @@ describe("assistant RBAC", () => {
 
 describe("assistant mock variations", () => {
   const user = adminUser();
-  const tools = [...internoReadTools, ...internoWriteTools];
+  const tools = getToolsForUser(user);
   const toolNames = new Set(tools.map((t) => t.name));
 
   beforeEach(() => {
@@ -430,6 +430,41 @@ describe("appointment draft resolver", () => {
       },
     });
     expect("result" in result && result.result && "__assistant_choices" in result.result).toBe(true);
+  });
+});
+
+describe("assistant portal concepts", () => {
+  it("roteia ajuda no portal prestador", () => {
+    const user = baseUser({ role: "PRESTADOR" });
+    clearMockContext(user.id);
+    const tools = getToolsForUser(user);
+    const plan = planMockFromIntents(
+      "como funciona minha agenda?",
+      user,
+      new Set(tools.map((t) => t.name)),
+    );
+    expect(plan.toolCalls[0]?.name).toBe("explain_capability");
+  });
+
+  it("roteia ajuda no portal beneficiário", () => {
+    const user = baseUser({ role: "BENEFICIARIO", patientId: "p1" });
+    clearMockContext(user.id);
+    const tools = getToolsForUser(user);
+    const plan = planMockFromIntents(
+      "como agendar consulta?",
+      user,
+      new Set(tools.map((t) => t.name)),
+    );
+    expect(plan.toolCalls[0]?.name).toBe("explain_capability");
+  });
+
+  it("buildPortalUiCopy adapta chips ao nicho VET", async () => {
+    const { buildPortalUiCopy } = await import("@/lib/assistant/portal-ui");
+    const copy = buildPortalUiCopy("beneficiario", NICHE_MASTER_LABELS.VET);
+    expect(
+      copy.suggestions.some((s) => /pet|tutor|atendimento/i.test(s)) ||
+        copy.emptyExamples.some((s) => /pet|tutor|atendimento/i.test(s)),
+    ).toBe(true);
   });
 });
 

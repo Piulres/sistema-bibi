@@ -242,7 +242,12 @@ export function formatToolResult(
   }
 }
 
-export function buildActions(toolName: string, result: unknown, role: string): AssistantAction[] {
+export function buildActions(
+  toolName: string,
+  result: unknown,
+  role: string,
+  labels?: SessionUser["labels"],
+): AssistantAction[] {
   if (isDraftToolResult(result)) {
     const actions: AssistantAction[] = [
       {
@@ -279,7 +284,7 @@ export function buildActions(toolName: string, result: unknown, role: string): A
       {
         type: "table",
         title: "Pendências financeiras",
-        columns: ["Beneficiário", "Valor", "Detalhe"],
+        columns: [labels?.beneficiary ?? "Beneficiário", "Valor", "Detalhe"],
         rows: data.debtors.map((d) => [d.patientName, d.amountLabel, d.detail]),
       },
       { type: "link", label: "Abrir faturamento", href: "/interno" },
@@ -294,7 +299,7 @@ export function buildActions(toolName: string, result: unknown, role: string): A
     get_prestador_dashboard: { label: "Minha agenda", href: "/prestador" },
     get_extrato_summary: { label: "Extrato", href: "/prestador/extrato" },
     get_pj_overview: { label: "Portal PJ", href: "/pj" },
-    get_open_invoices: { label: "Faturas", href: "/pj?section=faturas" },
+    get_open_invoices: { label: "Faturas", href: "/pj#faturas" },
     get_my_overview: { label: "Meu resumo", href: "/beneficiario/resumo" },
     list_available_slots: { label: "Agendar", href: "/beneficiario/agendar" },
   };

@@ -102,7 +102,7 @@ export async function runAssistantChat(input: {
 
       const formatted = formatToolResult(call.name, result, input.user.labels);
       sections.push(formatted ?? JSON.stringify(result, null, 2));
-      actions = [...(actions ?? []), ...buildActions(call.name, result, input.user.role)];
+      actions = [...(actions ?? []), ...buildActions(call.name, result, input.user.role, input.user.labels)];
     } catch (error) {
       const message =
         error instanceof AssistantPermissionError

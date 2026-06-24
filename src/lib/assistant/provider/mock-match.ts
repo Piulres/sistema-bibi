@@ -3,6 +3,7 @@ import type { AssistantPlan, AssistantToolCall } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
 import {
   MOCK_INTENTS,
+  SHARED,
   type MockIntentDef,
 } from "@/lib/assistant/provider/mock-intents";
 import {
@@ -25,9 +26,12 @@ import {
   rememberLastIntent,
   rememberOperationDraft,
   clearPendingChoice,
-  resolveFollowUpTool,
   clearMockContext,
 } from "@/lib/assistant/provider/mock-context";
+import {
+  buildPortalHelpFallback,
+  resolvePortalFollowUpTool,
+} from "@/lib/assistant/portal-concepts";
 import { formatChoiceQuestion } from "@/lib/assistant/resolve-entities";
 import {
   isDraftToolName,
@@ -180,7 +184,7 @@ function matchIntentOnSegment(
         arguments: buildDefaultArgs(lastTool, rawSegment, text || segment),
       };
     }
-    const switched = resolveFollowUpTool(text, lastTool);
+    const switched = resolvePortalFollowUpTool(user.role, text, lastTool);
     if (switched && toolNames.has(switched)) {
       return { name: switched, arguments: buildDefaultArgs(switched, rawSegment, text) };
     }
@@ -192,6 +196,21 @@ function matchIntentOnSegment(
     const args = matchSpecial(intent, rawSegment);
     if (args === null) continue;
     return { name: intent.tool, arguments: args };
+  }
+
+  if (
+    toolNames.has("explain_capability") &&
+    matchesAnyTrigger(text, SHARED.help) &&
+    !/\b(como esta|como está|como andam)\b/.test(text) &&
+    (/\b(como fazer|como criar|como cadastrar|como agendar|como faturar|onde |passo a passo|tutorial|manual|me ajuda)\b/.test(
+      text,
+    ) ||
+      /^como\s+(faturar|agendar|cadastrar|criar|incluir|pagar)\b/.test(text))
+  ) {
+    return {
+      name: "explain_capability",
+      arguments: { topic: rawSegment.trim() },
+    };
   }
 
   let best: { intent: MockIntentDef; score: number } | null = null;
@@ -252,7 +271,7 @@ export function planMockFromIntents(
     }
     return {
       toolCalls: [],
-      fallback: buildHelpFallback(user.role, toolNames, activeDraft?.tool),
+      fallback: buildPortalHelpFallback(user.role, user.labels, toolNames, activeDraft?.tool),
     };
   }
 
@@ -262,35 +281,3 @@ export function planMockFromIntents(
 }
 
 export { clearMockContext };
-
-function buildHelpFallback(role: string, toolNames: Set<string>, activeDraftTool?: string): string {
-  if (activeDraftTool === "draft_create_appointment" || activeDraftTool === "draft_book_appointment") {
-    return [
-      "Continuando o agendamento — me diga o que falta:",
-      "• Nome do paciente (ex.: *para João Pereira*)",
-      "• Procedimento (ex.: *eletrocardiograma*) — se for marcar por exame",
-      "• Prestador (ex.: *com Dra. Helena*) — ou *não sei* para ver a lista",
-      "• Data e hora (ex.: *amanhã às 15h*)",
-    ].join("\n");
-  }
-
-  const examples: Record<string, string[]> = {
-    INTERNO: [
-      "Agendamentos de hoje",
-      "Receita de ontem",
-      "Quem está devendo?",
-      "Criar usuário nome email@x.com senha bibi123 prestador",
-    ],
-    PRESTADOR: ["Minha agenda de hoje", "Meus pacientes", "Extrato do mês"],
-    PJ: ["Resumo da empresa", "Faturas em aberto", "Beneficiários"],
-    BENEFICIARIO: ["Meu resumo", "Próximos agendamentos", "Horários disponíveis hoje"],
-  };
-  const hints = examples[role] ?? examples.INTERNO;
-  const available = [...toolNames].slice(0, 8).join(", ");
-  return [
-    "Não entendi bem. Tente algo como:",
-    ...hints.map((h) => `• ${h}`),
-    "",
-    `Operações disponíveis no seu perfil: ${available}.`,
-  ].join("\n");
-}

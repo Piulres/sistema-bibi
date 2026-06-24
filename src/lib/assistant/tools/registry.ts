@@ -7,17 +7,21 @@ import { internoWriteTools } from "@/lib/assistant/tools/interno/write";
 import { prestadorReadTools } from "@/lib/assistant/tools/prestador/read";
 import { pjReadTools } from "@/lib/assistant/tools/pj/read";
 import { beneficiarioReadTools } from "@/lib/assistant/tools/beneficiario/read";
+import { explainCapabilityTool } from "@/lib/assistant/tools/shared/help";
 
 export function getToolsForUser(user: SessionUser): AssistantToolDefinition[] {
   switch (user.role) {
     case "INTERNO":
-      return filterToolsForUser([...internoReadTools, ...internoWriteTools], user);
+      return filterToolsForUser(
+        [...internoReadTools, ...internoWriteTools, explainCapabilityTool],
+        user,
+      );
     case "PRESTADOR":
-      return filterToolsForUser(prestadorReadTools, user);
+      return filterToolsForUser([...prestadorReadTools, explainCapabilityTool], user);
     case "PJ":
-      return filterToolsForUser(pjReadTools, user);
+      return filterToolsForUser([...pjReadTools, explainCapabilityTool], user);
     case "BENEFICIARIO":
-      return filterToolsForUser(beneficiarioReadTools, user);
+      return filterToolsForUser([...beneficiarioReadTools, explainCapabilityTool], user);
     default:
       return [];
   }

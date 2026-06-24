@@ -342,6 +342,24 @@ export const MOCK_INTENTS: readonly MockIntentDef[] = [
     triggers: SHARED.help,
   },
   {
+    tool: "explain_capability",
+    roles: ["PRESTADOR"],
+    priority: 12,
+    triggers: SHARED.help,
+  },
+  {
+    tool: "explain_capability",
+    roles: ["PJ"],
+    priority: 12,
+    triggers: SHARED.help,
+  },
+  {
+    tool: "explain_capability",
+    roles: ["BENEFICIARIO"],
+    priority: 12,
+    triggers: SHARED.help,
+  },
+  {
     tool: "draft_create_user",
     roles: ["INTERNO"],
     special: "create_user",

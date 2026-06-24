@@ -21,6 +21,10 @@ export default function AssistantActionCard({ actions }: Props) {
     <div className="space-y-2 border-t border-[var(--border-muted)] p-3">
       {actions.map((action, index) => {
         if (action.type === "confirm") {
+          const needsPassword =
+            action.title.toLowerCase().includes("usuário") ||
+            action.title.toLowerCase().includes("usuario") ||
+            "Perfil" in action.summary;
           return (
             <Card key={`confirm-${index}`} className="space-y-3 p-3">
               <p className="text-sm font-semibold text-[var(--text-primary)]">{action.title}</p>
@@ -32,13 +36,15 @@ export default function AssistantActionCard({ actions }: Props) {
                   </div>
                 ))}
               </dl>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Senha (se criação de usuário)"
-                className="w-full rounded-lg border border-[var(--border-muted)] px-3 py-2 text-xs"
-              />
+              {needsPassword && (
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Senha inicial do usuário"
+                  className="w-full rounded-lg border border-[var(--border-muted)] px-3 py-2 text-xs"
+                />
+              )}
               <div className="flex gap-2">
                 <Button
                   size="sm"

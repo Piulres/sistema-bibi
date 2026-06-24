@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import Alert from "@/components/ui/Alert";
 import { useAssistant } from "@/components/assistant/AssistantProvider";
 import AssistantMessageList from "@/components/assistant/AssistantMessageList";
 import AssistantActionCard from "@/components/assistant/AssistantActionCard";
 import AssistantComposer from "@/components/assistant/AssistantComposer";
+import { useLabels } from "@/hooks/useLabels";
+import { buildPortalUiCopy } from "@/lib/assistant/portal-ui";
 import type { PortalKey } from "@/lib/roles";
 
 type Props = {
@@ -14,6 +16,8 @@ type Props = {
 
 export default function AssistantPanel({ portal }: Props) {
   const { open, setOpen, messages, actions, loading, error } = useAssistant();
+  const { labels } = useLabels();
+  const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,8 +47,8 @@ export default function AssistantPanel({ portal }: Props) {
       >
         <header className="flex items-center justify-between border-b border-[var(--border-muted)] px-4 py-3">
           <div>
-            <p className="text-sm font-semibold text-[var(--text-primary)]">Assistente</p>
-            <p className="text-xs text-[var(--text-muted)]">Consultas operacionais guiadas</p>
+            <p className="text-sm font-semibold text-[var(--text-primary)]">{copy.title}</p>
+            <p className="text-xs text-[var(--text-muted)]">{copy.subtitle}</p>
           </div>
           <button
             type="button"
@@ -62,7 +66,7 @@ export default function AssistantPanel({ portal }: Props) {
           </div>
         )}
 
-        <AssistantMessageList messages={messages} loading={loading} />
+        <AssistantMessageList portal={portal} messages={messages} loading={loading} />
         <AssistantActionCard actions={actions} />
         <AssistantComposer portal={portal} />
       </aside>
