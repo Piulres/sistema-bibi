@@ -274,6 +274,8 @@ npm run test && npm run build
 CI=true npm run test:e2e
 ```
 
+`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
 ---
