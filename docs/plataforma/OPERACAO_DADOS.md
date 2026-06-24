@@ -67,6 +67,8 @@ npm run db:setup
 npm run db:verify
 ```
 
+**CI e pre-release:** `npm run pre-release` e o GitHub Actions rodam `db:bootstrap:demo` (`SEED_SCALE=small`) antes de `db:verify`. Não pule o bootstrap — `db:verify` falha se `operation.db` ou o espelho `dev.db` estiverem ausentes.
+
 **Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.
 
 ```bash

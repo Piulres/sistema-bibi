@@ -487,7 +487,7 @@ src/
 → `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
 
 **Como valido um pacote antes de publicar na Netlify?**
-→ `npm run pre-release` (lint + build Netlify local, sem publicar). Ver `docs/plataforma/OPERACOES.md`.
+→ `npm run pre-release` (lint + docs + bootstrap dual-store + `db:verify` + test + build Netlify, sem publicar). Ver `docs/plataforma/OPERACOES.md` §4.4.
 
 **Por que produção retorna 503?**
 → Se o corpo for `usage_exceeded`, a cota Netlify esgotou — não é bug. Dev local continua normal.

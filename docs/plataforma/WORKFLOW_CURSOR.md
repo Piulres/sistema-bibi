@@ -87,10 +87,16 @@ Evidências gravadas: [`../evidencias/`](../evidencias/).
 npm run pre-release
 ```
 
-Executa, em sequência:
+Executa, em sequência (`scripts/pre-release.mjs`):
 
 1. `npm run lint`
-2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+2. `npm run docs:verify`
+3. `npm run db:bootstrap:demo` (`SEED_SCALE=small` por padrão)
+4. `npm run db:verify` (dual-store: `demo.db` + `operation.db` + espelho `dev.db`)
+5. `npm test` (Vitest)
+6. `npm run netlify:build` (mesmo pipeline do deploy Netlify)
+
+> E2E Playwright **não** roda no `pre-release` — espelhe o job `e2e` do CI com `CI=true npm run test:e2e` quando necessário.
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 
