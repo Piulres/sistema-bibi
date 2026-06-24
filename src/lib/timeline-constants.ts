@@ -54,6 +54,7 @@ export const TIMELINE_ACTIONS = {
   STOCK_DISPENSED: "STOCK_DISPENSED",
   STOCK_ADJUSTED: "STOCK_ADJUSTED",
   STOCK_LOSS: "STOCK_LOSS",
+  IMPORTED: "IMPORTED",
 } as const;
 
 export type TimelineEntityType =

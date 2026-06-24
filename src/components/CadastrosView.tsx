@@ -24,6 +24,7 @@ import {
   emptyUserProfessional,
 } from "@/components/cadastros/CadastroExtraFields";
 import ProtocolTemplatesPanel from "@/components/ProtocolTemplatesPanel";
+import ImportInterchangePanel from "@/components/cadastros/ImportInterchangePanel";
 import { useLabels } from "@/hooks/useLabels";
 import { buildCadastrosTabs } from "@/lib/navigation/niche-nav";
 
@@ -474,6 +475,11 @@ export default function CadastrosView() {
 
       {tab === "patients" && (
         <div className="grid gap-6 lg:grid-cols-2">
+          <ImportInterchangePanel
+            entity="patients"
+            entityLabel={labels.patient}
+            onImported={load}
+          />
           <Card>
             <SectionHeader title="Novo beneficiário" />
             <form onSubmit={submitPatient} className="mt-4 space-y-3">
@@ -666,6 +672,7 @@ export default function CadastrosView() {
 
       {tab === "companies" && (
         <div className="grid gap-6 lg:grid-cols-2">
+          <ImportInterchangePanel entity="companies" entityLabel="Empresas PJ" onImported={load} />
           <Card>
             <SectionHeader title="Nova empresa" description="Razão social e CNPJ são obrigatórios (padrão mercado B2B)." />
             <form onSubmit={submitCompany} className="mt-4 space-y-3">
@@ -801,6 +808,11 @@ export default function CadastrosView() {
 
       {tab === "procedures" && (
         <div className="grid gap-6 lg:grid-cols-2">
+          <ImportInterchangePanel
+            entity="procedures"
+            entityLabel={labels.procedure}
+            onImported={load}
+          />
           <Card>
             <SectionHeader title="Novo procedimento" />
             <form onSubmit={submitProcedure} className="mt-4 space-y-3">

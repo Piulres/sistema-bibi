@@ -64,6 +64,7 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     create: [
       ui("Cadastrar beneficiário", "/interno/cadastros → Beneficiários", "POST /api/interno/patients"),
       ui("Walk-in particular", "/interno/agenda → walk-in", "POST /api/interno/patients"),
+      ui("Importar lote JSON/CSV", "/interno/cadastros → Importar", "POST /api/interno/import/patients"),
     ],
     read: [
       ui("Listar cadastros", "/interno/cadastros", "GET /api/interno/patients"),
@@ -78,7 +79,10 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     entity: "Empresa (PJ)",
     portal: "Interno",
     description: "Clientes corporativos e pipeline comercial.",
-    create: [ui("Nova empresa", "/interno/cadastros → Empresas", "POST /api/interno/companies")],
+    create: [
+      ui("Nova empresa", "/interno/cadastros → Empresas", "POST /api/interno/companies"),
+      ui("Importar lote JSON/CSV", "/interno/cadastros → Importar", "POST /api/interno/import/companies"),
+    ],
     read: [
       ui("Listar empresas", "/interno/cadastros", "GET /api/interno/companies"),
       ui("Pipeline CRM", "/interno/crm", "GET /api/interno/crm/pipeline"),
@@ -92,7 +96,10 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
   {
     entity: "Procedimento (catálogo)",
     portal: "Interno",
-    create: [ui("Novo procedimento", "/interno/cadastros → Procedimentos", "POST /api/interno/procedures")],
+    create: [
+      ui("Novo procedimento", "/interno/cadastros → Procedimentos", "POST /api/interno/procedures"),
+      ui("Importar lote JSON/CSV", "/interno/cadastros → Importar", "POST /api/interno/import/procedures"),
+    ],
     read: [
       ui("Catálogo interno", "/interno/cadastros", "GET /api/interno/procedures"),
       ui("Catálogo prestador", "/prestador/atendimento/[id]", "GET /api/procedures"),
