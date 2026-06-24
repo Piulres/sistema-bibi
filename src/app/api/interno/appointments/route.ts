@@ -8,6 +8,7 @@ import {
 } from "@/lib/appointment-service";
 import { isAppointmentModality } from "@/lib/telemedicine";
 import { listPatients } from "@/lib/patient-service";
+import { listProcedures } from "@/lib/procedure-service";
 
 export async function GET(request: Request) {
   try {
@@ -23,13 +24,14 @@ export async function GET(request: Request) {
       to = new Date(`${dateParam}T23:59:59.999`);
     }
 
-    const [appointments, providers, patients] = await Promise.all([
+    const [appointments, providers, patients, procedures] = await Promise.all([
       listAppointments({ tenantId: user.tenantId, from, to, providerId }),
       listProviders(user.tenantId),
       listPatients(user.tenantId),
+      listProcedures(user.tenantId),
     ]);
 
-    return NextResponse.json({ appointments, providers, patients });
+    return NextResponse.json({ appointments, providers, patients, procedures });
   } catch (error) {
     return authErrorResponse(error);
   }
@@ -41,15 +43,23 @@ export async function POST(request: Request) {
     const body = (await request.json()) as {
       patientId?: string;
       providerId?: string;
+      procedureId?: string;
       scheduledAt?: string;
       reason?: string | null;
       status?: string;
       modality?: string;
+      autoAssignProvider?: boolean;
     };
 
-    if (!body.patientId || !body.providerId || !body.scheduledAt) {
+    if (!body.patientId || !body.scheduledAt) {
       return NextResponse.json(
-        { error: "Informe paciente, prestador e data/hora" },
+        { error: "Informe paciente e data/hora" },
+        { status: 400 },
+      );
+    }
+    if (!body.providerId && !body.autoAssignProvider) {
+      return NextResponse.json(
+        { error: "Informe o prestador ou marque atribuição automática" },
         { status: 400 },
       );
     }
@@ -64,10 +74,12 @@ export async function POST(request: Request) {
       tenantId: user.tenantId,
       patientId: body.patientId,
       providerId: body.providerId,
+      procedureId: body.procedureId,
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
       status: body.status,
       modality: body.modality,
+      autoAssignProvider: body.autoAssignProvider,
       createdBy: user.id,
     });
 

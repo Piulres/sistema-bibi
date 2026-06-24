@@ -67,8 +67,10 @@ export async function executePendingAction(
         tenantId: user.tenantId,
         patientId: payload.data.patientId,
         providerId: payload.data.providerId,
+        procedureId: payload.data.procedureId,
         scheduledAt: new Date(payload.data.scheduledAt),
         reason: payload.data.reason,
+        autoAssignProvider: payload.data.autoAssignProvider,
         createdBy: user.id,
       });
 
@@ -92,8 +94,10 @@ export async function executePendingAction(
         tenantId: user.tenantId,
         patientId: user.patientId,
         providerId: payload.data.providerId,
+        procedureId: payload.data.procedureId,
         scheduledAt: new Date(payload.data.scheduledAt),
         reason: payload.data.reason,
+        autoAssignProvider: payload.data.autoAssignProvider,
         createdBy: user.id,
       });
 

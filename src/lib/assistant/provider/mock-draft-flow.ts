@@ -112,35 +112,6 @@ export function getMissingFieldsForTool(
   }
 }
 
-const FIELD_LABELS: Record<string, Record<string, string>> = {
-  draft_create_appointment: {
-    patientName: "patient",
-    procedureName: "procedure",
-    providerName: "provider",
-    providerPick: "provider",
-    date: "date",
-    time: "time",
-  },
-  draft_book_appointment: {
-    procedureName: "procedure",
-    providerName: "provider",
-    providerPick: "provider",
-    date: "date",
-    time: "time",
-  },
-  draft_create_user: {
-    name: "name",
-    email: "email",
-    password: "password",
-    role: "role",
-  },
-  draft_create_patient: {
-    name: "name",
-    cpf: "cpf",
-    birthDate: "birthDate",
-  },
-};
-
 export function buildDraftGuidance(
   tool: string,
   missing: string[],

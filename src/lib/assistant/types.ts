@@ -69,22 +69,26 @@ export type PendingActionPayload =
         companyId?: string | null;
       };
     }
-  | {
+    | {
       type: "create_appointment";
       data: {
         patientId: string;
-        providerId: string;
+        providerId?: string;
+        procedureId?: string;
         scheduledAt: string;
         reason?: string | null;
+        autoAssignProvider?: boolean;
       };
     }
   | {
       type: "book_appointment";
       data: {
         patientId: string;
-        providerId: string;
+        providerId?: string;
+        procedureId?: string;
         scheduledAt: string;
         reason?: string | null;
+        autoAssignProvider?: boolean;
       };
     };
 

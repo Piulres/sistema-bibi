@@ -145,9 +145,14 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   const [msg, setMsg] = useState<string | null>(null);
   const [pixState, setPixState] = useState<PixState | null>(null);
   const [providers, setProviders] = useState<{ id: string; name: string }[]>([]);
-  const [slots, setSlots] = useState<{ start: string; label: string }[]>([]);
+  const [procedures, setProcedures] = useState<{ id: string; name: string }[]>([]);
+  const [slots, setSlots] = useState<
+    { start: string; label: string; providerId?: string; providerName?: string }[]
+  >([]);
   const [scheduleForm, setScheduleForm] = useState({
     providerId: "",
+    procedureId: "",
+    noProviderPreference: false,
     date: new Date().toISOString().slice(0, 10),
     slot: "",
     reason: "Consulta de rotina",
@@ -163,19 +168,22 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   useEffect(() => {
     let active = true;
     (async () => {
-      const [overviewRes, providersRes, clinicalRes] = await Promise.all([
+      const [overviewRes, providersRes, clinicalRes, proceduresRes] = await Promise.all([
         fetch("/api/beneficiario/overview"),
         fetch("/api/beneficiario/providers"),
         fetch("/api/beneficiario/clinical"),
+        fetch("/api/procedures"),
       ]);
       const overviewData = await overviewRes.json();
       const providersData = await providersRes.json();
       const clinicalData = await clinicalRes.json();
+      const proceduresData = await proceduresRes.json();
       if (!active) return;
       if (!overviewRes.ok) setError(overviewData.error ?? "Erro ao carregar seus dados");
       else setOverview(overviewData.overview);
       if (clinicalRes.ok) setClinical(clinicalData.clinical);
       setProviders(providersData.providers ?? []);
+      setProcedures(proceduresData.procedures ?? []);
       setLoading(false);
     })();
     return () => {
@@ -186,13 +194,18 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   useEffect(() => {
     let active = true;
     (async () => {
-      if (!scheduleForm.providerId || !scheduleForm.date) {
+      if (!scheduleForm.date) {
         if (active) setSlots([]);
         return;
       }
-      const res = await fetch(
-        `/api/beneficiario/slots?providerId=${scheduleForm.providerId}&date=${scheduleForm.date}`,
-      );
+      if (!scheduleForm.noProviderPreference && !scheduleForm.providerId) {
+        if (active) setSlots([]);
+        return;
+      }
+      const query = scheduleForm.noProviderPreference
+        ? `date=${scheduleForm.date}`
+        : `providerId=${scheduleForm.providerId}&date=${scheduleForm.date}`;
+      const res = await fetch(`/api/beneficiario/slots?${query}`);
       const data = await res.json();
       if (!active) return;
       setSlots(data.slots ?? []);
@@ -201,11 +214,12 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     return () => {
       active = false;
     };
-  }, [scheduleForm.providerId, scheduleForm.date]);
+  }, [scheduleForm.providerId, scheduleForm.date, scheduleForm.noProviderPreference]);
 
   async function bookAppointment(e: React.FormEvent) {
     e.preventDefault();
     if (!scheduleForm.slot) return;
+    const selectedSlot = slots.find((s) => s.start === scheduleForm.slot);
     setBusy("book");
     setMsg(null);
     try {
@@ -213,10 +227,14 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          providerId: scheduleForm.providerId,
+          providerId: scheduleForm.noProviderPreference
+            ? selectedSlot?.providerId
+            : scheduleForm.providerId,
+          procedureId: scheduleForm.procedureId || undefined,
           scheduledAt: scheduleForm.slot,
           reason: scheduleForm.reason,
           modality: scheduleForm.modality,
+          autoAssignProvider: scheduleForm.noProviderPreference && !selectedSlot?.providerId,
         }),
       });
       const data = await res.json();
@@ -331,13 +349,44 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       <Card>
         <SectionHeader
           title="Agendar consulta"
-          description="Escolha prestador, data e horário disponível. A clínica confirma o agendamento."
+          description="Escolha o procedimento, data e horário. O prestador pode ser indicado ou atribuído automaticamente."
         />
         <form onSubmit={bookAppointment} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <label className="block text-sm">
+            <span className="text-[var(--text-secondary)]">Procedimento (opcional)</span>
+            <select
+              className="mt-1 w-full rounded border px-3 py-2"
+              value={scheduleForm.procedureId}
+              onChange={(e) => setScheduleForm({ ...scheduleForm, procedureId: e.target.value })}
+            >
+              <option value="">Não especificado</option>
+              {procedures.map((p) => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-sm sm:col-span-2 lg:col-span-4">
+            <input
+              type="checkbox"
+              checked={scheduleForm.noProviderPreference}
+              onChange={(e) =>
+                setScheduleForm({
+                  ...scheduleForm,
+                  noProviderPreference: e.target.checked,
+                  providerId: e.target.checked ? "" : scheduleForm.providerId,
+                  slot: "",
+                })
+              }
+            />
+            <span className="text-[var(--text-secondary)]">
+              Sem preferência de prestador (mostra horários de todos)
+            </span>
+          </label>
+          <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Prestador</span>
             <select
-              required
+              required={!scheduleForm.noProviderPreference}
+              disabled={scheduleForm.noProviderPreference}
               className="mt-1 w-full rounded border px-3 py-2"
               value={scheduleForm.providerId}
               onChange={(e) => setScheduleForm({ ...scheduleForm, providerId: e.target.value })}

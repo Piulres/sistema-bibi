@@ -155,6 +155,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         data: {
           patientId: ctx.user.patientId,
           providerId: finalData.providerId!,
+          procedureId: finalData.procedureId,
           scheduledAt: scheduled.toISOString(),
           reason,
         },

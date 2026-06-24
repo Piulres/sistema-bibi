@@ -211,6 +211,7 @@ export const internoWriteTools: AssistantToolDefinition[] = [
           data: {
             patientId: finalData.patientId!,
             providerId: finalData.providerId!,
+            procedureId: finalData.procedureId,
             scheduledAt: baseDate.toISOString(),
             reason,
           },
