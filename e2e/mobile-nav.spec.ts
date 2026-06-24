@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { loginAs, internoNav, internoNavDrawer } from "./helpers/auth";
+import { BENEFICIARIO_MOBILE_DRAWER_TITLE } from "./helpers/labels";
 
 test.describe("navegação responsiva", () => {
   test("interno: drawer mobile lista White Label", async ({ page }) => {
@@ -34,7 +35,7 @@ test.describe("navegação responsiva", () => {
 
     await expect(page.getByRole("button", { name: /resumo/i })).toBeVisible();
     await page.getByRole("button", { name: /resumo/i }).click();
-    const drawer = page.getByRole("navigation", { name: "Módulos do beneficiário" });
+    const drawer = page.getByRole("navigation", { name: BENEFICIARIO_MOBILE_DRAWER_TITLE });
     await expect(drawer).toBeVisible();
     await drawer.getByRole("link", { name: "Faturas" }).click();
     await expect(page).toHaveURL(/\/beneficiario\/faturas/);

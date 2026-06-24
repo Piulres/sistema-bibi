@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginAs, openInternoNav } from "./helpers/auth";
+import { MEDICAL_INTERNO_NAV } from "./helpers/labels";
 
 test.describe("RBAC — perfil RECEPCAO", () => {
   test.beforeEach(async ({ page }) => {
@@ -10,8 +11,8 @@ test.describe("RBAC — perfil RECEPCAO", () => {
   test("nav limitada: agenda e cadastros, sem faturamento", async ({ page }) => {
     await page.goto("/interno/dashboard");
     const nav = await openInternoNav(page);
-    await expect(nav.getByRole("link", { name: "Agenda", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Cadastros", exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: MEDICAL_INTERNO_NAV.appointments, exact: true })).toBeVisible();
+    await expect(nav.getByRole("link", { name: MEDICAL_INTERNO_NAV.cadastros, exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Comunicação", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Faturamento", exact: true })).toHaveCount(0);
     await expect(nav.getByRole("link", { name: "Integrações", exact: true })).toHaveCount(0);
@@ -40,7 +41,7 @@ test.describe("RBAC — perfil FATURAMENTO", () => {
     await expect(nav.getByRole("link", { name: "Faturamento", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Recorrência", exact: true })).toBeVisible();
     await expect(nav.getByRole("link", { name: "Relatórios", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Cadastros", exact: true })).toHaveCount(0);
+    await expect(nav.getByRole("link", { name: MEDICAL_INTERNO_NAV.cadastros, exact: true })).toHaveCount(0);
     await expect(nav.getByRole("link", { name: "Segurança", exact: true })).toHaveCount(0);
   });
 
