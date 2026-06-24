@@ -9,6 +9,7 @@ import { listDebtors } from "@/lib/assistant/queries/debtors";
 import { dayRange, formatDateLabel, parseAssistantDate } from "@/lib/assistant/dates";
 
 import { searchKnowledge, formatKnowledgeAnswer } from "@/lib/assistant/rag/knowledge";
+import { formatChoiceQuestion, resolveFromOptions } from "@/lib/assistant/resolve-entities";
 
 export const internoReadTools: AssistantToolDefinition[] = [
   {
@@ -148,6 +149,27 @@ export const internoReadTools: AssistantToolDefinition[] = [
           p.name.toLowerCase().includes(query) ||
           p.cpf.replace(/\D/g, "").includes(query.replace(/\D/g, "")),
       );
+      const options = matches.slice(0, 10).map((p) => ({
+        id: p.id,
+        label: p.name,
+        detail: [p.cpf, p.companyName].filter(Boolean).join(" · ") || undefined,
+      }));
+      const resolved = resolveFromOptions(options, query);
+
+      if (resolved.status === "ambiguous") {
+        return {
+          count: options.length,
+          guidance: formatChoiceQuestion(ctx.labels.patient.toLowerCase(), options),
+          patients: options.map((p) => ({
+            id: p.id,
+            name: p.label,
+            cpf: p.detail?.split(" · ")[0] ?? "",
+            companyName: p.detail?.includes(" · ") ? p.detail.split(" · ").slice(1).join(" · ") : null,
+            phone: null,
+          })),
+        };
+      }
+
       return {
         count: matches.length,
         patients: matches.slice(0, 10).map((p) => ({

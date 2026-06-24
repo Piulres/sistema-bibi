@@ -22,6 +22,8 @@ import { resolveInternoPermissions } from "@/lib/interno-permissions";
 import { mergeNicheLabels } from "@/lib/niche/labels";
 import { applyNicheBrandingDefaults } from "@/lib/niche/branding";
 import { isNicheId } from "@/lib/niche/types";
+import { resolveFromOptions } from "@/lib/assistant/resolve-entities";
+import { parseChoiceSelection } from "@/lib/assistant/provider/mock-extractors";
 import { DEMO_EMAILS } from "../helpers/seed-fixtures";
 import { getTestPrisma } from "../helpers/db";
 
@@ -213,6 +215,74 @@ describe("assistant draft multi-turn", () => {
     });
     expect(step3.actions?.some((a) => a.type === "confirm")).toBe(true);
     expect(step3.message.content).toMatch(/confirme/i);
+  });
+});
+
+describe("assistant disambiguation", () => {
+  it("parseChoiceSelection aceita número ou nome", () => {
+    const options = [
+      { id: "a", label: "João Pereira", detail: "111.222.333-44" },
+      { id: "b", label: "João Silva", detail: "999.000.111-22" },
+    ];
+    expect(parseChoiceSelection("2", options)).toBe("b");
+    expect(parseChoiceSelection("João Silva", options)).toBe("b");
+  });
+
+  it("resolveFromOptions detecta ambiguidade", () => {
+    const result = resolveFromOptions(
+      [
+        { id: "1", label: "Ana Costa" },
+        { id: "2", label: "Ana Lima" },
+      ],
+      "Ana",
+    );
+    expect(result.status).toBe("ambiguous");
+  });
+
+  it("pede escolha quando há vários pacientes com mesmo nome", async () => {
+    const prisma = getTestPrisma();
+    const dbUser = await prisma.user.findFirst({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+      include: { tenant: { include: { branding: true } } },
+    });
+    const niche = isNicheId(dbUser!.tenant!.niche) ? dbUser!.tenant!.niche : "MEDICAL";
+    const user: SessionUser = {
+      id: "disambig-user",
+      name: dbUser!.name,
+      email: dbUser!.email,
+      role: dbUser!.role,
+      tenantId: dbUser!.tenantId,
+      tenantSlug: dbUser!.tenant!.slug,
+      companyId: null,
+      patientId: null,
+      tenantName: dbUser!.tenant!.name,
+      companyName: null,
+      patientName: null,
+      internoProfile: dbUser!.internoProfile,
+      internoPermissions: resolveInternoPermissions(dbUser!.role, dbUser!.internoProfile),
+      branding: applyNicheBrandingDefaults(niche, CLINIC_BRANDING_DEFAULTS),
+      niche,
+      labels: mergeNicheLabels(niche, dbUser!.tenant!.labels),
+    };
+    clearMockContext(user.id);
+
+    const anaCount = await prisma.patient.count({
+      where: { tenantId: dbUser!.tenantId, name: { contains: "Ana" } },
+    });
+    if (anaCount < 2) return;
+
+    const result = await runAssistantChat({
+      user,
+      messages: [
+        {
+          role: "user",
+          content: "Agendar consulta para Ana amanhã às 10:00 com Dra Helena",
+        },
+      ],
+    });
+
+    expect(result.message.content).toMatch(/opções|Qual é a correta/i);
+    expect(result.actions?.some((a) => a.type === "choice")).toBe(true);
   });
 });
 

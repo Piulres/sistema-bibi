@@ -1,8 +1,6 @@
 import "server-only";
 import type { AssistantToolDefinition } from "@/lib/assistant/types";
 import { createPendingAction } from "@/lib/assistant/pending-actions";
-import { listPatients } from "@/lib/patient-service";
-import { listProviders } from "@/lib/appointment-service";
 import { ROLES } from "@/lib/roles";
 import { isAssignableRole } from "@/lib/user-service";
 import { isInternoProfile } from "@/lib/interno-permissions";
@@ -10,9 +8,15 @@ import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
 import { getPrisma } from "@/lib/db";
 import {
   buildIncompleteDraftResult,
+  buildChoiceDraftResult,
   buildResolveIncompleteResult,
 } from "@/lib/assistant/draft-response";
 import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
+import {
+  resolvePatientByName,
+  resolveProviderByName,
+  resolveProcedureByName,
+} from "@/lib/assistant/resolve-entities";
 
 function draftResult(input: {
   userId: string;
@@ -30,33 +34,6 @@ function draftResult(input: {
     summary: input.summary,
     href: input.href,
   };
-}
-
-async function resolvePatientId(tenantId: string, patientId?: string, patientName?: string) {
-  if (patientId) return patientId;
-  if (!patientName) return null;
-  const patients = await listPatients(tenantId);
-  const match = patients.find((p) => p.name.toLowerCase().includes(patientName.toLowerCase()));
-  return match?.id ?? null;
-}
-
-async function resolveProviderId(tenantId: string, providerId?: string, providerName?: string) {
-  if (providerId) return providerId;
-  const providers = await listProviders(tenantId);
-  const norm = (value: string) =>
-    value
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/\p{M}/gu, "")
-      .replace(/\./g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-  if (providerName) {
-    const query = norm(providerName);
-    const match = providers.find((p) => norm(p.name).includes(query) || query.includes(norm(p.name)));
-    return match?.id ?? null;
-  }
-  return null;
 }
 
 export const internoWriteTools: AssistantToolDefinition[] = [
@@ -186,6 +163,8 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         patientName: { type: "string" },
         providerId: { type: "string" },
         providerName: { type: "string" },
+        procedureId: { type: "string" },
+        procedureName: { type: "string" },
         date: { type: "string", description: "Data (hoje, DD/MM/AAAA, YYYY-MM-DD)" },
         time: { type: "string", description: "Hora HH:MM" },
         reason: { type: "string" },
@@ -200,6 +179,8 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         patientName?: string;
         providerId?: string;
         providerName?: string;
+        procedureId?: string;
+        procedureName?: string;
         date?: string;
         time?: string;
         reason?: string;
@@ -210,10 +191,22 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         return buildIncompleteDraftResult("draft_create_appointment", data, ctx.labels, missing);
       }
 
-      const patientId = await resolvePatientId(ctx.user.tenantId, data.patientId, data.patientName);
-      const providerId = await resolveProviderId(ctx.user.tenantId, data.providerId, data.providerName);
-
-      if (!patientId) {
+      const patientResult = await resolvePatientByName(
+        ctx.user.tenantId,
+        data.patientName,
+        data.patientId,
+      );
+      if (patientResult.status === "ambiguous") {
+        return buildChoiceDraftResult({
+          tool: "draft_create_appointment",
+          field: "patientId",
+          fieldLabel: ctx.labels.patient.toLowerCase(),
+          options: patientResult.options,
+          draftArgs: data,
+          labels: ctx.labels,
+        });
+      }
+      if (patientResult.status === "none") {
         return buildResolveIncompleteResult(
           "draft_create_appointment",
           `${ctx.labels.patient} não encontrado.`,
@@ -221,13 +214,55 @@ export const internoWriteTools: AssistantToolDefinition[] = [
           ctx.labels,
         );
       }
-      if (!providerId) {
+
+      const providerResult = await resolveProviderByName(
+        ctx.user.tenantId,
+        data.providerName,
+        data.providerId,
+      );
+      if (providerResult.status === "ambiguous") {
+        return buildChoiceDraftResult({
+          tool: "draft_create_appointment",
+          field: "providerId",
+          fieldLabel: ctx.labels.provider.toLowerCase(),
+          options: providerResult.options,
+          draftArgs: { ...data, patientId: patientResult.id },
+          labels: ctx.labels,
+        });
+      }
+      if (providerResult.status === "none") {
         return buildResolveIncompleteResult(
           "draft_create_appointment",
           `${ctx.labels.provider} não encontrado.`,
-          data,
+          { ...data, patientId: patientResult.id },
           ctx.labels,
         );
+      }
+
+      let procedureLabel: string | undefined;
+      if (data.procedureName || data.procedureId) {
+        const procedureResult = await resolveProcedureByName(
+          ctx.user.tenantId,
+          data.procedureName,
+          data.procedureId,
+        );
+        if (procedureResult.status === "ambiguous") {
+          return buildChoiceDraftResult({
+            tool: "draft_create_appointment",
+            field: "procedureId",
+            fieldLabel: ctx.labels.procedure.toLowerCase(),
+            options: procedureResult.options,
+            draftArgs: {
+              ...data,
+              patientId: patientResult.id,
+              providerId: providerResult.id,
+            },
+            labels: ctx.labels,
+          });
+        }
+        if (procedureResult.status === "unique") {
+          procedureLabel = procedureResult.label;
+        }
       }
 
       const baseDate = parseAssistantDate(data.date!);
@@ -239,9 +274,17 @@ export const internoWriteTools: AssistantToolDefinition[] = [
 
       const prisma = await getPrisma();
       const [patient, provider] = await Promise.all([
-        prisma.patient.findFirst({ where: { id: patientId, tenantId: ctx.user.tenantId } }),
-        prisma.user.findFirst({ where: { id: providerId, tenantId: ctx.user.tenantId } }),
+        prisma.patient.findFirst({
+          where: { id: patientResult.id, tenantId: ctx.user.tenantId },
+        }),
+        prisma.user.findFirst({
+          where: { id: providerResult.id, tenantId: ctx.user.tenantId },
+        }),
       ]);
+
+      const reason =
+        data.reason?.trim() ||
+        (procedureLabel ? `${ctx.labels.procedure}: ${procedureLabel}` : null);
 
       return draftResult({
         userId: ctx.user.id,
@@ -249,18 +292,19 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         payload: {
           type: "create_appointment",
           data: {
-            patientId,
-            providerId,
+            patientId: patientResult.id,
+            providerId: providerResult.id,
             scheduledAt: baseDate.toISOString(),
-            reason: data.reason ?? null,
+            reason,
           },
         },
         preview: `Agendar ${ctx.labels.appointment.toLowerCase()} para ${patient?.name ?? "paciente"}`,
         summary: {
-          [ctx.labels.patient]: patient?.name ?? patientId,
-          [ctx.labels.provider]: provider?.name ?? providerId,
+          [ctx.labels.patient]: patient?.name ?? patientResult.label,
+          [ctx.labels.provider]: provider?.name ?? providerResult.label,
           Data: baseDate.toLocaleString("pt-BR"),
-          ...(data.reason ? { Motivo: data.reason } : {}),
+          ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),
+          ...(reason && !procedureLabel ? { Motivo: reason } : {}),
         },
         href: "/interno/agenda",
       });

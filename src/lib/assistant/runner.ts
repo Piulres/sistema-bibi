@@ -15,8 +15,11 @@ import { findTool, getToolsForUser } from "@/lib/assistant/tools/registry";
 import {
   clearOperationDraft,
   rememberOperationDraft,
+  rememberPendingChoice,
+  clearPendingChoice,
 } from "@/lib/assistant/provider/mock-context";
 import { isDraftToolName } from "@/lib/assistant/provider/mock-draft-flow";
+import { isChoiceDraftResult } from "@/lib/assistant/types";
 
 async function resolvePlan(
   user: SessionUser,
@@ -78,6 +81,16 @@ export async function runAssistantChat(input: {
       if (isDraftToolResult(result)) {
         pendingActionId = result.pendingActionId;
         clearOperationDraft(input.user.id);
+        clearPendingChoice(input.user.id);
+      } else if (isChoiceDraftResult(result)) {
+        rememberPendingChoice(input.user.id, {
+          tool: result.tool,
+          field: result.field,
+          fieldLabel: result.fieldLabel,
+          options: result.options,
+          draftArgs: result.draftArgs,
+        });
+        rememberOperationDraft(input.user.id, result.tool, result.draftArgs);
       } else if (
         isDraftToolName(call.name) &&
         typeof result === "object" &&

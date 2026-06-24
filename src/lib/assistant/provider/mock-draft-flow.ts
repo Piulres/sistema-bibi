@@ -110,6 +110,7 @@ export function buildDraftGuidance(
   const prompts: Record<string, string> = {
     patientName: `Para quem é a ${labels.appointment.toLowerCase()}? Informe o nome do ${labels.patient.toLowerCase()}.`,
     providerName: `Com qual ${labels.provider.toLowerCase()}? Ex.: *Dra. Helena*.`,
+    procedureName: `Qual ${labels.procedure.toLowerCase()}? Ex.: *consulta clínica*, *eletrocardiograma*.`,
     date: "Para qual data? Ex.: *amanhã*, *25/06/2026*.",
     time: "Qual horário? Ex.: *15:30* ou *às 15h*.",
     name: "Qual o nome completo?",
@@ -160,10 +161,11 @@ export function formatPartialSummary(
   switch (tool) {
     case "draft_create_appointment":
     case "draft_book_appointment": {
-      const data = args as AppointmentArgs;
+      const data = args as AppointmentArgs & { procedureName?: string };
       const partial: Record<string, string> = {};
       if (data.patientName) partial[labels.patient] = data.patientName;
       if (data.providerName) partial[labels.provider] = data.providerName;
+      if (data.procedureName) partial[labels.procedure] = data.procedureName;
       if (data.date) partial.Data = data.date;
       if (data.time) partial.Horário = data.time;
       return partial;

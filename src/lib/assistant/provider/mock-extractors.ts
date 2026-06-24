@@ -89,14 +89,31 @@ export function extractTimeOptional(text: string): string | undefined {
   return undefined;
 }
 
+export function extractProcedureName(raw: string): string | undefined {
+  const patterns = [
+    /(?:procedimento|servi[cç]o|sess[aã]o)\s+([^,]+?)(?=\s+com\b|\s+para\b|\s+pro\b|\s+amanha|\s+amanhã|\s+hoje|$)/i,
+    /(?:consulta)\s+([a-zà-ú][a-zà-ú\s]{2,40}?)(?=\s+com\b|\s+para\b|\s+pro\b|\s+amanha|\s+amanhã|$)/i,
+  ];
+  for (const pattern of patterns) {
+    const match = raw.match(pattern);
+    if (match?.[1]) {
+      const value = match[1].trim();
+      if (!/^(para|pro|com|de|do|da)$/i.test(value)) return value;
+    }
+  }
+  return undefined;
+}
+
 export function extractCreateAppointmentArgs(raw: string): Record<string, unknown> {
   const dateHint = extractDateHint(raw);
   const time = extractTimeOptional(raw);
   const patientName = extractSearchQuery(raw) ?? extractBarePatientName(raw);
   const providerName = extractProviderName(raw);
+  const procedureName = extractProcedureName(raw);
   return {
     ...(patientName ? { patientName } : {}),
     ...(providerName ? { providerName } : {}),
+    ...(procedureName ? { procedureName } : {}),
     ...(dateHint ? { date: dateHint } : {}),
     ...(time ? { time } : {}),
   };
@@ -133,15 +150,43 @@ export function extractIncrementalArgs(tool: string, raw: string): Record<string
   }
 }
 
+export function parseChoiceSelection(
+  raw: string,
+  options: { id: string; label: string; detail?: string }[],
+): string | null {
+  const trimmed = raw.trim();
+  if (!trimmed || options.length === 0) return null;
+
+  const numberMatch = trimmed.match(/^(?:op[cç][aã]o\s*)?#?(\d+)\.?(?:\s|$)/i);
+  if (numberMatch) {
+    const index = Number(numberMatch[1]) - 1;
+    if (index >= 0 && index < options.length) return options[index]!.id;
+  }
+
+  const norm = normalizeMockText(trimmed);
+  const exact = options.filter((option) => normalizeMockText(option.label) === norm);
+  if (exact.length === 1) return exact[0]!.id;
+
+  const partial = options.filter((option) => {
+    const label = normalizeMockText(option.label);
+    return label.includes(norm) || norm.includes(label);
+  });
+  if (partial.length === 1) return partial[0]!.id;
+
+  return null;
+}
+
 export function isDraftContinuation(
   raw: string,
   lastTool: string | null,
   hasActiveDraft: boolean,
+  hasPendingChoice = false,
 ): boolean {
-  if (hasActiveDraft) return true;
+  if (hasPendingChoice || hasActiveDraft) return true;
   if (!lastTool?.startsWith("draft_")) return false;
 
   const t = normalizeMockText(raw);
+  const trimmed = raw.trim();
   if (extractDateHint(raw)) return true;
   if (extractTimeOptional(raw)) return true;
   if (extractProviderName(raw)) return true;
@@ -152,6 +197,7 @@ export function isDraftContinuation(
   if (/^(e\s+)?(para|pro)\s+/i.test(raw.trim())) return true;
   if (/\b(com\s+)?(dra?|dr)\.?\s+[a-z]/i.test(raw)) return true;
   if (/^(nome|email|e-mail|senha|cpf)\b/i.test(t)) return true;
+  if (/^\d{1,2}\.?$/.test(trimmed)) return true;
   return isFollowUpPhrase(t);
 }
 

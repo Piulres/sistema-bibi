@@ -1,11 +1,15 @@
 import "server-only";
 import type { NicheLabels } from "@/lib/niche/types";
-import type { IncompleteDraftResult } from "@/lib/assistant/types";
+import type { IncompleteDraftResult, ChoiceDraftResult } from "@/lib/assistant/types";
 import {
   buildDraftGuidance,
   formatPartialSummary,
   getMissingFieldsForTool,
 } from "@/lib/assistant/provider/mock-draft-flow";
+import {
+  type EntityOption,
+  formatChoiceQuestion,
+} from "@/lib/assistant/resolve-entities";
 
 export function buildIncompleteDraftResult(
   tool: string,
@@ -49,5 +53,32 @@ export function buildResolveIncompleteResult(
         : error.includes(labels.provider)
           ? `\n\nInforme o ${labels.provider.toLowerCase()}, ex.: *com Dra. Helena*.`
           : ""),
+  };
+}
+
+export function buildChoiceDraftResult(input: {
+  tool: string;
+  field: string;
+  fieldLabel: string;
+  options: EntityOption[];
+  draftArgs: Record<string, unknown>;
+  labels: import("@/lib/niche/types").NicheLabels;
+}): ChoiceDraftResult {
+  const partial = formatPartialSummary(input.tool, input.draftArgs, input.labels);
+  const partialBlock =
+    Object.keys(partial).length > 0
+      ? `\n\nJá definido:\n${Object.entries(partial)
+          .map(([k, v]) => `• ${k}: ${v}`)
+          .join("\n")}\n`
+      : "";
+
+  return {
+    __assistant_choices: true,
+    tool: input.tool,
+    field: input.field,
+    fieldLabel: input.fieldLabel,
+    question: `${formatChoiceQuestion(input.fieldLabel, input.options)}${partialBlock}`,
+    options: input.options,
+    draftArgs: input.draftArgs,
   };
 }

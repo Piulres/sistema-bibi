@@ -16,15 +16,19 @@ import {
   followUpDate,
   isDraftContinuation,
   isFollowUpPhrase,
+  parseChoiceSelection,
 } from "@/lib/assistant/provider/mock-extractors";
 import {
   getLastIntent,
   getOperationDraft,
+  getPendingChoice,
   rememberLastIntent,
   rememberOperationDraft,
+  clearPendingChoice,
   resolveFollowUpTool,
   clearMockContext,
 } from "@/lib/assistant/provider/mock-context";
+import { formatChoiceQuestion } from "@/lib/assistant/resolve-entities";
 import {
   isDraftToolName,
   mergeDraftArgs,
@@ -101,6 +105,37 @@ function rememberDraftFromCall(userId: string, call: AssistantToolCall): void {
   rememberOperationDraft(userId, call.name, merged);
 }
 
+function tryResolvePendingChoice(
+  raw: string,
+  user: SessionUser,
+  toolNames: Set<string>,
+): AssistantPlan | null {
+  const pending = getPendingChoice(user.id);
+  if (!pending || !toolNames.has(pending.tool)) return null;
+
+  const selectedId = parseChoiceSelection(raw, pending.options);
+  if (!selectedId) {
+    return {
+      toolCalls: [],
+      fallback: [
+        "Não identifiquei sua escolha.",
+        formatChoiceQuestion(pending.fieldLabel, pending.options),
+        "",
+        "Responda com o **número** ou o **nome completo**.",
+      ].join("\n"),
+    };
+  }
+
+  const merged = mergeDraftArgs(pending.draftArgs, { [pending.field]: selectedId });
+  clearPendingChoice(user.id);
+  rememberOperationDraft(user.id, pending.tool, merged);
+  rememberLastIntent(user.id, pending.tool);
+
+  return {
+    toolCalls: [{ name: pending.tool, arguments: stripDraftMeta(merged) }],
+  };
+}
+
 function tryDraftContinuation(
   raw: string,
   user: SessionUser,
@@ -108,7 +143,10 @@ function tryDraftContinuation(
   lastTool: string | null,
 ): AssistantToolCall | null {
   const activeDraft = getOperationDraft(user.id);
-  if (!isDraftContinuation(raw, lastTool, Boolean(activeDraft))) return null;
+  const pendingChoice = getPendingChoice(user.id);
+  if (!isDraftContinuation(raw, lastTool, Boolean(activeDraft), Boolean(pendingChoice))) {
+    return null;
+  }
 
   const tool =
     activeDraft?.tool ?? (lastTool && isDraftToolName(lastTool) ? lastTool : null);
@@ -182,6 +220,9 @@ export function planMockFromIntents(
       fallback: "Como posso ajudar? Use os atalhos abaixo ou descreva a operação.",
     };
   }
+
+  const choicePlan = tryResolvePendingChoice(raw, user, toolNames);
+  if (choicePlan) return choicePlan;
 
   const lastTool = getLastIntent(user.id);
   const segments = splitCompositeQuery(raw);

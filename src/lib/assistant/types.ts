@@ -31,6 +31,12 @@ export type AssistantAction =
       label: string;
       href: string;
       fields: Record<string, string>;
+    }
+  | {
+      type: "choice";
+      title: string;
+      field: string;
+      options: { label: string; value: string }[];
     };
 
 export type PendingActionType =
@@ -98,6 +104,16 @@ export type IncompleteDraftResult = {
   guidance: string;
 };
 
+export type ChoiceDraftResult = {
+  __assistant_choices: true;
+  tool: string;
+  field: string;
+  fieldLabel: string;
+  question: string;
+  options: { id: string; label: string; detail?: string }[];
+  draftArgs: Record<string, unknown>;
+};
+
 export function isDraftToolResult(value: unknown): value is DraftToolResult {
   return (
     typeof value === "object" &&
@@ -113,6 +129,15 @@ export function isIncompleteDraftResult(value: unknown): value is IncompleteDraf
     value !== null &&
     "__assistant_incomplete" in value &&
     (value as IncompleteDraftResult).__assistant_incomplete === true
+  );
+}
+
+export function isChoiceDraftResult(value: unknown): value is ChoiceDraftResult {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "__assistant_choices" in value &&
+    (value as ChoiceDraftResult).__assistant_choices === true
   );
 }
 

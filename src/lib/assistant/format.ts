@@ -1,7 +1,7 @@
 import "server-only";
 import type { AssistantAction } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
-import { isDraftToolResult, isIncompleteDraftResult } from "@/lib/assistant/types";
+import { isDraftToolResult, isIncompleteDraftResult, isChoiceDraftResult } from "@/lib/assistant/types";
 
 export function formatToolResult(
   toolName: string,
@@ -14,6 +14,10 @@ export function formatToolResult(
 
   if (isIncompleteDraftResult(result)) {
     return result.guidance;
+  }
+
+  if (isChoiceDraftResult(result)) {
+    return result.question;
   }
 
   if (typeof result === "object" && result !== null && "error" in result) {
@@ -111,7 +115,22 @@ export function formatToolResult(
         ...data.users.map((u) => `• ${u.name} (${u.email}) — ${u.role}`),
       ].join("\n");
     }
-    case "search_patients":
+    case "search_patients": {
+      const data = result as {
+        count: number;
+        guidance?: string;
+        patients: { name: string; cpf: string; companyName: string | null }[];
+      };
+      if (data.guidance) return data.guidance;
+      if (!data.patients.length) return "Nenhum cadastro encontrado.";
+      return [
+        `**${data.count}** resultado(s):`,
+        ...data.patients.map((p) => {
+          const extra = p.companyName ? ` · ${p.companyName}` : "";
+          return `• **${p.name}** — CPF ${p.cpf}${extra}`;
+        }),
+      ].join("\n");
+    }
     case "list_my_patients":
     case "list_company_beneficiaries": {
       const data = result as {
@@ -237,6 +256,20 @@ export function buildActions(toolName: string, result: unknown, role: string): A
       actions.push({ type: "link", label: "Abrir formulário", href: result.href });
     }
     return actions;
+  }
+
+  if (isChoiceDraftResult(result)) {
+    return [
+      {
+        type: "choice",
+        title: result.fieldLabel,
+        field: result.field,
+        options: result.options.map((option, index) => ({
+          label: `${index + 1}. ${option.label}${option.detail ? ` (${option.detail})` : ""}`,
+          value: String(index + 1),
+        })),
+      },
+    ];
   }
 
   if (toolName === "list_debtors") {

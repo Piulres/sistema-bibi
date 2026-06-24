@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function AssistantActionCard({ actions }: Props) {
-  const { confirmAction, loading } = useAssistant();
+  const { confirmAction, sendMessage, loading } = useAssistant();
   const [password, setPassword] = useState("");
 
   if (actions.length === 0) return null;
@@ -69,6 +69,30 @@ export default function AssistantActionCard({ actions }: Props) {
             >
               {action.label} →
             </Link>
+          );
+        }
+
+        if (action.type === "choice") {
+          return (
+            <Card key={`choice-${index}`} className="space-y-2 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+                Escolha: {action.title}
+              </p>
+              <div className="flex flex-col gap-2">
+                {action.options.map((option) => (
+                  <Button
+                    key={option.value}
+                    size="sm"
+                    variant="secondary"
+                    disabled={loading}
+                    className="justify-start text-left"
+                    onClick={() => void sendMessage(option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </div>
+            </Card>
           );
         }
 
