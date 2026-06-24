@@ -10,9 +10,13 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.cwd();
-const run = (cmd) => {
+const run = (cmd, extraEnv = {}) => {
   console.log(`\n▶ ${cmd}\n`);
-  execSync(cmd, { stdio: "inherit", cwd: root });
+  execSync(cmd, {
+    stdio: "inherit",
+    cwd: root,
+    env: { ...process.env, ...extraEnv },
+  });
 };
 
 const gitHead = () => {
@@ -32,6 +36,11 @@ console.log("Este script NÃO publica na Netlify.\n");
 const steps = [
   { name: "lint", cmd: "npm run lint" },
   { name: "docs-verify", cmd: "npm run docs:verify" },
+  {
+    name: "db-bootstrap",
+    cmd: "npm run db:bootstrap:demo",
+    env: { SEED_SCALE: process.env.SEED_SCALE ?? "small" },
+  },
   { name: "db-verify", cmd: "npm run db:verify" },
   { name: "test", cmd: "npm test" },
   { name: "netlify-build", cmd: "npm run netlify:build" },
@@ -39,7 +48,7 @@ const steps = [
 
 for (const step of steps) {
   try {
-    run(step.cmd);
+    run(step.cmd, step.env ?? {});
   } catch {
     console.error(`\n✗ Falhou em: ${step.name}`);
     console.error("Corrija antes de fechar o pacote. Ver docs/versoes/RELEASES.md\n");
