@@ -199,3 +199,19 @@ export async function updateMedicationStatus(input: {
 
   return mapMedication(row);
 }
+
+/** Encerra prescrição ativa (cancelamento clínico). */
+export async function cancelMedicationPrescription(input: {
+  id: string;
+  tenantId: string;
+  providerId: string;
+  patientName: string;
+}): Promise<MedicationView | null> {
+  return updateMedicationStatus({
+    id: input.id,
+    tenantId: input.tenantId,
+    providerId: input.providerId,
+    status: "SUSPENSA",
+    patientName: input.patientName,
+  });
+}

@@ -140,7 +140,17 @@ export default function AppointmentsView() {
     setBusy("walkin");
     setMsg(null);
     try {
-      const patientRes = await fetch("/api/interno/patients", {
+      const time =
+        walkIn.time ||
+        `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`;
+      const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+
+      if (isVet && !walkIn.petName.trim()) {
+        setMsg("Informe o nome do pet para agendar no segmento veterinário");
+        return;
+      }
+
+      const walkInRes = await fetch("/api/interno/appointments/walk-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -148,61 +158,17 @@ export default function AppointmentsView() {
           cpf: walkIn.cpf,
           birthDate: walkIn.birthDate,
           phone: walkIn.phone || null,
-          companyId: null,
-        }),
-      });
-      const patientData = await patientRes.json();
-      if (!patientRes.ok) {
-        setMsg(patientData.error ?? "Erro ao cadastrar paciente");
-        return;
-      }
-
-      const time =
-        walkIn.time ||
-        `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`;
-      const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
-
-      let petId: string | null = null;
-      if (isVet) {
-        if (!walkIn.petName.trim()) {
-          setMsg("Informe o nome do pet para agendar no segmento veterinário");
-          return;
-        }
-        const petRes = await fetch("/api/interno/pets", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            patientId: patientData.patient.id,
-            name: walkIn.petName.trim(),
-            species: walkIn.petSpecies,
-          }),
-        });
-        const petData = await petRes.json();
-        if (!petRes.ok) {
-          setMsg(petData.error ?? "Paciente cadastrado, mas falha ao cadastrar pet");
-          await load();
-          return;
-        }
-        petId = petData.pet.id;
-      }
-
-      const apptRes = await fetch("/api/interno/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: patientData.patient.id,
-          petId,
           providerId: walkIn.providerId,
           scheduledAt,
           reason: walkIn.reason,
-          status: "AGENDADO",
-          modality: "PRESENCIAL",
+          ...(isVet
+            ? { petName: walkIn.petName.trim(), petSpecies: walkIn.petSpecies }
+            : {}),
         }),
       });
-      const apptData = await apptRes.json();
-      if (!apptRes.ok) {
-        setMsg(apptData.error ?? "Paciente cadastrado, mas falha ao agendar");
-        await load();
+      const walkInData = await walkInRes.json();
+      if (!walkInRes.ok) {
+        setMsg(walkInData.error ?? "Erro no walk-in");
         return;
       }
 
@@ -221,13 +187,13 @@ export default function AppointmentsView() {
             email: `${emailBase || "paciente"}.${Date.now()}@walkin.demo`,
             password: "bibi123",
             role: "BENEFICIARIO",
-            patientId: patientData.patient.id,
+            patientId: walkInData.patient.id,
           }),
         });
       }
 
       setMsg(
-        `Walk-in: ${patientData.patient.name} cadastrado (particular) e agendado — confirme a chegada na lista abaixo.`,
+        `Walk-in: ${walkInData.patient.name} cadastrado (particular) e agendado — confirme a chegada na lista abaixo.`,
       );
       setWalkIn({
         name: "",

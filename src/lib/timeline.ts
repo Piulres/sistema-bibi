@@ -1,6 +1,12 @@
 import { getPrisma } from "@/lib/db";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import {
+  metadataHasDiff,
+  parseTimelineMetadata,
+  serializeTimelineMetadata,
+  type TimelineEventMetadata,
+} from "@/lib/change-management";
+import {
   TIMELINE_ENTITY_TYPES,
   type TimelineAction,
   type TimelineEntityType,
@@ -8,6 +14,7 @@ import {
 
 export { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES, TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
 export type { TimelineAction, TimelineEntityType } from "@/lib/timeline-constants";
+export type { TimelineEventMetadata } from "@/lib/change-management";
 
 export type RecordTimelineInput = {
   tenantId: string;
@@ -16,6 +23,10 @@ export type RecordTimelineInput = {
   action: TimelineAction | string;
   description: string;
   createdBy?: string | null;
+  metadata?: TimelineEventMetadata;
+  correlationId?: string | null;
+  reversesId?: string | null;
+  reversible?: boolean;
 };
 
 type DbClient = Prisma.TransactionClient | PrismaClient;
@@ -47,6 +58,10 @@ export async function recordTimelineEvent(
         action: input.action,
         description: input.description,
         createdBy: input.createdBy ?? null,
+        metadata: input.metadata ? serializeTimelineMetadata(input.metadata) : null,
+        correlationId: input.correlationId ?? null,
+        reversesId: input.reversesId ?? null,
+        reversible: input.reversible ?? false,
       },
     });
   } catch (error) {
@@ -65,7 +80,47 @@ export type TimelineEventView = {
   createdAtLabel: string;
   createdBy: string | null;
   actorName: string | null;
+  metadata: TimelineEventMetadata | null;
+  hasDiff: boolean;
+  correlationId: string | null;
+  reversesId: string | null;
+  reversible: boolean;
 };
+
+function mapTimelineEventView(
+  event: {
+    id: string;
+    entityType: string;
+    entityId: string;
+    action: string;
+    description: string;
+    createdAt: Date;
+    createdBy: string | null;
+    metadata: string | null;
+    correlationId: string | null;
+    reversesId: string | null;
+    reversible: boolean;
+  },
+  actorMap: Map<string, string>,
+): TimelineEventView {
+  const metadata = parseTimelineMetadata(event.metadata);
+  return {
+    id: event.id,
+    entityType: event.entityType,
+    entityId: event.entityId,
+    action: event.action,
+    description: event.description,
+    createdAt: event.createdAt.toISOString(),
+    createdAtLabel: dateTime(event.createdAt),
+    createdBy: event.createdBy,
+    actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
+    metadata,
+    hasDiff: metadataHasDiff(metadata),
+    correlationId: event.correlationId,
+    reversesId: event.reversesId,
+    reversible: event.reversible,
+  };
+}
 
 /** Busca eventos relacionados a um beneficiário (Cliente 360°). */
 export async function getPatientTimelineEvents(
@@ -137,17 +192,7 @@ export async function getPatientTimelineEvents(
       : [];
   const actorMap = new Map(actors.map((actor) => [actor.id, actor.name]));
 
-  return events.map((event) => ({
-    id: event.id,
-    entityType: event.entityType,
-    entityId: event.entityId,
-    action: event.action,
-    description: event.description,
-    createdAt: event.createdAt.toISOString(),
-    createdAtLabel: dateTime(event.createdAt),
-    createdBy: event.createdBy,
-    actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
-  }));
+  return events.map((event) => mapTimelineEventView(event, actorMap));
 }
 
 export type TenantAuditFilters = {
@@ -222,17 +267,7 @@ export async function getTenantAuditEvents(
   const actorMap = new Map(actors.map((actor) => [actor.id, actor.name]));
 
   return {
-    events: events.map((event) => ({
-      id: event.id,
-      entityType: event.entityType,
-      entityId: event.entityId,
-      action: event.action,
-      description: event.description,
-      createdAt: event.createdAt.toISOString(),
-      createdAtLabel: dateTime(event.createdAt),
-      createdBy: event.createdBy,
-      actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
-    })),
+    events: events.map((event) => mapTimelineEventView(event, actorMap)),
     total,
     page,
     limit,

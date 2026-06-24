@@ -142,9 +142,10 @@ export async function cancelBeneficiaryAppointment(input: {
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
     entityId: appointment.id,
-    action: TIMELINE_ACTIONS.UPDATED,
+    action: TIMELINE_ACTIONS.CANCELLED,
     description: `${appointment.patient.name} cancelou consulta agendada`,
     createdBy: input.createdBy,
+    reversible: false,
   });
 
   return { ok: true as const, status: "CANCELADO" as const };

@@ -1,12 +1,15 @@
 import "server-only";
 import { NextResponse } from "next/server";
 import {
+  buildInterchangeDataset,
+  serializeInterchangeDataset,
+} from "@/lib/imports/interchange";
+import {
   exportFileExtension,
   exportMimeType,
   type ExportFormat,
 } from "@/lib/exports/format";
 import {
-  buildCsvFromTabular,
   buildTablePdfBufferFromTabular,
   buildXlsxBufferFromTabular,
   type TabularExport,
@@ -50,20 +53,15 @@ export async function serveTabularExport(
   const filename = exportFilename(filenameBase, format);
 
   if (format === "json") {
+    const dataset = buildInterchangeDataset({
+      entity: "export",
+      columns: data.columns.map((column) => ({ key: column.key, header: column.header })),
+      rows: data.rows,
+    });
     const payload = {
       title: data.title,
       subtitle: data.subtitle ?? null,
-      exportedAt: new Date().toISOString(),
-      columns: data.columns.map((column) => column.header),
-      rows: data.rows.map((row) => {
-        const record: Record<string, string> = {};
-        for (const column of data.columns) {
-          const value = row[column.key];
-          record[column.key] =
-            value === null || value === undefined ? "" : String(value);
-        }
-        return record;
-      }),
+      ...dataset,
     };
     return new NextResponse(JSON.stringify(payload, null, 2), {
       headers: attachmentHeaders("json", filename),
@@ -71,7 +69,12 @@ export async function serveTabularExport(
   }
 
   if (format === "csv") {
-    return new NextResponse(buildCsvFromTabular(data), {
+    const dataset = buildInterchangeDataset({
+      entity: "export",
+      columns: data.columns.map((column) => ({ key: column.key, header: column.header })),
+      rows: data.rows,
+    });
+    return new NextResponse(serializeInterchangeDataset(dataset, "csv"), {
       headers: attachmentHeaders("csv", filename),
     });
   }

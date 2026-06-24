@@ -2,6 +2,7 @@ import "server-only";
 import { getPrisma } from "@/lib/db";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
+import { buildChangeMetadata } from "@/lib/change-management/metadata";
 import {
   buildTelemedicineUrl,
   isAppointmentModality,
@@ -135,6 +136,7 @@ export async function createAppointment(input: {
   status?: string;
   modality?: string;
   createdBy: string;
+  correlationId?: string;
 }) {
   const prisma = await getPrisma();
   const tenant = await prisma.tenant.findFirst({
@@ -221,6 +223,7 @@ export async function createAppointment(input: {
       ? `Atendimento agendado: ${finalAppointment.pet.name} (tutor ${patient.name}) com ${provider.name} (${dateTime(finalAppointment.scheduledAt)})`
       : `Consulta agendada: ${patient.name} com ${provider.name} (${dateTime(finalAppointment.scheduledAt)})`,
     createdBy: input.createdBy,
+    correlationId: input.correlationId,
   });
 
   void dispatchWebhooks({
@@ -286,9 +289,20 @@ export async function updateAppointment(input: {
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
     entityId: appointment.id,
-    action: TIMELINE_ACTIONS.UPDATED,
+    action:
+      appointment.status === "CANCELADO"
+        ? TIMELINE_ACTIONS.CANCELLED
+        : TIMELINE_ACTIONS.UPDATED,
     description: `Agendamento ${existing.patient.name}: status ${existing.status} → ${appointment.status}`,
     createdBy: input.createdBy,
+    metadata:
+      existing.status !== appointment.status
+        ? buildChangeMetadata(
+            { status: existing.status },
+            { status: appointment.status },
+          )
+        : undefined,
+    reversible: appointment.status === "CANCELADO",
   });
 
   return { appointment: mapAppointment(appointment) };

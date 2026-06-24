@@ -21,6 +21,7 @@ import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 import TabBar from "@/components/ui/TabBar";
 import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
+import { useDraftUndo } from "@/hooks/useDraftUndo";
 
 type Usage = {
   id: string;
@@ -89,7 +90,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const [detail, setDetail] = useState<Detail | null>(null);
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [selectedProc, setSelectedProc] = useState("");
-  const [note, setNote] = useState("");
+  const pepDraft = useDraftUndo({
+    storageKey: `pep-draft-${appointmentId}`,
+    initialValue: "",
+  });
+  const note = pepDraft.value;
+  const setNote = pepDraft.setValue;
   const [recordType, setRecordType] = useState<PepRecordType>("EVOLUCAO");
   const [recordTitle, setRecordTitle] = useState("");
   const [busy, setBusy] = useState(false);
@@ -230,7 +236,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       const data = await res.json();
       if (!res.ok) setMsg(data.error ?? "Erro ao salvar anotação");
       else {
-        setNote("");
+        pepDraft.clearDraft();
         setRecordTitle("");
         await load();
       }
@@ -530,9 +536,16 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             placeholder="Registrar evolução clínica, conduta, prescrição..."
             className={`mt-3 ${fieldClass}`}
           />
-          <Button className="mt-2" onClick={addNote} disabled={busy || !note.trim()}>
-            Salvar no prontuário
-          </Button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Button onClick={addNote} disabled={busy || !note.trim()}>
+              Salvar no prontuário
+            </Button>
+            {pepDraft.canUndo && (
+              <Button type="button" variant="secondary" onClick={pepDraft.undo} disabled={busy}>
+                Desfazer digitação
+              </Button>
+            )}
+          </div>
 
           <ul className="mt-4 space-y-3">
             {detail.records.map((r) => (
