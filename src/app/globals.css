@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  /* Brand — sobrescritos por TenantTheme em runtime */
-  --brand-primary: #0d9488;
-  --brand-primary-hover: #0f766e;
-  --brand-accent: #14b8a6;
-  --brand-hero-from: #0f172a;
-  --brand-hero-to: #134e4a;
+  /* Brand — Energia Brasileira (sobrescritos por TenantTheme em runtime) */
+  --brand-primary: #1e293b;
+  --brand-primary-hover: #0f172a;
+  --brand-accent: #f97316;
+  --brand-hero-from: #1e293b;
+  --brand-hero-to: #f59e0b;
 
   /* Portal accent — sobrescrito por portal context */
   --portal-accent: #6366f1;
@@ -22,6 +22,7 @@
   /* Borders */
   --border-default: #e2e8f0;
   --border-muted: #cbd5e1;
+  --border-accent: #fed7aa;
 
   /* Text */
   --text-primary: #0f172a;
@@ -30,7 +31,7 @@
   --text-inverse: #ffffff;
 
   /* Focus */
-  --ring-focus: #99f6e4;
+  --ring-focus: #fb923c;
 
   /* Status */
   --status-neutral-bg: #f1f5f9;
@@ -43,8 +44,8 @@
   --status-warning-text: #b45309;
   --status-danger-bg: #fef2f2;
   --status-danger-text: #b91c1c;
-  --status-brand-bg: #ccfbf1;
-  --status-brand-text: #0f766e;
+  --status-brand-bg: #fed7aa;
+  --status-brand-text: #92400e;
 
   /* Legacy aliases */
   --background: var(--surface-page);
@@ -63,7 +64,7 @@
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
   --text-inverse: #0f172a;
-  --ring-focus: #115e59;
+  --ring-focus: #fb923c;
   --status-neutral-bg: #334155;
   --status-neutral-text: #e2e8f0;
   --status-info-bg: #312e81;
@@ -74,8 +75,8 @@
   --status-warning-text: #fcd34d;
   --status-danger-bg: #7f1d1d;
   --status-danger-text: #fca5a5;
-  --status-brand-bg: #134e4a;
-  --status-brand-text: #5eead4;
+  --status-brand-bg: #7c2d12;
+  --status-brand-text: #fed7aa;
   --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35);
   --background: var(--surface-page);
   --foreground: var(--text-primary);
@@ -93,7 +94,7 @@
     --text-secondary: #cbd5e1;
     --text-muted: #94a3b8;
     --text-inverse: #0f172a;
-    --ring-focus: #115e59;
+    --ring-focus: #fb923c;
     --status-neutral-bg: #334155;
     --status-neutral-text: #e2e8f0;
     --status-info-bg: #312e81;
@@ -104,8 +105,8 @@
     --status-warning-text: #fcd34d;
     --status-danger-bg: #7f1d1d;
     --status-danger-text: #fca5a5;
-    --status-brand-bg: #134e4a;
-    --status-brand-text: #5eead4;
+    --status-brand-bg: #7c2d12;
+    --status-brand-text: #fed7aa;
     --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35);
     --background: var(--surface-page);
     --foreground: var(--text-primary);
@@ -249,7 +250,7 @@ body {
 }
 
 .landing-gradient-text {
-  background: linear-gradient(135deg, var(--brand-accent), #5eead4 60%, #a7f3d0);
+  background: linear-gradient(135deg, #f97316, #fb923c 60%, #fbbf24);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

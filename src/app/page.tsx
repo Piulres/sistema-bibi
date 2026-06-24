@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { buildLandingDescription } from "@/lib/landing/content";
 import { getSiteUrl } from "@/lib/landing/site-url";
@@ -7,18 +6,7 @@ import { resolveLandingNicheFromHeaders } from "@/lib/niche/resolve";
 import { nicheLandingBranding } from "@/lib/niche/branding";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import TenantTheme from "@/components/layout/TenantTheme";
-import LandingHeader from "@/components/landing/LandingHeader";
-import LandingNicheSwitcherBar from "@/components/landing/LandingNicheSwitcherBar";
-import LandingHeroNiche from "@/components/landing/LandingHeroNiche";
-import LandingStats from "@/components/landing/LandingStats";
-import LandingFeatures from "@/components/landing/LandingFeatures";
-import LandingHowItWorks from "@/components/landing/LandingHowItWorks";
-import LandingPortals from "@/components/landing/LandingPortals";
-import LandingFaq from "@/components/landing/LandingFaq";
-import LandingCta from "@/components/landing/LandingCta";
-import LandingFooter from "@/components/landing/LandingFooter";
-import LandingJsonLd from "@/components/landing/LandingJsonLd";
-import SegmentCookiePersist from "@/components/segment/SegmentCookiePersist";
+import LandingPageView from "@/components/landing/LandingPageView";
 
 type PageProps = {
   searchParams: Promise<{ niche?: string; tenant?: string }>;
@@ -72,29 +60,14 @@ export default async function Home({ searchParams }: PageProps) {
   const { niche: nicheParam, tenant: tenantParam } = await searchParams;
   const resolved = await resolveLandingNicheFromHeaders(nicheParam, tenantParam);
   const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
-  const segment = {
-    tenantSlug: resolved.tenantSlug,
-    niche: resolved.niche,
-  };
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
-      <Suspense fallback={null}>
-        <SegmentCookiePersist />
-      </Suspense>
-      <LandingJsonLd branding={branding} />
-      <LandingHeader branding={branding} />
-      <LandingNicheSwitcherBar />
-      <main id="conteudo-principal" className="flex-1">
-        <LandingHeroNiche niche={resolved.niche} branding={branding} />
-        <LandingStats />
-        <LandingFeatures niche={resolved.niche} />
-        <LandingHowItWorks niche={resolved.niche} />
-        <LandingPortals niche={resolved.niche} segment={segment} />
-        <LandingFaq niche={resolved.niche} />
-        <LandingCta branding={branding} niche={resolved.niche} />
-      </main>
-      <LandingFooter branding={branding} niche={resolved.niche} />
+      <LandingPageView
+        niche={resolved.niche}
+        branding={branding}
+        tenantSlug={resolved.tenantSlug}
+      />
     </TenantTheme>
   );
 }

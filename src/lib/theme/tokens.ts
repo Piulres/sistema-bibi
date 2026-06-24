@@ -3,10 +3,10 @@ import { PLATFORM } from "@/lib/platform";
 
 const SHARED_BRAND_COLORS = {
   logoUrl: null as string | null,
-  primaryColor: "#0d9488",
-  accentColor: "#14b8a6",
-  heroFrom: "#0f172a",
-  heroTo: "#134e4a",
+  primaryColor: "#1e293b",
+  accentColor: "#f97316",
+  heroFrom: "#1e293b",
+  heroTo: "#f59e0b",
   colorScheme: "light" as ColorScheme,
   customDomain: null,
   customDomainVerified: false,

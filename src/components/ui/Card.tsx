@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils/cn";
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
   padding?: "sm" | "md" | "lg";
+  accent?: boolean;
 };
 
 const paddingClass = {
@@ -12,12 +13,21 @@ const paddingClass = {
 
 export default function Card({
   padding = "md",
+  accent = false,
   className,
   children,
   ...props
 }: Props) {
   return (
-    <div className={cn("ds-card", paddingClass[padding], className)} {...props}>
+    <div
+      className={cn(
+        "ds-card",
+        paddingClass[padding],
+        accent && "border-l-4 border-l-[var(--brand-accent)]",
+        className,
+      )}
+      {...props}
+    >
       {children}
     </div>
   );

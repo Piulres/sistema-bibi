@@ -13,31 +13,35 @@ export const PORTAL_THEMES: Record<
 > = {
   prestador: {
     label: "Portal do Prestador",
-    accentFrom: "#14b8a6",
-    accentTo: "#059669",
-    navActiveClass: "border-[var(--brand-primary)] text-[var(--brand-primary)]",
-    navIdleClass: "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
+    accentFrom: "#1e293b",
+    accentTo: "#f97316",
+    navActiveClass: "border-[var(--brand-accent)] text-[var(--brand-accent)]",
+    navIdleClass:
+      "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
   },
   interno: {
     label: "Portal Interno",
     accentFrom: "#6366f1",
     accentTo: "#2563eb",
     navActiveClass: "border-[var(--portal-accent)] text-[var(--portal-accent)]",
-    navIdleClass: "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
+    navIdleClass:
+      "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
   },
   pj: {
     label: "Portal da Empresa",
     accentFrom: "#d946ef",
     accentTo: "#9333ea",
     navActiveClass: "border-[var(--portal-accent)] text-[var(--portal-accent)]",
-    navIdleClass: "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
+    navIdleClass:
+      "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
   },
   beneficiario: {
     label: "Portal do Beneficiário",
-    accentFrom: "#14b8a6",
-    accentTo: "#0891b2",
-    navActiveClass: "border-[var(--brand-primary)] text-[var(--brand-primary)]",
-    navIdleClass: "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
+    accentFrom: "#1e293b",
+    accentTo: "#f97316",
+    navActiveClass: "border-[var(--brand-accent)] text-[var(--brand-accent)]",
+    navIdleClass:
+      "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
   },
 };
 

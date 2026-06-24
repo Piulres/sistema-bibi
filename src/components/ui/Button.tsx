@@ -2,15 +2,17 @@ import { cn } from "@/lib/utils/cn";
 
 const variants = {
   primary:
-    "bg-[var(--brand-primary)] text-[var(--text-inverse)] hover:bg-[var(--brand-primary-hover)] focus-visible:ring-[var(--ring-focus)]",
+    "bg-[var(--brand-primary)] text-[var(--text-inverse)] hover:bg-[var(--brand-primary-hover)] focus-visible:ring-[var(--ring-focus)] active:scale-95",
   secondary:
-    "border border-[var(--border-muted)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] focus-visible:ring-[var(--ring-focus)]",
+    "border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] focus-visible:ring-[var(--ring-focus)] active:scale-95",
   portal:
-    "bg-[var(--portal-accent)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-[var(--ring-focus)]",
+    "bg-[var(--portal-accent)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-[var(--ring-focus)] active:scale-95",
   ghost:
-    "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] focus-visible:ring-[var(--ring-focus)]",
+    "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] focus-visible:ring-[var(--ring-focus)] active:scale-95",
+  accent:
+    "bg-[var(--brand-accent)] text-[var(--text-inverse)] hover:bg-orange-500 focus-visible:ring-[var(--ring-focus)] active:scale-95",
   danger:
-    "bg-[var(--status-danger-text)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-red-200",
+    "bg-[var(--status-danger-text)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-red-200 active:scale-95",
 } as const;
 
 const sizes = {
@@ -35,7 +37,7 @@ export default function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center rounded-[var(--radius-button)] transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex items-center justify-center rounded-[var(--radius-button)] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
         variants[variant],
         sizes[size],
         className,

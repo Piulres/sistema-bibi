@@ -52,7 +52,7 @@ export default function PortalHeader({
             </div>
           )}
           <div className="min-w-0">
-            <p className="truncate text-xs font-semibold uppercase tracking-wider text-[var(--brand-primary)]">
+            <p className="truncate text-xs font-semibold uppercase tracking-wider text-[var(--brand-accent)]">
               {portalLabel}
             </p>
             <p className="truncate text-sm font-medium text-[var(--text-primary)]">

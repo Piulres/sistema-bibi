@@ -4,12 +4,14 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils/cn";
-import { SEGMENT_TENANTS } from "@/lib/niche/demo-accounts";
+import { SEGMENT_LANDING_PAGES } from "@/lib/platform/structure";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import { appendSegmentToPath } from "@/lib/segment/types";
 import { isNicheId, type NicheId } from "@/lib/niche/types";
 
 const NAV_LINKS = [
+  { href: "/plataforma", label: "Plataforma" },
+  { href: "/venda", label: "Venda" },
   { href: "#recursos", label: "Recursos" },
   { href: "#como-funciona", label: "Como funciona" },
   { href: "#portais", label: "Portais" },
@@ -98,16 +100,29 @@ export default function LandingMobileMenu() {
               <ul className="space-y-1">
                 {NAV_LINKS.map((link) => (
                   <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      className={cn(
-                        "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium",
-                        "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
-                      )}
-                    >
-                      {link.label}
-                    </a>
+                    {link.href.startsWith("#") ? (
+                      <a
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium",
+                          "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]",
+                        )}
+                      >
+                        {link.label}
+                      </a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        className={cn(
+                          "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium",
+                          "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]",
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -116,13 +131,13 @@ export default function LandingMobileMenu() {
                 Segmento demo
               </p>
               <ul className="mt-1 flex flex-wrap gap-1.5 px-2">
-                {SEGMENT_TENANTS.map((ref) => {
-                  const config = getNicheConfig(ref.niche);
-                  const isActive = tenant === ref.slug;
+                {SEGMENT_LANDING_PAGES.map((page) => {
+                  const config = getNicheConfig(page.niche);
+                  const isActive = tenant === page.tenantSlug;
                   return (
-                    <li key={ref.slug}>
+                    <li key={page.slug}>
                       <Link
-                        href={`/?tenant=${ref.slug}`}
+                        href={page.href}
                         onClick={() => setOpen(false)}
                         className={cn(
                           "inline-block rounded-full px-2.5 py-1 text-xs font-medium",
