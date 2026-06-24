@@ -134,7 +134,7 @@ export default function LoginForm({
                 />
               ) : (
                 <div
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)] ds-gradient-portal"
+                  className="ds-logo-mark flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)]"
                   aria-hidden
                 >
                   {branding.displayName.charAt(0)}
@@ -144,7 +144,7 @@ export default function LoginForm({
                 <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
                   {branding.displayName}
                 </p>
-                <div className="mt-1 h-1 w-12 rounded-full ds-gradient-portal" />
+                <div className="mt-1 h-1 w-12 rounded-full ds-logo-mark" />
               </div>
             </div>
             <h1 className="mt-4 text-2xl font-bold text-[var(--text-primary)]">{title}</h1>

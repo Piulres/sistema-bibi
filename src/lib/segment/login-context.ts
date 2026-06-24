@@ -36,7 +36,7 @@ export async function getLoginSegmentContext(options?: {
       colorScheme: tenantBranding.colorScheme,
       customDomain: tenantBranding.customDomain,
       customDomainVerified: tenantBranding.customDomainVerified,
-    });
+    }, { fromDatabase: true });
   } else {
     branding = applyNicheBrandingDefaults(segment.niche, branding);
   }

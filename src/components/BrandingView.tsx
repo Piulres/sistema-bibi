@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import { COLOR_SCHEMES, type ColorScheme } from "@/lib/theme/color-scheme";
-import { BRANDING_PRESETS } from "@/lib/theme/presets";
+import { SEGMENT_BRANDING_PRESETS, VARIETY_BRANDING_PRESETS } from "@/lib/theme/presets";
 import { brandingToCssVars } from "@/lib/theme/css-vars";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
@@ -165,11 +165,31 @@ export default function BrandingView() {
 
         <Card>
           <SectionHeader
-            title="Presets white label"
-            description="Aplique uma paleta pronta e ajuste os detalhes antes de salvar."
+            title="Presets por segmento"
+            description="Paletas nativas de cada vertical ServiceOS — aplicam cores completas do nicho."
           />
           <div className="mt-4 flex flex-wrap gap-2">
-            {BRANDING_PRESETS.map((preset) => (
+            {SEGMENT_BRANDING_PRESETS.map((preset) => (
+              <Button
+                key={preset.id}
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => applyPreset(preset.id)}
+              >
+                {preset.label}
+              </Button>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <SectionHeader
+            title="Variedades de esquema"
+            description="Paletas adicionais para personalizar além do segmento padrão."
+          />
+          <div className="mt-4 flex flex-wrap gap-2">
+            {VARIETY_BRANDING_PRESETS.map((preset) => (
               <Button
                 key={preset.id}
                 type="button"
