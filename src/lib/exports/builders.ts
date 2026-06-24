@@ -61,6 +61,8 @@ export async function buildAuditTabularExport(
       { header: "Descrição", key: "description", width: 40 },
       { header: "Responsável", key: "actorName", width: 18 },
       { header: "ID entidade", key: "entityId", width: 22 },
+      { header: "Campos alterados", key: "fieldsChanged", width: 28 },
+      { header: "Reversível", key: "reversible", width: 10 },
     ],
     rows: result.events.map((event) => ({
       createdAt: event.createdAtLabel,
@@ -71,6 +73,8 @@ export async function buildAuditTabularExport(
       description: event.description,
       actorName: event.actorName ?? "Sistema",
       entityId: event.entityId,
+      fieldsChanged: event.metadata?.fieldsChanged?.join(", ") ?? "",
+      reversible: event.reversible ? "Sim" : "Não",
     })),
   };
 }

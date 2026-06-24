@@ -568,6 +568,23 @@ model TimelineEvent {
   @@index([correlationId])
 }
 
+/// Versão materializada de entidade para restore administrativo (Pacote C).
+model EntityRevision {
+  id         String   @id @default(cuid())
+  tenantId   String
+  entityType String
+  entityId   String
+  revision   Int
+  /// JSON do estado após a alteração
+  snapshot   String
+  timelineId String?
+  createdAt  DateTime @default(now())
+  createdBy  String?
+
+  @@unique([entityType, entityId, revision])
+  @@index([tenantId, entityType, entityId])
+}
+
 /// Assinatura recorrente vinculada a beneficiario e/ou empresa.
 /// status: ATIVA | SUSPENSA | CANCELADA
 /// billingCycle: MENSAL | TRIMESTRAL | SEMESTRAL | ANUAL

@@ -104,6 +104,7 @@ export async function createPatient(
     phone?: string | null;
     companyId?: string | null;
     createdBy: string;
+    correlationId?: string;
   } & PatientExtraFields,
 ) {
   const prisma = await getPrisma();
@@ -142,6 +143,7 @@ export async function createPatient(
     action: TIMELINE_ACTIONS.CREATED,
     description: `Beneficiário ${patient.name} cadastrado`,
     createdBy: input.createdBy,
+    correlationId: input.correlationId,
   });
 
   void dispatchWebhooks({

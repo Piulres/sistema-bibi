@@ -11,8 +11,10 @@ import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { changeFieldLabel, formatMetadataValue } from "@/lib/change-management";
 import type { TimelineEventMetadata } from "@/lib/change-management";
+import { RESTORE_CONFIRM_PHRASE } from "@/lib/change-management/policy";
 import { TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
 import ExportButtons from "@/components/ExportButtons";
+import { useToast } from "@/components/ui/Toast";
 
 type AuditEvent = {
   id: string;
@@ -96,6 +98,8 @@ export default function AuditoriaView() {
   const [page, setPage] = useState(1);
   const [refreshToken, setRefreshToken] = useState(0);
   const [expandedDiffIds, setExpandedDiffIds] = useState<Set<string>>(new Set());
+  const [restoreBusy, setRestoreBusy] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     let active = true;
@@ -137,6 +141,26 @@ export default function AuditoriaView() {
       else next.add(eventId);
       return next;
     });
+  }
+
+  async function restoreEvent(event: AuditEvent) {
+    setRestoreBusy(event.id);
+    try {
+      const res = await fetch(`/api/interno/audit/${event.id}/restore`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: RESTORE_CONFIRM_PHRASE }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast({ message: data.error ?? "Falha ao restaurar", tone: "danger" });
+        return;
+      }
+      showToast({ message: "Versão restaurada com sucesso", tone: "success" });
+      setRefreshToken((t) => t + 1);
+    } finally {
+      setRestoreBusy(null);
+    }
   }
 
   if (loading && !data) {
@@ -271,6 +295,18 @@ export default function AuditoriaView() {
                           {diffOpen ? "Ocultar alterações" : "Ver alterações"}
                         </Button>
                         {diffOpen && event.metadata && <AuditEventDiff metadata={event.metadata} />}
+                        {event.reversible && event.hasDiff && (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="ml-2"
+                            disabled={restoreBusy === event.id}
+                            onClick={() => restoreEvent(event)}
+                          >
+                            {restoreBusy === event.id ? "Restaurando…" : "Restaurar versão"}
+                          </Button>
+                        )}
                       </div>
                     )}
                     <p className="mt-1 text-xs text-[var(--text-muted)]">

@@ -260,6 +260,22 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     delete: none,
   },
   {
+    entity: "Change management (reversibilidade)",
+    portal: "Interno",
+    description: "Auditoria acionável, restore e compensações de domínio.",
+    create: [
+      apiOnly("Walk-in atômico", "POST /api/interno/appointments/walk-in"),
+      apiOnly("Restore via auditoria", "POST /api/interno/audit/[eventId]/restore"),
+      apiOnly("Desfazer recente", "POST /api/interno/change/revert-recent"),
+      apiOnly("Anular fatura", "POST /api/interno/invoices/[id]/void"),
+      apiOnly("Void ProcedureUsage", "POST /api/interno/procedure-usages/[id]/void"),
+      apiOnly("Reversão estoque", "POST /api/interno/stock/movements/[id]/reverse"),
+    ],
+    read: [apiOnly("Revisões de entidade", "GET /api/interno/revisions?entityType=&entityId=")],
+    update: none,
+    delete: none,
+  },
+  {
     entity: "Dashboard executivo",
     portal: "Interno",
     create: none,

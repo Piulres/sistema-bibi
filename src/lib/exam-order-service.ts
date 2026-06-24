@@ -208,3 +208,19 @@ export async function updateExamOrder(input: {
 
   return mapExamOrder(row);
 }
+
+/** Cancela pedido de exame ainda não realizado. */
+export async function cancelExamOrder(input: {
+  id: string;
+  tenantId: string;
+  providerId: string;
+  patientName: string;
+}): Promise<ExamOrderView | null> {
+  return updateExamOrder({
+    id: input.id,
+    tenantId: input.tenantId,
+    providerId: input.providerId,
+    patientName: input.patientName,
+    status: "CANCELADO",
+  });
+}

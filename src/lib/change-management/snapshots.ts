@@ -82,3 +82,43 @@ export function snapshotPricingRule(r: {
     companyName: r.company?.name ?? null,
   };
 }
+
+export function snapshotProcedure(p: {
+  code: string;
+  name: string;
+  category: string;
+  basePrice: number;
+}): Record<string, unknown> {
+  return {
+    code: p.code,
+    name: p.name,
+    category: p.category,
+    basePrice: p.basePrice,
+  };
+}
+
+export function snapshotBranding(b: {
+  displayName: string;
+  tagline: string | null;
+  primaryColor: string;
+  accentColor: string;
+  heroFrom: string;
+  heroTo: string;
+  platformLabel: string;
+  colorScheme: string;
+  customDomain: string | null;
+  customDomainVerified: boolean;
+}): Record<string, unknown> {
+  return {
+    displayName: b.displayName,
+    tagline: b.tagline,
+    primaryColor: b.primaryColor,
+    accentColor: b.accentColor,
+    heroFrom: b.heroFrom,
+    heroTo: b.heroTo,
+    platformLabel: b.platformLabel,
+    colorScheme: b.colorScheme,
+    customDomain: b.customDomain,
+    customDomainVerified: b.customDomainVerified,
+  };
+}
