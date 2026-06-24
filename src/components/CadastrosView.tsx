@@ -26,6 +26,8 @@ import {
 import ProtocolTemplatesPanel from "@/components/ProtocolTemplatesPanel";
 import ImportInterchangePanel from "@/components/cadastros/ImportInterchangePanel";
 import { useLabels } from "@/hooks/useLabels";
+import { useFormUndo } from "@/hooks/useFormUndo";
+import { useToast } from "@/components/ui/Toast";
 import { buildCadastrosTabs } from "@/lib/navigation/niche-nav";
 
 type Tab = "patients" | "companies" | "procedures" | "pricing" | "protocols" | "users" | "operations";
@@ -147,6 +149,8 @@ export default function CadastrosView() {
   const [editingProcedure, setEditingProcedure] = useState<ProcedureRow | null>(null);
   const [editingUser, setEditingUser] = useState<UserRow | null>(null);
   const [userEditPassword, setUserEditPassword] = useState("");
+  const patientEditUndo = useFormUndo<PatientRow | null>(null);
+  const { showToast } = useToast();
 
   const selectTab = useCallback(
     (next: Tab) => {
@@ -251,7 +255,24 @@ export default function CadastrosView() {
       else {
         setMsg(`Beneficiário ${data.patient.name} atualizado`);
         setEditingPatient(null);
+        patientEditUndo.reset(null);
         await load();
+        showToast({
+          message: `${data.patient.name} atualizado`,
+          actionLabel: "Desfazer",
+          tone: "success",
+          onAction: async () => {
+            const revertRes = await fetch("/api/interno/change/revert-recent", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ entityType: "Patient", entityId: data.patient.id }),
+            });
+            if (revertRes.ok) {
+              await load();
+              showToast({ message: "Alteração desfeita", tone: "info" });
+            }
+          },
+        });
       }
     } finally {
       setBusy(null);
@@ -641,6 +662,19 @@ export default function CadastrosView() {
                           <Button type="button" size="sm" variant="secondary" onClick={() => setEditingPatient(null)}>
                             Cancelar
                           </Button>
+                          {patientEditUndo.canUndo && (
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                const restored = patientEditUndo.undo();
+                                if (restored) setEditingPatient(restored);
+                              }}
+                            >
+                              Desfazer (Ctrl+Z)
+                            </Button>
+                          )}
                         </div>
                       </form>
                     ) : (
@@ -657,7 +691,10 @@ export default function CadastrosView() {
                             {p.phone ? ` · ${p.phone}` : ""}
                           </p>
                         </div>
-                        <Button type="button" size="sm" variant="ghost" onClick={() => setEditingPatient({ ...p })}>
+                        <Button type="button" size="sm" variant="ghost" onClick={() => {
+                          patientEditUndo.reset({ ...p });
+                          setEditingPatient({ ...p });
+                        }}>
                           Editar
                         </Button>
                       </div>

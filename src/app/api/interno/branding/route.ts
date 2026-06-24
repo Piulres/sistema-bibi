@@ -3,7 +3,6 @@ import { getPrisma } from "@/lib/db";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { getTenantBranding } from "@/lib/theme/branding";
 import {
-  recordTimelineEvent,
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
@@ -13,6 +12,8 @@ import {
   normalizeCustomDomain,
   type BrandingInput,
 } from "@/lib/theme/branding-validation";
+import { snapshotBranding } from "@/lib/change-management/snapshots";
+import { runChangeCommand } from "@/lib/change-management/run-change";
 
 function brandingResponse(row: {
   displayName: string;
@@ -79,26 +80,29 @@ export async function PUT(request: Request) {
       customDomainVerified = true;
     }
 
-    const branding = await prisma.tenantBranding.upsert({
-      where: { tenantId: user.tenantId },
-      create: {
-        tenantId: user.tenantId,
-        ...data,
-        customDomainVerified,
-      },
-      update: {
-        ...data,
-        customDomainVerified,
-      },
-    });
-
-    await recordTimelineEvent({
+    const branding = await runChangeCommand({
       tenantId: user.tenantId,
       entityType: TIMELINE_ENTITY_TYPES.BRANDING,
       entityId: user.tenantId,
       action: TIMELINE_ACTIONS.UPDATED,
-      description: `Identidade visual atualizada: ${branding.displayName}${domainChanged ? " (domínio alterado)" : ""}`,
+      description: `Identidade visual atualizada: ${data.displayName}${domainChanged ? " (domínio alterado)" : ""}`,
       createdBy: user.id,
+      before: existing ? snapshotBranding(existing) : undefined,
+      reversible: true,
+      afterSnapshot: snapshotBranding,
+      execute: async (tx) =>
+        tx.tenantBranding.upsert({
+          where: { tenantId: user.tenantId },
+          create: {
+            tenantId: user.tenantId,
+            ...data,
+            customDomainVerified,
+          },
+          update: {
+            ...data,
+            customDomainVerified,
+          },
+        }),
     });
 
     return NextResponse.json({
