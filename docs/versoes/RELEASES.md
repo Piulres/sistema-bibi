@@ -13,10 +13,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy pendente desta release |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3b8607` @ `22a5b1d` |
 | **Versão anterior em produção** | **2.0.0** — deploy `6a3b711d` @ `9944783` |
-| **Commit release v2.1** | `dev` @ merge `main` (59 commits à frente da `main` anterior) |
-| `main` / `dev` | Release **v2.1.0** — merge `dev` → `main` |
+| **Commit release v2.1** | `22a5b1d` |
+| `main` / `dev` | **v2.1.0** — sincronizadas |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
 | **Pacote anterior** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (24/06/2026) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.1.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.1.0** — após merge desta release |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — após deploy |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3b8607` @ `22a5b1d` |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -53,7 +53,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.1.0` |
 | **PRs** | [#126](https://github.com/Piulres/sistema-bibi/pull/126)–[#133](https://github.com/Piulres/sistema-bibi/pull/133), [#129](https://github.com/Piulres/sistema-bibi/pull/129)–[#132](https://github.com/Piulres/sistema-bibi/pull/132), [#131](https://github.com/Piulres/sistema-bibi/pull/131) |
 | **Doc** | [`V2_1.md`](V2_1.md) |
-| **Publicado em** | 24/06/2026 |
+| **Publicado em** | 24/06/2026 — deploy Netlify `6a3b8607` @ `22a5b1d` |
 
 **Inclui (além de v2.0.0):**
 
