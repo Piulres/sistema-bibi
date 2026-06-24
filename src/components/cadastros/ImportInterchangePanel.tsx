@@ -220,14 +220,14 @@ export default function ImportInterchangePanel({
       </div>
 
       {error && (
-        <Alert variant="error" className="mt-4">
+        <Alert tone="danger" className="mt-4">
           {error}
         </Alert>
       )}
 
       {summary && (
         <div className="mt-4 space-y-3">
-          <Alert variant={summary.errors > 0 ? "warning" : "success"}>{summary.message}</Alert>
+          <Alert tone={summary.errors > 0 ? "warning" : "success"}>{summary.message}</Alert>
           <div className="grid gap-2 text-sm sm:grid-cols-4">
             <div className="rounded border border-[var(--border-muted)] p-2">
               <div className="text-[var(--text-secondary)]">Total</div>

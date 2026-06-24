@@ -9,6 +9,7 @@ import {
   interchangeFileExtension,
   interchangeMimeType,
   parseInterchangeFormat,
+  type InterchangeFormat,
 } from "@/lib/imports/format";
 import { getImportEntityLabel, isImportEntity } from "@/lib/imports/schemas";
 
@@ -62,7 +63,7 @@ export async function POST(request: Request, { params }: Params) {
 
     const contentType = request.headers.get("content-type") ?? "";
     let content = "";
-    let format = "json";
+    let format: InterchangeFormat = "json";
     let dryRun = false;
 
     if (contentType.includes("multipart/form-data")) {

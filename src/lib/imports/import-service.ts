@@ -257,7 +257,7 @@ async function importPatientRow(input: {
   });
 
   if ("error" in result) {
-    return { row: 0, status: "error", message: result.error, identifier: cpf };
+    return { row: 0, status: "error", message: result.error ?? "Erro ao importar", identifier: cpf };
   }
 
   return {
@@ -314,7 +314,7 @@ async function importCompanyRow(input: {
   });
 
   if ("error" in result) {
-    return { row: 0, status: "error", message: result.error, identifier: cnpj };
+    return { row: 0, status: "error", message: result.error ?? "Erro ao importar", identifier: cnpj };
   }
 
   return {
@@ -367,7 +367,7 @@ async function importProcedureRow(input: {
   });
 
   if ("error" in result) {
-    return { row: 0, status: "error", message: result.error, identifier: code };
+    return { row: 0, status: "error", message: result.error ?? "Erro ao importar", identifier: code };
   }
 
   const serviceType = trimOrNull(input.row.serviceType ?? "");

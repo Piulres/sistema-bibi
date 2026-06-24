@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { convertInterchangeContent } from "@/lib/imports/interchange";
 import { parseInterchangeFormat, interchangeMimeType } from "@/lib/imports/format";
+import { getImportColumns, isImportEntity } from "@/lib/imports/schemas";
 
 /** Converte payload de importação entre JSON e CSV. */
 export async function POST(request: Request) {
