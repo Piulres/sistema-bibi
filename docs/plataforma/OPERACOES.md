@@ -193,7 +193,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.0.0`** — **Sistema Bibi - ServiceOS**. Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v2.1.0`** — **Sistema Bibi - ServiceOS**. Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 

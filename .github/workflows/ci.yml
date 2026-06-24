@@ -23,6 +23,17 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Docs verify
+        run: npm run docs:verify
+
+      - name: Prepare database
+        run: npm run db:push && npm run db:seed
+        env:
+          SEED_SCALE: small
+
+      - name: Database verify
+        run: npm run db:verify
+
       - name: Unit + integration + API tests
         run: npm run test
         env:

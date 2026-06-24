@@ -13,27 +13,29 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** — deploy `6a3b711d` @ `9944783` |
-| **Commit release** | `9944783` (hardening segurança pós-POC — [PR #131](https://github.com/Piulres/sistema-bibi/pull/131)) |
-| `main` / `dev` | Aguardando merge do PR #131 |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy pendente desta release |
+| **Versão anterior em produção** | **2.0.0** — deploy `6a3b711d` @ `9944783` |
+| **Commit release v2.1** | `dev` @ merge `main` (59 commits à frente da `main` anterior) |
+| `main` / `dev` | Release **v2.1.0** — merge `dev` → `main` |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
-| **Pacote anterior** | deploy `6a3abdc1` @ `b661b39` (23/06/2026) |
+| **Pacote anterior** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (24/06/2026) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.0.0** — Sistema Bibi - ServiceOS |
-| **Release** | `main` | **v2.0.0** — idem |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (segurança pós-POC) |
+| **Integração** | `dev` | **v2.1.0** — Sistema Bibi - ServiceOS |
+| **Release** | `main` | **v2.1.0** — após merge desta release |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — após deploy |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque — **tag criada** |
+| **`v2.1.0`** | merge `dev`→`main` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
+| **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
 | `v1.2.0` | `485819a` | Care Chart, exports, homepage — substituído por v2.0 |
 | `v1.1.0` | `8c8cd01` | Care Chart (substituído) |
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
@@ -44,7 +46,32 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.0.0` — Sistema Bibi - ServiceOS (multi-nicho)
+### `v2.1.0` — Sistema Bibi - ServiceOS (pós-POC integrado)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.1.0` |
+| **PRs** | [#126](https://github.com/Piulres/sistema-bibi/pull/126)–[#133](https://github.com/Piulres/sistema-bibi/pull/133), [#129](https://github.com/Piulres/sistema-bibi/pull/129)–[#132](https://github.com/Piulres/sistema-bibi/pull/132), [#131](https://github.com/Piulres/sistema-bibi/pull/131) |
+| **Doc** | [`V2_1.md`](V2_1.md) |
+| **Publicado em** | 24/06/2026 |
+
+**Inclui (além de v2.0.0):**
+
+- **Segurança pós-POC:** proxy HMAC, rate limit login/MFA, headers CSP/HSTS, RBAC users ADMIN
+- **Assistente operacional:** chat nos 4 portais, mock 350+ gatilhos, confirmação de ações
+- **VET / Pet:** entidade Pet, ficha clínica, vacinas, walk-in com pet
+- **Change management A–F:** reversão faturas, PPU, estoque, restore via timeline
+- **Importação JSON/CSV:** interchange de cadastros (patients, providers, companies, procedures)
+- **Agendamento flexível:** procedimento sem prestador obrigatório
+- **Landing:** CTA WhatsApp, SEO, tags marketing, identidade Energia Brasileira
+- **OpenAPI v2.1:** +15 paths (assistente, pets, import, change-mgmt)
+- **Versão na UI:** `Sistema Bibi - ServiceOS v2.1` em title, badges e Swagger
+
+**Testes:** 384 Vitest · 128 E2E · `docs:verify` · `db:verify` · `pre-release` OK.
+
+---
+
+### `v2.0.0` — Sistema Bibi - ServiceOS (multi-nicho) *(substituído por v2.1.0)*
 
 | Campo | Valor |
 |-------|-------|
@@ -120,7 +147,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.1.x** | [`V1_1.md`](V1_1.md) | Care Chart (incorporado em 1.2.0) |
 | **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
-| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | ✅ **`v2.0.0` em produção** |
+| **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
+| **2.1.x** | [`V2_1.md`](V2_1.md) | ✅ **`v2.1.0` em produção** |
 | **1.4.x** | Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) | 🚧 Isolado — docs na branch |
 
 ---

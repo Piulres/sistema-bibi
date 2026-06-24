@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (jun/2026):** **v2.0.0** @ commit `49edb90` — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+**Produção (jun/2026):** **v2.1.0** — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_1.md`](../versoes/V2_1.md).
 
 ---
 
