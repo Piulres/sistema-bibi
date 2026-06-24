@@ -11,6 +11,7 @@ export const HOME_NAV_ANCHORS: LandingNavItem[] = [
   { href: "#produto", label: "Produto" },
   { href: "#visao", label: "Visão" },
   { href: "#valores", label: "Valores" },
+  { href: "#novidades", label: "Novidades" },
   { href: "#segmentos", label: "Segmentos" },
   { href: "#portais", label: "Portais" },
   { href: "#faq", label: "FAQ" },

@@ -155,4 +155,49 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("docs:verify OK — estrutura por segmentos e marca Sistema Bibi - ServiceOS consistentes.");
+// Alinhamento versão: package.json ↔ platform.ts ↔ changelog landing
+try {
+  const pkgVersion = JSON.parse(readFileSync(join(ROOT, "package.json"), "utf8")).version;
+  const platformTs = readFileSync(join(ROOT, "src/lib/platform.ts"), "utf8");
+  const changelogTs = readFileSync(join(ROOT, "src/lib/landing/changelog-content.ts"), "utf8");
+
+  const platformVersion = platformTs.match(/version:\s*"([^"]+)"/)?.[1];
+  const currentChangelogVersion = changelogTs.match(
+    /version:\s*"([\d.]+)"[\s\S]*?status:\s*"current"/,
+  )?.[1];
+
+  if (!platformVersion) {
+    errors.push("src/lib/platform.ts: não encontrou PLATFORM.version");
+  }
+  if (!currentChangelogVersion) {
+    errors.push(
+      "src/lib/landing/changelog-content.ts: não encontrou release com status current",
+    );
+  }
+  if (pkgVersion && currentChangelogVersion && pkgVersion !== currentChangelogVersion) {
+    errors.push(
+      `Versão desalinhada: package.json (${pkgVersion}) ≠ changelog current (${currentChangelogVersion}) — ver docs/plataforma/LANDING_CHANGELOG.md`,
+    );
+  }
+  if (
+    platformVersion &&
+    currentChangelogVersion &&
+    !currentChangelogVersion.startsWith(`${platformVersion}.`)
+  ) {
+    errors.push(
+      `Versão desalinhada: PLATFORM.version (${platformVersion}) não é prefixo de changelog (${currentChangelogVersion})`,
+    );
+  }
+} catch (e) {
+  errors.push(`Falha ao validar changelog landing: ${e.message}`);
+}
+
+if (errors.length > 0) {
+  console.error("docs:verify falhou:\n");
+  for (const e of errors) console.error(`  - ${e}`);
+  process.exit(1);
+}
+
+console.log(
+  "docs:verify OK — estrutura por segmentos, marca Sistema Bibi - ServiceOS e changelog landing consistentes.",
+);

@@ -233,6 +233,20 @@ Se o deploy falhar antes de publicar, basta **não** atualizar `RELEASES.md` com
 
 ---
 
+## Changelog na landing (home)
+
+A seção **Novidades** (`/#novidades`) apresenta o changelog para demonstrações comerciais.
+
+| Momento | Arquivo |
+|---------|---------|
+| Ao fechar pacote | `src/lib/landing/changelog-content.ts` |
+| Junto com release | `src/lib/platform.ts`, `package.json` |
+| Instruções completas | [`../plataforma/LANDING_CHANGELOG.md`](../plataforma/LANDING_CHANGELOG.md) |
+
+**Regra:** quando este arquivo marca uma versão como **em produção**, a home deve exibir a mesma versão em destaque. `npm run docs:verify` valida o alinhamento.
+
+---
+
 ## Publicar um pacote
 
 ```bash
