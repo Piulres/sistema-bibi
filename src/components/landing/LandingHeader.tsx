@@ -6,6 +6,7 @@ import type { LandingNavContext } from "@/lib/landing/navigation";
 import {
   landingNavItems,
   SEGMENT_ACCESS_HREF,
+  SEGMENT_ACCESS_LABEL,
 } from "@/lib/landing/navigation";
 import LandingMobileMenu from "@/components/landing/LandingMobileMenu";
 
@@ -40,10 +41,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
             />
           ) : (
             <span
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-[var(--text-inverse)] shadow-sm"
-              style={{
-                background: `linear-gradient(135deg, var(--brand-hero-from), var(--brand-hero-to))`,
-              }}
+              className="ds-logo-mark flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-bold text-[var(--text-inverse)] shadow-sm"
               aria-hidden
             >
               {branding.displayName.charAt(0)}
@@ -71,7 +69,7 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
               href={SEGMENT_ACCESS_HREF}
               className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             >
-              Segmentos
+              {SEGMENT_ACCESS_LABEL}
             </Link>
           )}
           {anchors.map((link) => (

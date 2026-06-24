@@ -50,7 +50,7 @@ export default function LandingHomePageView({ branding }: Props) {
           features={HOME_FEATURES}
         />
         <LandingNiches />
-        <LandingPortals niche="MEDICAL" />
+        <LandingPortals niche="MEDICAL" branding={branding} />
         <LandingFaq items={HOME_FAQ} />
         <LandingCta branding={branding} niche="MEDICAL" description={HOME_CTA} />
       </main>

@@ -8,9 +8,11 @@ import type { LandingNavContext } from "@/lib/landing/navigation";
 import {
   landingNavItems,
   SEGMENT_ACCESS_HREF,
+  SEGMENT_ACCESS_LABEL,
 } from "@/lib/landing/navigation";
 import { SEGMENT_LANDING_PAGES } from "@/lib/platform/structure";
 import { getNicheConfig } from "@/lib/niche/defaults";
+import { segmentPillStyle } from "@/lib/theme/segment-colors";
 
 type Props = {
   context?: LandingNavContext;
@@ -111,7 +113,7 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                       onClick={() => setOpen(false)}
                       className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]"
                     >
-                      Segmentos
+                      {SEGMENT_ACCESS_LABEL}
                     </Link>
                   </li>
                 )}
@@ -146,11 +148,10 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                             href={page.href}
                             onClick={() => setOpen(false)}
                             className={cn(
-                              "inline-block rounded-full px-2.5 py-1 text-xs font-medium",
-                              isActive
-                                ? "bg-[var(--brand-primary)] text-[var(--text-inverse)]"
-                                : "border border-[var(--border-default)] text-[var(--text-secondary)]",
+                              "inline-block rounded-full border px-2.5 py-1 text-xs font-medium transition",
+                              !isActive && "hover:bg-[var(--surface-muted)]",
                             )}
+                            style={segmentPillStyle(page.niche, isActive)}
                           >
                             {config.name}
                           </Link>

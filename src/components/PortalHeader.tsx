@@ -45,7 +45,7 @@ export default function PortalHeader({
             />
           ) : (
             <div
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)] ds-gradient-brand"
+              className="ds-logo-mark flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)]"
               aria-hidden
             >
               {displayName.charAt(0)}

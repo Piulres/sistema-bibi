@@ -35,7 +35,7 @@ export default function LandingSegmentPageView({ niche, branding, tenantSlug }: 
         <LandingHeroNiche niche={niche} branding={branding} />
         <LandingFeatures niche={niche} />
         <LandingHowItWorks niche={niche} />
-        <LandingPortals niche={niche} segment={segment} />
+        <LandingPortals niche={niche} branding={branding} segment={segment} />
         <LandingFaq niche={niche} />
         <LandingCta branding={branding} niche={niche} />
       </main>
