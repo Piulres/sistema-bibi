@@ -6,6 +6,8 @@ import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
 import Link from "next/link";
 import { landingCtaClasses } from "@/components/landing/landing-cta";
+import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
+import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
 type Props = {
   niche: NicheId;
@@ -56,16 +58,21 @@ export default function LandingHeroNiche({ niche, branding }: Props) {
           </p>
 
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
+            <LandingTrackedCta
               href="#portais"
-              className={landingCtaClasses("hero", "lg", "group")}
+              event="cta_portals_click"
+              location="hero-segment"
+              variant="hero"
+              size="lg"
+              className="group"
             >
               Explorar portais
               <LandingIcon
                 name="arrow-right"
                 className="h-5 w-5 transition group-hover:translate-x-0.5"
               />
-            </Link>
+            </LandingTrackedCta>
+            <LandingWhatsAppCta variant="hero-ghost" size="lg" location="hero-segment" />
             <Link
               href="#recursos"
               className={landingCtaClasses("hero-ghost", "lg")}

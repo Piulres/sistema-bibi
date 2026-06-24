@@ -5,6 +5,8 @@ import { HOME_HERO } from "@/lib/landing/home-content";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
 import { SEGMENT_ACCESS_HREF } from "@/lib/landing/navigation";
 import { landingCtaClasses } from "@/components/landing/landing-cta";
+import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
+import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
 export default function LandingHeroProduct() {
   return (
@@ -44,16 +46,21 @@ export default function LandingHeroProduct() {
           <p className="landing-fade-in mt-4 max-w-xl text-sm text-white/55">{HOME_HERO.subline}</p>
 
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a
+            <LandingTrackedCta
               href="#portais"
-              className={landingCtaClasses("hero", "lg", "group")}
+              event="cta_portals_click"
+              location="hero-home"
+              variant="hero"
+              size="lg"
+              className="group"
             >
               Acessar portais
               <LandingIcon
                 name="arrow-right"
                 className="h-5 w-5 transition group-hover:translate-x-0.5"
               />
-            </a>
+            </LandingTrackedCta>
+            <LandingWhatsAppCta variant="hero-ghost" size="lg" location="hero-home" />
             <Link
               href={SEGMENT_ACCESS_HREF}
               className={landingCtaClasses("hero-ghost", "lg")}

@@ -1,9 +1,9 @@
-import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { NicheId } from "@/lib/niche/types";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingIcon from "@/components/landing/LandingIcon";
-import { landingCtaClasses } from "@/components/landing/landing-cta";
+import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
+import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
 type Props = {
   branding: BrandingTokens;
@@ -46,20 +46,35 @@ export default function LandingCta({ branding, niche = "MEDICAL", description }:
             {ctaDescription}
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+            <LandingTrackedCta
               href="/interno/login"
-              className={landingCtaClasses("hero", "lg", "min-w-[12rem]")}
+              event="cta_demo_click"
+              location="cta-footer"
+              variant="hero"
+              size="lg"
+              className="min-w-[12rem]"
             >
               Acessar demonstração
               <LandingIcon name="arrow-right" className="h-5 w-5" />
-            </Link>
-            <a
+            </LandingTrackedCta>
+            <LandingWhatsAppCta
+              variant="hero"
+              size="lg"
+              location="cta-footer"
+              className="min-w-[12rem]"
+            />
+            <LandingTrackedCta
               href="/openapi.yaml"
-              className={landingCtaClasses("hero-ghost", "lg", "min-w-[12rem]")}
+              event="cta_demo_click"
+              location="cta-footer-api"
+              variant="hero-ghost"
+              size="lg"
+              className="min-w-[12rem]"
+              external
             >
               Ver API (OpenAPI)
-            </a>
+            </LandingTrackedCta>
           </div>
         </div>
       </div>
