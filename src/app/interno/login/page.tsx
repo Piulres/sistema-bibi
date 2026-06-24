@@ -1,6 +1,10 @@
 import LoginForm from "@/components/LoginForm";
 import { getLoginSegmentContext } from "@/lib/segment/login-context";
-import { SEGMENT_TENANTS, segmentTenantByNiche } from "@/lib/niche/demo-accounts";
+import {
+  demoEmailForPortal,
+  loginNicheDemoOptions,
+  resolveSegmentTenantRef,
+} from "@/lib/segment/login-demo";
 
 type PageProps = {
   searchParams: Promise<{ tenant?: string; niche?: string }>;
@@ -13,24 +17,18 @@ export default async function InternoLoginPage({ searchParams }: PageProps) {
     nicheParam,
   });
 
-  const defaultDemo = context.tenantSlug
-    ? SEGMENT_TENANTS.find((t) => t.slug === context.tenantSlug) ?? segmentTenantByNiche(context.niche)
-    : segmentTenantByNiche(context.niche);
+  const tenantRef = resolveSegmentTenantRef(context.tenantSlug, context.niche);
 
   return (
     <LoginForm
       portal="interno"
       title="Portal Interno"
-      subtitle={`Administre operação e faturamento de ${context.tenantName ?? context.nicheName}.`}
-      demoEmail={defaultDemo.internoEmail}
+      subtitle={`Administre operação e faturamento de ${context.tenantName ?? tenantRef.tenant}.`}
+      demoEmail={demoEmailForPortal(tenantRef, "interno")}
       demoPassword="bibi123"
       branding={context.branding}
       segmentContext={context}
-      nicheDemos={SEGMENT_TENANTS.map(({ niche, tenant, internoEmail }) => ({
-        niche,
-        tenant,
-        internoEmail,
-      }))}
+      nicheDemos={loginNicheDemoOptions()}
     />
   );
 }

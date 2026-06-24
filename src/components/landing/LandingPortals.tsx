@@ -37,19 +37,13 @@ export default function LandingPortals({ niche, segment }: Props) {
               >
                 <article className="landing-card-hover relative h-full overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
                   <div
-                    className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r opacity-80"
-                    style={{
-                      backgroundImage: `linear-gradient(90deg, ${theme.accentFrom}, ${theme.accentTo})`,
-                    }}
+                    className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] opacity-80"
                     aria-hidden
                   />
 
                   <div className="flex items-start justify-between gap-4">
                     <div
-                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--text-inverse)] shadow-sm"
-                      style={{
-                        background: `linear-gradient(135deg, ${theme.accentFrom}, ${theme.accentTo})`,
-                      }}
+                      className="ds-gradient-brand flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--text-inverse)] shadow-sm"
                       aria-hidden
                     >
                       <LandingIcon name="portals" className="h-6 w-6" />
@@ -66,7 +60,7 @@ export default function LandingPortals({ niche, segment }: Props) {
                     {portal.description}
                   </p>
 
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-primary)] transition group-hover:gap-2.5">
+                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-accent)] transition group-hover:gap-2.5">
                     Entrar no portal
                     <LandingIcon name="arrow-right" className="h-4 w-4" />
                   </span>

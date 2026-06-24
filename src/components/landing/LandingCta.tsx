@@ -1,16 +1,18 @@
-import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { NicheId } from "@/lib/niche/types";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingIcon from "@/components/landing/LandingIcon";
+import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
+import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
 type Props = {
   branding: BrandingTokens;
-  niche: NicheId;
+  niche?: NicheId;
+  description?: string;
 };
 
-export default function LandingCta({ branding, niche }: Props) {
-  const { ctaDescription } = getNicheLandingContent(niche);
+export default function LandingCta({ branding, niche = "MEDICAL", description }: Props) {
+  const ctaDescription = description ?? getNicheLandingContent(niche).ctaDescription;
 
   return (
     <section aria-labelledby="cta-heading" className="mx-auto max-w-6xl px-6 py-24">
@@ -33,30 +35,46 @@ export default function LandingCta({ branding, niche }: Props) {
 
           <h2
             id="cta-heading"
-            className="mt-6 text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.75rem] lg:leading-tight"
+            className="mt-6 text-3xl tracking-tight text-white sm:text-4xl lg:text-[2.75rem] lg:leading-tight"
           >
-            Pronto para conhecer o{" "}
-            <span className="landing-gradient-text">{branding.displayName}</span>?
+            <span className="font-light">Pronto para conhecer o </span>
+            <span className="font-bold">{branding.displayName}</span>
+            <span className="font-light">?</span>
           </h2>
 
           <p className="mx-auto mt-4 max-w-xl text-lg text-white/75">
             {ctaDescription}
           </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:flex-wrap">
+            <LandingTrackedCta
               href="/interno/login"
-              className="inline-flex min-w-[12rem] items-center justify-center gap-2 rounded-full bg-[var(--brand-accent)] px-7 py-3.5 text-base font-semibold text-[var(--surface-inverse)] shadow-lg shadow-teal-900/25 transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              event="cta_demo_click"
+              location="cta-footer"
+              variant="hero"
+              size="lg"
+              className="min-w-[12rem]"
             >
               Acessar demonstração
               <LandingIcon name="arrow-right" className="h-5 w-5" />
-            </Link>
-            <a
+            </LandingTrackedCta>
+            <LandingWhatsAppCta
+              variant="hero"
+              size="lg"
+              location="cta-footer"
+              className="min-w-[12rem]"
+            />
+            <LandingTrackedCta
               href="/openapi.yaml"
-              className="inline-flex min-w-[12rem] items-center justify-center rounded-full border border-white/20 bg-white/8 px-7 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              event="cta_demo_click"
+              location="cta-footer-api"
+              variant="hero-ghost"
+              size="lg"
+              className="min-w-[12rem]"
+              external
             >
               Ver API (OpenAPI)
-            </a>
+            </LandingTrackedCta>
           </div>
         </div>
       </div>

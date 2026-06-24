@@ -20,7 +20,7 @@ export default function SegmentContextBanner({ context }: Props) {
 
   return (
     <div className="mt-4 rounded-[var(--radius-button)] border border-[var(--brand-primary)]/30 bg-[var(--brand-primary)]/5 px-3 py-2 text-xs text-[var(--text-secondary)]">
-      Operação: <strong>{context.tenantName ?? context.tenantSlug}</strong> · Segmento{" "}
+      Operação: <strong>{context.tenantName ?? context.tenantSlug ?? "—"}</strong> · Segmento{" "}
       <strong>{context.nicheName}</strong>
       {context.tenantSlug && (
         <>

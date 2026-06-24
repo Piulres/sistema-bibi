@@ -12,6 +12,7 @@ export type ClinicalSidebarData = {
   activeMedications: { id: string; medication: string; dosage: string; frequency: string }[];
   pendingExams: { id: string; examName: string; status: string; statusLabel: string }[];
   activeProtocols: { id: string; templateName: string; progressPercent: number }[];
+  vaccines?: { id: string; vaccineName: string; statusLabel: string; nextDueAtLabel: string | null }[];
 };
 
 type Props = {
@@ -117,6 +118,22 @@ export default function ClinicalSidebar({ data, loading }: Props) {
                     style={{ width: `${p.progressPercent}%` }}
                   />
                 </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {data.vaccines && data.vaccines.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-[var(--text-muted)]">Vacinas recentes</p>
+          <ul className="mt-1 space-y-2">
+            {data.vaccines.slice(0, 4).map((v) => (
+              <li key={v.id} className="text-sm text-[var(--text-secondary)]">
+                {v.vaccineName}
+                {v.nextDueAtLabel && (
+                  <span className="block text-xs text-[var(--text-muted)]">Reforço: {v.nextDueAtLabel}</span>
+                )}
               </li>
             ))}
           </ul>

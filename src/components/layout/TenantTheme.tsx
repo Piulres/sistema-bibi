@@ -14,7 +14,7 @@ type Props = {
 export default function TenantTheme({ branding, portal, className, children }: Props) {
   const style = {
     ...brandingToCssVars(branding),
-    ...(portal ? portalAccentCssVars(portal) : {}),
+    ...(portal ? portalAccentCssVars(branding) : {}),
   } as React.CSSProperties;
 
   return (

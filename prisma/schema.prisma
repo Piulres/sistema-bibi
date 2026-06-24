@@ -31,6 +31,7 @@ model Tenant {
   users        User[]
   companies    Company[]
   patients     Patient[]
+  pets         Pet[]
   procedures   Procedure[]
   appointments Appointment[]
   invoices     Invoice[]
@@ -56,10 +57,10 @@ model TenantBranding {
   tagline      String?
   logoUrl      String?
   /// Cores em hex (#RRGGBB). Injetadas como CSS variables em runtime.
-  primaryColor   String @default("#0d9488")
-  accentColor    String @default("#14b8a6")
-  heroFrom       String @default("#0f172a")
-  heroTo         String @default("#134e4a")
+  primaryColor   String @default("#1e293b")
+  accentColor    String @default("#f97316")
+  heroFrom       String @default("#1e293b")
+  heroTo         String @default("#f59e0b")
   /// Nome da plataforma quando exibido como produto white-label (ex. "Powered by Bibi").
   platformLabel  String @default("Powered by Sistema Bibi - ServiceOS")
   /// colorScheme: light | dark | system
@@ -110,6 +111,7 @@ model User {
   medicationPrescriptions MedicationPrescription[] @relation("ProviderPrescriptions")
   examOrders     ExamOrder[]     @relation("ProviderExamOrders")
   protocolEnrollments PatientProtocolEnrollment[] @relation("ProviderProtocolEnrollments")
+  petVaccineRecords PetVaccineRecord[] @relation("ProviderPetVaccines")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -169,6 +171,7 @@ model Patient {
   company   Company? @relation(fields: [companyId], references: [id])
 
   users          User[]
+  pets           Pet[]
   appointments   Appointment[]
   medicalRecords MedicalRecord[]
   clinicalProfile PatientClinicalProfile?
@@ -178,6 +181,75 @@ model Patient {
   invoices       Invoice[]
   subscriptions  Subscription[]
   messages       Message[]
+}
+
+/// Animal de estimação (nicho VET) — vinculado ao tutor (`Patient`).
+/// species: CANINO | FELINO | AVES | OUTRO
+/// sex: M | F | NI
+/// size: PEQUENO | MEDIO | GRANDE
+/// status: ATIVO | FALECIDO | TRANSFERIDO
+model Pet {
+  id        String   @id @default(cuid())
+  name      String
+  species   String
+  breed     String?
+  sex       String?
+  birthDate DateTime?
+  size      String?
+  weightKg  Float?
+  microchip String?
+  status    String   @default("ATIVO")
+  notes     String?
+  createdAt DateTime @default(now())
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  appointments   Appointment[]
+  medicalRecords MedicalRecord[]
+  clinicalProfile PetClinicalProfile?
+  medicationPrescriptions MedicationPrescription[]
+  examOrders     ExamOrder[]
+  vaccineRecords PetVaccineRecord[]
+
+  @@index([tenantId, patientId])
+  @@index([tenantId, status])
+}
+
+/// Perfil clínico do pet (alergias, condições crônicas).
+model PetClinicalProfile {
+  id                String   @id @default(cuid())
+  petId             String   @unique
+  pet               Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  /// JSON: [{ substance, severity, notes }]
+  allergies         String?
+  /// JSON: [{ condition, since, notes }]
+  chronicConditions String?
+  updatedAt         DateTime @updatedAt
+}
+
+/// Registro de vacinação do pet.
+/// status: APLICADA | PENDENTE | VENCIDA
+model PetVaccineRecord {
+  id            String   @id @default(cuid())
+  petId         String
+  pet           Pet      @relation(fields: [petId], references: [id], onDelete: Cascade)
+  vaccineName   String
+  doseLabel     String?
+  appliedAt     DateTime?
+  nextDueAt     DateTime?
+  batchNumber   String?
+  status        String   @default("APLICADA")
+  notes         String?
+  providerId    String?
+  provider      User?    @relation("ProviderPetVaccines", fields: [providerId], references: [id])
+  appointmentId String?
+  createdAt     DateTime @default(now())
+
+  @@index([petId, status])
+  @@index([petId, nextDueAt])
 }
 
 /// Catálogo de serviços agnóstico — consulta médica, hora técnica jurídica, banho e tosa, etc.
@@ -333,6 +405,10 @@ model Appointment {
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
 
+  /// Pet atendido (obrigatório no nicho VET)
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
+
   providerId String
   provider   User   @relation("ProviderAppointments", fields: [providerId], references: [id])
 
@@ -377,6 +453,9 @@ model MedicalRecord {
   patientId String
   patient   Patient @relation(fields: [patientId], references: [id])
 
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
+
   providerId String
   provider   User   @relation("ProviderRecords", fields: [providerId], references: [id])
 
@@ -403,6 +482,8 @@ model MedicationPrescription {
   id            String   @id @default(cuid())
   patientId     String
   patient       Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  petId         String?
+  pet           Pet?     @relation(fields: [petId], references: [id])
   providerId    String
   provider      User     @relation("ProviderPrescriptions", fields: [providerId], references: [id])
   appointmentId String?
@@ -419,6 +500,7 @@ model MedicationPrescription {
   createdAt     DateTime @default(now())
 
   @@index([patientId, status])
+  @@index([petId, status])
 }
 
 /// Pedido de exame (workflow clínico).
@@ -427,6 +509,8 @@ model ExamOrder {
   id                  String   @id @default(cuid())
   patientId           String
   patient             Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  petId               String?
+  pet                 Pet?     @relation(fields: [petId], references: [id])
   providerId          String
   provider            User     @relation("ProviderExamOrders", fields: [providerId], references: [id])
   appointmentId       String?
@@ -443,6 +527,7 @@ model ExamOrder {
   createdAt           DateTime @default(now())
 
   @@index([patientId, status])
+  @@index([petId, status])
 }
 
 /// Template de protocolo de cuidado por tenant.
@@ -545,22 +630,49 @@ model Payment {
 
 /// Auditoria universal de eventos do sistema (Timeline).
 /// entityType: User | Patient | Appointment | ProcedureUsage | MedicalRecord | Invoice | Company
-/// action: LOGIN | CREATED | UPDATED | APPOINTMENT_COMPLETED | PROCEDURE_REGISTERED |
-///         MEDICAL_RECORD_CREATED | INVOICE_ISSUED | CHARGE_SENT | CONTRACT_CHANGED
+/// action: LOGIN | CREATED | UPDATED | REVERTED | RESTORED | CANCELLED | APPOINTMENT_COMPLETED |
+///         PROCEDURE_REGISTERED | MEDICAL_RECORD_CREATED | INVOICE_ISSUED | CHARGE_SENT | CONTRACT_CHANGED
+/// metadata: JSON opcional — { before, after, fieldsChanged } para restore e diff na auditoria
 model TimelineEvent {
-  id          String   @id @default(cuid())
-  tenantId    String
-  entityType  String
-  entityId    String
-  action      String
-  description String
-  createdAt   DateTime @default(now())
-  createdBy   String?
+  id            String   @id @default(cuid())
+  tenantId      String
+  entityType    String
+  entityId      String
+  action        String
+  description   String
+  /// JSON: { before?, after?, fieldsChanged? }
+  metadata      String?
+  /// Agrupa operações compostas (ex.: walk-in = patient + appointment)
+  correlationId String?
+  /// Evento original que esta operação desfez/compensou
+  reversesId    String?
+  /// Indica se restore administrativo é permitido (Pacote C+)
+  reversible    Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  createdBy     String?
 
   tenant Tenant @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId, createdAt])
   @@index([entityType, entityId])
+  @@index([correlationId])
+}
+
+/// Versão materializada de entidade para restore administrativo (Pacote C).
+model EntityRevision {
+  id         String   @id @default(cuid())
+  tenantId   String
+  entityType String
+  entityId   String
+  revision   Int
+  /// JSON do estado após a alteração
+  snapshot   String
+  timelineId String?
+  createdAt  DateTime @default(now())
+  createdBy  String?
+
+  @@unique([entityType, entityId, revision])
+  @@index([tenantId, entityType, entityId])
 }
 
 /// Assinatura recorrente vinculada a beneficiario e/ou empresa.

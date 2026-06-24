@@ -9,6 +9,9 @@ import {
 import { isAppointmentModality } from "@/lib/telemedicine";
 import { listPatients } from "@/lib/patient-service";
 import { listProcedures } from "@/lib/procedure-service";
+import { listPets } from "@/lib/pet-service";
+import { getPrisma } from "@/lib/db";
+import { requiresPet } from "@/lib/vet-niche";
 
 export async function GET(request: Request) {
   try {
@@ -24,14 +27,28 @@ export async function GET(request: Request) {
       to = new Date(`${dateParam}T23:59:59.999`);
     }
 
-    const [appointments, providers, patients, procedures] = await Promise.all([
+    const prisma = await getPrisma();
+    const tenant = await prisma.tenant.findFirst({
+      where: { id: user.tenantId },
+      select: { niche: true },
+    });
+
+    const [appointments, providers, patients, procedures, pets] = await Promise.all([
       listAppointments({ tenantId: user.tenantId, from, to, providerId }),
       listProviders(user.tenantId),
       listPatients(user.tenantId),
       listProcedures(user.tenantId),
+      requiresPet(tenant?.niche) ? listPets(user.tenantId) : Promise.resolve([]),
     ]);
 
-    return NextResponse.json({ appointments, providers, patients, procedures });
+    return NextResponse.json({
+      appointments,
+      providers,
+      patients,
+      procedures,
+      pets,
+      niche: tenant?.niche,
+    });
   } catch (error) {
     return authErrorResponse(error);
   }
@@ -42,6 +59,7 @@ export async function POST(request: Request) {
     const user = await requireInternoModule("agenda");
     const body = (await request.json()) as {
       patientId?: string;
+      petId?: string | null;
       providerId?: string;
       procedureId?: string;
       scheduledAt?: string;
@@ -73,6 +91,7 @@ export async function POST(request: Request) {
     const result = await createAppointment({
       tenantId: user.tenantId,
       patientId: body.patientId,
+      petId: body.petId,
       providerId: body.providerId,
       procedureId: body.procedureId,
       scheduledAt: new Date(body.scheduledAt),

@@ -9,7 +9,7 @@ import { getNicheConfig, getDefaultLabels } from "@/lib/niche/defaults";
 import { mergeNicheLabels } from "@/lib/niche/labels";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { NICHE_INTERNO_DEMOS } from "@/lib/niche/demo-accounts";
-import { buildInternoNavTabs } from "@/lib/navigation/niche-nav";
+import { buildInternoNavTabs, buildCadastrosTabs } from "@/lib/navigation/niche-nav";
 import { isNicheId, NICHE_IDS } from "@/lib/niche/types";
 import { NICHE_DEMOS } from "../../prisma/seed-data/niche-tenants";
 
@@ -105,6 +105,12 @@ describe("niche.buildInternoNavTabs", () => {
     expect(vet.find((t) => t.key === "agenda")?.label).toBe("Atendimentos");
     expect(vet.find((t) => t.key === "estoque")?.label).toBe("Estoque pet");
   });
+
+  it("inclui aba Pets nos cadastros VET", () => {
+    const tabs = buildCadastrosTabs(getDefaultLabels("VET"), "VET");
+    expect(tabs.find((t) => t.key === "pets")?.label).toBe("Pets");
+    expect(tabs.find((t) => t.key === "patients")?.label).toBe("Tutores");
+  });
 });
 
 describe("niche.NICHE_INTERNO_DEMOS", () => {
@@ -125,11 +131,26 @@ describe("niche seed demos", () => {
     expect(dental?.procedures.find((p) => p.code === "DEN-CON")?.basePrice).toBe(350);
     expect(legal?.procedures.find((p) => p.code === "LEG-HT")?.basePrice).toBe(500);
     expect(vet?.procedures.find((p) => p.code === "VET-BAN")?.basePrice).toBe(150);
+    expect(vet?.procedures.find((p) => p.code === "VET-CIR-CAS")?.basePrice).toBe(450);
+  });
+
+  it("cobre catálogos expandidos em todos os nichos demo", () => {
+    for (const demo of NICHE_DEMOS) {
+      expect(demo.procedures.length).toBeGreaterThanOrEqual(12);
+      expect(demo.providers.length).toBeGreaterThanOrEqual(3);
+    }
   });
 
   it("cobre os cinco nichos além de MEDICAL", () => {
     expect(NICHE_DEMOS.map((d) => d.niche).sort()).toEqual(
       ["DENTAL", "EDUCATION", "LEGAL", "SPA", "VET"].sort(),
     );
+  });
+
+  it("PetCare não usa override Banho/Tosa na agenda", () => {
+    const vet = NICHE_DEMOS.find((d) => d.niche === "VET");
+    expect(vet?.slug).toBe("petcare");
+    expect(vet?.procedures.some((p) => p.code === "VET-CON")).toBe(true);
+    expect(vet?.procedures.some((p) => p.code === "VET-EMER")).toBe(true);
   });
 });

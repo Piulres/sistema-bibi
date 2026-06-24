@@ -21,8 +21,8 @@ type Props = {
 /** Navegação por âncoras — drawer em mobile/tablet, faixa rolável em desktop largo. */
 export default function SectionNav({
   sections,
-  activeClass = "border-[var(--portal-accent)] text-[var(--portal-accent)]",
-  idleClass = "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
+  activeClass = "border-[var(--brand-accent)] text-[var(--brand-accent)]",
+  idleClass = "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
   className,
   drawerTitle = "Seções da página",
 }: Props) {
@@ -80,7 +80,7 @@ export default function SectionNav({
         sections={sections}
         activeId={activeId}
         onSelect={handleClick}
-        activeClass="bg-[var(--surface-muted)] text-[var(--portal-accent)]"
+        activeClass="bg-[var(--surface-muted)] text-[var(--brand-accent)]"
         idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
         title={drawerTitle}
       />

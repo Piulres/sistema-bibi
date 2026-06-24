@@ -1,5 +1,7 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
+import { buildChangeMetadata } from "@/lib/change-management";
+import { snapshotPatient } from "@/lib/change-management/snapshots";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
 import { isValidCpf, normalizeCpf } from "@/lib/validation/br-documents";
@@ -102,6 +104,7 @@ export async function createPatient(
     phone?: string | null;
     companyId?: string | null;
     createdBy: string;
+    correlationId?: string;
   } & PatientExtraFields,
 ) {
   const prisma = await getPrisma();
@@ -140,6 +143,7 @@ export async function createPatient(
     action: TIMELINE_ACTIONS.CREATED,
     description: `Beneficiário ${patient.name} cadastrado`,
     createdBy: input.createdBy,
+    correlationId: input.correlationId,
   });
 
   void dispatchWebhooks({
@@ -172,6 +176,7 @@ export async function updatePatient(
 
   const existing = await prisma.patient.findFirst({
     where: { id: input.patientId, tenantId: input.tenantId },
+    include: { company: { select: { name: true } } },
   });
   if (!existing) return null;
 
@@ -190,6 +195,8 @@ export async function updatePatient(
     });
     if (!company) return { error: "Empresa não encontrada" as const };
   }
+
+  const beforeSnapshot = snapshotPatient(existing);
 
   const patient = await prisma.patient.update({
     where: { id: existing.id },
@@ -211,6 +218,8 @@ export async function updatePatient(
     action: TIMELINE_ACTIONS.UPDATED,
     description: `Beneficiário ${patient.name} atualizado`,
     createdBy: input.createdBy,
+    metadata: buildChangeMetadata(beforeSnapshot, snapshotPatient(patient)),
+    reversible: true,
   });
 
   return { patient: mapPatient(patient) };

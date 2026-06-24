@@ -31,6 +31,8 @@ O **Sistema Bibi - ServiceOS** é uma infraestrutura multi-tenant horizontal: o 
 suporta clínicas, pet shops, consultórios odontológicos, escritórios de advocacia,
 spas e escolas — alterando apenas nomenclatura (labels) e identidade visual por nicho.
 
+**Identidade visual padrão:** [Energia Brasileira](docs/plataforma/BRANDING.md) — Dark Slate (`#1e293b`) + Orange (`#f97316`), com presets por segmento.
+
 Cada operação é um *tenant* com **quatro portais segregados** por perfil de acesso.
 O modelo **Pay Per Use** cobra apenas serviços efetivamente utilizados, com transparência
 prévia de valores e faturamento sem perdas de informação — de consultas médicas a

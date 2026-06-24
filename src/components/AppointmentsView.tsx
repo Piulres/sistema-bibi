@@ -11,6 +11,7 @@ import CalloutCard from "@/components/ui/CalloutCard";
 import AppointmentCard from "@/components/ui/AppointmentCard";
 import FlowStepper from "@/components/ui/FlowStepper";
 import { CARE_JOURNEY_STEPS } from "@/lib/care-journey";
+import { useLabels } from "@/hooks/useLabels";
 
 type Appointment = {
   id: string;
@@ -19,12 +20,21 @@ type Appointment = {
   modality: string;
   telemedicineUrl: string | null;
   patientName: string;
+  petName: string | null;
   providerName: string;
   reason: string | null;
 };
 
 type Option = { id: string; name: string };
 type ProcedureOption = { id: string; name: string; code: string };
+
+type PetOption = {
+  id: string;
+  name: string;
+  patientId: string;
+  speciesLabel: string;
+  tutorName: string;
+};
 
 const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
@@ -35,17 +45,21 @@ function timeFromScheduleLabel(label: string): string {
 }
 
 export default function AppointmentsView() {
+  const { niche, labels } = useLabels();
+  const isVet = niche === "VET";
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [providers, setProviders] = useState<Option[]>([]);
   const [patients, setPatients] = useState<Option[]>([]);
   const [procedures, setProcedures] = useState<ProcedureOption[]>([]);
+  const [pets, setPets] = useState<PetOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     patientId: "",
+    petId: "",
     providerId: "",
     procedureId: "",
     autoAssignProvider: false,
@@ -66,6 +80,8 @@ export default function AppointmentsView() {
     time: "",
     reason: "Consulta walk-in",
     createPortalUser: false,
+    petName: "",
+    petSpecies: "CANINO",
   });
 
   const load = useCallback(async () => {
@@ -75,6 +91,7 @@ export default function AppointmentsView() {
     setProviders(data.providers ?? []);
     setPatients(data.patients ?? []);
     setProcedures(data.procedures ?? []);
+    setPets(data.pets ?? []);
     setLoading(false);
   }, [date]);
 
@@ -88,6 +105,7 @@ export default function AppointmentsView() {
       setProviders(data.providers ?? []);
       setPatients(data.patients ?? []);
       setProcedures(data.procedures ?? []);
+      setPets(data.pets ?? []);
       setLoading(false);
     })();
     return () => {
@@ -106,6 +124,7 @@ export default function AppointmentsView() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           patientId: form.patientId,
+          petId: isVet ? form.petId : null,
           providerId: form.autoAssignProvider ? undefined : form.providerId,
           procedureId: form.procedureId || undefined,
           autoAssignProvider: form.autoAssignProvider,
@@ -131,7 +150,17 @@ export default function AppointmentsView() {
     setBusy("walkin");
     setMsg(null);
     try {
-      const patientRes = await fetch("/api/interno/patients", {
+      const time =
+        walkIn.time ||
+        `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`;
+      const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+
+      if (isVet && !walkIn.petName.trim()) {
+        setMsg("Informe o nome do pet para agendar no segmento veterinário");
+        return;
+      }
+
+      const walkInRes = await fetch("/api/interno/appointments/walk-in", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -139,38 +168,19 @@ export default function AppointmentsView() {
           cpf: walkIn.cpf,
           birthDate: walkIn.birthDate,
           phone: walkIn.phone || null,
-          companyId: null,
-        }),
-      });
-      const patientData = await patientRes.json();
-      if (!patientRes.ok) {
-        setMsg(patientData.error ?? "Erro ao cadastrar paciente");
-        return;
-      }
-
-      const time =
-        walkIn.time ||
-        `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`;
-      const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
-
-      const apptRes = await fetch("/api/interno/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: patientData.patient.id,
           providerId: walkIn.autoAssignProvider ? undefined : walkIn.providerId,
           procedureId: walkIn.procedureId || undefined,
           autoAssignProvider: walkIn.autoAssignProvider,
           scheduledAt,
           reason: walkIn.reason,
-          status: "AGENDADO",
-          modality: "PRESENCIAL",
+          ...(isVet
+            ? { petName: walkIn.petName.trim(), petSpecies: walkIn.petSpecies }
+            : {}),
         }),
       });
-      const apptData = await apptRes.json();
-      if (!apptRes.ok) {
-        setMsg(apptData.error ?? "Paciente cadastrado, mas falha ao agendar");
-        await load();
+      const walkInData = await walkInRes.json();
+      if (!walkInRes.ok) {
+        setMsg(walkInData.error ?? "Erro no walk-in");
         return;
       }
 
@@ -189,13 +199,13 @@ export default function AppointmentsView() {
             email: `${emailBase || "paciente"}.${Date.now()}@walkin.demo`,
             password: "bibi123",
             role: "BENEFICIARIO",
-            patientId: patientData.patient.id,
+            patientId: walkInData.patient.id,
           }),
         });
       }
 
       setMsg(
-        `Walk-in: ${patientData.patient.name} cadastrado (particular) e agendado — confirme a chegada na lista abaixo.`,
+        `Walk-in: ${walkInData.patient.name} cadastrado (particular) e agendado — confirme a chegada na lista abaixo.`,
       );
       setWalkIn({
         name: "",
@@ -208,6 +218,8 @@ export default function AppointmentsView() {
         time: "",
         reason: "Consulta walk-in",
         createPortalUser: false,
+        petName: "",
+        petSpecies: "CANINO",
       });
       await load();
     } finally {
@@ -360,6 +372,35 @@ export default function AppointmentsView() {
               onChange={(e) => setWalkIn({ ...walkIn, time: e.target.value })}
             />
           </label>
+          {isVet && (
+            <>
+              <label className="block text-sm" htmlFor="walkin-pet-name">
+                <span className="text-[var(--text-secondary)]">Nome do {labels.patient.toLowerCase()}</span>
+                <input
+                  id="walkin-pet-name"
+                  required
+                  className={fieldClass}
+                  value={walkIn.petName}
+                  onChange={(e) => setWalkIn({ ...walkIn, petName: e.target.value })}
+                />
+              </label>
+              <label className="block text-sm" htmlFor="walkin-pet-species">
+                <span className="text-[var(--text-secondary)]">Espécie</span>
+                <select
+                  id="walkin-pet-species"
+                  required
+                  className={fieldClass}
+                  value={walkIn.petSpecies}
+                  onChange={(e) => setWalkIn({ ...walkIn, petSpecies: e.target.value })}
+                >
+                  <option value="CANINO">Canino</option>
+                  <option value="FELINO">Felino</option>
+                  <option value="AVES">Aves</option>
+                  <option value="OUTRO">Outro</option>
+                </select>
+              </label>
+            </>
+          )}
           <label className="block text-sm sm:col-span-2">
             <span className="text-[var(--text-secondary)]">Motivo</span>
             <input
@@ -412,12 +453,12 @@ export default function AppointmentsView() {
             />
           </label>
           <label className="block text-sm">
-            <span className="text-[var(--text-secondary)]">Beneficiário</span>
+            <span className="text-[var(--text-secondary)]">{isVet ? labels.beneficiary : "Beneficiário"}</span>
             <select
               required
               className="mt-1 w-full rounded border px-3 py-2"
               value={form.patientId}
-              onChange={(e) => setForm({ ...form, patientId: e.target.value })}
+              onChange={(e) => setForm({ ...form, patientId: e.target.value, petId: "" })}
             >
               <option value="">Selecione...</option>
               {patients.map((p) => (
@@ -427,6 +468,26 @@ export default function AppointmentsView() {
               ))}
             </select>
           </label>
+          {isVet && (
+            <label className="block text-sm">
+              <span className="text-[var(--text-secondary)]">{labels.patient}</span>
+              <select
+                required
+                className="mt-1 w-full rounded border px-3 py-2"
+                value={form.petId}
+                onChange={(e) => setForm({ ...form, petId: e.target.value })}
+              >
+                <option value="">Selecione...</option>
+                {pets
+                  .filter((p) => !form.patientId || p.patientId === form.patientId)
+                  .map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.speciesLabel}) — {p.tutorName}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          )}
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Prestador</span>
             <select
@@ -516,7 +577,7 @@ export default function AppointmentsView() {
               <AppointmentCard
                 key={a.id}
                 time={timeFromScheduleLabel(a.scheduledAtLabel)}
-                title={a.patientName}
+                title={isVet && a.petName ? `${a.petName} · ${labels.beneficiary}: ${a.patientName}` : a.patientName}
                 subtitle={`${a.providerName}${a.modality === "TELE" ? " · Telemedicina" : ""}`}
                 status={a.status}
                 meta={
