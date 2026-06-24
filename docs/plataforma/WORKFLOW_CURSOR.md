@@ -94,6 +94,38 @@ Executa, em sequência:
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 
+> `pre-release` valida o **build Netlify** (`db:push` + seed + `next build`). O **CI GitHub** cobre outra camada: testes automatizados + bootstrap dual-store. Use ambos antes de fechar pacote com mudanças sensíveis.
+
+---
+
+## CI GitHub Actions (automático em PR)
+
+Dispara em push/PR para `main`, `dev` e `cursor/**`. Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+
+**Espelhar localmente** (requer `DATABASE_URL` — Prisma falha sem ela):
+
+```bash
+export DATABASE_URL="file:./dev.db"
+export SESSION_SECRET="ci-github-actions-session-secret-32chars-min"
+export CRON_SECRET="ci-cron-secret-32-characters-min"
+export SEED_SCALE=small
+
+npm run lint && npm run docs:verify
+npm run db:bootstrap:demo && npm run db:verify
+DATABASE_URL="file:./test.db" npm run test && npm run build
+CI=true npm run test:e2e
+```
+
+| O que valida | CI | `pre-release` |
+|--------------|-----|---------------|
+| Lint + docs | ✅ | lint only |
+| Testes unit/integration/API | ✅ | ❌ |
+| E2E Playwright | ✅ | ❌ |
+| Dual-store (`demo.db` + `operation.db`) | ✅ | ❌ |
+| Build Netlify (`netlify:build`) | ❌ | ✅ |
+
+Detalhes: [`TESTES.md`](TESTES.md) · env vars: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) §8.
+
 ---
 
 ## Publicar em produção (manual, raro)

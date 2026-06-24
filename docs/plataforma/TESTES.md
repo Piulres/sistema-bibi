@@ -192,8 +192,10 @@ npm run test:watch
 # E2E (sobe dev server na porta 3100)
 npm run test:e2e
 
-# Lint + test + build (espelha CI local)
-npm run lint && npm run test && npm run build
+# Espelhar CI GitHub (ver seção CI abaixo — requer DATABASE_URL global)
+npm run lint && npm run docs:verify
+npm run db:bootstrap:demo && npm run db:verify
+DATABASE_URL="file:./test.db" npm run test && npm run build
 ```
 
 ### Variáveis em testes
@@ -264,15 +266,30 @@ Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 | `SESSION_SECRET` | secret de 32+ chars para testes |
 | `CRON_SECRET` | secret de 32+ chars para testes |
 | `SEED_SCALE` | `small` (seed rápido) |
+| `ALLOW_DEMO_RESET` | `true` (E2E que exercitam reset demo) |
 
 **Espelhar CI localmente:**
 
 ```bash
+export DATABASE_URL="file:./dev.db"
+export SESSION_SECRET="ci-github-actions-session-secret-32chars-min"
+export CRON_SECRET="ci-cron-secret-32-characters-min"
+export SEED_SCALE=small
+
 npm run lint && npm run docs:verify
-SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
-npm run test && npm run build
+npm run db:bootstrap:demo && npm run db:verify
+DATABASE_URL="file:./test.db" npm run test && npm run build
 CI=true npm run test:e2e
 ```
+
+### Pitfalls do CI
+
+| Sintoma | Causa | Correção |
+|---------|-------|----------|
+| `Environment variable not found: DATABASE_URL` | Prisma sem `env` global no workflow | Definir `DATABASE_URL` no topo do `ci.yml` |
+| `db:verify` falha após `db:push` | Só `dev.db` criado — faltam `demo.db` + `operation.db` | Usar `db:bootstrap:demo` |
+| `dev.db` não espelha `demo.db` | Bootstrap incompleto ou arquivo manual | Re-rodar `db:bootstrap:demo` |
+| Testes passam local, CI falha em E2E | Porta ou `CI=true` ausente | `CI=true PLAYWRIGHT_PORT=3100 npm run test:e2e` |
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
