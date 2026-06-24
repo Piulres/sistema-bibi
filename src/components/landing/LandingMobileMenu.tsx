@@ -104,17 +104,6 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                     </Link>
                   </li>
                 )}
-                {context === "home" && (
-                  <li>
-                    <Link
-                      href={SEGMENT_ACCESS_HREF}
-                      onClick={() => setOpen(false)}
-                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]"
-                    >
-                      Segmentos
-                    </Link>
-                  </li>
-                )}
                 {anchors.map((link) => (
                   <li key={link.href}>
                     <a
@@ -172,13 +161,23 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
                   </Link>
                 </li>
                 <li>
-                  <a
-                    href="#portais"
-                    onClick={() => setOpen(false)}
-                    className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--surface-muted)]"
-                  >
-                    Acessar portais
-                  </a>
+                  {context === "home" ? (
+                    <Link
+                      href={SEGMENT_ACCESS_HREF}
+                      onClick={() => setOpen(false)}
+                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--surface-muted)]"
+                    >
+                      Acessar portais
+                    </Link>
+                  ) : (
+                    <a
+                      href="#portais"
+                      onClick={() => setOpen(false)}
+                      className="block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-semibold text-[var(--brand-primary)] hover:bg-[var(--surface-muted)]"
+                    >
+                      Acessar portais
+                    </a>
+                  )}
                 </li>
               </ul>
             </nav>

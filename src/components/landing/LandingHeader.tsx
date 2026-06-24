@@ -16,7 +16,7 @@ type Props = {
 
 export default function LandingHeader({ branding, context = "home" }: Props) {
   const anchors = landingNavItems(context);
-  const portalsHref = context === "home" ? "#portais" : "#portais";
+  const portalsHref = context === "home" ? SEGMENT_ACCESS_HREF : "#portais";
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-default)]/60 bg-[var(--surface-page)]/80 backdrop-blur-xl">
@@ -66,14 +66,6 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
               Início
             </Link>
           )}
-          {context === "home" && (
-            <Link
-              href={SEGMENT_ACCESS_HREF}
-              className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
-            >
-              Segmentos
-            </Link>
-          )}
           {anchors.map((link) => (
             <a
               key={link.href}
@@ -95,13 +87,23 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
           >
             Entrar
           </Link>
-          <a
-            href={portalsHref}
-            className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
-          >
-            <span className="sm:hidden">Portais</span>
-            <span className="hidden sm:inline">Acessar portais</span>
-          </a>
+          {portalsHref.startsWith("/") ? (
+            <Link
+              href={portalsHref}
+              className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+            >
+              <span className="sm:hidden">Portais</span>
+              <span className="hidden sm:inline">Acessar portais</span>
+            </Link>
+          ) : (
+            <a
+              href={portalsHref}
+              className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-3 py-2 text-xs font-semibold text-[var(--text-inverse)] shadow-sm transition hover:bg-[var(--brand-primary-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+            >
+              <span className="sm:hidden">Portais</span>
+              <span className="hidden sm:inline">Acessar portais</span>
+            </a>
+          )}
         </div>
       </div>
     </header>
