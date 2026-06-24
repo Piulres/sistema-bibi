@@ -73,10 +73,16 @@ async function main() {
   clearMockContext(user.id);
   const messages: AssistantMessage[] = [];
 
+  console.log("═".repeat(60));
+  console.log("SIMULAÇÃO — Agendamento via chat (mock ativo)");
+  console.log(`Portal: Interno · Usuário: ${user.name} <${user.email}>`);
+  console.log(`Tenant: ${user.tenantName} (${user.tenantSlug}) · Nicho: ${user.niche}`);
+  console.log("═".repeat(60));
+
   const turns = [
     "oi, preciso marcar uma consulta",
     "é pro João Pereira",
-    "amanhã às 15h com a Dra Helena",
+    "amanhã às 11h com a Dra Helena",
     "__CONFIRM__",
   ];
   let pendingId: string | undefined;
@@ -121,9 +127,16 @@ async function main() {
         `[Card na UI]\n${card.title}\n${summary}\n  → botões: Confirmar | Cancelar`,
       );
     }
+
+    const choice = result.actions?.find((a) => a.type === "choice");
+    if (choice && choice.type === "choice") {
+      const options = choice.options.map((o) => `  [ ${o.label} ]`).join("\n");
+      line("Assistente", `[Botões de escolha — ${choice.title}]\n${options}`);
+    }
   }
 
   console.log("\n" + "=".repeat(60));
+  console.log(`Portal: Interno · ${user.email} · ${user.tenantName}`);
   console.log(confirmed ? "✅ Consulta marcada no banco." : "❌ Agendamento não concluído.");
 }
 
