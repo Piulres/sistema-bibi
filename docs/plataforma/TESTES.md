@@ -1,7 +1,9 @@
-# Estratégia de Testes Automatizados — ServiceOS Bibi
+# Estratégia de Testes Automatizados — Sistema Bibi - ServiceOS
 
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
+
+**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~121** Route Handlers · **73** paths no OpenAPI (`public/openapi.yaml`).
 
 ---
 
@@ -9,7 +11,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 ```
                     ┌─────────────┐
-                    │  E2E        │  Playwright — 9 specs
+                    │  E2E        │  Playwright — 10 specs (desktop + mobile)
                     ├─────────────┤
                     │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
@@ -30,7 +32,7 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
 | E2E | Playwright | `e2e/` | `npm run test:e2e` |
-| CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main` |
+| CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main`, `dev`, `cursor/**` |
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
@@ -147,7 +149,9 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ---
 
-## Mapa das 58 rotas API
+## Mapa das rotas API
+
+**FATO:** existem **~100** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **58** paths — subconjunto intencional para integradores.
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -239,16 +243,47 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | 11 módulos admin |
+| `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 
 ---
 
+## CI (GitHub Actions)
+
+Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
+
+1. **unit-integration-api** — `lint` → `docs:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
+2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)
+
+**Variáveis globais do workflow** (obrigatórias — Prisma falha sem `DATABASE_URL`):
+
+| Variável | Valor CI |
+|----------|----------|
+| `DATABASE_URL` | `file:./dev.db` (relativo ao `schema.prisma`) |
+| `SESSION_SECRET` | secret de 32+ chars para testes |
+| `CRON_SECRET` | secret de 32+ chars para testes |
+| `SEED_SCALE` | `small` (seed rápido) |
+
+**Espelhar CI localmente:**
+
+```bash
+npm run lint && npm run docs:verify
+SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
+npm run test && npm run build
+CI=true npm run test:e2e
+```
+
+`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+
+> Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
+
+---
+
 ## Referências
 
-- Fluxos de negócio: [`FLUXOS.md`](FLUXOS.md)
+- Fluxos de negócio: [`FLUXOS.md`](../produto/FLUXOS.md)
 - Auditoria de falhas por portal: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md)
 - Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md)
-- Evidências manuais: [`evidencias/`](evidencias/)
+- Evidências manuais: [`../evidencias/`](../evidencias/)
 - CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
