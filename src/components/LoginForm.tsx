@@ -22,6 +22,7 @@ import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
+import HomeBrandLink from "@/components/brand/HomeBrandLink";
 
 type Props = {
   portal: PortalKey;
@@ -132,29 +133,17 @@ export default function LoginForm({
             ← Voltar
           </Link>
           <Card padding="lg" className="mt-4">
-            <div className="flex items-center gap-3">
-              {branding.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={branding.logoUrl}
-                  alt=""
-                  className="h-10 w-10 rounded-lg object-contain"
-                />
-              ) : (
-                <div
-                  className="ds-logo-mark flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)]"
-                  aria-hidden
-                >
-                  {branding.displayName.charAt(0)}
-                </div>
-              )}
-              <div>
-                <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
-                  {branding.displayName}
-                </p>
-                <div className="mt-1 h-1 w-12 rounded-full ds-logo-mark" />
-              </div>
-            </div>
+            <HomeBrandLink
+              displayName={branding.displayName}
+              logoUrl={branding.logoUrl}
+              logoSize="md"
+              showTitle={false}
+            >
+              <p className="text-xs font-medium uppercase tracking-wider text-[var(--text-muted)]">
+                {branding.displayName}
+              </p>
+              <div className="mt-1 h-1 w-12 rounded-full ds-logo-mark" aria-hidden />
+            </HomeBrandLink>
             <h1 className="mt-4 text-2xl font-bold text-[var(--text-primary)]">{title}</h1>
             <p className="mt-1 text-sm text-[var(--text-secondary)]">{subtitle}</p>
             {segmentContext && <SegmentContextBanner context={segmentContext} />}

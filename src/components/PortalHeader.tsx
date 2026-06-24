@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { PLATFORM } from "@/lib/platform";
 import Button from "@/components/ui/Button";
 import ServiceOsBadges from "@/components/niche/ServiceOsBadges";
+import HomeBrandLink from "@/components/brand/HomeBrandLink";
 import { useLabels } from "@/hooks/useLabels";
 
 type Props = {
@@ -35,32 +36,20 @@ export default function PortalHeader({
   return (
     <header className="border-b border-[var(--border-default)] bg-[var(--surface-card)]">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6">
-        <div className="flex min-w-0 items-center gap-3">
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={logoUrl}
-              alt=""
-              className="h-9 w-9 shrink-0 rounded-lg object-contain"
-            />
-          ) : (
-            <div
-              className="ds-logo-mark flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-sm font-bold text-[var(--text-inverse)]"
-              aria-hidden
-            >
-              {displayName.charAt(0)}
-            </div>
-          )}
-          <div className="min-w-0">
-            <p className="truncate text-xs font-semibold uppercase tracking-wider text-[var(--brand-accent)]">
-              {portalLabel}
-            </p>
-            <p className="truncate text-sm font-medium text-[var(--text-primary)]">
-              {displayName}
-            </p>
-            <ServiceOsBadges niche={niche} />
-          </div>
-        </div>
+        <HomeBrandLink
+          displayName={displayName}
+          logoUrl={logoUrl}
+          logoSize="sm"
+          showTitle={false}
+        >
+          <p className="truncate text-xs font-semibold uppercase tracking-wider text-[var(--brand-accent)]">
+            {portalLabel}
+          </p>
+          <p className="truncate text-sm font-medium text-[var(--text-primary)]">
+            {displayName}
+          </p>
+          <ServiceOsBadges niche={niche} />
+        </HomeBrandLink>
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <span
             className="max-w-[5.5rem] truncate text-xs text-[var(--text-secondary)] sm:max-w-none sm:text-sm"
