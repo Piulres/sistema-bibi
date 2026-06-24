@@ -8,7 +8,8 @@ type IconName =
   | "arrow-right"
   | "check"
   | "shield"
-  | "menu";
+  | "menu"
+  | "message";
 
 type Props = {
   name: IconName;
@@ -129,6 +130,23 @@ export default function LandingIcon({
       return (
         <svg className={className} viewBox="0 0 24 24" fill="none" {...ariaProps}>
           <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
+        </svg>
+      );
+    case "message":
+      return (
+        <svg className={className} viewBox="0 0 24 24" fill="none" {...ariaProps}>
+          <path
+            d="M7 8.5h10M7 12h6"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+          />
+          <path
+            d="M5 5.5h14a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2H9l-4 3v-3.5H5a2 2 0 0 1-2-2V7.5a2 2 0 0 1 2-2Z"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinejoin="round"
+          />
         </svg>
       );
   }

@@ -112,7 +112,24 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
       where: { slug: "petcare" },
       select: { id: true },
     });
-    return !petcare;
+    if (!petcare) return true;
+
+    const petcareAppts = await prisma.appointment.count({
+      where: { tenantId: petcare.id },
+    });
+    if (petcareAppts < 10) return true;
+
+    const vetProcedures = await prisma.procedure.count({
+      where: { tenantId: petcare.id },
+    });
+    if (vetProcedures < 15) return true;
+
+    const petCount = await prisma.pet.count({
+      where: { tenantId: petcare.id },
+    });
+    if (petCount < 10) return true;
+
+    return false;
   } finally {
     await prisma.$disconnect();
   }

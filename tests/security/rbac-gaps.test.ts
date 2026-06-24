@@ -31,7 +31,7 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
 
   const withoutModuleGuard = routes.filter((file) => {
     const src = readFileSync(file, "utf8");
-    return !src.includes("requireInternoModule");
+    return !src.includes("requireInternoModule") && !src.includes("requireInternoAdmin");
   });
 
   it("todas as rotas internas usam guard de módulo", () => {
@@ -43,11 +43,13 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
     expect(exposed).not.toContain("/interno/billing");
     expect(exposed).not.toContain("/interno/invoices/[id]/pix");
     expect(exposed).not.toContain("/interno/data-store");
+    expect(exposed).not.toContain("/interno/users");
   });
 
   it("READONLY não deveria acessar billing na matriz de permissões", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "billing")).toBe(false);
     expect(hasInternoPermission("INTERNO", "READONLY", "cadastros")).toBe(false);
+    expect(hasInternoPermission("INTERNO", null, "billing")).toBe(false);
     expect(hasInternoPermission("INTERNO", "READONLY", "auditoria")).toBe(true);
     expect(hasInternoPermission("INTERNO", "FATURAMENTO", "auditoria")).toBe(true);
   });

@@ -1,9 +1,9 @@
 openapi: 3.0.3
 info:
   title: Sistema Bibi - ServiceOS — API
-  version: 2.0.0
+  version: 2.1.0
   description: >
-    API do Sistema Bibi - ServiceOS v2.0 — plataforma Pay Per Use multi-nicho. Multi-tenant,
+    API do Sistema Bibi - ServiceOS v2.1 — plataforma Pay Per Use multi-nicho. Multi-tenant,
     quatro portais segregados por `role`, vocabulário adaptável por segmento.
 
     Autenticação por cookie de sessão httpOnly (`bibi_session`) assinado via
@@ -34,6 +34,14 @@ tags:
     description: Jobs agendados (header x-cron-secret)
   - name: MFA
     description: Autenticação em dois fatores (INTERNO)
+  - name: Assistente
+    description: Chat operacional com confirmação de ações (4 portais)
+  - name: Pets
+    description: Ficha clínica por pet (nicho VET)
+  - name: Importação
+    description: Interchange JSON/CSV para cadastros
+  - name: Change Management
+    description: Reversão de alterações e auditoria com restore
 
 components:
   securitySchemes:
@@ -1591,6 +1599,187 @@ paths:
       summary: Confirma pagamento PIX
       responses:
         '200': { description: Pagamento confirmado }
+
+  /api/assistant/chat:
+    post:
+      tags: [Assistente]
+      summary: Envia mensagem ao assistente operacional
+      description: >
+        Disponível nos 4 portais autenticados quando ASSISTANT_ENABLED=true.
+        Retorna resposta, ações pendentes e links de navegação.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [messages]
+              properties:
+                messages:
+                  type: array
+                  items:
+                    type: object
+                    required: [role, content]
+                    properties:
+                      role: { type: string, enum: [user, assistant] }
+                      content: { type: string }
+                pageContext: { type: string }
+      responses:
+        '200': { description: Resposta do assistente }
+        '400': { description: Requisição inválida ou sem mensagem do usuário }
+        '403': { description: Portal não suportado }
+        '503': { description: Assistente desabilitado }
+
+  /api/assistant/confirm:
+    post:
+      tags: [Assistente]
+      summary: Confirma ou cancela ação pendente do assistente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [pendingActionId, confirmed]
+              properties:
+                pendingActionId: { type: string }
+                confirmed: { type: boolean }
+                password: { type: string, description: Obrigatório para ações sensíveis }
+      responses:
+        '200': { description: Ação executada ou cancelada }
+        '400': { description: Requisição inválida }
+        '410': { description: Ação expirada ou inválida }
+
+  /api/interno/pets:
+    get:
+      tags: [Pets, Interno]
+      summary: Lista pets cadastrados (nicho VET)
+      responses:
+        '200': { description: Lista de pets }
+    post:
+      tags: [Pets, Interno]
+      summary: Cadastra pet vinculado a tutor
+      responses:
+        '201': { description: Pet criado }
+
+  /api/interno/pets/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Pets, Interno]
+      summary: Detalhe do pet
+      responses:
+        '200': { description: Pet }
+    patch:
+      tags: [Pets, Interno]
+      summary: Atualiza cadastro do pet
+      responses:
+        '200': { description: Pet atualizado }
+
+  /api/prestador/pets:
+    get:
+      tags: [Pets, Prestador]
+      summary: Pets do prestador logado
+      responses:
+        '200': { description: Lista de pets }
+
+  /api/prestador/pets/{id}/clinical-overview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Pets, Prestador]
+      summary: Visão clínica consolidada do pet
+      responses:
+        '200': { description: Resumo clínico }
+
+  /api/interno/import/convert:
+    post:
+      tags: [Importação, Interno]
+      summary: Converte arquivo JSON/CSV para formato de importação
+      responses:
+        '200': { description: Payload convertido }
+
+  /api/interno/import/{entity}:
+    parameters:
+      - name: entity
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [patients, providers, companies, procedures]
+    post:
+      tags: [Importação, Interno]
+      summary: Importa cadastros a partir de JSON validado
+      responses:
+        '200': { description: Importação concluída }
+
+  /api/interno/revisions:
+    get:
+      tags: [Change Management, Interno]
+      summary: Lista revisões recentes com diff before/after
+      responses:
+        '200': { description: Histórico de revisões }
+
+  /api/interno/change/revert-recent:
+    post:
+      tags: [Change Management, Interno]
+      summary: Reverte alteração recente (pacotes A–F)
+      responses:
+        '200': { description: Reversão aplicada }
+
+  /api/interno/audit/{eventId}/restore:
+    parameters:
+      - name: eventId
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Change Management, Interno]
+      summary: Restaura estado anterior de entidade via timeline
+      responses:
+        '200': { description: Estado restaurado }
+
+  /api/interno/procedure-usages/{id}/void:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Change Management, Interno]
+      summary: Anula procedimento Pay Per Use registrado
+      responses:
+        '200': { description: Procedimento anulado }
+
+  /api/interno/invoices/{id}/void:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Change Management, Interno]
+      summary: Anula fatura emitida
+      responses:
+        '200': { description: Fatura anulada }
+
+  /api/interno/stock/movements/{id}/reverse:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      tags: [Change Management, Interno]
+      summary: Estorna movimentação de estoque
+      responses:
+        '200': { description: Movimentação estornada }
 
   /api/cron/reminders:
     post:

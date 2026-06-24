@@ -56,7 +56,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 
 - **Stop builds** no painel — não depender de CI em cada push
 - Validar: `npm run pre-release` (build local)
-- Publicar (humano): `npx netlify deploy --prod --no-build` após build local OK
+- Publicar (humano): `npx netlify deploy --prod` após `npm run pre-release` (**não** usar `--no-build`)
 - Secrets (`SESSION_SECRET`, `CRON_SECRET`) só no painel — nunca commitar
 - Detalhes: `@.cursor/rules/netlify-release.mdc`
 

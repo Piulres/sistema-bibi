@@ -35,9 +35,10 @@ describe("Cenários RBAC — matriz perfil × módulo", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "agenda")).toBe(false);
   });
 
-  it("perfil null em INTERNO equivale a ADMIN (seed legado)", () => {
+  it("perfil null em INTERNO recebe READONLY (menor privilégio)", () => {
     const perms = resolveInternoPermissions("INTERNO", null);
-    expect(perms).toHaveLength(13);
+    expect(perms).toHaveLength(3);
+    expect(hasInternoPermission("INTERNO", null, "billing")).toBe(false);
   });
 
   it("roles não-interno não recebem módulos", () => {

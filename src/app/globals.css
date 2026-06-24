@@ -8,10 +8,10 @@
   --brand-hero-from: #1e293b;
   --brand-hero-to: #f59e0b;
 
-  /* Portal accent — sobrescrito por portal context */
-  --portal-accent: #6366f1;
-  --portal-accent-from: #6366f1;
-  --portal-accent-to: #2563eb;
+  /* Portal accent — espelha whitelabel do tenant em runtime */
+  --portal-accent: var(--brand-accent);
+  --portal-accent-from: var(--brand-hero-from);
+  --portal-accent-to: var(--brand-hero-to);
 
   /* Surfaces */
   --surface-page: #f8fafc;
@@ -161,6 +161,14 @@ body {
   );
 }
 
+.ds-logo-mark {
+  background: linear-gradient(
+    135deg,
+    var(--brand-primary),
+    var(--brand-accent)
+  );
+}
+
 .ds-gradient-portal {
   background: linear-gradient(
     to bottom right,
@@ -250,10 +258,104 @@ body {
 }
 
 .landing-gradient-text {
-  background: linear-gradient(135deg, #f97316, #fb923c 60%, #fbbf24);
+  background: linear-gradient(
+    135deg,
+    var(--brand-accent),
+    color-mix(in srgb, var(--brand-accent) 70%, white)
+  );
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Landing — CTAs unificados */
+.landing-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--radius-button);
+  font-weight: 600;
+  line-height: 1.25;
+  text-decoration: none;
+  border: 1.5px solid transparent;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.landing-cta--sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+}
+
+.landing-cta--md {
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.landing-cta--lg {
+  padding: 0.875rem 1.5rem;
+  font-size: 1rem;
+}
+
+/* Superfície clara — header e nav */
+.landing-cta--surface {
+  background: var(--brand-primary);
+  color: var(--text-inverse);
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.06),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.landing-cta--surface:hover {
+  background: var(--brand-primary-hover);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--brand-primary) 28%, transparent);
+}
+
+/* Hero escuro — primário (alto contraste) */
+.landing-cta--hero {
+  background: rgb(255 255 255 / 0.98);
+  color: var(--brand-primary);
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.2);
+}
+
+.landing-cta--hero:hover {
+  background: white;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.24);
+}
+
+/* Hero escuro — secundário */
+.landing-cta--hero-ghost {
+  border-color: rgb(255 255 255 / 0.32);
+  background: rgb(255 255 255 / 0.06);
+  color: rgb(255 255 255 / 0.95);
+  backdrop-filter: blur(10px);
+}
+
+.landing-cta--hero-ghost:hover {
+  border-color: rgb(255 255 255 / 0.5);
+  background: rgb(255 255 255 / 0.11);
+  color: white;
+}
+
+.landing-cta:focus-visible {
+  outline: 2px solid var(--ring-focus);
+  outline-offset: 2px;
+}
+
+.landing-cta--hero:focus-visible,
+.landing-cta--hero-ghost:focus-visible {
+  outline-color: white;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .landing-cta:active {
+    transform: scale(0.98);
+  }
 }
 
 .landing-glass {

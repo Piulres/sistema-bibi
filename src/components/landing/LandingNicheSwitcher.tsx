@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { SEGMENT_LANDING_PAGES } from "@/lib/platform/structure";
 import { getNicheConfig } from "@/lib/niche/defaults";
+import { segmentPillStyle } from "@/lib/theme/segment-colors";
 
 type Props = {
   className?: string;
@@ -47,11 +48,10 @@ export default function LandingNicheSwitcher({ className = "" }: Props) {
           <Link
             key={page.slug}
             href={page.href}
-            className={`rounded-full px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
-              isActive
-                ? "bg-[var(--brand-primary)] text-[var(--text-inverse)] shadow-sm"
-                : "border border-[var(--border-default)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)]"
+            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
+              isActive ? "shadow-sm" : "bg-transparent hover:opacity-90"
             }`}
+            style={segmentPillStyle(page.niche, isActive)}
             aria-current={isActive ? "page" : undefined}
             title={page.label}
           >

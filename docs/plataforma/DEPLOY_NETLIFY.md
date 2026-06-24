@@ -10,16 +10,16 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 
 ---
 
-## Status atual (23/06/2026)
+## Status atual (24/06/2026)
 
 | Item | Estado |
 |------|--------|
-| Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.0.0`** — deploy `6a3abdc1` @ `b661b39` |
-| `main` / `dev` | Sincronizadas em **`b661b39`** |
-| Build local `npm run netlify:build` | ✅ Passa |
+| Site principal | ✅ https://sistema-bibi.netlify.app |
+| Pacote em produção | **`v2.1.0`** — deploy `6a3bc7a4` @ `40e2dfc` |
+| Pacote anterior (quebrado) | deploys `6a3b8768`–`6a3b8917` — assets `/_next/static` em 404 |
+| `main` / `dev` | Sincronizadas em **`40e2dfc`** |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
-| Deploy produção | `npx netlify build` → `npx netlify deploy --prod --no-build` (site `sistema-bibi`) |
+| Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
@@ -93,20 +93,23 @@ npm run netlify:dev
 
 ---
 
-## Primeiro deploy manual (quando autorizado)
-
-Pré-requisitos: [Netlify CLI](https://docs.netlify.com/cli/get-started/) autenticada (`npx netlify login`).
+## Publicar em produção (pacote fechado)
 
 ```bash
-# 1. Linkar site (se ainda nao linkado)
-npx netlify link
+# 1. Validar localmente
+npm run pre-release
 
-# 2. Preview (nao afeta producao)
-npx netlify deploy
+# 2. Publicar (build integrado — obrigatório para Next.js)
+npx netlify deploy --prod --message "vX.Y.Z: descrição"
 
-# 3. Producao (somente quando aprovado)
-npx netlify deploy --prod
+# 3. Smoke test — assets estáticos
+curl -s https://sistema-bibi.netlify.app/ | rg -o '/_next/static/chunks/[^"]+\.css' | head -1 \
+  | xargs -I{} curl -s -o /dev/null -w "%{http_code}\n" "https://sistema-bibi.netlify.app{}"
+# Deve retornar 200
 ```
+
+> **Não use `--no-build`** com `@netlify/plugin-nextjs`. O HTML é publicado, mas
+> `/_next/static/chunks/*` fica em **404** e o front não hidrata.
 
 ---
 
@@ -163,7 +166,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
 | Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
-| Card “Base de dados” não aparece | Versão antiga ou não-ADMIN | Deploy com PR dual-store; login `faturamento@bibi.health` (ADMIN) |
+| Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
 
 ---
 

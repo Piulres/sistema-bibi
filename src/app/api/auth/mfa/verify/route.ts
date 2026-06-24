@@ -11,6 +11,7 @@ import {
   validateUserSegmentAccess,
 } from "@/lib/segment/auth";
 import { persistSegmentCookie } from "@/lib/segment/cookie";
+import { enforceAuthRateLimit } from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {
   const prisma = await getPrisma();
@@ -44,8 +45,13 @@ export async function POST(request: Request) {
     }
 
     if (!verifyTotp(user.mfaSecret, body.code)) {
+      const blocked = enforceAuthRateLimit(request, "mfa", true);
+      if (blocked) return blocked;
       return NextResponse.json({ error: "Código inválido" }, { status: 401 });
     }
+
+    const blocked = enforceAuthRateLimit(request, "mfa", false);
+    if (blocked) return blocked;
 
     const segmentCheck = await validateUserSegmentAccess(request, user, {
       tenantSlug: body.tenantSlug,

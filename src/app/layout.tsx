@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getSiteUrl } from "@/lib/landing/site-url";
 import { PLATFORM } from "@/lib/platform";
 import NavigationProgress from "@/components/layout/NavigationProgress";
+import MarketingTags from "@/components/marketing/MarketingTags";
+import CampaignParamsProvider from "@/components/marketing/CampaignParamsProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -20,8 +23,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${PLATFORM.name} — ${PLATFORM.tagline}`,
-    template: `%s | ${PLATFORM.shortName}`,
+    default: `${PLATFORM.name} ${PLATFORM.version} — ${PLATFORM.tagline}`,
+    template: `%s | ${PLATFORM.shortName} ${PLATFORM.version}`,
   },
   description: PLATFORM.description,
   applicationName: PLATFORM.name,
@@ -55,6 +58,10 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full scroll-smooth antialiased`}
     >
       <body className="flex min-h-full flex-col font-sans antialiased">
+        <MarketingTags />
+        <Suspense fallback={null}>
+          <CampaignParamsProvider />
+        </Suspense>
         <NavigationProgress />
         {children}
       </body>

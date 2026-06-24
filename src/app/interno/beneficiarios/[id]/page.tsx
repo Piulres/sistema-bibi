@@ -11,7 +11,7 @@ export default async function PatientOverviewPage({
   params: Promise<{ id: string }>;
   searchParams: Promise<{ from?: string }>;
 }) {
-  await requireInternoPage();
+  await requireInternoPage("cadastros");
 
   const { id } = await params;
   const { from } = await searchParams;
