@@ -493,7 +493,7 @@ src/
 → Se o corpo for `usage_exceeded`, a cota Netlify esgotou — não é bug. Dev local continua normal.
 
 **Como publico em produção?**
-→ Após `npm run pre-release`: `npx netlify deploy --prod --no-build` (manual). Atualizar `docs/versoes/RELEASES.md`. O `--no-build` economiza cota Netlify.
+→ Após `npm run pre-release`: `npx netlify deploy --prod` (manual, **com build integrado**). Atualizar `docs/versoes/RELEASES.md`. Não usar `--no-build` — quebra assets `/_next/static`.
 
 **Agentes Cursor podem fazer deploy?**
 → Não, salvo pedido explícito. Regras em `AGENTS.md` e `.cursor/rules/operacoes-bibi.mdc`.

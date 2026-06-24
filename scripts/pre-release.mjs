@@ -60,5 +60,6 @@ try {
 }
 
 console.log("\n✓ Pre-release OK — pacote validado localmente.");
-console.log("  Publicar só quando quiser: npx netlify deploy --prod");
+console.log("  Publicar: npx netlify deploy --prod  (NÃO usar --no-build com Next.js)");
+console.log("  Smoke test: /_next/static/chunks/*.css deve retornar 200 após deploy");
 console.log("  Registrar em: docs/versoes/RELEASES.md\n");
