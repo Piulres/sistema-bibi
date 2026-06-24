@@ -32,7 +32,7 @@ import {
   buildPortalHelpFallback,
   resolvePortalFollowUpTool,
 } from "@/lib/assistant/portal-concepts";
-import { formatChoiceQuestion } from "@/lib/assistant/resolve-entities";
+import { choiceNotRecognized, greetingHelp } from "@/lib/assistant/humanize";
 import {
   isDraftToolName,
   mergeDraftArgs,
@@ -121,12 +121,7 @@ function tryResolvePendingChoice(
   if (!selectedId) {
     return {
       toolCalls: [],
-      fallback: [
-        "Não identifiquei sua escolha.",
-        formatChoiceQuestion(pending.fieldLabel, pending.options),
-        "",
-        "Responda com o **número** ou o **nome completo**.",
-      ].join("\n"),
+      fallback: choiceNotRecognized(pending.fieldLabel, pending.options),
     };
   }
 
@@ -236,7 +231,7 @@ export function planMockFromIntents(
   if (!raw.trim()) {
     return {
       toolCalls: [],
-      fallback: "Como posso ajudar? Use os atalhos abaixo ou descreva a operação.",
+      fallback: greetingHelp(),
     };
   }
 

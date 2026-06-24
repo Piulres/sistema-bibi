@@ -5,6 +5,15 @@ import { createAppointment } from "@/lib/appointment-service";
 import { bookBeneficiaryAppointment } from "@/lib/scheduling-service";
 import type { PendingActionPayload } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
+import {
+  confirmErrorNoPatient,
+  confirmErrorPassword,
+  confirmErrorSelfOnly,
+  confirmErrorUnknown,
+  confirmSuccessAppointment,
+  confirmSuccessPatient,
+  confirmSuccessUser,
+} from "@/lib/assistant/humanize";
 
 export type ConfirmResult =
   | { ok: true; message: string; href?: string; entityId?: string }
@@ -18,7 +27,7 @@ export async function executePendingAction(
   switch (payload.type) {
     case "create_user": {
       const password = passwordOverride?.trim() || payload.data.password;
-      if (!password) return { ok: false, error: "Senha obrigatória para confirmar." };
+      if (!password) return { ok: false, error: confirmErrorPassword() };
 
       const result = await createUser({
         tenantId: user.tenantId,
@@ -35,7 +44,7 @@ export async function executePendingAction(
       if ("error" in result) return { ok: false, error: result.error };
       return {
         ok: true,
-        message: `Usuário **${result.user.name}** criado (${result.user.email}).`,
+        message: confirmSuccessUser(result.user.name, result.user.email),
         href: "/interno/cadastros",
         entityId: result.user.id,
       };
@@ -56,7 +65,7 @@ export async function executePendingAction(
       if ("error" in result) return { ok: false, error: result.error };
       return {
         ok: true,
-        message: `${user.labels.patient} **${result.patient.name}** cadastrado(a).`,
+        message: confirmSuccessPatient(user.labels, result.patient.name),
         href: `/interno/beneficiarios/${result.patient.id}`,
         entityId: result.patient.id,
       };
@@ -78,16 +87,16 @@ export async function executePendingAction(
       const appt = result.appointment;
       return {
         ok: true,
-        message: `${user.labels.appointment} agendado(a) para **${appt.scheduledAtLabel}**.`,
+        message: confirmSuccessAppointment(user.labels, appt.scheduledAtLabel),
         href: "/interno/agenda",
         entityId: appt.id,
       };
     }
 
     case "book_appointment": {
-      if (!user.patientId) return { ok: false, error: "Conta sem beneficiário vinculado." };
+      if (!user.patientId) return { ok: false, error: confirmErrorNoPatient() };
       if (payload.data.patientId !== user.patientId) {
-        return { ok: false, error: "Só é possível agendar para sua própria conta." };
+        return { ok: false, error: confirmErrorSelfOnly() };
       }
 
       const result = await bookBeneficiaryAppointment({
@@ -105,13 +114,13 @@ export async function executePendingAction(
       const appt = result.appointment;
       return {
         ok: true,
-        message: `${user.labels.appointment} confirmado(a) para **${appt.scheduledAtLabel}**.`,
+        message: confirmSuccessAppointment(user.labels, appt.scheduledAtLabel),
         href: "/beneficiario/agenda",
         entityId: appt.id,
       };
     }
 
     default:
-      return { ok: false, error: "Ação desconhecida." };
+      return { ok: false, error: confirmErrorUnknown() };
   }
 }

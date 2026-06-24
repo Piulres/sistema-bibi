@@ -460,9 +460,6 @@ export const MOCK_INTENTS: readonly MockIntentDef[] = [
       "pelo procedimento",
       "marcar eletrocardiograma",
       "agendar eletrocardiograma",
-      "listar prestadores",
-      "quais prestadores",
-      "quais medicos",
     ]),
   },
   {

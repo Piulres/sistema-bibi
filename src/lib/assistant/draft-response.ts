@@ -8,8 +8,13 @@ import {
 } from "@/lib/assistant/provider/mock-draft-flow";
 import {
   type EntityOption,
-  formatChoiceQuestion,
 } from "@/lib/assistant/resolve-entities";
+import {
+  formatChoiceQuestion,
+  formatPartialBlock,
+  resolvePatientHint,
+  resolveProviderHint,
+} from "@/lib/assistant/humanize";
 
 export function buildIncompleteDraftResult(
   tool: string,
@@ -43,15 +48,11 @@ export function buildResolveIncompleteResult(
     partial,
     guidance:
       error +
-      (Object.keys(partial).length
-        ? `\n\nAté agora:\n${Object.entries(partial)
-            .map(([k, v]) => `• ${k}: ${v}`)
-            .join("\n")}`
-        : "") +
+      formatPartialBlock(partial, "Já tenho assim:") +
       (error.includes(labels.patient)
-        ? `\n\nConfira o nome ou tente: *buscar paciente ${(args as { patientName?: string }).patientName ?? "..."}*.`
+        ? resolvePatientHint(labels, (args as { patientName?: string }).patientName)
         : error.includes(labels.provider)
-          ? `\n\nInforme o ${labels.provider.toLowerCase()}, ex.: *com Dra. Helena*.`
+          ? resolveProviderHint(labels)
           : ""),
   };
 }
@@ -65,12 +66,7 @@ export function buildChoiceDraftResult(input: {
   labels: import("@/lib/niche/types").NicheLabels;
 }): ChoiceDraftResult {
   const partial = formatPartialSummary(input.tool, input.draftArgs, input.labels);
-  const partialBlock =
-    Object.keys(partial).length > 0
-      ? `\n\nJá definido:\n${Object.entries(partial)
-          .map(([k, v]) => `• ${k}: ${v}`)
-          .join("\n")}\n`
-      : "";
+  const partialBlock = formatPartialBlock(partial, "Já anotei:");
 
   return {
     __assistant_choices: true,

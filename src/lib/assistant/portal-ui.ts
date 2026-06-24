@@ -19,7 +19,7 @@ export function buildPortalUiCopy(portal: PortalKey, labels: NicheLabels): Porta
         subtitle: `Agenda, cadastros e faturamento · ${labels.patient}s e ${labels.providers.toLowerCase()}`,
         placeholder: "Pergunte ou peça uma ação da operação…",
         loading: "Consultando a operação…",
-        emptyIntro: "Pergunte em linguagem natural, por exemplo:",
+        emptyIntro: "Olá! Posso ajudar com a operação — experimente perguntar:",
         emptyExamples: [
           `Quantos ${labels.appointments.toLowerCase()} temos hoje?`,
           "Qual a receita de ontem?",
@@ -93,7 +93,7 @@ export function buildPortalUiCopy(portal: PortalKey, labels: NicheLabels): Porta
         subtitle: `Seus ${labels.appointments.toLowerCase()}, faturas e agendamento`,
         placeholder: "Pergunte sobre sua conta ou agende…",
         loading: "Consultando sua conta…",
-        emptyIntro: "Posso ajudar com sua conta:",
+        emptyIntro: "Posso ajudar com sua conta — experimente:",
         emptyExamples: [
           "Meu resumo",
           `Próximos ${labels.appointments.toLowerCase()}`,

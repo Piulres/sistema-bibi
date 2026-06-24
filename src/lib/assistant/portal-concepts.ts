@@ -3,6 +3,12 @@ import type { Role } from "@/lib/roles";
 import type { NicheLabels } from "@/lib/niche/types";
 import type { PortalKey } from "@/lib/roles";
 import { PORTALS } from "@/lib/roles";
+import {
+  bookContinuationIntro,
+  draftContinuationIntro,
+  portalExamples,
+  portalFallbackIntro,
+} from "@/lib/assistant/humanize";
 
 export function roleToPortalKey(role: Role): PortalKey {
   switch (role) {
@@ -70,59 +76,22 @@ export function buildPortalHelpFallback(
   activeDraftTool?: string,
 ): string {
   if (activeDraftTool === "draft_create_appointment") {
-    return [
-      "Continuando o agendamento — me diga o que falta:",
-      `• Nome do ${labels.patient.toLowerCase()} (ex.: *para João Pereira*)`,
-      `• ${labels.procedure} (ex.: *eletrocardiograma*) — se for marcar por exame`,
-      `• ${labels.provider} (ex.: *com Dra. Helena*) — ou *não sei* para ver a lista`,
-      "• Data e hora (ex.: *amanhã às 15h*)",
-    ].join("\n");
+    return draftContinuationIntro(labels);
   }
 
   if (activeDraftTool === "draft_book_appointment") {
-    return [
-      `Continuando seu agendamento — informe:`,
-      `• ${labels.procedure} desejado (opcional)`,
-      `• Data e horário (ex.: *amanhã às 11h*)`,
-      `• ${labels.provider} — ou diga *sem preferência* para ver horários de todos`,
-    ].join("\n");
+    return bookContinuationIntro(labels);
   }
 
-  const examples: Record<Role, string[]> = {
-    INTERNO: [
-      `${labels.appointments} de hoje`,
-      "Receita de ontem",
-      "Quem está devendo?",
-      `Como cadastrar ${labels.patient.toLowerCase()}?`,
-    ],
-    PRESTADOR: [
-      `Minha agenda de hoje`,
-      `Meus ${labels.patients.toLowerCase()}`,
-      "Extrato do mês",
-      "Próximo atendimento",
-    ],
-    PJ: [
-      "Resumo da empresa",
-      `${labels.beneficiaries} ativos`,
-      "Faturas em aberto",
-    ],
-    BENEFICIARIO: [
-      "Meu resumo",
-      `Próximos ${labels.appointments.toLowerCase()}`,
-      "Minhas faturas",
-      `Quero agendar ${labels.appointment.toLowerCase()}`,
-    ],
-  };
-
+  const hints = portalExamples(role, labels);
   const portal = PORTALS[roleToPortalKey(role)];
-  const hints = examples[role] ?? examples.INTERNO;
   const available = [...toolNames].slice(0, 8).join(", ");
 
   return [
-    `Não entendi bem no **${portal.label}**. Tente algo como:`,
+    portalFallbackIntro(portal.label),
     ...hints.map((h) => `• ${h}`),
     "",
-    `Operações disponíveis no seu perfil: ${available}.`,
+    `No seu perfil posso ajudar com: ${available}.`,
   ].join("\n");
 }
 

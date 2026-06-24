@@ -2,6 +2,14 @@ import "server-only";
 import type { AssistantAction } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
 import { isDraftToolResult, isIncompleteDraftResult, isChoiceDraftResult } from "@/lib/assistant/types";
+import {
+  confirmPrompt,
+  emptyInvoices,
+  emptyListResult,
+  emptyOpenInvoices,
+  emptySearchResult,
+  emptySlots,
+} from "@/lib/assistant/humanize";
 
 export function formatToolResult(
   toolName: string,
@@ -9,7 +17,7 @@ export function formatToolResult(
   labels: SessionUser["labels"],
 ): string | null {
   if (isDraftToolResult(result)) {
-    return `${result.preview}\n\nRevise os dados abaixo e **confirme** para executar.`;
+    return `${result.preview}\n\n${confirmPrompt()}`;
   }
 
   if (isIncompleteDraftResult(result)) {
@@ -109,7 +117,7 @@ export function formatToolResult(
     }
     case "list_users": {
       const data = result as { count: number; users: { name: string; email: string; role: string }[] };
-      if (data.count === 0) return "Nenhum usuário encontrado.";
+      if (data.count === 0) return emptyListResult("usuários");
       return [
         `**${data.count}** usuário(s):`,
         ...data.users.map((u) => `• ${u.name} (${u.email}) — ${u.role}`),
@@ -122,7 +130,7 @@ export function formatToolResult(
         patients: { name: string; cpf: string; companyName: string | null }[];
       };
       if (data.guidance) return data.guidance;
-      if (!data.patients.length) return "Nenhum cadastro encontrado.";
+      if (!data.patients.length) return emptySearchResult(labels);
       return [
         `**${data.count}** resultado(s):`,
         ...data.patients.map((p) => {
@@ -139,7 +147,7 @@ export function formatToolResult(
         beneficiaries?: { name: string; cpf: string; consumedLabel: string }[];
       };
       const items = data.patients ?? data.beneficiaries ?? [];
-      if (data.count === 0) return "Nenhum resultado.";
+      if (data.count === 0) return emptyListResult(labels.patients);
       return [
         `**${data.count}** resultado(s):`,
         ...items.slice(0, 10).map((p) => {
@@ -202,7 +210,7 @@ export function formatToolResult(
         totalLabel: string;
         invoices: { patientName: string; totalLabel: string; status: string }[];
       };
-      if (data.count === 0) return "Nenhuma fatura em aberto.";
+      if (data.count === 0) return emptyOpenInvoices();
       return [
         `**${data.count}** fatura(s) em aberto — total **${data.totalLabel}**`,
         ...data.invoices.map((i) => `• ${i.patientName}: ${i.totalLabel} (${i.status})`),
@@ -229,12 +237,12 @@ export function formatToolResult(
         count: number;
         invoices: { totalLabel: string; status: string; createdAtLabel: string }[];
       };
-      if (data.count === 0) return "Nenhuma fatura.";
+      if (data.count === 0) return emptyInvoices();
       return data.invoices.map((i) => `• ${i.createdAtLabel}: ${i.totalLabel} (${i.status})`).join("\n");
     }
     case "list_available_slots": {
       const data = result as { date: string; slots: { label: string }[] };
-      if (!data.slots.length) return `Sem horários disponíveis em ${data.date}.`;
+      if (!data.slots.length) return emptySlots(data.date);
       return [`Horários em ${data.date}:`, ...data.slots.map((s) => `• ${s.label}`)].join("\n");
     }
     default:

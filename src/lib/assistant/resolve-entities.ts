@@ -2,6 +2,9 @@ import "server-only";
 import { listPatients, type PatientListView } from "@/lib/patient-service";
 import { listProviders } from "@/lib/appointment-service";
 import { listProcedures, type ProcedureView } from "@/lib/procedure-service";
+import { formatChoiceQuestion } from "@/lib/assistant/humanize";
+
+export { formatChoiceQuestion };
 
 export type EntityOption = {
   id: string;
@@ -174,19 +177,3 @@ export async function listAllProcedureOptions(tenantId: string): Promise<EntityO
   }));
 }
 
-export function formatChoiceQuestion(
-  fieldLabel: string,
-  options: EntityOption[],
-): string {
-  const lines = [
-    `Encontrei **${options.length}** opções de ${fieldLabel}. Qual é a correta?`,
-    "",
-    ...options.map((option, index) => {
-      const detail = option.detail ? ` — ${option.detail}` : "";
-      return `**${index + 1}.** ${option.label}${detail}`;
-    }),
-    "",
-    "Responda com o **número** ou o **nome completo** da opção.",
-  ];
-  return lines.join("\n");
-}

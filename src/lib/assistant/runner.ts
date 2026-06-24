@@ -8,6 +8,12 @@ import type { SessionUser } from "@/lib/session";
 import { resolveAssistantProvider } from "@/lib/assistant/config";
 import { buildAssistantSystemPrompt } from "@/lib/assistant/context";
 import { buildActions, formatToolResult } from "@/lib/assistant/format";
+import {
+  runnerEmptyResult,
+  runnerFallback,
+  runnerUnavailable,
+  toolExecutionError,
+} from "@/lib/assistant/humanize";
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
 import { planGatewayAssistant } from "@/lib/assistant/provider/gateway";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
@@ -48,7 +54,7 @@ export async function runAssistantChat(input: {
 
   if (tools.length === 0) {
     return {
-      message: { role: "assistant", content: "O assistente não está disponível para seu perfil." },
+      message: { role: "assistant", content: runnerUnavailable() },
     };
   }
 
@@ -57,7 +63,7 @@ export async function runAssistantChat(input: {
 
   if (plan.toolCalls.length === 0) {
     return {
-      message: { role: "assistant", content: plan.fallback ?? "Não entendi. Tente reformular." },
+      message: { role: "assistant", content: plan.fallback ?? runnerFallback() },
     };
   }
 
@@ -107,7 +113,7 @@ export async function runAssistantChat(input: {
       const message =
         error instanceof AssistantPermissionError
           ? error.message
-          : "Erro ao executar a consulta.";
+          : toolExecutionError();
       trace?.push({ name: call.name, ok: false, error: message });
       sections.push(message);
     }
@@ -116,7 +122,7 @@ export async function runAssistantChat(input: {
   return {
     message: {
       role: "assistant",
-      content: sections.join("\n\n") || "Não foi possível obter os dados.",
+      content: sections.join("\n\n") || runnerEmptyResult(),
     },
     actions: actions?.length ? actions : undefined,
     pendingActionId,

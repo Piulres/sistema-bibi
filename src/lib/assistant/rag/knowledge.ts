@@ -1,6 +1,7 @@
 import "server-only";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
+import { formatKnowledgeAnswer as humanizeKnowledgeAnswer } from "@/lib/assistant/humanize";
 
 export type KnowledgeChunk = {
   id: string;
@@ -74,15 +75,5 @@ export function searchKnowledge(query: string, limit = 3): KnowledgeChunk[] {
 }
 
 export function formatKnowledgeAnswer(query: string, chunks: KnowledgeChunk[]): string {
-  if (chunks.length === 0) {
-    return `Não encontrei documentação específica sobre "${query}". Consulte o menu do portal ou pergunte de outra forma.`;
-  }
-
-  const lines = [`Encontrei **${chunks.length}** trecho(s) relevante(s) sobre "${query}":`, ""];
-  for (const chunk of chunks) {
-    lines.push(`**${chunk.title}** (${chunk.source})`);
-    lines.push(chunk.content.split("\n").slice(0, 6).join("\n"));
-    lines.push("");
-  }
-  return lines.join("\n").trim();
+  return humanizeKnowledgeAnswer(query, chunks);
 }

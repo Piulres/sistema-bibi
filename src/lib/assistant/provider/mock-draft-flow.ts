@@ -1,5 +1,10 @@
 import "server-only";
 import type { NicheLabels } from "@/lib/niche/types";
+import {
+  buildDraftGuidanceText,
+  buildResolveErrorGuidance as humanizeResolveError,
+  draftFieldPrompt,
+} from "@/lib/assistant/humanize";
 
 export const DRAFT_TOOL_NAMES = new Set([
   "draft_create_user",
@@ -118,50 +123,7 @@ export function buildDraftGuidance(
   labels: NicheLabels,
   partial: Record<string, string>,
 ): string {
-  const prompts: Record<string, string> = {
-    patientName: `Para quem é a ${labels.appointment.toLowerCase()}? Informe o nome do ${labels.patient.toLowerCase()}.`,
-    providerName: `Com qual ${labels.provider.toLowerCase()}? Ex.: *Dra. Helena*. Se não souber, diga *não sei* ou *listar prestadores*.`,
-    providerPick: `Escolha o ${labels.provider.toLowerCase()} na lista abaixo ou informe o nome.`,
-    procedureName: `Qual ${labels.procedure.toLowerCase()}? Ex.: *eletrocardiograma*, *consulta clínica*.`,
-    date: "Para qual data? Ex.: *amanhã*, *25/06/2026*.",
-    time: "Qual horário? Ex.: *15:30* ou *às 15h*.",
-    name: "Qual o nome completo?",
-    email: "Qual o e-mail de login?",
-    password: "Qual a senha inicial? (ou diga *senha bibi123*)",
-    role: "Qual o perfil? *prestador*, *interno*, *pj* ou *beneficiário*.",
-    cpf: "Qual o CPF?",
-    birthDate: "Qual a data de nascimento? Ex.: *15/03/1990*.",
-  };
-
-  const lines: string[] = [];
-  if (Object.keys(partial).length > 0) {
-    lines.push("Até agora tenho:");
-    for (const [key, value] of Object.entries(partial)) {
-      lines.push(`• ${key}: ${value}`);
-    }
-    lines.push("");
-  }
-
-  const next = missing[0];
-  const question = next ? prompts[next] : "Pode detalhar um pouco mais?";
-
-  lines.push(question ?? "Pode detalhar um pouco mais?");
-
-  if (missing.length > 1) {
-    const rest = missing
-      .slice(1)
-      .map((m) => prompts[m] ?? m)
-      .join(" · ");
-    lines.push(`\nDepois ainda preciso de: ${rest}`);
-  }
-
-  if (tool === "draft_create_appointment" || tool === "draft_book_appointment") {
-    lines.push(
-      `\n_Dica: você pode enviar tudo de uma vez — *Agendar eletrocardiograma para João Pereira amanhã às 11h* (sem precisar do nome do ${labels.provider.toLowerCase()})._`,
-    );
-  }
-
-  return lines.join("\n");
+  return buildDraftGuidanceText({ tool, missing, labels, partial });
 }
 
 export function formatPartialSummary(
@@ -212,21 +174,7 @@ export function buildResolveErrorGuidance(
   labels: NicheLabels,
 ): string {
   const partial = formatPartialSummary(tool, args, labels);
-  const partialBlock =
-    Object.keys(partial).length > 0
-      ? `\n\nAté agora:\n${Object.entries(partial)
-          .map(([k, v]) => `• ${k}: ${v}`)
-          .join("\n")}`
-      : "";
-
-  if (error.includes(labels.patient) || error.includes("Paciente")) {
-    return `${error}${partialBlock}\n\nConfira o nome ou busque antes: *buscar paciente João*.`;
-  }
-  if (error.includes(labels.provider) || error.includes("Prestador")) {
-    return `${error}${partialBlock}\n\nInforme o nome do ${labels.provider.toLowerCase()}, ex.: *com Dra. Helena*, ou diga *não sei* para ver a lista.`;
-  }
-  if (error.includes(labels.procedure) || error.includes("Procedimento")) {
-    return `${error}${partialBlock}\n\nInforme o ${labels.procedure.toLowerCase()}, ex.: *eletrocardiograma*.`;
-  }
-  return `${error}${partialBlock}`;
+  return humanizeResolveError(error, partial, labels);
 }
+
+export { draftFieldPrompt };
