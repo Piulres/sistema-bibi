@@ -61,18 +61,12 @@ export default function LandingHeader({ branding, context = "home" }: Props) {
             Entrar
           </Link>
           {portalsHref.startsWith("/") ? (
-            <Link
-              href={portalsHref}
-              className={landingCtaClasses("surface", "sm")}
-            >
+            <Link href={portalsHref} className={landingCtaClasses("surface", "sm")}>
               <span className="sm:hidden">Portais</span>
               <span className="hidden sm:inline">Acessar portais</span>
             </Link>
           ) : (
-            <a
-              href={portalsHref}
-              className={landingCtaClasses("surface", "sm")}
-            >
+            <a href={portalsHref} className={landingCtaClasses("surface", "sm")}>
               <span className="sm:hidden">Portais</span>
               <span className="hidden sm:inline">Acessar portais</span>
             </a>
