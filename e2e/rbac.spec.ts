@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginAs, openInternoNav } from "./helpers/auth";
-import { MEDICAL_INTERNO_NAV } from "./helpers/labels";
+import { MEDICAL_INTERNO_NAV } from "./helpers/medical-nav";
 
 test.describe("RBAC — perfil RECEPCAO", () => {
   test.beforeEach(async ({ page }) => {

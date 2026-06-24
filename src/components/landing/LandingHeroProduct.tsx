@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { BrandingTokens } from "@/lib/theme/tokens";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { HOME_HERO } from "@/lib/landing/home-content";
@@ -7,11 +6,7 @@ import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
 import { SEGMENT_ACCESS_HREF } from "@/lib/landing/navigation";
 import { landingCtaClasses } from "@/components/landing/landing-cta";
 
-type Props = {
-  branding?: BrandingTokens;
-};
-
-export default function LandingHeroProduct(_props: Props) {
+export default function LandingHeroProduct() {
   return (
     <section
       aria-labelledby="hero-heading"

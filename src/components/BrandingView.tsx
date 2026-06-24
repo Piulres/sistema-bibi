@@ -4,9 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import { COLOR_SCHEMES, type ColorScheme } from "@/lib/theme/color-scheme";
-import { SEGMENT_BRANDING_PRESETS, VARIETY_BRANDING_PRESETS } from "@/lib/theme/presets";
-
-const BRANDING_PRESETS = [...SEGMENT_BRANDING_PRESETS, ...VARIETY_BRANDING_PRESETS];
+import { BRANDING_PRESETS, SEGMENT_BRANDING_PRESETS, VARIETY_BRANDING_PRESETS } from "@/lib/theme/presets";
 import { brandingToCssVars } from "@/lib/theme/css-vars";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";

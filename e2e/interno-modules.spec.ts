@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginAs, openInternoNav, portalMain } from "./helpers/auth";
-import { MEDICAL_INTERNO_NAV } from "./helpers/labels";
+import { MEDICAL_INTERNO_NAV } from "./helpers/medical-nav";
 
 const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno/dashboard", heading: /Dashboard Executivo/i },
