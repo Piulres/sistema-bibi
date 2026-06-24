@@ -16,14 +16,26 @@ const OBSOLETE_DOC_PATHS = [
   "docs/ARQUITETURA.md",
   "docs/pesquisa/nichos/10-nicho-vet.md",
   "docs/pesquisa/08-prompt-healthos-expansao.md",
+  "docs/pesquisa/nichos/README.md",
 ];
 
+/** Links quebrados: doc de plataforma referenciado sem ../plataforma/ */
+const LEGACY_PLATAFORMA_DOC_LINK =
+  /\]\((OPERACOES|ARQUITETURA|BENCHMARK|TESTES|DESIGN_SYSTEM|NOTEBOOKLM|WORKFLOW_CURSOR|DEPLOY_NETLIFY|PAYMENTS|COMMUNICATIONS)\.md\)/;
+
+/** Links para versoes/ sem prefixo correto */
+const LEGACY_VERSOES_DOC_LINK =
+  /\]\((V2_0\.md|V2_0_ARCHITECTURE\.md)\)/;
+
+const LEGACY_EVIDENCIAS_LINK = /\]\((evidencias\/|HISTORICO_2026-06-21\.md)\)/;
+
 const STALE_PATTERNS = [
-  { pattern: /Sistema Bibi — Gestão Inteligente em Saúde/g, hint: "metadata layout — use ServiceOS" },
+  { pattern: /Sistema Bibi — Gestão Inteligente em Saúde/g, hint: "metadata layout — use Sistema Bibi - ServiceOS" },
   { pattern: /applicationCategory:\s*"HealthApplication"/g, hint: "LandingJsonLd — use BusinessApplication" },
   { pattern: /Entre com as credenciais da sua clínica/g, hint: "login pages — copy genérica multi-segmento" },
-  { pattern: /Powered by Sistema Bibi/g, hint: "platformLabel — use ServiceOS Bibi" },
-  { pattern: /issuer = "Sistema Bibi"/g, hint: "MFA issuer — use ServiceOS Bibi" },
+  { pattern: /Powered by ServiceOS Bibi/g, hint: "platformLabel — use Powered by Sistema Bibi - ServiceOS" },
+  { pattern: /\bServiceOS Bibi\b/g, hint: "marca — use Sistema Bibi - ServiceOS" },
+  { pattern: /issuer = "ServiceOS Bibi"/g, hint: "MFA issuer — use Sistema Bibi - ServiceOS" },
 ];
 
 /** HealthOS só em histórico v1.x ou notas explícitas de migração */
@@ -36,18 +48,6 @@ const HEALTHOS_ALLOWLIST = [
   "AGENTS.md",
   ".cursor/rules/serviceos-dev.mdc",
   "scripts/verify-docs.mjs",
-];
-
-/** Sistema Bibi como marca de produto — legado v1.x */
-const SISTEMA_BIBI_ALLOWLIST = [
-  "docs/versoes/",
-  "docs/plataforma/HISTORICO",
-  "docs/plataforma/DESIGN_SYSTEM.md",
-  "docs/prompts/",
-  "docs/README.md",
-  ".cursor/rules/serviceos-dev.mdc",
-  "scripts/verify-docs.mjs",
-  "sistema-bibi.netlify.app",
 ];
 
 const SCAN_DIRS = ["docs", ".cursor/rules", "src"];
@@ -100,7 +100,15 @@ for (const file of filesToScan) {
   const content = readFileSync(file, "utf8");
 
   for (const { pattern, hint } of STALE_PATTERNS) {
-    if (isAllowed(rel, [...HEALTHOS_ALLOWLIST, "docs/versoes/"])) continue;
+    if (
+      isAllowed(rel, [
+        ...HEALTHOS_ALLOWLIST,
+        "docs/versoes/",
+        "scripts/verify-docs.mjs",
+        ".cursor/rules/serviceos-dev.mdc",
+      ])
+    )
+      continue;
     if (pattern.test(content)) {
       errors.push(`${rel}: ${hint}`);
       pattern.lastIndex = 0;
@@ -108,11 +116,36 @@ for (const file of filesToScan) {
   }
 
   if (/\bHealthOS\b/.test(content) && !isAllowed(rel, HEALTHOS_ALLOWLIST)) {
-    errors.push(`${rel}: menção a HealthOS — use ServiceOS (v2.0)`);
+    errors.push(`${rel}: menção a HealthOS — use Sistema Bibi - ServiceOS`);
   }
 
-  if (/Sistema Bibi/.test(content) && !isAllowed(rel, SISTEMA_BIBI_ALLOWLIST)) {
-    errors.push(`${rel}: marca legada "Sistema Bibi" — use ServiceOS Bibi`);
+  if (
+    (rel.startsWith("docs/versoes/") ||
+      rel.startsWith("docs/pesquisa/") ||
+      rel.startsWith("docs/produto/")) &&
+    LEGACY_PLATAFORMA_DOC_LINK.test(content)
+  ) {
+    errors.push(
+      `${rel}: link obsoleto para doc de plataforma — use ../plataforma/<arquivo>.md`,
+    );
+    LEGACY_PLATAFORMA_DOC_LINK.lastIndex = 0;
+  }
+
+  if (
+    (rel.startsWith("docs/plataforma/") || rel.startsWith("docs/produto/")) &&
+    LEGACY_VERSOES_DOC_LINK.test(content)
+  ) {
+    errors.push(
+      `${rel}: link obsoleto para doc de versão — use ../versoes/<arquivo>.md`,
+    );
+    LEGACY_VERSOES_DOC_LINK.lastIndex = 0;
+  }
+
+  if (rel.startsWith("docs/produto/") && LEGACY_EVIDENCIAS_LINK.test(content)) {
+    errors.push(
+      `${rel}: link obsoleto — use ../evidencias/ ou ../plataforma/HISTORICO_2026-06-21.md`,
+    );
+    LEGACY_EVIDENCIAS_LINK.lastIndex = 0;
   }
 }
 
@@ -122,4 +155,4 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("docs:verify OK — estrutura por segmentos e menções ServiceOS v2.0 consistentes.");
+console.log("docs:verify OK — estrutura por segmentos e marca Sistema Bibi - ServiceOS consistentes.");
