@@ -13,11 +13,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3b8768` @ `21bc72c` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3bc7a4` @ `40e2dfc` |
 | **Versão anterior em produção** | **2.0.0** — deploy `6a3b711d` @ `9944783` |
-| **Commit release v2.1** | `22a5b1d` |
+| **Commit release v2.1** | `40e2dfc` |
 | `main` / `dev` | **v2.1.0** — sincronizadas |
-| **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
+| **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build** — ver abaixo) |
 | **Pacote anterior** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (24/06/2026) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.1.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.1.0** — após merge desta release |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3b8768` @ `21bc72c` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -53,7 +53,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.1.0` |
 | **PRs** | [#126](https://github.com/Piulres/sistema-bibi/pull/126)–[#133](https://github.com/Piulres/sistema-bibi/pull/133), [#129](https://github.com/Piulres/sistema-bibi/pull/129)–[#132](https://github.com/Piulres/sistema-bibi/pull/132), [#131](https://github.com/Piulres/sistema-bibi/pull/131) |
 | **Doc** | [`V2_1.md`](V2_1.md) |
-| **Publicado em** | 24/06/2026 — deploy Netlify `6a3b8768` @ `21bc72c` |
+| **Publicado em** | 24/06/2026 — deploy Netlify `6a3bc7a4` @ `40e2dfc` (fix assets `/_next/static`) |
 
 **Inclui (além de v2.0.0):**
 
@@ -202,11 +202,14 @@ git checkout v1.2.0          # ou: git checkout 485819a
 npm ci
 npm run pre-release
 
-# 3. Deploy sem rebuild remoto (economiza cota)
-npx netlify deploy --prod --no-build --message "rollback: v1.2.0"
+# 3. Deploy com build integrado do CLI (não usar --no-build)
+npx netlify deploy --prod --message "rollback: v1.2.0"
 
-# 4. Atualizar este arquivo (RELEASES.md) e AGENTS.md com versão em produção
-# 5. Opcional: git checkout main && git push (main continua em v2.0; só produção volta)
+# 4. Smoke test — chunk CSS deve retornar 200 (substitua pelo hash do HTML atual)
+curl -s https://sistema-bibi.netlify.app/ | rg -o '/_next/static/chunks/[^"]+\.css' | head -1 | xargs -I{} curl -s -o /dev/null -w "%{http_code} {}\n" "https://sistema-bibi.netlify.app{}"
+
+# 5. Atualizar este arquivo (RELEASES.md) e AGENTS.md com versão em produção
+# 6. Opcional: git checkout main && git push (main continua em v2.0; só produção volta)
 ```
 
 ### O que muda em cada rollback
@@ -222,7 +225,7 @@ npx netlify deploy --prod --no-build --message "rollback: v1.2.0"
 1. **Schema Prisma** — v2.0 adiciona `Tenant.niche`, `Tenant.labels`, `Procedure.serviceType`. Rollback para v1.2 **sem** reset do banco pode gerar erro se colunas forem obrigatórias no código antigo (v1.2 ignora campos extras no SQLite em geral, mas seed/bootstrap difere).
 2. **Dados de operação** — modo `operation` em Blobs persiste entre deploys; rollback de código **não** apaga dados.
 3. **Tags git** — `v1.2.0`, `v1.1.0`, etc. permanecem no repositório; rollback é checkout + rebuild + deploy.
-4. **Cota Netlify** — cada deploy consome minutos; usar `--no-build` após `pre-release` local.
+4. **Cota Netlify** — cada deploy consome minutos; validar local com `pre-release` antes de publicar.
 
 ### Rollback “só documentação”
 
@@ -235,12 +238,15 @@ Se o deploy falhar antes de publicar, basta **não** atualizar `RELEASES.md` com
 ```bash
 git checkout dev && git pull && npm run pre-release
 git checkout main && git pull && git merge dev && npm run pre-release
-npx netlify build
-npx netlify deploy --prod --no-build --message "vX.Y.Z: descrição"
+npx netlify deploy --prod --message "vX.Y.Z: descrição"
 git tag -a vX.Y.Z -m "Release X.Y.Z"
 git push origin main && git push origin vX.Y.Z
 git checkout dev && git merge main && git push origin dev
 ```
+
+> **Importante (Next.js 16 + `@netlify/plugin-nextjs`):** não use `--no-build`. Esse flag
+> publica HTML sem os assets `/_next/static/*` na CDN (front quebrado). O build integrado do
+> `netlify deploy --prod` empacota corretamente via plugin.
 
 ---
 
