@@ -1,6 +1,5 @@
 import "server-only";
 import { cookies } from "next/headers";
-import crypto from "node:crypto";
 import { getPrisma } from "@/lib/db";
 import { CLINIC_BRANDING_DEFAULTS, type BrandingTokens } from "@/lib/theme/tokens";
 import { normalizeColorScheme } from "@/lib/theme/color-scheme";
@@ -11,42 +10,21 @@ import {
   resolveInternoPermissions,
   type InternoModule,
 } from "@/lib/interno-permissions";
-
-const COOKIE_NAME = "bibi_session";
-const SECRET = process.env.SESSION_SECRET ?? "bibi-poc-dev-secret-change-me";
-
-function sign(value: string): string {
-  const sig = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
-  return `${value}.${sig}`;
-}
-
-function verify(token: string | undefined): string | null {
-  if (!token) return null;
-  const idx = token.lastIndexOf(".");
-  if (idx < 0) return null;
-  const value = token.slice(0, idx);
-  const sig = token.slice(idx + 1);
-  const expected = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
-  // Comparacao em tempo constante para evitar timing attacks.
-  const a = Buffer.from(sig);
-  const b = Buffer.from(expected);
-  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
-  return value;
-}
+import { sessionCookieOptions } from "@/lib/security/config";
+import {
+  SESSION_COOKIE_NAME,
+  signSessionValue,
+  verifySessionToken,
+} from "@/lib/security/session-token";
 
 export async function createSession(userId: string): Promise<void> {
   const store = await cookies();
-  store.set(COOKIE_NAME, sign(userId), {
-    httpOnly: true,
-    sameSite: "lax",
-    path: "/",
-    maxAge: 60 * 60 * 8,
-  });
+  store.set(SESSION_COOKIE_NAME, signSessionValue(userId), sessionCookieOptions());
 }
 
 export async function destroySession(): Promise<void> {
   const store = await cookies();
-  store.delete(COOKIE_NAME);
+  store.delete(SESSION_COOKIE_NAME);
 }
 
 export type SessionUser = {
@@ -70,8 +48,8 @@ export type SessionUser = {
 
 export async function getSessionUser(): Promise<SessionUser | null> {
   const store = await cookies();
-  const token = store.get(COOKIE_NAME)?.value;
-  const userId = verify(token);
+  const token = store.get(SESSION_COOKIE_NAME)?.value;
+  const userId = verifySessionToken(token);
   if (!userId) return null;
 
   const prisma = await getPrisma();

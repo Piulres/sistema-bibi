@@ -11,7 +11,7 @@ import {
 export async function GET() {
   const prisma = await getPrisma();
   try {
-    const session = await requireUser();
+    const session = await requireInternoModule("seguranca");
     const user = await prisma.user.findUnique({
       where: { id: session.id },
       select: { mfaEnabled: true },

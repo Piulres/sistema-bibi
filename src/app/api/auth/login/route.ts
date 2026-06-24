@@ -13,6 +13,7 @@ import {
   validateUserSegmentAccess,
 } from "@/lib/segment/auth";
 import { persistSegmentCookie } from "@/lib/segment/cookie";
+import { enforceAuthRateLimit } from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string; portal?: string; tenantSlug?: string };
@@ -45,11 +46,16 @@ export async function POST(request: Request) {
   });
 
   if (!user || !verifyPassword(password, user.password)) {
+    const blocked = enforceAuthRateLimit(request, "login", true);
+    if (blocked) return blocked;
     return NextResponse.json(
       { error: "E-mail ou senha incorretos" },
       { status: 401 },
     );
   }
+
+  const blocked = enforceAuthRateLimit(request, "login", false);
+  if (blocked) return blocked;
 
   if (user.role !== portalConfig.role) {
     return NextResponse.json(

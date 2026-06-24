@@ -9,15 +9,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Status agora (23/06/2026)
+## Status agora (24/06/2026)
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** — deploy `6a3abdc1` @ `b661b39` |
-| **Commit release** | `b661b39` |
-| `main` / `dev` | Sincronizadas em **`b661b39`** |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.0.0** — **Sistema Bibi - ServiceOS** — deploy `6a3b711d` @ `9944783` |
+| **Commit release** | `9944783` (hardening segurança pós-POC — [PR #131](https://github.com/Piulres/sistema-bibi/pull/131)) |
+| `main` / `dev` | Aguardando merge do PR #131 |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify build` → `npx netlify deploy --prod --no-build` |
-| **Pacote anterior** | deploy `6a3a9973` @ `49edb90` (23/06/2026 manhã) |
+| **Pacote anterior** | deploy `6a3abdc1` @ `b661b39` (23/06/2026) |
 | Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ### Sincronização de ambientes
@@ -26,7 +26,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.0.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.0.0** — idem |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3abdc1` @ `b661b39` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (segurança pós-POC) |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
