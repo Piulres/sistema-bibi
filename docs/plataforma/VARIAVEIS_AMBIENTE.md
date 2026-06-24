@@ -45,6 +45,8 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
 | `RUN_SEED_ON_BUILD` | Não | `true` em demo | Seed no build Netlify (`false` em operação) |
 | `ALLOW_DEMO_RESET` | Não | `true` | Botão restaurar demo na UI |
+| `ASSISTANT_ENABLED` | Não | ligado | Desliga UI + API do assistente (`false`) |
+| `DISABLE_RATE_LIMIT` | Não | — | Desliga rate limit login/MFA (dev) |
 | `NETLIFY` | Auto | `true` no deploy | Detecção de ambiente Netlify |
 
 ---
@@ -89,6 +91,36 @@ SESSION_SECRET="string-longa-aleatoria-min-32-chars"
 | **Efeito** | Nível de log Prisma; em dev, mock/console são registrados se gateway/provider não estiver definido |
 
 Não precisa estar no `.env` local — o Next define automaticamente.
+
+### Assistente operacional (v2.1)
+
+| Variável | Padrão | Onde | Efeito |
+|----------|--------|------|--------|
+| `ASSISTANT_ENABLED` | ligado (`!== "false"`) | `src/lib/assistant/config.ts` | Desliga chat nos 4 portais e retorna 503 nas APIs |
+| `ASSISTANT_PROVIDER` | `mock` | `src/lib/assistant/config.ts` | `mock` (dev) \| `netlify-gateway` (produção) |
+| `ASSISTANT_MODEL` | `gpt-4o-mini` | `src/lib/assistant/config.ts` | Modelo quando provider = gateway |
+
+```env
+# ASSISTANT_ENABLED=false
+# ASSISTANT_PROVIDER=mock
+# ASSISTANT_MODEL=gpt-4o-mini
+```
+
+### Change management (v2.1)
+
+| Variável | Padrão | Onde | Efeito |
+|----------|--------|------|--------|
+| `CHANGE_RESTORE_WINDOW_MS` | `300000` (5 min) | `src/lib/change-management/policy.ts` | Janela do desfazer rápido (`revert-recent`) |
+| `CHANGE_RESTORE_REQUIRES_CONFIRM` | `true` | idem | Exige digitar `RESTAURAR` no restore admin |
+| `CHANGE_RESTORE_REQUIRES_APPROVAL` | `false` | idem | Reservado 4-eyes (Pacote F) |
+
+Detalhes: [`CHANGE_MANAGEMENT_DEPLOY.md`](CHANGE_MANAGEMENT_DEPLOY.md).
+
+### Segurança (v2.1)
+
+| Variável | Padrão | Onde | Efeito |
+|----------|--------|------|--------|
+| `DISABLE_RATE_LIMIT` | — | `src/lib/security/rate-limit.ts` | `true` desliga rate limit (dev); `CI=true` também desliga |
 
 ---
 
