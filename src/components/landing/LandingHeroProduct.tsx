@@ -35,10 +35,10 @@ export default function LandingHeroProduct(_props: Props) {
 
           <h1
             id="hero-heading"
-            className="landing-fade-in mt-8 text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
+            className="landing-fade-in mt-8 text-4xl tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
           >
-            {HOME_HERO.headline}{" "}
-            <span className="landing-gradient-text">{HOME_HERO.headlineAccent}</span>
+            <span className="font-light">{HOME_HERO.headline}</span>{" "}
+            <span className="font-bold">{HOME_HERO.headlineAccent}</span>
           </h1>
 
           <p className="landing-fade-in mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">

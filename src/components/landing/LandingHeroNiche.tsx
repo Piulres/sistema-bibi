@@ -39,10 +39,10 @@ export default function LandingHeroNiche({ niche, branding }: Props) {
 
           <h1
             id="hero-heading"
-            className="landing-fade-in mt-8 text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
+            className="landing-fade-in mt-8 text-4xl tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
           >
-            {landing.headline}{" "}
-            <span className="landing-gradient-text">{landing.headlineAccent}</span>
+            <span className="font-light">{landing.headline}</span>{" "}
+            <span className="font-bold">{landing.headlineAccent}</span>
           </h1>
 
           <p className="landing-fade-in mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
