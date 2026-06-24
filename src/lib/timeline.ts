@@ -1,7 +1,6 @@
 import { getPrisma } from "@/lib/db";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import {
-  TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
   type TimelineAction,
   type TimelineEntityType,
