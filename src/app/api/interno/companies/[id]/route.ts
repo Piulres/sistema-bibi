@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
-import { isCompanyStatus, updateCompany } from "@/lib/company-service";
-import { contractActiveFromStatus } from "@/lib/company-crm";
+import { updateCompany } from "@/lib/company-service";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -11,24 +10,21 @@ export async function PATCH(request: Request, { params }: Params) {
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
 
-    if (body.status && !isCompanyStatus(String(body.status))) {
-      return NextResponse.json({ error: "Status inválido" }, { status: 400 });
+    if (body.status !== undefined) {
+      return NextResponse.json(
+        { error: "Alteração de status CRM deve usar o endpoint dedicado" },
+        { status: 403 },
+      );
     }
 
-    const status = body.status ? String(body.status) : undefined;
     const contractActive =
-      body.contractActive !== undefined
-        ? Boolean(body.contractActive)
-        : status
-          ? contractActiveFromStatus(status)
-          : undefined;
+      body.contractActive !== undefined ? Boolean(body.contractActive) : undefined;
 
     const result = await updateCompany({
       tenantId: user.tenantId,
       companyId: id,
       name: body.name ? String(body.name) : undefined,
       cnpj: body.cnpj ? String(body.cnpj) : undefined,
-      status,
       contractActive,
       tradeName: body.tradeName as string | null | undefined,
       email: body.email as string | null | undefined,

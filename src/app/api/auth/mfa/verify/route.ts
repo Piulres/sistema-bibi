@@ -11,8 +11,21 @@ import {
   validateUserSegmentAccess,
 } from "@/lib/segment/auth";
 import { persistSegmentCookie } from "@/lib/segment/cookie";
+import {
+  checkRateLimit,
+  clientIpFromRequest,
+  rateLimitResponse,
+} from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {
+  const rate = checkRateLimit(`mfa:${clientIpFromRequest(request)}`, {
+    limit: 10,
+    windowMs: 15 * 60 * 1000,
+  });
+  if (!rate.allowed) {
+    return rateLimitResponse(rate.retryAfterSeconds);
+  }
+
   const prisma = await getPrisma();
   try {
     const body = (await request.json()) as {

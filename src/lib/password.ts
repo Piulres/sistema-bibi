@@ -1,17 +1,19 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "crypto";
+import { isProductionRuntime } from "@/lib/security/config";
 
 const PREFIX = "scrypt:";
 
-/** Gera hash scrypt para armazenamento seguro (POC+). */
+/** Gera hash scrypt para armazenamento seguro. */
 export function hashPassword(password: string): string {
   const salt = randomBytes(16).toString("hex");
   const hash = scryptSync(password, salt, 64).toString("hex");
   return `${PREFIX}${salt}:${hash}`;
 }
 
-/** Verifica senha contra hash scrypt ou texto legado (migração). */
+/** Verifica senha contra hash scrypt. Em produção, rejeita texto legado. */
 export function verifyPassword(password: string, stored: string): boolean {
   if (!stored.startsWith(PREFIX)) {
+    if (isProductionRuntime()) return false;
     return stored === password;
   }
 

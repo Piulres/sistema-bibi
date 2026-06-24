@@ -26,23 +26,23 @@ jobs:
       - name: Unit + integration + API tests
         run: npm run test
         env:
-          SESSION_SECRET: ci-test-session-secret-32chars
-          CRON_SECRET: ci-cron-secret
+          SESSION_SECRET: ci-github-actions-session-secret-32chars-min
+          CRON_SECRET: ci-cron-secret-32-characters-min
           DATABASE_URL: file:./test.db
 
       - name: Build
         run: npm run build
         env:
-          SESSION_SECRET: ci-test-session-secret-32chars
-          CRON_SECRET: ci-cron-secret
+          SESSION_SECRET: ci-github-actions-session-secret-32chars-min
+          CRON_SECRET: ci-cron-secret-32-characters-min
           DATABASE_URL: file:./dev.db
 
   e2e:
     runs-on: ubuntu-latest
     needs: unit-integration-api
     env:
-      SESSION_SECRET: ci-test-session-secret-32chars
-      CRON_SECRET: ci-cron-secret
+      SESSION_SECRET: ci-github-actions-session-secret-32chars-min
+      CRON_SECRET: ci-cron-secret-32-characters-min
       DATABASE_URL: file:./dev.db
     steps:
       - uses: actions/checkout@v4
