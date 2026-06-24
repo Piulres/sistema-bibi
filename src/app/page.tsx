@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { PLATFORM } from "@/lib/platform";
-import { getSiteUrl } from "@/lib/landing/site-url";
+import { buildLandingMetadata } from "@/lib/landing/metadata";
 import { segmentTenantBySlug } from "@/lib/niche/demo-accounts";
 import { segmentLandingHref } from "@/lib/platform/structure";
 import TenantTheme from "@/components/layout/TenantTheme";
@@ -13,32 +13,21 @@ type PageProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = getPlatformBranding();
-  const siteUrl = getSiteUrl();
   const title = `${PLATFORM.name} — ${PLATFORM.tagline}`;
-  const description = PLATFORM.description;
 
-  return {
+  return buildLandingMetadata({
     title,
-    description,
-    metadataBase: new URL(siteUrl),
-    alternates: { canonical: "/" },
-    openGraph: {
-      type: "website",
-      locale: "pt_BR",
-      url: siteUrl,
-      siteName: branding.displayName,
-      title,
-      description,
-    },
+    description: PLATFORM.description,
+    canonicalPath: "/",
     keywords: [
       "serviceos",
       "pay per use",
       "multi-nicho",
       "white label",
       "sistema bibi",
+      "infraestrutura b2b",
     ],
-  };
+  });
 }
 
 export default async function Home({ searchParams }: PageProps) {
