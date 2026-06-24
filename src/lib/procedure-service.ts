@@ -1,6 +1,8 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
+import { snapshotProcedure } from "@/lib/change-management/snapshots";
+import { runChangeCommand } from "@/lib/change-management/run-change";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 
 export const PROCEDURE_CATEGORIES = ["CONSULTA", "EXAME"] as const;
@@ -102,28 +104,32 @@ export async function updateProcedure(input: {
     if (dup) return { error: "Código já cadastrado" as const };
   }
 
-  const procedure = await prisma.procedure.update({
-    where: { id: existing.id },
-    data: {
-      code: input.code?.trim() ?? undefined,
-      name: input.name?.trim() ?? undefined,
-      category: input.category ?? undefined,
-      basePrice: input.basePrice ?? undefined,
-    },
-  });
-
+  const beforeSnapshot = snapshotProcedure(existing);
   const priceChanged =
     input.basePrice !== undefined && input.basePrice !== existing.basePrice;
 
-  await recordTimelineEvent({
+  const procedure = await runChangeCommand({
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.PROCEDURE,
-    entityId: procedure.id,
+    entityId: existing.id,
     action: TIMELINE_ACTIONS.UPDATED,
     description: priceChanged
-      ? `Procedimento ${procedure.code}: preço ${formatBRL(existing.basePrice)} → ${formatBRL(procedure.basePrice)} (usos já registrados mantêm valor congelado)`
-      : `Procedimento ${procedure.code} atualizado`,
+      ? `Procedimento ${existing.code}: preço ${formatBRL(existing.basePrice)} → ${formatBRL(input.basePrice!)} (usos já registrados mantêm valor congelado)`
+      : `Procedimento ${existing.code} atualizado`,
     createdBy: input.createdBy,
+    before: beforeSnapshot,
+    reversible: true,
+    afterSnapshot: snapshotProcedure,
+    execute: async (tx) =>
+      tx.procedure.update({
+        where: { id: existing.id },
+        data: {
+          code: input.code?.trim() ?? undefined,
+          name: input.name?.trim() ?? undefined,
+          category: input.category ?? undefined,
+          basePrice: input.basePrice ?? undefined,
+        },
+      }),
   });
 
   return { procedure: mapProcedure(procedure) };
@@ -144,15 +150,21 @@ export async function deleteProcedure(input: {
     return { error: "Procedimento com uso registrado não pode ser excluído" as const };
   }
 
-  await prisma.procedure.delete({ where: { id: existing.id } });
+  const beforeSnapshot = snapshotProcedure(existing);
 
-  await recordTimelineEvent({
+  await runChangeCommand({
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.PROCEDURE,
     entityId: existing.id,
     action: TIMELINE_ACTIONS.DELETED,
     description: `Procedimento ${existing.code} removido do catálogo`,
     createdBy: input.createdBy,
+    deleteSnapshot: beforeSnapshot,
+    reversible: true,
+    execute: async (tx) => {
+      await tx.procedure.delete({ where: { id: existing.id } });
+      return { id: existing.id };
+    },
   });
 
   return { ok: true as const };

@@ -50,31 +50,55 @@ type ProtocolTemplate = {
 type ClinicalProfile = {
   allergies: { substance: string; severity?: string; notes?: string }[];
   chronicConditions: { condition: string; since?: string; notes?: string }[];
-  bloodType: string | null;
+  bloodType?: string | null;
+};
+
+type Vaccine = {
+  id: string;
+  vaccineName: string;
+  doseLabel: string | null;
+  status: string;
+  statusLabel: string;
+  appliedAtLabel: string | null;
+  nextDueAtLabel: string | null;
+  batchNumber: string | null;
+  notes: string | null;
 };
 
 type Procedure = { id: string; name: string; category: string };
 
+type CareTab = "medicacao" | "exames" | "protocolos" | "perfil" | "vacinas";
+
 type Props = {
   patientId: string;
+  petId?: string;
+  subjectType?: "patient" | "pet";
   appointmentId?: string;
   procedures?: Procedure[];
-  tab: "medicacao" | "exames" | "protocolos" | "perfil";
+  tab: CareTab;
   onChanged?: () => void;
 };
 
 export default function ClinicalCarePanel({
   patientId,
+  petId,
+  subjectType = petId ? "pet" : "patient",
   appointmentId,
   procedures = [],
   tab,
   onChanged,
 }: Props) {
+  const apiBase =
+    subjectType === "pet" && petId
+      ? `/api/prestador/pets/${petId}`
+      : `/api/prestador/patients/${patientId}`;
+  const isPet = subjectType === "pet" && Boolean(petId);
   const [medications, setMedications] = useState<Medication[]>([]);
   const [examOrders, setExamOrders] = useState<ExamOrder[]>([]);
   const [enrollments, setEnrollments] = useState<ProtocolEnrollment[]>([]);
   const [templates, setTemplates] = useState<ProtocolTemplate[]>([]);
   const [profile, setProfile] = useState<ClinicalProfile | null>(null);
+  const [vaccines, setVaccines] = useState<Vaccine[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -95,21 +119,28 @@ export default function ClinicalCarePanel({
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [allergyInput, setAllergyInput] = useState({ substance: "", severity: "" });
   const [conditionInput, setConditionInput] = useState("");
+  const [vaccineForm, setVaccineForm] = useState({
+    vaccineName: "",
+    doseLabel: "",
+    nextDueAt: "",
+    batchNumber: "",
+    notes: "",
+  });
 
   const loadMedications = useCallback(async () => {
-    const res = await fetch(`/api/prestador/patients/${patientId}/medications`);
+    const res = await fetch(`${apiBase}/medications`);
     const data = await res.json();
     if (res.ok) setMedications(data.medications);
-  }, [patientId]);
+  }, [apiBase]);
 
   const loadExams = useCallback(async () => {
     const url = appointmentId
-      ? `/api/prestador/patients/${patientId}/exam-orders?appointmentId=${appointmentId}`
-      : `/api/prestador/patients/${patientId}/exam-orders`;
+      ? `${apiBase}/exam-orders?appointmentId=${appointmentId}`
+      : `${apiBase}/exam-orders`;
     const res = await fetch(url);
     const data = await res.json();
     if (res.ok) setExamOrders(data.examOrders);
-  }, [patientId, appointmentId]);
+  }, [apiBase, appointmentId]);
 
   const loadProtocols = useCallback(async () => {
     const res = await fetch(`/api/prestador/patients/${patientId}/protocols`);
@@ -121,10 +152,24 @@ export default function ClinicalCarePanel({
   }, [patientId]);
 
   const loadProfile = useCallback(async () => {
-    const res = await fetch(`/api/prestador/patients/${patientId}/clinical-profile`);
+    const res = await fetch(`${apiBase}/clinical-profile`);
     const data = await res.json();
-    if (res.ok) setProfile(data.profile);
-  }, [patientId]);
+    if (res.ok) {
+      const loaded = data.profile as ClinicalProfile & { bloodType?: string | null };
+      setProfile({
+        allergies: loaded.allergies ?? [],
+        chronicConditions: loaded.chronicConditions ?? [],
+        bloodType: loaded.bloodType ?? null,
+      });
+    }
+  }, [apiBase]);
+
+  const loadVaccines = useCallback(async () => {
+    if (!isPet || !petId) return;
+    const res = await fetch(`${apiBase}/vaccines`);
+    const data = await res.json();
+    if (res.ok) setVaccines(data.vaccines);
+  }, [apiBase, isPet, petId]);
 
   useEffect(() => {
     let active = true;
@@ -133,19 +178,20 @@ export default function ClinicalCarePanel({
       if (tab === "exames") await loadExams();
       if (tab === "protocolos") await loadProtocols();
       if (tab === "perfil") await loadProfile();
+      if (tab === "vacinas") await loadVaccines();
       if (!active) return;
     })();
     return () => {
       active = false;
     };
-  }, [tab, loadMedications, loadExams, loadProtocols, loadProfile]);
+  }, [tab, loadMedications, loadExams, loadProtocols, loadProfile, loadVaccines]);
 
   async function addMedication() {
     setBusy(true);
     setMsg(null);
     setError(null);
     try {
-      const res = await fetch(`/api/prestador/patients/${patientId}/medications`, {
+      const res = await fetch(`${apiBase}/medications`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -188,7 +234,7 @@ export default function ClinicalCarePanel({
     setMsg(null);
     setError(null);
     try {
-      const res = await fetch(`/api/prestador/patients/${patientId}/exam-orders`, {
+      const res = await fetch(`${apiBase}/exam-orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ appointmentId, ...examForm }),
@@ -269,7 +315,7 @@ export default function ClinicalCarePanel({
     setBusy(true);
     setMsg(null);
     try {
-      const res = await fetch(`/api/prestador/patients/${patientId}/clinical-profile`, {
+      const res = await fetch(`${apiBase}/clinical-profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(next),
@@ -284,10 +330,45 @@ export default function ClinicalCarePanel({
     }
   }
 
+  async function addVaccine() {
+    if (!isPet) return;
+    setBusy(true);
+    setMsg(null);
+    setError(null);
+    try {
+      const res = await fetch(`${apiBase}/vaccines`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          appointmentId,
+          vaccineName: vaccineForm.vaccineName,
+          doseLabel: vaccineForm.doseLabel || undefined,
+          nextDueAt: vaccineForm.nextDueAt || undefined,
+          batchNumber: vaccineForm.batchNumber || undefined,
+          notes: vaccineForm.notes || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro ao registrar vacina");
+        return;
+      }
+      setVaccineForm({ vaccineName: "", doseLabel: "", nextDueAt: "", batchNumber: "", notes: "" });
+      setMsg("Vacina registrada.");
+      await loadVaccines();
+      onChanged?.();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (tab === "medicacao") {
     return (
       <div className="space-y-4">
-        <SectionHeader title="Gestão de medicação" description="Prescrições estruturadas do paciente." />
+        <SectionHeader
+          title="Gestão de medicação"
+          description={isPet ? "Prescrições estruturadas do pet." : "Prescrições estruturadas do paciente."}
+        />
         {msg && <Alert tone="success">{msg}</Alert>}
         {error && <Alert tone="danger">{error}</Alert>}
         <div className="grid gap-2 sm:grid-cols-2">
@@ -371,6 +452,13 @@ export default function ClinicalCarePanel({
   }
 
   if (tab === "protocolos") {
+    if (isPet) {
+      return (
+        <p className="text-sm text-[var(--text-muted)]">
+          Protocolos de cuidado permanecem vinculados ao tutor. Use o histórico do tutor para protocolos compartilhados.
+        </p>
+      );
+    }
     return (
       <div className="space-y-4">
         <SectionHeader title="Protocolos de cuidado" description="Checklists e acompanhamento programado." />
@@ -430,19 +518,61 @@ export default function ClinicalCarePanel({
     );
   }
 
+  if (tab === "vacinas") {
+    if (!isPet) {
+      return <p className="text-sm text-[var(--text-muted)]">Carteira vacinal disponível apenas para pets (nicho VET).</p>;
+    }
+    return (
+      <div className="space-y-4">
+        <SectionHeader title="Carteira vacinal" description="Registro de vacinas aplicadas e próximos reforços." />
+        {msg && <Alert tone="success">{msg}</Alert>}
+        {error && <Alert tone="danger">{error}</Alert>}
+        <div className="grid gap-2 sm:grid-cols-2">
+          <input className={fieldClass} placeholder="Vacina (ex: V10, Antirrábica)" value={vaccineForm.vaccineName} onChange={(e) => setVaccineForm({ ...vaccineForm, vaccineName: e.target.value })} />
+          <input className={fieldClass} placeholder="Dose (ex: reforço anual)" value={vaccineForm.doseLabel} onChange={(e) => setVaccineForm({ ...vaccineForm, doseLabel: e.target.value })} />
+          <input className={fieldClass} type="date" placeholder="Próximo reforço" value={vaccineForm.nextDueAt} onChange={(e) => setVaccineForm({ ...vaccineForm, nextDueAt: e.target.value })} />
+          <input className={fieldClass} placeholder="Lote" value={vaccineForm.batchNumber} onChange={(e) => setVaccineForm({ ...vaccineForm, batchNumber: e.target.value })} />
+          <input className={`sm:col-span-2 ${fieldClass}`} placeholder="Observações" value={vaccineForm.notes} onChange={(e) => setVaccineForm({ ...vaccineForm, notes: e.target.value })} />
+        </div>
+        <Button onClick={addVaccine} disabled={busy}>Registrar vacina</Button>
+        <ul className="space-y-3">
+          {vaccines.map((v) => (
+            <li key={v.id} className="rounded-[var(--radius-button)] border border-[var(--border-default)] p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-medium">{v.vaccineName}{v.doseLabel ? ` — ${v.doseLabel}` : ""}</p>
+                <StatusBadge value={v.status} label={v.statusLabel} />
+              </div>
+              <p className="mt-1 text-sm text-[var(--text-muted)]">
+                {v.appliedAtLabel ? `Aplicada em ${v.appliedAtLabel}` : "Pendente"}
+                {v.nextDueAtLabel ? ` · Próximo reforço: ${v.nextDueAtLabel}` : ""}
+              </p>
+              {v.batchNumber && <p className="text-xs text-[var(--text-muted)]">Lote: {v.batchNumber}</p>}
+              {v.notes && <p className="mt-1 text-sm text-[var(--text-secondary)]">{v.notes}</p>}
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  }
+
   // perfil
   if (!profile) return <p className="text-sm text-[var(--text-muted)]">Carregando perfil...</p>;
 
   return (
     <div className="space-y-4">
-      <SectionHeader title="Perfil clínico" description="Alergias e condições persistentes do paciente." />
-      {msg && <Alert tone="success">{msg}</Alert>}
-      <input
-        className={fieldClass}
-        placeholder="Tipo sanguíneo"
-        value={profile.bloodType ?? ""}
-        onChange={(e) => setProfile({ ...profile, bloodType: e.target.value || null })}
+      <SectionHeader
+        title="Perfil clínico"
+        description={isPet ? "Alergias e condições persistentes do pet." : "Alergias e condições persistentes do paciente."}
       />
+      {msg && <Alert tone="success">{msg}</Alert>}
+      {!isPet && (
+        <input
+          className={fieldClass}
+          placeholder="Tipo sanguíneo"
+          value={profile.bloodType ?? ""}
+          onChange={(e) => setProfile({ ...profile, bloodType: e.target.value || null })}
+        />
+      )}
       <div className="flex flex-wrap gap-2">
         <input className={`flex-1 ${fieldClass}`} placeholder="Alergia" value={allergyInput.substance} onChange={(e) => setAllergyInput({ ...allergyInput, substance: e.target.value })} />
         <input className={`w-32 ${fieldClass}`} placeholder="Gravidade" value={allergyInput.severity} onChange={(e) => setAllergyInput({ ...allergyInput, severity: e.target.value })} />

@@ -1,5 +1,6 @@
 import { getSiteUrl } from "@/lib/landing/site-url";
 import { buildLandingDescription } from "@/lib/landing/content";
+import { getSalesWhatsAppConfig } from "@/lib/landing/whatsapp";
 import { PLATFORM } from "@/lib/platform";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 
@@ -10,6 +11,7 @@ type Props = {
 export default function LandingJsonLd({ branding }: Props) {
   const siteUrl = getSiteUrl();
   const description = buildLandingDescription(branding.tagline);
+  const whatsapp = getSalesWhatsAppConfig();
 
   const organization = {
     "@context": "https://schema.org",
@@ -18,6 +20,33 @@ export default function LandingJsonLd({ branding }: Props) {
     description,
     url: siteUrl,
     ...(branding.logoUrl ? { logo: branding.logoUrl } : {}),
+    ...(whatsapp
+      ? {
+          contactPoint: [
+            {
+              "@type": "ContactPoint",
+              contactType: "sales",
+              telephone: `+${whatsapp.number}`,
+              availableLanguage: ["Portuguese"],
+              areaServed: "BR",
+              url: `https://wa.me/${whatsapp.number}`,
+            },
+          ],
+        }
+      : {}),
+  };
+
+  const website = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: branding.displayName,
+    url: siteUrl,
+    description,
+    inLanguage: "pt-BR",
+    publisher: {
+      "@type": "Organization",
+      name: branding.displayName,
+    },
   };
 
   const software = {
@@ -72,6 +101,10 @@ export default function LandingJsonLd({ branding }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organization) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(website) }}
       />
       <script
         type="application/ld+json"

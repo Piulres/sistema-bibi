@@ -36,7 +36,7 @@ test.describe("RBAC — perfil FATURAMENTO", () => {
 
   test("nav limitada: faturamento e recorrência, sem cadastros", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    const nav = await openInternoNav(page);
+    await openInternoNav(page);
     await expect(internoNavLink(page, "/interno")).toBeVisible();
     await expect(internoNavLink(page, "/interno/assinaturas")).toBeVisible();
     await expect(internoNavLink(page, "/interno/relatorios")).toBeVisible();

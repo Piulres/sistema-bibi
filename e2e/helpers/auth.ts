@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 export type PortalKey = "prestador" | "interno" | "pj" | "beneficiario";
 
@@ -56,9 +56,11 @@ export async function openInternoNav(page: Page) {
     return desktop;
   }
   const drawer = internoNavDrawer(page);
-  if (!(await drawer.isVisible())) {
-    await page.locator(".lg\\:hidden").getByRole("button").first().click();
+  if (await drawer.isVisible()) {
+    return drawer;
   }
+  await page.locator(".lg\\:hidden").getByRole("button").first().click();
+  await expect(drawer).toBeVisible();
   return drawer;
 }
 

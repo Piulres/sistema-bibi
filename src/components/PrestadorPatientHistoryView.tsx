@@ -14,6 +14,8 @@ import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
 import Card from "@/components/ui/Card";
 
 type Overview = {
+  subjectType?: "patient" | "pet";
+  tutorPatientId?: string;
   patient: {
     id: string;
     name: string;
@@ -67,7 +69,9 @@ type Overview = {
 export default function PrestadorPatientHistoryView({ patientId }: { patientId: string }) {
   const [overview, setOverview] = useState<Overview | null>(null);
   const [clinicalSidebar, setClinicalSidebar] = useState<ClinicalSidebarData | null>(null);
-  const [historyTab, setHistoryTab] = useState<"historico" | "medicacao" | "exames" | "protocolos" | "perfil">("historico");
+  const [subjectType, setSubjectType] = useState<"patient" | "pet">("patient");
+  const [tutorPatientId, setTutorPatientId] = useState<string | null>(null);
+  const [historyTab, setHistoryTab] = useState<"historico" | "medicacao" | "exames" | "protocolos" | "perfil" | "vacinas">("historico");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -85,13 +89,17 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
         setError(data.error ?? "Erro ao carregar histórico");
       } else {
         setOverview(data.overview);
+        setSubjectType(data.overview.subjectType ?? "patient");
+        setTutorPatientId(data.overview.tutorPatientId ?? null);
       }
       if (clinicalRes.ok) {
+        const o = clinicalData.overview;
         setClinicalSidebar({
-          profile: clinicalData.overview.profile,
-          activeMedications: clinicalData.overview.activeMedications,
-          pendingExams: clinicalData.overview.pendingExams,
-          activeProtocols: clinicalData.overview.activeProtocols,
+          profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
+          activeMedications: o.activeMedications,
+          pendingExams: o.pendingExams,
+          activeProtocols: o.activeProtocols ?? [],
+          vaccines: o.vaccines,
         });
       }
       setLoading(false);
@@ -107,6 +115,31 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
   }
 
   const { patient, summary } = overview;
+  const isPet = subjectType === "pet";
+  const clinicalPatientId = isPet && tutorPatientId ? tutorPatientId : patientId;
+  const careTabs = [
+    { key: "historico", label: "Histórico" },
+    { key: "medicacao", label: "Medicação" },
+    { key: "exames", label: "Exames" },
+    ...(isPet ? [] : [{ key: "protocolos", label: "Protocolos" }]),
+    ...(isPet ? [{ key: "vacinas", label: "Vacinas" }] : []),
+    { key: "perfil", label: "Perfil clínico" },
+  ] as const;
+
+  async function refreshClinicalSidebar() {
+    const clinicalRes = await fetch(`/api/prestador/patients/${patientId}/clinical-overview`);
+    const clinicalData = await clinicalRes.json();
+    if (clinicalRes.ok) {
+      const o = clinicalData.overview;
+      setClinicalSidebar({
+        profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
+        activeMedications: o.activeMedications,
+        pendingExams: o.pendingExams,
+        activeProtocols: o.activeProtocols ?? [],
+        vaccines: o.vaccines,
+      });
+    }
+  }
 
   return (
     <div className="space-y-8">
@@ -116,7 +149,9 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">{patient.name}</h1>
-            <p className="mt-1 text-sm text-[var(--text-muted)]">CPF {patient.cpf}</p>
+            <p className="mt-1 text-sm text-[var(--text-muted)]">
+              {isPet ? patient.cpf : `CPF ${patient.cpf}`}
+            </p>
             <p className="text-sm text-[var(--text-muted)]">
               Nascimento: {patient.birthDateLabel}
               {patient.phone ? ` · Tel. ${patient.phone}` : ""}
@@ -158,13 +193,7 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
 
         <div className="space-y-4">
           <TabBar
-            tabs={[
-              { key: "historico", label: "Histórico" },
-              { key: "medicacao", label: "Medicação" },
-              { key: "exames", label: "Exames" },
-              { key: "protocolos", label: "Protocolos" },
-              { key: "perfil", label: "Perfil clínico" },
-            ]}
+            tabs={[...careTabs]}
             active={historyTab}
             onSelect={(k) => setHistoryTab(k as typeof historyTab)}
           />
@@ -357,23 +386,14 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
             </>
           )}
 
-          {["medicacao", "exames", "protocolos", "perfil"].includes(historyTab) && (
+          {["medicacao", "exames", "protocolos", "perfil", "vacinas"].includes(historyTab) && (
             <Card padding="lg">
               <ClinicalCarePanel
-                patientId={patientId}
-                tab={historyTab as "medicacao" | "exames" | "protocolos" | "perfil"}
-                onChanged={async () => {
-                  const clinicalRes = await fetch(`/api/prestador/patients/${patientId}/clinical-overview`);
-                  const clinicalData = await clinicalRes.json();
-                  if (clinicalRes.ok) {
-                    setClinicalSidebar({
-                      profile: clinicalData.overview.profile,
-                      activeMedications: clinicalData.overview.activeMedications,
-                      pendingExams: clinicalData.overview.pendingExams,
-                      activeProtocols: clinicalData.overview.activeProtocols,
-                    });
-                  }
-                }}
+                patientId={clinicalPatientId}
+                petId={isPet ? patientId : undefined}
+                subjectType={subjectType}
+                tab={historyTab as "medicacao" | "exames" | "protocolos" | "perfil" | "vacinas"}
+                onChanged={refreshClinicalSidebar}
               />
             </Card>
           )}

@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import PortalShell from "@/components/layout/PortalShell";
 import InternoNav from "@/components/InternoNav";
+import { ToastProvider } from "@/components/ui/Toast";
 import { PORTALS } from "@/lib/roles";
 import { INTERNO_PUBLIC_PATHS } from "@/lib/navigation";
 import type { SessionUser } from "@/lib/session";
@@ -27,17 +28,19 @@ export default function InternoPortalShell({ user, children }: Props) {
   const portal = PORTALS.interno;
 
   return (
-    <PortalShell
-      portal="interno"
-      portalLabel={`Operação · ${user.labels.beneficiaries}`}
-      loginPath={portal.loginPath}
-      userName={user.name}
-      branding={user.branding}
-      niche={user.niche}
-      labels={user.labels}
-    >
-      <InternoNav permissions={user.internoPermissions} />
-      <div className="portal-page-content mt-8 min-w-0">{children}</div>
-    </PortalShell>
+    <ToastProvider>
+      <PortalShell
+        portal="interno"
+        portalLabel={`Operação · ${user.labels.beneficiaries}`}
+        loginPath={portal.loginPath}
+        userName={user.name}
+        branding={user.branding}
+        niche={user.niche}
+        labels={user.labels}
+      >
+        <InternoNav permissions={user.internoPermissions} />
+        <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      </PortalShell>
+    </ToastProvider>
   );
 }

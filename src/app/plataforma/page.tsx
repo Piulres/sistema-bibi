@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { PLATFORM } from "@/lib/platform";
+import { buildLandingMetadata } from "@/lib/landing/metadata";
 import {
   PLATFORM_STRUCTURE,
   SALES_SITE_SECTIONS,
@@ -14,11 +15,13 @@ import LandingHeader from "@/components/landing/LandingHeader";
 import LandingFooter from "@/components/landing/LandingFooter";
 import Card from "@/components/ui/Card";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = buildLandingMetadata({
   title: `Mapa da Plataforma — ${PLATFORM.name}`,
   description:
     "Estrutura completa do Portal Sistema Bibi: landing por segmento, portais Interno, Prestador, Empresa e Beneficiário.",
-};
+  canonicalPath: "/plataforma",
+  keywords: ["serviceos", "arquitetura", "portais", "multi-nicho"],
+});
 
 export default async function PlataformaPage() {
   const branding = getPlatformBranding();

@@ -21,6 +21,7 @@ import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 import TabBar from "@/components/ui/TabBar";
 import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
+import { useDraftUndo } from "@/hooks/useDraftUndo";
 
 type Usage = {
   id: string;
@@ -40,6 +41,7 @@ type RecordItem = {
 type Detail = {
   appointment: { id: string; scheduledAt: string; status: string; reason: string | null };
   patient: { id: string; name: string; cpf: string; company: string | null };
+  pet?: { id: string; name: string; species: string; breed: string | null } | null;
   usages: Usage[];
   records: RecordItem[];
 };
@@ -79,7 +81,7 @@ const CARE_TABS = [
   { key: "perfil", label: "Perfil clínico" },
 ] as const;
 
-type CareTab = (typeof CARE_TABS)[number]["key"];
+type CareTab = (typeof CARE_TABS)[number]["key"] | "vacinas";
 
 const fieldClass =
   "w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
@@ -88,7 +90,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const [detail, setDetail] = useState<Detail | null>(null);
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [selectedProc, setSelectedProc] = useState("");
-  const [note, setNote] = useState("");
+  const pepDraft = useDraftUndo({
+    storageKey: `pep-draft-${appointmentId}`,
+    initialValue: "",
+  });
+  const note = pepDraft.value;
+  const setNote = pepDraft.setValue;
   const [recordType, setRecordType] = useState<PepRecordType>("EVOLUCAO");
   const [recordTitle, setRecordTitle] = useState("");
   const [busy, setBusy] = useState(false);
@@ -102,17 +109,19 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const [selectedMaterial, setSelectedMaterial] = useState("");
   const [materialQty, setMaterialQty] = useState("1");
 
-  const loadClinical = useCallback(async (patientId: string) => {
+  const loadClinical = useCallback(async (clinicalId: string) => {
     setClinicalLoading(true);
     try {
-      const res = await fetch(`/api/prestador/patients/${patientId}/clinical-overview`);
+      const res = await fetch(`/api/prestador/patients/${clinicalId}/clinical-overview`);
       const data = await res.json();
       if (res.ok) {
+        const o = data.overview;
         setClinicalSidebar({
-          profile: data.overview.profile,
-          activeMedications: data.overview.activeMedications,
-          pendingExams: data.overview.pendingExams,
-          activeProtocols: data.overview.activeProtocols,
+          profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
+          activeMedications: o.activeMedications,
+          pendingExams: o.pendingExams,
+          activeProtocols: o.activeProtocols ?? [],
+          vaccines: o.vaccines,
         });
       }
     } finally {
@@ -137,8 +146,9 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       return;
     }
     setDetail(data);
-    if (data.patient?.id) {
-      await loadClinical(data.patient.id);
+    const clinicalId = data.pet?.id ?? data.patient?.id;
+    if (clinicalId) {
+      await loadClinical(clinicalId);
     }
   }, [appointmentId, loadClinical]);
 
@@ -155,8 +165,9 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       if (!detailRes.ok) setError(detailData.error ?? "Erro ao carregar");
       else {
         setDetail(detailData);
-        if (detailData.patient?.id) {
-          void loadClinical(detailData.patient.id);
+        const clinicalId = detailData.pet?.id ?? detailData.patient?.id;
+        if (clinicalId) {
+          void loadClinical(clinicalId);
         }
       }
       if (procData.procedures) setProcedures(procData.procedures);
@@ -225,7 +236,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
       const data = await res.json();
       if (!res.ok) setMsg(data.error ?? "Erro ao salvar anotação");
       else {
-        setNote("");
+        pepDraft.clearDraft();
         setRecordTitle("");
         await load();
       }
@@ -308,6 +319,16 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
     appointmentStatus: detail.appointment.status,
     hasUnbilledUsages: detail.usages.some((u) => !u.billed),
   });
+  const hasPet = Boolean(detail.pet?.id);
+  const careTabs = hasPet
+    ? [
+        ...CARE_TABS.filter((t) => t.key !== "protocolos"),
+        { key: "vacinas" as const, label: "Vacinas" },
+      ]
+    : [...CARE_TABS];
+  const historyHref = hasPet
+    ? `/prestador/paciente/${detail.pet!.id}`
+    : `/prestador/paciente/${detail.patient.id}`;
 
   return (
     <div className="space-y-6">
@@ -320,20 +341,29 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)]">{detail.patient.name}</h1>
+            <h1 className="text-2xl font-bold text-[var(--text-primary)]">
+              {hasPet ? detail.pet!.name : detail.patient.name}
+            </h1>
             <p className="text-sm text-[var(--text-muted)]">
-              CPF {detail.patient.cpf}
-              {detail.patient.company ? ` · ${detail.patient.company}` : " · Particular"}
+              {hasPet
+                ? `Tutor: ${detail.patient.name} (CPF ${detail.patient.cpf})`
+                : `CPF ${detail.patient.cpf}`}
+              {detail.patient.company ? ` · ${detail.patient.company}` : hasPet ? "" : " · Particular"}
             </p>
+            {hasPet && (
+              <p className="text-xs text-[var(--text-muted)]">
+                {[detail.pet!.species, detail.pet!.breed].filter(Boolean).join(" · ")}
+              </p>
+            )}
             <p className="mt-1 text-sm text-[var(--text-muted)]">
               {new Date(detail.appointment.scheduledAt).toLocaleString("pt-BR")} ·{" "}
               {detail.appointment.reason ?? "Consulta"}
             </p>
             <Link
-              href={`/prestador/paciente/${detail.patient.id}`}
+              href={historyHref}
               className="mt-2 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
             >
-              Ver histórico completo do paciente →
+              {hasPet ? "Ver histórico completo do pet →" : "Ver histórico completo do paciente →"}
             </Link>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -358,7 +388,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         <ClinicalSidebar data={clinicalSidebar} loading={clinicalLoading} />
 
         <div className="space-y-4">
-          <TabBar tabs={[...CARE_TABS]} active={careTab} onSelect={(k) => setCareTab(k as CareTab)} aria-label="Abas do atendimento clínico" />
+          <TabBar tabs={[...careTabs]} active={careTab} onSelect={(k) => setCareTab(k as CareTab)} aria-label="Abas do atendimento clínico" />
 
           {careTab === "procedimentos" && (
         <Card padding="lg">
@@ -506,9 +536,16 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             placeholder="Registrar evolução clínica, conduta, prescrição..."
             className={`mt-3 ${fieldClass}`}
           />
-          <Button className="mt-2" onClick={addNote} disabled={busy || !note.trim()}>
-            Salvar no prontuário
-          </Button>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Button onClick={addNote} disabled={busy || !note.trim()}>
+              Salvar no prontuário
+            </Button>
+            {pepDraft.canUndo && (
+              <Button type="button" variant="secondary" onClick={pepDraft.undo} disabled={busy}>
+                Desfazer digitação
+              </Button>
+            )}
+          </div>
 
           <ul className="mt-4 space-y-3">
             {detail.records.map((r) => (
@@ -533,14 +570,16 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         </Card>
           )}
 
-          {["medicacao", "exames", "protocolos", "perfil"].includes(careTab) && (
+          {["medicacao", "exames", "protocolos", "perfil", "vacinas"].includes(careTab) && (
             <Card padding="lg">
               <ClinicalCarePanel
                 patientId={detail.patient.id}
+                petId={detail.pet?.id}
+                subjectType={hasPet ? "pet" : "patient"}
                 appointmentId={appointmentId}
                 procedures={procedures}
-                tab={careTab as "medicacao" | "exames" | "protocolos" | "perfil"}
-                onChanged={() => loadClinical(detail.patient.id)}
+                tab={careTab as "medicacao" | "exames" | "protocolos" | "perfil" | "vacinas"}
+                onChanged={() => loadClinical(detail.pet?.id ?? detail.patient.id)}
               />
             </Card>
           )}

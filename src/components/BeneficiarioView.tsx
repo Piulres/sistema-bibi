@@ -13,6 +13,7 @@ import ExportButtons from "@/components/ExportButtons";
 import AppointmentCard from "@/components/ui/AppointmentCard";
 import PixQrDisplay from "@/components/ui/PixQrDisplay";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
+import { useLabels } from "@/hooks/useLabels";
 
 export type BeneficiarioSection =
   | "agendar"
@@ -127,6 +128,21 @@ type ClinicalData = {
     progressPercent: number;
     nextReviewAtLabel: string | null;
   }[];
+  petsClinical?: {
+    petId: string;
+    petName: string;
+    activeMedications: { id: string; medication: string; dosage: string; frequency: string }[];
+    pendingExams: { id: string; examName: string; statusLabel: string }[];
+    vaccines: {
+      id: string;
+      vaccineName: string;
+      doseLabel: string | null;
+      statusLabel: string;
+      appliedAtLabel: string | null;
+      nextDueAtLabel: string | null;
+    }[];
+    upcomingVaccines: { id: string; vaccineName: string; nextDueAtLabel: string | null }[];
+  }[];
 };
 
 type PixState = {
@@ -136,6 +152,8 @@ type PixState = {
 };
 
 export default function BeneficiarioView({ section }: { section?: BeneficiarioSection }) {
+  const { niche, labels } = useLabels();
+  const isVet = niche === "VET";
   const show = (id: BeneficiarioSection) => !section || section === id;
   const [overview, setOverview] = useState<Overview | null>(null);
   const [clinical, setClinical] = useState<ClinicalData | null>(null);
@@ -145,9 +163,11 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   const [msg, setMsg] = useState<string | null>(null);
   const [pixState, setPixState] = useState<PixState | null>(null);
   const [providers, setProviders] = useState<{ id: string; name: string }[]>([]);
+  const [pets, setPets] = useState<{ id: string; name: string; speciesLabel: string }[]>([]);
   const [slots, setSlots] = useState<{ start: string; label: string }[]>([]);
   const [scheduleForm, setScheduleForm] = useState({
     providerId: "",
+    petId: "",
     date: new Date().toISOString().slice(0, 10),
     slot: "",
     reason: "Consulta de rotina",
@@ -163,11 +183,15 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   useEffect(() => {
     let active = true;
     (async () => {
-      const [overviewRes, providersRes, clinicalRes] = await Promise.all([
+      const fetches: Promise<Response>[] = [
         fetch("/api/beneficiario/overview"),
         fetch("/api/beneficiario/providers"),
         fetch("/api/beneficiario/clinical"),
-      ]);
+      ];
+      if (isVet) fetches.push(fetch("/api/beneficiario/pets"));
+
+      const responses = await Promise.all(fetches);
+      const [overviewRes, providersRes, clinicalRes, petsRes] = responses;
       const overviewData = await overviewRes.json();
       const providersData = await providersRes.json();
       const clinicalData = await clinicalRes.json();
@@ -176,12 +200,16 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       else setOverview(overviewData.overview);
       if (clinicalRes.ok) setClinical(clinicalData.clinical);
       setProviders(providersData.providers ?? []);
+      if (petsRes) {
+        const petsData = await petsRes.json();
+        setPets(petsData.pets ?? []);
+      }
       setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, []);
+  }, [isVet]);
 
   useEffect(() => {
     let active = true;
@@ -214,6 +242,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           providerId: scheduleForm.providerId,
+          petId: isVet ? scheduleForm.petId : null,
           scheduledAt: scheduleForm.slot,
           reason: scheduleForm.reason,
           modality: scheduleForm.modality,
@@ -330,10 +359,28 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       <section id="agendar">
       <Card>
         <SectionHeader
-          title="Agendar consulta"
-          description="Escolha prestador, data e horário disponível. A clínica confirma o agendamento."
+          title={isVet ? `Agendar ${labels.appointment.toLowerCase()}` : "Agendar consulta"}
+          description={isVet
+            ? `Escolha o ${labels.patient.toLowerCase()}, prestador, data e horário.`
+            : "Escolha prestador, data e horário disponível. A clínica confirma o agendamento."}
         />
         <form onSubmit={bookAppointment} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {isVet && (
+            <label className="block text-sm">
+              <span className="text-[var(--text-secondary)]">{labels.patient}</span>
+              <select
+                required
+                className="mt-1 w-full rounded border px-3 py-2"
+                value={scheduleForm.petId}
+                onChange={(e) => setScheduleForm({ ...scheduleForm, petId: e.target.value })}
+              >
+                <option value="">Selecione...</option>
+                {pets.map((p) => (
+                  <option key={p.id} value={p.id}>{p.name} ({p.speciesLabel})</option>
+                ))}
+              </select>
+            </label>
+          )}
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Prestador</span>
             <select
@@ -711,8 +758,50 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       {show("plano") && (
       <section id="plano">
-        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meu plano de cuidado</h3>
-        {!clinical?.protocols?.filter((p) => p.statusLabel === "Ativo").length ? (
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">
+          {isVet ? "Plano de cuidado dos pets" : "Meu plano de cuidado"}
+        </h3>
+        {isVet ? (
+          clinical?.petsClinical && clinical.petsClinical.length > 0 ? (
+          <div className="mt-3 space-y-4">
+            {clinical.petsClinical.map((pet) => (
+              <article key={pet.petId} className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm">
+                <h4 className="font-semibold text-[var(--text-primary)]">{pet.petName}</h4>
+                <div className="mt-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Carteira vacinal</p>
+                  {pet.vaccines.length === 0 ? (
+                    <p className="mt-2 text-sm text-[var(--text-muted)]">Nenhuma vacina registrada.</p>
+                  ) : (
+                    <ul className="mt-2 space-y-2">
+                      {pet.vaccines.map((v) => (
+                        <li key={v.id} className="flex flex-wrap items-center justify-between gap-2 text-sm">
+                          <span>
+                            {v.vaccineName}{v.doseLabel ? ` (${v.doseLabel})` : ""}
+                            {v.nextDueAtLabel ? ` · reforço ${v.nextDueAtLabel}` : ""}
+                          </span>
+                          <StatusBadge value={v.statusLabel} label={v.statusLabel} />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {pet.activeMedications.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">Medicações ativas</p>
+                    <ul className="mt-1 text-sm text-[var(--text-secondary)]">
+                      {pet.activeMedications.map((m) => (
+                        <li key={m.id}>{m.medication} — {m.dosage}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+          ) : (
+            <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Cadastre um pet para acompanhar vacinas e medicações.</p>
+          )
+        ) : !clinical?.protocols?.filter((p) => p.statusLabel === "Ativo").length ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum protocolo ativo.</p>
         ) : (
           <div className="mt-3 space-y-3">

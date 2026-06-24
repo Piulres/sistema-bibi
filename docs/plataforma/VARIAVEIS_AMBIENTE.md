@@ -35,6 +35,12 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `CRON_SECRET` | Sim (cron) | — | Jobs `/api/cron/*` |
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
+| `NEXT_PUBLIC_SALES_WHATSAPP` | Não | — | CTA comercial WhatsApp na landing |
+| `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Não | mensagem padrão | Texto pré-preenchido no wa.me |
+| `NEXT_PUBLIC_MARKETING_ENABLED` | Não | `false` | Liga GTM/pixels (`true` em prod) |
+| `NEXT_PUBLIC_GTM_ID` | Não | — | Google Tag Manager |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Não | — | Meta Pixel (opcional se usar só GTM) |
+| `NEXT_PUBLIC_GOOGLE_ADS_ID` | Não | — | Google Ads / gtag (opcional) |
 | `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
 | `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
 | `RUN_SEED_ON_BUILD` | Não | `true` em demo | Seed no build Netlify (`false` em operação) |
@@ -246,6 +252,19 @@ NEXT_PUBLIC_SITE_URL=https://sistema-bibi.netlify.app
 ### `URL` (Netlify)
 
 Injetada automaticamente pela Netlify com a URL do deploy. Usada como fallback de `NEXT_PUBLIC_SITE_URL`. Não precisa definir manualmente.
+
+### Comercial e marketing (landing)
+
+| Variável | Uso |
+|----------|-----|
+| `NEXT_PUBLIC_SALES_WHATSAPP` | Número E.164 (`+5511970828949`). Se vazio, o botão **Fale com um especialista** não aparece. |
+| `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Mensagem inicial no WhatsApp. |
+| `NEXT_PUBLIC_MARKETING_ENABLED` | `true` para injetar tags. Manter `false` em dev/CI. |
+| `NEXT_PUBLIC_GTM_ID` | Container GTM (hub recomendado). |
+| `NEXT_PUBLIC_META_PIXEL_ID` | Pixel Meta direto (opcional). |
+| `NEXT_PUBLIC_GOOGLE_ADS_ID` | Conversões Google Ads (opcional). |
+
+Guia de campanhas UTM: [`MARKETING_CAMPAIGNS.md`](MARKETING_CAMPAIGNS.md).
 
 ---
 

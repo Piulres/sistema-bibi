@@ -13,6 +13,7 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       providerId?: string;
+      petId?: string | null;
       scheduledAt?: string;
       reason?: string | null;
       modality?: string;
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
     const result = await bookBeneficiaryAppointment({
       tenantId: user.tenantId,
       patientId: user.patientId,
+      petId: body.petId,
       providerId: body.providerId,
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,

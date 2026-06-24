@@ -72,6 +72,7 @@ export async function getAvailableSlots(input: {
 export async function bookBeneficiaryAppointment(input: {
   tenantId: string;
   patientId: string;
+  petId?: string | null;
   providerId: string;
   scheduledAt: Date;
   reason?: string | null;
@@ -93,6 +94,7 @@ export async function bookBeneficiaryAppointment(input: {
   return createAppointment({
     tenantId: input.tenantId,
     patientId: input.patientId,
+    petId: input.petId,
     providerId: input.providerId,
     scheduledAt: input.scheduledAt,
     reason: input.reason,
@@ -140,9 +142,10 @@ export async function cancelBeneficiaryAppointment(input: {
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
     entityId: appointment.id,
-    action: TIMELINE_ACTIONS.UPDATED,
+    action: TIMELINE_ACTIONS.CANCELLED,
     description: `${appointment.patient.name} cancelou consulta agendada`,
     createdBy: input.createdBy,
+    reversible: false,
   });
 
   return { ok: true as const, status: "CANCELADO" as const };
