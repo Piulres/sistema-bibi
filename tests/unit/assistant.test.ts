@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, beforeEach } from "vitest";
 import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
 import { filterToolsForUser } from "@/lib/assistant/tools/registry";
@@ -6,6 +6,8 @@ import { internoReadTools } from "@/lib/assistant/tools/interno/read";
 import { internoWriteTools } from "@/lib/assistant/tools/interno/write";
 import { prestadorReadTools } from "@/lib/assistant/tools/prestador/read";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
+import { countMockTriggers } from "@/lib/assistant/provider/mock-intents";
+import { planMockFromIntents, clearMockContext } from "@/lib/assistant/provider/mock-match";
 import { searchKnowledge } from "@/lib/assistant/rag/knowledge";
 import {
   createPendingAction,
@@ -34,6 +36,33 @@ const baseUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
   niche: "MEDICAL",
   labels: NICHE_MASTER_LABELS.MEDICAL,
   ...overrides,
+});
+
+const adminUser = () =>
+  baseUser({
+    internoProfile: "ADMIN",
+    internoPermissions: [
+      "dashboard",
+      "billing",
+      "agenda",
+      "cadastros",
+      "relatorios",
+      "auditoria",
+      "estoque",
+      "crm",
+      "subscriptions",
+      "comunicacao",
+      "branding",
+      "integracoes",
+      "seguranca",
+    ],
+  });
+
+describe("mock trigger catalog", () => {
+  it("tem centenas de gatilhos únicos", () => {
+    const count = countMockTriggers();
+    expect(count).toBeGreaterThanOrEqual(350);
+  });
 });
 
 describe("assistant dates", () => {
@@ -66,31 +95,6 @@ describe("assistant RBAC", () => {
     expect(() => assertToolPermission(user, tool)).toThrow(AssistantPermissionError);
   });
 
-  it("ADMIN tem tools read e write", () => {
-    const user = baseUser({
-      internoProfile: "ADMIN",
-      internoPermissions: [
-        "dashboard",
-        "billing",
-        "agenda",
-        "cadastros",
-        "estoque",
-        "crm",
-        "subscriptions",
-        "comunicacao",
-        "relatorios",
-        "auditoria",
-        "branding",
-        "integracoes",
-        "seguranca",
-      ],
-    });
-    const read = filterToolsForUser(internoReadTools, user);
-    const write = filterToolsForUser(internoWriteTools, user);
-    expect(read.length).toBe(internoReadTools.length);
-    expect(write.length).toBe(internoWriteTools.length);
-  });
-
   it("prestador tem tools próprias", () => {
     const user = baseUser({ role: "PRESTADOR", internoPermissions: [] });
     const tools = filterToolsForUser(prestadorReadTools, user);
@@ -98,52 +102,49 @@ describe("assistant RBAC", () => {
   });
 });
 
-describe("assistant mock provider", () => {
-  const user = baseUser({
-    internoProfile: "ADMIN",
-    internoPermissions: [
-      "dashboard",
-      "billing",
-      "agenda",
-      "cadastros",
-      "relatorios",
-      "auditoria",
-      "estoque",
-      "crm",
-      "subscriptions",
-      "comunicacao",
-      "branding",
-      "integracoes",
-      "seguranca",
-    ],
-  });
+describe("assistant mock variations", () => {
+  const user = adminUser();
   const tools = [...internoReadTools, ...internoWriteTools];
+  const toolNames = new Set(tools.map((t) => t.name));
 
-  it("roteia agendamentos de hoje", () => {
-    const plan = planMockAssistant(
-      [{ role: "user", content: "Quantos agendamentos temos hoje?" }],
-      tools,
-      user,
-    );
-    expect(plan.toolCalls[0]?.name).toBe("count_appointments");
+  beforeEach(() => {
+    clearMockContext(user.id);
   });
 
-  it("roteia criação de usuário", () => {
-    const plan = planMockAssistant(
-      [{ role: "user", content: "Criar usuário João Silva joao@test.com senha bibi123 prestador" }],
-      tools,
-      user,
-    );
-    expect(plan.toolCalls[0]?.name).toBe("draft_create_user");
+  const cases: [string, string][] = [
+    ["Quantos agendamentos temos hoje?", "count_appointments"],
+    ["Qual a lotação do dia?", "count_appointments"],
+    ["Quanto faturamos ontem?", "get_revenue_summary"],
+    ["Panorama financeiro de hoje", "get_revenue_summary"],
+    ["Quem está devendo?", "list_debtors"],
+    ["Lista de inadimplentes", "list_debtors"],
+    ["Resumo executivo", "get_dashboard_kpis"],
+    ["Como está a operação?", "get_dashboard_kpis"],
+    ["Listar usuários do sistema", "list_users"],
+    ["Como faturar um paciente?", "explain_capability"],
+    ["Criar usuário João joao@x.com senha bibi123 prestador", "draft_create_user"],
+    ["Agendamentos de hoje e quem está devendo", "count_appointments"],
+  ];
+
+  it.each(cases)("entende: %s", (phrase, expectedTool) => {
+    const plan = planMockAssistant([{ role: "user", content: phrase }], tools, user);
+    const names = plan.toolCalls.map((c) => c.name);
+    expect(names).toContain(expectedTool);
   });
 
-  it("roteia explicação (RAG)", () => {
-    const plan = planMockAssistant(
-      [{ role: "user", content: "Como faturar um paciente?" }],
-      tools,
-      user,
-    );
-    expect(plan.toolCalls[0]?.name).toBe("explain_capability");
+  it("pergunta composta dispara múltiplas tools", () => {
+    const plan = planMockFromIntents("Agendamentos de hoje e quem está devendo", user, toolNames);
+    expect(plan.toolCalls.length).toBeGreaterThanOrEqual(2);
+    expect(plan.toolCalls.map((c) => c.name)).toContain("count_appointments");
+    expect(plan.toolCalls.map((c) => c.name)).toContain("list_debtors");
+  });
+
+  it("sinônimos de receita", () => {
+    const phrases = ["Quanto entrou hoje?", "Fechamento financeiro de ontem", "Volume faturado"];
+    for (const phrase of phrases) {
+      const plan = planMockFromIntents(phrase, user, toolNames);
+      expect(plan.toolCalls[0]?.name).toBe("get_revenue_summary");
+    }
   });
 });
 

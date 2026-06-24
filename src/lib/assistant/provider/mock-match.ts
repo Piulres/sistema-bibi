@@ -1,0 +1,194 @@
+import "server-only";
+import type { AssistantPlan, AssistantToolCall } from "@/lib/assistant/types";
+import type { SessionUser } from "@/lib/session";
+import {
+  MOCK_INTENTS,
+  type MockIntentDef,
+} from "@/lib/assistant/provider/mock-intents";
+import {
+  defaultDateArg,
+  dateRangeFromText,
+  extractCreatePatientArgs,
+  extractCreateUserArgs,
+  extractSearchQuery,
+  extractTime,
+  followUpDate,
+  isFollowUpPhrase,
+} from "@/lib/assistant/provider/mock-extractors";
+import {
+  getLastIntent,
+  rememberLastIntent,
+  resolveFollowUpTool,
+  clearMockContext,
+} from "@/lib/assistant/provider/mock-context";
+import {
+  matchesAnyTrigger,
+  normalizeMockText,
+  scoreTriggers,
+  splitCompositeQuery,
+} from "@/lib/assistant/provider/mock-normalize";
+
+function buildDefaultArgs(tool: string, raw: string, text: string): Record<string, unknown> {
+  switch (tool) {
+    case "count_appointments":
+    case "list_my_appointments":
+      return { date: defaultDateArg(text) };
+    case "get_revenue_summary":
+      return dateRangeFromText(text);
+    case "list_debtors":
+      return { limit: 15 };
+    case "get_dashboard_kpis":
+    case "get_prestador_dashboard":
+    case "get_pj_overview":
+    case "get_my_overview":
+    case "get_open_invoices":
+    case "list_my_invoices":
+    case "list_users":
+      return {};
+    case "list_my_patients":
+    case "list_company_beneficiaries": {
+      const q = extractSearchQuery(raw);
+      return q ? { search: q } : {};
+    }
+    case "search_patients": {
+      const q = extractSearchQuery(raw);
+      return q ? { query: q } : { query: raw.trim() };
+    }
+    case "explain_capability":
+      return { topic: raw };
+    case "get_extrato_summary":
+      return { from: defaultDateArg(text) };
+    case "list_available_slots":
+      return { date: defaultDateArg(text) };
+    case "draft_create_appointment":
+      return {
+        date: defaultDateArg(text),
+        time: extractTime(raw),
+        patientName: extractSearchQuery(raw) ?? undefined,
+      };
+    default:
+      return {};
+  }
+}
+
+function intentAllowed(intent: MockIntentDef, role: string, toolNames: Set<string>): boolean {
+  if (!toolNames.has(intent.tool)) return false;
+  if (intent.roles && !intent.roles.includes(role)) return false;
+  return true;
+}
+
+function matchSpecial(
+  intent: MockIntentDef,
+  raw: string,
+): Record<string, unknown> | null {
+  if (intent.special === "create_user") return extractCreateUserArgs(raw);
+  if (intent.special === "create_patient") return extractCreatePatientArgs(raw);
+  return {};
+}
+
+function matchIntentOnSegment(
+  segment: string,
+  rawSegment: string,
+  user: SessionUser,
+  toolNames: Set<string>,
+  lastTool: string | null,
+): AssistantToolCall | null {
+  const text = normalizeMockText(segment);
+
+  if (isFollowUpPhrase(text) && lastTool && toolNames.has(lastTool)) {
+    const date = followUpDate(text);
+    if (date || text.length < 20) {
+      return {
+        name: lastTool,
+        arguments: buildDefaultArgs(lastTool, rawSegment, text || segment),
+      };
+    }
+    const switched = resolveFollowUpTool(text, lastTool);
+    if (switched && toolNames.has(switched)) {
+      return { name: switched, arguments: buildDefaultArgs(switched, rawSegment, text) };
+    }
+  }
+
+  for (const intent of MOCK_INTENTS.filter((i) => i.special)) {
+    if (!intentAllowed(intent, user.role, toolNames)) continue;
+    if (!matchesAnyTrigger(text, intent.triggers)) continue;
+    const args = matchSpecial(intent, rawSegment);
+    if (args === null) continue;
+    return { name: intent.tool, arguments: args };
+  }
+
+  let best: { intent: MockIntentDef; score: number } | null = null;
+  for (const intent of MOCK_INTENTS.filter((i) => !i.special)) {
+    if (!intentAllowed(intent, user.role, toolNames)) continue;
+    const score = scoreTriggers(text, intent.triggers) + (intent.priority ?? 0);
+    if (score <= (intent.priority ?? 0)) continue;
+    if (!best || score > best.score) best = { intent, score };
+  }
+
+  if (!best) return null;
+  return {
+    name: best.intent.tool,
+    arguments: buildDefaultArgs(best.intent.tool, rawSegment, text),
+  };
+}
+
+export function planMockFromIntents(
+  raw: string,
+  user: SessionUser,
+  toolNames: Set<string>,
+): AssistantPlan {
+  if (!raw.trim()) {
+    return {
+      toolCalls: [],
+      fallback: "Como posso ajudar? Use os atalhos abaixo ou descreva a operação.",
+    };
+  }
+
+  const lastTool = getLastIntent(user.id);
+  const segments = splitCompositeQuery(raw);
+  const calls: AssistantToolCall[] = [];
+  const seen = new Set<string>();
+
+  for (const segment of segments) {
+    const match = matchIntentOnSegment(segment, raw, user, toolNames, lastTool);
+    if (match && !seen.has(match.name)) {
+      calls.push(match);
+      seen.add(match.name);
+    }
+  }
+
+  if (calls.length === 0) {
+    return {
+      toolCalls: [],
+      fallback: buildHelpFallback(user.role, toolNames),
+    };
+  }
+
+  for (const call of calls) rememberLastIntent(user.id, call.name);
+
+  return { toolCalls: calls.slice(0, 4) };
+}
+
+export { clearMockContext };
+
+function buildHelpFallback(role: string, toolNames: Set<string>): string {
+  const examples: Record<string, string[]> = {
+    INTERNO: [
+      "Agendamentos de hoje",
+      "Receita de ontem",
+      "Quem está devendo?",
+      "Criar usuário nome email@x.com senha bibi123 prestador",
+    ],
+    PRESTADOR: ["Minha agenda de hoje", "Meus pacientes", "Extrato do mês"],
+    PJ: ["Resumo da empresa", "Faturas em aberto", "Beneficiários"],
+    BENEFICIARIO: ["Meu resumo", "Próximos agendamentos", "Horários disponíveis hoje"],
+  };
+  const hints = examples[role] ?? examples.INTERNO;
+  const available = [...toolNames].slice(0, 8).join(", ");
+  return [
+    "Não entendi bem. Tente algo como:",
+    ...hints.map((h) => `• ${h}`),
+    "",
+    `Operações disponíveis no seu perfil: ${available}.`,
+  ].join("\n");
+}

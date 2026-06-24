@@ -8,27 +8,46 @@ import type { PortalKey } from "@/lib/roles";
 const SUGGESTIONS: Record<PortalKey, string[]> = {
   interno: [
     "Agendamentos de hoje",
+    "Quantas consultas temos hoje?",
     "Receita de ontem",
+    "Quanto faturamos hoje?",
     "Quem está devendo?",
+    "Pendências financeiras",
     "Resumo do dashboard",
+    "Panorama da operação",
+    "Listar usuários",
     "Como criar um paciente?",
+    "Como faturar?",
+    "Agendamentos hoje e quem deve",
   ],
   prestador: [
     "Minha agenda de hoje",
+    "O que tenho hoje?",
     "Resumo do dashboard",
     "Meus pacientes",
+    "Carteira de pacientes",
     "Extrato do mês",
+    "Quanto recebi?",
+    "Próximos pacientes",
   ],
   pj: [
     "Resumo da empresa",
+    "Visão geral",
     "Beneficiários da empresa",
+    "Colaboradores ativos",
     "Faturas em aberto",
+    "O que devemos?",
+    "Boletos pendentes",
   ],
   beneficiario: [
     "Meu resumo",
+    "Como estou?",
     "Próximos agendamentos",
+    "Minha agenda",
     "Minhas faturas",
+    "O que devo?",
     "Horários disponíveis hoje",
+    "Quero agendar",
   ],
 };
 
@@ -52,7 +71,7 @@ export default function AssistantComposer({ portal }: Props) {
 
   return (
     <div className="border-t border-[var(--border-muted)] bg-[var(--surface-card)] p-3">
-      <div className="mb-2 flex flex-wrap gap-1.5">
+      <div className="mb-2 flex max-h-24 flex-wrap gap-1.5 overflow-y-auto">
         {chips.map((chip) => (
           <button
             key={chip}
