@@ -12,7 +12,7 @@ import {
   SEGMENT_LANDING_PAGES,
 } from "@/lib/platform/structure";
 import TenantTheme from "@/components/layout/TenantTheme";
-import LandingPageView from "@/components/landing/LandingPageView";
+import LandingSegmentPageView from "@/components/landing/LandingSegmentPageView";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -63,7 +63,7 @@ export default async function SegmentLandingPage({ params }: PageProps) {
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
-      <LandingPageView niche={niche} branding={branding} tenantSlug={tenantSlug} />
+      <LandingSegmentPageView niche={niche} branding={branding} tenantSlug={tenantSlug} />
     </TenantTheme>
   );
 }

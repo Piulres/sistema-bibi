@@ -10,7 +10,7 @@ const NICHE_IDS = Object.keys(NICHE_CONFIGS) as NicheId[];
 export default function LandingNiches() {
   return (
     <section
-      id="nichos"
+      id="segmentos"
       aria-labelledby="niches-heading"
       className="border-t border-[var(--border-default)] bg-[var(--surface-muted)]/40"
     >
@@ -18,8 +18,8 @@ export default function LandingNiches() {
         <LandingSectionHeader
           id="niches-heading"
           eyebrow="Multi-nicho"
-          title="Seis segmentos, uma identidade coesa"
-          description="Cada nicho tem cor primária própria — Orange (#f97316) permanece como accent universal em CTAs e destaques."
+        title="Seis segmentos, uma infraestrutura"
+        description="Cada vertical tem página dedicada com demonstração segmentada — labels, cores e portais pré-configurados para o tenant demo."
         />
 
         <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

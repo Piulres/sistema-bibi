@@ -1,25 +1,22 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { getPlatformBranding } from "@/lib/theme/branding";
-import { buildLandingDescription } from "@/lib/landing/content";
+import { PLATFORM } from "@/lib/platform";
 import { getSiteUrl } from "@/lib/landing/site-url";
-import { resolveLandingNicheFromHeaders } from "@/lib/niche/resolve";
-import { nicheLandingBranding } from "@/lib/niche/branding";
-import { getNicheConfig } from "@/lib/niche/defaults";
+import { segmentTenantBySlug } from "@/lib/niche/demo-accounts";
+import { segmentLandingHref } from "@/lib/platform/structure";
 import TenantTheme from "@/components/layout/TenantTheme";
-import LandingPageView from "@/components/landing/LandingPageView";
+import LandingHomePageView from "@/components/landing/LandingHomePageView";
 
 type PageProps = {
   searchParams: Promise<{ niche?: string; tenant?: string }>;
 };
 
-export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  const { niche: nicheParam, tenant: tenantParam } = await searchParams;
-  const resolved = await resolveLandingNicheFromHeaders(nicheParam, tenantParam);
-  const config = getNicheConfig(resolved.niche);
-  const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
+export async function generateMetadata(): Promise<Metadata> {
+  const branding = getPlatformBranding();
   const siteUrl = getSiteUrl();
-  const title = `${branding.displayName} — ${config.name} · ServiceOS Pay Per Use`;
-  const description = buildLandingDescription(config.tagline);
+  const title = `${PLATFORM.name} — ${PLATFORM.tagline}`;
+  const description = PLATFORM.description;
 
   return {
     title,
@@ -33,41 +30,32 @@ export async function generateMetadata({ searchParams }: PageProps): Promise<Met
       siteName: branding.displayName,
       title,
       description,
-      ...(branding.logoUrl ? { images: [{ url: branding.logoUrl, alt: branding.displayName }] } : {}),
-    },
-    twitter: {
-      card: branding.logoUrl ? "summary_large_image" : "summary",
-      title,
-      description,
-      ...(branding.logoUrl ? { images: [branding.logoUrl] } : {}),
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true },
     },
     keywords: [
       "serviceos",
       "pay per use",
       "multi-nicho",
       "white label",
-      ...config.landing.keywords,
+      "sistema bibi",
     ],
   };
 }
 
 export default async function Home({ searchParams }: PageProps) {
-  const { niche: nicheParam, tenant: tenantParam } = await searchParams;
-  const resolved = await resolveLandingNicheFromHeaders(nicheParam, tenantParam);
-  const branding = nicheLandingBranding(resolved.niche, getPlatformBranding());
+  const { tenant: tenantParam } = await searchParams;
+
+  if (tenantParam) {
+    const ref = segmentTenantBySlug(tenantParam);
+    if (ref) {
+      redirect(segmentLandingHref(ref.niche));
+    }
+  }
+
+  const branding = getPlatformBranding();
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
-      <LandingPageView
-        niche={resolved.niche}
-        branding={branding}
-        tenantSlug={resolved.tenantSlug}
-      />
+      <LandingHomePageView branding={branding} />
     </TenantTheme>
   );
 }

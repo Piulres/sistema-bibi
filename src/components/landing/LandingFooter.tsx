@@ -1,24 +1,39 @@
 import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { NicheId } from "@/lib/niche/types";
+import type { LandingNavContext } from "@/lib/landing/navigation";
+import { landingNavItems } from "@/lib/landing/navigation";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
+import { PORTALS } from "@/lib/roles";
 
 type Props = {
   branding: BrandingTokens;
-  niche: NicheId;
+  context?: LandingNavContext;
+  niche?: NicheId;
+  footerTagline?: string;
 };
 
-const FOOTER_LINKS: { href: string; label: string; external?: boolean }[] = [
-  { href: "#recursos", label: "Recursos" },
-  { href: "#como-funciona", label: "Como funciona" },
-  { href: "#faq", label: "FAQ" },
-  { href: "/api-docs.html", label: "Documentação API", external: true },
-];
-
-export default function LandingFooter({ branding, niche }: Props) {
+export default function LandingFooter({
+  branding,
+  context = "home",
+  niche = "MEDICAL",
+  footerTagline,
+}: Props) {
   const year = new Date().getFullYear();
-  const { footerTagline, portals } = getNicheLandingContent(niche);
+  const tagline = footerTagline ?? getNicheLandingContent(niche).footerTagline;
+  const navLinks = landingNavItems(context);
+
+  const portalLinks =
+    context === "home"
+      ? Object.entries(PORTALS).map(([key, portal]) => ({
+          href: portal.loginPath,
+          label: PORTAL_THEMES[key as keyof typeof PORTALS].label,
+        }))
+      : getNicheLandingContent(niche).portals.map((portal) => ({
+          href: portal.href,
+          label: PORTAL_THEMES[portal.key].label,
+        }));
 
   return (
     <footer className="border-t border-[var(--border-default)] bg-[var(--surface-muted)]/80">
@@ -29,24 +44,19 @@ export default function LandingFooter({ branding, niche }: Props) {
               {branding.displayName}
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-[var(--text-secondary)]">
-              {footerTagline}
+              {tagline}
             </p>
-            <p className="mt-4 text-xs text-[var(--text-muted)]">
-              {branding.platformLabel}
-            </p>
+            <p className="mt-4 text-xs text-[var(--text-muted)]">{branding.platformLabel}</p>
           </div>
 
           <nav aria-label="Links do rodapé">
             <p className="text-sm font-semibold text-[var(--text-primary)]">Navegação</p>
             <ul className="mt-4 space-y-2">
-              {FOOTER_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    {...(link.external
-                      ? { target: "_blank", rel: "noopener noreferrer" }
-                      : {})}
-                    className="text-sm text-[var(--text-secondary)] transition hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] rounded-sm"
+                    className="rounded-sm text-sm text-[var(--text-secondary)] transition hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                   >
                     {link.label}
                   </a>
@@ -58,13 +68,13 @@ export default function LandingFooter({ branding, niche }: Props) {
           <nav aria-label="Portais de acesso">
             <p className="text-sm font-semibold text-[var(--text-primary)]">Portais</p>
             <ul className="mt-4 space-y-2">
-              {portals.map((portal) => (
+              {portalLinks.map((portal) => (
                 <li key={portal.href}>
                   <Link
                     href={portal.href}
-                    className="text-sm text-[var(--text-secondary)] transition hover:text-[var(--brand-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] rounded-sm"
+                    className="rounded-sm text-sm text-[var(--text-secondary)] transition hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                   >
-                    {PORTAL_THEMES[portal.key].label}
+                    {portal.label}
                   </Link>
                 </li>
               ))}
@@ -73,11 +83,13 @@ export default function LandingFooter({ branding, niche }: Props) {
         </div>
 
         <div className="mt-12 flex flex-col gap-2 border-t border-[var(--border-default)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} {branding.displayName}. Demonstração POC do produto.</p>
+          <p>
+            © {year} {branding.displayName}. Demonstração POC do produto.
+          </p>
           <p>
             <Link
               href="/interno/login"
-              className="underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] rounded-sm"
+              className="rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             >
               Portal interno
             </Link>
