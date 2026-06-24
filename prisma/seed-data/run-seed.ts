@@ -75,13 +75,13 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.patientProtocolEnrollment.deleteMany();
   await prisma.petVaccineRecord.deleteMany();
   await prisma.petClinicalProfile.deleteMany();
-  await prisma.pet.deleteMany();
   await prisma.examOrder.deleteMany();
   await prisma.medicationPrescription.deleteMany();
   await prisma.patientClinicalProfile.deleteMany();
   await prisma.careProtocolTemplate.deleteMany();
   await prisma.medicalRecord.deleteMany();
   await prisma.appointment.deleteMany();
+  await prisma.pet.deleteMany();
   await prisma.pricingRule.deleteMany();
   await prisma.procedure.deleteMany();
   await prisma.patient.deleteMany();
