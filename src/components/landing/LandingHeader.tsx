@@ -15,6 +15,11 @@ const NAV_LINKS = [
   { href: "#faq", label: "FAQ" },
 ] as const;
 
+const PLATFORM_LINKS = [
+  { href: "/plataforma", label: "Plataforma" },
+  { href: "/venda", label: "Venda" },
+] as const;
+
 export default function LandingHeader({ branding }: Props) {
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-default)]/60 bg-[var(--surface-page)]/80 backdrop-blur-xl">
@@ -56,6 +61,15 @@ export default function LandingHeader({ branding }: Props) {
           aria-label="Navegação principal"
           className="hidden items-center gap-0.5 rounded-full border border-[var(--border-default)] bg-[var(--surface-card)]/80 p-1 shadow-sm md:flex"
         >
+          {PLATFORM_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="rounded-full px-3.5 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition hover:bg-[var(--surface-muted)] hover:text-[var(--brand-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            >
+              {link.label}
+            </Link>
+          ))}
           {NAV_LINKS.map((link) => (
             <a
               key={link.href}

@@ -1,7 +1,9 @@
 import { NICHE_PRESETS_ENERGIA_BRASILEIRA } from "@/lib/theme/presets-energia-brasileira";
 import { NICHE_CONFIGS } from "@/lib/niche/defaults";
+import { segmentLandingHref } from "@/lib/platform/structure";
 import type { NicheId } from "@/lib/niche/types";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
+import Link from "next/link";
 
 const NICHE_IDS = Object.keys(NICHE_CONFIGS) as NicheId[];
 
@@ -26,6 +28,10 @@ export default function LandingNiches() {
             const config = NICHE_CONFIGS[id];
             return (
               <li key={id}>
+                <Link
+                  href={segmentLandingHref(id)}
+                  className="block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+                >
                 <article className="landing-card-hover h-full overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
                   <div
                     className="h-2"
@@ -51,6 +57,7 @@ export default function LandingNiches() {
                     <p className="mt-3 text-sm text-[var(--text-secondary)]">{config.tagline}</p>
                   </div>
                 </article>
+                </Link>
               </li>
             );
           })}
