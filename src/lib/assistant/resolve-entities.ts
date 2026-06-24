@@ -150,6 +150,30 @@ export async function resolveProcedureByName(
   return resolveFromOptions(options, procedureName);
 }
 
+export async function listAllProviderOptions(tenantId: string): Promise<EntityOption[]> {
+  const { getPrisma } = await import("@/lib/db");
+  const prisma = await getPrisma();
+  const rows = await prisma.user.findMany({
+    where: { tenantId, role: "PRESTADOR" },
+    select: { id: true, name: true, email: true, specialty: true },
+    orderBy: { name: "asc" },
+  });
+  return rows.map((row) => ({
+    id: row.id,
+    label: row.name,
+    detail: row.specialty ?? row.email ?? undefined,
+  }));
+}
+
+export async function listAllProcedureOptions(tenantId: string): Promise<EntityOption[]> {
+  const procedures = await listProcedures(tenantId);
+  return procedures.map((procedure) => ({
+    id: procedure.id,
+    label: procedure.name,
+    detail: `${procedure.code} · ${procedure.basePriceLabel}`,
+  }));
+}
+
 export function formatChoiceQuestion(
   fieldLabel: string,
   options: EntityOption[],

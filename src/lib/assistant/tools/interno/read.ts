@@ -183,6 +183,42 @@ export const internoReadTools: AssistantToolDefinition[] = [
     },
   },
   {
+    name: "list_providers",
+    description: "Lista prestadores ativos do tenant (nome e especialidade).",
+    parameters: { type: "object", properties: {} },
+    requiredModule: "agenda",
+    handler: async (ctx) => {
+      const { listAllProviderOptions } = await import("@/lib/assistant/resolve-entities");
+      const providers = await listAllProviderOptions(ctx.user.tenantId);
+      return {
+        count: providers.length,
+        providers: providers.map((p) => ({
+          id: p.id,
+          name: p.label,
+          detail: p.detail ?? null,
+        })),
+      };
+    },
+  },
+  {
+    name: "list_procedures",
+    description: "Lista procedimentos/serviços do catálogo do tenant.",
+    parameters: { type: "object", properties: {} },
+    requiredModule: "cadastros",
+    handler: async (ctx) => {
+      const { listAllProcedureOptions } = await import("@/lib/assistant/resolve-entities");
+      const procedures = await listAllProcedureOptions(ctx.user.tenantId);
+      return {
+        count: procedures.length,
+        procedures: procedures.slice(0, 20).map((p) => ({
+          id: p.id,
+          name: p.label,
+          detail: p.detail ?? null,
+        })),
+      };
+    },
+  },
+  {
     name: "explain_capability",
     description: "Explica como fazer algo na plataforma (fluxos, cadastros, faturamento) usando a base de conhecimento.",
     parameters: {

@@ -6,10 +6,9 @@ import { listProviders } from "@/lib/appointment-service";
 import { createPendingAction } from "@/lib/assistant/pending-actions";
 import { parseAssistantDate } from "@/lib/assistant/dates";
 import {
-  buildIncompleteDraftResult,
-  buildResolveIncompleteResult,
-} from "@/lib/assistant/draft-response";
-import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
+  resolveAppointmentDraft,
+  type AppointmentDraftArgs,
+} from "@/lib/assistant/appointment-draft";
 
 export const beneficiarioReadTools: AssistantToolDefinition[] = [
   {
@@ -107,6 +106,8 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
       properties: {
         providerId: { type: "string" },
         providerName: { type: "string" },
+        procedureId: { type: "string" },
+        procedureName: { type: "string" },
         date: { type: "string" },
         time: { type: "string" },
         scheduledAt: { type: "string", description: "ISO datetime do slot" },
@@ -117,61 +118,45 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
     kind: "draft",
     handler: async (ctx, args) => {
       if (!ctx.user.patientId) return { error: "Conta sem beneficiário vinculado." };
-      const data = args as {
-        providerId?: string;
-        providerName?: string;
-        date?: string;
-        time?: string;
-        scheduledAt?: string;
-        reason?: string;
-      };
+      const data = args as AppointmentDraftArgs & { scheduledAt?: string };
 
-      const missing = getMissingFieldsForTool("draft_book_appointment", data);
-      if (missing.length > 0) {
-        return buildIncompleteDraftResult("draft_book_appointment", data, ctx.labels, missing);
+      const resolved = await resolveAppointmentDraft({
+        tenantId: ctx.user.tenantId,
+        labels: ctx.labels,
+        data,
+        tool: "draft_book_appointment",
+        fixedPatientId: ctx.user.patientId,
+        fixedPatientName: ctx.user.patientName ?? undefined,
+      });
+      if (!("ok" in resolved) || !resolved.ok) {
+        return resolved.result;
       }
 
-      const providers = await listProviders(ctx.user.tenantId);
-      let providerId = data.providerId;
-      if (!providerId && data.providerName) {
-        const norm = (v: string) =>
-          v
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/\p{M}/gu, "")
-            .replace(/\./g, "")
-            .trim();
-        const query = norm(data.providerName);
-        providerId = providers.find(
-          (p) => norm(p.name).includes(query) || query.includes(norm(p.name)),
-        )?.id;
-      }
-      if (!providerId) {
-        return buildResolveIncompleteResult(
-          "draft_book_appointment",
-          `${ctx.labels.provider} não encontrado.`,
-          data,
-          ctx.labels,
-        );
-      }
+      const finalData = resolved.data;
+      const procedureLabel = resolved.procedureLabel;
 
       const scheduled = data.scheduledAt
         ? new Date(data.scheduledAt)
         : (() => {
-            const base = parseAssistantDate(data.date!);
-            const [hour, minute] = data.time!.split(":").map(Number);
+            const base = parseAssistantDate(finalData.date!);
+            const [hour, minute] = finalData.time!.split(":").map(Number);
             base.setHours(hour, minute, 0, 0);
             return base;
           })();
 
-      const provider = providers.find((p) => p.id === providerId);
+      const providers = await listProviders(ctx.user.tenantId);
+      const provider = providers.find((p) => p.id === finalData.providerId);
+      const reason =
+        finalData.reason?.trim() ||
+        (procedureLabel ? `${ctx.labels.procedure}: ${procedureLabel}` : null);
+
       const pendingActionId = createPendingAction(ctx.user.id, ctx.user.tenantId, {
         type: "book_appointment",
         data: {
           patientId: ctx.user.patientId,
-          providerId,
+          providerId: finalData.providerId!,
           scheduledAt: scheduled.toISOString(),
-          reason: data.reason ?? null,
+          reason,
         },
       });
 
@@ -180,9 +165,10 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         pendingActionId,
         preview: `Agendar ${ctx.labels.appointment.toLowerCase()} com ${provider?.name ?? "prestador"}`,
         summary: {
-          [ctx.labels.provider]: provider?.name ?? providerId,
+          [ctx.labels.provider]: provider?.name ?? finalData.providerName ?? "—",
           Horário: scheduled.toLocaleString("pt-BR"),
-          ...(data.reason ? { Motivo: data.reason } : {}),
+          ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),
+          ...(reason && !procedureLabel ? { Motivo: reason } : {}),
         },
         href: "/beneficiario/agendar",
       };

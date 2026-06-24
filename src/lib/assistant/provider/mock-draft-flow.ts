@@ -32,10 +32,39 @@ export function stripDraftMeta(args: OperationDraftArgs): OperationDraftArgs {
 
 type AppointmentArgs = {
   patientName?: string;
+  patientId?: string;
   providerName?: string;
+  providerId?: string;
+  procedureName?: string;
+  procedureId?: string;
   date?: string;
   time?: string;
+  providerUnknown?: boolean;
+  listProviders?: boolean;
+  bookByProcedure?: boolean;
 };
+
+function isProcedureFirst(data: AppointmentArgs): boolean {
+  return Boolean(data.bookByProcedure || data.procedureName || data.procedureId);
+}
+
+function hasProvider(data: AppointmentArgs): boolean {
+  return Boolean(data.providerId || data.providerName?.trim());
+}
+
+function shouldSkipProviderName(data: AppointmentArgs): boolean {
+  if (hasProvider(data)) return true;
+  return Boolean(data.providerUnknown || data.listProviders || isProcedureFirst(data));
+}
+
+function readyForProviderPick(data: AppointmentArgs, tool: string): boolean {
+  if (!shouldSkipProviderName(data) || hasProvider(data)) return false;
+  const hasPatient =
+    tool === "draft_book_appointment" || Boolean(data.patientId || data.patientName?.trim());
+  const hasProcedureOk =
+    !isProcedureFirst(data) || Boolean(data.procedureId || data.procedureName?.trim());
+  return Boolean(hasPatient && data.date?.trim() && data.time?.trim() && hasProcedureOk);
+}
 
 export function getMissingFieldsForTool(
   tool: string,
@@ -46,10 +75,17 @@ export function getMissingFieldsForTool(
     case "draft_book_appointment": {
       const data = args as AppointmentArgs;
       const missing: string[] = [];
-      if (!data.patientName?.trim() && tool === "draft_create_appointment") {
+      if (tool === "draft_create_appointment" && !data.patientName?.trim() && !data.patientId) {
         missing.push("patientName");
       }
-      if (!data.providerName?.trim()) missing.push("providerName");
+      if (isProcedureFirst(data) && !data.procedureName?.trim() && !data.procedureId) {
+        missing.push("procedureName");
+      }
+      if (readyForProviderPick(data, tool)) {
+        missing.push("providerPick");
+      } else if (!shouldSkipProviderName(data) && !hasProvider(data)) {
+        missing.push("providerName");
+      }
       if (!data.date?.trim()) missing.push("date");
       if (!data.time?.trim()) missing.push("time");
       return missing;
@@ -79,12 +115,16 @@ export function getMissingFieldsForTool(
 const FIELD_LABELS: Record<string, Record<string, string>> = {
   draft_create_appointment: {
     patientName: "patient",
+    procedureName: "procedure",
     providerName: "provider",
+    providerPick: "provider",
     date: "date",
     time: "time",
   },
   draft_book_appointment: {
+    procedureName: "procedure",
     providerName: "provider",
+    providerPick: "provider",
     date: "date",
     time: "time",
   },
@@ -109,8 +149,9 @@ export function buildDraftGuidance(
 ): string {
   const prompts: Record<string, string> = {
     patientName: `Para quem é a ${labels.appointment.toLowerCase()}? Informe o nome do ${labels.patient.toLowerCase()}.`,
-    providerName: `Com qual ${labels.provider.toLowerCase()}? Ex.: *Dra. Helena*.`,
-    procedureName: `Qual ${labels.procedure.toLowerCase()}? Ex.: *consulta clínica*, *eletrocardiograma*.`,
+    providerName: `Com qual ${labels.provider.toLowerCase()}? Ex.: *Dra. Helena*. Se não souber, diga *não sei* ou *listar prestadores*.`,
+    providerPick: `Escolha o ${labels.provider.toLowerCase()} na lista abaixo ou informe o nome.`,
+    procedureName: `Qual ${labels.procedure.toLowerCase()}? Ex.: *eletrocardiograma*, *consulta clínica*.`,
     date: "Para qual data? Ex.: *amanhã*, *25/06/2026*.",
     time: "Qual horário? Ex.: *15:30* ou *às 15h*.",
     name: "Qual o nome completo?",
@@ -131,7 +172,6 @@ export function buildDraftGuidance(
   }
 
   const next = missing[0];
-  const fieldKey = FIELD_LABELS[tool]?.[next ?? ""] ?? next;
   const question = next ? prompts[next] : "Pode detalhar um pouco mais?";
 
   lines.push(question ?? "Pode detalhar um pouco mais?");
@@ -144,9 +184,9 @@ export function buildDraftGuidance(
     lines.push(`\nDepois ainda preciso de: ${rest}`);
   }
 
-  if (tool === "draft_create_appointment" && fieldKey) {
+  if (tool === "draft_create_appointment" || tool === "draft_book_appointment") {
     lines.push(
-      `\n_Dica: você pode enviar tudo de uma vez — *Agendar para João Pereira com Dra Helena amanhã às 15:30*._`,
+      `\n_Dica: você pode enviar tudo de uma vez — *Agendar eletrocardiograma para João Pereira amanhã às 11h* (sem precisar do nome do ${labels.provider.toLowerCase()})._`,
     );
   }
 
@@ -161,13 +201,16 @@ export function formatPartialSummary(
   switch (tool) {
     case "draft_create_appointment":
     case "draft_book_appointment": {
-      const data = args as AppointmentArgs & { procedureName?: string };
+      const data = args as AppointmentArgs;
       const partial: Record<string, string> = {};
       if (data.patientName) partial[labels.patient] = data.patientName;
       if (data.providerName) partial[labels.provider] = data.providerName;
       if (data.procedureName) partial[labels.procedure] = data.procedureName;
       if (data.date) partial.Data = data.date;
       if (data.time) partial.Horário = data.time;
+      if (data.providerUnknown || data.listProviders) {
+        partial["Prestador"] = "a escolher na lista";
+      }
       return partial;
     }
     case "draft_create_user": {
@@ -209,7 +252,10 @@ export function buildResolveErrorGuidance(
     return `${error}${partialBlock}\n\nConfira o nome ou busque antes: *buscar paciente João*.`;
   }
   if (error.includes(labels.provider) || error.includes("Prestador")) {
-    return `${error}${partialBlock}\n\nInforme o nome do ${labels.provider.toLowerCase()}, ex.: *com Dra. Helena*.`;
+    return `${error}${partialBlock}\n\nInforme o nome do ${labels.provider.toLowerCase()}, ex.: *com Dra. Helena*, ou diga *não sei* para ver a lista.`;
+  }
+  if (error.includes(labels.procedure) || error.includes("Procedimento")) {
+    return `${error}${partialBlock}\n\nInforme o ${labels.procedure.toLowerCase()}, ex.: *eletrocardiograma*.`;
   }
   return `${error}${partialBlock}`;
 }

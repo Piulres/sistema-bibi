@@ -7,16 +7,9 @@ import { isInternoProfile } from "@/lib/interno-permissions";
 import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
 import { getPrisma } from "@/lib/db";
 import {
-  buildIncompleteDraftResult,
-  buildChoiceDraftResult,
-  buildResolveIncompleteResult,
-} from "@/lib/assistant/draft-response";
-import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
-import {
-  resolvePatientByName,
-  resolveProviderByName,
-  resolveProcedureByName,
-} from "@/lib/assistant/resolve-entities";
+  resolveAppointmentDraft,
+  type AppointmentDraftArgs,
+} from "@/lib/assistant/appointment-draft";
 
 function draftResult(input: {
   userId: string;
@@ -174,99 +167,23 @@ export const internoWriteTools: AssistantToolDefinition[] = [
     requiredModule: "agenda",
     kind: "draft",
     handler: async (ctx, args) => {
-      const data = args as {
-        patientId?: string;
-        patientName?: string;
-        providerId?: string;
-        providerName?: string;
-        procedureId?: string;
-        procedureName?: string;
-        date?: string;
-        time?: string;
-        reason?: string;
-      };
+      const data = args as AppointmentDraftArgs;
 
-      const missing = getMissingFieldsForTool("draft_create_appointment", data);
-      if (missing.length > 0) {
-        return buildIncompleteDraftResult("draft_create_appointment", data, ctx.labels, missing);
+      const resolved = await resolveAppointmentDraft({
+        tenantId: ctx.user.tenantId,
+        labels: ctx.labels,
+        data,
+        tool: "draft_create_appointment",
+      });
+      if (!("ok" in resolved) || !resolved.ok) {
+        return resolved.result;
       }
 
-      const patientResult = await resolvePatientByName(
-        ctx.user.tenantId,
-        data.patientName,
-        data.patientId,
-      );
-      if (patientResult.status === "ambiguous") {
-        return buildChoiceDraftResult({
-          tool: "draft_create_appointment",
-          field: "patientId",
-          fieldLabel: ctx.labels.patient.toLowerCase(),
-          options: patientResult.options,
-          draftArgs: data,
-          labels: ctx.labels,
-        });
-      }
-      if (patientResult.status === "none") {
-        return buildResolveIncompleteResult(
-          "draft_create_appointment",
-          `${ctx.labels.patient} não encontrado.`,
-          data,
-          ctx.labels,
-        );
-      }
+      const finalData = resolved.data;
+      const procedureLabel = resolved.procedureLabel;
 
-      const providerResult = await resolveProviderByName(
-        ctx.user.tenantId,
-        data.providerName,
-        data.providerId,
-      );
-      if (providerResult.status === "ambiguous") {
-        return buildChoiceDraftResult({
-          tool: "draft_create_appointment",
-          field: "providerId",
-          fieldLabel: ctx.labels.provider.toLowerCase(),
-          options: providerResult.options,
-          draftArgs: { ...data, patientId: patientResult.id },
-          labels: ctx.labels,
-        });
-      }
-      if (providerResult.status === "none") {
-        return buildResolveIncompleteResult(
-          "draft_create_appointment",
-          `${ctx.labels.provider} não encontrado.`,
-          { ...data, patientId: patientResult.id },
-          ctx.labels,
-        );
-      }
-
-      let procedureLabel: string | undefined;
-      if (data.procedureName || data.procedureId) {
-        const procedureResult = await resolveProcedureByName(
-          ctx.user.tenantId,
-          data.procedureName,
-          data.procedureId,
-        );
-        if (procedureResult.status === "ambiguous") {
-          return buildChoiceDraftResult({
-            tool: "draft_create_appointment",
-            field: "procedureId",
-            fieldLabel: ctx.labels.procedure.toLowerCase(),
-            options: procedureResult.options,
-            draftArgs: {
-              ...data,
-              patientId: patientResult.id,
-              providerId: providerResult.id,
-            },
-            labels: ctx.labels,
-          });
-        }
-        if (procedureResult.status === "unique") {
-          procedureLabel = procedureResult.label;
-        }
-      }
-
-      const baseDate = parseAssistantDate(data.date!);
-      const [hour, minute] = data.time!.split(":").map(Number);
+      const baseDate = parseAssistantDate(finalData.date!);
+      const [hour, minute] = finalData.time!.split(":").map(Number);
       if (Number.isNaN(hour) || Number.isNaN(minute)) {
         return { error: "Hora inválida. Use HH:MM." };
       }
@@ -275,15 +192,15 @@ export const internoWriteTools: AssistantToolDefinition[] = [
       const prisma = await getPrisma();
       const [patient, provider] = await Promise.all([
         prisma.patient.findFirst({
-          where: { id: patientResult.id, tenantId: ctx.user.tenantId },
+          where: { id: finalData.patientId!, tenantId: ctx.user.tenantId },
         }),
         prisma.user.findFirst({
-          where: { id: providerResult.id, tenantId: ctx.user.tenantId },
+          where: { id: finalData.providerId!, tenantId: ctx.user.tenantId },
         }),
       ]);
 
       const reason =
-        data.reason?.trim() ||
+        finalData.reason?.trim() ||
         (procedureLabel ? `${ctx.labels.procedure}: ${procedureLabel}` : null);
 
       return draftResult({
@@ -292,16 +209,16 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         payload: {
           type: "create_appointment",
           data: {
-            patientId: patientResult.id,
-            providerId: providerResult.id,
+            patientId: finalData.patientId!,
+            providerId: finalData.providerId!,
             scheduledAt: baseDate.toISOString(),
             reason,
           },
         },
         preview: `Agendar ${ctx.labels.appointment.toLowerCase()} para ${patient?.name ?? "paciente"}`,
         summary: {
-          [ctx.labels.patient]: patient?.name ?? patientResult.label,
-          [ctx.labels.provider]: provider?.name ?? providerResult.label,
+          [ctx.labels.patient]: patient?.name ?? finalData.patientName ?? "—",
+          [ctx.labels.provider]: provider?.name ?? finalData.providerName ?? "—",
           Data: baseDate.toLocaleString("pt-BR"),
           ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),
           ...(reason && !procedureLabel ? { Motivo: reason } : {}),

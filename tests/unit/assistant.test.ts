@@ -23,7 +23,7 @@ import { mergeNicheLabels } from "@/lib/niche/labels";
 import { applyNicheBrandingDefaults } from "@/lib/niche/branding";
 import { isNicheId } from "@/lib/niche/types";
 import { resolveFromOptions } from "@/lib/assistant/resolve-entities";
-import { parseChoiceSelection } from "@/lib/assistant/provider/mock-extractors";
+import { parseChoiceSelection, extractCreateAppointmentArgs } from "@/lib/assistant/provider/mock-extractors";
 import { DEMO_EMAILS } from "../helpers/seed-fixtures";
 import { getTestPrisma } from "../helpers/db";
 
@@ -283,6 +283,153 @@ describe("assistant disambiguation", () => {
 
     expect(result.message.content).toMatch(/opções|Qual é a correta/i);
     expect(result.actions?.some((a) => a.type === "choice")).toBe(true);
+  });
+
+  it("lista prestadores quando o usuário não sabe o médico", async () => {
+    const prisma = getTestPrisma();
+    const dbUser = await prisma.user.findFirst({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+      include: { tenant: { include: { branding: true } } },
+    });
+    const niche = isNicheId(dbUser!.tenant!.niche) ? dbUser!.tenant!.niche : "MEDICAL";
+    const user: SessionUser = {
+      id: "provider-list-user",
+      name: dbUser!.name,
+      email: dbUser!.email,
+      role: dbUser!.role,
+      tenantId: dbUser!.tenantId,
+      tenantSlug: dbUser!.tenant!.slug,
+      companyId: null,
+      patientId: null,
+      tenantName: dbUser!.tenant!.name,
+      companyName: null,
+      patientName: null,
+      internoProfile: dbUser!.internoProfile,
+      internoPermissions: resolveInternoPermissions(dbUser!.role, dbUser!.internoProfile),
+      branding: applyNicheBrandingDefaults(niche, CLINIC_BRANDING_DEFAULTS),
+      niche,
+      labels: mergeNicheLabels(niche, dbUser!.tenant!.labels),
+    };
+    clearMockContext(user.id);
+
+    const step1 = await runAssistantChat({
+      user,
+      messages: [
+        {
+          role: "user",
+          content: "marcar consulta para João Pereira amanhã às 11h, não sei o médico",
+        },
+      ],
+    });
+
+    expect(step1.message.content).toMatch(/opções|prestador/i);
+    expect(step1.actions?.some((a) => a.type === "choice")).toBe(true);
+
+    const choice = step1.actions?.find((a) => a.type === "choice");
+    const helena =
+      choice?.type === "choice"
+        ? choice.options.find((o) => /helena/i.test(o.label))
+        : undefined;
+
+    const step2 = await runAssistantChat({
+      user,
+      messages: [
+        {
+          role: "user",
+          content: "marcar consulta para João Pereira amanhã às 11h, não sei o médico",
+        },
+        step1.message,
+        { role: "user", content: helena?.label ?? "1" },
+      ],
+    });
+
+    expect(step2.actions?.some((a) => a.type === "confirm")).toBe(true);
+  });
+
+  it("agenda pelo procedimento e pede escolha de prestador", async () => {
+    const prisma = getTestPrisma();
+    const dbUser = await prisma.user.findFirst({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+      include: { tenant: { include: { branding: true } } },
+    });
+    const niche = isNicheId(dbUser!.tenant!.niche) ? dbUser!.tenant!.niche : "MEDICAL";
+    const user: SessionUser = {
+      id: "procedure-book-user",
+      name: dbUser!.name,
+      email: dbUser!.email,
+      role: dbUser!.role,
+      tenantId: dbUser!.tenantId,
+      tenantSlug: dbUser!.tenant!.slug,
+      companyId: null,
+      patientId: null,
+      tenantName: dbUser!.tenant!.name,
+      companyName: null,
+      patientName: null,
+      internoProfile: dbUser!.internoProfile,
+      internoPermissions: resolveInternoPermissions(dbUser!.role, dbUser!.internoProfile),
+      branding: applyNicheBrandingDefaults(niche, CLINIC_BRANDING_DEFAULTS),
+      niche,
+      labels: mergeNicheLabels(niche, dbUser!.tenant!.labels),
+    };
+    clearMockContext(user.id);
+
+    const step1 = await runAssistantChat({
+      user,
+      messages: [
+        {
+          role: "user",
+          content: "marcar eletrocardiograma para João Pereira amanhã às 11h",
+        },
+      ],
+    });
+
+    expect(step1.message.content).toMatch(/eletrocardiograma|opções|prestador/i);
+    expect(step1.actions?.some((a) => a.type === "choice")).toBe(true);
+  });
+});
+
+describe("appointment draft resolver", () => {
+  it("extractCreateAppointmentArgs detecta providerUnknown", () => {
+    const args = extractCreateAppointmentArgs(
+      "marcar consulta para João Pereira amanhã às 11h, não sei o médico",
+    );
+    expect(args.providerUnknown).toBe(true);
+    expect(args.patientName).toBe("João Pereira");
+    expect(args.time).toBe("11:00");
+    expect(args.procedureName).toBeUndefined();
+  });
+
+  it("planMock roteia providerUnknown para draft_create_appointment", () => {
+    const user = adminUser();
+    clearMockContext(user.id);
+    const tools = filterToolsForUser(internoReadTools.concat(internoWriteTools), user);
+    const plan = planMockFromIntents(
+      "marcar consulta para João Pereira amanhã às 11h, não sei o médico",
+      user,
+      new Set(tools.map((t) => t.name)),
+    );
+    expect(plan.toolCalls[0]?.name).toBe("draft_create_appointment");
+    expect(plan.toolCalls[0]?.arguments).toMatchObject({
+      providerUnknown: true,
+      patientName: "João Pereira",
+    });
+  });
+
+  it("oferece lista de prestadores quando providerUnknown", async () => {
+    const prisma = getTestPrisma();
+    const tenant = await prisma.tenant.findFirst({ where: { slug: "horizonte" } });
+    const { resolveAppointmentDraft } = await import("@/lib/assistant/appointment-draft");
+    const result = await resolveAppointmentDraft({
+      tenantId: tenant!.id,
+      labels: NICHE_MASTER_LABELS.MEDICAL,
+      data: {
+        patientName: "João Pereira",
+        date: "amanhã",
+        time: "11:00",
+        providerUnknown: true,
+      },
+    });
+    expect("result" in result && result.result && "__assistant_choices" in result.result).toBe(true);
   });
 });
 

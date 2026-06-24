@@ -264,11 +264,12 @@ export function planMockFromIntents(
 export { clearMockContext };
 
 function buildHelpFallback(role: string, toolNames: Set<string>, activeDraftTool?: string): string {
-  if (activeDraftTool === "draft_create_appointment") {
+  if (activeDraftTool === "draft_create_appointment" || activeDraftTool === "draft_book_appointment") {
     return [
       "Continuando o agendamento — me diga o que falta:",
       "• Nome do paciente (ex.: *para João Pereira*)",
-      "• Prestador (ex.: *com Dra. Helena*)",
+      "• Procedimento (ex.: *eletrocardiograma*) — se for marcar por exame",
+      "• Prestador (ex.: *com Dra. Helena*) — ou *não sei* para ver a lista",
       "• Data e hora (ex.: *amanhã às 15h*)",
     ].join("\n");
   }

@@ -89,19 +89,88 @@ export function extractTimeOptional(text: string): string | undefined {
   return undefined;
 }
 
+function isInvalidProcedureCapture(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  return (
+    /^(para|pro|com|de|do|da|consulta|atendimento|agendamento|horario|horário)$/i.test(
+      normalized,
+    ) || /^(para|pro|com)\s+/i.test(normalized)
+  );
+}
+
 export function extractProcedureName(raw: string): string | undefined {
+  const known = [
+    "eletrocardiograma",
+    "ecg",
+    "hemograma",
+    "ultrassom",
+    "consulta clinica",
+    "consulta clínica",
+    "consulta medica",
+    "consulta médica",
+  ];
+  const lower = normalizeMockText(raw);
+  for (const term of known) {
+    if (lower.includes(term.replace(/í/g, "i"))) {
+      return term
+        .split(" ")
+        .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ")
+        .replace("Clinica", "Clínica")
+        .replace("Medica", "Médica");
+    }
+  }
+
   const patterns = [
-    /(?:procedimento|servi[cç]o|sess[aã]o)\s+([^,]+?)(?=\s+com\b|\s+para\b|\s+pro\b|\s+amanha|\s+amanhã|\s+hoje|$)/i,
-    /(?:consulta)\s+([a-zà-ú][a-zà-ú\s]{2,40}?)(?=\s+com\b|\s+para\b|\s+pro\b|\s+amanha|\s+amanhã|$)/i,
+    /(?:marcar|agendar)\s+(?:o\s+|a\s+|um\s+|uma\s+)?([a-zà-ú][a-zà-ú\s]{2,50}?)(?=\s+para\b|\s+pro\b|\s+com\b|\s+amanha|\s+amanhã|\s+hoje|$)/i,
+    /(?:procedimento|servi[cç]o|sess[aã]o|exame)\s+([^,]+?)(?=\s+com\b|\s+para\b|\s+pro\b|\s+amanha|\s+amanhã|\s+hoje|$)/i,
+    /(?:consulta)\s+(clinica|clínica|medica|médica|odontologica|odontológica|cardiologica|cardiológica)(?=\s+com\b|\s+para\b|\s+pro\b|\s+amanha|\s+amanhã|$)/i,
   ];
   for (const pattern of patterns) {
     const match = raw.match(pattern);
     if (match?.[1]) {
       const value = match[1].trim();
-      if (!/^(para|pro|com|de|do|da)$/i.test(value)) return value;
+      if (!isInvalidProcedureCapture(value)) return value;
     }
   }
   return undefined;
+}
+
+export function extractProviderListIntent(raw: string): {
+  providerUnknown?: boolean;
+  listProviders?: boolean;
+  bookByProcedure?: boolean;
+} {
+  const t = normalizeMockText(raw);
+  const result: {
+    providerUnknown?: boolean;
+    listProviders?: boolean;
+    bookByProcedure?: boolean;
+  } = {};
+
+  if (
+    /\b(nao sei|nao lembro|tanto faz|qualquer um|qualquer prestador|quem tiver vaga|nao tenho preferencia)\b/.test(
+      t,
+    )
+  ) {
+    result.providerUnknown = true;
+  }
+  if (
+    /\b(listar prestadores|lista de prestadores|quais prestadores|quais medicos|quem atende|mostrar medicos|ver medicos)\b/.test(
+      t,
+    )
+  ) {
+    result.listProviders = true;
+    result.providerUnknown = true;
+  }
+  if (
+    /\b(pelo procedimento|por procedimento|agendar procedimento|marcar procedimento|marcar exame|agendar exame)\b/.test(
+      t,
+    )
+  ) {
+    result.bookByProcedure = true;
+  }
+  return result;
 }
 
 export function extractCreateAppointmentArgs(raw: string): Record<string, unknown> {
@@ -110,12 +179,15 @@ export function extractCreateAppointmentArgs(raw: string): Record<string, unknow
   const patientName = extractSearchQuery(raw) ?? extractBarePatientName(raw);
   const providerName = extractProviderName(raw);
   const procedureName = extractProcedureName(raw);
+  const providerIntent = extractProviderListIntent(raw);
   return {
     ...(patientName ? { patientName } : {}),
     ...(providerName ? { providerName } : {}),
     ...(procedureName ? { procedureName } : {}),
     ...(dateHint ? { date: dateHint } : {}),
     ...(time ? { time } : {}),
+    ...providerIntent,
+    ...(procedureName ? { bookByProcedure: true } : {}),
   };
 }
 
@@ -190,6 +262,9 @@ export function isDraftContinuation(
   if (extractDateHint(raw)) return true;
   if (extractTimeOptional(raw)) return true;
   if (extractProviderName(raw)) return true;
+  if (extractProcedureName(raw)) return true;
+  if (extractProviderListIntent(raw).providerUnknown) return true;
+  if (extractProviderListIntent(raw).bookByProcedure) return true;
   if (extractBarePatientName(raw)) return true;
   if (extractSearchQuery(raw)) return true;
   if (extractEmail(raw)) return true;
