@@ -6,6 +6,15 @@ on:
   pull_request:
     branches: [main, dev]
 
+# Prisma exige DATABASE_URL em todo comando que toca o schema.
+# Dual-store: bootstrap gera demo.db + operation.db + espelho dev.db (db:verify).
+env:
+  DATABASE_URL: file:./dev.db
+  SESSION_SECRET: ci-github-actions-session-secret-32chars-min
+  CRON_SECRET: ci-cron-secret-32-characters-min
+  SEED_SCALE: small
+  ALLOW_DEMO_RESET: "true"
+
 jobs:
   unit-integration-api:
     runs-on: ubuntu-latest
@@ -26,10 +35,8 @@ jobs:
       - name: Docs verify
         run: npm run docs:verify
 
-      - name: Prepare database
-        run: npm run db:push && npm run db:seed
-        env:
-          SEED_SCALE: small
+      - name: Prepare database (dual-store)
+        run: npm run db:bootstrap:demo
 
       - name: Database verify
         run: npm run db:verify
@@ -37,24 +44,14 @@ jobs:
       - name: Unit + integration + API tests
         run: npm run test
         env:
-          SESSION_SECRET: ci-github-actions-session-secret-32chars-min
-          CRON_SECRET: ci-cron-secret-32-characters-min
           DATABASE_URL: file:./test.db
 
       - name: Build
         run: npm run build
-        env:
-          SESSION_SECRET: ci-github-actions-session-secret-32chars-min
-          CRON_SECRET: ci-cron-secret-32-characters-min
-          DATABASE_URL: file:./dev.db
 
   e2e:
     runs-on: ubuntu-latest
     needs: unit-integration-api
-    env:
-      SESSION_SECRET: ci-github-actions-session-secret-32chars-min
-      CRON_SECRET: ci-cron-secret-32-characters-min
-      DATABASE_URL: file:./dev.db
     steps:
       - uses: actions/checkout@v4
 
@@ -66,10 +63,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Prepare database
-        run: npm run db:push && npm run db:seed
-        env:
-          SEED_SCALE: small
+      - name: Prepare database (dual-store)
+        run: npm run db:bootstrap:demo
 
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
