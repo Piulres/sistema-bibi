@@ -144,7 +144,10 @@ export async function resolveSegmentFromHeaders(options?: {
   tenantSlug?: string | null;
   nicheParam?: string | null;
 }): Promise<ResolvedSegmentContext> {
-  await ensureDataStoreForSegmentAccess(options?.tenantSlug, options?.nicheParam);
+  await ensureDataStoreForSegmentAccess({
+    tenantSlug: options?.tenantSlug,
+    nicheParam: options?.nicheParam,
+  });
 
   const h = await headers();
   const cookieSegment = await readSegmentCookie();
@@ -158,9 +161,13 @@ export async function resolveSegmentFromHeaders(options?: {
 
 export async function resolveSegmentFromLoginRequest(
   request: Request,
-  body?: { tenantSlug?: string | null; nicheParam?: string | null },
+  body?: { tenantSlug?: string | null; nicheParam?: string | null; email?: string | null },
 ): Promise<ResolvedSegmentContext> {
-  await ensureDataStoreForSegmentAccess(body?.tenantSlug, body?.nicheParam);
+  await ensureDataStoreForSegmentAccess({
+    tenantSlug: body?.tenantSlug,
+    nicheParam: body?.nicheParam,
+    email: body?.email,
+  });
 
   const cookieSegment = readSegmentCookieFromRequest(request);
   return resolveSegmentContext({

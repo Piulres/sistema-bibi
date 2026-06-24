@@ -6,6 +6,7 @@ import { getSiteUrl } from "@/lib/landing/site-url";
 import { nicheLandingBranding } from "@/lib/niche/branding";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import { segmentTenantByNiche } from "@/lib/niche/demo-accounts";
+import { ensureDataStoreForSegmentAccess } from "@/lib/data-store/ensure-data-store-for-segment";
 import {
   isSegmentLandingSlug,
   nicheFromSegmentSlug,
@@ -59,6 +60,7 @@ export default async function SegmentLandingPage({ params }: PageProps) {
 
   const niche = nicheFromSegmentSlug(slug)!;
   const tenantSlug = segmentTenantByNiche(niche).slug;
+  await ensureDataStoreForSegmentAccess({ segmentLanding: true, tenantSlug });
   const branding = nicheLandingBranding(niche, getPlatformBranding());
 
   return (

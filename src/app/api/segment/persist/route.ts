@@ -17,7 +17,10 @@ export async function POST(request: Request) {
     // body vazio — usa só cookie/headers atuais
   }
 
-  await ensureDataStoreForSegmentAccess(body.tenant ?? null, body.niche ?? null);
+  await ensureDataStoreForSegmentAccess({
+    tenantSlug: body.tenant ?? null,
+    nicheParam: body.niche ?? null,
+  });
 
   const segment = await resolveSegmentFromHeaders({
     tenantSlug: body.tenant ?? null,
