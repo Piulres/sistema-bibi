@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginAs, openInternoNav, portalMain } from "./helpers/auth";
+import { DEMO_MEDICAL } from "./helpers/demo-labels";
 
 const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno/dashboard", heading: /Dashboard Executivo/i },
@@ -38,9 +39,9 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
     for (const label of [
       "Dashboard",
       "Faturamento",
-      "Agenda",
-      "Cadastros",
-      "Estoque",
+      DEMO_MEDICAL.appointments,
+      DEMO_MEDICAL.cadastrosTab,
+      DEMO_MEDICAL.estoqueTab,
       "CRM Corporativo",
       "Recorrência",
       "Comunicação",
