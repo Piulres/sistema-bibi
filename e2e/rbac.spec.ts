@@ -9,7 +9,7 @@ test.describe("RBAC — perfil RECEPCAO", () => {
 
   test("nav limitada: agenda e cadastros, sem faturamento", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    const nav = await openInternoNav(page);
+    await openInternoNav(page);
     await expect(internoNavLink(page, "/interno/agenda")).toBeVisible();
     await expect(internoNavLink(page, "/interno/cadastros")).toBeVisible();
     await expect(internoNavLink(page, "/interno/comunicacao")).toBeVisible();
