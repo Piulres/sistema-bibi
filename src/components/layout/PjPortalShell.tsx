@@ -1,6 +1,7 @@
 "use client";
 
 import PortalShell from "@/components/layout/PortalShell";
+import AssistantShell from "@/components/assistant/AssistantShell";
 import SectionNav from "@/components/ui/SectionNav";
 import { PORTALS } from "@/lib/roles";
 import { PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
@@ -9,10 +10,11 @@ import type { SessionUser } from "@/lib/session";
 
 type Props = {
   user: SessionUser | null;
+  assistantEnabled?: boolean;
   children: React.ReactNode;
 };
 
-export default function PjPortalShell({ user, children }: Props) {
+export default function PjPortalShell({ user, assistantEnabled = true, children }: Props) {
   if (!user || user.role !== "PJ") {
     return children;
   }
@@ -37,7 +39,9 @@ export default function PjPortalShell({ user, children }: Props) {
         className="mt-6"
         drawerTitle="Seções da empresa"
       />
-      <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      <AssistantShell portal="pj" enabled={assistantEnabled}>
+        <div className="portal-page-content mt-8 min-w-0">{children}</div>
+      </AssistantShell>
     </PortalShell>
   );
 }

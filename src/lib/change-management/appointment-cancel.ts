@@ -15,7 +15,9 @@ export async function walkInAndSchedule(input: {
   cpf: string;
   birthDate: Date;
   phone?: string | null;
-  providerId: string;
+  providerId?: string;
+  procedureId?: string;
+  autoAssignProvider?: boolean;
   scheduledAt: Date;
   reason?: string | null;
   createdBy: string;
@@ -63,10 +65,12 @@ export async function walkInAndSchedule(input: {
     patientId: patientResult.patient.id,
     petId,
     providerId: input.providerId,
+    procedureId: input.procedureId,
     scheduledAt: input.scheduledAt,
     reason: input.reason,
     status: "AGENDADO",
     modality: "PRESENCIAL",
+    autoAssignProvider: input.autoAssignProvider,
     createdBy: input.createdBy,
     correlationId,
   });

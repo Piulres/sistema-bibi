@@ -40,6 +40,8 @@ export type AppointmentView = {
   modality: string;
   telemedicineUrl: string | null;
   reason: string | null;
+  procedureId: string | null;
+  procedureName: string | null;
   patientId: string;
   patientName: string;
   petId: string | null;
@@ -56,12 +58,14 @@ function mapAppointment(a: {
   modality: string;
   telemedicineUrl: string | null;
   reason: string | null;
+  procedureId: string | null;
   patientId: string;
   petId: string | null;
   providerId: string;
   patient: { name: string; company: { name: string } | null };
   pet: { name: string } | null;
   provider: { name: string };
+  procedure?: { name: string } | null;
 }): AppointmentView {
   return {
     id: a.id,
@@ -71,6 +75,8 @@ function mapAppointment(a: {
     modality: a.modality,
     telemedicineUrl: a.telemedicineUrl,
     reason: a.reason,
+    procedureId: a.procedureId,
+    procedureName: a.procedure?.name ?? null,
     patientId: a.patientId,
     patientName: a.patient.name,
     petId: a.petId,
@@ -110,6 +116,7 @@ export async function listAppointments(input: {
       patient: { include: { company: true } },
       pet: { select: { name: true } },
       provider: { select: { name: true } },
+      procedure: { select: { name: true } },
     },
     orderBy: { scheduledAt: "asc" },
   });
@@ -126,15 +133,44 @@ export async function listProviders(tenantId: string) {
   });
 }
 
+async function findAvailableProviderAt(input: {
+  tenantId: string;
+  scheduledAt: Date;
+}): Promise<{ id: string; name: string } | null> {
+  const prisma = await getPrisma();
+  const providers = await prisma.user.findMany({
+    where: { tenantId: input.tenantId, role: "PRESTADOR" },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
+  for (const provider of providers) {
+    const conflict = await prisma.appointment.findFirst({
+      where: {
+        tenantId: input.tenantId,
+        providerId: provider.id,
+        scheduledAt: input.scheduledAt,
+        status: { notIn: ["CANCELADO", "FALTOU"] },
+      },
+      select: { id: true },
+    });
+    if (!conflict) return provider;
+  }
+
+  return null;
+}
+
 export async function createAppointment(input: {
   tenantId: string;
   patientId: string;
   petId?: string | null;
-  providerId: string;
+  providerId?: string;
+  procedureId?: string;
   scheduledAt: Date;
   reason?: string | null;
   status?: string;
   modality?: string;
+  autoAssignProvider?: boolean;
   createdBy: string;
   correlationId?: string;
 }) {
@@ -163,15 +199,40 @@ export async function createAppointment(input: {
     return { error: "Pet não aplicável neste segmento" as const };
   }
 
+  let procedureName: string | null = null;
+  if (input.procedureId) {
+    const procedure = await prisma.procedure.findFirst({
+      where: { id: input.procedureId, tenantId: input.tenantId },
+      select: { id: true, name: true },
+    });
+    if (!procedure) return { error: "Procedimento não encontrado" as const };
+    procedureName = procedure.name;
+  }
+
+  let providerId = input.providerId;
+  if (!providerId) {
+    if (!input.autoAssignProvider) {
+      return { error: "Informe o prestador ou ative atribuição automática" as const };
+    }
+    const assigned = await findAvailableProviderAt({
+      tenantId: input.tenantId,
+      scheduledAt: input.scheduledAt,
+    });
+    if (!assigned) {
+      return { error: "Nenhum prestador disponível neste horário" as const };
+    }
+    providerId = assigned.id;
+  }
+
   const provider = await prisma.user.findFirst({
-    where: { id: input.providerId, tenantId: input.tenantId, role: "PRESTADOR" },
+    where: { id: providerId, tenantId: input.tenantId, role: "PRESTADOR" },
   });
   if (!provider) return { error: "Prestador não encontrado" as const };
 
   const conflict = await prisma.appointment.findFirst({
     where: {
       tenantId: input.tenantId,
-      providerId: input.providerId,
+      providerId,
       scheduledAt: input.scheduledAt,
       status: { notIn: ["CANCELADO", "FALTOU"] },
     },
@@ -181,14 +242,19 @@ export async function createAppointment(input: {
   const modality: AppointmentModality =
     input.modality && isAppointmentModality(input.modality) ? input.modality : "PRESENCIAL";
 
+  const reason =
+    input.reason?.trim() ||
+    (procedureName ? `Procedimento: ${procedureName}` : null);
+
   const appointment = await prisma.appointment.create({
     data: {
       tenantId: input.tenantId,
       patientId: input.patientId,
       petId: input.petId ?? null,
-      providerId: input.providerId,
+      providerId,
+      procedureId: input.procedureId ?? null,
       scheduledAt: input.scheduledAt,
-      reason: input.reason?.trim() || null,
+      reason,
       status: input.status ?? "AGENDADO",
       modality,
       telemedicineUrl: null,
@@ -197,6 +263,7 @@ export async function createAppointment(input: {
       patient: { include: { company: true } },
       pet: { select: { name: true } },
       provider: { select: { name: true } },
+      procedure: { select: { name: true } },
     },
   });
 
@@ -210,6 +277,7 @@ export async function createAppointment(input: {
         patient: { include: { company: true } },
         pet: { select: { name: true } },
         provider: { select: { name: true } },
+        procedure: { select: { name: true } },
       },
     });
   }
@@ -282,6 +350,7 @@ export async function updateAppointment(input: {
       patient: { include: { company: true } },
       pet: { select: { name: true } },
       provider: { select: { name: true } },
+      procedure: { select: { name: true } },
     },
   });
 

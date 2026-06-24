@@ -26,6 +26,7 @@ type Appointment = {
 };
 
 type Option = { id: string; name: string };
+type ProcedureOption = { id: string; name: string; code: string };
 
 type PetOption = {
   id: string;
@@ -50,6 +51,7 @@ export default function AppointmentsView() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [providers, setProviders] = useState<Option[]>([]);
   const [patients, setPatients] = useState<Option[]>([]);
+  const [procedures, setProcedures] = useState<ProcedureOption[]>([]);
   const [pets, setPets] = useState<PetOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState<string | null>(null);
@@ -59,6 +61,8 @@ export default function AppointmentsView() {
     patientId: "",
     petId: "",
     providerId: "",
+    procedureId: "",
+    autoAssignProvider: false,
     time: "09:00",
     reason: "Consulta",
     status: "CONFIRMADO",
@@ -71,6 +75,8 @@ export default function AppointmentsView() {
     birthDate: "",
     phone: "",
     providerId: "",
+    procedureId: "",
+    autoAssignProvider: false,
     time: "",
     reason: "Consulta walk-in",
     createPortalUser: false,
@@ -84,6 +90,7 @@ export default function AppointmentsView() {
     setAppointments(data.appointments ?? []);
     setProviders(data.providers ?? []);
     setPatients(data.patients ?? []);
+    setProcedures(data.procedures ?? []);
     setPets(data.pets ?? []);
     setLoading(false);
   }, [date]);
@@ -97,6 +104,7 @@ export default function AppointmentsView() {
       setAppointments(data.appointments ?? []);
       setProviders(data.providers ?? []);
       setPatients(data.patients ?? []);
+      setProcedures(data.procedures ?? []);
       setPets(data.pets ?? []);
       setLoading(false);
     })();
@@ -117,7 +125,9 @@ export default function AppointmentsView() {
         body: JSON.stringify({
           patientId: form.patientId,
           petId: isVet ? form.petId : null,
-          providerId: form.providerId,
+          providerId: form.autoAssignProvider ? undefined : form.providerId,
+          procedureId: form.procedureId || undefined,
+          autoAssignProvider: form.autoAssignProvider,
           scheduledAt,
           reason: form.reason,
           status: form.status,
@@ -158,7 +168,9 @@ export default function AppointmentsView() {
           cpf: walkIn.cpf,
           birthDate: walkIn.birthDate,
           phone: walkIn.phone || null,
-          providerId: walkIn.providerId,
+          providerId: walkIn.autoAssignProvider ? undefined : walkIn.providerId,
+          procedureId: walkIn.procedureId || undefined,
+          autoAssignProvider: walkIn.autoAssignProvider,
           scheduledAt,
           reason: walkIn.reason,
           ...(isVet
@@ -201,6 +213,8 @@ export default function AppointmentsView() {
         birthDate: "",
         phone: "",
         providerId: "",
+        procedureId: "",
+        autoAssignProvider: false,
         time: "",
         reason: "Consulta walk-in",
         createPortalUser: false,
@@ -302,7 +316,8 @@ export default function AppointmentsView() {
             <span className="text-[var(--text-secondary)]">Prestador</span>
             <select
               id="walkin-provider"
-              required
+              required={!walkIn.autoAssignProvider}
+              disabled={walkIn.autoAssignProvider}
               className={fieldClass}
               value={walkIn.providerId}
               onChange={(e) => setWalkIn({ ...walkIn, providerId: e.target.value })}
@@ -314,6 +329,38 @@ export default function AppointmentsView() {
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block text-sm" htmlFor="walkin-procedure">
+            <span className="text-[var(--text-secondary)]">Procedimento (opcional)</span>
+            <select
+              id="walkin-procedure"
+              className={fieldClass}
+              value={walkIn.procedureId}
+              onChange={(e) => setWalkIn({ ...walkIn, procedureId: e.target.value })}
+            >
+              <option value="">Não especificado</option>
+              {procedures.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-sm sm:col-span-2">
+            <input
+              type="checkbox"
+              checked={walkIn.autoAssignProvider}
+              onChange={(e) =>
+                setWalkIn({
+                  ...walkIn,
+                  autoAssignProvider: e.target.checked,
+                  providerId: e.target.checked ? "" : walkIn.providerId,
+                })
+              }
+            />
+            <span className="text-[var(--text-secondary)]">
+              Sem preferência de prestador (atribui automaticamente quem estiver livre)
+            </span>
           </label>
           <label className="block text-sm" htmlFor="walkin-time">
             <span className="text-[var(--text-secondary)]">Horário (vazio = agora)</span>
@@ -444,7 +491,8 @@ export default function AppointmentsView() {
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Prestador</span>
             <select
-              required
+              required={!form.autoAssignProvider}
+              disabled={form.autoAssignProvider}
               className="mt-1 w-full rounded border px-3 py-2"
               value={form.providerId}
               onChange={(e) => setForm({ ...form, providerId: e.target.value })}
@@ -456,6 +504,37 @@ export default function AppointmentsView() {
                 </option>
               ))}
             </select>
+          </label>
+          <label className="block text-sm">
+            <span className="text-[var(--text-secondary)]">Procedimento (opcional)</span>
+            <select
+              className="mt-1 w-full rounded border px-3 py-2"
+              value={form.procedureId}
+              onChange={(e) => setForm({ ...form, procedureId: e.target.value })}
+            >
+              <option value="">Não especificado</option>
+              {procedures.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2 text-sm sm:col-span-2 lg:col-span-3">
+            <input
+              type="checkbox"
+              checked={form.autoAssignProvider}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  autoAssignProvider: e.target.checked,
+                  providerId: e.target.checked ? "" : form.providerId,
+                })
+              }
+            />
+            <span className="text-[var(--text-secondary)]">
+              Sem preferência de prestador (atribui automaticamente quem estiver livre)
+            </span>
           </label>
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Modalidade</span>

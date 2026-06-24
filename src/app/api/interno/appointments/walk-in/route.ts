@@ -10,12 +10,21 @@ export async function POST(request: Request) {
       cpf: string;
       birthDate: string;
       phone?: string | null;
-      providerId: string;
+      providerId?: string;
+      procedureId?: string;
+      autoAssignProvider?: boolean;
       scheduledAt: string;
       reason?: string | null;
       petName?: string | null;
       petSpecies?: string | null;
     };
+
+    if (!body.providerId && !body.autoAssignProvider) {
+      return NextResponse.json(
+        { error: "Informe o prestador ou marque atribuição automática" },
+        { status: 400 },
+      );
+    }
 
     const result = await walkInAndSchedule({
       tenantId: user.tenantId,
@@ -24,6 +33,8 @@ export async function POST(request: Request) {
       birthDate: new Date(body.birthDate),
       phone: body.phone,
       providerId: body.providerId,
+      procedureId: body.procedureId,
+      autoAssignProvider: body.autoAssignProvider,
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
       createdBy: user.id,

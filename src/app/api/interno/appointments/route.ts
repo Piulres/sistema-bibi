@@ -8,6 +8,7 @@ import {
 } from "@/lib/appointment-service";
 import { isAppointmentModality } from "@/lib/telemedicine";
 import { listPatients } from "@/lib/patient-service";
+import { listProcedures } from "@/lib/procedure-service";
 import { listPets } from "@/lib/pet-service";
 import { getPrisma } from "@/lib/db";
 import { requiresPet } from "@/lib/vet-niche";
@@ -32,14 +33,22 @@ export async function GET(request: Request) {
       select: { niche: true },
     });
 
-    const [appointments, providers, patients, pets] = await Promise.all([
+    const [appointments, providers, patients, procedures, pets] = await Promise.all([
       listAppointments({ tenantId: user.tenantId, from, to, providerId }),
       listProviders(user.tenantId),
       listPatients(user.tenantId),
+      listProcedures(user.tenantId),
       requiresPet(tenant?.niche) ? listPets(user.tenantId) : Promise.resolve([]),
     ]);
 
-    return NextResponse.json({ appointments, providers, patients, pets, niche: tenant?.niche });
+    return NextResponse.json({
+      appointments,
+      providers,
+      patients,
+      procedures,
+      pets,
+      niche: tenant?.niche,
+    });
   } catch (error) {
     return authErrorResponse(error);
   }
@@ -52,15 +61,23 @@ export async function POST(request: Request) {
       patientId?: string;
       petId?: string | null;
       providerId?: string;
+      procedureId?: string;
       scheduledAt?: string;
       reason?: string | null;
       status?: string;
       modality?: string;
+      autoAssignProvider?: boolean;
     };
 
-    if (!body.patientId || !body.providerId || !body.scheduledAt) {
+    if (!body.patientId || !body.scheduledAt) {
       return NextResponse.json(
-        { error: "Informe paciente, prestador e data/hora" },
+        { error: "Informe paciente e data/hora" },
+        { status: 400 },
+      );
+    }
+    if (!body.providerId && !body.autoAssignProvider) {
+      return NextResponse.json(
+        { error: "Informe o prestador ou marque atribuição automática" },
         { status: 400 },
       );
     }
@@ -76,10 +93,12 @@ export async function POST(request: Request) {
       patientId: body.patientId,
       petId: body.petId,
       providerId: body.providerId,
+      procedureId: body.procedureId,
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
       status: body.status,
       modality: body.modality,
+      autoAssignProvider: body.autoAssignProvider,
       createdBy: user.id,
     });
 

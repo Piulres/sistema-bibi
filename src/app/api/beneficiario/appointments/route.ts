@@ -13,14 +13,22 @@ export async function POST(request: Request) {
 
     const body = (await request.json()) as {
       providerId?: string;
+      procedureId?: string;
       petId?: string | null;
       scheduledAt?: string;
       reason?: string | null;
       modality?: string;
+      autoAssignProvider?: boolean;
     };
 
-    if (!body.providerId || !body.scheduledAt) {
-      return NextResponse.json({ error: "Informe prestador e horário" }, { status: 400 });
+    if (!body.scheduledAt) {
+      return NextResponse.json({ error: "Informe o horário" }, { status: 400 });
+    }
+    if (!body.providerId && !body.autoAssignProvider) {
+      return NextResponse.json(
+        { error: "Informe o prestador ou escolha sem preferência" },
+        { status: 400 },
+      );
     }
 
     if (body.modality && !isAppointmentModality(body.modality)) {
@@ -32,9 +40,11 @@ export async function POST(request: Request) {
       patientId: user.patientId,
       petId: body.petId,
       providerId: body.providerId,
+      procedureId: body.procedureId,
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
       modality: body.modality,
+      autoAssignProvider: body.autoAssignProvider,
       createdBy: user.id,
     });
 

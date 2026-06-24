@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import PortalShell from "@/components/layout/PortalShell";
+import AssistantShell from "@/components/assistant/AssistantShell";
 import InternoNav from "@/components/InternoNav";
 import { ToastProvider } from "@/components/ui/Toast";
 import { PORTALS } from "@/lib/roles";
@@ -10,11 +11,12 @@ import type { SessionUser } from "@/lib/session";
 
 type Props = {
   user: SessionUser | null;
+  assistantEnabled?: boolean;
   children: React.ReactNode;
 };
 
 /** Mantém shell e navegação do interno entre transições SPA. */
-export default function InternoPortalShell({ user, children }: Props) {
+export default function InternoPortalShell({ user, assistantEnabled = true, children }: Props) {
   const pathname = usePathname();
 
   if (INTERNO_PUBLIC_PATHS.includes(pathname as (typeof INTERNO_PUBLIC_PATHS)[number])) {
@@ -39,7 +41,9 @@ export default function InternoPortalShell({ user, children }: Props) {
         labels={user.labels}
       >
         <InternoNav permissions={user.internoPermissions} />
-        <div className="portal-page-content mt-8 min-w-0">{children}</div>
+        <AssistantShell portal="interno" enabled={assistantEnabled}>
+          <div className="portal-page-content mt-8 min-w-0">{children}</div>
+        </AssistantShell>
       </PortalShell>
     </ToastProvider>
   );

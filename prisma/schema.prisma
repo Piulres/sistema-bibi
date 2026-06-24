@@ -273,6 +273,7 @@ model Procedure {
   usages       ProcedureUsage[]
   examOrders   ExamOrder[]
   materialKits ProcedureMaterialKit[]
+  appointments Appointment[]
 
   @@unique([tenantId, code])
 }
@@ -410,6 +411,10 @@ model Appointment {
 
   providerId String
   provider   User   @relation("ProviderAppointments", fields: [providerId], references: [id])
+
+  /// Procedimento solicitado no agendamento (opcional; uso efetivo continua em ProcedureUsage).
+  procedureId String?
+  procedure   Procedure? @relation(fields: [procedureId], references: [id])
 
   usages         ProcedureUsage[]
   medicalRecords MedicalRecord[]
