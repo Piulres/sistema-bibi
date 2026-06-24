@@ -8,6 +8,7 @@ import { prestadorReadTools } from "@/lib/assistant/tools/prestador/read";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
 import { countMockTriggers } from "@/lib/assistant/provider/mock-intents";
 import { planMockFromIntents, clearMockContext } from "@/lib/assistant/provider/mock-match";
+import { runAssistantChat } from "@/lib/assistant/runner";
 import { searchKnowledge } from "@/lib/assistant/rag/knowledge";
 import {
   createPendingAction,
@@ -17,6 +18,12 @@ import {
 import type { SessionUser } from "@/lib/session";
 import { CLINIC_BRANDING_DEFAULTS } from "@/lib/theme/tokens";
 import { NICHE_MASTER_LABELS } from "@/constants/niches";
+import { resolveInternoPermissions } from "@/lib/interno-permissions";
+import { mergeNicheLabels } from "@/lib/niche/labels";
+import { applyNicheBrandingDefaults } from "@/lib/niche/branding";
+import { isNicheId } from "@/lib/niche/types";
+import { DEMO_EMAILS } from "../helpers/seed-fixtures";
+import { getTestPrisma } from "../helpers/db";
 
 const baseUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
   id: "u1",
@@ -145,6 +152,67 @@ describe("assistant mock variations", () => {
       const plan = planMockFromIntents(phrase, user, toolNames);
       expect(plan.toolCalls[0]?.name).toBe("get_revenue_summary");
     }
+  });
+});
+
+describe("assistant draft multi-turn", () => {
+  beforeEach(() => {
+    clearMockContext("draft-flow-user");
+  });
+
+  it("guia agendamento incremental até pedir confirmação", async () => {
+    const prisma = getTestPrisma();
+    const dbUser = await prisma.user.findFirst({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+      include: { tenant: { include: { branding: true } } },
+    });
+    expect(dbUser?.tenant).toBeTruthy();
+
+    const niche = isNicheId(dbUser!.tenant!.niche) ? dbUser!.tenant!.niche : "MEDICAL";
+    const user: SessionUser = {
+      id: "draft-flow-user",
+      name: dbUser!.name,
+      email: dbUser!.email,
+      role: dbUser!.role,
+      tenantId: dbUser!.tenantId,
+      tenantSlug: dbUser!.tenant!.slug,
+      companyId: null,
+      patientId: null,
+      tenantName: dbUser!.tenant!.name,
+      companyName: null,
+      patientName: null,
+      internoProfile: dbUser!.internoProfile,
+      internoPermissions: resolveInternoPermissions(dbUser!.role, dbUser!.internoProfile),
+      branding: applyNicheBrandingDefaults(niche, CLINIC_BRANDING_DEFAULTS),
+      niche,
+      labels: mergeNicheLabels(niche, dbUser!.tenant!.labels),
+    };
+
+    const messages: { role: "user" | "assistant"; content: string }[] = [];
+
+    const step1 = await runAssistantChat({
+      user,
+      messages: [...messages, { role: "user", content: "preciso marcar uma consulta" }],
+    });
+    expect(step1.message.content).toMatch(/Para quem|paciente/i);
+    expect(step1.actions).toBeUndefined();
+
+    messages.push({ role: "user", content: "preciso marcar uma consulta" }, step1.message);
+
+    const step2 = await runAssistantChat({
+      user,
+      messages: [...messages, { role: "user", content: "é pro João Pereira" }],
+    });
+    expect(step2.message.content).toMatch(/João|Prestador|Dra|data|horário/i);
+
+    messages.push({ role: "user", content: "é pro João Pereira" }, step2.message);
+
+    const step3 = await runAssistantChat({
+      user,
+      messages: [...messages, { role: "user", content: "amanhã às 15h com a Dra Helena" }],
+    });
+    expect(step3.actions?.some((a) => a.type === "confirm")).toBe(true);
+    expect(step3.message.content).toMatch(/confirme/i);
   });
 });
 

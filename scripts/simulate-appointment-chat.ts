@@ -77,7 +77,6 @@ async function main() {
     "oi, preciso marcar uma consulta",
     "é pro João Pereira",
     "amanhã às 15h com a Dra Helena",
-    "Agendar consulta para João Pereira com Dra Helena amanhã às 15:30",
     "__CONFIRM__",
   ];
   let pendingId: string | undefined;

@@ -12,6 +12,11 @@ import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/
 import { planGatewayAssistant } from "@/lib/assistant/provider/gateway";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
 import { findTool, getToolsForUser } from "@/lib/assistant/tools/registry";
+import {
+  clearOperationDraft,
+  rememberOperationDraft,
+} from "@/lib/assistant/provider/mock-context";
+import { isDraftToolName } from "@/lib/assistant/provider/mock-draft-flow";
 
 async function resolvePlan(
   user: SessionUser,
@@ -72,6 +77,14 @@ export async function runAssistantChat(input: {
 
       if (isDraftToolResult(result)) {
         pendingActionId = result.pendingActionId;
+        clearOperationDraft(input.user.id);
+      } else if (
+        isDraftToolName(call.name) &&
+        typeof result === "object" &&
+        result !== null &&
+        "error" in result
+      ) {
+        rememberOperationDraft(input.user.id, call.name, call.arguments);
       }
 
       const formatted = formatToolResult(call.name, result, input.user.labels);

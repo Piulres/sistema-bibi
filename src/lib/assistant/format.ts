@@ -1,7 +1,7 @@
 import "server-only";
 import type { AssistantAction } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
-import { isDraftToolResult } from "@/lib/assistant/types";
+import { isDraftToolResult, isIncompleteDraftResult } from "@/lib/assistant/types";
 
 export function formatToolResult(
   toolName: string,
@@ -10,6 +10,10 @@ export function formatToolResult(
 ): string | null {
   if (isDraftToolResult(result)) {
     return `${result.preview}\n\nRevise os dados abaixo e **confirme** para executar.`;
+  }
+
+  if (isIncompleteDraftResult(result)) {
+    return result.guidance;
   }
 
   if (typeof result === "object" && result !== null && "error" in result) {

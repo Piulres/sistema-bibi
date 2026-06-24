@@ -5,6 +5,11 @@ import { getAvailableSlots } from "@/lib/scheduling-service";
 import { listProviders } from "@/lib/appointment-service";
 import { createPendingAction } from "@/lib/assistant/pending-actions";
 import { parseAssistantDate } from "@/lib/assistant/dates";
+import {
+  buildIncompleteDraftResult,
+  buildResolveIncompleteResult,
+} from "@/lib/assistant/draft-response";
+import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
 
 export const beneficiarioReadTools: AssistantToolDefinition[] = [
   {
@@ -101,24 +106,65 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
       type: "object",
       properties: {
         providerId: { type: "string" },
+        providerName: { type: "string" },
+        date: { type: "string" },
+        time: { type: "string" },
         scheduledAt: { type: "string", description: "ISO datetime do slot" },
         reason: { type: "string" },
       },
-      required: ["scheduledAt"],
     },
     requiredRoles: ["BENEFICIARIO"],
     kind: "draft",
     handler: async (ctx, args) => {
       if (!ctx.user.patientId) return { error: "Conta sem beneficiário vinculado." };
-      const data = args as { providerId?: string; scheduledAt?: string; reason?: string };
-      if (!data.scheduledAt) return { error: "Informe o horário (scheduledAt)." };
+      const data = args as {
+        providerId?: string;
+        providerName?: string;
+        date?: string;
+        time?: string;
+        scheduledAt?: string;
+        reason?: string;
+      };
+
+      const missing = getMissingFieldsForTool("draft_book_appointment", data);
+      if (missing.length > 0) {
+        return buildIncompleteDraftResult("draft_book_appointment", data, ctx.labels, missing);
+      }
 
       const providers = await listProviders(ctx.user.tenantId);
-      const providerId = data.providerId ?? providers[0]?.id;
-      if (!providerId) return { error: "Prestador não encontrado." };
+      let providerId = data.providerId;
+      if (!providerId && data.providerName) {
+        const norm = (v: string) =>
+          v
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/\p{M}/gu, "")
+            .replace(/\./g, "")
+            .trim();
+        const query = norm(data.providerName);
+        providerId = providers.find(
+          (p) => norm(p.name).includes(query) || query.includes(norm(p.name)),
+        )?.id;
+      }
+      if (!providerId) {
+        return buildResolveIncompleteResult(
+          "draft_book_appointment",
+          `${ctx.labels.provider} não encontrado.`,
+          data,
+          ctx.labels,
+        );
+      }
+
+      const scheduled = data.scheduledAt
+        ? new Date(data.scheduledAt)
+        : (() => {
+            const base = parseAssistantDate(data.date!);
+            const [hour, minute] = data.time!.split(":").map(Number);
+            base.setHours(hour, minute, 0, 0);
+            return base;
+          })();
 
       const provider = providers.find((p) => p.id === providerId);
-      const scheduled = new Date(data.scheduledAt);
       const pendingActionId = createPendingAction(ctx.user.id, ctx.user.tenantId, {
         type: "book_appointment",
         data: {

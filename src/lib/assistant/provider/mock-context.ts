@@ -5,26 +5,60 @@ type LastIntent = {
   at: number;
 };
 
+export type OperationDraft = {
+  tool: string;
+  args: Record<string, unknown>;
+  at: number;
+};
+
 const TTL_MS = 15 * 60 * 1000;
-const store = new Map<string, LastIntent>();
+const intentStore = new Map<string, LastIntent>();
+const draftStore = new Map<string, OperationDraft>();
 
 export function rememberLastIntent(userId: string, tool: string): void {
-  store.set(userId, { tool, at: Date.now() });
+  intentStore.set(userId, { tool, at: Date.now() });
 }
 
 export function getLastIntent(userId: string): string | null {
-  const item = store.get(userId);
+  const item = intentStore.get(userId);
   if (!item) return null;
   if (Date.now() - item.at > TTL_MS) {
-    store.delete(userId);
+    intentStore.delete(userId);
     return null;
   }
   return item.tool;
 }
 
+export function getOperationDraft(userId: string): OperationDraft | null {
+  const item = draftStore.get(userId);
+  if (!item) return null;
+  if (Date.now() - item.at > TTL_MS) {
+    draftStore.delete(userId);
+    return null;
+  }
+  return item;
+}
+
+export function rememberOperationDraft(
+  userId: string,
+  tool: string,
+  args: Record<string, unknown>,
+): void {
+  draftStore.set(userId, { tool, args, at: Date.now() });
+}
+
+export function clearOperationDraft(userId: string): void {
+  draftStore.delete(userId);
+}
+
 export function clearMockContext(userId?: string): void {
-  if (userId) store.delete(userId);
-  else store.clear();
+  if (userId) {
+    intentStore.delete(userId);
+    draftStore.delete(userId);
+  } else {
+    intentStore.clear();
+    draftStore.clear();
+  }
 }
 
 /** Mapeia follow-up curto para tool quando só muda data ou confirma assunto. */

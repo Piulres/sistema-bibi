@@ -39,22 +39,120 @@ export function extractSearchQuery(raw: string): string | null {
 }
 
 export function extractProviderName(raw: string): string | undefined {
-  const match = raw.match(
+  const withCom = raw.match(
     /\bcom\s+(?:a\s+|o\s+)?((?:dra?|dr)\.?\s+[A-Za-zÀ-ú][A-Za-zÀ-ú\s.]{1,40}?)(?=\s+amanha|\s+amanhã|\s+hoje|\s+ontem|\s+(?:as|às)\s+|\s+\d{1,2}:\d{2}|\s+\d{1,2}\s*h|$)/i,
   );
-  return match?.[1]?.trim();
+  if (withCom?.[1]) return withCom[1].trim();
+
+  const bare = raw.match(
+    /\b((?:dra?|dr)\.?\s+[A-Za-zÀ-ú][A-Za-zÀ-ú\s.]{2,40})(?=\s*$|\s+amanha|\s+amanhã|\s+hoje|\s+(?:as|às)\s+|\s+\d)/i,
+  );
+  return bare?.[1]?.trim();
+}
+
+export function extractBarePatientName(raw: string): string | undefined {
+  const trimmed = raw.trim().replace(/[?.!]+$/, "");
+  const patterns = [
+    /^(?:e\s+)?(?:para|pro)\s+(.+)/i,
+    /^(?:paciente|benefici[aá]rio|pet|cliente|aluno)\s+(.+)/i,
+  ];
+  for (const pattern of patterns) {
+    const match = trimmed.match(pattern);
+    if (match?.[1]) {
+      return cleanupPersonName(match[1]);
+    }
+  }
+  if (
+    /^[A-Za-zÀ-ú][A-Za-zÀ-ú\s.'-]{2,50}$/.test(trimmed) &&
+    !/\b(amanha|amanhã|hoje|ontem|agendar|marcar|consulta|dra?|dr)\b/i.test(trimmed)
+  ) {
+    return trimmed;
+  }
+  return undefined;
+}
+
+function cleanupPersonName(value: string): string {
+  return value
+    .replace(/\s+com\b.+$/i, "")
+    .replace(/\s+(?:amanha|amanhã|hoje|ontem)\b.+$/i, "")
+    .replace(/\s+(?:as|às)\s+\d.+$/i, "")
+    .trim();
+}
+
+export function extractTimeOptional(text: string): string | undefined {
+  const m = text.match(/\b(\d{1,2}:\d{2})\b/);
+  if (m) return m[1];
+  const h = text.match(/\b(?:as|às)\s*(\d{1,2})\s*(?:h|horas?)\b/i);
+  if (h) return `${h[1].padStart(2, "0")}:00`;
+  const bareH = text.match(/\b(\d{1,2})\s*h\b/i);
+  if (bareH) return `${bareH[1].padStart(2, "0")}:00`;
+  return undefined;
 }
 
 export function extractCreateAppointmentArgs(raw: string): Record<string, unknown> {
-  const text = normalizeMockText(raw);
-  const patientName = extractSearchQuery(raw);
+  const dateHint = extractDateHint(raw);
+  const time = extractTimeOptional(raw);
+  const patientName = extractSearchQuery(raw) ?? extractBarePatientName(raw);
   const providerName = extractProviderName(raw);
   return {
-    date: defaultDateArg(text),
-    time: extractTime(raw),
     ...(patientName ? { patientName } : {}),
     ...(providerName ? { providerName } : {}),
+    ...(dateHint ? { date: dateHint } : {}),
+    ...(time ? { time } : {}),
   };
+}
+
+export function extractIncrementalArgs(tool: string, raw: string): Record<string, unknown> {
+  switch (tool) {
+    case "draft_create_appointment":
+    case "draft_book_appointment":
+      return extractCreateAppointmentArgs(raw);
+    case "draft_create_user": {
+      const email = extractEmail(raw);
+      const password = extractPassword(raw);
+      const name =
+        extractBarePatientName(raw) ??
+        raw.match(/(?:nome|chamado)\s+([A-Za-zÀ-ú][A-Za-zÀ-ú\s.'-]{2,60})/i)?.[1]?.trim();
+      return {
+        ...(name ? { name } : {}),
+        ...(email ? { email } : {}),
+        ...(password ? { password } : {}),
+        ...(extractRole(raw) !== "PRESTADOR" || /\b(prestador|interno|pj|benefici)/i.test(raw)
+          ? { role: extractRole(raw) }
+          : {}),
+      };
+    }
+    case "draft_create_patient": {
+      const full = extractCreatePatientArgs(raw);
+      if (full) return full;
+      const name = extractBarePatientName(raw);
+      return name ? { name } : {};
+    }
+    default:
+      return {};
+  }
+}
+
+export function isDraftContinuation(
+  raw: string,
+  lastTool: string | null,
+  hasActiveDraft: boolean,
+): boolean {
+  if (hasActiveDraft) return true;
+  if (!lastTool?.startsWith("draft_")) return false;
+
+  const t = normalizeMockText(raw);
+  if (extractDateHint(raw)) return true;
+  if (extractTimeOptional(raw)) return true;
+  if (extractProviderName(raw)) return true;
+  if (extractBarePatientName(raw)) return true;
+  if (extractSearchQuery(raw)) return true;
+  if (extractEmail(raw)) return true;
+  if (/\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\d{11}/.test(raw)) return true;
+  if (/^(e\s+)?(para|pro)\s+/i.test(raw.trim())) return true;
+  if (/\b(com\s+)?(dra?|dr)\.?\s+[a-z]/i.test(raw)) return true;
+  if (/^(nome|email|e-mail|senha|cpf)\b/i.test(t)) return true;
+  return isFollowUpPhrase(t);
 }
 
 export function extractEmail(text: string): string | null {
@@ -145,11 +243,7 @@ export function extractCreatePatientArgs(raw: string): Record<string, unknown> |
 }
 
 export function extractTime(text: string): string {
-  const m = text.match(/\b(\d{1,2}:\d{2})\b/);
-  if (m) return m[1];
-  const h = text.match(/\b(?:as|às|as)\s*(\d{1,2})\s*(?:h|horas?)\b/i);
-  if (h) return `${h[1].padStart(2, "0")}:00`;
-  return "09:00";
+  return extractTimeOptional(text) ?? "09:00";
 }
 
 export function defaultDateArg(text: string): string {

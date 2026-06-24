@@ -90,12 +90,29 @@ export type DraftToolResult = {
   href?: string;
 };
 
+export type IncompleteDraftResult = {
+  __assistant_incomplete: true;
+  tool: string;
+  missing: string[];
+  partial: Record<string, string>;
+  guidance: string;
+};
+
 export function isDraftToolResult(value: unknown): value is DraftToolResult {
   return (
     typeof value === "object" &&
     value !== null &&
     "__assistant_pending" in value &&
     (value as DraftToolResult).__assistant_pending === true
+  );
+}
+
+export function isIncompleteDraftResult(value: unknown): value is IncompleteDraftResult {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "__assistant_incomplete" in value &&
+    (value as IncompleteDraftResult).__assistant_incomplete === true
   );
 }
 

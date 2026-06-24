@@ -8,6 +8,11 @@ import { isAssignableRole } from "@/lib/user-service";
 import { isInternoProfile } from "@/lib/interno-permissions";
 import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
 import { getPrisma } from "@/lib/db";
+import {
+  buildIncompleteDraftResult,
+  buildResolveIncompleteResult,
+} from "@/lib/assistant/draft-response";
+import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
 
 function draftResult(input: {
   userId: string;
@@ -51,7 +56,7 @@ async function resolveProviderId(tenantId: string, providerId?: string, provider
     const match = providers.find((p) => norm(p.name).includes(query) || query.includes(norm(p.name)));
     return match?.id ?? null;
   }
-  return providers[0]?.id ?? null;
+  return null;
 }
 
 export const internoWriteTools: AssistantToolDefinition[] = [
@@ -81,7 +86,8 @@ export const internoWriteTools: AssistantToolDefinition[] = [
       };
 
       if (!data.name?.trim() || !data.email?.trim() || !data.password?.trim() || !data.role) {
-        return { error: "Informe nome, e-mail, senha e perfil." };
+        const missing = getMissingFieldsForTool("draft_create_user", data);
+        return buildIncompleteDraftResult("draft_create_user", data, ctx.labels, missing);
       }
 
       const role = data.role.toUpperCase();
@@ -140,7 +146,8 @@ export const internoWriteTools: AssistantToolDefinition[] = [
       };
 
       if (!data.name?.trim() || !data.cpf?.trim() || !data.birthDate) {
-        return { error: "Informe nome, CPF e data de nascimento." };
+        const missing = getMissingFieldsForTool("draft_create_patient", data);
+        return buildIncompleteDraftResult("draft_create_patient", data, ctx.labels, missing);
       }
 
       const birth = parseAssistantDate(data.birthDate);
@@ -198,15 +205,33 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         reason?: string;
       };
 
+      const missing = getMissingFieldsForTool("draft_create_appointment", data);
+      if (missing.length > 0) {
+        return buildIncompleteDraftResult("draft_create_appointment", data, ctx.labels, missing);
+      }
+
       const patientId = await resolvePatientId(ctx.user.tenantId, data.patientId, data.patientName);
       const providerId = await resolveProviderId(ctx.user.tenantId, data.providerId, data.providerName);
 
-      if (!patientId) return { error: `${ctx.labels.patient} não encontrado.` };
-      if (!providerId) return { error: `${ctx.labels.provider} não encontrado.` };
-      if (!data.date || !data.time) return { error: "Informe data e hora." };
+      if (!patientId) {
+        return buildResolveIncompleteResult(
+          "draft_create_appointment",
+          `${ctx.labels.patient} não encontrado.`,
+          data,
+          ctx.labels,
+        );
+      }
+      if (!providerId) {
+        return buildResolveIncompleteResult(
+          "draft_create_appointment",
+          `${ctx.labels.provider} não encontrado.`,
+          data,
+          ctx.labels,
+        );
+      }
 
-      const baseDate = parseAssistantDate(data.date);
-      const [hour, minute] = data.time.split(":").map(Number);
+      const baseDate = parseAssistantDate(data.date!);
+      const [hour, minute] = data.time!.split(":").map(Number);
       if (Number.isNaN(hour) || Number.isNaN(minute)) {
         return { error: "Hora inválida. Use HH:MM." };
       }

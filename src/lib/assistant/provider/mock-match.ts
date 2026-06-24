@@ -6,23 +6,30 @@ import {
   type MockIntentDef,
 } from "@/lib/assistant/provider/mock-intents";
 import {
-  defaultDateArg,
   dateRangeFromText,
+  defaultDateArg,
   extractCreateAppointmentArgs,
   extractCreatePatientArgs,
   extractCreateUserArgs,
+  extractIncrementalArgs,
   extractSearchQuery,
-  extractTime,
   followUpDate,
+  isDraftContinuation,
   isFollowUpPhrase,
 } from "@/lib/assistant/provider/mock-extractors";
-import { parseAssistantDate } from "@/lib/assistant/dates";
 import {
   getLastIntent,
+  getOperationDraft,
   rememberLastIntent,
+  rememberOperationDraft,
   resolveFollowUpTool,
   clearMockContext,
 } from "@/lib/assistant/provider/mock-context";
+import {
+  isDraftToolName,
+  mergeDraftArgs,
+  stripDraftMeta,
+} from "@/lib/assistant/provider/mock-draft-flow";
 import {
   matchesAnyTrigger,
   normalizeMockText,
@@ -63,6 +70,7 @@ function buildDefaultArgs(tool: string, raw: string, text: string): Record<strin
     case "list_available_slots":
       return { date: defaultDateArg(text) };
     case "draft_create_appointment":
+    case "draft_book_appointment":
       return extractCreateAppointmentArgs(raw);
     default:
       return {};
@@ -82,14 +90,36 @@ function matchSpecial(
   if (intent.special === "create_user") return extractCreateUserArgs(raw);
   if (intent.special === "create_patient") return extractCreatePatientArgs(raw);
   if (intent.special === "create_appointment") return extractCreateAppointmentArgs(raw);
-  if (intent.special === "book_appointment") {
-    const base = extractCreateAppointmentArgs(raw);
-    const date = parseAssistantDate(String(base.date ?? "hoje"));
-    const [hour, minute] = String(base.time ?? "09:00").split(":").map(Number);
-    date.setHours(hour, minute, 0, 0);
-    return { scheduledAt: date.toISOString(), reason: null };
-  }
+  if (intent.special === "book_appointment") return extractCreateAppointmentArgs(raw);
   return {};
+}
+
+function rememberDraftFromCall(userId: string, call: AssistantToolCall): void {
+  if (!isDraftToolName(call.name)) return;
+  const existing = getOperationDraft(userId);
+  const merged = mergeDraftArgs(existing?.args ?? {}, call.arguments);
+  rememberOperationDraft(userId, call.name, merged);
+}
+
+function tryDraftContinuation(
+  raw: string,
+  user: SessionUser,
+  toolNames: Set<string>,
+  lastTool: string | null,
+): AssistantToolCall | null {
+  const activeDraft = getOperationDraft(user.id);
+  if (!isDraftContinuation(raw, lastTool, Boolean(activeDraft))) return null;
+
+  const tool =
+    activeDraft?.tool ?? (lastTool && isDraftToolName(lastTool) ? lastTool : null);
+  if (!tool || !toolNames.has(tool)) return null;
+
+  const incoming = extractIncrementalArgs(tool, raw);
+  const merged = mergeDraftArgs(activeDraft?.args ?? {}, incoming);
+  rememberOperationDraft(user.id, tool, merged);
+  rememberLastIntent(user.id, tool);
+
+  return { name: tool, arguments: stripDraftMeta(merged) };
 }
 
 function matchIntentOnSegment(
@@ -101,7 +131,10 @@ function matchIntentOnSegment(
 ): AssistantToolCall | null {
   const text = normalizeMockText(segment);
 
-  if (isFollowUpPhrase(text) && lastTool && toolNames.has(lastTool)) {
+  const draftContinuation = tryDraftContinuation(rawSegment, user, toolNames, lastTool);
+  if (draftContinuation) return draftContinuation;
+
+  if (isFollowUpPhrase(text) && lastTool && toolNames.has(lastTool) && !isDraftToolName(lastTool)) {
     const date = followUpDate(text);
     if (date || text.length < 20) {
       return {
@@ -160,13 +193,25 @@ export function planMockFromIntents(
     if (match && !seen.has(match.name)) {
       calls.push(match);
       seen.add(match.name);
+      rememberDraftFromCall(user.id, match);
     }
   }
 
   if (calls.length === 0) {
+    const activeDraft = getOperationDraft(user.id);
+    if (activeDraft && toolNames.has(activeDraft.tool)) {
+      return {
+        toolCalls: [
+          {
+            name: activeDraft.tool,
+            arguments: stripDraftMeta(activeDraft.args),
+          },
+        ],
+      };
+    }
     return {
       toolCalls: [],
-      fallback: buildHelpFallback(user.role, toolNames),
+      fallback: buildHelpFallback(user.role, toolNames, activeDraft?.tool),
     };
   }
 
@@ -177,7 +222,16 @@ export function planMockFromIntents(
 
 export { clearMockContext };
 
-function buildHelpFallback(role: string, toolNames: Set<string>): string {
+function buildHelpFallback(role: string, toolNames: Set<string>, activeDraftTool?: string): string {
+  if (activeDraftTool === "draft_create_appointment") {
+    return [
+      "Continuando o agendamento — me diga o que falta:",
+      "• Nome do paciente (ex.: *para João Pereira*)",
+      "• Prestador (ex.: *com Dra. Helena*)",
+      "• Data e hora (ex.: *amanhã às 15h*)",
+    ].join("\n");
+  }
+
   const examples: Record<string, string[]> = {
     INTERNO: [
       "Agendamentos de hoje",
