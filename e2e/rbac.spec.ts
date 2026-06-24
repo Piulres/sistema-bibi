@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAs, openInternoNav } from "./helpers/auth";
+import { loginAs, internoNavLink, openInternoNav } from "./helpers/auth";
 
 test.describe("RBAC — perfil RECEPCAO", () => {
   test.beforeEach(async ({ page }) => {
@@ -10,11 +10,11 @@ test.describe("RBAC — perfil RECEPCAO", () => {
   test("nav limitada: agenda e cadastros, sem faturamento", async ({ page }) => {
     await page.goto("/interno/dashboard");
     const nav = await openInternoNav(page);
-    await expect(nav.getByRole("link", { name: "Agenda", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Cadastros", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Comunicação", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Faturamento", exact: true })).toHaveCount(0);
-    await expect(nav.getByRole("link", { name: "Integrações", exact: true })).toHaveCount(0);
+    await expect(internoNavLink(page, "/interno/agenda")).toBeVisible();
+    await expect(internoNavLink(page, "/interno/cadastros")).toBeVisible();
+    await expect(internoNavLink(page, "/interno/comunicacao")).toBeVisible();
+    await expect(internoNavLink(page, "/interno")).toHaveCount(0);
+    await expect(internoNavLink(page, "/interno/integracoes")).toHaveCount(0);
   });
 
   test("acesso direto a faturamento redireciona para dashboard", async ({ page }) => {
@@ -37,11 +37,11 @@ test.describe("RBAC — perfil FATURAMENTO", () => {
   test("nav limitada: faturamento e recorrência, sem cadastros", async ({ page }) => {
     await page.goto("/interno/dashboard");
     const nav = await openInternoNav(page);
-    await expect(nav.getByRole("link", { name: "Faturamento", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Recorrência", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Relatórios", exact: true })).toBeVisible();
-    await expect(nav.getByRole("link", { name: "Cadastros", exact: true })).toHaveCount(0);
-    await expect(nav.getByRole("link", { name: "Segurança", exact: true })).toHaveCount(0);
+    await expect(internoNavLink(page, "/interno")).toBeVisible();
+    await expect(internoNavLink(page, "/interno/assinaturas")).toBeVisible();
+    await expect(internoNavLink(page, "/interno/relatorios")).toBeVisible();
+    await expect(internoNavLink(page, "/interno/cadastros")).toHaveCount(0);
+    await expect(internoNavLink(page, "/interno/seguranca")).toHaveCount(0);
   });
 
   test("acesso direto a cadastros redireciona para dashboard", async ({ page }) => {

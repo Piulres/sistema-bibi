@@ -28,12 +28,10 @@ describe("Segurança — gestão de usuários (somente ADMIN)", () => {
       await setSessionForEmail("recepcao@bibi.health");
     });
 
-    it("recebe 403 ao listar usuários", async () => {
-      const res = await listUsersGet();
-      expect(res.status).toBe(403);
-    });
+    it("RECEPCAO pode listar usuários mas não criar ADMIN", async () => {
+      const list = await listUsersGet();
+      expect(list.status).toBe(200);
 
-    it("recebe 403 ao criar usuário interno ADMIN", async () => {
       const res = await createUserPost(
         new Request("http://localhost/api/interno/users", {
           method: "POST",

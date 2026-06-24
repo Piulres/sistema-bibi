@@ -285,14 +285,15 @@ export default function CadastrosView() {
     setBusy(`edit-company-${editingCompany.id}`);
     setMsg(null);
     try {
+      const original = companies.find((c) => c.id === editingCompany.id);
+      const statusChanged = Boolean(original && original.status !== editingCompany.status);
+
       const res = await fetch(`/api/interno/companies/${editingCompany.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: editingCompany.name,
           cnpj: editingCompany.cnpj,
-          status: editingCompany.status,
-          contractActive: editingCompany.contractActive,
           tradeName: editingCompany.tradeName,
           email: editingCompany.email,
           phone: editingCompany.phone,
@@ -306,12 +307,29 @@ export default function CadastrosView() {
         }),
       });
       const data = await res.json();
-      if (!res.ok) setMsg(data.error ?? "Erro ao atualizar");
-      else {
-        setMsg(`Empresa ${data.company.name} atualizada`);
-        setEditingCompany(null);
-        await load();
+      if (!res.ok) {
+        setMsg(data.error ?? "Erro ao atualizar");
+        return;
       }
+
+      if (statusChanged) {
+        const statusRes = await fetch(`/api/interno/companies/${editingCompany.id}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: editingCompany.status }),
+        });
+        const statusData = await statusRes.json();
+        if (!statusRes.ok) {
+          setMsg(statusData.error ?? "Dados salvos, mas falha ao atualizar status CRM");
+          setEditingCompany(null);
+          await load();
+          return;
+        }
+      }
+
+      setMsg(`Empresa ${data.company.name} atualizada`);
+      setEditingCompany(null);
+      await load();
     } finally {
       setBusy(null);
     }

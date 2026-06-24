@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireInternoAdmin, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoAdmin, requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { createUser, listUsers } from "@/lib/user-service";
 
 export async function GET() {
   try {
-    const user = await requireInternoAdmin();
+    const user = await requireInternoModule("cadastros");
     const users = await listUsers(user.tenantId);
     return NextResponse.json({ users });
   } catch (error) {

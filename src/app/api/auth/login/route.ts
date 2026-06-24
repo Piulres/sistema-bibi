@@ -13,21 +13,9 @@ import {
   validateUserSegmentAccess,
 } from "@/lib/segment/auth";
 import { persistSegmentCookie } from "@/lib/segment/cookie";
-import {
-  checkRateLimit,
-  clientIpFromRequest,
-  rateLimitResponse,
-} from "@/lib/security/rate-limit";
+import { enforceAuthRateLimit } from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {
-  const rate = checkRateLimit(`login:${clientIpFromRequest(request)}`, {
-    limit: 10,
-    windowMs: 15 * 60 * 1000,
-  });
-  if (!rate.allowed) {
-    return rateLimitResponse(rate.retryAfterSeconds);
-  }
-
   let body: { email?: string; password?: string; portal?: string; tenantSlug?: string };
   try {
     body = await request.json();
@@ -58,11 +46,16 @@ export async function POST(request: Request) {
   });
 
   if (!user || !verifyPassword(password, user.password)) {
+    const blocked = enforceAuthRateLimit(request, "login", true);
+    if (blocked) return blocked;
     return NextResponse.json(
       { error: "E-mail ou senha incorretos" },
       { status: 401 },
     );
   }
+
+  const blocked = enforceAuthRateLimit(request, "login", false);
+  if (blocked) return blocked;
 
   if (user.role !== portalConfig.role) {
     return NextResponse.json(

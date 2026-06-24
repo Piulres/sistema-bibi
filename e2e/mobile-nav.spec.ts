@@ -34,7 +34,7 @@ test.describe("navegação responsiva", () => {
 
     await expect(page.getByRole("button", { name: /resumo/i })).toBeVisible();
     await page.getByRole("button", { name: /resumo/i }).click();
-    const drawer = page.getByRole("navigation", { name: "Módulos do beneficiário" });
+    const drawer = page.getByRole("navigation", { name: "Módulos do portal" });
     await expect(drawer).toBeVisible();
     await drawer.getByRole("link", { name: "Faturas" }).click();
     await expect(page).toHaveURL(/\/beneficiario\/faturas/);

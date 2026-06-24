@@ -30,6 +30,13 @@ export async function loginAs(
   await page.waitForURL(DASHBOARD_PATTERNS[portal]);
 }
 
+/** Link de módulo interno por rota (estável entre nichos / labels dinâmicos). */
+export function internoNavLink(page: Page, href: string) {
+  return page
+    .getByRole("navigation", { name: "Navegação por abas" })
+    .locator(`a[href="${href}"]`);
+}
+
 /** Abas do portal interno em desktop (≥ lg). */
 export function internoNav(page: Page) {
   return page.getByRole("navigation", { name: "Navegação por abas" });

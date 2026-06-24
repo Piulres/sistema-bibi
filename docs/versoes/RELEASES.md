@@ -26,7 +26,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.0.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.0.0** — idem |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3abdc1` @ `b661b39` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (segurança pós-POC) |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
