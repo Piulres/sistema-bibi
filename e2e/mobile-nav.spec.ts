@@ -1,6 +1,24 @@
 import { test, expect } from "@playwright/test";
 import { loginAs, internoNav, internoNavDrawer } from "./helpers/auth";
 
+test.describe("landing mobile menu", () => {
+  test("home: drawer exibe links de navegação em tela cheia", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    await page.getByRole("button", { name: /abrir menu/i }).click();
+    const drawer = page.getByRole("dialog", { name: /menu de navegação/i });
+    await expect(drawer).toBeVisible();
+
+    const box = await drawer.boundingBox();
+    expect(box?.height ?? 0).toBeGreaterThan(300);
+
+    await expect(drawer.getByRole("navigation", { name: /seções da landing/i })).toBeVisible();
+    await expect(drawer.getByRole("link", { name: /entrar/i })).toBeVisible();
+    await expect(drawer.getByRole("link", { name: /acessar portais/i })).toBeVisible();
+  });
+});
+
 test.describe("navegação responsiva", () => {
   test("interno: drawer mobile lista White Label", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
