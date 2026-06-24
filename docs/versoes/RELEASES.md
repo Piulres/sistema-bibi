@@ -13,7 +13,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3b8607` @ `22a5b1d` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3b8768` @ `21bc72c` |
 | **Versão anterior em produção** | **2.0.0** — deploy `6a3b711d` @ `9944783` |
 | **Commit release v2.1** | `22a5b1d` |
 | `main` / `dev` | **v2.1.0** — sincronizadas |
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.1.0** — Sistema Bibi - ServiceOS |
 | **Release** | `main` | **v2.1.0** — após merge desta release |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3b8607` @ `22a5b1d` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3b8768` @ `21bc72c` |
 | **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
 
 ### Tags git (histórico)
@@ -53,7 +53,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.1.0` |
 | **PRs** | [#126](https://github.com/Piulres/sistema-bibi/pull/126)–[#133](https://github.com/Piulres/sistema-bibi/pull/133), [#129](https://github.com/Piulres/sistema-bibi/pull/129)–[#132](https://github.com/Piulres/sistema-bibi/pull/132), [#131](https://github.com/Piulres/sistema-bibi/pull/131) |
 | **Doc** | [`V2_1.md`](V2_1.md) |
-| **Publicado em** | 24/06/2026 — deploy Netlify `6a3b8607` @ `22a5b1d` |
+| **Publicado em** | 24/06/2026 — deploy Netlify `6a3b8768` @ `21bc72c` |
 
 **Inclui (além de v2.0.0):**
 

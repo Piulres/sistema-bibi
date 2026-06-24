@@ -15,7 +15,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app |
-| Pacote em produção | **`v2.1.0`** — deploy `6a3b8607` @ `22a5b1d` |
+| Pacote em produção | **`v2.1.0`** — deploy `6a3b8768` @ `21bc72c` |
 | Pacote anterior | **`v2.0.0`** — deploy `6a3b711d` @ `9944783` |
 | `main` / `dev` | Sincronizadas em **`22a5b1d`** |
 | Build local `npm run netlify:build` | ✅ Passa |
