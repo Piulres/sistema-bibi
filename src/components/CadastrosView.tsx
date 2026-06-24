@@ -24,13 +24,14 @@ import {
   emptyUserProfessional,
 } from "@/components/cadastros/CadastroExtraFields";
 import ProtocolTemplatesPanel from "@/components/ProtocolTemplatesPanel";
+import CadastrosPetsTab from "@/components/cadastros/CadastrosPetsTab";
 import ImportInterchangePanel from "@/components/cadastros/ImportInterchangePanel";
 import { useLabels } from "@/hooks/useLabels";
 import { useFormUndo } from "@/hooks/useFormUndo";
 import { useToast } from "@/components/ui/Toast";
 import { buildCadastrosTabs } from "@/lib/navigation/niche-nav";
 
-type Tab = "patients" | "companies" | "procedures" | "pricing" | "protocols" | "users" | "operations";
+type Tab = "patients" | "pets" | "companies" | "procedures" | "pricing" | "protocols" | "users" | "operations";
 
 const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
@@ -706,6 +707,8 @@ export default function CadastrosView() {
           </Card>
         </div>
       )}
+
+      {tab === "pets" && <CadastrosPetsTab />}
 
       {tab === "companies" && (
         <div className="grid gap-6 lg:grid-cols-2">

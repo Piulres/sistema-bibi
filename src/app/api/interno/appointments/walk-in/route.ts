@@ -13,6 +13,8 @@ export async function POST(request: Request) {
       providerId: string;
       scheduledAt: string;
       reason?: string | null;
+      petName?: string | null;
+      petSpecies?: string | null;
     };
 
     const result = await walkInAndSchedule({
@@ -25,6 +27,8 @@ export async function POST(request: Request) {
       scheduledAt: new Date(body.scheduledAt),
       reason: body.reason,
       createdBy: user.id,
+      petName: body.petName,
+      petSpecies: body.petSpecies,
     });
 
     if ("error" in result) {

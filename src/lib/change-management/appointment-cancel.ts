@@ -4,6 +4,8 @@ import { buildChangeMetadata } from "@/lib/change-management/metadata";
 import { newCorrelationId } from "@/lib/change-management/run-change";
 import { createAppointment } from "@/lib/appointment-service";
 import { createPatient } from "@/lib/patient-service";
+import { createPet } from "@/lib/pet-service";
+import { requiresPet } from "@/lib/vet-niche";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 
 /** Walk-in atômico: beneficiário + agendamento com correlationId compartilhado. */
@@ -17,8 +19,16 @@ export async function walkInAndSchedule(input: {
   scheduledAt: Date;
   reason?: string | null;
   createdBy: string;
+  petName?: string | null;
+  petSpecies?: string | null;
 }) {
   const correlationId = newCorrelationId();
+  const prisma = await getPrisma();
+  const tenant = await prisma.tenant.findFirst({
+    where: { id: input.tenantId },
+    select: { niche: true },
+  });
+  const isVet = requiresPet(tenant?.niche);
 
   const patientResult = await createPatient({
     tenantId: input.tenantId,
@@ -32,9 +42,26 @@ export async function walkInAndSchedule(input: {
   });
   if ("error" in patientResult) return patientResult;
 
+  let petId: string | null = null;
+  if (isVet) {
+    if (!input.petName?.trim() || !input.petSpecies) {
+      return { error: "Informe nome e espécie do pet para walk-in veterinário" as const };
+    }
+    const petResult = await createPet({
+      tenantId: input.tenantId,
+      patientId: patientResult.patient.id,
+      name: input.petName.trim(),
+      species: input.petSpecies,
+      createdBy: input.createdBy,
+    });
+    if ("error" in petResult) return petResult;
+    petId = petResult.pet.id;
+  }
+
   const apptResult = await createAppointment({
     tenantId: input.tenantId,
     patientId: patientResult.patient.id,
+    petId,
     providerId: input.providerId,
     scheduledAt: input.scheduledAt,
     reason: input.reason,

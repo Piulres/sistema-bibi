@@ -81,7 +81,7 @@ function mapExamOrder(
 export async function listPatientExamOrders(
   patientId: string,
   tenantId: string,
-  options?: { status?: ExamOrderStatus; appointmentId?: string },
+  options?: { status?: ExamOrderStatus; appointmentId?: string; petId?: string; tutorOnly?: boolean },
 ): Promise<ExamOrderView[]> {
   const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
@@ -94,6 +94,8 @@ export async function listPatientExamOrders(
       patientId,
       ...(options?.status ? { status: options.status } : {}),
       ...(options?.appointmentId ? { appointmentId: options.appointmentId } : {}),
+      ...(options?.petId ? { petId: options.petId } : {}),
+      ...(options?.tutorOnly ? { petId: null } : {}),
     },
     include: {
       provider: { select: { name: true } },
@@ -110,6 +112,7 @@ export async function createExamOrder(input: {
   tenantId: string;
   providerId: string;
   appointmentId?: string | null;
+  petId?: string | null;
   procedureId?: string | null;
   examName: string;
   clinicalIndication?: string | null;
@@ -117,6 +120,13 @@ export async function createExamOrder(input: {
 }): Promise<ExamOrderView> {
   const prisma = await getPrisma();
   let examName = input.examName.trim();
+
+  if (input.petId) {
+    const pet = await prisma.pet.findFirst({
+      where: { id: input.petId, tenantId: input.tenantId, patientId: input.patientId },
+    });
+    if (!pet) throw new Error("Pet não encontrado");
+  }
 
   if (input.procedureId) {
     const procedure = await prisma.procedure.findFirst({
@@ -129,6 +139,7 @@ export async function createExamOrder(input: {
   const row = await prisma.examOrder.create({
     data: {
       patientId: input.patientId,
+      petId: input.petId ?? null,
       providerId: input.providerId,
       appointmentId: input.appointmentId ?? null,
       procedureId: input.procedureId ?? null,

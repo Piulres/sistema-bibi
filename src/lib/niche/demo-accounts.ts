@@ -8,6 +8,8 @@ export type SegmentTenantRef = {
   tenant: string;
   internoEmail: string;
   providerEmail: string;
+  beneficiaryEmail: string;
+  pjEmail: string;
 };
 
 /** Referência canônica dos tenants demo por segmento (espelha o seed). */
@@ -18,6 +20,8 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     tenant: "Clínica Horizonte",
     internoEmail: "faturamento@bibi.health",
     providerEmail: "dra.helena@bibi.health",
+    beneficiaryEmail: "joao.pereira@email.com",
+    pjEmail: "rh@techcorp.com",
   },
   {
     niche: "VET",
@@ -25,6 +29,8 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     tenant: "PetCare",
     internoEmail: "operacao@petcare.demo",
     providerEmail: "dr.rafael@petcare.demo",
+    beneficiaryEmail: "tutor@petcare.demo",
+    pjEmail: "rh@techpet.demo",
   },
   {
     niche: "DENTAL",
@@ -32,6 +38,8 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     tenant: "Smile Odonto",
     internoEmail: "operacao@smile.demo",
     providerEmail: "dra.camila@smile.demo",
+    beneficiaryEmail: "paciente@smile.demo",
+    pjEmail: "rh@corpodont.demo",
   },
   {
     niche: "LEGAL",
@@ -39,6 +47,8 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     tenant: "Lex & Partners",
     internoEmail: "operacao@lex.demo",
     providerEmail: "dr.andre@lex.demo",
+    beneficiaryEmail: "cliente@lex.demo",
+    pjEmail: "rh@assjur.demo",
   },
   {
     niche: "SPA",
@@ -46,6 +56,8 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     tenant: "Zen Studio",
     internoEmail: "operacao@zen.demo",
     providerEmail: "instrutora.lia@zen.demo",
+    beneficiaryEmail: "cliente@zen.demo",
+    pjEmail: "rh@wellcorp.demo",
   },
   {
     niche: "EDUCATION",
@@ -53,6 +65,8 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     tenant: "EduPrime",
     internoEmail: "operacao@eduprime.demo",
     providerEmail: "prof.marcos@eduprime.demo",
+    beneficiaryEmail: "aluno@eduprime.demo",
+    pjEmail: "rh@educorp.demo",
   },
 ];
 
