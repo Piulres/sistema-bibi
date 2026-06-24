@@ -5,9 +5,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import type { PortalKey } from "@/lib/roles";
-import type { NicheDemoAccount } from "@/lib/niche/demo-accounts";
-import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
 import type { LoginSegmentContext } from "@/lib/segment/login-context";
+import {
+  PORTAL_LOGIN_PATHS,
+  type LoginNicheDemoOption,
+} from "@/lib/segment/login-demo";
+import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
+import { appendSegmentToPath } from "@/lib/segment/types";
+import { segmentPillStyle } from "@/lib/theme/segment-colors";
 import { PLATFORM } from "@/lib/platform";
 import SegmentContextBanner from "@/components/segment/SegmentContextBanner";
 import SegmentCookiePersist from "@/components/segment/SegmentCookiePersist";
@@ -26,7 +31,7 @@ type Props = {
   demoPassword: string;
   branding: BrandingTokens;
   segmentContext?: LoginSegmentContext;
-  nicheDemos?: NicheDemoAccount[];
+  nicheDemos?: LoginNicheDemoOption[];
 };
 
 export default function LoginForm({
@@ -113,7 +118,10 @@ export default function LoginForm({
   return (
     <TenantTheme branding={branding} portal={portal} className="flex flex-1 flex-col">
       <Suspense fallback={null}>
-        <SegmentCookiePersist />
+        <SegmentCookiePersist
+          tenantSlug={segmentContext?.tenantSlug}
+          niche={segmentContext?.niche}
+        />
       </Suspense>
       <main className="flex flex-1 items-center justify-center px-6 py-12">
         <div className="w-full max-w-md">
@@ -220,23 +228,27 @@ export default function LoginForm({
                 {nicheDemos && nicheDemos.length > 0 && (
                   <div className="mt-3 space-y-2">
                     <p className="text-xs font-medium text-[var(--text-secondary)]">
-                      {PLATFORM.versionLabel} — experimente outro nicho:
+                      {PLATFORM.versionLabel} — experimente outro segmento:
                     </p>
                     <div className="flex flex-wrap gap-1.5">
-                      {nicheDemos.map((demo) => (
-                        <button
-                          key={demo.niche}
-                          type="button"
-                          onClick={() => setEmail(demo.internoEmail)}
-                          className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
-                            email === demo.internoEmail
-                              ? "border-[var(--brand-primary)] bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]"
-                              : "border-[var(--border-default)] text-[var(--text-secondary)]"
-                          }`}
-                        >
-                          {nicheDemoLabel(demo.niche)} · {demo.tenant}
-                        </button>
-                      ))}
+                      {nicheDemos.map((demo) => {
+                        const isActive = segmentContext?.tenantSlug === demo.slug;
+                        return (
+                          <Link
+                            key={demo.niche}
+                            href={appendSegmentToPath(PORTAL_LOGIN_PATHS[portal], {
+                              tenantSlug: demo.slug,
+                            })}
+                            className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
+                              isActive ? "shadow-sm" : "bg-transparent"
+                            }`}
+                            style={segmentPillStyle(demo.niche, isActive)}
+                            aria-current={isActive ? "page" : undefined}
+                          >
+                            {nicheDemoLabel(demo.niche)} · {demo.tenant}
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

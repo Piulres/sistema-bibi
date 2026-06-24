@@ -3,12 +3,14 @@ import { headers } from "next/headers";
 import { getPrisma } from "@/lib/db";
 import { getDefaultLabels } from "@/lib/niche/defaults";
 import { mergeNicheLabels } from "@/lib/niche/labels";
+import { segmentTenantBySlug } from "@/lib/niche/demo-accounts";
 import { isNicheId, type NicheId, type NicheLabels } from "@/lib/niche/types";
 import {
   resolveTenantIdFromHost,
   resolveTenantIdFromSlug,
 } from "@/lib/tenant-resolver";
 import { readSegmentCookie, readSegmentCookieFromRequest } from "@/lib/segment/cookie";
+import { ensureDataStoreForSegmentAccess } from "@/lib/data-store/ensure-data-store-for-segment";
 import type { ResolvedSegment } from "@/lib/segment/types";
 
 export type ResolvedSegmentContext = ResolvedSegment & {
@@ -71,6 +73,25 @@ export async function resolveSegmentContext(options?: {
     if (tenantSlug) {
       const tenantId = await resolveTenantIdFromSlug(tenantSlug);
       if (tenantId) return loadTenantSegment(tenantId);
+
+      const canonical = segmentTenantBySlug(tenantSlug);
+      if (canonical) {
+        return {
+          niche: canonical.niche,
+          tenantId: null,
+          tenantSlug: canonical.slug,
+          tenantName: canonical.tenant,
+          labels: getDefaultLabels(canonical.niche),
+        };
+      }
+
+      return {
+        niche: "MEDICAL",
+        tenantId: null,
+        tenantSlug,
+        tenantName: null,
+        labels: getDefaultLabels("MEDICAL"),
+      };
     }
 
     const fromCookie = options?.cookieSegment;
@@ -123,6 +144,8 @@ export async function resolveSegmentFromHeaders(options?: {
   tenantSlug?: string | null;
   nicheParam?: string | null;
 }): Promise<ResolvedSegmentContext> {
+  await ensureDataStoreForSegmentAccess(options?.tenantSlug, options?.nicheParam);
+
   const h = await headers();
   const cookieSegment = await readSegmentCookie();
   return resolveSegmentContext({
@@ -135,12 +158,15 @@ export async function resolveSegmentFromHeaders(options?: {
 
 export async function resolveSegmentFromLoginRequest(
   request: Request,
-  body?: { tenantSlug?: string | null },
+  body?: { tenantSlug?: string | null; nicheParam?: string | null },
 ): Promise<ResolvedSegmentContext> {
+  await ensureDataStoreForSegmentAccess(body?.tenantSlug, body?.nicheParam);
+
   const cookieSegment = readSegmentCookieFromRequest(request);
   return resolveSegmentContext({
     host: request.headers.get("host"),
     tenantSlug: body?.tenantSlug ?? null,
+    nicheParam: body?.nicheParam ?? null,
     cookieSegment,
   });
 }
