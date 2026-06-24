@@ -382,6 +382,9 @@ export const MOCK_INTENTS: readonly MockIntentDef[] = [
     triggers: T([
       "agendar",
       "marcar consulta",
+      "marcar uma consulta",
+      "preciso marcar",
+      "quero marcar uma consulta",
       "marcar atendimento",
       "criar agendamento",
       "novo agendamento",

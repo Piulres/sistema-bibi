@@ -8,6 +8,7 @@ import {
 import {
   defaultDateArg,
   dateRangeFromText,
+  extractCreateAppointmentArgs,
   extractCreatePatientArgs,
   extractCreateUserArgs,
   extractSearchQuery,
@@ -15,6 +16,7 @@ import {
   followUpDate,
   isFollowUpPhrase,
 } from "@/lib/assistant/provider/mock-extractors";
+import { parseAssistantDate } from "@/lib/assistant/dates";
 import {
   getLastIntent,
   rememberLastIntent,
@@ -61,11 +63,7 @@ function buildDefaultArgs(tool: string, raw: string, text: string): Record<strin
     case "list_available_slots":
       return { date: defaultDateArg(text) };
     case "draft_create_appointment":
-      return {
-        date: defaultDateArg(text),
-        time: extractTime(raw),
-        patientName: extractSearchQuery(raw) ?? undefined,
-      };
+      return extractCreateAppointmentArgs(raw);
     default:
       return {};
   }
@@ -83,6 +81,14 @@ function matchSpecial(
 ): Record<string, unknown> | null {
   if (intent.special === "create_user") return extractCreateUserArgs(raw);
   if (intent.special === "create_patient") return extractCreatePatientArgs(raw);
+  if (intent.special === "create_appointment") return extractCreateAppointmentArgs(raw);
+  if (intent.special === "book_appointment") {
+    const base = extractCreateAppointmentArgs(raw);
+    const date = parseAssistantDate(String(base.date ?? "hoje"));
+    const [hour, minute] = String(base.time ?? "09:00").split(":").map(Number);
+    date.setHours(hour, minute, 0, 0);
+    return { scheduledAt: date.toISOString(), reason: null };
+  }
   return {};
 }
 

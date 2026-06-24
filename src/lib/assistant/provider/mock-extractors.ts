@@ -25,6 +25,7 @@ export function extractSearchQuery(raw: string): string | null {
     /(?:buscar|procurar|encontrar|pesquisar|localizar)\s+(?:o\s+|a\s+)?(?:paciente|benefici[aá]rio|pet|cliente|aluno|usuario|usu[aá]rio|pessoa)?\s*[:\-]?\s*(.+)/i,
     /(?:nome|cpf)\s*(?:do|da|de)?\s*[:\-]?\s*(.+)/i,
     /(?:paciente|benefici[aá]rio|pet|cliente|aluno)\s+(?:chamado|nome|de nome)?\s*[:\-]?\s*(.+)/i,
+    /(?:para|pro)\s+([A-Za-zÀ-ú][A-Za-zÀ-ú\s.'-]{1,60}?)(?=\s+com\b|\s+amanha|\s+amanhã|\s+hoje|\s+ontem|\s+(?:as|às)\s+|\s+\d{1,2}:\d{2}|\s+\d{1,2}\s*h|$)/i,
     /(?:quem e|quem é)\s+(.+)/i,
   ];
   for (const pattern of patterns) {
@@ -35,6 +36,25 @@ export function extractSearchQuery(raw: string): string | null {
     }
   }
   return null;
+}
+
+export function extractProviderName(raw: string): string | undefined {
+  const match = raw.match(
+    /\bcom\s+(?:a\s+|o\s+)?((?:dra?|dr)\.?\s+[A-Za-zÀ-ú][A-Za-zÀ-ú\s.]{1,40}?)(?=\s+amanha|\s+amanhã|\s+hoje|\s+ontem|\s+(?:as|às)\s+|\s+\d{1,2}:\d{2}|\s+\d{1,2}\s*h|$)/i,
+  );
+  return match?.[1]?.trim();
+}
+
+export function extractCreateAppointmentArgs(raw: string): Record<string, unknown> {
+  const text = normalizeMockText(raw);
+  const patientName = extractSearchQuery(raw);
+  const providerName = extractProviderName(raw);
+  return {
+    date: defaultDateArg(text),
+    time: extractTime(raw),
+    ...(patientName ? { patientName } : {}),
+    ...(providerName ? { providerName } : {}),
+  };
 }
 
 export function extractEmail(text: string): string | null {

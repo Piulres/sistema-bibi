@@ -38,8 +38,17 @@ async function resolvePatientId(tenantId: string, patientId?: string, patientNam
 async function resolveProviderId(tenantId: string, providerId?: string, providerName?: string) {
   if (providerId) return providerId;
   const providers = await listProviders(tenantId);
+  const norm = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "")
+      .replace(/\./g, "")
+      .replace(/\s+/g, " ")
+      .trim();
   if (providerName) {
-    const match = providers.find((p) => p.name.toLowerCase().includes(providerName.toLowerCase()));
+    const query = norm(providerName);
+    const match = providers.find((p) => norm(p.name).includes(query) || query.includes(norm(p.name)));
     return match?.id ?? null;
   }
   return providers[0]?.id ?? null;
