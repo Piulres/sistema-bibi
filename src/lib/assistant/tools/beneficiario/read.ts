@@ -25,7 +25,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         nextAppointment: overview.nextAppointment,
         openInvoices: overview.invoices.filter((i) => i.status !== "PAGA").length,
         subscriptions: overview.subscriptions.length,
-        pendingUsages: overview.pendingUsages.length,
+        pendingUsages: overview.usages.filter((u) => !u.billed).length,
       };
     },
   },

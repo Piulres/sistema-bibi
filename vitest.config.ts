@@ -23,6 +23,8 @@ export default defineConfig({
       CRON_SECRET: "test-cron-secret",
       PAYMENT_GATEWAY: "mock",
       COMMUNICATION_PROVIDER: "console",
+      ASSISTANT_ENABLED: "true",
+      ASSISTANT_PROVIDER: "mock",
     },
   },
 });
