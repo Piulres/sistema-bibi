@@ -104,9 +104,32 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 | `MobileNavDrawer` | Drawer de rotas (interno) |
 | `MobileSectionDrawer` | Drawer de seções (PJ, beneficiário) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
-| `LandingMobileMenu` | Menu hamburger da landing |
+| `LandingMobileMenu` | Menu hamburger da landing — overlay via portal (ver abaixo) |
 
 Config de menus e rótulos: `src/lib/navigation/routes.ts`.
+
+### Navegação mobile (drawers)
+
+Breakpoint **`lg` (1024px)**. Abaixo de `lg`, portais autenticados trocam `NavTabs` / faixa rolável por drawer; a landing usa hamburger.
+
+| Componente | Onde | Overlay `fixed` | Portal (`document.body`) |
+|------------|------|-----------------|--------------------------|
+| `LandingMobileMenu` | `LandingHeader` (home e `/segmentos/*`) | z-60 backdrop · z-70 painel | ✅ obrigatório |
+| `MobileSectionDrawer` | PJ, beneficiário (`SectionNav`) | z-60 | ✅ |
+| `MobileNavDrawer` | Interno, prestador (`InternoNav`, `PrestadorNav`) | z-40 / z-50 | ❌ inline no shell |
+
+**Pitfall — `backdrop-blur` quebra `position: fixed`:** `LandingHeader` é `sticky top-0 z-50` com `backdrop-blur-xl`. Propriedades `filter` / `backdrop-filter` (e também `transform`, `perspective`) criam um **containing block** para descendentes `fixed` — o drawer ficava preso à altura do header (~só a barra "Menu" visível).
+
+**Regra para novos overlays full-screen:** se o trigger vive dentro de ancestral com blur/filtro/transform, renderize overlay + painel com `createPortal(..., document.body)` e z-index **acima** do header sticky (`z-[60]`/`z-[70]` na landing).
+
+```tsx
+// LandingMobileMenu.tsx — padrão adotado
+{typeof document !== "undefined" && drawer && createPortal(drawer, document.body)}
+```
+
+Comportamento compartilhado dos drawers: `Escape` fecha e devolve foco ao trigger; `document.body.style.overflow = "hidden"` enquanto aberto; `role="dialog"` + `aria-modal`; animação `ds-nav-drawer-enter` (`globals.css`).
+
+**Regressão E2E:** `e2e/mobile-nav.spec.ts` — home em viewport 390×844: drawer com altura > 300px e links "Entrar" / "Acessar portais" visíveis; demais portais validam drawer mobile.
 
 ## Uso em páginas
 

@@ -27,6 +27,8 @@ Referências: `@AGENTS.md` · `@docs/plataforma/ARQUITETURA.md` · `@docs/plataf
 - Tokens: `src/app/globals.css` (`--brand-*`, `--surface-*`)
 - White label: `TenantBranding` + `TenantTheme`
 - E2E interno: escopar nav com `getByRole('navigation', { name: 'Navegação por abas' })`
+- Drawers mobile (`< lg`): `LandingMobileMenu` e `MobileSectionDrawer` usam `createPortal(document.body)` — ancestrais com `backdrop-blur`/`filter`/`transform` prendem `position: fixed`; ver `DESIGN_SYSTEM.md` § Navegação mobile
+- E2E drawers: `e2e/mobile-nav.spec.ts` (landing: bounding box altura > 300px)
 
 ## Padrões de API
 

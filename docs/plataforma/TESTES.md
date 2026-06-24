@@ -246,6 +246,40 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `mobile-nav.spec.ts` | Landing drawer (altura full-screen, links CTAs) + drawers mobile interno, PJ, beneficiário e prestador |
+
+Helpers: `e2e/helpers/auth.ts` — `internoNav`, `internoNavDrawer` (abre drawer se necessário).
+
+---
+
+## CI (GitHub Actions)
+
+Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
+
+1. **unit-integration-api** — `lint` → `docs:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
+2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)
+
+**Variáveis globais do workflow** (obrigatórias — Prisma falha sem `DATABASE_URL`):
+
+| Variável | Valor CI |
+|----------|----------|
+| `DATABASE_URL` | `file:./dev.db` (relativo ao `schema.prisma`) |
+| `SESSION_SECRET` | secret de 32+ chars para testes |
+| `CRON_SECRET` | secret de 32+ chars para testes |
+| `SEED_SCALE` | `small` (seed rápido) |
+
+**Espelhar CI localmente:**
+
+```bash
+npm run lint && npm run docs:verify
+SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
+npm run test && npm run build
+CI=true npm run test:e2e
+```
+
+`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+
+> Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
 ---
 
