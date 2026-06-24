@@ -36,7 +36,7 @@ export default function LandingHomePageView({ branding }: Props) {
       <LandingJsonLd branding={branding} />
       <LandingHeader branding={branding} context="home" />
       <main id="conteudo-principal" className="flex-1">
-        <LandingHeroProduct branding={branding} />
+        <LandingHeroProduct />
         <LandingStats />
         <LandingHomeProduct />
         <LandingHomeVision />
