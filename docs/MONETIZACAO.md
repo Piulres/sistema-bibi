@@ -1,6 +1,6 @@
 # Estratégia de Monetização — Sistema Bibi
 
-Documento que descreve **onde o HealthOS gera receita**, alinhado ao posicionamento
+Documento que descreve **onde o ServiceOS gera receita**, alinhado ao posicionamento
 de infraestrutura financeira e clínica para saúde corporativa Pay Per Use.
 
 > **Contexto de mercado:** [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) ·
@@ -61,7 +61,7 @@ recomendada: **0,5% a 2%** do valor transacionado, configurável por tenant.
 
 **Exemplo comercial (500 vidas, ~7% uso, consulta R$ 340):** volume transacionado
 ~R$ 11.560/mês; take rate de 1% ≈ R$ 116 — somado à taxa de plataforma compõe
-a receita do HealthOS sem inflar o custo do cliente (ROI ~91% vs plano tradicional
+a receita do ServiceOS sem inflar o custo do cliente (ROI ~91% vs plano tradicional
 de R$ 175.000/mês).
 
 ---

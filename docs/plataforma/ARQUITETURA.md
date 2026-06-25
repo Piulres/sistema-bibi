@@ -369,7 +369,7 @@ sequenceDiagram
 
 ## 3.1 Price Snapshot — `ProcedureUsage` como coração do sistema
 
-A entidade **`ProcedureUsage`** é o coração do HealthOS: cada linha representa um
+A entidade **`ProcedureUsage`** é o coração do ServiceOS: cada linha representa um
 evento clínico-financeiro irreversível — procedimento utilizado, preço congelado,
 status de faturamento. Sem ela não há Pay Per Use, transparência para o RH nem
 margem auditável para a clínica. Todo o restante (fatura, PIX, Portal PJ) deriva
