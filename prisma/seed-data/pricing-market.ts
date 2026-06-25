@@ -1,12 +1,12 @@
 import type { SeedCompany } from "./companies";
 
-/** Catálogo base — referência mercado privado/corporativo BR (2024–2025, clínica média). */
+/** Catálogo base — referência mercado privado/corporativo BR (2026, faixa R$ 300–500 consultas). */
 export const BASE_PROCEDURES = [
-  { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 320, tissCode: "10101012" },
-  { code: "CON-CAR", name: "Consulta Cardiologia", category: "CONSULTA", basePrice: 420, tissCode: "10101039" },
-  { code: "CON-DER", name: "Consulta Dermatologia", category: "CONSULTA", basePrice: 380, tissCode: "10101047" },
-  { code: "CON-PSI", name: "Consulta Psicologia", category: "CONSULTA", basePrice: 280, tissCode: "10101063" },
-  { code: "CON-OFT", name: "Consulta Oftalmologia", category: "CONSULTA", basePrice: 350, tissCode: "10101055" },
+  { code: "CON-CLM", name: "Consulta Clínica Médica", category: "CONSULTA", basePrice: 400, tissCode: "10101012" },
+  { code: "CON-CAR", name: "Consulta Cardiologia", category: "CONSULTA", basePrice: 500, tissCode: "10101039" },
+  { code: "CON-DER", name: "Consulta Dermatologia", category: "CONSULTA", basePrice: 450, tissCode: "10101047" },
+  { code: "CON-PSI", name: "Consulta Psicologia", category: "CONSULTA", basePrice: 300, tissCode: "10101063" },
+  { code: "CON-OFT", name: "Consulta Oftalmologia", category: "CONSULTA", basePrice: 420, tissCode: "10101055" },
   { code: "EXA-HEM", name: "Hemograma Completo", category: "EXAME", basePrice: 48, tissCode: "40304361" },
   { code: "EXA-ECG", name: "Eletrocardiograma", category: "EXAME", basePrice: 95, tissCode: "40101010" },
   { code: "EXA-USG", name: "Ultrassonografia Abdominal", category: "EXAME", basePrice: 220, tissCode: "40901106" },
