@@ -35,22 +35,22 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
   test("nav exibe todos os módulos para admin", async ({ page }) => {
     await page.goto("/interno/dashboard");
     const nav = await openInternoNav(page);
-    for (const label of [
-      "Dashboard",
-      "Faturamento",
-      "Agenda",
-      "Cadastros",
-      "Estoque",
-      "CRM Corporativo",
-      "Recorrência",
-      "Comunicação",
-      "Relatórios",
-      "Auditoria",
-      "White Label",
-      "Integrações",
-      "Segurança",
+    for (const href of [
+      "/interno/dashboard",
+      "/interno",
+      "/interno/agenda",
+      "/interno/cadastros",
+      "/interno/estoque",
+      "/interno/crm",
+      "/interno/assinaturas",
+      "/interno/comunicacao",
+      "/interno/relatorios",
+      "/interno/auditoria",
+      "/interno/branding",
+      "/interno/integracoes",
+      "/interno/seguranca",
     ]) {
-      await expect(nav.getByRole("link", { name: label, exact: true })).toBeVisible();
+      await expect(nav.locator(`a[href="${href}"]`)).toBeVisible();
     }
   });
 

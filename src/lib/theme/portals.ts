@@ -9,7 +9,7 @@ export const PORTAL_LABELS: Record<PortalKey, string> = {
   beneficiario: "Portal do Beneficiário",
 };
 
-/** Classes de navegação unificadas — acentos vêm do branding do tenant via CSS vars. */
+/** Classes de navegação — acentos vêm do branding do tenant via CSS vars. */
 export const PORTAL_NAV_ACTIVE_CLASS =
   "border-[var(--brand-accent)] text-[var(--brand-accent)]";
 
@@ -19,10 +19,7 @@ export const PORTAL_NAV_IDLE_CLASS =
 export const PORTAL_MOBILE_ACTIVE_CLASS =
   "bg-[var(--surface-muted)] text-[var(--brand-accent)]";
 
-/**
- * CSS variables de acento do portal — derivadas do branding do tenant/segmento.
- * Dentro dos portais, `--portal-accent` espelha `--brand-accent` do tenant ativo.
- */
+/** CSS variables de acento — derivadas do whitelabel do tenant ativo. */
 export function portalAccentCssVars(
   branding: Pick<BrandingTokens, "primaryColor" | "accentColor" | "heroFrom" | "heroTo">,
 ): Record<string, string> {
@@ -33,7 +30,7 @@ export function portalAccentCssVars(
   };
 }
 
-/** @deprecated Prefer `PORTAL_LABELS` + classes exportadas. Mantido para compatibilidade. */
+/** @deprecated Prefer `PORTAL_LABELS` + classes exportadas. */
 export const PORTAL_THEMES: Record<
   PortalKey,
   {

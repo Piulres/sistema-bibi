@@ -53,6 +53,18 @@ export type SeedMassContext = {
   excludePatientIds: Set<string>;
   companies: SeedCompany[];
   scale: ScaleConfig;
+  /** Retorna petId para agendamentos (nicho VET). */
+  resolvePetId?: (patient: PatientRef, salt: number) => string | null;
+  /** Substituem pickers médicos quando informados (tenants multi-nicho). */
+  pickProcedureCode?: (companyIndex: number, companies: SeedCompany[], salt: number) => string;
+  pickAppointmentReason?: (companyIndex: number, companies: SeedCompany[], salt: number) => string;
+  isTelemedicineAppointment?: (companyIndex: number, companies: SeedCompany[], salt: number) => boolean;
+  appointmentReasons?: readonly string[];
+  medicalRecordSnippets?: readonly string[];
+  benefitProductPicker?: (
+    sector: string,
+    salt: number,
+  ) => { billingCycle: string; amount: number; description: string };
 };
 
 export type SeedMassStats = {
@@ -132,15 +144,15 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
       else status = "CANCELADO";
     }
 
-    const isTele = isTelemedicineAppointment(
-      patient.companyIndex,
-      ctx.companies,
-      i,
-    );
+    const isTele = ctx.isTelemedicineAppointment
+      ? ctx.isTelemedicineAppointment(patient.companyIndex, ctx.companies, i)
+      : isTelemedicineAppointment(patient.companyIndex, ctx.companies, i);
     const reason =
       patient.companyIndex > 0
-        ? pickAppointmentReason(patient.companyIndex, ctx.companies, i)
-        : pick(APPOINTMENT_REASONS, i);
+        ? ctx.pickAppointmentReason
+          ? ctx.pickAppointmentReason(patient.companyIndex, ctx.companies, i)
+          : pickAppointmentReason(patient.companyIndex, ctx.companies, i)
+        : pick(ctx.appointmentReasons ?? APPOINTMENT_REASONS, i);
 
     const appointment = await ctx.prisma.appointment.create({
       data: {
@@ -151,6 +163,7 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
         reason,
         tenantId: ctx.tenantId,
         patientId: patient.id,
+        petId: ctx.resolvePetId?.(patient, i) ?? null,
         providerId,
       },
     });
@@ -184,7 +197,9 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
     const procCount = isOccupational ? 2 + (i % 2) : 1 + (i % 2);
 
     for (let j = 0; j < procCount; j++) {
-      const code = pickProcedureCode(appt.patient.companyIndex, ctx.companies, i + j);
+      const code = ctx.pickProcedureCode
+        ? ctx.pickProcedureCode(appt.patient.companyIndex, ctx.companies, i + j)
+        : pickProcedureCode(appt.patient.companyIndex, ctx.companies, i + j);
       const proc = ctx.procedures[code];
       if (!proc) continue;
 
@@ -223,8 +238,9 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
         data: {
           recordType: i % 7 === 0 ? "ATESTADO" : "EVOLUCAO",
           title: i % 7 === 0 ? "Atestado médico" : null,
-          content: pick(MEDICAL_RECORD_SNIPPETS, i),
+          content: pick(ctx.medicalRecordSnippets ?? MEDICAL_RECORD_SNIPPETS, i),
           patientId: appt.patient.id,
+          petId: ctx.resolvePetId?.(appt.patient, i) ?? null,
           providerId: appt.providerId,
           appointmentId: appt.id,
           createdAt: appt.scheduledAt,
@@ -348,7 +364,9 @@ export async function seedOperationalMass(ctx: SeedMassContext): Promise<SeedMas
 
     for (let i = 0; i < withSub.length; i++) {
       const patient = withSub[i]!;
-      const product = benefitProductForSector(company.sector, company.index + i);
+      const product = ctx.benefitProductPicker
+        ? ctx.benefitProductPicker(company.sector, company.index + i)
+        : benefitProductForSector(company.sector, company.index + i);
 
       const subscription = await ctx.prisma.subscription.create({
         data: {

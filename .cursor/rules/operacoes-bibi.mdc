@@ -38,7 +38,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 | Produção fora | 1× `curl`; se `usage_exceeded` → avisar cota | redeploy, loop curl |
 | Publicar | Só com pedido explícito; seguir `@docs/plataforma/OPERACOES.md` §5 | deploy autônomo |
 | Alternar demo/operação | Orientar `@docs/plataforma/OPERACAO_DADOS.md` § produção | trocar `DATABASE_URL` manualmente |
-| Pós-deploy | Atualizar `@docs/versoes/RELEASES.md` | marcar publicado sem confirmação |
+| Pós-deploy | Atualizar `@docs/versoes/RELEASES.md` + changelog landing (`@docs/plataforma/LANDING_CHANGELOG.md`) | marcar publicado sem confirmação |
 
 ## Comandos
 
@@ -56,7 +56,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 
 - **Stop builds** no painel — não depender de CI em cada push
 - Validar: `npm run pre-release` (build local)
-- Publicar (humano): `npx netlify deploy --prod --no-build` após build local OK
+- Publicar (humano): `npx netlify deploy --prod` após `npm run pre-release` (**não** usar `--no-build`)
 - Secrets (`SESSION_SECRET`, `CRON_SECRET`) só no painel — nunca commitar
 - Detalhes: `@.cursor/rules/netlify-release.mdc`
 

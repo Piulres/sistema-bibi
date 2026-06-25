@@ -13,6 +13,9 @@ export type ExamOrderStatus = (typeof EXAM_ORDER_STATUSES)[number];
 export const PROTOCOL_ENROLLMENT_STATUSES = ["ATIVO", "CONCLUIDO", "SUSPENSO"] as const;
 export type ProtocolEnrollmentStatus = (typeof PROTOCOL_ENROLLMENT_STATUSES)[number];
 
+export const VACCINE_STATUSES = ["APLICADA", "PENDENTE", "VENCIDA"] as const;
+export type VaccineStatus = (typeof VACCINE_STATUSES)[number];
+
 export type AllergyEntry = {
   substance: string;
   severity?: string;
@@ -91,6 +94,19 @@ export function protocolStatusLabel(status: string): string {
       return "Concluído";
     case "SUSPENSO":
       return "Suspenso";
+    default:
+      return status;
+  }
+}
+
+export function vaccineStatusLabel(status: string): string {
+  switch (status) {
+    case "APLICADA":
+      return "Aplicada";
+    case "PENDENTE":
+      return "Pendente";
+    case "VENCIDA":
+      return "Vencida";
     default:
       return status;
   }

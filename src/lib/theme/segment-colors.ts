@@ -1,6 +1,6 @@
 import type { NicheId } from "@/lib/niche/types";
 
-/** Paleta canônica por segmento — usada em listagens, banners, selects e landing de nicho. */
+/** Paleta canônica por segmento — listagens, landing de nicho e presets white label. */
 export type SegmentColorPreset = {
   primaryColor: string;
   accentColor: string;
@@ -32,10 +32,10 @@ export const SEGMENT_COLORS: Record<NicheId, SegmentColorPreset> = {
     label: "Odontologia",
   },
   LEGAL: {
-    primaryColor: "#475569",
-    accentColor: "#d97706",
-    heroFrom: "#334155",
-    heroTo: "#d97706",
+    primaryColor: "#1e3a5f",
+    accentColor: "#c9a227",
+    heroFrom: "#0f2744",
+    heroTo: "#2d4a6f",
     label: "Jurídico",
   },
   SPA: {
@@ -58,6 +58,16 @@ export function getSegmentColors(niche: NicheId): SegmentColorPreset {
   return SEGMENT_COLORS[niche];
 }
 
+export function segmentGradient(niche: NicheId): string {
+  const colors = getSegmentColors(niche);
+  return `linear-gradient(90deg, ${colors.primaryColor}, ${colors.accentColor})`;
+}
+
+export function segmentGradientDiagonal(niche: NicheId): string {
+  const colors = getSegmentColors(niche);
+  return `linear-gradient(135deg, ${colors.heroFrom}, ${colors.heroTo})`;
+}
+
 /** Estilo inline para pill/chip de segmento (switcher, menu mobile, selects). */
 export function segmentPillStyle(
   niche: NicheId,
@@ -75,16 +85,4 @@ export function segmentPillStyle(
     borderColor: `${colors.primaryColor}55`,
     color: colors.primaryColor,
   };
-}
-
-/** Gradiente horizontal para faixas e cards de segmento. */
-export function segmentGradient(niche: NicheId): string {
-  const colors = getSegmentColors(niche);
-  return `linear-gradient(90deg, ${colors.primaryColor}, ${colors.accentColor})`;
-}
-
-/** Gradiente diagonal para ícones e avatares de segmento. */
-export function segmentGradientDiagonal(niche: NicheId): string {
-  const colors = getSegmentColors(niche);
-  return `linear-gradient(135deg, ${colors.heroFrom}, ${colors.heroTo})`;
 }

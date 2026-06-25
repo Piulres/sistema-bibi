@@ -1,16 +1,14 @@
 import Link from "next/link";
-import type { BrandingTokens } from "@/lib/theme/tokens";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { HOME_HERO } from "@/lib/landing/home-content";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
 import { SEGMENT_ACCESS_HREF } from "@/lib/landing/navigation";
+import { landingCtaClasses } from "@/components/landing/landing-cta";
+import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
+import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
-type Props = {
-  branding?: BrandingTokens;
-};
-
-export default function LandingHeroProduct(_props: Props) {
+export default function LandingHeroProduct() {
   return (
     <section
       aria-labelledby="hero-heading"
@@ -35,10 +33,10 @@ export default function LandingHeroProduct(_props: Props) {
 
           <h1
             id="hero-heading"
-            className="landing-fade-in mt-8 text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
+            className="landing-fade-in mt-8 text-4xl tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
           >
-            {HOME_HERO.headline}{" "}
-            <span className="landing-gradient-text">{HOME_HERO.headlineAccent}</span>
+            <span className="font-light">{HOME_HERO.headline}</span>{" "}
+            <span className="font-bold">{HOME_HERO.headlineAccent}</span>
           </h1>
 
           <p className="landing-fade-in mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
@@ -48,19 +46,24 @@ export default function LandingHeroProduct(_props: Props) {
           <p className="landing-fade-in mt-4 max-w-xl text-sm text-white/55">{HOME_HERO.subline}</p>
 
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <a
+            <LandingTrackedCta
               href="#portais"
-              className="group inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--brand-accent)] px-6 py-3.5 text-base font-semibold text-[var(--surface-inverse)] shadow-lg transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              event="cta_portals_click"
+              location="hero-home"
+              variant="hero"
+              size="lg"
+              className="group"
             >
               Acessar portais
               <LandingIcon
                 name="arrow-right"
                 className="h-5 w-5 transition group-hover:translate-x-0.5"
               />
-            </a>
+            </LandingTrackedCta>
+            <LandingWhatsAppCta variant="hero-ghost" size="lg" location="hero-home" />
             <Link
               href={SEGMENT_ACCESS_HREF}
-              className="inline-flex items-center justify-center rounded-[var(--radius-button)] border border-white/20 bg-white/8 px-6 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className={landingCtaClasses("hero-ghost", "lg")}
             >
               Acesso segmentado
             </Link>

@@ -4,9 +4,9 @@ import { cookies } from "next/headers";
 import type { NicheId } from "@/lib/niche/types";
 import { isNicheId } from "@/lib/niche/types";
 import type { ResolvedSegment } from "@/lib/segment/types";
+import { getSessionSecret, isProductionRuntime } from "@/lib/security/config";
 
 const COOKIE_NAME = "bibi_segment";
-const SECRET = process.env.SESSION_SECRET ?? "bibi-poc-dev-secret-change-me";
 const MAX_AGE_SEC = 60 * 60 * 24 * 7; // 7 dias
 
 type SegmentPayload = {
@@ -17,7 +17,7 @@ type SegmentPayload = {
 };
 
 function sign(value: string): string {
-  const sig = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
+  const sig = crypto.createHmac("sha256", getSessionSecret()).update(value).digest("hex");
   return `${value}.${sig}`;
 }
 
@@ -27,7 +27,7 @@ function verify(token: string | undefined): SegmentPayload | null {
   if (idx < 0) return null;
   const value = token.slice(0, idx);
   const sig = token.slice(idx + 1);
-  const expected = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
+  const expected = crypto.createHmac("sha256", getSessionSecret()).update(value).digest("hex");
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
@@ -54,6 +54,7 @@ export async function persistSegmentCookie(segment: ResolvedSegment): Promise<vo
     sameSite: "lax",
     path: "/",
     maxAge: MAX_AGE_SEC,
+    secure: isProductionRuntime(),
   });
 }
 

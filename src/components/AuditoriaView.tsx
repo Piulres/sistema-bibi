@@ -9,8 +9,12 @@ import LoadingState from "@/components/ui/LoadingState";
 import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
+import { changeFieldLabel, formatMetadataValue } from "@/lib/change-management";
+import type { TimelineEventMetadata } from "@/lib/change-management";
+import { RESTORE_CONFIRM_PHRASE } from "@/lib/change-management/policy";
 import { TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
 import ExportButtons from "@/components/ExportButtons";
+import { useToast } from "@/components/ui/Toast";
 
 type AuditEvent = {
   id: string;
@@ -20,6 +24,11 @@ type AuditEvent = {
   description: string;
   createdAtLabel: string;
   actorName: string | null;
+  metadata: TimelineEventMetadata | null;
+  hasDiff: boolean;
+  correlationId: string | null;
+  reversesId: string | null;
+  reversible: boolean;
 };
 
 type FilterOption = { value: string; label: string };
@@ -43,6 +52,40 @@ function entityLink(event: AuditEvent): string | null {
   return null;
 }
 
+function AuditEventDiff({ metadata }: { metadata: TimelineEventMetadata }) {
+  const fields = metadata.fieldsChanged ?? [];
+  if (fields.length === 0) return null;
+
+  return (
+    <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border-muted)] bg-[var(--surface-muted)]">
+      <table className="w-full min-w-[20rem] text-left text-xs">
+        <thead>
+          <tr className="border-b border-[var(--border-muted)] text-[var(--text-muted)]">
+            <th className="px-3 py-2 font-medium">Campo</th>
+            <th className="px-3 py-2 font-medium">Antes</th>
+            <th className="px-3 py-2 font-medium">Depois</th>
+          </tr>
+        </thead>
+        <tbody>
+          {fields.map((field) => (
+            <tr key={field} className="border-b border-[var(--border-muted)] last:border-0">
+              <td className="px-3 py-2 font-medium text-[var(--text-secondary)]">
+                {changeFieldLabel(field)}
+              </td>
+              <td className="px-3 py-2 text-[var(--text-muted)]">
+                {formatMetadataValue(metadata.before?.[field])}
+              </td>
+              <td className="px-3 py-2 text-[var(--text-secondary)]">
+                {formatMetadataValue(metadata.after?.[field])}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export default function AuditoriaView() {
   const [data, setData] = useState<AuditResponse | null>(null);
   const [loading, setLoading] = useState(true);
@@ -54,6 +97,9 @@ export default function AuditoriaView() {
   const [to, setTo] = useState("");
   const [page, setPage] = useState(1);
   const [refreshToken, setRefreshToken] = useState(0);
+  const [expandedDiffIds, setExpandedDiffIds] = useState<Set<string>>(new Set());
+  const [restoreBusy, setRestoreBusy] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     let active = true;
@@ -86,6 +132,35 @@ export default function AuditoriaView() {
     e.preventDefault();
     setPage(1);
     setRefreshToken((t) => t + 1);
+  }
+
+  function toggleDiff(eventId: string) {
+    setExpandedDiffIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(eventId)) next.delete(eventId);
+      else next.add(eventId);
+      return next;
+    });
+  }
+
+  async function restoreEvent(event: AuditEvent) {
+    setRestoreBusy(event.id);
+    try {
+      const res = await fetch(`/api/interno/audit/${event.id}/restore`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: RESTORE_CONFIRM_PHRASE }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast({ message: data.error ?? "Falha ao restaurar", tone: "danger" });
+        return;
+      }
+      showToast({ message: "Versão restaurada com sucesso", tone: "success" });
+      setRefreshToken((t) => t + 1);
+    } finally {
+      setRestoreBusy(null);
+    }
   }
 
   if (loading && !data) {
@@ -195,6 +270,8 @@ export default function AuditoriaView() {
           <ol className="relative mt-4 space-y-0 border-l border-[var(--border-default)] pl-6">
             {events.map((event) => {
               const href = entityLink(event);
+              const showDiff = event.hasDiff && event.metadata;
+              const diffOpen = expandedDiffIds.has(event.id);
               return (
                 <li key={event.id} className="relative pb-6 last:pb-0">
                   <span className="absolute -left-[1.625rem] top-1.5 h-3 w-3 rounded-full border-2 border-[var(--surface-card)] bg-[var(--portal-accent)] ring-2 ring-[var(--surface-muted)]" />
@@ -202,8 +279,36 @@ export default function AuditoriaView() {
                     <div className="flex flex-wrap items-center gap-2">
                       <StatusBadge value={event.action} map="timeline" />
                       <span className="text-xs text-[var(--text-muted)]">{event.createdAtLabel}</span>
+                      {event.reversesId && (
+                        <span className="text-xs text-[var(--text-muted)]">· reverte evento</span>
+                      )}
                     </div>
                     <p className="mt-2 text-sm text-[var(--text-secondary)]">{event.description}</p>
+                    {showDiff && (
+                      <div className="mt-2">
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => toggleDiff(event.id)}
+                        >
+                          {diffOpen ? "Ocultar alterações" : "Ver alterações"}
+                        </Button>
+                        {diffOpen && event.metadata && <AuditEventDiff metadata={event.metadata} />}
+                        {event.reversible && event.hasDiff && (
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            className="ml-2"
+                            disabled={restoreBusy === event.id}
+                            onClick={() => restoreEvent(event)}
+                          >
+                            {restoreBusy === event.id ? "Restaurando…" : "Restaurar versão"}
+                          </Button>
+                        )}
+                      </div>
+                    )}
                     <p className="mt-1 text-xs text-[var(--text-muted)]">
                       {event.actorName ?? "Sistema"} ·{" "}
                       {TIMELINE_ENTITY_LABELS[event.entityType] ?? event.entityType}
@@ -251,8 +356,9 @@ export default function AuditoriaView() {
       </section>
 
       <Alert tone="info">
-        Alterações de preço de procedimento e valor de assinatura geram eventos aqui. Valores já
-        registrados em Pay Per Use ou cobranças faturadas permanecem congelados.
+        Eventos de cadastro e precificação passam a registrar antes/depois quando disponível — use
+        &quot;Ver alterações&quot; na linha do evento. Restore administrativo chega no Pacote C;
+        valores já faturados em Pay Per Use permanecem congelados.
       </Alert>
     </div>
   );

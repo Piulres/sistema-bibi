@@ -32,6 +32,7 @@ import {
 import { resolveSeedScale } from "./scale";
 import { seedVitacareTenant } from "./vitacare";
 import { seedNicheTenants } from "./niche-tenants";
+import { seedAllNicheOperational, nicheDemoCredentials } from "./niche-operational";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
@@ -72,12 +73,15 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.stockLot.deleteMany();
   await prisma.medicalProduct.deleteMany();
   await prisma.patientProtocolEnrollment.deleteMany();
+  await prisma.petVaccineRecord.deleteMany();
+  await prisma.petClinicalProfile.deleteMany();
   await prisma.examOrder.deleteMany();
   await prisma.medicationPrescription.deleteMany();
   await prisma.patientClinicalProfile.deleteMany();
   await prisma.careProtocolTemplate.deleteMany();
   await prisma.medicalRecord.deleteMany();
   await prisma.appointment.deleteMany();
+  await prisma.pet.deleteMany();
   await prisma.pricingRule.deleteMany();
   await prisma.procedure.deleteMany();
   await prisma.patient.deleteMany();
@@ -795,6 +799,9 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("\nPopulando tenants ServiceOS multi-nicho (v2.0)...");
   const nicheStats = await seedNicheTenants(prisma, DEMO_PASSWORD);
 
+  console.log("\nMassa operacional multi-nicho (histórico + futuro)...");
+  const nicheOperational = await seedAllNicheOperational(prisma, DEMO_PASSWORD, scale);
+
   const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
   const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });
   const pjCount = await prisma.user.count({ where: { tenantId: tenant.id, role: "PJ" } });
@@ -814,7 +821,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log(`  Faturas Bibi: ${invoiceCount}`);
   console.log(`  Procedimentos pendentes de faturamento: ${pendingUsages}`);
   console.log(`  VitaCare: ${vitacareStats.companies} empresas · ${vitacareStats.patients} beneficiarios`);
-  console.log(`  ServiceOS nichos: ${nicheStats.tenants} tenants · ${nicheStats.procedures} procedimentos demo`);
+  console.log(`  ServiceOS nichos: ${nicheStats.tenants} tenants · ${nicheStats.procedures} procedimentos · ${nicheStats.providers} prestadores`);
+  console.log(`  Massa nichos: ${nicheOperational.totalPatients} cadastros · ${nicheOperational.totalAppointments} agendamentos`);
   console.log("\nMassa operacional Bibi (esta execucao):");
   console.log(`  +${massStats.appointments} agendamentos · +${massStats.procedureUsages} procedimentos`);
   console.log(`  +${massStats.medicalRecords} prontuarios · +${massStats.invoices} faturas · +${massStats.payments} pagamentos`);
@@ -835,11 +843,10 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("  VitaCare     -> /interno/login       : operacao@vitacare.demo / bibi123");
   console.log("  VitaCare PJ  -> /pj/login            : rh@vitacarecorp.demo / bibi123");
   console.log("\nServiceOS multi-nicho (v2.0) — senha bibi123:");
-  console.log("  PetCare (VET)     -> /interno/login : operacao@petcare.demo");
-  console.log("  Smile (DENTAL)    -> /interno/login : operacao@smile.demo");
-  console.log("  Lex (LEGAL)       -> /interno/login : operacao@lex.demo");
-  console.log("  Zen (SPA)         -> /interno/login : operacao@zen.demo");
-  console.log("  EduPrime (EDU)    -> /interno/login : operacao@eduprime.demo");
+  for (const cred of nicheDemoCredentials()) {
+    console.log(`  ${cred.niche.padEnd(10)} interno: ${cred.interno} · prestador: ${cred.prestador}`);
+    console.log(`  ${"".padEnd(10)} beneficiário: ${cred.beneficiario} · PJ: ${cred.pj}`);
+  }
   console.log("\nSEED_SCALE=small|medium|large no .env controla volume da massa");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
 

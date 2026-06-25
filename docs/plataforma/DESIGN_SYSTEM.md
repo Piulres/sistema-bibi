@@ -105,8 +105,15 @@ Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e wal
 | `MobileSectionDrawer` | Drawer de seções (PJ, beneficiário) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
 | `LandingMobileMenu` | Menu hamburger da landing |
+| `LandingChangelog` | Seção `#novidades` — changelog curado para demonstração |
 
-Config de menus e rótulos: `src/lib/navigation/routes.ts`.
+Config de menus e rótulos: `src/lib/navigation/routes.ts` (portais autenticados) · `src/lib/landing/navigation.ts` (âncoras da home).
+
+### Changelog na home (`#novidades`)
+
+Conteúdo em `src/lib/landing/changelog-content.ts` — **atualizar sempre ao fechar pacote**, junto com `RELEASES.md` e `src/lib/platform.ts`.
+
+Instruções completas: [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md).
 
 ## Uso em páginas
 

@@ -44,7 +44,7 @@ O Brasil é o **3º maior mercado pet do mundo** (projeção 2026), com forte de
 | Vacinação (V8/V10) | `SERVICO` | R$ 120 | R$ 80–180 | AcharVet |
 | Consulta especialista | `CONSULTA` | R$ 320 | R$ 200–450 | AcharVet |
 
-**Seed atual:** Banho e Tosa **R$ 150** — alinhado à mediana combo porte médio. Override demo PetCare: `appointment: "Banho/Tosa"`.
+**Seed atual:** catálogo completo (consulta, vacinação, exames, cirurgia, internação, estética). Agenda interna usa label padrão **Atendimentos** (sem override banho/tosa).
 
 ---
 

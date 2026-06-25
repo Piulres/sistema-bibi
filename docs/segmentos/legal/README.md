@@ -19,8 +19,12 @@ Escritórios de advocacia e hora técnica corporativa.
 |-------|--------|--------|
 | Interno | `operacao@lex.demo` | Lex & Partners |
 | Prestador | `dr.andre@lex.demo` | Lex & Partners |
+| Cliente (beneficiário) | `cliente@lex.demo` | Lex & Partners |
+| Empresa PJ | `rh@assjur.demo` | Lex & Partners |
 
 Senha: **`bibi123`**
+
+Catálogo demo: consulta, hora técnica, parecer, contratos, trabalhista, LGPD e due diligence. Massa operacional com histórico e agendamentos futuros.
 
 ## Pesquisa
 
@@ -28,4 +32,5 @@ Senha: **`bibi123`**
 
 ## Código
 
-- Landing: `/?niche=LEGAL`
+- Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`
+- Landing: `/?tenant=lex`

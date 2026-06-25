@@ -22,6 +22,7 @@ export async function GET(
       where: { id, providerId: user.id },
       include: {
         patient: { include: { company: true } },
+        pet: { select: { id: true, name: true, species: true, breed: true } },
         usages: { include: { procedure: true }, orderBy: { performedAt: "asc" } },
         medicalRecords: { orderBy: { createdAt: "desc" } },
       },
@@ -45,6 +46,14 @@ export async function GET(
         company: appointment.patient.company?.name ?? null,
         companyId: appointment.patient.companyId,
       },
+      pet: appointment.pet
+        ? {
+            id: appointment.pet.id,
+            name: appointment.pet.name,
+            species: appointment.pet.species,
+            breed: appointment.pet.breed,
+          }
+        : null,
       usages: appointment.usages.map((u) => ({
         id: u.id,
         procedure: u.procedure.name,

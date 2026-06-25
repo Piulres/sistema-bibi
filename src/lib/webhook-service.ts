@@ -12,6 +12,7 @@ export const WEBHOOK_EVENTS = [
   "APPOINTMENT_CREATED",
   "COMPANY_STATUS_CHANGED",
   "PATIENT_CREATED",
+  "ENTITY_REVERTED",
 ] as const;
 
 export type WebhookEvent = (typeof WEBHOOK_EVENTS)[number];

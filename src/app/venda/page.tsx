@@ -2,23 +2,30 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPlatformBranding } from "@/lib/theme/branding";
 import { PLATFORM } from "@/lib/platform";
+import { buildLandingMetadata } from "@/lib/landing/metadata";
 import { SALES_SITE_SECTIONS } from "@/lib/platform/structure";
 import TenantTheme from "@/components/layout/TenantTheme";
 import LandingHeader from "@/components/landing/LandingHeader";
 import LandingFooter from "@/components/landing/LandingFooter";
 import LandingCta from "@/components/landing/LandingCta";
+import LandingJsonLd from "@/components/landing/LandingJsonLd";
 
-export const metadata: Metadata = {
-  title: `Venda — ${PLATFORM.name}`,
-  description:
-    "Propósitos, público-alvo, missão e valor do Sistema Bibi - ServiceOS — infraestrutura Pay Per Use multi-nicho.",
-};
+const VENDA_DESCRIPTION =
+  "Propósitos, público-alvo, missão e valor do Sistema Bibi - ServiceOS — infraestrutura Pay Per Use multi-nicho.";
+
+export const metadata: Metadata = buildLandingMetadata({
+  title: `Proposta comercial — ${PLATFORM.name}`,
+  description: VENDA_DESCRIPTION,
+  canonicalPath: "/venda",
+  keywords: ["serviceos", "proposta", "pay per use", "b2b", "sistema bibi"],
+});
 
 export default async function VendaPage() {
   const branding = getPlatformBranding();
 
   return (
     <TenantTheme branding={branding} className="flex min-h-full flex-col">
+      <LandingJsonLd branding={branding} />
       <LandingHeader branding={branding} context="home" />
       <main id="conteudo-principal" className="flex-1">
         <section className="landing-mesh-hero px-6 py-20 text-[var(--text-inverse)]">
