@@ -10,6 +10,7 @@
     "netlify:dev": "netlify dev",
     "pre-release": "node scripts/pre-release.mjs",
     "docs:verify": "node scripts/verify-docs.mjs",
+    "openapi:verify": "node scripts/verify-openapi.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
@@ -17,7 +18,7 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && node scripts/copy-swagger-ui.mjs",
     "db:push": "prisma db push",
     "db:seed": "prisma db seed",
     "db:backfill-slugs": "node scripts/backfill-tenant-slugs.mjs",
@@ -52,10 +53,12 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "prisma": "6",
+    "swagger-ui-dist": "^5.32.8",
     "tailwindcss": "^4",
     "tsx": "^4",
     "typescript": "^5",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.9"
+    "vitest": "^4.1.9",
+    "yaml": "^2.9.0"
   }
 }

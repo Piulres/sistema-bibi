@@ -52,6 +52,9 @@ yarn-error.log*
 # tenant logo uploads (local dev fallback)
 /public/tenant-logos/
 
+# swagger-ui (gerado por scripts/copy-swagger-ui.mjs no postinstall)
+/public/swagger-ui/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

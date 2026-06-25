@@ -14,6 +14,7 @@
 |--------|-----------|
 | Desenvolvedor / agente IA | [`AGENTS.md`](../AGENTS.md) · [`prompts/README.md`](prompts/README.md) |
 | Operações e deploy | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) |
+| API (Swagger / OpenAPI) | [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) |
 | Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
 | Demo multi-nicho | [`segmentos/README.md`](segmentos/README.md) |

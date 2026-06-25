@@ -93,4 +93,4 @@ beneficiários, assinaturas, alertas e export CSV).
 
 - Landing pública: [`imagens/landing.webp`](imagens/landing.webp) — `src/app/page.tsx`
 - Swagger UI: [`imagens/swagger_overview.webp`](imagens/swagger_overview.webp) —
-  `public/api-docs.html` + `public/openapi.yaml`
+  `public/api/docs` + `public/openapi.yaml` (legado `/api-docs.html` → redirect)

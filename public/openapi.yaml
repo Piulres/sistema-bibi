@@ -16,6 +16,8 @@ externalDocs:
 servers:
   - url: http://localhost:3000
     description: Desenvolvimento local
+  - url: https://sistema-bibi.netlify.app
+    description: Produção (Netlify)
 
 tags:
   - name: Auth

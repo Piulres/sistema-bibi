@@ -176,7 +176,7 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 ### Beneficiário (5) — 🔑 BENEFICIARIO
 ### Compartilhado (2) — procedures, branding/logo
 
-Contrato OpenAPI: `public/openapi.yaml` — candidato a testes de contrato (não implementado).
+Contrato OpenAPI: `public/openapi.yaml` — Swagger UI em `/api/docs` (ver [`API_DOCS.md`](API_DOCS.md)).
 
 ---
 
