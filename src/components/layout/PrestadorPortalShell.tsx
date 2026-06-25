@@ -3,6 +3,7 @@
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import PrestadorNav from "@/components/PrestadorNav";
+import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { PORTALS } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
 
@@ -21,19 +22,24 @@ export default function PrestadorPortalShell({ user, assistantEnabled = true, ch
   const portal = PORTALS.prestador;
 
   return (
-    <PortalShell
-      portal="prestador"
-      portalLabel={user.labels.portalProvider}
-      loginPath={portal.loginPath}
-      userName={user.name}
-      branding={user.branding}
-      niche={user.niche}
-      labels={user.labels}
-    >
-      <PrestadorNav />
-      <AssistantShell portal="prestador" enabled={assistantEnabled}>
-        <div className="portal-page-content mt-8 min-w-0">{children}</div>
-      </AssistantShell>
-    </PortalShell>
+    <OnboardingProvider portal="prestador" labels={user.labels}>
+      <PortalShell
+        portal="prestador"
+        portalLabel={user.labels.portalProvider}
+        loginPath={portal.loginPath}
+        userName={user.name}
+        branding={user.branding}
+        niche={user.niche}
+        labels={user.labels}
+      >
+        <PrestadorNav />
+        <AssistantShell portal="prestador" enabled={assistantEnabled}>
+          <div className="portal-page-content mt-8 min-w-0" data-tour-id="portal-content">
+            {children}
+          </div>
+        </AssistantShell>
+      </PortalShell>
+      <OnboardingTour />
+    </OnboardingProvider>
   );
 }

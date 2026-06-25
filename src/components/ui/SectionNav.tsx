@@ -75,7 +75,7 @@ export default function SectionNav({
   }, [sections]);
 
   return (
-    <div className={className}>
+    <div className={className} data-tour-id="portal-nav">
       <MobileSectionDrawer
         sections={sections}
         activeId={activeId}

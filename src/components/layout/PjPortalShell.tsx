@@ -3,6 +3,7 @@
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import SectionNav from "@/components/ui/SectionNav";
+import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { PORTALS } from "@/lib/roles";
 import { PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
 import { buildPjSectionNav } from "@/lib/navigation/niche-nav";
@@ -23,25 +24,30 @@ export default function PjPortalShell({ user, assistantEnabled = true, children 
   const sections = buildPjSectionNav(user.labels);
 
   return (
-    <PortalShell
-      portal="pj"
-      portalLabel={`Portal ${user.labels.company}`}
-      loginPath={portal.loginPath}
-      userName={user.name}
-      branding={user.branding}
-      niche={user.niche}
-      labels={user.labels}
-    >
-      <SectionNav
-        sections={sections}
-        activeClass={PORTAL_NAV_ACTIVE_CLASS}
-        idleClass={PORTAL_NAV_IDLE_CLASS}
-        className="mt-6"
-        drawerTitle="Seções da empresa"
-      />
-      <AssistantShell portal="pj" enabled={assistantEnabled}>
-        <div className="portal-page-content mt-8 min-w-0">{children}</div>
-      </AssistantShell>
-    </PortalShell>
+    <OnboardingProvider portal="pj" labels={user.labels}>
+      <PortalShell
+        portal="pj"
+        portalLabel={`Portal ${user.labels.company}`}
+        loginPath={portal.loginPath}
+        userName={user.name}
+        branding={user.branding}
+        niche={user.niche}
+        labels={user.labels}
+      >
+        <SectionNav
+          sections={sections}
+          activeClass={PORTAL_NAV_ACTIVE_CLASS}
+          idleClass={PORTAL_NAV_IDLE_CLASS}
+          className="mt-6"
+          drawerTitle="Seções da empresa"
+        />
+        <AssistantShell portal="pj" enabled={assistantEnabled}>
+          <div className="portal-page-content mt-8 min-w-0" data-tour-id="portal-content">
+            {children}
+          </div>
+        </AssistantShell>
+      </PortalShell>
+      <OnboardingTour />
+    </OnboardingProvider>
   );
 }
