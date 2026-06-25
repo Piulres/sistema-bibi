@@ -13,10 +13,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy pendente @ `303ddca` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3d525f` @ `07c7a7e` |
 | **Versão anterior em produção** | **2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` |
-| **Commit release v2.1** | `303ddca` (dev integrada) |
-| `main` / `dev` | **v2.1.0** — sincronização em andamento |
+| **Commit release v2.1** | `07c7a7e` |
+| `main` / `dev` | **v2.1.0** — sincronizadas |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
 | **Pacote anterior** | **v2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` (24/06/2026) |
 
@@ -26,8 +26,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v2.1.0** — PRs #122–#123, #100, #95, changelog landing |
 | **Release** | `main` | **v2.1.0** — após merge desta publicação |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — publicação 24/06/2026 |
-| **Preview** | deploy draft | `6a3d406e` @ `303ddca` — validado 200 OK |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3d525f` @ `07c7a7e` (24/06/2026) |
+| **Preview** | deploy draft | `6a3d406e` @ `303ddca` — validado antes da publicação |
 
 ### Tags git (histórico)
 
@@ -52,7 +52,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.1.0` |
 | **PRs** | [#126](https://github.com/Piulres/sistema-bibi/pull/126)–[#133](https://github.com/Piulres/sistema-bibi/pull/133), [#129](https://github.com/Piulres/sistema-bibi/pull/129)–[#132](https://github.com/Piulres/sistema-bibi/pull/132), [#131](https://github.com/Piulres/sistema-bibi/pull/131) |
 | **Doc** | [`V2_1.md`](V2_1.md) |
-| **Publicado em** | 24/06/2026 — deploy Netlify (integração #122–#123, #100, #95, changelog) |
+| **Publicado em** | 24/06/2026 — deploy Netlify `6a3d525f` @ `07c7a7e` (Voa, segmentos, changelog, ROI) |
 
 **Inclui (além de v2.0.0):**
 
