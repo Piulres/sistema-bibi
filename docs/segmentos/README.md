@@ -16,10 +16,21 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 
 ## Como validar um segmento em demo
 
-1. Landing: `/?tenant=petcare` (recomendado) ou `/?niche=VET`
-2. Clique em um portal — o link leva `?tenant=petcare` no login
-3. Entre com `operacao@petcare.demo` — contas de outro tenant são bloqueadas
-4. Confirme badge **ServiceOS v2.0** + nicho no header e nav do segmento
+1. Landing: `/?tenant=petcare` (recomendado) ou `/?niche=VET` — ou página dedicada `/segmentos/veterinaria`
+2. O sistema alterna automaticamente para o banco **demo** (ver [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) § seleção automática)
+3. Clique em um portal — o link leva `?tenant=petcare` no login
+4. Entre com `operacao@petcare.demo` — contas de outro tenant são bloqueadas
+5. Confirme badge **ServiceOS v2.1** + nicho no header, pills coloridas no login e nav do segmento
+
+### Cores por segmento
+
+Paleta canônica em `src/lib/theme/segment-colors.ts` (`SEGMENT_COLORS`). Usada em:
+
+- Pills do switcher de nicho na landing e menu mobile (`segmentPillStyle`)
+- Gradientes de cards (`segmentGradient`, `segmentGradientDiagonal`)
+- Presets white label (`presets.ts`, `presets-energia-brasileira.ts`)
+
+Detalhes visuais: [`DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md) § cores por segmento.
 
 ## Roteamento por segmento
 

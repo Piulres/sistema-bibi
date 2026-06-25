@@ -81,7 +81,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint + `docs:verify` + `db:bootstrap:demo` + `db:verify` + test + `netlify:build` | **Validar pacote sem publicar** |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
@@ -155,6 +155,8 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+
+**Seleção automática (v2.1):** ao acessar landing de segmento (`/segmentos/*`), `?tenant=petcare` ou login com e-mail demo exclusivo (`operacao@petcare.demo`), o sistema chama `ensureDataStoreForSegmentAccess()` e alterna para **demo** sem passar por `/interno/seguranca`. Tenant `bibi-saude` força **operação**. Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § seleção automática.
 
 ---
 

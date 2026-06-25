@@ -14,7 +14,8 @@
 |--------|-----------|
 | Desenvolvedor / agente IA | [`AGENTS.md`](../AGENTS.md) · [`prompts/README.md`](prompts/README.md) |
 | Operações e deploy | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) |
-| Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
+| Escopo v2.1 (produção) | [`versoes/V2_1.md`](versoes/V2_1.md) |
+| Escopo v2.0 (base multi-nicho) | [`versoes/V2_0.md`](versoes/V2_0.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
 | Demo multi-nicho | [`segmentos/README.md`](segmentos/README.md) |
 

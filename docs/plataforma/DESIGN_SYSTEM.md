@@ -55,6 +55,25 @@ Paleta padrão da plataforma (v2.0):
 
 Presets por nicho: `src/lib/theme/presets-energia-brasileira.ts` — cada segmento mantém cor primária própria com **Orange universal** como accent.
 
+### Cores por segmento (`segment-colors.ts`)
+
+Além do branding por tenant (`TenantBranding`), a plataforma define uma **paleta fixa por `NicheId`** para listagens, landing e UI pública:
+
+| Nicho | Primária | Accent | Uso típico |
+|-------|----------|--------|------------|
+| MEDICAL | `#1e293b` | `#2563eb` | Saúde — slate + azul |
+| VET | `#059669` | `#34d399` | Veterinária — verde |
+| DENTAL | `#0891b2` | `#22d3ee` | Odontologia — ciano |
+| LEGAL | `#1e3a5f` | `#c9a227` | Jurídico — navy + dourado |
+| SPA | `#7c3aed` | `#e879f9` | Bem-estar — roxo |
+| EDUCATION | `#d97706` | `#fbbf24` | Educação — âmbar |
+
+**API:** `getSegmentColors(niche)` · `segmentPillStyle(niche, active)` · `segmentGradient(niche)`
+
+**Componentes:** `LandingNiches`, `LandingNicheSwitcher`, `LandingMobileMenu`, `LoginForm` (pills de segmento).
+
+Tenant white label pode sobrescrever cores via `TenantBranding`; `SEGMENT_COLORS` é o fallback da plataforma e das demos por nicho.
+
 Guia completo: [`BRANDING.md`](BRANDING.md).
 
 ## Tokens CSS

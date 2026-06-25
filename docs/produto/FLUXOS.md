@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v2.0** (produção jun/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v2.1** (produção jun/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Escopo: [`../versoes/V2_1.md`](../versoes/V2_1.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -14,7 +14,7 @@ ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev,
 ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
 ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
 
-**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384).
+**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (395).
 
 ---
 
@@ -92,6 +92,29 @@ Fluxo em `src/app/page.tsx`:
 3. `getNicheLandingContent(niche)` — features, FAQ, descrição dos portais com vocabulário correto.
 
 O motor Pay Per Use (§7) **não muda** entre nichos — apenas rótulos e copy.
+
+### 0.5 Dual-store automático por segmento (v2.1)
+
+Quando `DUAL_DATA_STORE=true`, o acesso a um tenant demo ou landing de segmento **alterna o banco para demo** antes do login ou da renderização da página.
+
+```mermaid
+flowchart TD
+  A["?tenant=petcare / /segmentos/*"] --> E["ensureDataStoreForSegmentAccess()"]
+  B["operacao@petcare.demo"] --> E
+  C["?tenant=bibi-saude"] --> O["operation"]
+  E --> D["demo.db ativo"]
+  O --> Op["operation.db ativo"]
+```
+
+| Gatilho | Modo | Arquivo |
+|---------|------|---------|
+| `?tenant=` demo (petcare, lex…) | demo | `ensure-data-store-for-segment.ts` |
+| `?tenant=bibi-saude` | operation | idem |
+| Landing `/segmentos/[slug]` | demo | `segmentos/[slug]/page.tsx` |
+| Login com e-mail demo exclusivo | demo | `api/auth/login/route.ts` |
+| `?niche=` ≠ MEDICAL | demo | `resolve.ts` |
+
+E-mails compartilhados (`faturamento@bibi.health`) **não** forçam demo — dependem de `?tenant=horizonte` vs `bibi-saude`. Detalhes: [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) § seleção automática.
 
 ---
 

@@ -178,7 +178,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v2.0.0`** | `49edb90` | 23/06/2026 | ✅ **Em produção** — deploy `6a3a9973` |
+| **`v2.1.0`** | `07c7a7e` | 24/06/2026 | ✅ **Em produção** — deploy `6a3d525f` |
+| **`v2.0.0`** | `49edb90` | 23/06/2026 | ✅ Substituído por v2.1.0 — deploy `6a3a9973` |
 | **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
 | **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ Substituído |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
