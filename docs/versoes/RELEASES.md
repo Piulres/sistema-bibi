@@ -13,22 +13,21 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3bc7a4` @ `40e2dfc` |
-| **Versão anterior em produção** | **2.0.0** — deploy `6a3b711d` @ `9944783` |
-| **Commit release v2.1** | `40e2dfc` |
-| `main` / `dev` | **v2.1.0** — sincronizadas |
-| **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build** — ver abaixo) |
-| **Pacote anterior** | **v2.0.0** — deploy `6a3b711d` @ `9944783` (24/06/2026) |
-| Feature paralela | **v1.4.0** Voa — branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy pendente @ `303ddca` |
+| **Versão anterior em produção** | **2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` |
+| **Commit release v2.1** | `303ddca` (dev integrada) |
+| `main` / `dev` | **v2.1.0** — sincronização em andamento |
+| **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
+| **Pacote anterior** | **v2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` (24/06/2026) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.1.0** — Sistema Bibi - ServiceOS |
-| **Release** | `main` | **v2.1.0** — após merge desta release |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` |
-| **Feature** | `integracao-voa` | **v1.4.0** Voa (isolado) |
+| **Integração** | `dev` | **v2.1.0** — PRs #122–#123, #100, #95, changelog landing |
+| **Release** | `main` | **v2.1.0** — após merge desta publicação |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — publicação 24/06/2026 |
+| **Preview** | deploy draft | `6a3d406e` @ `303ddca` — validado 200 OK |
 
 ### Tags git (histórico)
 
@@ -53,7 +52,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.1.0` |
 | **PRs** | [#126](https://github.com/Piulres/sistema-bibi/pull/126)–[#133](https://github.com/Piulres/sistema-bibi/pull/133), [#129](https://github.com/Piulres/sistema-bibi/pull/129)–[#132](https://github.com/Piulres/sistema-bibi/pull/132), [#131](https://github.com/Piulres/sistema-bibi/pull/131) |
 | **Doc** | [`V2_1.md`](V2_1.md) |
-| **Publicado em** | 24/06/2026 — deploy Netlify `6a3bc7a4` @ `40e2dfc` (fix assets `/_next/static`) |
+| **Publicado em** | 24/06/2026 — deploy Netlify (integração #122–#123, #100, #95, changelog) |
 
 **Inclui (além de v2.0.0):**
 
@@ -63,11 +62,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Change management A–F:** reversão faturas, PPU, estoque, restore via timeline
 - **Importação JSON/CSV:** interchange de cadastros (patients, providers, companies, procedures)
 - **Agendamento flexível:** procedimento sem prestador obrigatório
-- **Landing:** CTA WhatsApp, SEO, tags marketing, identidade Energia Brasileira
-- **OpenAPI v2.1:** +15 paths (assistente, pets, import, change-mgmt)
+- **Landing:** CTA WhatsApp, SEO, tags marketing, identidade Energia Brasileira, **changelog #novidades**
+- **Segmentos:** cores por nicho (#122), login demo automático (#123), ROI ~91% (#100)
+- **Voa Health Fase 1:** embed no atendimento, importação PEP ([#95](https://github.com/Piulres/sistema-bibi/pull/95))
+- **OpenAPI v2.1:** +15 paths (assistente, pets, import, change-mgmt, voa)
 - **Versão na UI:** `Sistema Bibi - ServiceOS v2.1` em title, badges e Swagger
 
-**Testes:** 384 Vitest · 128 E2E · `docs:verify` · `db:verify` · `pre-release` OK.
+**Testes:** 395 Vitest · 128 E2E · `docs:verify` · `db:verify` · `pre-release` OK.
 
 ---
 
@@ -148,8 +149,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
-| **2.1.x** | [`V2_1.md`](V2_1.md) | ✅ **`v2.1.0` em produção** |
-| **1.4.x** | Branch `integracao-voa` ([PR #95](https://github.com/Piulres/sistema-bibi/pull/95)) | 🚧 Isolado — docs na branch |
+| **2.1.x** | [`V2_1.md`](V2_1.md) | ✅ **`v2.1.0` em produção** (Voa Fase 1 integrada) |
+| **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
 
@@ -230,6 +231,20 @@ curl -s https://sistema-bibi.netlify.app/ | rg -o '/_next/static/chunks/[^"]+\.c
 ### Rollback “só documentação”
 
 Se o deploy falhar antes de publicar, basta **não** atualizar `RELEASES.md` como publicado — produção permanece na versão anterior.
+
+---
+
+## Changelog na landing (home)
+
+A seção **Novidades** (`/#novidades`) apresenta o changelog para demonstrações comerciais.
+
+| Momento | Arquivo |
+|---------|---------|
+| Ao fechar pacote | `src/lib/landing/changelog-content.ts` |
+| Junto com release | `src/lib/platform.ts`, `package.json` |
+| Instruções completas | [`../plataforma/LANDING_CHANGELOG.md`](../plataforma/LANDING_CHANGELOG.md) |
+
+**Regra:** quando este arquivo marca uma versão como **em produção**, a home deve exibir a mesma versão em destaque. `npm run docs:verify` valida o alinhamento.
 
 ---
 

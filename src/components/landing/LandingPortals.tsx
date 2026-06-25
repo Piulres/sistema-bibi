@@ -1,17 +1,22 @@
 import Link from "next/link";
 import type { NicheId } from "@/lib/niche/types";
+import type { BrandingTokens } from "@/lib/theme/tokens";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
-import { PORTAL_THEMES } from "@/lib/theme/portals";
+import { PORTAL_LABELS } from "@/lib/theme/portals";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 
 type Props = {
   niche: NicheId;
+  /** Cores dos cards — plataforma na home, segmento nas páginas de nicho. */
+  branding: BrandingTokens;
   segment?: { tenantSlug?: string | null; niche?: NicheId };
 };
 
-export default function LandingPortals({ niche, segment }: Props) {
+export default function LandingPortals({ niche, branding, segment }: Props) {
   const { portals } = getNicheLandingContent(niche, segment);
+  const accentFrom = branding.heroFrom;
+  const accentTo = branding.heroTo;
 
   return (
     <section
@@ -28,7 +33,7 @@ export default function LandingPortals({ niche, segment }: Props) {
 
       <ul className="mt-14 grid gap-5 sm:grid-cols-2">
         {portals.map((portal) => {
-          const theme = PORTAL_THEMES[portal.key];
+          const label = PORTAL_LABELS[portal.key];
           return (
             <li key={portal.href}>
               <Link
@@ -37,13 +42,19 @@ export default function LandingPortals({ niche, segment }: Props) {
               >
                 <article className="landing-card-hover relative h-full overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
                   <div
-                    className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--brand-primary)] to-[var(--brand-accent)] opacity-80"
+                    className="absolute inset-x-0 top-0 h-1 opacity-80"
+                    style={{
+                      backgroundImage: `linear-gradient(90deg, ${accentFrom}, ${accentTo})`,
+                    }}
                     aria-hidden
                   />
 
                   <div className="flex items-start justify-between gap-4">
                     <div
-                      className="ds-gradient-brand flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--text-inverse)] shadow-sm"
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-[var(--text-inverse)] shadow-sm"
+                      style={{
+                        background: `linear-gradient(135deg, ${branding.primaryColor}, ${branding.accentColor})`,
+                      }}
                       aria-hidden
                     >
                       <LandingIcon name="portals" className="h-6 w-6" />
@@ -54,13 +65,16 @@ export default function LandingPortals({ niche, segment }: Props) {
                   </div>
 
                   <h3 className="mt-5 text-lg font-semibold text-[var(--text-primary)]">
-                    {theme.label}
+                    {label}
                   </h3>
                   <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
                     {portal.description}
                   </p>
 
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-accent)] transition group-hover:gap-2.5">
+                  <span
+                    className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold transition group-hover:gap-2.5"
+                    style={{ color: branding.primaryColor }}
+                  >
                     Entrar no portal
                     <LandingIcon name="arrow-right" className="h-4 w-4" />
                   </span>

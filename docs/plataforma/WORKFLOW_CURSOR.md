@@ -20,7 +20,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | Integrar | GitHub | **PR (draft) → `dev`** — nunca direto na `main` |
 | Release | GitHub | merge `dev` → `main` (humano, ao fechar pacote) |
 | Publicar | **só você** | `npx netlify deploy --prod` |
-| Registrar | git | atualizar `docs/versoes/RELEASES.md` |
+| Registrar | git | atualizar `RELEASES.md` + changelog da landing (`LANDING_CHANGELOG.md`) |
 
 ### Branches
 
@@ -136,6 +136,7 @@ Assim só publica quando você roda `netlify deploy --prod` ou clica “Trigger 
 | Preferir `npm run dev` + testes locais | Economiza tokens e cota |
 | Usar `npm run pre-release` | Valida sem publicar |
 | Atualizar `RELEASES.md` | Só após deploy manual confirmado pelo usuário |
+| Atualizar changelog da landing | `changelog-content.ts` + `platform.ts` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md) |
 | Não investigar 503 como regressão | Resposta `usage_exceeded` = plano Netlify |
 
 ---

@@ -38,6 +38,25 @@ O modelo **Pay Per Use** cobra apenas serviços efetivamente utilizados, com tra
 prévia de valores e faturamento sem perdas de informação — de consultas médicas a
 horas técnicas jurídicas ou aulas de yoga.
 
+O núcleo tecnológico é o **Price Snapshot**: no ato do atendimento, `computePrice()`
+aplica as `PricingRule` corporativas e persiste o valor em
+`ProcedureUsage.priceCharged` — congelado, auditável, sem reajuste retroativo.
+
+### ROI Real (cenário 500 vidas)
+
+| Dimensão | Plano tradicional | Sistema Bibi (Pay Per Use) |
+|----------|-------------------|----------------------------|
+| Modelo | Mensalidade fixa por colaborador | Pagamento por utilização efetiva |
+| **Custo mensal** | **R$ 175.000** | **R$ 14.500** |
+| **Economia** | — | **~91%** (~R$ 160.500/mês) |
+
+Premissas: ticket médio de consulta corporativa **R$ 340** (base **R$ 400** − 15%
+desconto TechCorp via `PricingRule`), ~34 atendimentos/mês (~7% de utilização)
++ taxa de plataforma. Detalhamento:
+[`docs/pesquisa/09-sintese-consultor-senior.md`](docs/pesquisa/09-sintese-consultor-senior.md) ·
+[`docs/MONETIZACAO.md`](docs/MONETIZACAO.md) ·
+[`docs/plataforma/ROI_REFERENCIA.md`](docs/plataforma/ROI_REFERENCIA.md)
+
 | Portal | Público | Foco |
 |--------|---------|------|
 | **Portal do Prestador** | Profissionais (médicos, advogados, instrutores…) | Agenda e registro de serviços |
@@ -77,8 +96,12 @@ infraestrutura e acelerando time-to-market para novos verticais sem fork de cód
 
 ## 2. Pilares de negócio
 
-- **Pay Per Use** — cada procedimento utilizado é registrado com o preço
-  *congelado* no momento do uso (snapshot), garantindo transparência prévia.
+- **Price Snapshot** — mecanismo core que extingue a “caixa preta”: cada
+  procedimento registrado no atendimento congela o preço via `computePrice()` +
+  `PricingRule.multiplier` em `ProcedureUsage.priceCharged`, garantindo que RH,
+  CFO e beneficiário vejam o mesmo valor antes e depois do faturamento.
+- **Pay Per Use** — cobrança apenas pelo que foi efetivamente utilizado; sem
+  capitação ociosa nem sinistralidade opaca.
 - **Precificação dinâmica** — regras por empresa ajustam o preço base (ex.:
   desconto corporativo de 15% para a TechCorp em consultas clínicas).
 - **Previsibilidade financeira** — o faturamento agrega apenas o que foi usado e
@@ -237,9 +260,10 @@ Referência de onde cada entidade pode ser criada, lida, alterada ou removida na
 
 Diagrama completo com sequência cross-portal: [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md) §7.
 
-Exemplo de precificação dinâmica do seed: a **Consulta Clínica Médica** (base **R$ 320,00**,
-faixa R$ 300–R$ 500) para um beneficiário da **TechCorp** é cobrada por **R$ 272,00**
-(desconto corporativo de 15%). O valor é **congelado** em `ProcedureUsage.priceCharged` no ato do registro.
+Exemplo de precificação dinâmica do seed (ticket médio mercado 2026): **Consulta
+Clínica** com base **R$ 400,00**; beneficiário **TechCorp** paga **R$ 340,00**
+(`PricingRule.multiplier` 0,85 = desconto corporativo de 15%), valor congelado
+em `ProcedureUsage.priceCharged` no ato do atendimento.
 
 ## 8. Modelo de dados
 
@@ -481,6 +505,10 @@ sistema-bibi/
   [`docs/produto/JORNADA_CLIENTE.md`](docs/produto/JORNADA_CLIENTE.md)
 - **Auditoria de falhas nos quatro portais:**
   [`docs/produto/AUDITORIA_FLUXOS.md`](docs/produto/AUDITORIA_FLUXOS.md)
+- **Estratégia de monetização** (take rate, SaaS enterprise, analytics premium):
+  [`docs/MONETIZACAO.md`](docs/MONETIZACAO.md)
+- **Pesquisa competitiva e posicionamento ServiceOS:**
+  [`docs/pesquisa/README.md`](docs/pesquisa/README.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/plataforma/BENCHMARK.md`](docs/plataforma/BENCHMARK.md)
 - **Arquitetura ServiceOS v2.0 (multi-nicho):**

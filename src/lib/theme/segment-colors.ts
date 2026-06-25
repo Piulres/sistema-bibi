@@ -68,6 +68,7 @@ export function segmentGradientDiagonal(niche: NicheId): string {
   return `linear-gradient(135deg, ${colors.heroFrom}, ${colors.heroTo})`;
 }
 
+/** Estilo inline para pill/chip de segmento (switcher, menu mobile, selects). */
 export function segmentPillStyle(
   niche: NicheId,
   active: boolean,

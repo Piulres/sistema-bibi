@@ -367,21 +367,118 @@ sequenceDiagram
 
 ---
 
-## 4. Segregação de acesso (multi-tenancy)
+## 3.1 Price Snapshot — `ProcedureUsage` como coração do sistema
+
+A entidade **`ProcedureUsage`** é o coração do ServiceOS: cada linha representa um
+evento clínico-financeiro irreversível — procedimento utilizado, preço congelado,
+status de faturamento. Sem ela não há Pay Per Use, transparência para o RH nem
+margem auditável para a clínica. Todo o restante (fatura, PIX, Portal PJ) deriva
+deste snapshot.
+
+O **Price Snapshot** extingue a “caixa preta” da sinistralidade: o valor cobrado é
+**calculado e persistido no momento do atendimento**, antes de qualquer
+faturamento ou pagamento. Alterações futuras em `Procedure.basePrice` ou em
+`PricingRule` **não retroagem** sobre usos já registrados.
+
+### Fluxo técnico
+
+```mermaid
+sequenceDiagram
+  participant P as Prestador
+  participant API as POST .../procedures
+  participant CP as computePrice()
+  participant DB as Prisma
+
+  P->>API: { procedureId } no atendimento
+  API->>DB: Appointment + Patient.companyId
+  API->>CP: procedureId, companyId, tenantId
+  CP->>DB: Procedure.basePrice + PricingRule.multiplier
+  CP-->>API: { basePrice, multiplier, price }
+  API->>DB: ProcedureUsage { priceCharged: price, billed: false }
+  API-->>P: procedimento com preço congelado
+```
+
+### Entidades envolvidas
+
+| Entidade / função | Papel no snapshot |
+|-------------------|-------------------|
+| `Procedure.basePrice` | Preço de tabela do tenant |
+| `PricingRule.multiplier` | Ajuste por empresa (ex.: 0,85 → R$ 400 base = **R$ 340** TechCorp) |
+| `computePrice()` (`pricing.ts`) | Resolve preço efetivo antes da persistência |
+| `ProcedureUsage.priceCharged` | **Valor congelado** — fonte da verdade para faturamento |
+| `ProcedureUsage.billed` | `false` até virar `InvoiceItem` |
+| `InvoiceItem.amount` | Copiado do snapshot na emissão da fatura |
+
+### Ligação com faturamento
+
+1. Prestador registra uso → `priceCharged` definido, `billed = false`.
+2. Interno emite fatura (`invoice-service.ts`) → cria `InvoiceItem` com `usageId`,
+   marca `billed = true`.
+3. Beneficiário ou operador confirma PIX → `Payment` + `Invoice.status = PAGA`.
+
+O beneficiário e o Portal PJ consultam os mesmos `priceCharged` — não há divergência
+entre “preço mostrado no atendimento” e “preço na fatura”.
+
+> Referência de negócio: [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) ·
+> Monetização: [`MONETIZACAO.md`](MONETIZACAO.md)
+
+---
+
+## 4. Segregação de acesso e capitalização por portal
 
 ```mermaid
 flowchart LR
   R{role da sessão}
-  R -->|PRESTADOR| A["/prestador/*<br/>agenda, atendimento, PEP"]
-  R -->|INTERNO| B["/interno/*<br/>RBAC por internoProfile"]
-  R -->|PJ| C["/pj/*<br/>contratos, beneficiários"]
-  R -->|BENEFICIARIO| E["/beneficiario/*<br/>self-service"]
+  R -->|PRESTADOR| A["/prestador/*<br/>registra uso + PEP"]
+  R -->|INTERNO| B["/interno/*<br/>fatura + CRM + RBAC"]
+  R -->|PJ| C["/pj/*<br/>consome visão corporativa"]
+  R -->|BENEFICIARIO| E["/beneficiario/*<br/>paga + autoatendimento"]
   R -.->|role incorreto| D["403 / redirect ao login"]
 ```
 
 A validação ocorre em duas camadas: `src/proxy.ts` (checagem otimista do cookie,
 redireciona ao login) e o servidor (`requireUser([...roles])` em cada handler e
 `getSessionUser()` em cada página), que valida assinatura HMAC e `role`.
+
+### Capitalização independente — infraestrutura de confiança
+
+Cada portal participa do ciclo Pay Per Use em um ponto distinto, sem sobrepor
+permissões. Juntos, transformam o sistema em **infraestrutura de confiança** para
+todas as partes:
+
+| Portal | Ator | Papel na capitalização | Componentes |
+|--------|------|------------------------|-------------|
+| **Prestador** | Médico / clínica | **Origina** o snapshot — registra `ProcedureUsage` com `priceCharged` no atendimento | `POST .../appointments/{id}/procedures`, PEP |
+| **Interno** | Operação / faturamento | **Consolida** — agrupa usos `billed=false`, emite `Invoice`, aciona PIX | `invoice-service`, `/interno` billing |
+| **PJ** | RH / CFO | **Supervisiona** — vê consumo corporativo, descontos e relatórios sem alterar preços | `pj-portal-service`, `/api/pj/overview` |
+| **Beneficiário** | Colaborador / paciente | **Liquida** — consulta faturas e paga (PIX) o que foi usado | `/beneficiario`, `POST .../invoices/{id}/pay` |
+
+```mermaid
+flowchart TB
+  subgraph Prestador["Portal Prestador"]
+    U["ProcedureUsage<br/>priceCharged congelado"]
+  end
+  subgraph Interno["Portal Interno"]
+    I["Invoice + InvoiceItem<br/>billed = true"]
+    PIX["Payment PIX"]
+  end
+  subgraph PJ["Portal PJ"]
+    V["Visão consumo<br/>PricingRule visível"]
+  end
+  subgraph Ben["Portal Beneficiário"]
+    P["Pagamento<br/>confirmação"]
+  end
+
+  U --> I --> PIX
+  U -.->|leitura| V
+  I -.->|leitura| V
+  PIX --> P
+```
+
+Nenhum portal “reescreve” o snapshot de outro: o prestador grava, o interno
+fatura, o PJ audita, o beneficiário paga. Essa segregação garante **transparência
+financeira total** — o CFO confia que o número do Portal PJ é o mesmo que entrou
+na fatura e na margem da clínica.
 
 ---
 

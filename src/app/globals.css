@@ -161,6 +161,7 @@ body {
   );
 }
 
+/* Logo fallback — primary → accent (Energia Brasileira na home; segmento no portal) */
 .ds-logo-mark {
   background: linear-gradient(
     135deg,

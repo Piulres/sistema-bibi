@@ -10,7 +10,7 @@ type Props = {
   className?: string;
 };
 
-/** Seletor de segmento — links para `/segmentos/[slug]`. */
+/** Seletor de segmento — links para `/segmentos/[slug]` com cores do nicho. */
 export default function LandingNicheSwitcher({ className = "" }: Props) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -49,7 +49,7 @@ export default function LandingNicheSwitcher({ className = "" }: Props) {
             key={page.slug}
             href={page.href}
             className={`rounded-full border px-2.5 py-1 text-xs font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
-              isActive ? "shadow-sm" : "bg-transparent hover:opacity-90"
+              isActive ? "shadow-sm" : "bg-transparent hover:bg-[var(--surface-muted)]"
             }`}
             style={segmentPillStyle(page.niche, isActive)}
             aria-current={isActive ? "page" : undefined}

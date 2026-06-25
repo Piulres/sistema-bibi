@@ -10,6 +10,7 @@ import {
 import LandingProblem from "@/components/landing/LandingProblem";
 import LandingSolution from "@/components/landing/LandingSolution";
 import LandingRoi from "@/components/landing/LandingRoi";
+import LandingChangelog from "@/components/landing/LandingChangelog";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingPortals from "@/components/landing/LandingPortals";
 import LandingNiches from "@/components/landing/LandingNiches";
@@ -44,13 +45,14 @@ export default function LandingHomePageView({ branding }: Props) {
         <LandingProblem />
         <LandingSolution />
         <LandingRoi />
+        <LandingChangelog />
         <LandingFeatures
           sectionId="recursos"
           featuresSection={HOME_FEATURES_SECTION}
           features={HOME_FEATURES}
         />
         <LandingNiches />
-        <LandingPortals niche="MEDICAL" />
+        <LandingPortals niche="MEDICAL" branding={branding} />
         <LandingFaq items={HOME_FAQ} />
         <LandingCta branding={branding} niche="MEDICAL" description={HOME_CTA} />
       </main>

@@ -1,4 +1,4 @@
-import { NICHE_PRESETS_ENERGIA_BRASILEIRA } from "@/lib/theme/presets-energia-brasileira";
+import { SEGMENT_COLORS, segmentGradient, segmentGradientDiagonal } from "@/lib/theme/segment-colors";
 import { NICHE_CONFIGS } from "@/lib/niche/defaults";
 import { segmentLandingHref } from "@/lib/platform/structure";
 import type { NicheId } from "@/lib/niche/types";
@@ -24,7 +24,7 @@ export default function LandingNiches() {
 
         <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {NICHE_IDS.map((id) => {
-            const preset = NICHE_PRESETS_ENERGIA_BRASILEIRA[id];
+            const preset = SEGMENT_COLORS[id];
             const config = NICHE_CONFIGS[id];
             return (
               <li key={id}>
@@ -35,16 +35,14 @@ export default function LandingNiches() {
                 <article className="landing-card-hover h-full overflow-hidden rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
                   <div
                     className="h-2"
-                    style={{
-                      background: `linear-gradient(90deg, ${preset.primaryColor}, ${preset.accentColor})`,
-                    }}
+                    style={{ background: segmentGradient(id) }}
                     aria-hidden
                   />
                   <div className="p-5">
                     <div className="flex items-center gap-3">
                       <span
                         className="flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold text-white"
-                        style={{ backgroundColor: preset.primaryColor }}
+                        style={{ background: segmentGradientDiagonal(id) }}
                         aria-hidden
                       >
                         {preset.label.charAt(0)}

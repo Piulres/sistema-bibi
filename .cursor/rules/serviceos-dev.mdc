@@ -28,4 +28,5 @@ Fonte: `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` · Segmentos: `docs/segment
 ## Documentação
 
 - Índice: `docs/README.md` · Prompts: `docs/prompts/README.md`
+- Changelog na home: `docs/plataforma/LANDING_CHANGELOG.md` — atualizar `changelog-content.ts` ao fechar pacote
 - Histórico v1.x / HealthOS: só em `docs/versoes/V1_*.md` — não copiar para features novas

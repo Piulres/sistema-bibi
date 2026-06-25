@@ -34,6 +34,9 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `COMMUNICATION_PROVIDER` | Não | `console` (dev) | E-mail / SMS / WhatsApp |
 | `CRON_SECRET` | Sim (cron) | — | Jobs `/api/cron/*` |
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
+| `VOA_ENABLED` | Não | `false` | Assistente IA Voa no atendimento |
+| `VOA_INTEGRATION_TOKEN` | Se Voa ativo | — | Token plugin Voa Health |
+| `VOA_ENV` | Não | `homologacao` | `homologacao` \| `producao` (referência operacional) |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
 | `NEXT_PUBLIC_SALES_WHATSAPP` | Não | — | CTA comercial WhatsApp na landing |
 | `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Não | mensagem padrão | Texto pré-preenchido no wa.me |
@@ -233,6 +236,26 @@ TWILIO_AUTH_TOKEN=
 META_WHATSAPP_TOKEN=
 ```
 
+### Integração — Voa Health (IA clínica)
+
+Ver [`docs/VOA_INTEGRATION.md`](VOA_INTEGRATION.md).
+
+| Variável | Obrigatória | Padrão | Descrição |
+|----------|-------------|--------|-----------|
+| `VOA_ENABLED` | Não | `false` | Habilita aba Assistente IA no portal prestador |
+| `VOA_INTEGRATION_TOKEN` | Sim (se enabled) | — | Token fornecido pela Voa (`init` do plugin) |
+| `VOA_ENV` | Não | `homologacao` | Referência: `homologacao` (chave `sk_user_*`) ou `producao` |
+| `VOA_PLUGIN_SCRIPT_URL` | Não | `https://integration.voa.health/plugin.js` | URL do script |
+
+```env
+VOA_ENV=homologacao
+VOA_ENABLED=false
+# VOA_INTEGRATION_TOKEN=   # homologação: sk_user_* — só no .env local / Netlify
+# VOA_PLUGIN_SCRIPT_URL=https://integration.voa.health/plugin.js
+```
+
+Contato sandbox: integration@voahealth.com
+
 ---
 
 ## 6. SEO e URL pública
@@ -387,6 +410,9 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 | `COMMUNICATION_PROVIDER` | `src/lib/communications/bootstrap.ts`, `communication-gateway.ts`, `api/interno/messages` |
 | `CRON_SECRET` | `src/app/api/cron/reminders/route.ts`, `cron/webhooks/route.ts` |
 | `TELEMEDICINE_BASE_URL` | `src/lib/telemedicine.ts` |
+| `VOA_ENABLED` | `src/lib/voa/config.ts` |
+| `VOA_INTEGRATION_TOKEN` | `src/lib/voa/config.ts` |
+| `VOA_PLUGIN_SCRIPT_URL` | `src/lib/voa/config.ts` |
 | `NEXT_PUBLIC_SITE_URL` | `src/lib/landing/site-url.ts` |
 | `SEED_SCALE` | `prisma/seed-data/scale.ts` |
 | `ALLOW_DEMO_RESET` | `src/lib/demo-reset.ts` |

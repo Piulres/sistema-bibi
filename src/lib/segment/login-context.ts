@@ -4,6 +4,7 @@ import { getNicheConfig } from "@/lib/niche/defaults";
 import { getTenantBranding } from "@/lib/theme/branding";
 import { LOGIN_PORTAL_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
 import type { NicheId, NicheLabels } from "@/lib/niche/types";
+import { ensureDataStoreForSegmentAccess } from "@/lib/data-store/ensure-data-store-for-segment";
 import { resolveSegmentFromHeaders } from "@/lib/segment/resolve";
 import { resolveSegmentTenantRef } from "@/lib/segment/login-demo";
 import type { ResolvedSegment } from "@/lib/segment/types";
@@ -19,6 +20,11 @@ export async function getLoginSegmentContext(options?: {
   tenantSlug?: string | null;
   nicheParam?: string | null;
 }): Promise<LoginSegmentContext> {
+  await ensureDataStoreForSegmentAccess({
+    tenantSlug: options?.tenantSlug,
+    nicheParam: options?.nicheParam,
+  });
+
   const segment = await resolveSegmentFromHeaders(options);
   const nicheName = getNicheConfig(segment.niche).name;
 
