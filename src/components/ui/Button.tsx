@@ -6,11 +6,11 @@ const variants = {
   secondary:
     "border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] focus-visible:ring-[var(--ring-focus)] active:scale-95",
   portal:
-    "bg-[var(--portal-accent)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-[var(--ring-focus)] active:scale-95",
+    "bg-[var(--brand-accent)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-[var(--ring-focus)] active:scale-95",
   ghost:
     "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] focus-visible:ring-[var(--ring-focus)] active:scale-95",
   accent:
-    "bg-[var(--brand-accent)] text-[var(--text-inverse)] hover:bg-orange-500 focus-visible:ring-[var(--ring-focus)] active:scale-95",
+    "bg-[var(--brand-accent)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-[var(--ring-focus)] active:scale-95",
   danger:
     "bg-[var(--status-danger-text)] text-[var(--text-inverse)] hover:opacity-90 focus-visible:ring-red-200 active:scale-95",
 } as const;

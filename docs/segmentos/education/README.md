@@ -19,8 +19,12 @@ Escolas, mentorias e capacitação corporativa.
 |-------|--------|--------|
 | Interno | `operacao@eduprime.demo` | EduPrime |
 | Prestador | `prof.marcos@eduprime.demo` | EduPrime |
+| Aluno (beneficiário) | `aluno@eduprime.demo` | EduPrime |
+| Empresa PJ | `rh@educorp.demo` | EduPrime |
 
 Senha: **`bibi123`**
+
+Catálogo demo: aulas particulares, mentoria, workshops, inglês, certificações e treinamentos corporativos. Massa operacional com histórico e agendamentos futuros.
 
 ## Pesquisa
 
@@ -28,4 +32,5 @@ Senha: **`bibi123`**
 
 ## Código
 
-- Landing: `/?niche=EDUCATION`
+- Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`
+- Landing: `/?tenant=eduprime`

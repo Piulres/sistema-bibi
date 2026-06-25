@@ -1,5 +1,6 @@
 import "server-only";
 import crypto from "node:crypto";
+import { getSessionSecret } from "@/lib/security/config";
 
 const BASE32_ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
@@ -77,10 +78,9 @@ export function createMfaSetup(email: string) {
 }
 
 const MFA_CHALLENGE_COOKIE = "bibi_mfa_challenge";
-const SECRET = process.env.SESSION_SECRET ?? "bibi-poc-dev-secret-change-me";
 
 function sign(value: string): string {
-  const sig = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
+  const sig = crypto.createHmac("sha256", getSessionSecret()).update(value).digest("hex");
   return `${value}.${sig}`;
 }
 
@@ -90,7 +90,7 @@ function verifySigned(token: string | undefined): string | null {
   if (idx < 0) return null;
   const value = token.slice(0, idx);
   const sig = token.slice(idx + 1);
-  const expected = crypto.createHmac("sha256", SECRET).update(value).digest("hex");
+  const expected = crypto.createHmac("sha256", getSessionSecret()).update(value).digest("hex");
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
   if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;

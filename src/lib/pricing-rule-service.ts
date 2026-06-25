@@ -1,6 +1,8 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { computePrice, formatBRL } from "@/lib/pricing";
+import { buildChangeMetadata, buildDeleteMetadata } from "@/lib/change-management";
+import { snapshotPricingRule } from "@/lib/change-management/snapshots";
 import {
   recordTimelineEvent,
   TIMELINE_ACTIONS,
@@ -144,6 +146,8 @@ export async function updatePricingRule(input: {
     return { error: "Multiplicador deve ser maior que zero" as const };
   }
 
+  const beforeSnapshot = snapshotPricingRule(existing);
+
   const rule = await prisma.pricingRule.update({
     where: { id: existing.id },
     data: {
@@ -166,6 +170,8 @@ export async function updatePricingRule(input: {
     action: TIMELINE_ACTIONS.UPDATED,
     description: `Regra atualizada: ${rule.company?.name ?? "—"} · ${rule.procedure.code} — ${multiplierLabel(rule.multiplier)} → ${formatBRL(price)}`,
     createdBy: input.createdBy,
+    metadata: buildChangeMetadata(beforeSnapshot, snapshotPricingRule(rule)),
+    reversible: true,
   });
 
   return { rule: await mapRule(rule) };
@@ -183,6 +189,8 @@ export async function deletePricingRule(input: {
   });
   if (!existing) return null;
 
+  const beforeSnapshot = snapshotPricingRule(existing);
+
   await prisma.pricingRule.delete({ where: { id: existing.id } });
 
   await recordTimelineEvent({
@@ -192,6 +200,8 @@ export async function deletePricingRule(input: {
     action: TIMELINE_ACTIONS.DELETED,
     description: `Regra removida: ${existing.company?.name ?? "—"} · ${existing.procedure.code}`,
     createdBy: input.createdBy,
+    metadata: buildDeleteMetadata(beforeSnapshot),
+    reversible: true,
   });
 
   return { ok: true as const };

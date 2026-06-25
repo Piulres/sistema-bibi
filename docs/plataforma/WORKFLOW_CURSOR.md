@@ -20,7 +20,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | Integrar | GitHub | **PR (draft) → `dev`** — nunca direto na `main` |
 | Release | GitHub | merge `dev` → `main` (humano, ao fechar pacote) |
 | Publicar | **só você** | `npx netlify deploy --prod` |
-| Registrar | git | atualizar `docs/versoes/RELEASES.md` |
+| Registrar | git | atualizar `RELEASES.md` + changelog da landing (`LANDING_CHANGELOG.md`) |
 
 ### Branches
 
@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (jun/2026):** **v2.0.0** @ commit `49edb90` — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+**Produção (jun/2026):** **v2.1.0** — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_1.md`](../versoes/V2_1.md).
 
 ---
 
@@ -107,7 +107,7 @@ Se passar, o pacote está **pronto para publicação** — mas ainda **não** fo
 ```bash
 git checkout main && git pull
 npm run pre-release
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
+npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"
 ```
 
 Depois: atualize [`RELEASES.md`](../versoes/RELEASES.md) e faça commit na `main`.
@@ -136,6 +136,7 @@ Assim só publica quando você roda `netlify deploy --prod` ou clica “Trigger 
 | Preferir `npm run dev` + testes locais | Economiza tokens e cota |
 | Usar `npm run pre-release` | Valida sem publicar |
 | Atualizar `RELEASES.md` | Só após deploy manual confirmado pelo usuário |
+| Atualizar changelog da landing | `changelog-content.ts` + `platform.ts` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md) |
 | Não investigar 503 como regressão | Resposta `usage_exceeded` = plano Netlify |
 
 ---

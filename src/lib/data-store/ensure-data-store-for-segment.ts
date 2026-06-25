@@ -1,5 +1,6 @@
 import "server-only";
 import { SEGMENT_TENANTS } from "@/lib/niche/demo-accounts";
+import { isNicheId } from "@/lib/niche/types";
 import {
   getDataStoreMode,
   isDualDataStoreEnabled,
@@ -7,6 +8,9 @@ import {
   type DataStoreMode,
 } from "@/lib/data-store-mode";
 import { invalidatePrismaCache } from "@/lib/db";
+
+/** Tenant padrão do modo operação (bootstrap mínimo). */
+export const OPERATION_DEFAULT_TENANT_SLUG = "bibi-saude";
 
 /** Slugs dos tenants demo por segmento (horizonte, petcare, smile…). */
 export const DEMO_SEGMENT_TENANT_SLUGS = new Set(
@@ -34,7 +38,9 @@ export const DEMO_ONLY_SEGMENT_EMAILS = new Set(
 
 export function isDemoSegmentTenantSlug(slug: string | null | undefined): boolean {
   if (!slug) return false;
-  return DEMO_SEGMENT_TENANT_SLUGS.has(slug.toLowerCase());
+  const normalized = slug.toLowerCase().trim();
+  if (normalized === OPERATION_DEFAULT_TENANT_SLUG) return false;
+  return DEMO_SEGMENT_TENANT_SLUGS.has(normalized);
 }
 
 export function isDemoOnlySegmentEmail(email: string | null | undefined): boolean {
@@ -42,41 +48,49 @@ export function isDemoOnlySegmentEmail(email: string | null | undefined): boolea
   return DEMO_ONLY_SEGMENT_EMAILS.has(email.toLowerCase().trim());
 }
 
-export type EnsureDemoForSegmentOptions = {
+export type EnsureDataStoreForSegmentOptions = {
   tenantSlug?: string | null;
   nicheParam?: string | null;
   email?: string | null;
   segmentLanding?: boolean;
 };
 
+function targetStoreForSegment(options: EnsureDataStoreForSegmentOptions): DataStoreMode | null {
+  const slug = options.tenantSlug?.toLowerCase().trim();
+  if (slug === OPERATION_DEFAULT_TENANT_SLUG) return "operation";
+  if (slug && isDemoSegmentTenantSlug(slug)) return "demo";
+
+  if (options.segmentLanding) return "demo";
+  if (isDemoOnlySegmentEmail(options.email)) return "demo";
+
+  const niche = options.nicheParam?.toUpperCase() ?? null;
+  if (niche && isNicheId(niche) && niche !== "MEDICAL") return "demo";
+
+  return null;
+}
+
 /**
- * Garante modo demo quando o fluxo é de demonstração segmentada.
- * Operação real (`bibi-saude`) permanece no modo operação.
+ * Garante o banco correto ao acessar tenants demo (?tenant=lex, horizonte, petcare…),
+ * landing de segmento, e-mail demo exclusivo ou tenant de operação (?tenant=bibi-saude).
  */
-export async function ensureDemoDataStoreForSegmentAccess(
-  options: EnsureDemoForSegmentOptions = {},
+export async function ensureDataStoreForSegmentAccess(
+  options: EnsureDataStoreForSegmentOptions = {},
 ): Promise<DataStoreMode> {
   if (!isDualDataStoreEnabled()) {
     return getDataStoreMode();
   }
 
-  const niche = options.nicheParam?.toUpperCase() ?? null;
-  const needsDemo =
-    options.segmentLanding === true ||
-    isDemoSegmentTenantSlug(options.tenantSlug) ||
-    isDemoOnlySegmentEmail(options.email) ||
-    (niche !== null && niche !== "MEDICAL");
-
-  if (!needsDemo) {
+  const target = targetStoreForSegment(options);
+  if (!target) {
     return getDataStoreMode();
   }
 
   const current = await getDataStoreMode();
-  if (current === "demo") {
+  if (current === target) {
     return current;
   }
 
-  await setDataStoreMode("demo");
+  await setDataStoreMode(target);
   await invalidatePrismaCache();
-  return "demo";
+  return target;
 }

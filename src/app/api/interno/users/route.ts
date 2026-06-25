@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoAdmin, requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { createUser, listUsers } from "@/lib/user-service";
 
 export async function GET() {
@@ -14,7 +14,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoAdmin();
     const body = (await request.json()) as {
       email?: string;
       password?: string;

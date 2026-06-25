@@ -101,6 +101,7 @@ export function buildCadastrosTabs(labels: NicheLabels, niche: NicheId) {
 
   return [
     { key: "patients" as const, label: labels.beneficiaries },
+    ...(niche === "VET" ? [{ key: "pets" as const, label: labels.patients }] : []),
     { key: "companies" as const, label: companiesTabLabel(labels) },
     { key: "procedures" as const, label: labels.procedures },
     { key: "pricing" as const, label: "Precificação" },

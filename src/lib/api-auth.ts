@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { getSessionUser, type SessionUser } from "@/lib/session";
 import {
   hasInternoPermission,
+  isInternoAdmin,
   type InternoModule,
 } from "@/lib/interno-permissions";
 
@@ -35,6 +36,15 @@ export async function requireInternoModule(module: InternoModule): Promise<Sessi
   const user = await requireUser(["INTERNO"]);
   if (!hasInternoPermission(user.role, user.internoProfile, module)) {
     throw new ApiAuthError(403, "Sem permissão para este módulo");
+  }
+  return user;
+}
+
+/** Garante perfil ADMIN no portal interno. */
+export async function requireInternoAdmin(): Promise<SessionUser> {
+  const user = await requireUser(["INTERNO"]);
+  if (!isInternoAdmin(user.role, user.internoProfile)) {
+    throw new ApiAuthError(403, "Somente administradores podem executar esta ação");
   }
   return user;
 }

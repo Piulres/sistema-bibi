@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoAdmin, authErrorResponse } from "@/lib/api-auth";
 import { updateUser } from "@/lib/user-service";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoAdmin();
     const { id } = await params;
     const body = (await request.json()) as {
       email?: string;

@@ -33,14 +33,14 @@ export function isInternoProfile(value: string): value is InternoProfile {
   return PROFILE_SET.has(value);
 }
 
-/** null/undefined = ADMIN (compatibilidade seed). */
+/** null/undefined/inválido = READONLY (menor privilégio). */
 export function resolveInternoPermissions(
   role: string,
   internoProfile: string | null | undefined,
 ): InternoModule[] {
   if (role !== "INTERNO") return [];
   if (!internoProfile || !isInternoProfile(internoProfile)) {
-    return [...INTERNO_PROFILES.ADMIN];
+    return [...INTERNO_PROFILES.READONLY];
   }
   return [...INTERNO_PROFILES[internoProfile]];
 }
@@ -58,7 +58,7 @@ export function isInternoAdmin(
   internoProfile: string | null | undefined,
 ): boolean {
   if (role !== "INTERNO") return false;
-  return !internoProfile || internoProfile === "ADMIN";
+  return internoProfile === "ADMIN";
 }
 
 export function internoProfileLabel(profile: string | null | undefined): string {
@@ -72,6 +72,6 @@ export function internoProfileLabel(profile: string | null | undefined): string 
     case "ADMIN":
       return "Administrador";
     default:
-      return "Administrador (padrão)";
+      return "Somente leitura (padrão)";
   }
 }

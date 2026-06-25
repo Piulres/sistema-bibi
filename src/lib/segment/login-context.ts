@@ -1,11 +1,12 @@
 import "server-only";
-import { applyNicheBrandingDefaults } from "@/lib/niche/branding";
+import { applyNicheBrandingDefaults, nicheLandingBranding } from "@/lib/niche/branding";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import { getTenantBranding } from "@/lib/theme/branding";
 import { LOGIN_PORTAL_BRANDING, type BrandingTokens } from "@/lib/theme/tokens";
 import type { NicheId, NicheLabels } from "@/lib/niche/types";
-import { ensureDemoDataStoreForSegmentAccess } from "@/lib/data-store/ensure-demo-for-segment";
+import { ensureDataStoreForSegmentAccess } from "@/lib/data-store/ensure-data-store-for-segment";
 import { resolveSegmentFromHeaders } from "@/lib/segment/resolve";
+import { resolveSegmentTenantRef } from "@/lib/segment/login-demo";
 import type { ResolvedSegment } from "@/lib/segment/types";
 
 export type LoginSegmentContext = ResolvedSegment & {
@@ -19,7 +20,7 @@ export async function getLoginSegmentContext(options?: {
   tenantSlug?: string | null;
   nicheParam?: string | null;
 }): Promise<LoginSegmentContext> {
-  await ensureDemoDataStoreForSegmentAccess({
+  await ensureDataStoreForSegmentAccess({
     tenantSlug: options?.tenantSlug,
     nicheParam: options?.nicheParam,
   });
@@ -42,9 +43,14 @@ export async function getLoginSegmentContext(options?: {
       colorScheme: tenantBranding.colorScheme,
       customDomain: tenantBranding.customDomain,
       customDomainVerified: tenantBranding.customDomainVerified,
-    });
+    }, { fromDatabase: true });
   } else {
-    branding = applyNicheBrandingDefaults(segment.niche, branding);
+    const ref = resolveSegmentTenantRef(segment.tenantSlug, segment.niche);
+    branding = nicheLandingBranding(segment.niche, {
+      ...LOGIN_PORTAL_BRANDING,
+      displayName: ref.tenant,
+      tagline: getNicheConfig(segment.niche).tagline,
+    });
   }
 
   return {

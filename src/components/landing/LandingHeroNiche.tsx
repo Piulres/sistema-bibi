@@ -5,6 +5,9 @@ import LandingIcon from "@/components/landing/LandingIcon";
 import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
 import Link from "next/link";
+import { landingCtaClasses } from "@/components/landing/landing-cta";
+import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
+import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
 type Props = {
   niche: NicheId;
@@ -39,10 +42,10 @@ export default function LandingHeroNiche({ niche, branding }: Props) {
 
           <h1
             id="hero-heading"
-            className="landing-fade-in mt-8 text-4xl font-bold tracking-tight sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
+            className="landing-fade-in mt-8 text-4xl tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
           >
-            {landing.headline}{" "}
-            <span className="landing-gradient-text">{landing.headlineAccent}</span>
+            <span className="font-light">{landing.headline}</span>{" "}
+            <span className="font-bold">{landing.headlineAccent}</span>
           </h1>
 
           <p className="landing-fade-in mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
@@ -55,19 +58,24 @@ export default function LandingHeroNiche({ niche, branding }: Props) {
           </p>
 
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
+            <LandingTrackedCta
               href="#portais"
-              className="group inline-flex items-center justify-center gap-2 rounded-[var(--radius-button)] bg-[var(--brand-accent)] px-6 py-3.5 text-base font-semibold text-[var(--surface-inverse)] shadow-lg transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              event="cta_portals_click"
+              location="hero-segment"
+              variant="hero"
+              size="lg"
+              className="group"
             >
               Explorar portais
               <LandingIcon
                 name="arrow-right"
                 className="h-5 w-5 transition group-hover:translate-x-0.5"
               />
-            </Link>
+            </LandingTrackedCta>
+            <LandingWhatsAppCta variant="hero-ghost" size="lg" location="hero-segment" />
             <Link
               href="#recursos"
-              className="inline-flex items-center justify-center rounded-[var(--radius-button)] border border-white/20 bg-white/8 px-6 py-3.5 text-base font-semibold text-white backdrop-blur-sm transition hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent"
+              className={landingCtaClasses("hero-ghost", "lg")}
             >
               Ver recursos
             </Link>

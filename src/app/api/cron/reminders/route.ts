@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { enqueueDueReminders } from "@/lib/reminder-service";
+import { isValidCronSecret } from "@/lib/security/cron-auth";
 
 /**
  * Job agendado de lembretes — protegido por CRON_SECRET.
@@ -8,10 +9,10 @@ import { enqueueDueReminders } from "@/lib/reminder-service";
  */
 export async function POST(request: Request) {
   const prisma = await getPrisma();
-  const secret = request.headers.get("x-cron-secret") ?? request.headers.get("authorization");
+  const secret = request.headers.get("x-cron-secret");
   const expected = process.env.CRON_SECRET?.trim();
 
-  if (!expected || secret !== expected) {
+  if (!isValidCronSecret(secret, expected)) {
     return NextResponse.json({ error: "Não autorizado" }, { status: 401 });
   }
 

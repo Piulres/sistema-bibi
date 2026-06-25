@@ -11,6 +11,16 @@ import {
 const SLOT_START_HOUR = 8;
 const SLOT_END_HOUR = 18;
 
+export type AppointmentSlot = {
+  start: string;
+  label: string;
+};
+
+export type AppointmentSlotWithProvider = AppointmentSlot & {
+  providerId: string;
+  providerName: string;
+};
+
 function startOfDay(date: Date): Date {
   const d = new Date(date);
   d.setHours(0, 0, 0, 0);
@@ -23,28 +33,8 @@ function endOfDay(date: Date): Date {
   return d;
 }
 
-/** Gera slots de 30min entre 8h e 18h excluindo horários já ocupados. */
-export async function getAvailableSlots(input: {
-  tenantId: string;
-  providerId: string;
-  date: Date;
-}): Promise<{ slots: { start: string; label: string }[] }> {
-  const prisma = await getPrisma();
-  const dayStart = startOfDay(input.date);
-  const dayEnd = endOfDay(input.date);
-
-  const booked = await prisma.appointment.findMany({
-    where: {
-      tenantId: input.tenantId,
-      providerId: input.providerId,
-      scheduledAt: { gte: dayStart, lte: dayEnd },
-      status: { notIn: ["CANCELADO", "FALTOU"] },
-    },
-    select: { scheduledAt: true },
-  });
-
-  const bookedSet = new Set(booked.map((b) => b.scheduledAt.getTime()));
-  const slots: { start: string; label: string }[] = [];
+function buildDaySlots(dayStart: Date, bookedSet: Set<number>): AppointmentSlot[] {
+  const slots: AppointmentSlot[] = [];
   const now = Date.now();
 
   for (let hour = SLOT_START_HOUR; hour < SLOT_END_HOUR; hour++) {
@@ -66,22 +56,134 @@ export async function getAvailableSlots(input: {
     }
   }
 
+  return slots;
+}
+
+/** Gera slots de 30min entre 8h e 18h excluindo horários já ocupados. */
+export async function getAvailableSlots(input: {
+  tenantId: string;
+  providerId: string;
+  date: Date;
+}): Promise<{ slots: AppointmentSlot[] }> {
+  const prisma = await getPrisma();
+  const dayStart = startOfDay(input.date);
+  const dayEnd = endOfDay(input.date);
+
+  const booked = await prisma.appointment.findMany({
+    where: {
+      tenantId: input.tenantId,
+      providerId: input.providerId,
+      scheduledAt: { gte: dayStart, lte: dayEnd },
+      status: { notIn: ["CANCELADO", "FALTOU"] },
+    },
+    select: { scheduledAt: true },
+  });
+
+  const bookedSet = new Set(booked.map((b) => b.scheduledAt.getTime()));
+  return { slots: buildDaySlots(dayStart, bookedSet) };
+}
+
+/** Slots livres de todos os prestadores em uma data (para quem não tem preferência). */
+export async function getAvailableSlotsAcrossProviders(input: {
+  tenantId: string;
+  date: Date;
+}): Promise<{ slots: AppointmentSlotWithProvider[] }> {
+  const prisma = await getPrisma();
+  const providers = await prisma.user.findMany({
+    where: { tenantId: input.tenantId, role: "PRESTADOR" },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
+  const slots: AppointmentSlotWithProvider[] = [];
+  for (const provider of providers) {
+    const { slots: providerSlots } = await getAvailableSlots({
+      tenantId: input.tenantId,
+      providerId: provider.id,
+      date: input.date,
+    });
+    for (const slot of providerSlots) {
+      slots.push({
+        ...slot,
+        providerId: provider.id,
+        providerName: provider.name,
+        label: `${slot.label} — ${provider.name}`,
+      });
+    }
+  }
+
+  slots.sort((a, b) => a.start.localeCompare(b.start));
   return { slots };
+}
+
+/** Primeiro prestador livre no horário exato (atribuição automática). */
+export async function findAvailableProviderAt(input: {
+  tenantId: string;
+  scheduledAt: Date;
+  preferredProviderId?: string;
+}): Promise<{ id: string; name: string } | null> {
+  const prisma = await getPrisma();
+  const providers = await prisma.user.findMany({
+    where: { tenantId: input.tenantId, role: "PRESTADOR" },
+    select: { id: true, name: true },
+    orderBy: { name: "asc" },
+  });
+
+  const ordered = input.preferredProviderId
+    ? [
+        ...providers.filter((p) => p.id === input.preferredProviderId),
+        ...providers.filter((p) => p.id !== input.preferredProviderId),
+      ]
+    : providers;
+
+  for (const provider of ordered) {
+    const conflict = await prisma.appointment.findFirst({
+      where: {
+        tenantId: input.tenantId,
+        providerId: provider.id,
+        scheduledAt: input.scheduledAt,
+        status: { notIn: ["CANCELADO", "FALTOU"] },
+      },
+      select: { id: true },
+    });
+    if (!conflict) return provider;
+  }
+
+  return null;
 }
 
 export async function bookBeneficiaryAppointment(input: {
   tenantId: string;
   patientId: string;
-  providerId: string;
+  petId?: string | null;
+  providerId?: string;
+  procedureId?: string;
   scheduledAt: Date;
   reason?: string | null;
   modality?: string;
+  autoAssignProvider?: boolean;
   createdBy: string;
 }) {
+  let providerId = input.providerId;
+
+  if (!providerId) {
+    if (!input.autoAssignProvider) {
+      return { error: "Informe o prestador ou escolha sem preferência" as const };
+    }
+    const assigned = await findAvailableProviderAt({
+      tenantId: input.tenantId,
+      scheduledAt: input.scheduledAt,
+    });
+    if (!assigned) {
+      return { error: "Nenhum prestador disponível neste horário" as const };
+    }
+    providerId = assigned.id;
+  }
+
   const slotDate = startOfDay(input.scheduledAt);
   const { slots } = await getAvailableSlots({
     tenantId: input.tenantId,
-    providerId: input.providerId,
+    providerId,
     date: slotDate,
   });
 
@@ -93,7 +195,9 @@ export async function bookBeneficiaryAppointment(input: {
   return createAppointment({
     tenantId: input.tenantId,
     patientId: input.patientId,
-    providerId: input.providerId,
+    petId: input.petId,
+    providerId,
+    procedureId: input.procedureId,
     scheduledAt: input.scheduledAt,
     reason: input.reason,
     modality: input.modality,
@@ -140,9 +244,10 @@ export async function cancelBeneficiaryAppointment(input: {
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
     entityId: appointment.id,
-    action: TIMELINE_ACTIONS.UPDATED,
+    action: TIMELINE_ACTIONS.CANCELLED,
     description: `${appointment.patient.name} cancelou consulta agendada`,
     createdBy: input.createdBy,
+    reversible: false,
   });
 
   return { ok: true as const, status: "CANCELADO" as const };

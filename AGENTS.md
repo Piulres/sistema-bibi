@@ -47,7 +47,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v2.0.0`** — **Sistema Bibi - ServiceOS** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md` (deploy atual).
+(cota Netlify). Produção: **`v2.1.0`** — **Sistema Bibi - ServiceOS** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md` (deploy atual).
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
@@ -102,12 +102,12 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 | Setup banco VM nova | `db:push && db:seed` | ✅ Sim |
 | Reset banco | `npm run db:reset` | ❌ Bloqueado |
 | Deploy produção | `netlify deploy --prod` | ❌ Só se usuário pedir |
-| Atualizar release | `docs/versoes/RELEASES.md` | ❌ Só após deploy confirmado |
+| Atualizar release | `docs/versoes/RELEASES.md` + changelog landing | ❌ Só após deploy confirmado |
 | Abrir PR | base **`dev`** | ❌ PR direto na `main` |
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.0.0`** — `docs/versoes/V2_0.md` · `docs/versoes/RELEASES.md`.
+**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.1.0`** — `docs/versoes/V2_1.md` · `docs/versoes/V2_0.md` · `docs/versoes/RELEASES.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 
@@ -143,7 +143,9 @@ Mapa completo: [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVE
 | Prestador | `src/app/prestador/layout.tsx` | `PrestadorNav` | Atendimento (`buildAtendimentoBreadcrumbs`) |
 | PJ | `src/app/pj/layout.tsx` | `SectionNav` — 4 seções | — |
 | Beneficiário | `src/app/beneficiario/layout.tsx` | `SectionNav` — **11 abas** | — |
-| Landing | — | `LandingHeader` + `LandingMobileMenu` | — |
+| Landing | — | `LandingHeader` + `LandingMobileMenu` · `#novidades` (changelog) | — |
+
+**Changelog na home:** seção `#novidades` alimentada por `src/lib/landing/changelog-content.ts`. **Atualizar sempre ao fechar pacote** — ver `docs/plataforma/LANDING_CHANGELOG.md` (junto com `RELEASES.md` e `src/lib/platform.ts`). Validar com `npm run docs:verify`.
 
 **Config:** `src/lib/navigation/routes.ts` · **Padrão:** pages só com `PageHeader` + view (não repetir `PortalShell`/`InternoNav`).
 
@@ -176,7 +178,7 @@ Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particula
   Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.
 - **Política de deploy (agentes):** **NUNCA** executar `netlify deploy --prod` nem investigar produção
   em loop, salvo pedido explícito do usuário. Testar com `npm run dev` / `npm run pre-release`.
-  Pacotes fechados: `docs/versoes/RELEASES.md`.
+  Pacotes fechados: `docs/versoes/RELEASES.md` · changelog UI: `docs/plataforma/LANDING_CHANGELOG.md`.
 - **Design system / white label:** tokens em `src/app/globals.css`, primitivos em
   `src/components/ui/`, branding por tenant via `TenantBranding` + `TenantTheme`.
   Ver `docs/plataforma/DESIGN_SYSTEM.md`. **Navegação SPA (PR #58):** layouts por portal em
@@ -192,5 +194,6 @@ Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particula
   `docs/plataforma/ARQUITETURA.md`, `docs/plataforma/NOTEBOOKLM.md` (RAG), `docs/plataforma/PAYMENTS.md`, `docs/plataforma/COMMUNICATIONS.md`,
   `docs/plataforma/HISTORICO_2026-06-21.md` (auditoria PRs/deploys), `docs/plataforma/OPERACOES.md` (mapa de operações),
   `docs/versoes/V2_0.md` (escopo ServiceOS v2.0), `docs/versoes/V2_0_ARCHITECTURE.md` (arquitetura multi-nicho),
-  `docs/versoes/RELEASES.md` (pacotes fechados), `docs/plataforma/WORKFLOW_CURSOR.md` (dev sem deploy),
+  `docs/versoes/RELEASES.md` (pacotes fechados),   `docs/plataforma/WORKFLOW_CURSOR.md` (dev sem deploy),
+  `docs/plataforma/LANDING_CHANGELOG.md` (manutenção do bloco Novidades na home),
   `.cursor/rules/operacoes-bibi.mdc` (core), `netlify-release.mdc` (deploy), `stack-nextjs.mdc` (código), `docs/evidencias/` (capturas dos fluxos).

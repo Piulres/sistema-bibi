@@ -7,7 +7,7 @@ import { formatBRL } from "@/lib/pricing";
 export async function GET() {
   const prisma = await getPrisma();
   try {
-    const user = await requireUser(["PRESTADOR", "INTERNO"]);
+    const user = await requireUser(["PRESTADOR", "INTERNO", "BENEFICIARIO"]);
 
     const procedures = await prisma.procedure.findMany({
       where: { tenantId: user.tenantId },

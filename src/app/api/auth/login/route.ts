@@ -7,12 +7,13 @@ import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/
 import { createMfaChallengeToken } from "@/lib/mfa";
 import { isNicheId } from "@/lib/niche/types";
 import { getNicheConfig } from "@/lib/niche/defaults";
-import { ensureDemoDataStoreForSegmentAccess } from "@/lib/data-store/ensure-demo-for-segment";
+import { ensureDataStoreForSegmentAccess } from "@/lib/data-store/ensure-data-store-for-segment";
 import {
   buildLoginSegmentResponse,
   validateUserSegmentAccess,
 } from "@/lib/segment/auth";
 import { persistSegmentCookie } from "@/lib/segment/cookie";
+import { enforceAuthRateLimit } from "@/lib/security/rate-limit";
 
 export async function POST(request: Request) {
   let body: { email?: string; password?: string; portal?: string; tenantSlug?: string };
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
     );
   }
 
-  await ensureDemoDataStoreForSegmentAccess({ tenantSlug, email });
+  await ensureDataStoreForSegmentAccess({ tenantSlug, email });
 
   const prisma = await getPrisma();
 
@@ -45,11 +46,16 @@ export async function POST(request: Request) {
   });
 
   if (!user || !verifyPassword(password, user.password)) {
+    const blocked = enforceAuthRateLimit(request, "login", true);
+    if (blocked) return blocked;
     return NextResponse.json(
       { error: "E-mail ou senha incorretos" },
       { status: 401 },
     );
   }
+
+  const blocked = enforceAuthRateLimit(request, "login", false);
+  if (blocked) return blocked;
 
   if (user.role !== portalConfig.role) {
     return NextResponse.json(

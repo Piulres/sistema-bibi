@@ -19,10 +19,8 @@
   DATABASE_URL = "file:./dev.db"
   DUAL_DATA_STORE = "true"
   NETLIFY = "true"
-  ALLOW_DEMO_RESET = "true"
-  # Defina SESSION_SECRET no painel Netlify (Site settings > Environment variables).
-  # O valor abaixo e apenas fallback da POC — troque antes de ir a producao.
-  SESSION_SECRET = "bibi-poc-netlify-secret-change-me"
+  # SESSION_SECRET e CRON_SECRET: definir no painel Netlify (≥ 32 chars). Não commitar valores reais.
+  ALLOW_DEMO_RESET = "false"
 
 [[plugins]]
   package = "./netlify/plugins/patch-regional-blobs"
@@ -33,8 +31,7 @@
 [context.production.environment]
   NODE_ENV = "production"
   NETLIFY = "true"
-  # POC demo: botão restaurar seed em /interno/seguranca (somente ADMIN)
-  ALLOW_DEMO_RESET = "true"
+  ALLOW_DEMO_RESET = "false"
 
 # Contexto de deploy para ambiente de OPERAÇÃO (Postgres — sem massa demo).
 # Uso: npx netlify deploy --prod --build --context operation
@@ -50,8 +47,6 @@
   NODE_ENV = "production"
   NETLIFY = "true"
   ALLOW_DEMO_RESET = "true"
-
-# Emulacao local: netlify dev encaminha :8888 → next dev :3000
 [dev]
   command = "npm run dev"
   targetPort = 3000
@@ -64,6 +59,10 @@
     X-Frame-Options = "DENY"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    X-Permitted-Cross-Domain-Policies = "none"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=()"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
 
 [[headers]]
   for = "/api/branding/logo/*"

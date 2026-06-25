@@ -74,7 +74,7 @@ function mapMedication(
 export async function listPatientMedications(
   patientId: string,
   tenantId: string,
-  options?: { status?: MedicationStatus; activeOnly?: boolean },
+  options?: { status?: MedicationStatus; activeOnly?: boolean; petId?: string; tutorOnly?: boolean },
 ): Promise<MedicationView[]> {
   const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
@@ -88,8 +88,14 @@ export async function listPatientMedications(
       ? { status: "ATIVA" }
       : {};
 
+  const petFilter = options?.petId
+    ? { petId: options.petId }
+    : options?.tutorOnly
+      ? { petId: null }
+      : {};
+
   const rows = await prisma.medicationPrescription.findMany({
-    where: { patientId, ...statusFilter },
+    where: { patientId, ...statusFilter, ...petFilter },
     include: { provider: { select: { name: true } } },
     orderBy: [{ status: "asc" }, { startDate: "desc" }],
   });
@@ -102,6 +108,7 @@ export async function createMedicationPrescription(input: {
   tenantId: string;
   providerId: string;
   appointmentId?: string | null;
+  petId?: string | null;
   medication: string;
   dosage: string;
   frequency: string;
@@ -111,6 +118,14 @@ export async function createMedicationPrescription(input: {
   patientName: string;
 }): Promise<MedicationView> {
   const prisma = await getPrisma();
+
+  if (input.petId) {
+    const pet = await prisma.pet.findFirst({
+      where: { id: input.petId, tenantId: input.tenantId, patientId: input.patientId },
+    });
+    if (!pet) throw new Error("Pet não encontrado");
+  }
+
   const endDate =
     input.durationDays && input.durationDays > 0
       ? new Date(Date.now() + input.durationDays * 86_400_000)
@@ -119,6 +134,7 @@ export async function createMedicationPrescription(input: {
   const row = await prisma.medicationPrescription.create({
     data: {
       patientId: input.patientId,
+      petId: input.petId ?? null,
       providerId: input.providerId,
       appointmentId: input.appointmentId ?? null,
       medication: input.medication.trim(),
@@ -182,4 +198,20 @@ export async function updateMedicationStatus(input: {
   });
 
   return mapMedication(row);
+}
+
+/** Encerra prescrição ativa (cancelamento clínico). */
+export async function cancelMedicationPrescription(input: {
+  id: string;
+  tenantId: string;
+  providerId: string;
+  patientName: string;
+}): Promise<MedicationView | null> {
+  return updateMedicationStatus({
+    id: input.id,
+    tenantId: input.tenantId,
+    providerId: input.providerId,
+    status: "SUSPENSA",
+    patientName: input.patientName,
+  });
 }

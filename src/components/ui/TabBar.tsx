@@ -35,8 +35,8 @@ export default function TabBar({
             className={cn(
               "-mb-px shrink-0 snap-start border-b-2 px-4 py-2.5 text-sm font-medium transition",
               active === tab.key
-                ? "border-[var(--portal-accent)] text-[var(--portal-accent)]"
-                : "border-transparent text-[var(--text-muted)] hover:border-[var(--border-muted)] hover:text-[var(--text-secondary)]",
+                ? "border-[var(--brand-accent)] text-[var(--brand-accent)]"
+                : "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
             )}
             aria-current={active === tab.key ? "page" : undefined}
           >

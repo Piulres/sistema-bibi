@@ -3,6 +3,7 @@ import { GET as patientsGet, POST as patientsPost } from "@/app/api/interno/pati
 import { PATCH as patientPatch } from "@/app/api/interno/patients/[id]/route";
 import { GET as companiesGet, POST as companiesPost } from "@/app/api/interno/companies/route";
 import { PATCH as companyPatch } from "@/app/api/interno/companies/[id]/route";
+import { PATCH as companyStatusPatch } from "@/app/api/interno/companies/[id]/status/route";
 import { GET as proceduresGet, POST as proceduresPost } from "@/app/api/interno/procedures/route";
 import { PUT as procedurePut, DELETE as procedureDelete } from "@/app/api/interno/procedures/[id]/route";
 import { GET as usersGet, POST as usersPost } from "@/app/api/interno/users/route";
@@ -134,8 +135,8 @@ describe("API — CRUD Cadastros (interno)", () => {
       const created = await createRes.json();
       const id = created.company.id as string;
 
-      const patchRes = await companyPatch(
-        new Request(`http://localhost/api/interno/companies/${id}`, {
+      const patchRes = await companyStatusPatch(
+        new Request(`http://localhost/api/interno/companies/${id}/status`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ status: "NEGOCIACAO" }),
@@ -145,6 +146,16 @@ describe("API — CRUD Cadastros (interno)", () => {
       expect(patchRes.status).toBe(200);
       const patched = await patchRes.json();
       expect(patched.company.status).toBe("NEGOCIACAO");
+
+      const blockedStatusOnCadastros = await companyPatch(
+        new Request(`http://localhost/api/interno/companies/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "ATIVO" }),
+        }),
+        { params: Promise.resolve({ id }) },
+      );
+      expect(blockedStatusOnCadastros.status).toBe(403);
     });
 
     it("rejeita CNPJ inválido", async () => {

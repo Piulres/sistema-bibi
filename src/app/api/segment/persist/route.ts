@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { ensureDemoDataStoreForSegmentAccess } from "@/lib/data-store/ensure-demo-for-segment";
+import { ensureDataStoreForSegmentAccess } from "@/lib/data-store/ensure-data-store-for-segment";
 import { resolveSegmentFromHeaders } from "@/lib/segment/resolve";
 import { persistSegmentCookie } from "@/lib/segment/cookie";
 
@@ -17,9 +17,9 @@ export async function POST(request: Request) {
     // body vazio — usa só cookie/headers atuais
   }
 
-  await ensureDemoDataStoreForSegmentAccess({
-    tenantSlug: body.tenant,
-    nicheParam: body.niche,
+  await ensureDataStoreForSegmentAccess({
+    tenantSlug: body.tenant ?? null,
+    nicheParam: body.niche ?? null,
   });
 
   const segment = await resolveSegmentFromHeaders({

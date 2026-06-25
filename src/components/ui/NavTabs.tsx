@@ -19,8 +19,8 @@ type Props = {
 export default function NavTabs({
   tabs,
   active,
-  activeClass = "border-[var(--portal-accent)] text-[var(--portal-accent)]",
-  idleClass = "border-transparent text-[var(--text-muted)] hover:border-[var(--border-default)] hover:text-[var(--text-secondary)]",
+  activeClass = "border-[var(--brand-accent)] text-[var(--brand-accent)]",
+  idleClass = "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
   className,
 }: Props) {
   return (

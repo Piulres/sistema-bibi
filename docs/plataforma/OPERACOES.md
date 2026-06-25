@@ -30,7 +30,7 @@ flowchart LR
     G --> G2[merge dev → main]
     G2 --> H{Cota Netlify OK?}
     H -->|503 usage_exceeded| I[Aguardar reset / upgrade]
-    H -->|OK| J["npx netlify deploy --prod --no-build"]
+    H -->|OK| J["npx netlify deploy --prod"]
     J --> K[Atualizar RELEASES.md]
   end
 
@@ -181,9 +181,13 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 - [ ] `git checkout main && git pull && git merge dev` (ou PR `dev` → `main`)
 - [ ] `npm run pre-release` — sem erros
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
-- [ ] `npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"`
+- [ ] `npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"`
+- [ ] Smoke test: `/_next/static/chunks/*.css` retorna **200**
 - [ ] Smoke test: landing + um login por portal
 - [ ] Atualizar [`RELEASES.md`](../versoes/RELEASES.md) (mover rascunho → produção)
+- [ ] Atualizar changelog da landing: `src/lib/landing/changelog-content.ts` + `src/lib/platform.ts` + `package.json` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md)
+- [ ] Smoke test: `/#novidades` exibe a versão publicada
+- [ ] `npm run docs:verify`
 - [ ] Commit: `docs(release): fecha pacote bibi-poc-YYYY-MM-DDx`
 - [ ] (Opcional) Tag git: `git tag -a bibi-poc-...`
 
@@ -193,7 +197,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.0.0`** — **Sistema Bibi - ServiceOS**. Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v2.1.0`** — **Sistema Bibi - ServiceOS**. Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -203,7 +207,7 @@ Exemplo atual em produção: **`v2.0.0`** — **Sistema Bibi - ServiceOS**. Ver 
 |----------|-----------------|-------|
 | Validar build CI | `npm run pre-release` | Não publica |
 | Preview | `npx netlify deploy` | Não afeta produção |
-| Produção | `npx netlify deploy --prod --no-build` | **Só com pedido explícito** — após `pre-release` local |
+| Produção | `npx netlify deploy --prod` | **Só com pedido explícito** — após `pre-release` local; **não** usar `--no-build` |
 | Parar gasto de cota | Painel → **Stop builds** | Desliga CI no push |
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
@@ -223,7 +227,7 @@ Regras obrigatórias para Cursor, Cloud Agent e assistentes. Implementadas em:
 | Arquivo | Ativação | Conteúdo |
 |---------|----------|----------|
 | `.cursor/rules/operacoes-bibi.mdc` | Always apply | Operações core, token budget, matriz de decisão |
-| `.cursor/rules/netlify-release.mdc` | Inteligente (deploy/release) | Netlify, `--no-build`, cota, checklist publicação |
+| `.cursor/rules/netlify-release.mdc` | Inteligente (deploy/release) | Netlify, deploy com build, cota, checklist publicação |
 | `.cursor/rules/stack-nextjs.mdc` | Globs `src/**`, `prisma/**` | Next 16, Prisma 6, ESLint, UI |
 
 Detalhes também em `AGENTS.md`.

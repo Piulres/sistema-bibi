@@ -13,8 +13,8 @@ Referências: `@docs/plataforma/DEPLOY_NETLIFY.md` · `@docs/versoes/RELEASES.md
 |---------|---------|------|
 | Desligar CI contínuo | Evita build a cada push | Painel → **Stop builds** |
 | Build local primeiro | Economiza build minutes | `npm run pre-release` |
-| Deploy sem rebuild remoto | Não gasta minutos na Netlify | `npx netlify deploy --prod --no-build` |
-| Pacotes fechados | Controle do que está no ar | Atualizar `RELEASES.md` |
+| Deploy sem rebuild remoto | **Não usar** com Next.js — quebra `/_next/static` | `npx netlify deploy --prod` após `pre-release` |
+| Pacotes fechados | Controle do que está no ar | Atualizar `RELEASES.md` + `changelog-content.ts` |
 | Preview só quando pedido | Evita deploys fantasma | Não rodar `netlify deploy` em agente |
 | Secrets no painel | Segurança | `SESSION_SECRET`, `CRON_SECRET` — não no git |
 | Ignorar 503 usage_exceeded | Não é regressão | Aguardar reset/upgrade do plano |
@@ -30,11 +30,14 @@ git checkout main && git pull && git merge origin/dev
 # 2. Validar e publicar
 npm run pre-release                              # lint + build local (obrigatório)
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
-npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
-# smoke test → atualizar docs/versoes/RELEASES.md → commit na main
+npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"
+# smoke test: chunk CSS em /_next/static/ deve retornar 200
+# smoke test → atualizar docs/versoes/RELEASES.md + changelog landing (LANDING_CHANGELOG.md) → commit na main
 ```
 
-> `--no-build`: usa artefatos já gerados pelo `pre-release`. Só omita se o build local falhou e o humano autorizar rebuild remoto.
+> **Não use `--no-build`** com `@netlify/plugin-nextjs` — publica HTML sem assets
+> `/_next/static/*` na CDN (front quebrado). O `netlify deploy --prod` roda o build
+> integrado do plugin e empacota corretamente.
 
 ## O que agentes NÃO devem fazer
 
@@ -43,6 +46,7 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 - Tratar `usage_exceeded` como bug de código
 - Habilitar auto-publish ou merge+deploy como solução
 - Atualizar `RELEASES.md` sem deploy confirmado pelo usuário
+- Esquecer `src/lib/landing/changelog-content.ts` ao fechar pacote — ver `LANDING_CHANGELOG.md`
 
 ## Troubleshooting (1 tentativa cada)
 
@@ -59,4 +63,4 @@ npx netlify deploy --prod --no-build --message "bibi-poc-YYYY-MM-DDx: resumo"
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Registrar em `@docs/versoes/RELEASES.md` após cada publicação manual.
+Registrar em `@docs/versoes/RELEASES.md` e `@docs/plataforma/LANDING_CHANGELOG.md` após cada publicação manual.

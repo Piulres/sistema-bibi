@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import { expect, type Page } from "@playwright/test";
 
 export type PortalKey = "prestador" | "interno" | "pj" | "beneficiario";
 
@@ -30,6 +30,13 @@ export async function loginAs(
   await page.waitForURL(DASHBOARD_PATTERNS[portal]);
 }
 
+/** Link de módulo interno por rota (estável entre nichos / labels dinâmicos). */
+export function internoNavLink(page: Page, href: string) {
+  return page
+    .getByRole("navigation", { name: "Navegação por abas" })
+    .locator(`a[href="${href}"]`);
+}
+
 /** Abas do portal interno em desktop (≥ lg). */
 export function internoNav(page: Page) {
   return page.getByRole("navigation", { name: "Navegação por abas" });
@@ -49,9 +56,11 @@ export async function openInternoNav(page: Page) {
     return desktop;
   }
   const drawer = internoNavDrawer(page);
-  if (!(await drawer.isVisible())) {
-    await page.locator(".lg\\:hidden").getByRole("button").first().click();
+  if (await drawer.isVisible()) {
+    return drawer;
   }
+  await page.locator(".lg\\:hidden").getByRole("button").first().click();
+  await expect(drawer).toBeVisible();
   return drawer;
 }
 

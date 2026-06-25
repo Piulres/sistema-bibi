@@ -2,10 +2,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEMO_ONLY_SEGMENT_EMAILS,
   DEMO_SEGMENT_TENANT_SLUGS,
-  ensureDemoDataStoreForSegmentAccess,
+  ensureDataStoreForSegmentAccess,
   isDemoOnlySegmentEmail,
   isDemoSegmentTenantSlug,
-} from "@/lib/data-store/ensure-demo-for-segment";
+} from "@/lib/data-store/ensure-data-store-for-segment";
 
 const { getDataStoreMode, setDataStoreMode, isDualDataStoreEnabled } = vi.hoisted(() => ({
   getDataStoreMode: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock("@/lib/db", () => ({
   invalidatePrismaCache,
 }));
 
-describe("ensure-demo-for-segment", () => {
+describe("ensure-data-store-for-segment", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     isDualDataStoreEnabled.mockReturnValue(true);
@@ -54,7 +54,7 @@ describe("ensure-demo-for-segment", () => {
   });
 
   it("alterna para demo ao acessar landing de segmento", async () => {
-    const mode = await ensureDemoDataStoreForSegmentAccess({ segmentLanding: true });
+    const mode = await ensureDataStoreForSegmentAccess({ segmentLanding: true });
 
     expect(mode).toBe("demo");
     expect(setDataStoreMode).toHaveBeenCalledWith("demo");
@@ -62,19 +62,19 @@ describe("ensure-demo-for-segment", () => {
   });
 
   it("alterna para demo com tenant slug de segmento", async () => {
-    await ensureDemoDataStoreForSegmentAccess({ tenantSlug: "petcare" });
+    await ensureDataStoreForSegmentAccess({ tenantSlug: "petcare" });
 
     expect(setDataStoreMode).toHaveBeenCalledWith("demo");
   });
 
   it("alterna para demo com e-mail exclusivo de segmento", async () => {
-    await ensureDemoDataStoreForSegmentAccess({ email: "operacao@petcare.demo" });
+    await ensureDataStoreForSegmentAccess({ email: "operacao@petcare.demo" });
 
     expect(setDataStoreMode).toHaveBeenCalledWith("demo");
   });
 
   it("mantém operação sem contexto de segmento", async () => {
-    const mode = await ensureDemoDataStoreForSegmentAccess();
+    const mode = await ensureDataStoreForSegmentAccess();
 
     expect(mode).toBe("operation");
     expect(setDataStoreMode).not.toHaveBeenCalled();
@@ -83,9 +83,17 @@ describe("ensure-demo-for-segment", () => {
   it("não regrava modo quando já está em demo", async () => {
     getDataStoreMode.mockResolvedValue("demo");
 
-    const mode = await ensureDemoDataStoreForSegmentAccess({ tenantSlug: "petcare" });
+    const mode = await ensureDataStoreForSegmentAccess({ tenantSlug: "petcare" });
 
     expect(mode).toBe("demo");
     expect(setDataStoreMode).not.toHaveBeenCalled();
+  });
+
+  it("alterna para operação com tenant bibi-saude quando em demo", async () => {
+    getDataStoreMode.mockResolvedValue("demo");
+
+    await ensureDataStoreForSegmentAccess({ tenantSlug: "bibi-saude" });
+
+    expect(setDataStoreMode).toHaveBeenCalledWith("operation");
   });
 });
