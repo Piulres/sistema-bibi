@@ -22,6 +22,7 @@ import TabBar from "@/components/ui/TabBar";
 import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
 import { useDraftUndo } from "@/hooks/useDraftUndo";
+import VoaAssistantPanel from "@/components/voa/VoaAssistantPanel";
 
 type Usage = {
   id: string;
@@ -74,6 +75,7 @@ const currency = (v: number) =>
 const CARE_TABS = [
   { key: "procedimentos", label: "Procedimentos" },
   { key: "materiais", label: "Materiais" },
+  { key: "voa", label: "Assistente IA" },
   { key: "prontuario", label: "Prontuário" },
   { key: "medicacao", label: "Medicação" },
   { key: "exames", label: "Exames" },
@@ -490,6 +492,14 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             ))}
           </ul>
         </Card>
+          )}
+
+          {careTab === "voa" && (
+            <VoaAssistantPanel
+              appointmentId={appointmentId}
+              patientId={detail.patient.id}
+              onImported={load}
+            />
           )}
 
           {careTab === "prontuario" && (
