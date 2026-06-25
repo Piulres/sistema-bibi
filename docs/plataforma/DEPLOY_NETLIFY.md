@@ -15,9 +15,9 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app |
-| Pacote em produção | **`v2.1.0`** — deploy `6a3bc7a4` @ `40e2dfc` |
-| Pacote anterior (quebrado) | deploys `6a3b8768`–`6a3b8917` — assets `/_next/static` em 404 |
-| `main` / `dev` | Sincronizadas em **`40e2dfc`** |
+| Pacote em produção | **`v2.1.0`** — deploy `6a3d525f` @ `07c7a7e` |
+| Pacote anterior | **`v2.1.0`** — deploy `6a3bc7a4` @ `40e2dfc` |
+| `main` / `dev` | Sincronizadas em **`07c7a7e`** (v2.1.0) |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |

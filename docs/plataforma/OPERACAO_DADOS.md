@@ -99,6 +99,42 @@ Para voltar à demo: confirmar com `DEMO`.
 
 ---
 
+## Seleção automática por segmento (v2.1)
+
+Quando `DUAL_DATA_STORE=true`, o modo demo/operação pode ser escolhido **automaticamente** ao navegar ou fazer login — sem abrir `/interno/seguranca`.
+
+**Código:** `src/lib/data-store/ensure-data-store-for-segment.ts`
+
+### Regras (prioridade)
+
+| Entrada | Modo forçado | Exemplo |
+|---------|--------------|---------|
+| `?tenant=bibi-saude` | **operation** | Piloto operação mínima |
+| `?tenant=` de tenant demo (petcare, lex, smile…) | **demo** | `?tenant=petcare` |
+| Landing `/segmentos/[slug]` | **demo** | `/segmentos/veterinaria` |
+| E-mail exclusivo de segmento demo | **demo** | `operacao@petcare.demo` |
+| `?niche=` ≠ `MEDICAL` (sem tenant) | **demo** | `/?niche=LEGAL` |
+| Demais casos | Mantém modo atual | `faturamento@bibi.health` sem `?tenant=` |
+
+### Onde é chamado
+
+| Ponto | Arquivo |
+|-------|---------|
+| Login | `src/app/api/auth/login/route.ts` |
+| Resolver de segmento | `src/lib/segment/resolve.ts` |
+| Contexto de login | `src/lib/segment/login-context.ts` |
+| Landing de segmento | `src/app/segmentos/[slug]/page.tsx` |
+| Persistência cookie | `src/app/api/segment/persist/route.ts` |
+
+### E-mails compartilhados vs exclusivos
+
+- **Compartilhados** (`faturamento@bibi.health`, `dra.helena@bibi.health`) existem em demo e operação — o tenant vem de `?tenant=` / cookie (`horizonte` → demo; `bibi-saude` → operação).
+- **Exclusivos** (`operacao@petcare.demo`, `operacao@lex.demo`, …) existem só na massa demo — login com esses e-mails força modo **demo**.
+
+Testes: `tests/unit/ensure-data-store-for-segment.test.ts` · `tests/unit/login-segment.test.ts`
+
+---
+
 ## Limitações conhecidas
 
 | Aspecto | Demo | Operação |
