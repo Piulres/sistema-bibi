@@ -71,10 +71,27 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "CTA WhatsApp, SEO enriquecido e tags UTM",
           "Identidade visual Energia Brasileira",
           "Home produto e landings por segmento",
+          "Seção #novidades com changelog v2.1 e v2.0",
+        ],
+      },
+      {
+        title: "Segmentos e demo",
+        items: [
+          "Cores por nicho (pills, landing, login) via segment-colors",
+          "Login demo alterna automaticamente para modo demo por segmento",
+          "ROI ~91% e preços mercado 2026 documentados",
+        ],
+      },
+      {
+        title: "Voa Health (Fase 1)",
+        items: [
+          "Painel embed no atendimento do prestador",
+          "Importação de documentos clínicos para o PEP",
+          "APIs /voa e /voa/import com testes automatizados",
         ],
       },
     ],
-    testStats: "384 testes Vitest · 128 E2E · pre-release OK",
+    testStats: "395 testes Vitest · 128 E2E · pre-release OK",
   },
   {
     version: "2.0.0",
