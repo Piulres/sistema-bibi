@@ -53,6 +53,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |-------|-------|
 | **Tag git** | `v2.2.0` |
 | **PRs** | [#142](https://github.com/Piulres/sistema-bibi/pull/142) |
+| **Doc** | [`V2_2.md`](V2_2.md) |
 | **Publicado em** | 25/06/2026 — deploy Netlify `6a3ea6c5` @ `2c38248` |
 
 **Inclui (além de v2.1.0):**
@@ -172,7 +173,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
-| **2.1.x** | [`V2_1.md`](V2_1.md) | ✅ **`v2.1.0` em produção** (Voa Fase 1 integrada) |
+| **2.2.x** | [`V2_2.md`](V2_2.md) | ✅ **`v2.2.0` em produção** (onboarding tour) |
+| **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---

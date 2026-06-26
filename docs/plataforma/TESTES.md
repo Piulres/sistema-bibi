@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~121** Route Handlers · **73** paths no OpenAPI (`public/openapi.yaml`).
+**Ground truth (jun/2026):** **403** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~121** Route Handlers · **73** paths no OpenAPI (`public/openapi.yaml`).
 
 ---
 
@@ -28,6 +28,8 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | Unitário | Vitest | `tests/unit/` | `npm run test` |
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
+
+Cobertura v2.2 onboarding: `tests/unit/onboarding.test.ts` — `matchesRoute`, `buildTourSteps` por portal, labels dinâmicos, parse de `bibi_onboarding`.
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
@@ -133,6 +135,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Fluxo | Teste |
 |-------|-------|
+| Onboarding tour (builders, rotas, storage) | ✅ `onboarding.test.ts` |
 | PJ overview/reports | ✅ `portal-flows.test.ts` |
 | Beneficiário booking | ✅ E2E parcial (`flows`, `walkin-particular`) |
 | Exportações PDF/Excel | ✅ `exports.test.ts` (PEP, faturas, auditoria, portais) |
