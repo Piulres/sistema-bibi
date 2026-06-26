@@ -5,10 +5,11 @@ import {
 } from "@/lib/interno-permissions";
 
 describe("Cenários RBAC — matriz perfil × módulo", () => {
-  it("ADMIN acessa todos os 13 módulos", () => {
+  it("ADMIN acessa todos os 14 módulos", () => {
     const perms = resolveInternoPermissions("INTERNO", "ADMIN");
-    expect(perms).toHaveLength(13);
+    expect(perms).toHaveLength(14);
     expect(hasInternoPermission("INTERNO", "ADMIN", "billing")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "ADMIN", "projetos")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "auditoria")).toBe(true);
   });
 

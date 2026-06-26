@@ -28,6 +28,7 @@ export const SEGMENT_BRANDING_PRESETS: BrandingPreset[] = NICHE_IDS.map((niche) 
     LEGAL: "Lex & Partners",
     SPA: "Zen Studio",
     EDUCATION: "EduPrime",
+    CONSTRUCTION: "Build Engenharia",
   };
   const taglines: Record<NicheId, string> = {
     MEDICAL: "Cuidado humanizado com gestão inteligente",
@@ -36,6 +37,7 @@ export const SEGMENT_BRANDING_PRESETS: BrandingPreset[] = NICHE_IDS.map((niche) 
     LEGAL: "Infraestrutura Pay Per Use para escritórios",
     SPA: "Spas e estúdios com faturamento previsível",
     EDUCATION: "Aulas e cursos com cobrança por sessão efetiva",
+    CONSTRUCTION: "Gestão de obras com orçamento e cronograma",
   };
 
   return {

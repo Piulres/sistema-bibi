@@ -6,6 +6,7 @@ export const INTERNO_MODULES = [
   "cadastros",
   "estoque",
   "crm",
+  "projetos",
   "subscriptions",
   "comunicacao",
   "relatorios",
@@ -20,8 +21,8 @@ export type InternoModule = (typeof INTERNO_MODULES)[number];
 /** internoProfile: ADMIN | FATURAMENTO | RECEPCAO | READONLY */
 export const INTERNO_PROFILES = {
   ADMIN: [...INTERNO_MODULES],
-  FATURAMENTO: ["dashboard", "billing", "subscriptions", "relatorios", "auditoria"],
-  RECEPCAO: ["dashboard", "agenda", "cadastros", "estoque", "comunicacao"],
+  FATURAMENTO: ["dashboard", "billing", "subscriptions", "relatorios", "auditoria", "projetos"],
+  RECEPCAO: ["dashboard", "agenda", "cadastros", "estoque", "comunicacao", "projetos"],
   READONLY: ["dashboard", "relatorios", "auditoria"],
 } as const satisfies Record<string, readonly InternoModule[]>;
 

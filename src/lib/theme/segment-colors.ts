@@ -52,6 +52,13 @@ export const SEGMENT_COLORS: Record<NicheId, SegmentColorPreset> = {
     heroTo: "#fcd34d",
     label: "Educação",
   },
+  CONSTRUCTION: {
+    primaryColor: "#ea580c",
+    accentColor: "#fb923c",
+    heroFrom: "#c2410c",
+    heroTo: "#f97316",
+    label: "Engenharia",
+  },
 };
 
 export function getSegmentColors(niche: NicheId): SegmentColorPreset {

@@ -17,6 +17,7 @@ test.describe("Melhorias de fluxo — mapa interno", () => {
 
 test.describe("Portal Prestador — confirmar presença", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "prestador", "dra.helena@bibi.health");
   });
 

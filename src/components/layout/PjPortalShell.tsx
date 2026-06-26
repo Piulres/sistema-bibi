@@ -21,7 +21,7 @@ export default function PjPortalShell({ user, assistantEnabled = true, children 
   }
 
   const portal = PORTALS.pj;
-  const sections = buildPjSectionNav(user.labels);
+  const sections = buildPjSectionNav(user.labels, user.niche);
 
   return (
     <OnboardingProvider portal="pj" labels={user.labels}>

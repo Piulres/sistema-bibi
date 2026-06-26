@@ -124,6 +124,24 @@ const EDUCATION: NicheLabels = {
   service: "Serviço educacional",
 };
 
+const CONSTRUCTION: NicheLabels = {
+  patient: "Obra",
+  patients: "Obras",
+  provider: "Profissional de obra",
+  providers: "Equipe de obra",
+  procedure: "Serviço executável",
+  procedures: "Serviços",
+  appointment: "Diária",
+  appointments: "Diárias",
+  medicalRecord: "Diário de obra",
+  beneficiary: "Cliente",
+  beneficiaries: "Clientes",
+  company: "Contratante",
+  portalBeneficiary: "Portal do Cliente",
+  portalProvider: "Portal de Campo",
+  service: "Diária de obra",
+};
+
 /** Mapa mestre: nicho → glossário completo. Não editar em runtime. */
 export const NICHE_MASTER_LABELS = {
   MEDICAL,
@@ -132,6 +150,7 @@ export const NICHE_MASTER_LABELS = {
   LEGAL,
   SPA,
   EDUCATION,
+  CONSTRUCTION,
 } as const satisfies Record<NicheId, NicheLabels>;
 
 /** Resumo legível para AGENTS.md e documentação. */
