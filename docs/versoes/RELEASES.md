@@ -47,7 +47,28 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.1.0` — Sistema Bibi - ServiceOS (pós-POC integrado)
+### `v2.2.0` — Sistema Bibi - ServiceOS (onboarding guiado)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.2.0` |
+| **PRs** | [#142](https://github.com/Piulres/sistema-bibi/pull/142) |
+| **Publicado em** | 25/06/2026 — deploy Netlify `6a3ea6c5` @ `2c38248` |
+
+**Inclui (além de v2.1.0):**
+
+- **Onboarding tour:** product tour automático na primeira visita a cada portal
+- **Spotlight e hotspots:** destaque visual com tooltip posicionado automaticamente
+- **Tours por portal:** interno, prestador, PJ e beneficiário com passos contextuais por rota
+- **Labels multi-nicho:** textos do tour adaptados via `useLabels()` (paciente, pet, cliente…)
+- **Reinício manual:** botão **Tour** no header de cada portal
+- **Persistência:** `localStorage` (`bibi_onboarding`) por portal
+
+**Testes:** 403 Vitest · 128 E2E · `docs:verify` · `db:verify` · `pre-release` OK.
+
+---
+
+### `v2.1.0` — Sistema Bibi - ServiceOS (pós-POC integrado) *(substituído por v2.2.0)*
 
 | Campo | Valor |
 |-------|-------|
