@@ -61,7 +61,7 @@ export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): Nav
   }
 
   tabs.push(
-    { href: "/prestador", label: labels.appointments, key: "agenda" },
+    { href: "/prestador", label: "Agenda", key: "agenda" },
     { href: "/prestador/pacientes", label: labels.beneficiaries, key: "pacientes" },
     { href: "/prestador/extrato", label: "Extrato", key: "extrato" },
     { href: "/prestador/relatorios", label: "Relatórios", key: "relatorios" },
