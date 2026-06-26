@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/*": ["./prisma/**/*"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/api-docs.html",
+        destination: "/api/docs",
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

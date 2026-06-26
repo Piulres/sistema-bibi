@@ -396,9 +396,11 @@ Erros retornam `{ "error": "mensagem" }` com o status HTTP adequado
 
 Com o servidor rodando, explore e teste a API direto do navegador:
 
-- **Swagger UI:** http://localhost:3000/api-docs.html
+- **Swagger UI:** http://localhost:3000/api/docs
 - **Especificação OpenAPI 3.0 (YAML):** http://localhost:3000/openapi.yaml
   (fonte em [`public/openapi.yaml`](public/openapi.yaml))
+
+Guia de execução e testes: [`docs/plataforma/API_DOCS.md`](docs/plataforma/API_DOCS.md)
 
 ### Exemplo com `curl`
 

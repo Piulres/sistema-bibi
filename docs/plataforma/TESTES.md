@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~121** Route Handlers · **73** paths no OpenAPI (`public/openapi.yaml`).
+**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~123** Route Handlers · **123** paths no OpenAPI (`public/openapi.yaml`).
 
 ---
 
@@ -176,7 +176,7 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 ### Beneficiário (5) — 🔑 BENEFICIARIO
 ### Compartilhado (2) — procedures, branding/logo
 
-Contrato OpenAPI: `public/openapi.yaml` — candidato a testes de contrato (não implementado).
+Contrato OpenAPI: `public/openapi.yaml` — Swagger UI em `/api/docs` (ver [`API_DOCS.md`](API_DOCS.md)).
 
 ---
 

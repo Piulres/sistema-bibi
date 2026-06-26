@@ -307,7 +307,7 @@ Base: `http://localhost:3000/api`
 
 **PJ:** overview enriquecido, export CSV (`/api/pj/reports`)
 
-OpenAPI completa: `public/openapi.yaml` — Swagger UI em `/api-docs.html`
+OpenAPI completa: `public/openapi.yaml` — Swagger UI em `/api/docs`
 
 ---
 

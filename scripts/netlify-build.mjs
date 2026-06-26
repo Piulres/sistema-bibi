@@ -42,5 +42,6 @@ const run = (cmd) => {
   execSync(cmd, { stdio: "inherit", env: process.env, cwd: root });
 };
 
+run("node scripts/copy-swagger-ui.mjs");
 run("npx tsx scripts/setup-database.ts");
 run("npm run build");

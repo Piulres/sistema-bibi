@@ -35,6 +35,9 @@ jobs:
       - name: Docs verify
         run: npm run docs:verify
 
+      - name: OpenAPI verify
+        run: npm run openapi:verify
+
       - name: Prepare database (dual-store)
         run: npm run db:bootstrap:demo
 
