@@ -34,6 +34,26 @@ describe("CONSTRUCTION niche labels", () => {
   });
 });
 
+describe("isolamento CONSTRUCTION vs outros nichos", () => {
+  it("nav interno só inclui Obras em CONSTRUCTION", async () => {
+    const { buildInternoNavTabs, buildPjSectionNav } = await import("@/lib/navigation/niche-nav");
+    const { NICHE_MASTER_LABELS } = await import("@/constants/niches");
+
+    const medicalNav = buildInternoNavTabs(NICHE_MASTER_LABELS.MEDICAL, "MEDICAL");
+    expect(medicalNav.some((t) => t.key === "projetos")).toBe(false);
+
+    const buildNav = buildInternoNavTabs(NICHE_MASTER_LABELS.CONSTRUCTION, "CONSTRUCTION");
+    expect(buildNav.some((t) => t.key === "projetos")).toBe(true);
+    expect(buildNav.find((t) => t.key === "projetos")?.label).toBe("Obras");
+
+    const medicalPj = buildPjSectionNav(NICHE_MASTER_LABELS.MEDICAL, "MEDICAL");
+    expect(medicalPj.some((s) => s.href === "/pj/projetos")).toBe(false);
+
+    const buildPj = buildPjSectionNav(NICHE_MASTER_LABELS.CONSTRUCTION, "CONSTRUCTION");
+    expect(buildPj.some((s) => s.href === "/pj/projetos")).toBe(true);
+  });
+});
+
 describe("project-service (CONSTRUCTION seed)", () => {
   it("lista obras da empresa PJ Incorp Alpha", async () => {
     const { getTestPrisma } = await import("../helpers/db");
@@ -109,6 +129,18 @@ describe("project-service (CONSTRUCTION seed)", () => {
     const buffer = await buildBudgetPdfBuffer(data!);
     expect(buffer.length).toBeGreaterThan(500);
     expect(buffer.subarray(0, 4).toString()).toBe("%PDF");
+  });
+
+  it("obra aprovada no seed tem fatura vinculada", async () => {
+    const { getTestPrisma } = await import("../helpers/db");
+    const prisma = getTestPrisma();
+    const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
+    const project = await prisma.project.findFirst({
+      where: { tenantId: tenant!.id, code: "OBR-2026-001" },
+      include: { budgets: true },
+    });
+    const approved = project!.budgets.find((b) => b.status === "APROVADO");
+    expect(approved?.invoiceId).toBeTruthy();
   });
 
   it("PJ acessa obra da própria empresa", async () => {

@@ -1,5 +1,17 @@
 import type { PrismaClient } from "@prisma/client";
 
+type TaskSeed = {
+  name: string;
+  phase: string;
+  status: string;
+  progressPercent: number;
+  sortOrder: number;
+  /** Dias após startDate da obra */
+  startOffsetDays?: number;
+  durationDays?: number;
+  dependsOnSortOrder?: number;
+};
+
 /** Massa demo de obras para o tenant Build Engenharia (CONSTRUCTION). */
 export async function seedConstructionProjects(prisma: PrismaClient): Promise<number> {
   const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
@@ -14,6 +26,11 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
   const engPaulo = await prisma.user.findFirst({
     where: { tenantId: tenant.id, email: "eng.paulo@build.demo" },
   });
+
+  const alreadySeeded = await prisma.project.findFirst({
+    where: { tenantId: tenant.id, code: "OBR-2026-001" },
+  });
+  if (alreadySeeded) return 0;
 
   const projects = [
     {
@@ -36,11 +53,46 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
         ],
       },
       tasks: [
-        { name: "Demolição", phase: "GERAL", status: "CONCLUIDO", progressPercent: 100, sortOrder: 0 },
-        { name: "Alvenaria", phase: "ESTRUTURA", status: "EM_ANDAMENTO", progressPercent: 60, sortOrder: 1 },
-        { name: "Elétrica", phase: "ACABAMENTO", status: "PENDENTE", progressPercent: 0, sortOrder: 2 },
-        { name: "Pintura", phase: "ACABAMENTO", status: "PENDENTE", progressPercent: 0, sortOrder: 3 },
-      ],
+        {
+          name: "Demolição",
+          phase: "GERAL",
+          status: "CONCLUIDO",
+          progressPercent: 100,
+          sortOrder: 0,
+          startOffsetDays: 0,
+          durationDays: 21,
+        },
+        {
+          name: "Alvenaria",
+          phase: "ESTRUTURA",
+          status: "EM_ANDAMENTO",
+          progressPercent: 60,
+          sortOrder: 1,
+          startOffsetDays: 22,
+          durationDays: 45,
+          dependsOnSortOrder: 0,
+        },
+        {
+          name: "Elétrica",
+          phase: "ACABAMENTO",
+          status: "PENDENTE",
+          progressPercent: 0,
+          sortOrder: 2,
+          startOffsetDays: 68,
+          durationDays: 30,
+          dependsOnSortOrder: 1,
+        },
+        {
+          name: "Pintura",
+          phase: "ACABAMENTO",
+          status: "PENDENTE",
+          progressPercent: 0,
+          sortOrder: 3,
+          startOffsetDays: 99,
+          durationDays: 25,
+          dependsOnSortOrder: 2,
+        },
+      ] satisfies TaskSeed[],
     },
     {
       code: "OBR-2026-002",
@@ -59,9 +111,26 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
         ],
       },
       tasks: [
-        { name: "Vistoria in loco", phase: "GERAL", status: "PENDENTE", progressPercent: 0, sortOrder: 0 },
-        { name: "Elaboração do laudo", phase: "GERAL", status: "PENDENTE", progressPercent: 0, sortOrder: 1 },
-      ],
+        {
+          name: "Vistoria in loco",
+          phase: "GERAL",
+          status: "PENDENTE",
+          progressPercent: 0,
+          sortOrder: 0,
+          startOffsetDays: 0,
+          durationDays: 7,
+        },
+        {
+          name: "Elaboração do laudo",
+          phase: "GERAL",
+          status: "PENDENTE",
+          progressPercent: 0,
+          sortOrder: 1,
+          startOffsetDays: 8,
+          durationDays: 14,
+          dependsOnSortOrder: 0,
+        },
+      ] satisfies TaskSeed[],
     },
     {
       code: "OBR-2026-003",
@@ -78,7 +147,7 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
           { description: "Relatórios fotográficos", unit: "un", quantity: 6, unitPrice: 350 },
         ],
       },
-      tasks: [],
+      tasks: [] as TaskSeed[],
     },
   ];
 
@@ -90,6 +159,7 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
       0,
     );
     const total = subtotal * (1 + spec.budget.bdiPercent / 100);
+    const obraStart = spec.startDate ?? new Date(2026, 2, 1);
 
     const project = await prisma.project.create({
       data: {
@@ -126,19 +196,67 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
           },
         },
         tasks: {
-          create: spec.tasks.map((t) => ({
-            name: t.name,
-            phase: t.phase,
-            status: t.status,
-            progressPercent: t.progressPercent,
-            sortOrder: t.sortOrder,
-            assigneeId: t.status === "EM_ANDAMENTO" ? engPaulo?.id : manager?.id,
-            startDate: spec.startDate,
-            endDate: spec.endDate,
-          })),
+          create: spec.tasks.map((t) => {
+            const start = new Date(obraStart);
+            start.setDate(start.getDate() + (t.startOffsetDays ?? 0));
+            const end = new Date(start);
+            end.setDate(end.getDate() + (t.durationDays ?? 14));
+            return {
+              name: t.name,
+              phase: t.phase,
+              status: t.status,
+              progressPercent: t.progressPercent,
+              sortOrder: t.sortOrder,
+              assigneeId: t.status === "EM_ANDAMENTO" ? engPaulo?.id : manager?.id,
+              startDate: start,
+              endDate: end,
+            };
+          }),
         },
       },
+      include: { budgets: true, tasks: { orderBy: { sortOrder: "asc" } } },
     });
+
+    for (const t of spec.tasks) {
+      if (t.dependsOnSortOrder === undefined) continue;
+      const dep = project.tasks.find((x) => x.sortOrder === t.dependsOnSortOrder);
+      const task = project.tasks.find((x) => x.sortOrder === t.sortOrder);
+      if (dep && task) {
+        await prisma.projectTask.update({
+          where: { id: task.id },
+          data: { dependsOnId: dep.id },
+        });
+      }
+    }
+
+    if (spec.budget.status === "APROVADO" && company) {
+      const patient = await prisma.patient.findFirst({
+        where: { tenantId: tenant.id, companyId: company.id },
+        orderBy: { createdAt: "asc" },
+      });
+      const budget = project.budgets[0];
+      if (patient && budget) {
+        const invoice = await prisma.invoice.create({
+          data: {
+            tenantId: tenant.id,
+            patientId: patient.id,
+            companyId: company.id,
+            total: budget.total,
+            status: "FECHADA",
+            items: {
+              create: spec.budget.lineItems.map((li) => ({
+                description: `${spec.code} — ${li.description}`,
+                amount: li.quantity * li.unitPrice,
+              })),
+            },
+          },
+        });
+        await prisma.budget.update({
+          where: { id: budget.id },
+          data: { invoiceId: invoice.id },
+        });
+      }
+    }
 
     await prisma.attachment.create({
       data: {

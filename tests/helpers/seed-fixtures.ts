@@ -10,6 +10,8 @@ export const DEMO_EMAILS = {
   maria: "maria.souza@email.com",
   pedro: "pedro.almeida@email.com",
   pjTechcorp: "rh@techcorp.com",
+  buildInterno: "operacao@build.demo",
+  buildPj: "rh@incorp.demo",
 } as const;
 
 export const DEMO_CPFS = {
@@ -128,6 +130,27 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
       where: { tenantId: petcare.id },
     });
     if (petCount < 10) return true;
+
+    const build = await prisma.tenant.findFirst({
+      where: { slug: "build", niche: "CONSTRUCTION" },
+      select: { id: true },
+    });
+    if (!build) return true;
+
+    const obraDemo = await prisma.project.findFirst({
+      where: { tenantId: build.id, code: "OBR-2026-002" },
+      include: { budgets: true },
+    });
+    if (!obraDemo) return true;
+    const pendingBudget = obraDemo.budgets.find((b) => b.status === "ENVIADO");
+    if (!pendingBudget) return true;
+
+    const obraComFatura = await prisma.project.findFirst({
+      where: { tenantId: build.id, code: "OBR-2026-001" },
+      include: { budgets: true },
+    });
+    const approvedBudget = obraComFatura?.budgets.find((b) => b.status === "APROVADO");
+    if (!approvedBudget?.invoiceId) return true;
 
     return false;
   } finally {

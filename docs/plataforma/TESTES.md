@@ -44,6 +44,22 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 | Maria Souza | `maria.souza@email.com` | Fatura FECHADA + PIX pendente |
 | Pedro Almeida | `pedro.almeida@email.com` | Particular, fatura PAGA |
 | Dra. Helena | `dra.helena@bibi.health` | Prestador com CRM/SP, export PEP |
+| Build interno | `operacao@build.demo` | Obras CONSTRUCTION — pipeline e orçamentos |
+| Build PJ | `rh@incorp.demo` | Aprovar proposta `OBR-2026-002` |
+
+### Obras / CONSTRUCTION (`tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`)
+
+| Caso | O que valida |
+|------|----------------|
+| Labels `CONSTRUCTION` | Glossário Obra, Dossiê técnico, Vistoria |
+| `listProjectsForCompany` | 3 obras Incorp Alpha no seed |
+| `approveBudget` + PDF | Fatura emitida, buffer `%PDF` |
+| `getProjectForCompany` | URLs de anexo PJ |
+| API interno build | Lista, pipeline, detalhe, dependências, PDF, reject |
+| API PJ Incorp | Lista, alerta overview, approve → invoice, PDF |
+| Isolamento | MEDICAL interno lista vazia; TechCorp PJ sem obras/alertas |
+
+Massa: tenant `build`, obras `OBR-2026-001` (aprovada + fatura), `OBR-2026-002` (proposta ENVIADO), `OBR-2026-003` (rascunho). Doc: [`docs/segmentos/construction/README.md`](../segmentos/construction/README.md).
 
 ---
 
@@ -236,6 +252,8 @@ Senha única: `bibi123`
 | PJ | `rh@techcorp.com` |
 | Beneficiário | `joao.pereira@email.com` |
 | Beneficiário (particular) | `pedro.almeida@email.com` |
+| Build interno | `operacao@build.demo` |
+| Build PJ (Incorp Alpha) | `rh@incorp.demo` |
 
 ### Specs E2E (`e2e/`)
 
