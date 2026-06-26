@@ -77,7 +77,7 @@ describe("contrato OpenAPI", () => {
 
   it("cobre os endpoints principais documentados", () => {
     const paths = collectOpenApiPaths(spec);
-    expect(paths.size).toBeGreaterThanOrEqual(70);
+    expect(paths.size).toBeGreaterThanOrEqual(115);
     expect(paths.has("/api/auth/login")).toBe(true);
     expect(paths.has("/api/prestador/agenda")).toBe(true);
     expect(paths.has("/api/interno/billing")).toBe(true);

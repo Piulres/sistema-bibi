@@ -42,6 +42,12 @@ tags:
     description: Ficha clínica por pet (nicho VET)
   - name: Importação
     description: Interchange JSON/CSV para cadastros
+  - name: Voa
+    description: Integração Voa Health — IA clínica no atendimento
+  - name: Estoque
+    description: Gestão de estoque médico (produtos, lotes, movimentações)
+  - name: Segmento
+    description: Persistência de segmento/tenant na landing
   - name: Change Management
     description: Reversão de alterações e auditoria com restore
 
@@ -1707,6 +1713,18 @@ paths:
       responses:
         '200': { description: Payload convertido }
 
+    get:
+    tags:
+      - Importação
+      - Interno
+    summary: GET import convert
+    responses:
+      "200":
+        description: OK
+      "401":
+        description: Não autenticado
+      "403":
+        description: Acesso negado (role != INTERNO)
   /api/interno/import/{entity}:
     parameters:
       - name: entity
@@ -1721,6 +1739,18 @@ paths:
       responses:
         '200': { description: Importação concluída }
 
+    get:
+    tags:
+      - Importação
+      - Interno
+    summary: Export template ou dados da entidade (JSON/CSV)
+    responses:
+      "200":
+        description: OK
+      "401":
+        description: Não autenticado
+      "403":
+        description: Acesso negado (role != INTERNO)
   /api/interno/revisions:
     get:
       tags: [Change Management, Interno]
@@ -1782,6 +1812,1218 @@ paths:
       summary: Estorna movimentação de estoque
       responses:
         '200': { description: Movimentação estornada }
+
+
+  # --- paths sincronizados (scripts/sync-openapi-paths.mjs) ---
+  /api/beneficiario/appointments/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: &a1
+        - Beneficiário
+      summary: PATCH appointments id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != BENEFICIARIO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/beneficiario/clinical:
+    get:
+      tags: *a1
+      summary: GET beneficiario clinical
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != BENEFICIARIO)
+  /api/beneficiario/export:
+    get:
+      tags: *a1
+      summary: GET beneficiario export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != BENEFICIARIO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/beneficiario/invoices/{id}/export:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a1
+      summary: GET id export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != BENEFICIARIO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/beneficiario/pets/{id}/vaccines:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: &a2
+        - Pets
+        - Beneficiário
+      summary: GET id vaccines
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != BENEFICIARIO)
+  /api/beneficiario/pets:
+    get:
+      tags: *a2
+      summary: GET beneficiario pets
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != BENEFICIARIO)
+  /api/interno/appointments/walk-in:
+    post:
+      tags: &a4
+        - Interno
+      summary: Walk-in atômico — cria paciente e agenda
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/audit/export:
+    get:
+      tags: &a3
+        - Change Management
+        - Interno
+      summary: GET audit export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/interno/audit:
+    get:
+      tags: *a3
+      summary: GET interno audit
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+  /api/interno/billing/export:
+    get:
+      tags: *a4
+      summary: GET billing export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/interno/data-store:
+    get:
+      tags: *a4
+      summary: Status dual-store demo/operação
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a4
+      summary: Alterna modo demo ↔ operação (ADMIN)
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/demo/reset:
+    get:
+      tags: *a4
+      summary: Status do reset demo
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a4
+      summary: Restaura seed demo (ADMIN)
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/invoices/{id}/export:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a4
+      summary: GET id export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/interno/patients/{id}/clinical:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a4
+      summary: GET id clinical
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+  /api/interno/patients/{id}/records/{recordId}/export:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a4
+      summary: GET recordId export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/interno/pricing-rules/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    put:
+      tags: *a4
+      summary: PUT pricing-rules id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+    delete:
+      tags: *a4
+      summary: DELETE pricing-rules id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+  /api/interno/pricing-rules:
+    get:
+      tags: *a4
+      summary: GET interno pricing-rules
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a4
+      summary: POST interno pricing-rules
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/protocol-templates/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: *a4
+      summary: PATCH protocol-templates id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/protocol-templates:
+    get:
+      tags: *a4
+      summary: GET interno protocol-templates
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a4
+      summary: POST interno protocol-templates
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/stock/alerts:
+    get:
+      tags: &a5
+        - Estoque
+        - Interno
+      summary: GET stock alerts
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+  /api/interno/stock/lots/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: *a5
+      summary: PATCH lots id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/stock/lots:
+    get:
+      tags: *a5
+      summary: GET stock lots
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a5
+      summary: POST stock lots
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/stock/movements:
+    get:
+      tags: *a5
+      summary: GET stock movements
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a5
+      summary: POST stock movements
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/stock/procedure-kits/{procedureId}:
+    parameters:
+      - name: procedureId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a5
+      summary: GET procedure-kits procedureId
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a5
+      summary: POST procedure-kits procedureId
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/stock/products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: *a5
+      summary: PATCH products id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/stock/products:
+    get:
+      tags: *a5
+      summary: GET stock products
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+    post:
+      tags: *a5
+      summary: POST stock products
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/interno/subscriptions/export:
+    get:
+      tags: *a4
+      summary: GET subscriptions export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != INTERNO)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/prestador/appointments/{id}/materials:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: &a6
+        - Prestador
+      summary: GET id materials
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a6
+      summary: POST id materials
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/appointments/{id}/voa/import:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    post:
+      tags: &a7
+        - Voa
+        - Prestador
+      summary: Importa documento Voa para o PEP
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+        "503":
+          description: VOA_ENABLED=false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - patientId
+                - document
+              properties:
+                patientId:
+                  type: string
+                document:
+                  type: string
+                templateName:
+                  type: string
+                  nullable: true
+                templateSlug:
+                  type: string
+                  nullable: true
+                structuredOutput:
+                  type: object
+                  nullable: true
+  /api/prestador/appointments/{id}/voa:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a7
+      summary: Configuração de sessão Voa Health (plugin mount)
+      responses:
+        "200":
+          description: Config Voa (enabled, token, mount)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  enabled:
+                    type: boolean
+                  configured:
+                    type: boolean
+                  pluginScriptUrl:
+                    type: string
+                  token:
+                    type: string
+                    nullable: true
+                  mount:
+                    type: object
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/prestador/dashboard:
+    get:
+      tags: *a6
+      summary: GET prestador dashboard
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/prestador/exam-orders/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: *a6
+      summary: PATCH exam-orders id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/extrato/export:
+    get:
+      tags: *a6
+      summary: GET extrato export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/prestador/extrato:
+    get:
+      tags: *a6
+      summary: GET prestador extrato
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/prestador/medications/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: *a6
+      summary: PATCH medications id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/patients/{id}/clinical-overview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id clinical-overview
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/prestador/patients/{id}/clinical-profile:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id clinical-profile
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    put:
+      tags: *a6
+      summary: PUT id clinical-profile
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/patients/{id}/exam-orders:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id exam-orders
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a6
+      summary: POST id exam-orders
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/patients/{id}/export:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/prestador/patients/{id}/medications:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id medications
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a6
+      summary: POST id medications
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/patients/{id}/overview:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id overview
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/prestador/patients/{id}/protocols:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET id protocols
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a6
+      summary: POST id protocols
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/patients:
+    get:
+      tags: *a6
+      summary: GET prestador patients
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/prestador/pets/{id}/clinical-profile:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: &a8
+        - Pets
+        - Prestador
+      summary: GET id clinical-profile
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    put:
+      tags: *a8
+      summary: PUT id clinical-profile
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/pets/{id}/exam-orders:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a8
+      summary: GET id exam-orders
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a8
+      summary: POST id exam-orders
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/pets/{id}/medications:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a8
+      summary: GET id medications
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a8
+      summary: POST id medications
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/pets/{id}/vaccines:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a8
+      summary: GET id vaccines
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+    post:
+      tags: *a8
+      summary: POST id vaccines
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/protocols/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+    patch:
+      tags: *a6
+      summary: PATCH protocols id
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+  /api/prestador/records/{recordId}/export:
+    parameters:
+      - name: recordId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: *a6
+      summary: GET recordId export
+      responses:
+        "200":
+          description: Arquivo exportado
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+      parameters:
+        - name: format
+          in: query
+          schema:
+            type: string
+            enum:
+              - pdf
+              - xlsx
+              - csv
+              - json
+  /api/prestador/reports:
+    get:
+      tags: *a6
+      summary: GET prestador reports
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PRESTADOR)
+  /api/segment/persist:
+    post:
+      tags:
+        - Segmento
+      summary: Persiste cookie bibi_segment
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+      security: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
 
   /api/cron/reminders:
     post:

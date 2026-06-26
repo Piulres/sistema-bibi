@@ -107,7 +107,7 @@ if (orphanOpenApiPaths.length > 0) {
   }
 }
 
-const MIN_DOCUMENTED_PATHS = 70;
+const MIN_DOCUMENTED_PATHS = 115;
 if (openApiPaths.size < MIN_DOCUMENTED_PATHS) {
   errors.push(
     `Esperado ≥ ${MIN_DOCUMENTED_PATHS} paths documentados; encontrado ${openApiPaths.size}`,

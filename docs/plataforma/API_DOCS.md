@@ -6,6 +6,7 @@ Guia para explorar, testar e validar o contrato **OpenAPI 3.0** do **Sistema Bib
 |---------|-----------|----------------|
 | **Swagger UI (interativo)** | http://localhost:3000/api/docs | https://sistema-bibi.netlify.app/api/docs |
 | **Spec YAML** | http://localhost:3000/openapi.yaml | https://sistema-bibi.netlify.app/openapi.yaml |
+| **Paths documentados** | 123 (cobertura total dos Route Handlers) | idem |
 | Legado (redirect) | `/api-docs.html` → `/api/docs` | idem |
 
 Fonte da spec: [`public/openapi.yaml`](../../public/openapi.yaml) · Fluxos de negócio: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §11.
@@ -64,6 +65,9 @@ Você deve ver o cabeçalho do ServiceOS e a árvore de tags (Auth, Prestador, I
 ### Passo 4 — Validar contrato e testes automatizados
 
 ```bash
+# Sincroniza paths novos a partir dos Route Handlers
+npm run openapi:sync
+
 # Valida YAML, paths e cobertura vs Route Handlers
 npm run openapi:verify
 
@@ -136,9 +140,11 @@ curl -b cookies.txt http://localhost:3000/api/prestador/agenda
 
 Ao criar ou alterar Route Handlers em `src/app/api/**/route.ts`:
 
-1. Atualize `public/openapi.yaml` com path, método, schemas e segurança
-2. Rode `npm run openapi:verify` — paths documentados sem handler correspondente **falham**
-3. Handlers ainda não documentados geram **aviso** (hoje ~49 rotas secundárias fora do escopo público)
+1. Rode `npm run openapi:sync` — adiciona paths/métodos ausentes ao YAML
+2. Refine manualmente summaries/schemas dos endpoints críticos (Voa, estoque, billing)
+3. Rode `npm run openapi:verify` — paths documentados sem handler correspondente **falham**
+
+O sync automático cobre **123 paths** (paridade com Route Handlers). Endpoints novos recebem documentação mínima; enriqueça descrições conforme necessário.
 
 Roadmap: testes de contrato de resposta (P1 em [`TESTES.md`](TESTES.md)).
 

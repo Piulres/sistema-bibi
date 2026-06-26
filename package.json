@@ -11,6 +11,7 @@
     "pre-release": "node scripts/pre-release.mjs",
     "docs:verify": "node scripts/verify-docs.mjs",
     "openapi:verify": "node scripts/verify-openapi.mjs",
+    "openapi:sync": "node scripts/sync-openapi-paths.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
