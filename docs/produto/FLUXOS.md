@@ -14,7 +14,7 @@ ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev,
 ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
 ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
 
-**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384).
+**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (403).
 
 ---
 
@@ -594,6 +594,40 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 | Walk-in + check-in | Interno | `/interno/agenda` | §8.5 |
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
+
+### 8.10 Onboarding tour guiado (v2.2)
+
+Product tour nos quatro portais autenticados. Detalhe completo: [`../versoes/V2_2.md`](../versoes/V2_2.md).
+
+```mermaid
+sequenceDiagram
+  participant U as Usuário
+  participant P as OnboardingProvider
+  participant T as OnboardingTour
+  participant LS as localStorage
+
+  U->>P: Login + primeira visita ao portal
+  P->>LS: isTourCompleted(portal)?
+  alt não concluído
+    P->>T: active=true (após 800ms)
+    T->>U: Spotlight + tooltip no passo 1
+    U->>T: Próximo / Concluir
+    T->>LS: markTourCompleted(portal)
+  end
+  U->>P: Clica Tour no header
+  P->>LS: resetTour(portal)
+  P->>T: Reinicia do passo 1
+```
+
+| Etapa | Comportamento | Código |
+|-------|---------------|--------|
+| Montagem | `*PortalShell` envolve com `OnboardingProvider` + `OnboardingTour` | `src/components/layout/*PortalShell.tsx` |
+| Passos | Builders por portal + filtro por `pathname` | `src/lib/onboarding/tours/` |
+| Âncoras | `data-tour-id` em header, nav, content, assistant | `PortalHeader`, layouts |
+| Persistência | Chave `bibi_onboarding` — objeto por `PortalKey` | `src/lib/onboarding/storage.ts` |
+| Reinício | Botão **Tour** → `OnboardingTrigger` | `src/components/onboarding/OnboardingTrigger.tsx` |
+
+**Testes:** `tests/unit/onboarding.test.ts` — rotas wildcard, deduplicação de passos, labels por nicho.
 
 ---
 

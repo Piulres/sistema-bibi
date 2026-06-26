@@ -47,7 +47,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v2.1.0`** — **Sistema Bibi - ServiceOS** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md` (deploy atual).
+(cota Netlify). Produção: **`v2.2.0`** — **Sistema Bibi - ServiceOS** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md` (deploy atual).
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
@@ -107,7 +107,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.1.0`** — `docs/versoes/V2_1.md` · `docs/versoes/V2_0.md` · `docs/versoes/RELEASES.md`.
+**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.2.0`** — `docs/versoes/V2_2.md` · `docs/versoes/V2_1.md` · `docs/versoes/V2_0.md` · `docs/versoes/RELEASES.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 

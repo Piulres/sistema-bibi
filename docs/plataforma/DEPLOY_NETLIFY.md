@@ -10,12 +10,12 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 
 ---
 
-## Status atual (24/06/2026)
+## Status atual (25/06/2026)
 
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app |
-| Pacote em produção | **`v2.1.0`** — deploy `6a3bc7a4` @ `40e2dfc` |
+| Pacote em produção | **`v2.2.0`** — deploy `6a3ea6c5` @ `2c38248` |
 | Pacote anterior (quebrado) | deploys `6a3b8768`–`6a3b8917` — assets `/_next/static` em 404 |
 | `main` / `dev` | Sincronizadas em **`40e2dfc`** |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
