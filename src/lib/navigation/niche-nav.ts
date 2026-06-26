@@ -79,13 +79,17 @@ export function buildBeneficiarioNavTabs(labels: NicheLabels): NavTab[] {
 }
 
 /** Seções do portal PJ. */
-export function buildPjSectionNav(labels: NicheLabels) {
-  return [
+export function buildPjSectionNav(labels: NicheLabels, niche?: NicheId) {
+  const sections: { id: string; label: string; href?: string }[] = [
     { id: "resumo", label: "Resumo" },
     { id: "beneficiarios", label: labels.beneficiaries },
     { id: "assinaturas", label: "Assinaturas" },
     { id: "faturas", label: "Faturas" },
-  ] as const;
+  ];
+  if (niche === "CONSTRUCTION") {
+    sections.splice(1, 0, { id: "projetos", label: labels.patients, href: "/pj/projetos" });
+  }
+  return sections;
 }
 
 function companiesTabLabel(labels: NicheLabels): string {

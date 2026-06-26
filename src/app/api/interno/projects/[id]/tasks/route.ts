@@ -22,6 +22,8 @@ export async function POST(request: Request, { params }: RouteParams) {
       progressPercent: body.progressPercent !== undefined ? Number(body.progressPercent) : undefined,
       assigneeId:
         body.assigneeId !== undefined ? (body.assigneeId ? String(body.assigneeId) : null) : undefined,
+      dependsOnId:
+        body.dependsOnId !== undefined ? (body.dependsOnId ? String(body.dependsOnId) : null) : undefined,
       sortOrder: body.sortOrder !== undefined ? Number(body.sortOrder) : undefined,
       updatedBy: user.id,
     });

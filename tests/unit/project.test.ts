@@ -33,3 +33,99 @@ describe("CONSTRUCTION niche labels", () => {
     expect(NICHE_MASTER_LABELS.CONSTRUCTION.appointment).toBe("Vistoria");
   });
 });
+
+describe("project-service (CONSTRUCTION seed)", () => {
+  it("lista obras da empresa PJ Incorp Alpha", async () => {
+    const { getTestPrisma } = await import("../helpers/db");
+    const { listProjectsForCompany } = await import("@/lib/project/project-service");
+    const prisma = getTestPrisma();
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
+    const company = await prisma.company.findFirst({
+      where: { tenantId: tenant!.id, name: "Incorp Alpha" },
+    });
+    expect(company).toBeTruthy();
+
+    const projects = await listProjectsForCompany(tenant!.id, company!.id);
+    expect(projects.length).toBeGreaterThanOrEqual(2);
+    expect(projects.some((p) => p.code === "OBR-2026-002")).toBe(true);
+  });
+
+  it("aprova orçamento enviado e emite fatura", async () => {
+    const { getTestPrisma } = await import("../helpers/db");
+    const { approveBudget } = await import("@/lib/project/project-service");
+    const prisma = getTestPrisma();
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
+    const admin = await prisma.user.findFirst({
+      where: { tenantId: tenant!.id, email: "operacao@build.demo" },
+    });
+    const project = await prisma.project.findFirst({
+      where: { tenantId: tenant!.id, code: "OBR-2026-002" },
+      include: { budgets: true },
+    });
+    const budget = project!.budgets.find((b) => b.status === "ENVIADO");
+    if (!budget) {
+      const approved = project!.budgets.find((b) => b.status === "APROVADO");
+      expect(approved?.invoiceId).toBeTruthy();
+      return;
+    }
+
+    const beforeInvoices = await prisma.invoice.count({ where: { tenantId: tenant!.id } });
+
+    const result = await approveBudget({
+      tenantId: tenant!.id,
+      projectId: project!.id,
+      budgetId: budget!.id,
+      updatedBy: admin!.id,
+    });
+
+    expect("error" in result).toBe(false);
+    if ("error" in result) return;
+    expect(result.invoiceId).toBeTruthy();
+    expect(result.budget.status).toBe("APROVADO");
+
+    const afterInvoices = await prisma.invoice.count({ where: { tenantId: tenant!.id } });
+    expect(afterInvoices).toBe(beforeInvoices + 1);
+  });
+
+  it("gera dados para PDF de orçamento", async () => {
+    const { getTestPrisma } = await import("../helpers/db");
+    const { getBudgetPdfData } = await import("@/lib/project/project-service");
+    const { buildBudgetPdfBuffer } = await import("@/lib/exports/budget-pdf");
+    const prisma = getTestPrisma();
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
+    const project = await prisma.project.findFirst({
+      where: { tenantId: tenant!.id, code: "OBR-2026-003" },
+      include: { budgets: true },
+    });
+    const budget = project!.budgets[0];
+
+    const data = await getBudgetPdfData(tenant!.id, project!.id, budget.id);
+    expect(data).toBeTruthy();
+    expect(data!.project.code).toBe("OBR-2026-003");
+
+    const buffer = await buildBudgetPdfBuffer(data!);
+    expect(buffer.length).toBeGreaterThan(500);
+    expect(buffer.subarray(0, 4).toString()).toBe("%PDF");
+  });
+
+  it("PJ acessa obra da própria empresa", async () => {
+    const { getTestPrisma } = await import("../helpers/db");
+    const { getProjectForCompany } = await import("@/lib/project/project-service");
+    const prisma = getTestPrisma();
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
+    const company = await prisma.company.findFirst({
+      where: { tenantId: tenant!.id, name: "Incorp Alpha" },
+    });
+    const project = await prisma.project.findFirst({
+      where: { tenantId: tenant!.id, code: "OBR-2026-001" },
+    });
+
+    const detail = await getProjectForCompany(tenant!.id, company!.id, project!.id);
+    expect(detail).toBeTruthy();
+    expect(detail!.attachments[0]?.downloadUrl).toContain("/api/pj/attachments/");
+  });
+});

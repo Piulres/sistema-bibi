@@ -9,6 +9,7 @@ import {
   TASK_PHASES,
   projectStatusLabel,
 } from "@/lib/project/constants";
+import ScheduleTimeline from "@/components/projects/ScheduleTimeline";
 
 type LineItem = {
   description: string;
@@ -27,6 +28,7 @@ type Budget = {
   total: number;
   notes: string | null;
   approvedAt?: string | null;
+  invoiceId?: string | null;
   lineItems: LineItem[];
 };
 
@@ -41,6 +43,8 @@ type Task = {
   endDate: string | null;
   progressPercent: number;
   assigneeName: string | null;
+  dependsOnId: string | null;
+  dependsOnName: string | null;
 };
 
 type Attachment = {
@@ -110,6 +114,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
     startDate: "",
     endDate: "",
     progressPercent: 0,
+    dependsOnId: "",
   });
 
   const [uploadCategory, setUploadCategory] = useState("PLANTA");
@@ -204,7 +209,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
     }
   }
 
-  async function budgetAction(action: "send" | "approve" | "new-version") {
+  async function budgetAction(action: "send" | "approve" | "reject" | "new-version") {
     if (!activeBudget) return;
     setBusy(true);
     setMsg(null);
@@ -227,8 +232,10 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
         action === "send"
           ? "Proposta enviada"
           : action === "approve"
-            ? "Orçamento aprovado"
-            : "Nova versão criada",
+            ? "Orçamento aprovado — fatura emitida"
+            : action === "reject"
+              ? "Proposta recusada"
+              : "Nova versão criada",
       );
       await load();
     } finally {
@@ -248,6 +255,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
           ...taskForm,
           startDate: taskForm.startDate || null,
           endDate: taskForm.endDate || null,
+          dependsOnId: taskForm.dependsOnId || null,
         }),
       });
       const json = await res.json();
@@ -262,6 +270,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
         startDate: "",
         endDate: "",
         progressPercent: 0,
+        dependsOnId: "",
       });
       setMsg("Tarefa adicionada");
       await load();
@@ -408,6 +417,14 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
               Versão {activeBudget.version} · {activeBudget.statusLabel}
             </span>
             <span className="font-medium">{formatBrl(activeBudget.total)}</span>
+            <a
+              href={`/api/interno/projects/${projectId}/budgets/${activeBudget.id}/pdf`}
+              className="text-[var(--brand-primary)] hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Baixar PDF
+            </a>
           </div>
 
           {activeBudget.status === "RASCUNHO" && (
@@ -537,6 +554,14 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
               <button
                 type="button"
                 disabled={busy}
+                onClick={() => budgetAction("reject")}
+                className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
+              >
+                Recusar proposta
+              </button>
+              <button
+                type="button"
+                disabled={busy}
                 onClick={() => budgetAction("new-version")}
                 className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
               >
@@ -548,6 +573,19 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
           {activeBudget.status === "APROVADO" && (
             <p className="text-sm text-[var(--text-secondary)]">
               Orçamento aprovado em {formatDate(activeBudget.approvedAt ?? null)}.
+              {activeBudget.invoiceId && (
+                <>
+                  {" "}
+                  Fatura{" "}
+                  <Link
+                    href={`/interno?invoice=${activeBudget.invoiceId}`}
+                    className="text-[var(--brand-primary)] hover:underline"
+                  >
+                    {activeBudget.invoiceId.slice(0, 8)}
+                  </Link>{" "}
+                  emitida.
+                </>
+              )}
             </p>
           )}
 
@@ -614,6 +652,23 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 className="mt-1 w-full rounded border px-3 py-2"
               />
             </label>
+            {project.tasks.length > 0 && (
+              <label className="text-sm sm:col-span-2">
+                Depende de
+                <select
+                  value={taskForm.dependsOnId}
+                  onChange={(e) => setTaskForm((f) => ({ ...f, dependsOnId: e.target.value }))}
+                  className="mt-1 w-full rounded border px-3 py-2"
+                >
+                  <option value="">Nenhuma</option>
+                  {project.tasks.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
             <div className="sm:col-span-2 lg:col-span-3">
               <button
                 type="submit"
@@ -624,6 +679,8 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
               </button>
             </div>
           </form>
+
+          {project.tasks.length > 0 && <ScheduleTimeline tasks={project.tasks} />}
 
           <div className="space-y-3">
             {project.tasks.length === 0 && (
@@ -640,6 +697,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                     <p className="text-xs text-[var(--text-muted)]">
                       {task.phaseLabel} · {task.statusLabel}
                       {task.assigneeName ? ` · ${task.assigneeName}` : ""}
+                      {task.dependsOnName ? ` · Depende de: ${task.dependsOnName}` : ""}
                     </p>
                     <p className="mt-1 text-xs text-[var(--text-secondary)]">
                       {formatDate(task.startDate)} → {formatDate(task.endDate)}

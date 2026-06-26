@@ -18,6 +18,8 @@ import {
   saveAttachmentFile,
 } from "@/lib/storage/attachments";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
+import { formatBRL } from "@/lib/pricing";
+import { dispatchWebhooks } from "@/lib/webhook-service";
 
 export type ProjectListItem = {
   id: string;
@@ -60,6 +62,7 @@ export type BudgetView = {
   notes: string | null;
   sentAt: string | null;
   approvedAt: string | null;
+  invoiceId: string | null;
   lineItems: BudgetLineItemView[];
 };
 
@@ -74,6 +77,8 @@ export type TaskView = {
   endDate: string | null;
   progressPercent: number;
   assigneeName: string | null;
+  dependsOnId: string | null;
+  dependsOnName: string | null;
   sortOrder: number;
 };
 
@@ -134,7 +139,7 @@ function computeProjectProgress(tasks: { progressPercent: number }[]): number {
 }
 
 async function syncProjectProgress(projectId: string) {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const tasks = await prisma.projectTask.findMany({ where: { projectId } });
   const progress = computeProjectProgress(tasks);
   await prisma.project.update({ where: { id: projectId }, data: { progressPercent: progress } });
@@ -172,6 +177,7 @@ function mapBudget(b: {
   notes: string | null;
   sentAt: Date | null;
   approvedAt: Date | null;
+  invoiceId?: string | null;
   lineItems: {
     id: string;
     description: string;
@@ -194,6 +200,7 @@ function mapBudget(b: {
     notes: b.notes,
     sentAt: iso(b.sentAt),
     approvedAt: iso(b.approvedAt),
+    invoiceId: b.invoiceId ?? null,
     lineItems: b.lineItems.map(mapLineItem).sort((a, b) => a.sortOrder - b.sortOrder),
   };
 }
@@ -207,7 +214,9 @@ function mapTask(t: {
   endDate: Date | null;
   progressPercent: number;
   sortOrder: number;
+  dependsOnId?: string | null;
   assignee: { name: string } | null;
+  dependsOn?: { name: string } | null;
 }): TaskView {
   return {
     id: t.id,
@@ -220,6 +229,8 @@ function mapTask(t: {
     endDate: iso(t.endDate),
     progressPercent: t.progressPercent,
     assigneeName: t.assignee?.name ?? null,
+    dependsOnId: t.dependsOnId ?? null,
+    dependsOnName: t.dependsOn?.name ?? null,
     sortOrder: t.sortOrder,
   };
 }
@@ -251,7 +262,7 @@ function mapAttachment(a: {
 }
 
 export async function listProjects(tenantId: string): Promise<ProjectListItem[]> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const projects = await prisma.project.findMany({
     where: { tenantId },
     include: {
@@ -297,7 +308,7 @@ export async function getProjectDetail(
   tenantId: string,
   projectId: string,
 ): Promise<ProjectDetail | null> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const project = await prisma.project.findFirst({
     where: { id: projectId, tenantId },
     include: {
@@ -308,7 +319,10 @@ export async function getProjectDetail(
         orderBy: { version: "desc" },
       },
       tasks: {
-        include: { assignee: { select: { name: true } } },
+        include: {
+          assignee: { select: { name: true } },
+          dependsOn: { select: { name: true } },
+        },
         orderBy: { sortOrder: "asc" },
       },
     },
@@ -367,7 +381,7 @@ export async function createProject(input: {
   notes?: string | null;
   createdBy: string;
 }): Promise<{ project: ProjectDetail } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const code = input.code.trim().toUpperCase();
   const name = input.name.trim();
   if (!code || !name) return { error: "Informe código e nome da obra" };
@@ -429,7 +443,7 @@ export async function updateProject(input: {
   notes?: string | null;
   updatedBy: string;
 }): Promise<{ project: ProjectDetail } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const existing = await prisma.project.findFirst({
     where: { id: input.projectId, tenantId: input.tenantId },
   });
@@ -494,7 +508,7 @@ export async function upsertBudget(input: {
   }[];
   updatedBy: string;
 }): Promise<{ budget: BudgetView } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const project = await prisma.project.findFirst({
     where: { id: input.projectId, tenantId: input.tenantId },
   });
@@ -565,7 +579,7 @@ export async function sendBudget(input: {
   budgetId: string;
   updatedBy: string;
 }): Promise<{ budget: BudgetView; project: ProjectDetail } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const budget = await prisma.budget.findFirst({
     where: { id: input.budgetId, project: { id: input.projectId, tenantId: input.tenantId } },
     include: { lineItems: true },
@@ -602,17 +616,36 @@ export async function approveBudget(input: {
   projectId: string;
   budgetId: string;
   updatedBy: string;
-}): Promise<{ budget: BudgetView; project: ProjectDetail } | { error: string }> {
-  const prisma = getPrisma();
+  approvedByPjUserId?: string | null;
+}): Promise<
+  | { budget: BudgetView; project: ProjectDetail; invoiceId?: string }
+  | { error: string }
+> {
+  const prisma = await getPrisma();
   const budget = await prisma.budget.findFirst({
     where: { id: input.budgetId, project: { id: input.projectId, tenantId: input.tenantId } },
+    include: { lineItems: true, project: true },
   });
   if (!budget) return { error: "Orçamento não encontrado" };
   if (budget.status !== "ENVIADO") return { error: "Somente propostas enviadas podem ser aprovadas" };
+  if (budget.invoiceId) return { error: "Orçamento já faturado" };
+
+  const invoiceResult = await createInvoiceFromBudget({
+    tenantId: input.tenantId,
+    projectId: input.projectId,
+    budget,
+    createdBy: input.updatedBy,
+  });
+  if ("error" in invoiceResult) return invoiceResult;
 
   await prisma.budget.update({
     where: { id: budget.id },
-    data: { status: "APROVADO", approvedAt: new Date() },
+    data: {
+      status: "APROVADO",
+      approvedAt: new Date(),
+      invoiceId: invoiceResult.invoiceId,
+      approvedByPjUserId: input.approvedByPjUserId ?? null,
+    },
   });
   await prisma.project.update({
     where: { id: input.projectId },
@@ -624,7 +657,44 @@ export async function approveBudget(input: {
     entityType: TIMELINE_ENTITY_TYPES.BUDGET,
     entityId: budget.id,
     action: TIMELINE_ACTIONS.UPDATED,
-    description: `Orçamento v${budget.version} aprovado`,
+    description: `Orçamento v${budget.version} aprovado — fatura ${invoiceResult.invoiceId.slice(0, 8)}`,
+    createdBy: input.updatedBy,
+  });
+
+  const detail = await getProjectDetail(input.tenantId, input.projectId);
+  const updatedBudget = detail?.budgets.find((b) => b.id === budget.id);
+  if (!detail || !updatedBudget) return { error: "Erro ao carregar obra" };
+  return { budget: updatedBudget, project: detail, invoiceId: invoiceResult.invoiceId };
+}
+
+export async function rejectBudget(input: {
+  tenantId: string;
+  projectId: string;
+  budgetId: string;
+  updatedBy: string;
+}): Promise<{ budget: BudgetView; project: ProjectDetail } | { error: string }> {
+  const prisma = await getPrisma();
+  const budget = await prisma.budget.findFirst({
+    where: { id: input.budgetId, project: { id: input.projectId, tenantId: input.tenantId } },
+  });
+  if (!budget) return { error: "Orçamento não encontrado" };
+  if (budget.status !== "ENVIADO") return { error: "Somente propostas enviadas podem ser recusadas" };
+
+  await prisma.budget.update({
+    where: { id: budget.id },
+    data: { status: "REJEITADO", rejectedAt: new Date() },
+  });
+  await prisma.project.update({
+    where: { id: input.projectId },
+    data: { status: "ORCAMENTO" },
+  });
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.BUDGET,
+    entityId: budget.id,
+    action: TIMELINE_ACTIONS.UPDATED,
+    description: `Orçamento v${budget.version} recusado pelo cliente`,
     createdBy: input.updatedBy,
   });
 
@@ -634,13 +704,92 @@ export async function approveBudget(input: {
   return { budget: updatedBudget, project: detail };
 }
 
+async function createInvoiceFromBudget(input: {
+  tenantId: string;
+  projectId: string;
+  budget: {
+    id: string;
+    version: number;
+    total: number;
+    lineItems: { description: string; total: number }[];
+    project: { code: string; name: string; companyId: string | null };
+  };
+  createdBy: string;
+}): Promise<{ invoiceId: string } | { error: string }> {
+  const prisma = await getPrisma();
+  const patient = input.budget.project.companyId
+    ? await prisma.patient.findFirst({
+        where: {
+          tenantId: input.tenantId,
+          companyId: input.budget.project.companyId,
+        },
+        orderBy: { createdAt: "asc" },
+      })
+    : null;
+
+  if (!patient) {
+    return {
+      error:
+        "Não há beneficiário vinculado à empresa para emitir fatura. Cadastre um cliente na empresa.",
+    };
+  }
+
+  const invoice = await prisma.$transaction(async (tx) => {
+    const created = await tx.invoice.create({
+      data: {
+        tenantId: input.tenantId,
+        patientId: patient.id,
+        companyId: input.budget.project.companyId,
+        total: input.budget.total,
+        status: "FECHADA",
+        items: {
+          create: input.budget.lineItems.map((li) => ({
+            description: `${input.budget.project.code} — ${li.description}`,
+            amount: li.total,
+          })),
+        },
+      },
+    });
+
+    await recordTimelineEvent(
+      {
+        tenantId: input.tenantId,
+        entityType: TIMELINE_ENTITY_TYPES.INVOICE,
+        entityId: created.id,
+        action: TIMELINE_ACTIONS.INVOICE_ISSUED,
+        description: `Fatura de obra ${input.budget.project.code} (orçamento v${input.budget.version}) — ${formatBRL(created.total)}`,
+        createdBy: input.createdBy,
+      },
+      tx,
+    );
+
+    return created;
+  });
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: "INVOICE_ISSUED",
+    data: {
+      invoiceId: invoice.id,
+      patientId: patient.id,
+      companyId: input.budget.project.companyId,
+      total: invoice.total,
+      status: invoice.status,
+      projectId: input.projectId,
+      budgetId: input.budget.id,
+    },
+  });
+
+  return { invoiceId: invoice.id };
+}
+
 export async function createBudgetVersion(input: {
   tenantId: string;
   projectId: string;
   sourceBudgetId: string;
   updatedBy: string;
 }): Promise<{ budget: BudgetView } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const source = await prisma.budget.findFirst({
     where: {
       id: input.sourceBudgetId,
@@ -697,15 +846,26 @@ export async function upsertTask(input: {
   endDate?: string | null;
   progressPercent?: number;
   assigneeId?: string | null;
+  dependsOnId?: string | null;
   sortOrder?: number;
   updatedBy: string;
 }): Promise<{ task: TaskView } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const project = await prisma.project.findFirst({
     where: { id: input.projectId, tenantId: input.tenantId },
   });
   if (!project) return { error: "Obra não encontrada" };
   if (input.status && !isTaskStatus(input.status)) return { error: "Status inválido" };
+
+  if (input.dependsOnId) {
+    const dep = await prisma.projectTask.findFirst({
+      where: { id: input.dependsOnId, projectId: input.projectId },
+    });
+    if (!dep) return { error: "Tarefa dependente não encontrada" };
+    if (input.taskId && input.dependsOnId === input.taskId) {
+      return { error: "Tarefa não pode depender de si mesma" };
+    }
+  }
 
   const data = {
     name: input.name.trim(),
@@ -715,6 +875,7 @@ export async function upsertTask(input: {
     endDate: input.endDate ? new Date(input.endDate) : null,
     progressPercent: input.progressPercent ?? 0,
     assigneeId: input.assigneeId ?? null,
+    dependsOnId: input.dependsOnId ?? null,
     sortOrder: input.sortOrder ?? 0,
   };
 
@@ -723,13 +884,19 @@ export async function upsertTask(input: {
     task = await prisma.projectTask.update({
       where: { id: input.taskId },
       data,
-      include: { assignee: { select: { name: true } } },
+      include: {
+        assignee: { select: { name: true } },
+        dependsOn: { select: { name: true } },
+      },
     });
   } else {
     const count = await prisma.projectTask.count({ where: { projectId: input.projectId } });
     task = await prisma.projectTask.create({
       data: { ...data, projectId: input.projectId, sortOrder: input.sortOrder ?? count },
-      include: { assignee: { select: { name: true } } },
+      include: {
+        assignee: { select: { name: true } },
+        dependsOn: { select: { name: true } },
+      },
     });
   }
 
@@ -750,7 +917,7 @@ export async function deleteTask(input: {
   projectId: string;
   taskId: string;
 }): Promise<{ ok: true } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const task = await prisma.projectTask.findFirst({
     where: { id: input.taskId, projectId: input.projectId, project: { tenantId: input.tenantId } },
   });
@@ -770,7 +937,7 @@ export async function uploadAttachment(input: {
   category?: string;
   uploadedById: string;
 }): Promise<{ attachment: AttachmentView } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   if (!isAttachmentEntityType(input.entityType)) return { error: "Tipo de entidade inválido" };
   const category = input.category ?? "OUTRO";
   if (!isAttachmentCategory(category)) return { error: "Categoria inválida" };
@@ -837,7 +1004,7 @@ export async function getAttachmentForDownload(
   tenantId: string,
   attachmentId: string,
 ): Promise<{ fileName: string; contentType: string; buffer: Buffer } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const attachment = await prisma.attachment.findFirst({
     where: { id: attachmentId, tenantId },
   });
@@ -858,7 +1025,7 @@ export async function deleteAttachment(input: {
   attachmentId: string;
   deletedBy: string;
 }): Promise<{ ok: true } | { error: string }> {
-  const prisma = getPrisma();
+  const prisma = await getPrisma();
   const attachment = await prisma.attachment.findFirst({
     where: { id: input.attachmentId, tenantId: input.tenantId },
   });
@@ -886,4 +1053,126 @@ export async function listProjectPipeline(tenantId: string) {
     pipeline[status] = projects.filter((p) => p.status === status);
   }
   return { pipeline, statuses };
+}
+
+export type PjProjectListItem = {
+  id: string;
+  code: string;
+  name: string;
+  status: string;
+  statusLabel: string;
+  progressPercent: number;
+  budgetTotal: number | null;
+  budgetStatus: string | null;
+  budgetId: string | null;
+  sentAt: string | null;
+};
+
+export async function listProjectsForCompany(
+  tenantId: string,
+  companyId: string,
+): Promise<PjProjectListItem[]> {
+  const prisma = await getPrisma();
+  const projects = await prisma.project.findMany({
+    where: { tenantId, companyId },
+    include: {
+      budgets: { orderBy: { version: "desc" }, take: 1 },
+    },
+    orderBy: { updatedAt: "desc" },
+  });
+
+  return projects.map((p) => {
+    const b = p.budgets[0];
+    return {
+      id: p.id,
+      code: p.code,
+      name: p.name,
+      status: p.status,
+      statusLabel: projectStatusLabel(p.status),
+      progressPercent: p.progressPercent,
+      budgetTotal: b?.total ?? null,
+      budgetStatus: b?.status ?? null,
+      budgetId: b?.id ?? null,
+      sentAt: b?.sentAt ? b.sentAt.toISOString() : null,
+    };
+  });
+}
+
+export async function getProjectForCompany(
+  tenantId: string,
+  companyId: string,
+  projectId: string,
+): Promise<ProjectDetail | null> {
+  const prisma = await getPrisma();
+  const owned = await prisma.project.findFirst({
+    where: { id: projectId, tenantId, companyId },
+  });
+  if (!owned) return null;
+  const detail = await getProjectDetail(tenantId, projectId);
+  if (!detail) return null;
+  return {
+    ...detail,
+    attachments: detail.attachments.map((a) => ({
+      ...a,
+      downloadUrl: `/api/pj/attachments/${a.id}/download`,
+    })),
+  };
+}
+
+export async function canCompanyAccessAttachment(
+  tenantId: string,
+  companyId: string,
+  attachmentId: string,
+): Promise<boolean> {
+  const prisma = await getPrisma();
+  const attachment = await prisma.attachment.findFirst({
+    where: { id: attachmentId, tenantId },
+  });
+  if (!attachment) return false;
+
+  if (attachment.entityType === "Project") {
+    const project = await prisma.project.findFirst({
+      where: { id: attachment.entityId, tenantId, companyId },
+    });
+    return Boolean(project);
+  }
+
+  const budget = await prisma.budget.findFirst({
+    where: {
+      id: attachment.entityId,
+      project: { tenantId, companyId },
+    },
+  });
+  return Boolean(budget);
+}
+
+export async function getBudgetPdfData(
+  tenantId: string,
+  projectId: string,
+  budgetId: string,
+) {
+  const project = await getProjectDetail(tenantId, projectId);
+  if (!project) return null;
+  const budget = project.budgets.find((b) => b.id === budgetId);
+  if (!budget) return null;
+
+  const prisma = await getPrisma();
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    include: { branding: true },
+  });
+  if (!tenant) return null;
+
+  return {
+    tenantName: tenant.branding?.displayName ?? tenant.name,
+    platformLabel: tenant.branding?.platformLabel ?? "Powered by Sistema Bibi - ServiceOS",
+    project: {
+      code: project.code,
+      name: project.name,
+      companyName: project.companyName,
+      addressCity: project.addressCity,
+      addressState: project.addressState,
+    },
+    budget,
+  };
 }

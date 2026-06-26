@@ -3,6 +3,7 @@ import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   approveBudget,
   createBudgetVersion,
+  rejectBudget,
   sendBudget,
   upsertBudget,
 } from "@/lib/project/project-service";
@@ -71,6 +72,17 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     if (action === "approve") {
       const result = await approveBudget({
+        tenantId: user.tenantId,
+        projectId,
+        budgetId: String(body.budgetId ?? ""),
+        updatedBy: user.id,
+      });
+      if ("error" in result) return NextResponse.json({ error: result.error }, { status: 400 });
+      return NextResponse.json(result);
+    }
+
+    if (action === "reject") {
+      const result = await rejectBudget({
         tenantId: user.tenantId,
         projectId,
         budgetId: String(body.budgetId ?? ""),
