@@ -166,7 +166,7 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
             {project.managerName ? ` · Resp.: ${project.managerName}` : ""}
           </p>
         </div>
-        <StatusBadge status={project.status} label={project.statusLabel} />
+        <StatusBadge value={project.status} label={project.statusLabel} />
       </div>
 
       {msg && <Alert tone="info">{msg}</Alert>}

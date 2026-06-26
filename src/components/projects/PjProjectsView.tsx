@@ -59,7 +59,7 @@ export default function PjProjectsView() {
     return (
       <EmptyState
         title="Nenhuma obra vinculada"
-        description="Quando a operadora enviar propostas para sua empresa, elas aparecerão aqui."
+        message="Quando a operadora enviar propostas para sua empresa, elas aparecerão aqui."
       />
     );
   }
@@ -88,7 +88,7 @@ export default function PjProjectsView() {
                 </p>
               </div>
               <div className="flex flex-col items-end gap-2">
-                <StatusBadge status={project.status} label={project.statusLabel} />
+                <StatusBadge value={project.status} label={project.statusLabel} />
                 {pendingApproval && (
                   <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-900">
                     Aguardando aprovação
