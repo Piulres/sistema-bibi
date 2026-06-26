@@ -15,6 +15,7 @@ function getTargetRect(selector: string): Rect | null {
   const el = document.querySelector(selector);
   if (!el) return null;
   const r = el.getBoundingClientRect();
+  if (r.width < 4 || r.height < 4) return null;
   return { top: r.top, left: r.left, width: r.width, height: r.height };
 }
 
@@ -97,6 +98,11 @@ export default function OnboardingTour() {
     let cancelled = false;
     requestAnimationFrame(() => {
       if (cancelled) return;
+      const rect = getTargetRect(currentStep.target);
+      if (!rect) {
+        nextStep();
+        return;
+      }
       updatePosition();
       const el = document.querySelector(currentStep.target);
       el?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
@@ -105,7 +111,7 @@ export default function OnboardingTour() {
     return () => {
       cancelled = true;
     };
-  }, [active, currentStep, updatePosition]);
+  }, [active, currentStep, updatePosition, nextStep]);
 
   useEffect(() => {
     if (!active) return;

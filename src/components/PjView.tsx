@@ -186,7 +186,7 @@ export default function PjView() {
         </div>
       </section>
 
-      <section id="assinaturas">
+      <section id="assinaturas" data-tour-id="section-assinaturas">
         <SectionHeader title="Assinaturas recorrentes" />
         {subscriptions.length === 0 ? (
           <EmptyState message="Nenhuma assinatura vinculada à empresa." />
@@ -214,7 +214,7 @@ export default function PjView() {
         )}
       </section>
 
-      <section id="faturas">
+      <section id="faturas" data-tour-id="section-faturas">
         <SectionHeader title="Faturas da empresa" />
         {invoices.length === 0 ? (
           <EmptyState message="Nenhuma fatura emitida ainda." />

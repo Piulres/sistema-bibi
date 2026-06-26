@@ -2,7 +2,7 @@ import type { PortalKey } from "@/lib/roles";
 import type { NicheLabels } from "@/lib/niche/types";
 import type { InternoModule } from "@/lib/interno-permissions";
 
-export const ONBOARDING_VERSION = 1;
+export const ONBOARDING_VERSION = 2;
 
 export type OnboardingPlacement = "top" | "bottom" | "left" | "right" | "auto";
 
@@ -15,6 +15,10 @@ export type OnboardingStep = {
   placement?: OnboardingPlacement;
   /** Exibir apenas nesta rota (pathname exato ou prefixo com `*`). */
   route?: string;
+  /** Módulo interno — filtra passo conforme RBAC do usuário. */
+  module?: InternoModule;
+  /** Ordem de exibição (menor = antes). */
+  order?: number;
 };
 
 export type OnboardingTourConfig = {
