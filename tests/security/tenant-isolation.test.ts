@@ -25,26 +25,30 @@ describe("Segurança — isolamento cross-tenant", () => {
 
   it("interno de um tenant não acessa paciente de outro tenant", async () => {
     const prisma = getTestPrisma();
-    const bibiTenant = await prisma.tenant.findFirst({ where: { slug: "bibi-saude" } });
+    const homeTenant = await prisma.tenant.findFirst({ where: { slug: "horizonte" } });
     const foreignTenant = await prisma.tenant.findFirst({
-      where: { slug: { not: "bibi-saude" } },
+      where: { slug: "petcare" },
     });
 
-    if (!bibiTenant || !foreignTenant) return;
+    expect(homeTenant).toBeTruthy();
+    expect(foreignTenant).toBeTruthy();
+    if (!homeTenant || !foreignTenant) return;
 
     const foreignPatient = await prisma.patient.findFirst({
       where: { tenantId: foreignTenant.id },
       select: { id: true, tenantId: true },
     });
 
+    expect(foreignPatient).toBeTruthy();
     if (!foreignPatient) return;
 
     await setSessionForEmail("faturamento@bibi.health");
     const sessionUser = await prisma.user.findUniqueOrThrow({
       where: { email: "faturamento@bibi.health" },
     });
-    expect(sessionUser.tenantId).toBe(bibiTenant.id);
-    expect(foreignPatient.tenantId).not.toBe(bibiTenant.id);
+    expect(sessionUser.tenantId).toBe(homeTenant.id);
+    expect(foreignPatient.tenantId).toBe(foreignTenant.id);
+    expect(foreignPatient.tenantId).not.toBe(homeTenant.id);
 
     const res = await patientOverviewGet(
       new Request("http://localhost"),

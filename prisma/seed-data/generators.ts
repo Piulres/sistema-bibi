@@ -11,8 +11,10 @@ import {
   phoneForIndex,
   pick,
   pjEmailFromCompany,
+  pjRoleEmail,
   seedCpf,
 } from "./helpers";
+import type { SeedProfileConfig } from "./profile";
 
 export type GeneratedBeneficiary = {
   name: string;
@@ -125,19 +127,63 @@ export type PjUserSeed = {
   email: string;
   name: string;
   companyIndex: number;
+  /** Papel na equipe corporativa (RH, Financeiro…) */
+  role?: string;
 };
 
-/** Usuários PJ para empresas com contrato ativo ou inadimplente. */
-export function generatePjUsers(companies: SeedCompany[]): PjUserSeed[] {
-  const contractStatuses: CompanyStatus[] = ["ATIVO", "INADIMPLENTE"];
+const PJ_TEAM_ROLES = [
+  { suffix: "rh", label: "RH" },
+  { suffix: "financeiro", label: "Financeiro" },
+  { suffix: "beneficios", label: "Benefícios" },
+  { suffix: "compras", label: "Compras" },
+  { suffix: "gestor", label: "Gestor" },
+  { suffix: "operacoes", label: "Operações" },
+  { suffix: "juridico", label: "Jurídico" },
+  { suffix: "ti", label: "TI" },
+  { suffix: "diretoria", label: "Diretoria" },
+] as const;
 
-  return companies
-    .filter((c) => contractStatuses.includes(c.status))
-    .map((company) => ({
-      email: company.pjEmail ?? pjEmailFromCompany(company.name, company.index),
-      name: `RH ${company.name.split(" ")[0]}`,
-      companyIndex: company.index,
-    }));
+function pjUserCount(company: SeedCompany, profile: SeedProfileConfig): number {
+  const { min, max } = profile.pjUsersPerCompany;
+  if (min === max) return min;
+  const span = max - min + 1;
+  return min + (company.index % span);
+}
+
+/** Usuários PJ para empresas com contrato ativo ou inadimplente. */
+export function generatePjUsers(
+  companies: SeedCompany[],
+  profile?: Pick<SeedProfileConfig, "pjUsersPerCompany">,
+): PjUserSeed[] {
+  const contractStatuses: CompanyStatus[] = ["ATIVO", "INADIMPLENTE"];
+  const pjProfile = profile ?? { pjUsersPerCompany: { min: 1, max: 1 } };
+  const result: PjUserSeed[] = [];
+
+  for (const company of companies) {
+    if (!contractStatuses.includes(company.status)) continue;
+
+    const count = pjUserCount(company, { pjUsersPerCompany: pjProfile.pjUsersPerCompany } as SeedProfileConfig);
+    const companyShort = company.name.split(" ")[0] ?? company.name;
+
+    for (let i = 0; i < count; i++) {
+      const role = PJ_TEAM_ROLES[i]!;
+      const email =
+        i === 0 && company.pjEmail
+          ? company.pjEmail
+          : i === 0
+            ? pjEmailFromCompany(company.name, company.index)
+            : pjRoleEmail(company.name, company.index, role.suffix);
+
+      result.push({
+        email,
+        name: `${role.label} ${companyShort}`,
+        companyIndex: company.index,
+        role: role.label,
+      });
+    }
+  }
+
+  return result;
 }
 
 /** Garante CPF único na lista (fallback se colisão). */

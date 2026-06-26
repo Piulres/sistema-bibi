@@ -40,6 +40,16 @@ export function pjEmailFromCompany(name: string, index: number): string {
   return `rh.${slug.slice(0, 12)}${index}@empresa.demo`;
 }
 
+/** E-mail determinístico para equipe PJ (RH, financeiro, benefícios…). */
+export function pjRoleEmail(
+  name: string,
+  companyIndex: number,
+  roleSuffix: string,
+): string {
+  const slug = slugFromName(name).replace(/-/g, "");
+  return `${roleSuffix}.${slug.slice(0, 10)}${companyIndex}@empresa.demo`;
+}
+
 export function beneficiaryEmail(name: string, index: number): string {
   const parts = name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").split(" ");
   const first = parts[0] ?? "user";

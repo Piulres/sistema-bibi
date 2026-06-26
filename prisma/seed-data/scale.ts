@@ -1,5 +1,7 @@
+import { resolveSeedProfile } from "./profile";
+
 /** Escala da massa de dados — controlada por SEED_SCALE no .env */
-export type SeedScale = "small" | "medium" | "large";
+export type SeedScale = "small" | "medium" | "large" | "operation-1y";
 
 export type ScaleConfig = {
   scale: SeedScale;
@@ -11,6 +13,8 @@ export type ScaleConfig = {
   beneficiaryPortalUsers: number;
   /** Profundidade do histórico em dias */
   historyDays: number;
+  /** Fechamento mensal corporativo (baseline de faturas B2B) */
+  baselineMonths: number;
   /** Empresas no tenant VitaCare white-label */
   vitacareCompanies: number;
   /** Beneficiários por empresa ativa no VitaCare (média) */
@@ -25,6 +29,7 @@ const PRESETS: Record<SeedScale, ScaleConfig> = {
     subscriptionChargeSpan: 4,
     beneficiaryPortalUsers: 6,
     historyDays: 90,
+    baselineMonths: 6,
     vitacareCompanies: 5,
     vitacareBeneficiariesPerCompany: 4,
   },
@@ -35,6 +40,7 @@ const PRESETS: Record<SeedScale, ScaleConfig> = {
     subscriptionChargeSpan: 6,
     beneficiaryPortalUsers: 12,
     historyDays: 180,
+    baselineMonths: 6,
     vitacareCompanies: 8,
     vitacareBeneficiariesPerCompany: 6,
   },
@@ -45,15 +51,35 @@ const PRESETS: Record<SeedScale, ScaleConfig> = {
     subscriptionChargeSpan: 12,
     beneficiaryPortalUsers: 24,
     historyDays: 365,
+    baselineMonths: 12,
     vitacareCompanies: 12,
     vitacareBeneficiariesPerCompany: 10,
+  },
+  "operation-1y": {
+    scale: "operation-1y",
+    appointmentCount: 320,
+    messageCount: 96,
+    subscriptionChargeSpan: 12,
+    beneficiaryPortalUsers: 18,
+    historyDays: 365,
+    baselineMonths: 12,
+    vitacareCompanies: 6,
+    vitacareBeneficiariesPerCompany: 6,
   },
 };
 
 export function resolveSeedScale(): ScaleConfig {
+  const profile = resolveSeedProfile();
+  if (profile.profile === "operation-1y") {
+    return PRESETS["operation-1y"];
+  }
+
   const raw = (process.env.SEED_SCALE ?? "medium").toLowerCase();
   if (raw === "small" || raw === "medium" || raw === "large") {
     return PRESETS[raw];
+  }
+  if (raw === "operation-1y") {
+    return PRESETS["operation-1y"];
   }
   console.warn(`SEED_SCALE="${raw}" invalido — usando medium`);
   return PRESETS.medium;
