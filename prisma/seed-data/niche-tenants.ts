@@ -30,9 +30,9 @@ const NICHE_DEMO_META: Record<
   SPA: { name: "Zen Studio Bem-estar", cnpj: "44.444.444/0001-44", displayName: "Zen Studio" },
   EDUCATION: { name: "EduPrime Cursos", cnpj: "55.555.555/0001-55", displayName: "EduPrime" },
   CONSTRUCTION: {
-    name: "Build Engenharia e Construções",
+    name: "Build Engenharia Civil",
     cnpj: "66.666.666/0001-66",
-    displayName: "Build Engenharia",
+    displayName: "Engenharia Civil",
   },
 };
 

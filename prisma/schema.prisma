@@ -47,6 +47,7 @@ model Tenant {
   procedureMaterialKits ProcedureMaterialKit[]
   projects              Project[]
   attachments           Attachment[]
+  fieldReports          DailyFieldReport[]
 }
 
 /// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
@@ -117,6 +118,7 @@ model User {
   managedProjects   Project[]          @relation("ProjectManager")
   assignedTasks     ProjectTask[]      @relation("TaskAssignee")
   uploadedAttachments Attachment[]     @relation("AttachmentUploader")
+  fieldReports      DailyFieldReport[] @relation("FieldReportAuthor")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -597,6 +599,7 @@ model Invoice {
   subscriptionCharges SubscriptionCharge[]
   payments Payment[]
   budget Budget?
+  fieldReports DailyFieldReport[]
 }
 
 model InvoiceItem {
@@ -818,6 +821,10 @@ model Project {
 
   budgets Budget[]
   tasks   ProjectTask[]
+  fieldReports DailyFieldReport[]
+
+  /// FECHADO | DIARIA | MISTO — modelo de cobrança predominante da obra
+  billingMode String @default("MISTO")
 
   @@unique([tenantId, code])
   @@index([tenantId, status])
@@ -891,12 +898,46 @@ model ProjectTask {
   dependsOnId String?
   dependsOn   ProjectTask?  @relation("TaskDependency", fields: [dependsOnId], references: [id])
   dependents  ProjectTask[] @relation("TaskDependency")
+  fieldReports DailyFieldReport[]
 
   @@index([projectId])
 }
 
-/// Anexo técnico (plantas, laudos, memoriais, ART).
-/// entityType: Project | Budget
+/// Registro diário de campo (RDO) — profissional reporta presença, execução e fotos.
+/// status: RASCUNHO | ENVIADO | APROVADO | FATURADO
+model DailyFieldReport {
+  id              String   @id @default(cuid())
+  reportDate      DateTime
+  trade           String
+  locationNote    String?
+  latitude        Float?
+  longitude       Float?
+  workDone        String
+  pendingWork     String?
+  progressPercent Float?
+  diariaAmount    Float?
+  status          String   @default("ENVIADO")
+  invoiceId       String?
+  invoice         Invoice? @relation(fields: [invoiceId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  taskId    String?
+  task      ProjectTask? @relation(fields: [taskId], references: [id])
+  authorId  String
+  author    User    @relation("FieldReportAuthor", fields: [authorId], references: [id])
+
+  @@index([tenantId, projectId])
+  @@index([authorId, reportDate])
+  @@index([projectId, reportDate])
+}
+
+/// Anexo técnico (plantas, laudos, memoriais, ART, fotos de campo).
+/// entityType: Project | Budget | DailyFieldReport
 /// category: PLANTA | LAUDO | ART | CONTRATO | MEMORIAL | OUTRO
 model Attachment {
   id          String   @id @default(cuid())

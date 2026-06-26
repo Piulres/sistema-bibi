@@ -34,7 +34,7 @@ function segmentPageLabel(niche: NicheId): string {
     LEGAL: "Página Jurídica",
     SPA: "Página Bem-estar",
     EDUCATION: "Página Educação",
-    CONSTRUCTION: "Página Engenharia",
+    CONSTRUCTION: "Página Engenharia Civil",
   };
   return map[niche];
 }

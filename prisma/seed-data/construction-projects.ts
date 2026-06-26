@@ -26,6 +26,9 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
   const engPaulo = await prisma.user.findFirst({
     where: { tenantId: tenant.id, email: "eng.paulo@build.demo" },
   });
+  const pedreiroJose = await prisma.user.findFirst({
+    where: { tenantId: tenant.id, email: "pedreiro.jose@build.demo" },
+  });
 
   const alreadySeeded = await prisma.project.findFirst({
     where: { tenantId: tenant.id, code: "OBR-2026-001" },
@@ -174,6 +177,8 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
         progressPercent: spec.progressPercent,
         startDate: spec.startDate,
         endDate: spec.endDate,
+        billingMode:
+          spec.code === "OBR-2026-001" ? "MISTO" : spec.code === "OBR-2026-002" ? "FECHADO" : "DIARIA",
         budgets: {
           create: {
             version: 1,
@@ -207,7 +212,12 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
               status: t.status,
               progressPercent: t.progressPercent,
               sortOrder: t.sortOrder,
-              assigneeId: t.status === "EM_ANDAMENTO" ? engPaulo?.id : manager?.id,
+              assigneeId:
+                t.name === "Demolição" && pedreiroJose
+                  ? pedreiroJose.id
+                  : t.status === "EM_ANDAMENTO"
+                    ? engPaulo?.id
+                    : manager?.id,
               startDate: start,
               endDate: end,
             };
@@ -273,6 +283,29 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
     });
 
     count += 1;
+  }
+
+  const obra001 = await prisma.project.findFirst({
+    where: { tenantId: tenant.id, code: "OBR-2026-001" },
+    include: { tasks: { where: { name: "Alvenaria" }, take: 1 } },
+  });
+  if (obra001 && pedreiroJose) {
+    await prisma.dailyFieldReport.create({
+      data: {
+        tenantId: tenant.id,
+        projectId: obra001.id,
+        taskId: obra001.tasks[0]?.id ?? null,
+        authorId: pedreiroJose.id,
+        reportDate: new Date(),
+        trade: "PEDREIRO",
+        locationNote: "12º andar — área molhada",
+        workDone: "Conclusão de 12 m² de alvenaria no banheiro principal. Argamassa aplicada.",
+        pendingWork: "Aguardar cura para iniciar revestimento. Necessário 2 sacos de cimento.",
+        progressPercent: 65,
+        diariaAmount: 280,
+        status: "ENVIADO",
+      },
+    });
   }
 
   return count;

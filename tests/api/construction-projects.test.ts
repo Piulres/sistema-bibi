@@ -210,6 +210,54 @@ describe("API — Obras CONSTRUCTION", () => {
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("application/pdf");
     });
+
+    it("GET field-reports lista RDO da obra", async () => {
+      await setSessionForEmail(DEMO_EMAILS.buildInterno);
+      const project = await getBuildProject("OBR-2026-001");
+      const { GET } = await import("@/app/api/interno/projects/[id]/field-reports/route");
+      const res = await GET(
+        new Request(`http://localhost/api/interno/projects/${project.id}/field-reports`),
+        { params: Promise.resolve({ id: project.id }) },
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.reports.length).toBeGreaterThanOrEqual(1);
+    });
+  });
+
+  describe("Portal prestador campo", () => {
+    beforeEach(async () => {
+      await setSessionForEmail(DEMO_EMAILS.buildPedreiro);
+    });
+
+    it("GET /api/prestador/campo/projects lista obras alocadas", async () => {
+      const { GET } = await import("@/app/api/prestador/campo/projects/route");
+      const res = await GET();
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.projects.some((p: { code: string }) => p.code === "OBR-2026-001")).toBe(true);
+    });
+
+    it("POST field-report registra diária", async () => {
+      const project = await getBuildProject("OBR-2026-001");
+      const { POST } = await import("@/app/api/prestador/field-reports/route");
+      const res = await POST(
+        new Request("http://localhost/api/prestador/field-reports", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            projectId: project.id,
+            reportDate: new Date().toISOString().slice(0, 10),
+            trade: "PEDREIRO",
+            workDone: "Teste homologação — assentamento de piso",
+            diariaAmount: 280,
+          }),
+        }),
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.report.workDone).toContain("homologação");
+    });
   });
 
   describe("Isolamento entre segmentos", () => {

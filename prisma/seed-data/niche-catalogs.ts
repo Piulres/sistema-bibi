@@ -166,6 +166,9 @@ const CONSTRUCTION_PROCEDURES: NicheProcedureSeed[] = [
   { code: "ENG-MAN", name: "Manutenção Predial (visita)", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 380 },
   { code: "ENG-RET", name: "Retorno Vistoria Técnica", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 220 },
   { code: "ENG-PER", name: "Perícia Técnica Judicial", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 4500 },
+  { code: "ENG-DIA", name: "Diária de mão de obra", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 280 },
+  { code: "ENG-DIA-ENC", name: "Diária — encanador", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 300 },
+  { code: "ENG-DIA-PIN", name: "Diária — pintor", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 260 },
 ];
 
 export const NICHE_BENEFIT_PRODUCTS = {
@@ -575,6 +578,8 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       { email: "eng.carlos@build.demo", name: "Eng. Carlos Mendes", specialty: "Engenharia Civil", councilType: "CREA", councilNumber: "123456", councilUf: "SP", phone: "(11) 3456-9501" },
       { email: "arq.maria@build.demo", name: "Arq. Maria Santos", specialty: "Arquitetura", councilType: "CAU", councilNumber: "A234567", councilUf: "SP", phone: "(11) 3456-9502" },
       { email: "eng.paulo@build.demo", name: "Eng. Paulo Ribeiro", specialty: "Estruturas", councilType: "CREA", councilNumber: "345678", councilUf: "RJ", phone: "(21) 3456-9503" },
+      { email: "pedreiro.jose@build.demo", name: "José Ferreira", specialty: "Pedreiro", councilType: "OUTRO", councilNumber: "—", councilUf: "SP", phone: "(11) 98765-1100" },
+      { email: "pintor.luis@build.demo", name: "Luís Andrade", specialty: "Pintor", councilType: "OUTRO", councilNumber: "—", councilUf: "SP", phone: "(11) 98765-2200" },
     ],
     companies: [
       { name: "Incorp Alpha", cnpj: "66.100.200/0001-01", status: "ATIVO", sector: "Construção Civil", beneficiaries: 12, clinicalDiscount: 0.9 },

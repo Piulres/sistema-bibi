@@ -12,6 +12,7 @@ export const DEMO_EMAILS = {
   pjTechcorp: "rh@techcorp.com",
   buildInterno: "operacao@build.demo",
   buildPj: "rh@incorp.demo",
+  buildPedreiro: "pedreiro.jose@build.demo",
 } as const;
 
 export const DEMO_CPFS = {
@@ -151,6 +152,11 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
     });
     const approvedBudget = obraComFatura?.budgets.find((b) => b.status === "APROVADO");
     if (!approvedBudget?.invoiceId) return true;
+
+    const rdo = await prisma.dailyFieldReport.findFirst({
+      where: { project: { tenantId: build.id, code: "OBR-2026-001" } },
+    });
+    if (!rdo) return true;
 
     return false;
   } finally {

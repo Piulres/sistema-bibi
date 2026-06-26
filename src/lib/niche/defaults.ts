@@ -126,8 +126,8 @@ export const NICHE_CONFIGS: Record<NicheId, NicheConfig> = {
   },
   CONSTRUCTION: {
     id: "CONSTRUCTION",
-    name: "Engenharia",
-    tagline: "Gestão de obras com orçamento, cronograma e documentação técnica",
+    name: "Engenharia Civil",
+    tagline: "Obras, equipes de campo, diárias e faturamento integrado",
     labels: NICHE_MASTER_LABELS.CONSTRUCTION,
     branding: {
       primaryColor: NICHE_PRESETS_ENERGIA_BRASILEIRA.CONSTRUCTION.primaryColor,
@@ -136,12 +136,12 @@ export const NICHE_CONFIGS: Record<NicheId, NicheConfig> = {
       heroTo: NICHE_PRESETS_ENERGIA_BRASILEIRA.CONSTRUCTION.heroTo,
     },
     landing: {
-      badge: "Engenharia · SaaS · Pay Per Use",
-      headline: "Obras e empreiteiras",
-      headlineAccent: "com gestão integrada",
+      badge: "Engenharia Civil · SaaS · Pay Per Use",
+      headline: "Empreiteiras e obras",
+      headlineAccent: "com equipe de campo conectada",
       description:
-        "Orçamentos, cronogramas, propostas com anexos técnicos e faturamento Pay Per Use para construtoras e escritórios de engenharia.",
-      keywords: ["engenharia", "construção civil", "empreiteira", "pay per use", "gestão de obras"],
+        "Orçamentos, cronograma, registro diário com fotos, diárias e faturamento por obra fechada ou por dia de trabalho.",
+      keywords: ["engenharia civil", "empreiteira", "diária", "obra", "pay per use"],
     },
   },
 };

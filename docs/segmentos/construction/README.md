@@ -1,18 +1,20 @@
-# Segmento: Engenharia / Empreiteira (`CONSTRUCTION`)
+# Segmento: Engenharia Civil (`CONSTRUCTION`)
 
-Construtoras, empreiteiras e escritórios de engenharia com gestão de obras, orçamentos, cronograma e documentação técnica.
+Empreiteiras e empresas de **Engenharia Civil** — obras, equipes de campo, diárias e faturamento (obra fechada + por dia).
+
+**Posicionamento completo:** [`POSICIONAMENTO.md`](POSICIONAMENTO.md)
 
 ## Glossário UI
 
 | Chave | Termo |
 |-------|-------|
 | Obra (`patient`) | Obra |
-| Prestador | Engenheiro |
-| Procedimento | Serviço técnico |
-| Consulta / Vistoria (`appointment`) | Vistoria |
+| Prestador | Profissional de obra |
+| Procedimento | Serviço executável |
+| Diária (`appointment`) | Diária |
 | Beneficiário | Cliente |
-| Prontuário | Dossiê técnico |
-| Empresa (`company`) | Incorporadora |
+| Prontuário | Diário de obra |
+| Empresa (`company`) | Contratante |
 
 Fonte canônica: `src/constants/niches.ts` → `NICHE_MASTER_LABELS.CONSTRUCTION`
 
@@ -21,6 +23,7 @@ Fonte canônica: `src/constants/niches.ts` → `NICHE_MASTER_LABELS.CONSTRUCTION
 | Papel | E-mail | Onde |
 |-------|--------|------|
 | Interno (admin) | `operacao@build.demo` | `/interno/projetos` |
+| Pedreiro (campo) | `pedreiro.jose@build.demo` | `/prestador/campo` |
 | Engenheiro civil | `eng.carlos@build.demo` | `/login` (prestador) |
 | Arquiteta | `arq.maria@build.demo` | `/login` |
 | Cliente | `cliente@build.demo` | `/beneficiario/login` |
@@ -58,6 +61,26 @@ Interno: tarefas EM_ANDAMENTO → obra passa para EM_OBRA
 ```
 
 ## Módulo de obras
+
+### Portal prestador (campo)
+
+| Rota | Descrição |
+|------|-----------|
+| `/prestador/campo` | Registro diário — local, execução, fotos, diária |
+| `GET /api/prestador/campo/projects` | Obras alocadas ao profissional |
+| `POST /api/prestador/field-reports` | Criar RDO |
+| `POST /api/prestador/field-reports/attachments` | Foto de andamento |
+
+Nav: aba **Campo** — somente `CONSTRUCTION`.
+
+### Registros de campo (interno)
+
+| Rota | Descrição |
+|------|-----------|
+| `GET /api/interno/projects/[id]/field-reports` | Lista RDOs da obra |
+| `POST ...` action `approve` | Aprovar e faturar diária (se informada) |
+
+Aba **Campo** no detalhe da obra.
 
 ### Portal interno
 

@@ -10,6 +10,7 @@ import {
   projectStatusLabel,
 } from "@/lib/project/constants";
 import ScheduleTimeline from "@/components/projects/ScheduleTimeline";
+import FieldReportsPanel from "@/components/projects/FieldReportsPanel";
 
 type LineItem = {
   description: string;
@@ -77,7 +78,7 @@ type Project = {
   attachments: Attachment[];
 };
 
-type Tab = "resumo" | "orcamento" | "cronograma" | "anexos";
+type Tab = "resumo" | "orcamento" | "cronograma" | "campo" | "anexos";
 
 function formatBrl(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -327,6 +328,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
     { id: "resumo", label: "Resumo" },
     { id: "orcamento", label: "Orçamento" },
     { id: "cronograma", label: "Cronograma" },
+    { id: "campo", label: "Campo" },
     { id: "anexos", label: `Anexos (${project.attachments.length})` },
   ];
 
@@ -716,6 +718,8 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
           </div>
         </div>
       )}
+
+      {tab === "campo" && <FieldReportsPanel projectId={projectId} />}
 
       {tab === "anexos" && (
         <div className="space-y-4">

@@ -51,14 +51,23 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
 }
 
 /** Abas do prestador com termos do nicho. */
-export function buildPrestadorNavTabs(labels: NicheLabels): NavTab[] {
-  return [
+export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): NavTab[] {
+  const tabs: NavTab[] = [
     { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
-    { href: "/prestador", label: "Agenda", key: "agenda" },
-    { href: "/prestador/pacientes", label: labels.patients, key: "pacientes" },
+  ];
+
+  if (niche === "CONSTRUCTION") {
+    tabs.push({ href: "/prestador/campo", label: "Campo", key: "campo" });
+  }
+
+  tabs.push(
+    { href: "/prestador", label: labels.appointments, key: "agenda" },
+    { href: "/prestador/pacientes", label: labels.beneficiaries, key: "pacientes" },
     { href: "/prestador/extrato", label: "Extrato", key: "extrato" },
     { href: "/prestador/relatorios", label: "Relatórios", key: "relatorios" },
-  ];
+  );
+
+  return tabs;
 }
 
 /** Abas do beneficiário com termos do nicho. */

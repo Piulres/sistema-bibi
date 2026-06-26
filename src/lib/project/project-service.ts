@@ -947,11 +947,16 @@ export async function uploadAttachment(input: {
       where: { id: input.entityId, tenantId: input.tenantId },
     });
     if (!project) return { error: "Obra não encontrada" };
-  } else {
+  } else if (input.entityType === "Budget") {
     const budget = await prisma.budget.findFirst({
       where: { id: input.entityId, project: { tenantId: input.tenantId } },
     });
     if (!budget) return { error: "Orçamento não encontrado" };
+  } else {
+    const report = await prisma.dailyFieldReport.findFirst({
+      where: { id: input.entityId, tenantId: input.tenantId },
+    });
+    if (!report) return { error: "Registro de campo não encontrado" };
   }
 
   const attachment = await prisma.attachment.create({

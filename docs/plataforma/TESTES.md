@@ -44,10 +44,11 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 | Maria Souza | `maria.souza@email.com` | Fatura FECHADA + PIX pendente |
 | Pedro Almeida | `pedro.almeida@email.com` | Particular, fatura PAGA |
 | Dra. Helena | `dra.helena@bibi.health` | Prestador com CRM/SP, export PEP |
-| Build interno | `operacao@build.demo` | Obras CONSTRUCTION — pipeline e orçamentos |
+| Build interno | `operacao@build.demo` | Obras + aprovar RDO/diária |
+| Build pedreiro | `pedreiro.jose@build.demo` | Portal `/prestador/campo` |
 | Build PJ | `rh@incorp.demo` | Aprovar proposta `OBR-2026-002` |
 
-### Obras / CONSTRUCTION (`tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`)
+### Obras / Engenharia Civil
 
 | Caso | O que valida |
 |------|----------------|
@@ -59,7 +60,7 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 | API PJ Incorp | Lista, alerta overview, approve → invoice, PDF |
 | Isolamento | MEDICAL interno lista vazia; TechCorp PJ sem obras/alertas |
 
-Massa: tenant `build`, obras `OBR-2026-001` (aprovada + fatura), `OBR-2026-002` (proposta ENVIADO), `OBR-2026-003` (rascunho). Doc: [`docs/segmentos/construction/README.md`](../segmentos/construction/README.md).
+Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`
 
 ---
 

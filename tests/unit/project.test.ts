@@ -27,10 +27,11 @@ describe("project.constants", () => {
 });
 
 describe("CONSTRUCTION niche labels", () => {
-  it("define glossário completo", () => {
+  it("define glossário Engenharia Civil", () => {
     expect(NICHE_MASTER_LABELS.CONSTRUCTION.patient).toBe("Obra");
-    expect(NICHE_MASTER_LABELS.CONSTRUCTION.medicalRecord).toBe("Dossiê técnico");
-    expect(NICHE_MASTER_LABELS.CONSTRUCTION.appointment).toBe("Vistoria");
+    expect(NICHE_MASTER_LABELS.CONSTRUCTION.medicalRecord).toBe("Diário de obra");
+    expect(NICHE_MASTER_LABELS.CONSTRUCTION.appointment).toBe("Diária");
+    expect(NICHE_MASTER_LABELS.CONSTRUCTION.portalProvider).toBe("Portal de Campo");
   });
 });
 
