@@ -9,30 +9,32 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Status agora (24/06/2026)
+## Status agora (25/06/2026)
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.1.0** — **Sistema Bibi - ServiceOS** — deploy `6a3d525f` @ `07c7a7e` |
-| **Versão anterior em produção** | **2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` |
-| **Commit release v2.1** | `07c7a7e` |
-| `main` / `dev` | **v2.1.0** — sincronizadas |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — **Sistema Bibi - ServiceOS** — deploy `6a3ea6c5` @ `2c38248` |
+| **Versão anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
+| **Commit release v2.2** | `2c38248` |
+| `main` | **v2.2.0** — onboarding tour publicado |
+| `dev` | **v2.1.0** — aguarda merge de `main` |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
-| **Pacote anterior** | **v2.1.0** — deploy `6a3bc7a4` @ `40e2dfc` (24/06/2026) |
+| **Pacote anterior** | **v2.1.0** — deploy `6a3d525f` @ `07c7a7e` (24/06/2026) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.1.0** — PRs #122–#123, #100, #95, changelog landing |
-| **Release** | `main` | **v2.1.0** — após merge desta publicação |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.1.0** — deploy `6a3d525f` @ `07c7a7e` (24/06/2026) |
-| **Preview** | deploy draft | `6a3d406e` @ `303ddca` — validado antes da publicação |
+| **Integração** | `dev` | **v2.1.0** — aguarda merge `main` |
+| **Release** | `main` | **v2.2.0** — onboarding tour ([#142](https://github.com/Piulres/sistema-bibi/pull/142)) |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.2.0** — deploy `6a3ea6c5` @ `2c38248` (25/06/2026) |
+| **Preview** | deploy draft | `6a3ea6c5` @ `2c38248` — validado antes da publicação |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | merge `dev`→`main` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
 | `v1.2.0` | `485819a` | Care Chart, exports, homepage — substituído por v2.0 |
@@ -45,7 +47,28 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.1.0` — Sistema Bibi - ServiceOS (pós-POC integrado)
+### `v2.2.0` — Sistema Bibi - ServiceOS (onboarding guiado)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.2.0` |
+| **PRs** | [#142](https://github.com/Piulres/sistema-bibi/pull/142) |
+| **Publicado em** | 25/06/2026 — deploy Netlify `6a3ea6c5` @ `2c38248` |
+
+**Inclui (além de v2.1.0):**
+
+- **Onboarding tour:** product tour automático na primeira visita a cada portal
+- **Spotlight e hotspots:** destaque visual com tooltip posicionado automaticamente
+- **Tours por portal:** interno, prestador, PJ e beneficiário com passos contextuais por rota
+- **Labels multi-nicho:** textos do tour adaptados via `useLabels()` (paciente, pet, cliente…)
+- **Reinício manual:** botão **Tour** no header de cada portal
+- **Persistência:** `localStorage` (`bibi_onboarding`) por portal
+
+**Testes:** 403 Vitest · 128 E2E · `docs:verify` · `db:verify` · `pre-release` OK.
+
+---
+
+### `v2.1.0` — Sistema Bibi - ServiceOS (pós-POC integrado) *(substituído por v2.2.0)*
 
 | Campo | Valor |
 |-------|-------|

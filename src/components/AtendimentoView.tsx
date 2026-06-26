@@ -341,8 +341,8 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
 
       <Card padding="lg">
         <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
             <h1 className="text-2xl font-bold text-[var(--text-primary)]">
               {hasPet ? detail.pet!.name : detail.patient.name}
             </h1>
@@ -368,7 +368,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               {hasPet ? "Ver histórico completo do pet →" : "Ver histórico completo do paciente →"}
             </Link>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="relative z-10 flex shrink-0 flex-wrap items-center gap-2">
             <StatusBadge value={detail.appointment.status} map="appointment" />
             {detail.appointment.status === "AGENDADO" && (
               <Button variant="secondary" size="sm" onClick={confirmArrival} disabled={busy}>

@@ -16,7 +16,7 @@ export default function PrestadorNav() {
   const tabs = useMemo(() => buildPrestadorNavTabs(labels, niche), [labels, niche]);
 
   return (
-    <div className="mt-6">
+    <div className="mt-6" data-tour-id="portal-nav">
       <MobileNavDrawer
         tabs={tabs}
         active={active}

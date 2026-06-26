@@ -33,6 +33,7 @@ export default function NavTabs({
           <Link
             key={tab.href}
             href={tab.href}
+            data-tour-nav={tab.key}
             className={cn(
               "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
               active === tab.key ? activeClass : idleClass,

@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.1.0",
+    version: "2.2.0",
     label: PLATFORM.versionLabel,
-    date: "24/06/2026",
+    date: "25/06/2026",
     status: "current",
+    summary:
+      "Tour guiado de onboarding nos 4 portais com spotlight, hotspots pulsantes e textos adaptados por nicho.",
+    highlights: [
+      {
+        title: "Onboarding guiado",
+        items: [
+          "Product tour automático na primeira visita a cada portal",
+          "Spotlight, hotspots e tooltips posicionados automaticamente",
+          "Passos contextuais por rota (faturamento, agenda, agendar…)",
+          "Botão Tour no header para reiniciar o guia a qualquer momento",
+        ],
+      },
+      {
+        title: "Multi-nicho",
+        items: [
+          "Textos do tour usam labels do tenant (paciente, pet, cliente…)",
+          "Tours dedicados: interno, prestador, PJ e beneficiário",
+        ],
+      },
+    ],
+    testStats: "403 testes Vitest · 128 E2E · pre-release OK",
+  },
+  {
+    version: "2.1.0",
+    label: "Sistema Bibi - ServiceOS v2.1",
+    date: "24/06/2026",
+    status: "previous",
     summary:
       "Pacote pós-POC com segurança endurecida, assistente nos 4 portais, módulo VET (Pet), change management reversível e importação JSON/CSV.",
     highlights: [

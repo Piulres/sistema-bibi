@@ -216,7 +216,7 @@ export default function BillingView() {
         />
       </div>
 
-      <section>
+      <section data-tour-id="billing-pending">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionHeader
             title="Procedimentos a faturar (Pay Per Use)"

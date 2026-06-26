@@ -3,6 +3,7 @@
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import BeneficiarioNav from "@/components/BeneficiarioNav";
+import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { PORTALS } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
 
@@ -20,19 +21,24 @@ export default function BeneficiarioPortalShell({ user, assistantEnabled = true,
   const portal = PORTALS.beneficiario;
 
   return (
-    <PortalShell
-      portal="beneficiario"
-      portalLabel={user.labels.portalBeneficiary}
-      loginPath={portal.loginPath}
-      userName={user.name}
-      branding={user.branding}
-      niche={user.niche}
-      labels={user.labels}
-    >
-      <BeneficiarioNav />
-      <AssistantShell portal="beneficiario" enabled={assistantEnabled}>
-        <div className="portal-page-content mt-8 min-w-0">{children}</div>
-      </AssistantShell>
-    </PortalShell>
+    <OnboardingProvider portal="beneficiario" labels={user.labels}>
+      <PortalShell
+        portal="beneficiario"
+        portalLabel={user.labels.portalBeneficiary}
+        loginPath={portal.loginPath}
+        userName={user.name}
+        branding={user.branding}
+        niche={user.niche}
+        labels={user.labels}
+      >
+        <BeneficiarioNav />
+        <AssistantShell portal="beneficiario" enabled={assistantEnabled}>
+          <div className="portal-page-content mt-8 min-w-0" data-tour-id="portal-content">
+            {children}
+          </div>
+        </AssistantShell>
+      </PortalShell>
+      <OnboardingTour />
+    </OnboardingProvider>
   );
 }

@@ -127,7 +127,7 @@ export default function PjView() {
         />
       </div>
 
-      <section id="resumo">
+      <section id="resumo" data-tour-id="section-resumo">
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
           label="Contrato"
@@ -156,7 +156,7 @@ export default function PjView() {
       </div>
       </section>
 
-      <section id="beneficiarios">
+      <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title="Beneficiários" />
         <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
           <table className="w-full min-w-[36rem] text-left text-sm">
@@ -186,7 +186,7 @@ export default function PjView() {
         </div>
       </section>
 
-      <section id="assinaturas">
+      <section id="assinaturas" data-tour-id="section-assinaturas">
         <SectionHeader title="Assinaturas recorrentes" />
         {subscriptions.length === 0 ? (
           <EmptyState message="Nenhuma assinatura vinculada à empresa." />
@@ -214,7 +214,7 @@ export default function PjView() {
         )}
       </section>
 
-      <section id="faturas">
+      <section id="faturas" data-tour-id="section-faturas">
         <SectionHeader title="Faturas da empresa" />
         {invoices.length === 0 ? (
           <EmptyState message="Nenhuma fatura emitida ainda." />
