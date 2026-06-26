@@ -40,6 +40,10 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 **Mapa completo da massa (perfis, portais, segmentos):** [`MASSA_TESTES.md`](MASSA_TESTES.md) — inclui perfil `operation-1y` (20 clientes, 3–9 usuários PJ, 1 ano).
 
+**Inteligência de mercado e rotina diária por segmento:** [`docs/segmentos/INTELIGENCIA_OPERACIONAL_2026.md`](../segmentos/INTELIGENCIA_OPERACIONAL_2026.md)
+
+**Massa rica multi-nicho:** todos os 5 tenants nicho recebem RBAC interno (3 usuários), estoque, perfil clínico, pricing B2B, baseline, webhooks e 3 personas estrela (PPU/PIX/particular). PetCare: label `Banho/Tosa`.
+
 **Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts`
 
 | Fixture | E-mail / CPF | Uso típico |

@@ -71,13 +71,14 @@ export async function seedNicheTenants(
 
   for (const demo of NICHE_DEMOS) {
     const config = getNicheConfig(demo.niche);
+    const opConfig = NICHE_OPERATIONAL_CONFIGS.find((c) => c.slug === demo.slug);
     const tenant = await prisma.tenant.create({
       data: {
         name: demo.name,
         slug: demo.slug,
         cnpj: demo.cnpj,
         niche: demo.niche,
-        labels: serializeTenantLabels(demo.niche),
+        labels: serializeTenantLabels(demo.niche, opConfig?.labelOverrides),
         branding: {
           create: {
             displayName: demo.displayName,

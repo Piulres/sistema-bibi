@@ -132,13 +132,20 @@ Credenciais: `joao.pereira@email.com`, `maria.souza@email.com`, `pedro.almeida@e
 
 ## Massa por segmento (multi-nicho)
 
-Cada tenant nicho recebe via `niche-catalogs.ts` + `niche-operational.ts`:
+### Cada tenant nicho (×5) — massa rica
 
-- Catálogo de procedimentos (~15–19 por vertical)
-- 3 prestadores com conselho/registro
-- ~8 empresas parceiras + pacientes estrela
-- Massa operacional (agenda histórica + futuro)
-- VET: pets, vacinas, ficha clínica
+| Camada | Conteúdo |
+|--------|----------|
+| Equipe | 3 internos (ADMIN + RECEPCAO + FATURAMENTO) · 3 prestadores |
+| Parceiros B2B | 8 empresas · 3–9 PJ/parceiro (`operation-1y`) |
+| Personas | 3 estrelas: PPU hoje · PIX pendente · particular pago |
+| Clínico | VET: pets/vacinas · DENTAL: odontograma · LEGAL: dossiê · SPA: wellness · EDU: trilha |
+| Estoque | SKUs por segmento (vacinas, resinas, óleos, kits…) |
+| Receita | Baseline mensal · assinaturas · webhooks B2B |
+
+Código: `niche-rich-seed.ts` · `niche-clinical-demos.ts` · `niche-star-flows.ts`
+
+Pesquisa operacional: [`docs/segmentos/INTELIGENCIA_OPERACIONAL_2026.md`](../segmentos/INTELIGENCIA_OPERACIONAL_2026.md)
 
 | Nicho | Interno | Prestador | Beneficiário | PJ |
 |-------|---------|-----------|--------------|-----|
@@ -212,7 +219,7 @@ SEED_PROFILE=operation-1y npm run db:verify
 |--------|--------|
 | E2E por segmento (petcare, smile…) | ❌ só Horizonte |
 | `operation.db` com massa quente | ❌ só bootstrap |
-| PetCare label `appointment` → "Banho/Tosa" no seed | ⚠️ documentado, não aplicado |
+| PetCare label `appointment` → "Banho/Tosa" no seed | ✅ aplicado |
 | Testes de carga com 20 clientes × 9 usuários | ❌ futuro |
 
 ---

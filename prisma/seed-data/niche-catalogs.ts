@@ -1,4 +1,4 @@
-import type { NicheId } from "../../src/lib/niche/types";
+import type { NicheId, NicheLabels } from "../../src/lib/niche/types";
 import type { CompanyStatus } from "../../src/lib/company-crm";
 import type { SeedCompany } from "./companies";
 
@@ -63,6 +63,8 @@ export type NicheOperationalConfig = {
   pjName: string;
   telemedicineRatio: number;
   sectorProfiles: Record<string, { procedureCodes: string[]; reasons: readonly string[] }>;
+  /** Sobrescreve labels do tenant (ex.: PetCare appointment → Banho/Tosa) */
+  labelOverrides?: Partial<NicheLabels>;
 };
 
 const VET_PROCEDURES: NicheProcedureSeed[] = [
@@ -180,6 +182,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
   {
     niche: "VET",
     slug: "petcare",
+    labelOverrides: { appointment: "Banho/Tosa", appointments: "Banho/Tosa" },
     procedures: VET_PROCEDURES,
     providers: [
       { email: "dr.rafael@petcare.demo", name: "Dr. Rafael Mendes", specialty: "Clínica Geral Veterinária", councilType: "CRMV", councilNumber: "12345", councilUf: "SP", phone: "(11) 3456-9001" },
@@ -236,6 +239,14 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
         birthDate: new Date(1990, 7, 22),
         phone: "(11) 97654-3210",
         companyIndex: 2,
+      },
+      {
+        name: "Sandra Oliveira",
+        cpf: "101.101.101-01",
+        email: "particular@petcare.demo",
+        birthDate: new Date(1983, 2, 9),
+        phone: "(11) 96543-2108",
+        companyIndex: 0,
       },
     ],
     starPets: [
@@ -316,6 +327,14 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
         phone: "(11) 95432-1098",
         companyIndex: 3,
       },
+      {
+        name: "Helena Particular",
+        cpf: "102.102.102-02",
+        email: "particular@smile.demo",
+        birthDate: new Date(1990, 5, 20),
+        phone: "(11) 94321-0987",
+        companyIndex: 0,
+      },
     ],
     pjEmail: "rh@corpodont.demo",
     pjName: "RH CorpOdonto",
@@ -388,6 +407,14 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
         birthDate: new Date(1978, 11, 20),
         phone: "(11) 93210-9876",
         companyIndex: 3,
+      },
+      {
+        name: "Carlos Particular",
+        cpf: "103.103.103-03",
+        email: "particular@lex.demo",
+        birthDate: new Date(1985, 8, 14),
+        phone: "(11) 92109-8765",
+        companyIndex: 0,
       },
     ],
     pjEmail: "rh@assjur.demo",
@@ -462,6 +489,14 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
         phone: "(11) 91098-7654",
         companyIndex: 3,
       },
+      {
+        name: "Renata Particular",
+        cpf: "104.104.104-04",
+        email: "particular@zen.demo",
+        birthDate: new Date(1988, 11, 3),
+        phone: "(11) 90987-6543",
+        companyIndex: 0,
+      },
     ],
     pjEmail: "rh@wellcorp.demo",
     pjName: "RH WellCorp",
@@ -534,6 +569,14 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
         birthDate: new Date(1987, 9, 7),
         phone: "(11) 89876-5432",
         companyIndex: 3,
+      },
+      {
+        name: "Bruno Particular",
+        cpf: "105.105.105-05",
+        email: "particular@eduprime.demo",
+        birthDate: new Date(1993, 1, 28),
+        phone: "(11) 88765-4321",
+        companyIndex: 0,
       },
     ],
     pjEmail: "rh@educorp.demo",

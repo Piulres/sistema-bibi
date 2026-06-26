@@ -110,9 +110,15 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
 
     const petcare = await prisma.tenant.findFirst({
       where: { slug: "petcare" },
-      select: { id: true },
+      select: { id: true, labels: true },
     });
     if (!petcare) return true;
+    try {
+      const labels = JSON.parse(petcare.labels ?? "{}") as { appointment?: string };
+      if (labels.appointment !== "Banho/Tosa") return true;
+    } catch {
+      return true;
+    }
 
     const petcareAppts = await prisma.appointment.count({
       where: { tenantId: petcare.id },

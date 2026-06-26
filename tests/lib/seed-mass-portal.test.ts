@@ -194,14 +194,46 @@ describe("Massa demo — cobertura por segmento (multi-nicho)", () => {
     expect(internoUser?.tenantId).toBe(tenant.id);
   });
 
-  it("VET inclui pets e ficha clínica veterinária", async () => {
+  it("VET inclui pets, vacinas, estoque e label Banho/Tosa", async () => {
     const petcare = await prisma.tenant.findFirstOrThrow({ where: { slug: "petcare" } });
-    const pets = await prisma.pet.count({ where: { tenantId: petcare.id } });
-    const vaccines = await prisma.petVaccineRecord.count({
-      where: { pet: { tenantId: petcare.id } },
-    });
+    const labels = JSON.parse(petcare.labels ?? "{}") as { appointment?: string };
+    expect(labels.appointment).toBe("Banho/Tosa");
+
+    const [pets, vaccines, stock, internos] = await Promise.all([
+      prisma.pet.count({ where: { tenantId: petcare.id } }),
+      prisma.petVaccineRecord.count({ where: { pet: { tenantId: petcare.id } } }),
+      prisma.medicalProduct.count({ where: { tenantId: petcare.id } }),
+      prisma.user.count({ where: { tenantId: petcare.id, role: "INTERNO" } }),
+    ]);
     expect(pets).toBeGreaterThanOrEqual(10);
     expect(vaccines).toBeGreaterThanOrEqual(1);
+    expect(stock).toBeGreaterThanOrEqual(3);
+    expect(internos).toBeGreaterThanOrEqual(3);
+  });
+
+  it.each([
+    ["smile", "DENTAL"],
+    ["lex", "LEGAL"],
+    ["zen", "SPA"],
+    ["eduprime", "EDUCATION"],
+  ] as const)("segmento %s com massa rica (clínico + estoque + RBAC)", async (slug) => {
+    const tenant = await prisma.tenant.findFirstOrThrow({ where: { slug } });
+    const [internos, stock, clinical, webhooks, pricing] = await Promise.all([
+      prisma.user.count({ where: { tenantId: tenant.id, role: "INTERNO" } }),
+      prisma.medicalProduct.count({ where: { tenantId: tenant.id } }),
+      prisma.patientClinicalProfile.count({
+        where: { patient: { tenantId: tenant.id } },
+      }),
+      prisma.webhookEndpoint.count({ where: { tenantId: tenant.id } }),
+      prisma.pricingRule.count({
+        where: { procedure: { tenantId: tenant.id } },
+      }),
+    ]);
+    expect(internos).toBeGreaterThanOrEqual(3);
+    expect(stock).toBeGreaterThanOrEqual(2);
+    expect(clinical).toBeGreaterThanOrEqual(1);
+    expect(webhooks).toBeGreaterThanOrEqual(1);
+    expect(pricing).toBeGreaterThanOrEqual(1);
   });
 });
 
