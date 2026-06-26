@@ -13,6 +13,7 @@ import { usePathname } from "next/navigation";
 import type { PortalKey } from "@/lib/roles";
 import { buildTourSteps } from "@/lib/onboarding/tours";
 import { isTourCompleted, markTourCompleted, resetTour } from "@/lib/onboarding/storage";
+import { isOnboardingAutoStartEnabled } from "@/lib/onboarding/auto-start";
 import type { OnboardingStep } from "@/lib/onboarding/types";
 import type { InternoModule } from "@/lib/interno-permissions";
 import type { NicheLabels } from "@/lib/niche/types";
@@ -92,6 +93,7 @@ export function OnboardingProvider({ portal, labels, permissions, children }: Pr
   );
 
   useEffect(() => {
+    if (!isOnboardingAutoStartEnabled()) return;
     if (steps.length === 0) return;
     if (!isTourCompleted(portal)) {
       const timer = window.setTimeout(() => setActive(true), 800);
