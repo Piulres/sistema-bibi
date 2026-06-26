@@ -192,26 +192,26 @@ export async function seedNicheStarFlows(input: {
     });
 
     const benefits = NICHE_BENEFIT_PRODUCTS[input.config.niche as keyof typeof NICHE_BENEFIT_PRODUCTS];
-    const benefitKey = Object.keys(benefits)[0] as keyof typeof benefits;
-    const product = benefits[benefitKey]!;
-    await input.prisma.subscription.create({
-      data: {
-        tenantId: input.tenantId,
-        patientId: star3.patientId,
-        companyId: null,
-        status: "SUSPENSA",
-        billingCycle: product.billingCycle,
-        startDate: daysAgo(180),
-        amount: product.amount,
-        description: `${product.description} — suspenso (demo)`,
-      },
-    });
+    const product = Object.values(benefits)[0];
+    if (product) {
+      await input.prisma.subscription.create({
+        data: {
+          tenantId: input.tenantId,
+          patientId: star3.patientId,
+          companyId: null,
+          status: "SUSPENSA",
+          billingCycle: product.billingCycle,
+          startDate: daysAgo(180),
+          amount: product.amount,
+          description: `${product.description} — suspenso (demo)`,
+        },
+      });
+    }
   }
 
   const benefits = NICHE_BENEFIT_PRODUCTS[input.config.niche as keyof typeof NICHE_BENEFIT_PRODUCTS];
-  if (benefits && star1.companyId) {
-    const activeKey = Object.keys(benefits)[0] as keyof typeof benefits;
-    const activeProduct = benefits[activeKey]!;
+  const activeProduct = Object.values(benefits)[0];
+  if (benefits && activeProduct && star1.companyId) {
     const sub = await input.prisma.subscription.create({
       data: {
         tenantId: input.tenantId,
