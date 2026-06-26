@@ -36,6 +36,7 @@ console.log("Este script NÃO publica na Netlify.\n");
 const steps = [
   { name: "lint", cmd: "npm run lint" },
   { name: "docs-verify", cmd: "npm run docs:verify" },
+  { name: "openapi-verify", cmd: "npm run openapi:verify" },
   {
     name: "db-bootstrap",
     cmd: "npm run db:bootstrap:demo",
