@@ -28,7 +28,7 @@ export default function InternoNav({
       : allTabs;
 
   return (
-    <div className="mt-6">
+    <div className="mt-6" data-tour-id="portal-nav">
       <MobileNavDrawer
         tabs={tabs}
         active={resolvedActive}

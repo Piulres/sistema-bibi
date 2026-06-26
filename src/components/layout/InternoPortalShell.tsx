@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import InternoNav from "@/components/InternoNav";
+import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { ToastProvider } from "@/components/ui/Toast";
 import { PORTALS } from "@/lib/roles";
 import { INTERNO_PUBLIC_PATHS } from "@/lib/navigation";
@@ -30,21 +31,26 @@ export default function InternoPortalShell({ user, assistantEnabled = true, chil
   const portal = PORTALS.interno;
 
   return (
-    <ToastProvider>
-      <PortalShell
-        portal="interno"
-        portalLabel={`Operação · ${user.labels.beneficiaries}`}
-        loginPath={portal.loginPath}
-        userName={user.name}
-        branding={user.branding}
-        niche={user.niche}
-        labels={user.labels}
-      >
-        <InternoNav permissions={user.internoPermissions} />
-        <AssistantShell portal="interno" enabled={assistantEnabled}>
-          <div className="portal-page-content mt-8 min-w-0">{children}</div>
-        </AssistantShell>
-      </PortalShell>
-    </ToastProvider>
+    <OnboardingProvider portal="interno" labels={user.labels} permissions={user.internoPermissions}>
+      <ToastProvider>
+        <PortalShell
+          portal="interno"
+          portalLabel={`Operação · ${user.labels.beneficiaries}`}
+          loginPath={portal.loginPath}
+          userName={user.name}
+          branding={user.branding}
+          niche={user.niche}
+          labels={user.labels}
+        >
+          <InternoNav permissions={user.internoPermissions} />
+          <AssistantShell portal="interno" enabled={assistantEnabled}>
+            <div className="portal-page-content mt-8 min-w-0" data-tour-id="portal-content">
+              {children}
+            </div>
+          </AssistantShell>
+        </PortalShell>
+        <OnboardingTour />
+      </ToastProvider>
+    </OnboardingProvider>
   );
 }

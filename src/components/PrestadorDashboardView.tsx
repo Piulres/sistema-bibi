@@ -95,6 +95,7 @@ export default function PrestadorDashboardView() {
 
       {nextAppointment ? (
         <CalloutCard
+          data-tour-id="prestador-next-appt"
           title="Próximo atendimento"
           description={`${nextAppointment.patientName} · ${nextAppointment.scheduledAtLabel}`}
         >

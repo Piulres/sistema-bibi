@@ -25,7 +25,7 @@ export default defineConfig({
   ],
   webServer: {
     // E2E usa massa demo (PJ/beneficiário); evita operation.db sem usuários demo.
-    command: `ASSISTANT_ENABLED=true ASSISTANT_PROVIDER=mock DUAL_DATA_STORE=false npm run dev -- --port ${PORT}`,
+    command: `ASSISTANT_ENABLED=true ASSISTANT_PROVIDER=mock DUAL_DATA_STORE=false NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true npm run dev -- --port ${PORT}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,

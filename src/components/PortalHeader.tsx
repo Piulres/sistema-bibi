@@ -5,6 +5,7 @@ import { PLATFORM } from "@/lib/platform";
 import Button from "@/components/ui/Button";
 import ServiceOsBadges from "@/components/niche/ServiceOsBadges";
 import HomeBrandLink from "@/components/brand/HomeBrandLink";
+import OnboardingTrigger from "@/components/onboarding/OnboardingTrigger";
 import { useLabels } from "@/hooks/useLabels";
 
 type Props = {
@@ -34,7 +35,7 @@ export default function PortalHeader({
   }
 
   return (
-    <header className="border-b border-[var(--border-default)] bg-[var(--surface-card)]">
+    <header className="border-b border-[var(--border-default)] bg-[var(--surface-card)]" data-tour-id="portal-header">
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3 sm:gap-4 sm:px-6">
         <HomeBrandLink
           displayName={displayName}
@@ -51,6 +52,7 @@ export default function PortalHeader({
           <ServiceOsBadges niche={niche} />
         </HomeBrandLink>
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+          <OnboardingTrigger />
           <span
             className="max-w-[5.5rem] truncate text-xs text-[var(--text-secondary)] sm:max-w-none sm:text-sm"
             title={userName}

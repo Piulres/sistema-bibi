@@ -75,7 +75,7 @@ export default function SectionNav({
   }, [sections]);
 
   return (
-    <div className={className}>
+    <div className={className} data-tour-id="portal-nav">
       <MobileSectionDrawer
         sections={sections}
         activeId={activeId}
@@ -93,6 +93,7 @@ export default function SectionNav({
             <button
               key={section.id}
               type="button"
+              data-tour-nav={section.id}
               onClick={() => handleClick(section.id)}
               className={cn(
                 "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",

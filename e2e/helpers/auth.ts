@@ -23,6 +23,17 @@ export async function loginAs(
   email: string,
   password = "bibi123",
 ): Promise<void> {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      "bibi_onboarding",
+      JSON.stringify({
+        interno: { completed: true, version: 99 },
+        prestador: { completed: true, version: 99 },
+        pj: { completed: true, version: 99 },
+        beneficiario: { completed: true, version: 99 },
+      }),
+    );
+  });
   await page.goto(LOGIN_PATHS[portal]);
   await page.getByLabel(/e-mail/i).fill(email);
   await page.getByLabel(/senha/i).fill(password);

@@ -452,3 +452,152 @@ body {
 [id] {
   scroll-margin-top: 5rem;
 }
+
+/* Onboarding — product tour com spotlight e hotspots */
+.onboarding-root {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+}
+
+.onboarding-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(15 23 42 / 0.55);
+  pointer-events: auto;
+}
+
+.onboarding-spotlight {
+  position: fixed;
+  z-index: 91;
+  border-radius: var(--radius-button);
+  box-shadow:
+    0 0 0 9999px rgb(15 23 42 / 0.55),
+    0 0 0 2px var(--brand-accent),
+    0 0 24px 4px color-mix(in srgb, var(--brand-accent) 40%, transparent);
+  pointer-events: none;
+  transition:
+    top 0.25s ease,
+    left 0.25s ease,
+    width 0.25s ease,
+    height 0.25s ease;
+}
+
+.onboarding-hotspot-pulse {
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid var(--brand-accent);
+  animation: onboarding-pulse 2s ease-out infinite;
+}
+
+@keyframes onboarding-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+.onboarding-tooltip {
+  position: fixed;
+  z-index: 92;
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 1rem;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  box-shadow: var(--shadow-card);
+  pointer-events: auto;
+  transition:
+    top 0.25s ease,
+    left 0.25s ease;
+}
+
+.onboarding-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.onboarding-step-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--brand-accent);
+}
+
+.onboarding-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-button);
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--text-muted);
+  transition: background 0.15s;
+}
+
+.onboarding-close:hover {
+  background: var(--surface-muted);
+  color: var(--text-secondary);
+}
+
+.onboarding-tooltip-title {
+  margin: 0 0 0.375rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.onboarding-tooltip-body {
+  margin: 0 0 0.875rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.onboarding-tooltip-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.onboarding-progress {
+  display: flex;
+  justify-content: center;
+  gap: 0.375rem;
+  margin-top: 0.75rem;
+}
+
+.onboarding-dot {
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: var(--border-default);
+  transition: background 0.2s;
+}
+
+.onboarding-dot.active {
+  background: var(--brand-accent);
+  transform: scale(1.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-spotlight,
+  .onboarding-tooltip,
+  .onboarding-hotspot-pulse {
+    transition: none;
+    animation: none;
+  }
+}
