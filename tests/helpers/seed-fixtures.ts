@@ -113,9 +113,15 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
 
     const petcare = await prisma.tenant.findFirst({
       where: { slug: "petcare" },
-      select: { id: true },
+      select: { id: true, labels: true },
     });
     if (!petcare) return true;
+    try {
+      const labels = JSON.parse(petcare.labels ?? "{}") as { appointment?: string };
+      if (labels.appointment !== "Banho/Tosa") return true;
+    } catch {
+      return true;
+    }
 
     const petcareAppts = await prisma.appointment.count({
       where: { tenantId: petcare.id },
@@ -157,6 +163,21 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
       where: { project: { tenantId: build.id, code: "OBR-2026-001" } },
     });
     if (!rdo) return true;
+
+    const joaoPending = await prisma.procedureUsage.count({
+      where: { billed: false, appointment: { patient: { cpf: DEMO_CPFS.joao } } },
+    });
+    if (joaoPending < 1) return true;
+
+    const mariaPix = await prisma.payment.count({
+      where: { status: "PENDING", invoice: { patient: { cpf: DEMO_CPFS.maria } } },
+    });
+    if (mariaPix < 1) return true;
+
+    const pedroPaid = await prisma.invoice.count({
+      where: { patient: { cpf: DEMO_CPFS.pedro }, status: "PAGA" },
+    });
+    if (pedroPaid < 1) return true;
 
     return false;
   } finally {

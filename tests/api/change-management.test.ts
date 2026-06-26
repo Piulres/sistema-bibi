@@ -175,11 +175,55 @@ describe("Change management — pacotes B–D", () => {
 
   it("void fatura FECHADA libera usages", async () => {
     const prisma = getTestPrisma();
-    const invoice = await prisma.invoice.findFirst({
-      where: { status: "FECHADA" },
+    const horizonte = await prisma.tenant.findFirstOrThrow({ where: { slug: "horizonte" } });
+    const provider = await prisma.user.findFirstOrThrow({ where: { email: "dra.helena@bibi.health" } });
+    const procedure = await prisma.procedure.findFirstOrThrow({ where: { code: "CON-CLM" } });
+    const patient = await prisma.patient.create({
+      data: {
+        name: "Paciente Teste Void",
+        cpf: generateValidCpf(),
+        birthDate: new Date("1988-06-20"),
+        tenantId: horizonte.id,
+      },
+    });
+    const appointment = await prisma.appointment.create({
+      data: {
+        tenantId: horizonte.id,
+        patientId: patient.id,
+        providerId: provider.id,
+        scheduledAt: new Date(Date.now() + 86_400_000),
+        reason: "Teste void CM",
+        status: "REALIZADO",
+        modality: "PRESENCIAL",
+      },
+    });
+    const usage = await prisma.procedureUsage.create({
+      data: {
+        appointmentId: appointment.id,
+        procedureId: procedure.id,
+        priceCharged: procedure.basePrice,
+        billed: false,
+      },
+    });
+    const invoice = await prisma.invoice.create({
+      data: {
+        tenantId: horizonte.id,
+        patientId: patient.id,
+        total: procedure.basePrice,
+        status: "FECHADA",
+        items: {
+          create: [
+            {
+              description: procedure.name,
+              amount: procedure.basePrice,
+              usageId: usage.id,
+            },
+          ],
+        },
+      },
       include: { items: true },
     });
-    if (!invoice) return;
+    await prisma.procedureUsage.update({ where: { id: usage.id }, data: { billed: true } });
 
     await setSessionForEmail("faturamento@bibi.health");
     const res = await voidInvoicePost(

@@ -33,6 +33,14 @@ const MIN_PROCEDURES_OPERATION = 14;
 
 const errors = [];
 
+function resolveMinCompanies() {
+  const profile = (process.env.SEED_PROFILE ?? "market").toLowerCase();
+  if (profile === "operation-1y" || profile === "operation_1y" || profile === "operation1y") {
+    return 20;
+  }
+  return 50;
+}
+
 function clientFor(file) {
   return new PrismaClient({
     datasources: { db: { url: `file:${file}` } },
@@ -56,9 +64,12 @@ async function verifyDemo() {
       if (!user) errors.push(`demo.db: usuário demo ausente: ${email}`);
     }
 
+    const minCompanies = resolveMinCompanies();
     const companies = await prisma.company.count();
     const patients = await prisma.patient.count();
-    if (companies < 50) errors.push(`demo.db: esperado ≥50 empresas PJ, encontrado ${companies}`);
+    if (companies < minCompanies) {
+      errors.push(`demo.db: esperado ≥${minCompanies} empresas PJ, encontrado ${companies}`);
+    }
     if (patients < 100) errors.push(`demo.db: massa de beneficiários baixa (${patients})`);
 
     const horizonte = await prisma.tenant.findFirst({

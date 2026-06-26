@@ -31,12 +31,15 @@ describe("Pay Per Use — fluxo completo via API", () => {
 
   it("agendamento → procedimento → fatura → PIX → pago", async () => {
     const prisma = getTestPrisma();
-    const beneficiary = await prisma.user.findUniqueOrThrow({
-      where: { email: "joao.pereira@email.com" },
-    });
-    expect(beneficiary.patientId).toBeTruthy();
-    const patient = await prisma.patient.findUniqueOrThrow({
-      where: { id: beneficiary.patientId! },
+    const horizonte = await prisma.tenant.findFirstOrThrow({ where: { slug: "horizonte" } });
+    // Paciente descartável — evita faturar PPU pendente do João (fixture da massa demo).
+    const patient = await prisma.patient.create({
+      data: {
+        name: "Paciente Teste PPU",
+        cpf: `900.${String(Date.now()).slice(-6)}-00`,
+        birthDate: new Date("1990-01-15"),
+        tenantId: horizonte.id,
+      },
     });
     const provider = await prisma.user.findUniqueOrThrow({
       where: { email: "dra.helena@bibi.health" },
