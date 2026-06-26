@@ -22,7 +22,7 @@ model Tenant {
   cnpj      String   @unique
   /// Slug único para roteamento (?tenant=petcare) e identificação do segmento
   slug      String   @unique
-  /// Nicho operacional: MEDICAL | VET | DENTAL | LEGAL | SPA | EDUCATION
+  /// Nicho operacional: MEDICAL | VET | DENTAL | LEGAL | SPA | EDUCATION | CONSTRUCTION
   niche     String   @default("MEDICAL")
   /// JSON — dicionário de termos da UI (ex.: patient → "Pet" no nicho VET)
   labels    String?
@@ -45,6 +45,8 @@ model Tenant {
   stockLots             StockLot[]
   stockMovements        StockMovement[]
   procedureMaterialKits ProcedureMaterialKit[]
+  projects              Project[]
+  attachments           Attachment[]
 }
 
 /// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
@@ -112,6 +114,9 @@ model User {
   examOrders     ExamOrder[]     @relation("ProviderExamOrders")
   protocolEnrollments PatientProtocolEnrollment[] @relation("ProviderProtocolEnrollments")
   petVaccineRecords PetVaccineRecord[] @relation("ProviderPetVaccines")
+  managedProjects   Project[]          @relation("ProjectManager")
+  assignedTasks     ProjectTask[]      @relation("TaskAssignee")
+  uploadedAttachments Attachment[]     @relation("AttachmentUploader")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -142,6 +147,7 @@ model Company {
   pricingRules PricingRule[]
   invoices     Invoice[]
   subscriptions Subscription[]
+  projects     Project[]
 }
 
 /// Beneficiario / paciente. Pode ser individual ou vinculado a uma empresa (PJ).
@@ -274,6 +280,7 @@ model Procedure {
   examOrders   ExamOrder[]
   materialKits ProcedureMaterialKit[]
   appointments Appointment[]
+  budgetLineItems BudgetLineItem[]
 
   @@unique([tenantId, code])
 }
@@ -781,4 +788,127 @@ model WebhookDelivery {
 
   @@index([tenantId, status, nextRetryAt])
   @@index([webhookId, createdAt])
+}
+
+/// Obra / projeto de engenharia (nicho CONSTRUCTION).
+/// status: ORCAMENTO | PROPOSTA | APROVADO | EM_OBRA | PARALISADO | CONCLUIDO | CANCELADO
+model Project {
+  id              String    @id @default(cuid())
+  code            String
+  name            String
+  status          String    @default("ORCAMENTO")
+  addressStreet   String?
+  addressCity     String?
+  addressState    String?
+  addressZip      String?
+  startDate       DateTime?
+  endDate         DateTime?
+  progressPercent Float     @default(0)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  managerId String?
+  manager   User?   @relation("ProjectManager", fields: [managerId], references: [id])
+
+  budgets Budget[]
+  tasks   ProjectTask[]
+
+  @@unique([tenantId, code])
+  @@index([tenantId, status])
+}
+
+/// Orçamento de obra com versionamento.
+/// status: RASCUNHO | ENVIADO | APROVADO | REJEITADO | SUBSTITUIDO
+model Budget {
+  id         String    @id @default(cuid())
+  version    Int       @default(1)
+  status     String    @default("RASCUNHO")
+  subtotal   Float     @default(0)
+  bdiPercent Float     @default(0)
+  total      Float     @default(0)
+  validUntil DateTime?
+  notes      String?
+  sentAt     DateTime?
+  approvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  lineItems BudgetLineItem[]
+
+  @@index([projectId])
+}
+
+/// Item de orçamento (BOQ).
+model BudgetLineItem {
+  id          String @id @default(cuid())
+  description String
+  unit        String @default("un")
+  quantity    Float  @default(1)
+  unitPrice   Float  @default(0)
+  total       Float  @default(0)
+  sortOrder   Int    @default(0)
+
+  budgetId String
+  budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  procedureId String?
+  procedure   Procedure? @relation(fields: [procedureId], references: [id])
+}
+
+/// Tarefa do cronograma de obra.
+/// status: PENDENTE | EM_ANDAMENTO | CONCLUIDO | ATRASADO
+/// phase: FUNDACAO | ESTRUTURA | ACABAMENTO | GERAL
+model ProjectTask {
+  id              String    @id @default(cuid())
+  name            String
+  phase           String    @default("GERAL")
+  status          String    @default("PENDENTE")
+  startDate       DateTime?
+  endDate         DateTime?
+  progressPercent Float     @default(0)
+  sortOrder       Int       @default(0)
+  createdAt       DateTime  @default(now())
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+  assignee   User?  @relation("TaskAssignee", fields: [assigneeId], references: [id])
+
+  dependsOnId String?
+  dependsOn   ProjectTask?  @relation("TaskDependency", fields: [dependsOnId], references: [id])
+  dependents  ProjectTask[] @relation("TaskDependency")
+
+  @@index([projectId])
+}
+
+/// Anexo técnico (plantas, laudos, memoriais, ART).
+/// entityType: Project | Budget
+/// category: PLANTA | LAUDO | ART | CONTRATO | MEMORIAL | OUTRO
+model Attachment {
+  id          String   @id @default(cuid())
+  entityType  String
+  entityId    String
+  fileName    String
+  contentType String
+  blobKey     String
+  category    String   @default("OUTRO")
+  sizeBytes   Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  uploadedById String?
+  uploadedBy   User?  @relation("AttachmentUploader", fields: [uploadedById], references: [id])
+
+  @@index([tenantId, entityType, entityId])
 }

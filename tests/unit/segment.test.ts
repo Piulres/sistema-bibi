@@ -12,6 +12,7 @@ describe("segment.demo-accounts", () => {
     expect(new Set(slugs).size).toBe(slugs.length);
     expect(SEGMENT_SLUG_BY_NICHE.VET).toBe("petcare");
     expect(segmentTenantByNiche("LEGAL").internoEmail).toBe("operacao@lex.demo");
+    expect(segmentTenantByNiche("CONSTRUCTION").slug).toBe("build");
   });
 });
 

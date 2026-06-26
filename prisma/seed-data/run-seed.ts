@@ -33,6 +33,7 @@ import { resolveSeedScale } from "./scale";
 import { seedVitacareTenant } from "./vitacare";
 import { seedNicheTenants } from "./niche-tenants";
 import { seedAllNicheOperational, nicheDemoCredentials } from "./niche-operational";
+import { seedConstructionProjects } from "./construction-projects";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
@@ -85,6 +86,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.pricingRule.deleteMany();
   await prisma.procedure.deleteMany();
   await prisma.patient.deleteMany();
+  await prisma.attachment.deleteMany();
+  await prisma.projectTask.deleteMany();
+  await prisma.budgetLineItem.deleteMany();
+  await prisma.budget.deleteMany();
+  await prisma.project.deleteMany();
   await prisma.user.deleteMany();
   await prisma.company.deleteMany();
   await prisma.tenant.deleteMany();
@@ -801,6 +807,10 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
 
   console.log("\nMassa operacional multi-nicho (histórico + futuro)...");
   const nicheOperational = await seedAllNicheOperational(prisma, DEMO_PASSWORD, scale);
+
+  console.log("\nObras demo Build Engenharia (CONSTRUCTION)...");
+  const projectCount = await seedConstructionProjects(prisma);
+  console.log(`  +${projectCount} obras com orçamento, cronograma e anexos`);
 
   const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
   const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });

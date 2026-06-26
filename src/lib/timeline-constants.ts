@@ -21,6 +21,9 @@ export const TIMELINE_ENTITY_TYPES = {
   MEDICAL_PRODUCT: "MedicalProduct",
   STOCK_LOT: "StockLot",
   STOCK_MOVEMENT: "StockMovement",
+  PROJECT: "Project",
+  BUDGET: "Budget",
+  ATTACHMENT: "Attachment",
 } as const;
 
 export const TIMELINE_ACTIONS = {
@@ -87,4 +90,7 @@ export const TIMELINE_ENTITY_LABELS: Record<string, string> = {
   MedicalProduct: "Estoque — Produto",
   StockLot: "Estoque — Lote",
   StockMovement: "Estoque — Movimentação",
+  Project: "Obra",
+  Budget: "Orçamento",
+  Attachment: "Anexo",
 };

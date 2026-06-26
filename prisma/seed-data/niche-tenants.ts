@@ -19,41 +19,37 @@ export type NicheDemo = {
   providers: NicheOperationalConfig["providers"];
 };
 
+const NICHE_DEMO_META: Record<
+  NicheId,
+  { name: string; cnpj: string; displayName: string }
+> = {
+  MEDICAL: { name: "Clínica Horizonte", cnpj: "12.345.678/0001-90", displayName: "Horizonte" },
+  VET: { name: "PetCare Clínica Veterinária", cnpj: "11.111.111/0001-11", displayName: "PetCare" },
+  DENTAL: { name: "Smile Odontologia", cnpj: "22.222.222/0001-22", displayName: "Smile Odonto" },
+  LEGAL: { name: "Lex & Partners Advocacia", cnpj: "33.333.333/0001-33", displayName: "Lex & Partners" },
+  SPA: { name: "Zen Studio Bem-estar", cnpj: "44.444.444/0001-44", displayName: "Zen Studio" },
+  EDUCATION: { name: "EduPrime Cursos", cnpj: "55.555.555/0001-55", displayName: "EduPrime" },
+  CONSTRUCTION: {
+    name: "Build Engenharia e Construções",
+    cnpj: "66.666.666/0001-66",
+    displayName: "Build Engenharia",
+  },
+};
+
 /** Demos multi-nicho — catálogos e prestadores em niche-catalogs.ts */
-export const NICHE_DEMOS: NicheDemo[] = NICHE_OPERATIONAL_CONFIGS.map((config) => ({
-  niche: config.niche,
-  slug: config.slug,
-  name: config.niche === "VET"
-    ? "PetCare Clínica Veterinária"
-    : config.niche === "DENTAL"
-      ? "Smile Odontologia"
-      : config.niche === "LEGAL"
-        ? "Lex & Partners Advocacia"
-        : config.niche === "SPA"
-          ? "Zen Studio Bem-estar"
-          : "EduPrime Cursos",
-  cnpj: config.niche === "VET"
-    ? "11.111.111/0001-11"
-    : config.niche === "DENTAL"
-      ? "22.222.222/0001-22"
-      : config.niche === "LEGAL"
-        ? "33.333.333/0001-33"
-        : config.niche === "SPA"
-          ? "44.444.444/0001-44"
-          : "55.555.555/0001-55",
-  displayName: config.niche === "VET"
-    ? "PetCare"
-    : config.niche === "DENTAL"
-      ? "Smile Odonto"
-      : config.niche === "LEGAL"
-        ? "Lex & Partners"
-        : config.niche === "SPA"
-          ? "Zen Studio"
-          : "EduPrime",
-  internoEmail: `operacao@${config.slug}.demo`,
-  procedures: config.procedures,
-  providers: config.providers,
-}));
+export const NICHE_DEMOS: NicheDemo[] = NICHE_OPERATIONAL_CONFIGS.map((config) => {
+  const meta = NICHE_DEMO_META[config.niche];
+  return {
+    niche: config.niche,
+    slug: config.slug,
+    name: meta.name,
+    cnpj: meta.cnpj,
+    displayName: meta.displayName,
+    internoEmail: `operacao@${config.slug}.demo`,
+    procedures: config.procedures,
+    providers: config.providers,
+  };
+});
 
 export type NicheSeedResult = {
   tenants: number;

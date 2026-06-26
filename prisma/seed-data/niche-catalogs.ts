@@ -153,6 +153,21 @@ const EDUCATION_PROCEDURES: NicheProcedureSeed[] = [
   { code: "EDU-RET", name: "Acompanhamento Pedagógico", category: "SESSAO", serviceType: "EDUCACAO", basePrice: 130 },
 ];
 
+const CONSTRUCTION_PROCEDURES: NicheProcedureSeed[] = [
+  { code: "ENG-VIS", name: "Vistoria Técnica Inicial", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 450 },
+  { code: "ENG-HT", name: "Hora Técnica de Engenheiro", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 350 },
+  { code: "ENG-LAU", name: "Laudo Estrutural", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 2500 },
+  { code: "ENG-ART", name: "Emissão de ART", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 180 },
+  { code: "ENG-FIS", name: "Fiscalização de Obra (mensal)", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 3200 },
+  { code: "ENG-PROJ", name: "Projeto Arquitetônico (m²)", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 85 },
+  { code: "ENG-INS", name: "Inspeção Predial", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 1800 },
+  { code: "ENG-ORC", name: "Orçamento de Reforma", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 950 },
+  { code: "ENG-TOP", name: "Topografia / Levantamento", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 1200 },
+  { code: "ENG-MAN", name: "Manutenção Predial (visita)", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 380 },
+  { code: "ENG-RET", name: "Retorno Vistoria Técnica", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 220 },
+  { code: "ENG-PER", name: "Perícia Técnica Judicial", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 4500 },
+];
+
 export const NICHE_BENEFIT_PRODUCTS = {
   VET: {
     AUXILIO_PET: { billingCycle: "MENSAL" as const, amount: 89.9, description: "Auxílio pet — crédito Pay Per Use mensal" },
@@ -173,6 +188,10 @@ export const NICHE_BENEFIT_PRODUCTS = {
   EDUCATION: {
     EDUCORP: { billingCycle: "MENSAL" as const, amount: 99.9, description: "Educação corporativa — crédito de aulas" },
     IDIOMAS: { billingCycle: "MENSAL" as const, amount: 129.9, description: "Inglês corporativo — aulas mensais" },
+  },
+  CONSTRUCTION: {
+    MANUT_PRED: { billingCycle: "MENSAL" as const, amount: 199.9, description: "Manutenção predial — visitas técnicas mensais" },
+    FISCAL_OBRA: { billingCycle: "TRIMESTRAL" as const, amount: 899.9, description: "Fiscalização de obra trimestral" },
   },
 } as const;
 
@@ -546,6 +565,79 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       Varejo: { procedureCodes: ["EDU-AUL", "EDU-MAT", "EDU-RET", "EDU-CUR"], reasons: ["Aula particular — reforço matemática", "Curso intensivo — Excel avançado"] },
       Educação: { procedureCodes: ["EDU-WKS", "EDU-WEB", "EDU-ID", "EDU-MEN"], reasons: ["Workshop corporativo — liderança", "Avaliação de nivelamento — idiomas"] },
       Agronegócio: { procedureCodes: ["EDU-AUL", "EDU-CUR", "EDU-TEA", "EDU-RET"], reasons: ["Aula particular — reforço matemática", "Acompanhamento pedagógico — retorno"] },
+    },
+  },
+  {
+    niche: "CONSTRUCTION",
+    slug: "build",
+    procedures: CONSTRUCTION_PROCEDURES,
+    providers: [
+      { email: "eng.carlos@build.demo", name: "Eng. Carlos Mendes", specialty: "Engenharia Civil", councilType: "CREA", councilNumber: "123456", councilUf: "SP", phone: "(11) 3456-9501" },
+      { email: "arq.maria@build.demo", name: "Arq. Maria Santos", specialty: "Arquitetura", councilType: "CAU", councilNumber: "A234567", councilUf: "SP", phone: "(11) 3456-9502" },
+      { email: "eng.paulo@build.demo", name: "Eng. Paulo Ribeiro", specialty: "Estruturas", councilType: "CREA", councilNumber: "345678", councilUf: "RJ", phone: "(21) 3456-9503" },
+    ],
+    companies: [
+      { name: "Incorp Alpha", cnpj: "66.100.200/0001-01", status: "ATIVO", sector: "Construção Civil", beneficiaries: 12, clinicalDiscount: 0.9 },
+      { name: "TechBuild Corp", cnpj: "66.200.300/0001-02", status: "ATIVO", sector: "Tecnologia", beneficiaries: 8 },
+      { name: "Financeira Imob", cnpj: "66.300.400/0001-03", status: "ATIVO", sector: "Financeiro", beneficiaries: 15 },
+      { name: "Varejo Urbano", cnpj: "66.400.500/0001-04", status: "ATIVO", sector: "Varejo", beneficiaries: 6 },
+      { name: "Indústria Steel", cnpj: "66.500.600/0001-05", status: "ATIVO", sector: "Indústria", beneficiaries: 20, clinicalDiscount: 0.85 },
+      { name: "Logística Obra", cnpj: "66.600.700/0001-06", status: "NEGOCIACAO", sector: "Logística", beneficiaries: 0 },
+      { name: "Hotelaria Premium", cnpj: "66.700.800/0001-07", status: "ATIVO", sector: "Hospitalidade", beneficiaries: 10 },
+      { name: "Startup PropTech", cnpj: "66.800.900/0001-08", status: "PROPOSTA", sector: "HealthTech", beneficiaries: 0 },
+    ],
+    appointmentReasons: [
+      "Vistoria técnica — reforma torre A",
+      "Laudo estrutural — edifício comercial",
+      "Fiscalização mensal — canteiro de obras",
+      "Inspeção predial — entrega de chaves",
+      "Orçamento de reforma — área comum",
+      "Emissão de ART — projeto estrutural",
+      "Topografia — levantamento do terreno",
+      "Manutenção predial — infiltração",
+      "Hora técnica — parecer de adequação",
+      "Projeto arquitetônico — avaliação inicial",
+      "Retorno vistoria — acompanhamento",
+      "Reunião técnica — incorporadora",
+    ],
+    recordSnippets: [
+      "Vistoria realizada. Fissuras superficiais identificadas — sem comprometimento estrutural.",
+      "Laudo estrutural concluído. Recomendações de reforço documentadas.",
+      "Fiscalização de obra — conformidade com projeto aprovado.",
+      "Inspeção predial entregue. Pendências elétricas e hidráulicas listadas.",
+      "Orçamento de reforma elaborado com composições de custo unitário.",
+      "ART emitida e registrada no CREA-SP.",
+      "Topografia concluída. Curvas de nível entregues em DWG/PDF.",
+      "Manutenção predial — infiltração tratada com impermeabilização.",
+    ],
+    starPatients: [
+      {
+        name: "Fernando Costa",
+        cpf: "661.222.333-44",
+        email: "cliente@build.demo",
+        birthDate: new Date(1985, 3, 12),
+        phone: "(11) 98765-4321",
+        companyIndex: 1,
+      },
+      {
+        name: "Patricia Lima",
+        cpf: "662.333.444-55",
+        email: "patricia.build@build.demo",
+        birthDate: new Date(1979, 7, 28),
+        phone: "(11) 97654-3210",
+        companyIndex: 3,
+      },
+    ],
+    pjEmail: "rh@incorp.demo",
+    pjName: "RH Incorp Alpha",
+    telemedicineRatio: 0.05,
+    sectorProfiles: {
+      "Construção Civil": { procedureCodes: ["ENG-VIS", "ENG-FIS", "ENG-LAU", "ENG-ART"], reasons: ["Vistoria técnica — reforma torre A", "Fiscalização mensal — canteiro de obras"] },
+      Tecnologia: { procedureCodes: ["ENG-INS", "ENG-MAN", "ENG-ORC", "ENG-HT"], reasons: ["Inspeção predial — entrega de chaves", "Manutenção predial — infiltração"] },
+      Financeiro: { procedureCodes: ["ENG-PROJ", "ENG-LAU", "ENG-VIS", "ENG-TOP"], reasons: ["Projeto arquitetônico — avaliação inicial", "Laudo estrutural — edifício comercial"] },
+      Indústria: { procedureCodes: ["ENG-FIS", "ENG-LAU", "ENG-ART", "ENG-VIS"], reasons: ["Fiscalização mensal — canteiro de obras", "Emissão de ART — projeto estrutural"] },
+      Varejo: { procedureCodes: ["ENG-ORC", "ENG-MAN", "ENG-VIS", "ENG-INS"], reasons: ["Orçamento de reforma — área comum", "Vistoria técnica — reforma torre A"] },
+      Hospitalidade: { procedureCodes: ["ENG-INS", "ENG-MAN", "ENG-ORC", "ENG-HT"], reasons: ["Inspeção predial — entrega de chaves", "Manutenção predial — infiltração"] },
     },
   },
 ];

@@ -124,6 +124,26 @@ export const NICHE_CONFIGS: Record<NicheId, NicheConfig> = {
       keywords: ["educação", "cursos", "pay per use", "aulas", "capacitação corporativa"],
     },
   },
+  CONSTRUCTION: {
+    id: "CONSTRUCTION",
+    name: "Engenharia",
+    tagline: "Gestão de obras com orçamento, cronograma e documentação técnica",
+    labels: NICHE_MASTER_LABELS.CONSTRUCTION,
+    branding: {
+      primaryColor: NICHE_PRESETS_ENERGIA_BRASILEIRA.CONSTRUCTION.primaryColor,
+      accentColor: NICHE_PRESETS_ENERGIA_BRASILEIRA.CONSTRUCTION.accentColor,
+      heroFrom: NICHE_PRESETS_ENERGIA_BRASILEIRA.CONSTRUCTION.heroFrom,
+      heroTo: NICHE_PRESETS_ENERGIA_BRASILEIRA.CONSTRUCTION.heroTo,
+    },
+    landing: {
+      badge: "Engenharia · SaaS · Pay Per Use",
+      headline: "Obras e empreiteiras",
+      headlineAccent: "com gestão integrada",
+      description:
+        "Orçamentos, cronogramas, propostas com anexos técnicos e faturamento Pay Per Use para construtoras e escritórios de engenharia.",
+      keywords: ["engenharia", "construção civil", "empreiteira", "pay per use", "gestão de obras"],
+    },
+  },
 };
 
 export function getNicheConfig(niche: string): NicheConfig {

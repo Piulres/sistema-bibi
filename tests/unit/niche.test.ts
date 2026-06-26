@@ -141,9 +141,9 @@ describe("niche seed demos", () => {
     }
   });
 
-  it("cobre os cinco nichos além de MEDICAL", () => {
+  it("cobre os seis nichos além de MEDICAL", () => {
     expect(NICHE_DEMOS.map((d) => d.niche).sort()).toEqual(
-      ["DENTAL", "EDUCATION", "LEGAL", "SPA", "VET"].sort(),
+      ["CONSTRUCTION", "DENTAL", "EDUCATION", "LEGAL", "SPA", "VET"].sort(),
     );
   });
 

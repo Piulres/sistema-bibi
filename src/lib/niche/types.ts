@@ -6,6 +6,7 @@ export const NICHE_IDS = [
   "LEGAL",
   "SPA",
   "EDUCATION",
+  "CONSTRUCTION",
 ] as const;
 
 export type NicheId = (typeof NICHE_IDS)[number];

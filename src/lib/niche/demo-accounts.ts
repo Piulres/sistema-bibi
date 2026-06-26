@@ -68,6 +68,15 @@ export const SEGMENT_TENANTS: SegmentTenantRef[] = [
     beneficiaryEmail: "aluno@eduprime.demo",
     pjEmail: "rh@educorp.demo",
   },
+  {
+    niche: "CONSTRUCTION",
+    slug: "build",
+    tenant: "Build Engenharia",
+    internoEmail: "operacao@build.demo",
+    providerEmail: "eng.carlos@build.demo",
+    beneficiaryEmail: "cliente@build.demo",
+    pjEmail: "rh@incorp.demo",
+  },
 ];
 
 export const SEGMENT_SLUG_BY_NICHE = Object.fromEntries(

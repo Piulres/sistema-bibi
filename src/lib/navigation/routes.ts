@@ -27,6 +27,7 @@ export const INTERNO_ROUTE_LABELS: Record<string, string> = {
   "/interno/cadastros": "Cadastros",
   "/interno/estoque": "Estoque Médico",
   "/interno/crm": "CRM Corporativo",
+  "/interno/projetos": "Obras",
   "/interno/assinaturas": "Recorrência",
   "/interno/comunicacao": "Comunicação",
   "/interno/relatorios": "Relatórios",
@@ -44,6 +45,7 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
   if (pathname.startsWith("/interno/cadastros")) return "cadastros";
   if (pathname.startsWith("/interno/estoque")) return "estoque";
   if (pathname.startsWith("/interno/crm")) return "crm";
+  if (pathname.startsWith("/interno/projetos")) return "projetos";
   if (pathname.startsWith("/interno/assinaturas")) return "subscriptions";
   if (pathname.startsWith("/interno/comunicacao")) return "comunicacao";
   if (pathname.startsWith("/interno/relatorios")) return "relatorios";

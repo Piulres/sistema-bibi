@@ -11,6 +11,7 @@ export const SEGMENT_LANDING_SLUGS = {
   juridico: "LEGAL",
   "bem-estar": "SPA",
   educacao: "EDUCATION",
+  engenharia: "CONSTRUCTION",
 } as const satisfies Record<string, NicheId>;
 
 export type SegmentLandingSlug = keyof typeof SEGMENT_LANDING_SLUGS;
@@ -33,6 +34,7 @@ function segmentPageLabel(niche: NicheId): string {
     LEGAL: "Página Jurídica",
     SPA: "Página Bem-estar",
     EDUCATION: "Página Educação",
+    CONSTRUCTION: "Página Engenharia",
   };
   return map[niche];
 }
@@ -216,6 +218,7 @@ export const SALES_SITE_SECTIONS: SalesSiteSection[] = [
       "Pet shops e clínicas veterinárias",
       "Consultórios odontológicos e jurídicos",
       "Spas, estúdios de bem-estar e escolas",
+      "Construtoras, empreiteiras e escritórios de engenharia",
       "RH corporativo com programa de beneficiários",
     ],
   },

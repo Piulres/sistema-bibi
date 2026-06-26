@@ -10,6 +10,7 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 | Jurídico | `LEGAL` | [`legal/`](legal/) | [`pesquisa.md`](legal/pesquisa.md) |
 | Bem-estar | `SPA` | [`spa/`](spa/) | [`pesquisa.md`](spa/pesquisa.md) |
 | Educação | `EDUCATION` | [`education/`](education/) | [`pesquisa.md`](education/pesquisa.md) |
+| Engenharia | `CONSTRUCTION` | [`construction/`](construction/) | — |
 
 **Código canônico de labels:** [`src/constants/niches.ts`](../../src/constants/niches.ts)  
 **Template para novo segmento:** [`../pesquisa/TEMPLATE_PESQUISA_NICHO.md`](../pesquisa/TEMPLATE_PESQUISA_NICHO.md)

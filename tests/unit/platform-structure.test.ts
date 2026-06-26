@@ -10,8 +10,8 @@ import {
 } from "@/lib/platform/structure";
 
 describe("platform structure", () => {
-  it("define 6 landing pages por segmento", () => {
-    expect(SEGMENT_LANDING_PAGES).toHaveLength(6);
+  it("define 7 landing pages por segmento", () => {
+    expect(SEGMENT_LANDING_PAGES).toHaveLength(7);
     expect(SEGMENT_LANDING_PAGES.map((p) => p.href)).toEqual([
       "/segmentos/saude",
       "/segmentos/veterinaria",
@@ -19,6 +19,7 @@ describe("platform structure", () => {
       "/segmentos/juridico",
       "/segmentos/bem-estar",
       "/segmentos/educacao",
+      "/segmentos/engenharia",
     ]);
   });
 

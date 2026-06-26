@@ -15,6 +15,8 @@ function estoqueTabLabel(niche: NicheId): string {
       return "Insumos spa";
     case "EDUCATION":
       return "Materiais";
+    case "CONSTRUCTION":
+      return "Materiais de obra";
     default:
       return "Estoque";
   }
@@ -22,13 +24,20 @@ function estoqueTabLabel(niche: NicheId): string {
 
 /** Abas do portal interno com termos do nicho. */
 export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab[] {
-  return [
+  const tabs: NavTab[] = [
     { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" as InternoModule },
     { href: "/interno", label: "Faturamento", key: "billing" },
     { href: "/interno/agenda", label: labels.appointments, key: "agenda" },
     { href: "/interno/cadastros", label: `Cadastros · ${labels.beneficiaries}`, key: "cadastros" },
     { href: "/interno/estoque", label: estoqueTabLabel(niche), key: "estoque" },
     { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
+  ];
+
+  if (niche === "CONSTRUCTION") {
+    tabs.push({ href: "/interno/projetos", label: labels.patients, key: "projetos" });
+  }
+
+  tabs.push(
     { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
     { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
     { href: "/interno/relatorios", label: "Relatórios", key: "relatorios" },
@@ -36,7 +45,9 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
     { href: "/interno/branding", label: "White Label", key: "branding" },
     { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
     { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
-  ];
+  );
+
+  return tabs;
 }
 
 /** Abas do prestador com termos do nicho. */

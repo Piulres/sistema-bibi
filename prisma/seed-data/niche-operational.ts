@@ -50,6 +50,7 @@ const NICHE_CPF_BASE: Record<string, number> = {
   LEGAL: 30_000,
   SPA: 40_000,
   EDUCATION: 50_000,
+  CONSTRUCTION: 60_000,
 };
 
 async function seedSingleNicheOperational(
