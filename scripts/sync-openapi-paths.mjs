@@ -186,11 +186,31 @@ function buildOperation(path, method, tags, isPublic) {
   return op;
 }
 
-function indentYaml(yaml, spaces = 4) {
+function indentBlock(yaml, spaces = 2) {
+  const pad = " ".repeat(spaces);
   return yaml
     .split("\n")
-    .map((line) => (line ? `${" ".repeat(spaces)}${line}` : line))
+    .map((line) => (line ? `${pad}${line}` : line))
     .join("\n");
+}
+
+function pathHasMethodInFile(content, openApiPath, method) {
+  const pathLine = `  ${openApiPath}:`;
+  const startIdx = content.indexOf(pathLine);
+  if (startIdx === -1) return false;
+  const tail = content.slice(startIdx + pathLine.length);
+  const nextPath = tail.search(/\n  \/api\//);
+  const block = nextPath === -1 ? tail : tail.slice(0, nextPath);
+  return new RegExp(`\n    ${method}:`).test(block);
+}
+
+function formatMethodBlock(method, op) {
+  const opYaml = stringifyYaml(op, { lineWidth: 0 }).trim();
+  const opIndented = opYaml
+    .split("\n")
+    .map((line) => (line ? `      ${line}` : line))
+    .join("\n");
+  return `    ${method}:\n${opIndented}`;
 }
 
 function findPathBlockEnd(lines, startIdx) {
@@ -217,6 +237,7 @@ for (const file of collectRouteHandlers(API_ROOT)) {
 
   for (const method of methods) {
     if (spec.paths[openApiPath]?.[method]) continue;
+    if (pathHasMethodInFile(readFileSync(OPENAPI_PATH, "utf8"), openApiPath, method)) continue;
 
     const op = buildOperation(openApiPath, method, tags, isPublic);
     addedOps++;
@@ -242,11 +263,12 @@ let content = readFileSync(OPENAPI_PATH, "utf8");
 // Insere métodos em paths existentes (do fim para o início para não invalidar índices)
 const lines = content.split("\n");
 for (const patch of [...methodPatches].reverse()) {
+  if (pathHasMethodInFile(content, patch.path, patch.method)) continue;
   const pathLine = `  ${patch.path}:`;
   const startIdx = lines.findIndex((l) => l === pathLine);
   if (startIdx === -1) continue;
   const endIdx = findPathBlockEnd(lines, startIdx);
-  const methodYaml = indentYaml(`${patch.method}:\n${stringifyYaml(patch.op).trim()}`, 4);
+  const methodYaml = formatMethodBlock(patch.method, patch.op);
   lines.splice(endIdx, 0, methodYaml);
 }
 content = lines.join("\n");
@@ -254,7 +276,7 @@ content = lines.join("\n");
 // Insere paths novos
 if (Object.keys(newPaths).length > 0) {
   const blockYaml = stringifyYaml(newPaths, { lineWidth: 0 }).trim();
-  const block = `\n  # --- paths sincronizados (scripts/sync-openapi-paths.mjs) ---\n${indentYaml(blockYaml, 2)}\n\n`;
+  const block = `\n  # --- paths sincronizados (scripts/sync-openapi-paths.mjs) ---\n${indentBlock(blockYaml, 2)}\n\n`;
   if (!content.includes(INSERT_BEFORE)) {
     console.error("Marcador de inserção não encontrado");
     process.exit(1);

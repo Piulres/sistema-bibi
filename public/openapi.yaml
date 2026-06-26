@@ -1712,19 +1712,14 @@ paths:
       summary: Converte arquivo JSON/CSV para formato de importação
       responses:
         '200': { description: Payload convertido }
-
     get:
-    tags:
-      - Importação
-      - Interno
-    summary: GET import convert
-    responses:
-      "200":
-        description: OK
-      "401":
-        description: Não autenticado
-      "403":
-        description: Acesso negado (role != INTERNO)
+      tags: [Importação, Interno]
+      summary: Metadados de conversão (colunas e formatos suportados)
+      responses:
+        '200': { description: OK }
+        '401': { description: Não autenticado }
+        '403': { description: Acesso negado (role != INTERNO) }
+
   /api/interno/import/{entity}:
     parameters:
       - name: entity
@@ -1738,19 +1733,14 @@ paths:
       summary: Importa cadastros a partir de JSON validado
       responses:
         '200': { description: Importação concluída }
-
     get:
-    tags:
-      - Importação
-      - Interno
-    summary: Export template ou dados da entidade (JSON/CSV)
-    responses:
-      "200":
-        description: OK
-      "401":
-        description: Não autenticado
-      "403":
-        description: Acesso negado (role != INTERNO)
+      tags: [Importação, Interno]
+      summary: Export template ou dados da entidade (JSON/CSV)
+      responses:
+        '200': { description: OK }
+        '401': { description: Não autenticado }
+        '403': { description: Acesso negado (role != INTERNO) }
+
   /api/interno/revisions:
     get:
       tags: [Change Management, Interno]
