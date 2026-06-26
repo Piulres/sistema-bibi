@@ -33,7 +33,8 @@ test.describe("Portal Prestador — confirmar presença", () => {
 
     const presentBtn = page.getByRole("button", { name: /Paciente presente/i });
     await expect(presentBtn).toBeVisible();
-    await presentBtn.click();
+    await presentBtn.scrollIntoViewIfNeeded();
+    await presentBtn.click({ force: true });
     await expect(page.getByText(/presença do paciente confirmada/i)).toBeVisible();
   });
 });
