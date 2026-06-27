@@ -6,6 +6,7 @@ import {
   ALLOCATION_STATUSES,
   PAYMENT_TYPES,
 } from "@/lib/project/construction-modules";
+import { mirrorProjectCashEntry } from "@/lib/project/cash-service";
 
 export type AllocationPaymentView = {
   id: string;
@@ -129,6 +130,25 @@ export async function addAllocationPayment(
       notes: input.notes ?? null,
     },
   });
+
+  const payment = await prisma.projectAllocationPayment.findFirst({
+    where: { allocationId },
+    orderBy: { createdAt: "desc" },
+  });
+
+  if (payment) {
+    await mirrorProjectCashEntry({
+      tenantId,
+      projectId: allocation.projectId,
+      type: "SAIDA",
+      category: input.paymentType === "ADIANTAMENTO" ? "ADIANTAMENTO" : "MAO_OBRA",
+      description: `Pagamento ${allocation.trade} — ${allocation.providerId}`,
+      amount: input.amount,
+      referenceType: "ProjectAllocationPayment",
+      referenceId: payment.id,
+      entryDate: new Date(input.paymentDate),
+    });
+  }
 
   const updated = await prisma.projectAllocation.findUniqueOrThrow({
     where: { id: allocationId },

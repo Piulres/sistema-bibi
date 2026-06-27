@@ -20,6 +20,8 @@ import {
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { formatBRL } from "@/lib/pricing";
 import { dispatchWebhooks } from "@/lib/webhook-service";
+import { resolveInvoicePatientForCompany } from "@/lib/project/company-patient";
+import { mirrorProjectCashEntry } from "@/lib/project/cash-service";
 
 export type ProjectListItem = {
   id: string;
@@ -718,13 +720,11 @@ async function createInvoiceFromBudget(input: {
 }): Promise<{ invoiceId: string } | { error: string }> {
   const prisma = await getPrisma();
   const patient = input.budget.project.companyId
-    ? await prisma.patient.findFirst({
-        where: {
-          tenantId: input.tenantId,
-          companyId: input.budget.project.companyId,
-        },
-        orderBy: { createdAt: "asc" },
-      })
+    ? await resolveInvoicePatientForCompany(
+        input.tenantId,
+        input.budget.project.companyId,
+        "cliente@build.demo",
+      )
     : null;
 
   if (!patient) {
@@ -778,6 +778,17 @@ async function createInvoiceFromBudget(input: {
       projectId: input.projectId,
       budgetId: input.budget.id,
     },
+  });
+
+  await mirrorProjectCashEntry({
+    tenantId: input.tenantId,
+    projectId: input.projectId,
+    type: "ENTRADA",
+    category: "CONTRATO",
+    description: `Orçamento v${input.budget.version} aprovado — ${input.budget.project.code}`,
+    amount: invoice.total,
+    referenceType: "Budget",
+    referenceId: input.budget.id,
   });
 
   return { invoiceId: invoice.id };

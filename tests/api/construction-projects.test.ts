@@ -238,6 +238,15 @@ describe("API — Obras CONSTRUCTION", () => {
       expect(body.projects.some((p: { code: string }) => p.code === "OBR-2026-001")).toBe(true);
     });
 
+    it("GET /api/prestador/campo/projects inclui diária da alocação", async () => {
+      const { GET } = await import("@/app/api/prestador/campo/projects/route");
+      const res = await GET();
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const obra = body.projects.find((p: { code: string }) => p.code === "OBR-2026-001");
+      expect(obra?.dailyRate).toBe(280);
+    });
+
     it("POST field-report registra diária", async () => {
       const project = await getBuildProject("OBR-2026-001");
       const { POST } = await import("@/app/api/prestador/field-reports/route");
@@ -257,6 +266,33 @@ describe("API — Obras CONSTRUCTION", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.report.workDone).toContain("homologação");
+    });
+  });
+
+  describe("Portal beneficiário (cliente obra)", () => {
+    beforeEach(async () => {
+      await setSessionForEmail(DEMO_EMAILS.buildCliente);
+    });
+
+    it("GET /api/beneficiario/projects lista obras da empresa", async () => {
+      const { GET } = await import("@/app/api/beneficiario/projects/route");
+      const res = await GET();
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.projects.some((p: { code: string }) => p.code === "OBR-2026-001")).toBe(true);
+    });
+
+    it("GET /api/beneficiario/projects/[id] retorna detalhe da obra", async () => {
+      const project = await getBuildProject("OBR-2026-001");
+      const { GET } = await import("@/app/api/beneficiario/projects/[id]/route");
+      const res = await GET(
+        new Request(`http://localhost/api/beneficiario/projects/${project.id}`),
+        { params: Promise.resolve({ id: project.id }) },
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.project.code).toBe("OBR-2026-001");
+      expect(body.project.tasks.length).toBeGreaterThan(0);
     });
   });
 

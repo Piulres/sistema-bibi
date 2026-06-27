@@ -21,7 +21,8 @@ describe("login-demo", () => {
     const lex = resolveSegmentTenantRef("lex", "LEGAL");
     expect(demoEmailForPortal(lex, "interno")).toBe("operacao@lex.demo");
     expect(demoEmailForPortal(lex, "prestador")).toBe("dr.andre@lex.demo");
-    expect(demoEmailForPortal(lex, "pj")).toBe("rh@techcorp.com");
+    expect(demoEmailForPortal(lex, "pj")).toBe("rh@assjur.demo");
+    expect(demoEmailForPortal(lex, "beneficiario")).toBe("cliente@lex.demo");
   });
 
   it("mapeia caminhos de login por portal", () => {
