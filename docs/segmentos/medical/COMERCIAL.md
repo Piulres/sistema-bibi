@@ -6,6 +6,8 @@
 | **Tenant demo** | Clínica Horizonte · `/?tenant=horizonte` ou `/` |
 | **Pesquisa** | [`pesquisa-expansao-2026.md`](./pesquisa-expansao-2026.md) |
 | **Features comuns** | [`../../comercial/MODULOS_COMUNS.md`](../../comercial/MODULOS_COMUNS.md) |
+| **Benchmark mercado** | [`../../comercial/BENCHMARKS_POR_NICHO.md`](../../comercial/BENCHMARKS_POR_NICHO.md) §1 |
+| **Calculadora ROI** | [`../../comercial/CALCULADORA_ROI.md`](../../comercial/CALCULADORA_ROI.md) |
 
 ---
 

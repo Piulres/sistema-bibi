@@ -10,6 +10,7 @@ export type LandingNavItem = {
 export const HOME_NAV_ANCHORS: LandingNavItem[] = [
   { href: "#solucao", label: "Solução" },
   { href: "#roi", label: "ROI" },
+  { href: "#comparativo", label: "Comparativo" },
   { href: "#para-quem", label: "Para quem" },
   { href: "#segmentos", label: "Segmentos" },
   { href: "#portais", label: "Portais" },

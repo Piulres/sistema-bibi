@@ -12,6 +12,7 @@ Documentação de **vendas, marketing e posicionamento por segmento**. Complemen
 |--------|-----------|
 | Visão geral do produto | [`MODULOS_COMUNS.md`](MODULOS_COMUNS.md) |
 | Benchmarks por nicho | [`BENCHMARKS_POR_NICHO.md`](BENCHMARKS_POR_NICHO.md) |
+| Calculadora ROI (home) | [`CALCULADORA_ROI.md`](CALCULADORA_ROI.md) |
 | Plano e mudanças na homepage | [`PLANO_HOMEPAGE.md`](PLANO_HOMEPAGE.md) |
 | Técnicas por vertical | [`ESTRATEGIA_SEGMENTOS.md`](ESTRATEGIA_SEGMENTOS.md) |
 | Segmento específico | [`../segmentos/README.md`](../segmentos/README.md) → `COMERCIAL.md` |
@@ -27,6 +28,7 @@ docs/comercial/
 ├── README.md                 ← você está aqui
 ├── MODULOS_COMUNS.md         ← features compartilhadas (4 portais + plataforma)
 ├── BENCHMARKS_POR_NICHO.md   ← concorrentes, features, prós/contras por vertical
+├── CALCULADORA_ROI.md        ← fórmulas e presets da calculadora na home
 ├── PLANO_HOMEPAGE.md         ← plano e registro de mudanças na home
 └── ESTRATEGIA_SEGMENTOS.md   ← matriz de captação e links por nicho
 

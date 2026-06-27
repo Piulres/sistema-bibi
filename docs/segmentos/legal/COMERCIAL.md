@@ -6,6 +6,8 @@
 | **Tenant demo** | Lex & Partners · `/?tenant=lex` |
 | **Pesquisa** | [`pesquisa.md`](./pesquisa.md) |
 | **Features comuns** | [`../../comercial/MODULOS_COMUNS.md`](../../comercial/MODULOS_COMUNS.md) |
+| **Benchmark mercado** | [`../../comercial/BENCHMARKS_POR_NICHO.md`](../../comercial/BENCHMARKS_POR_NICHO.md) §4 |
+| **Calculadora ROI** | [`../../comercial/CALCULADORA_ROI.md`](../../comercial/CALCULADORA_ROI.md) |
 
 ---
 

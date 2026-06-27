@@ -135,17 +135,17 @@ Ver lista completa em [`MODULOS_COMUNS.md`](MODULOS_COMUNS.md). Resumo em 5 bloc
 
 ## CTAs por segmento (landing)
 
-| Nicho | CTA primário recomendado | Mensagem de apoio |
-|-------|--------------------------|-------------------|
-| Todos | Demo segmentada `/?tenant={slug}` | "Veja seu segmento com sua marca" |
-| `MEDICAL` | "Calcular economia para minha empresa" | ROI 500 vidas |
-| `VET` | "Ver auxílio pet transparente" | Por pet atendido |
-| `DENTAL` | "Odonto corporativo sem mensalidade ociosa" | Por procedimento |
-| `LEGAL` | "Auditar horas técnicas em tempo real" | Price Snapshot |
-| `SPA` | "Wellness pago por sessão utilizada" | vs. Gympass |
-| `EDUCATION` | "Crédito educacional por aula realizada" | vs. Udemy Business |
+| Nicho | CTA primário recomendado | URL campanha (hero) |
+|-------|--------------------------|---------------------|
+| Todos | Demo segmentada `/?tenant={slug}` | `/` |
+| `MEDICAL` | "Calcular economia para minha empresa" | `/?utm_segment=medical` |
+| `VET` | "Ver auxílio pet transparente" | `/?utm_segment=vet` |
+| `DENTAL` | "Odonto corporativo sem mensalidade ociosa" | `/?utm_segment=dental` |
+| `LEGAL` | "Auditar horas técnicas em tempo real" | `/?utm_segment=legal` |
+| `SPA` | "Wellness pago por sessão utilizada" | `/?utm_segment=spa` |
+| `EDUCATION` | "Crédito educacional por aula realizada" | `/?utm_segment=education` |
 
-Configuração atual: hero leva a `#portais` + WhatsApp. Evolução sugerida: calculadoras por segmento.
+Hero personalizado via `utm_segment` ou `segment`. Calculadora ROI com preset por nicho em `#roi`. Ver [`CALCULADORA_ROI.md`](CALCULADORA_ROI.md).
 
 ---
 

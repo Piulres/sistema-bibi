@@ -2,6 +2,7 @@ import type { BrandingTokens } from "@/lib/theme/tokens";
 import LandingHeader from "@/components/landing/LandingHeader";
 import LandingHeroProduct from "@/components/landing/LandingHeroProduct";
 import LandingStats from "@/components/landing/LandingStats";
+import LandingSocialProof from "@/components/landing/LandingSocialProof";
 import {
   LandingHomeProduct,
   LandingHomeValues,
@@ -10,7 +11,8 @@ import {
 import LandingHomeAudience from "@/components/landing/LandingHomeAudience";
 import LandingProblem from "@/components/landing/LandingProblem";
 import LandingSolution from "@/components/landing/LandingSolution";
-import LandingRoi from "@/components/landing/LandingRoi";
+import LandingRoiCalculator from "@/components/landing/LandingRoiCalculator";
+import LandingCompare from "@/components/landing/LandingCompare";
 import LandingChangelog from "@/components/landing/LandingChangelog";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingPortals from "@/components/landing/LandingPortals";
@@ -40,9 +42,11 @@ export default function LandingHomePageView({ branding }: Props) {
       <main id="conteudo-principal" className="flex-1">
         <LandingHeroProduct />
         <LandingStats />
+        <LandingSocialProof />
         <LandingProblem />
         <LandingSolution />
-        <LandingRoi />
+        <LandingRoiCalculator />
+        <LandingCompare />
         <LandingHomeAudience />
         <LandingNiches />
         <LandingFeatures
