@@ -65,7 +65,7 @@ export function draftStuckHint(labels: NicheLabels, tool: string): string {
     return "Para cadastrar, envie nome, CPF e data de nascimento em uma mensagem.";
   }
   if (tool === "draft_create_user") {
-    return "Para criar o usuário, informe nome, e-mail, senha e perfil (prestador, interno, PJ ou beneficiário).";
+    return "Para criar o usuário, informe nome, e-mail e perfil (prestador, interno, PJ ou beneficiário). A senha inicial você define na confirmação.";
   }
   return "Não captei essa parte. Pode reformular com mais detalhes?";
 }

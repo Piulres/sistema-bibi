@@ -1,7 +1,7 @@
 import "server-only";
 import type { AssistantToolDefinition } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
-import { hasInternoPermission } from "@/lib/interno-permissions";
+import { hasInternoPermission, isInternoAdmin } from "@/lib/interno-permissions";
 import { internoReadTools } from "@/lib/assistant/tools/interno/read";
 import { internoWriteTools } from "@/lib/assistant/tools/interno/write";
 import { prestadorReadTools } from "@/lib/assistant/tools/prestador/read";
@@ -33,6 +33,9 @@ export function filterToolsForUser(
 ): AssistantToolDefinition[] {
   return tools.filter((tool) => {
     if (tool.requiredRoles && !tool.requiredRoles.includes(user.role)) return false;
+    if (user.role === "INTERNO" && tool.requiredInternoAdmin) {
+      if (!isInternoAdmin(user.role, user.internoProfile)) return false;
+    }
     if (user.role === "INTERNO" && tool.requiredModule) {
       return hasInternoPermission(user.role, user.internoProfile, tool.requiredModule);
     }

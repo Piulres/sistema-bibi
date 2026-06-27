@@ -348,7 +348,6 @@ export function extractRole(text: string): string {
 export function extractCreateUserArgs(raw: string): Record<string, unknown> | null {
   const email = extractEmail(raw);
   if (!email) return null;
-  const password = extractPassword(raw) ?? "bibi123";
   const withoutEmail = raw.replace(email, "").replace(/senha\s+\S+/i, "");
   const namePatterns = [
     /(?:criar|cadastrar|adicionar|novo|registrar)\s+usu[aá]rio\s*[:\-]?\s*(.+)/i,
@@ -362,7 +361,7 @@ export function extractCreateUserArgs(raw: string): Record<string, unknown> | nu
       break;
     }
   }
-  return { name, email, password, role: extractRole(raw) };
+  return { name, email, role: extractRole(raw) };
 }
 
 export function extractCreatePatientArgs(raw: string): Record<string, unknown> | null {

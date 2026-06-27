@@ -2,8 +2,14 @@ import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { isAssistantEnabled } from "@/lib/assistant/config";
 import { executePendingAction } from "@/lib/assistant/confirm-executor";
-import { cancelPendingAction } from "@/lib/assistant/pending-actions";
-import { tryMarkPendingJtiConsumed } from "@/lib/assistant/pending-consumed";
+import {
+  assertPendingActionPermission,
+  ConfirmPermissionError,
+} from "@/lib/assistant/confirm-guard";
+import {
+  releasePendingJti,
+  tryMarkPendingJtiConsumed,
+} from "@/lib/assistant/pending-consumed";
 import { decodePendingEnvelope } from "@/lib/assistant/session-state";
 import type { AssistantConfirmRequest } from "@/lib/assistant/types";
 
@@ -27,25 +33,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "pendingActionId obrigatório." }, { status: 400 });
     }
 
-    if (!body.confirmed) {
-      cancelPendingAction(body.pendingActionId, user.id, user.tenantId);
-      return NextResponse.json({
-        message: { role: "assistant", content: "Ação cancelada." },
-      });
-    }
-
     const envelope = decodePendingEnvelope(body.pendingActionId, user.id, user.tenantId);
     if (!envelope) {
       return NextResponse.json({ error: "Ação expirada ou inválida." }, { status: 410 });
     }
 
-    const firstUse = await tryMarkPendingJtiConsumed(envelope.jti);
-    if (!firstUse) {
+    if (!body.confirmed) {
+      await tryMarkPendingJtiConsumed(envelope.jti);
+      return NextResponse.json({
+        message: { role: "assistant", content: "Ação cancelada." },
+      });
+    }
+
+    const reserved = await tryMarkPendingJtiConsumed(envelope.jti);
+    if (!reserved) {
       return NextResponse.json({ error: "Esta confirmação já foi utilizada." }, { status: 410 });
+    }
+
+    try {
+      assertPendingActionPermission(user, envelope.payload);
+    } catch (error) {
+      if (error instanceof ConfirmPermissionError) {
+        return NextResponse.json({ error: error.message }, { status: error.status });
+      }
+      throw error;
     }
 
     const result = await executePendingAction(user, envelope.payload, body.password);
     if (!result.ok) {
+      await releasePendingJti(envelope.jti);
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
