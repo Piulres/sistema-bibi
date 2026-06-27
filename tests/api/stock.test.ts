@@ -113,7 +113,7 @@ describe("Estoque médico — APIs", () => {
       where: { email: "dra.helena@bibi.health" },
     });
     const procedure = await prisma.procedure.findFirst({ where: { code: "CON-CLM" } });
-    const patient = await prisma.patient.findFirst({ where: { cpf: "111.222.333-44" } });
+    const patient = await prisma.patient.findFirst({ where: { cpf: "529.982.247-25" } });
     expect(procedure && patient).toBeTruthy();
 
     const luva = await prisma.medicalProduct.findFirst({

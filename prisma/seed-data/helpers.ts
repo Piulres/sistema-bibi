@@ -13,16 +13,44 @@ export function formatCpf(digits: string): string {
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9)}`;
 }
 
+function cpfChecksum(digits: number[], factor: number): number {
+  const sum = digits.reduce((acc, d, i) => acc + d * (factor - i), 0);
+  const mod = (sum * 10) % 11;
+  return mod === 10 ? 0 : mod;
+}
+
+/** Monta CPF válido a partir de 9 dígitos base (determinístico para seed). */
+export function buildValidCpfFromBase(base9: string): string {
+  const nums = base9
+    .replace(/\D/g, "")
+    .padStart(9, "0")
+    .slice(-9)
+    .split("")
+    .map(Number);
+  if (nums.every((d) => d === nums[0])) {
+    nums[8] = (nums[8]! + 1) % 10;
+  }
+  const d1 = cpfChecksum(nums, 10);
+  const d2 = cpfChecksum([...nums, d1], 11);
+  return formatCpf([...nums, d1, d2].join(""));
+}
+
 /** Gera CNPJ determinístico (apenas para seed — não valida dígitos verificadores). */
 export function seedCnpj(index: number): string {
   const base = String(10_000_000 + index).padStart(8, "0");
   return formatCnpj(`${base}0001${String(index % 100).padStart(2, "0")}`);
 }
 
-/** Gera CPF determinístico (apenas para seed). */
+/** Gera CPF determinístico com dígitos verificadores válidos (apenas para seed). */
 export function seedCpf(companyIndex: number, patientIndex: number): string {
   const base = String(100_000_000 + companyIndex * 1000 + patientIndex).padStart(9, "0");
-  return formatCpf(`${base}${String((companyIndex + patientIndex) % 100).padStart(2, "0")}`);
+  return buildValidCpfFromBase(base);
+}
+
+/** CPF demo memorável por índice (star flows, catálogos de nicho). */
+export function demoCpf(seed: number): string {
+  const base = String(200_000_000 + seed * 17_371).padStart(9, "0");
+  return buildValidCpfFromBase(base);
 }
 
 export function slugFromName(name: string): string {

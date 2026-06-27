@@ -251,7 +251,7 @@ describe("assistant draft multi-turn", () => {
 describe("assistant disambiguation", () => {
   it("parseChoiceSelection aceita número ou nome", () => {
     const options = [
-      { id: "a", label: "João Pereira", detail: "111.222.333-44" },
+      { id: "a", label: "João Pereira", detail: "529.982.247-25" },
       { id: "b", label: "João Silva", detail: "999.000.111-22" },
     ];
     expect(parseChoiceSelection("2", options)).toBe("b");

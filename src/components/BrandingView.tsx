@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import type { BrandingTokens } from "@/lib/theme/tokens";
 import { COLOR_SCHEMES, type ColorScheme } from "@/lib/theme/color-scheme";
 import { BRANDING_PRESETS, SEGMENT_BRANDING_PRESETS, VARIETY_BRANDING_PRESETS } from "@/lib/theme/presets";
@@ -9,10 +9,12 @@ import { brandingToCssVars } from "@/lib/theme/css-vars";
 import Card from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
-import Alert from "@/components/ui/Alert";
-import LoadingState from "@/components/ui/LoadingState";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import SectionHeader from "@/components/ui/SectionHeader";
 import { customDomainSetupHint } from "@/lib/custom-domain-hint";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { fetchJson } from "@/lib/ui/api-feedback";
 
 type ColorField = keyof Pick<
   BrandingTokens,
@@ -28,140 +30,137 @@ const colorFields: { key: ColorField; label: string }[] = [
 
 export default function BrandingView() {
   const router = useRouter();
-  const [form, setForm] = useState<BrandingTokens | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [msg, setMsg] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { isBusy, run, showToast } = useAsyncAction();
+  const [draft, setDraft] = useState<BrandingTokens | null>(null);
 
-  const load = useCallback(async () => {
-    const res = await fetch("/api/interno/branding");
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error ?? "Erro ao carregar branding");
-      setLoading(false);
-      return;
-    }
-    setForm(data.branding);
-    setError(null);
-    setLoading(false);
-  }, []);
+  const loadBranding = useCallback(
+    () =>
+      fetchJson<{ branding: BrandingTokens }>(
+        "/api/interno/branding",
+        undefined,
+        "Erro ao carregar branding",
+      ),
+    [],
+  );
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const res = await fetch("/api/interno/branding");
-      const data = await res.json();
-      if (!active) return;
-      if (!res.ok) setError(data.error ?? "Erro ao carregar branding");
-      else setForm(data.branding);
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { data, loading, error, reload } = useAsyncData(loadBranding, [], {
+    forbiddenMessage: "Sem permissão para acessar identidade visual",
+  });
+
+  const form = draft ?? data?.branding ?? null;
 
   function updateField<K extends keyof BrandingTokens>(key: K, value: BrandingTokens[K]) {
-    setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
+    setDraft((prev) => {
+      const base = prev ?? data?.branding;
+      if (!base) return prev;
+      return { ...base, [key]: value };
+    });
   }
 
   function applyPreset(presetId: string) {
     const preset = BRANDING_PRESETS.find((p) => p.id === presetId);
     if (!preset || !form) return;
-    setForm({
+    setDraft({
       ...form,
       ...preset.tokens,
       displayName: form.displayName || preset.tokens.displayName,
     });
-    setMsg(`Preset "${preset.label}" aplicado — salve para persistir.`);
+    showToast({
+      message: `Preset "${preset.label}" aplicado — salve para persistir.`,
+      tone: "info",
+    });
   }
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!form) return;
-    setSaving(true);
-    setMsg(null);
-    setError(null);
-    try {
-      const res = await fetch("/api/interno/branding", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao salvar");
-        return;
-      }
-      setForm(data.branding);
-      setMsg(data.message ?? "Identidade visual atualizada");
-      router.refresh();
-    } finally {
-      setSaving(false);
-    }
+    await run(
+      "save",
+      () =>
+        fetch("/api/interno/branding", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }),
+      {
+        silentSuccess: true,
+        errorMessage: "Erro ao salvar",
+        onSuccess: async (body) => {
+          setDraft(null);
+          await reload();
+          showToast({
+            message: String(body.message ?? "Identidade visual atualizada"),
+            tone: "success",
+          });
+          router.refresh();
+        },
+      },
+    );
   }
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setUploading(true);
-    setError(null);
-    try {
-      const body = new FormData();
-      body.append("file", file);
-      const res = await fetch("/api/interno/branding/logo", {
-        method: "POST",
-        body,
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Erro no upload");
-        return;
-      }
-      updateField("logoUrl", data.logoUrl);
-      setMsg(data.message ?? "Logo atualizado — salve para confirmar outras alterações.");
-    } finally {
-      setUploading(false);
-      e.target.value = "";
-    }
+    await run(
+      "upload",
+      () => {
+        const body = new FormData();
+        body.append("file", file);
+        return fetch("/api/interno/branding/logo", { method: "POST", body });
+      },
+      {
+        silentSuccess: true,
+        errorMessage: "Erro no upload",
+        onSuccess: (body) => {
+          updateField("logoUrl", body.logoUrl as string | null);
+          showToast({
+            message: String(body.message ?? "Logo atualizado — salve para confirmar outras alterações."),
+            tone: "success",
+          });
+        },
+      },
+    );
+    e.target.value = "";
   }
 
   async function verifyDomain() {
     if (!form) return;
-    setSaving(true);
-    setMsg(null);
-    setError(null);
-    try {
-      const res = await fetch("/api/interno/branding", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, verifyCustomDomain: true }),
-      });
-      const data = await res.json();
-      if (!res.ok) setError(data.error ?? "Erro ao verificar domínio");
-      else {
-        setForm(data.branding);
-        setMsg("Domínio marcado como verificado (simulação POC)");
-        router.refresh();
-      }
-    } finally {
-      setSaving(false);
-    }
+    await run(
+      "verify-domain",
+      () =>
+        fetch("/api/interno/branding", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ...form, verifyCustomDomain: true }),
+        }),
+      {
+        successMessage: "Domínio marcado como verificado (simulação POC)",
+        onSuccess: async () => {
+          setDraft(null);
+          await reload();
+          router.refresh();
+        },
+      },
+    );
   }
 
-  if (loading) return <LoadingState message="Carregando identidade visual..." />;
-  if (error && !form) return <Alert tone="danger">{error}</Alert>;
-  if (!form) return null;
+  async function discardChanges() {
+    setDraft(null);
+    await reload();
+  }
 
-  const previewStyle = brandingToCssVars(form) as React.CSSProperties;
+  const previewStyle = form ? (brandingToCssVars(form) as React.CSSProperties) : undefined;
 
   return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error && !form ? error : null}
+      loadingMessage="Carregando identidade visual..."
+      onRetry={() => void reload()}
+    >
+      {form && previewStyle && (
     <div className="grid gap-8 lg:grid-cols-[1fr_20rem]">
       <form onSubmit={handleSave} className="order-2 space-y-6 lg:order-1">
-        {msg && <Alert tone="success">{msg}</Alert>}
-        {error && <Alert tone="danger">{error}</Alert>}
 
         <Card>
           <SectionHeader
@@ -263,7 +262,7 @@ export default function BrandingView() {
               <input
                 type="file"
                 accept="image/png,image/jpeg,image/webp,image/svg+xml"
-                disabled={uploading}
+                disabled={isBusy("upload")}
                 onChange={handleLogoUpload}
                 className="mt-1 block w-full text-sm text-[var(--text-muted)] file:mr-3 file:rounded-[var(--radius-button)] file:border-0 file:bg-[var(--surface-muted)] file:px-3 file:py-2 file:text-sm file:font-medium file:text-[var(--text-secondary)]"
               />
@@ -299,7 +298,7 @@ export default function BrandingView() {
               </p>
             )}
             {form.customDomain && !form.customDomainVerified && (
-              <Button type="button" variant="secondary" size="sm" disabled={saving} onClick={verifyDomain}>
+              <Button type="button" variant="secondary" size="sm" disabled={isBusy("verify-domain")} onClick={verifyDomain}>
                 Marcar domínio como verificado
               </Button>
             )}
@@ -336,10 +335,10 @@ export default function BrandingView() {
         </Card>
 
         <div className="flex flex-wrap gap-3">
-          <Button type="submit" disabled={saving}>
-            {saving ? "Salvando..." : "Salvar identidade visual"}
+          <Button type="submit" disabled={isBusy("save")}>
+            {isBusy("save") ? "Salvando..." : "Salvar identidade visual"}
           </Button>
-          <Button type="button" variant="secondary" onClick={() => load()}>
+          <Button type="button" variant="secondary" onClick={() => void discardChanges()}>
             Descartar alterações
           </Button>
         </div>
@@ -404,5 +403,7 @@ export default function BrandingView() {
         </Card>
       </aside>
     </div>
+      )}
+    </ViewStateBoundary>
   );
 }

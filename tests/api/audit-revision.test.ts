@@ -30,7 +30,7 @@ describe("Auditoria — metadata before/after (Pacote A)", () => {
   it("atualização de beneficiário grava diff na timeline", async () => {
     const prisma = getTestPrisma();
     const patient = await prisma.patient.findFirstOrThrow({
-      where: { cpf: "111.222.333-44" },
+      where: { cpf: "529.982.247-25" },
     });
     const originalName = patient.name;
 

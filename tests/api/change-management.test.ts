@@ -45,7 +45,7 @@ describe("Change management — pacotes B–D", () => {
   it("restore exige confirmação RESTAURAR", async () => {
     const prisma = getTestPrisma();
     const patient = await prisma.patient.findFirstOrThrow({
-      where: { cpf: "111.222.333-44" },
+      where: { cpf: "529.982.247-25" },
     });
 
     await setSessionForEmail("faturamento@bibi.health");
@@ -84,7 +84,7 @@ describe("Change management — pacotes B–D", () => {
   it("revert-recent desfaz UPDATE do usuário logado", async () => {
     const prisma = getTestPrisma();
     const patient = await prisma.patient.findFirstOrThrow({
-      where: { cpf: "111.222.333-44" },
+      where: { cpf: "529.982.247-25" },
     });
     const originalPhone = patient.phone;
 

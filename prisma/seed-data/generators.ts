@@ -7,6 +7,7 @@ import {
 import {
   beneficiaryEmail,
   birthDateForAge,
+  buildValidCpfFromBase,
   formatCpf,
   phoneForIndex,
   pick,
@@ -30,7 +31,7 @@ export type GeneratedBeneficiary = {
 const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
   joao: {
     name: "João Pereira",
-    cpf: "111.222.333-44",
+    cpf: "529.982.247-25",
     birthDate: new Date("1985-04-12"),
     phone: "(11) 98888-1111",
     email: "joao.pereira@email.com",
@@ -38,7 +39,7 @@ const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
   },
   maria: {
     name: "Maria Souza",
-    cpf: "555.666.777-88",
+    cpf: "390.533.447-05",
     birthDate: new Date("1992-09-30"),
     phone: "(11) 97777-2222",
     email: "maria.souza@email.com",
@@ -46,7 +47,7 @@ const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
   },
   pedro: {
     name: "Pedro Almeida",
-    cpf: "999.000.111-22",
+    cpf: "153.509.460-56",
     birthDate: new Date("1978-01-05"),
     phone: "(11) 96666-3333",
     email: "pedro.almeida@email.com",
@@ -192,7 +193,7 @@ export function ensureUniqueCpfs(beneficiaries: GeneratedBeneficiary[]): Generat
   return beneficiaries.map((b, idx) => {
     let cpf = b.cpf.replace(/\D/g, "");
     if (seen.has(cpf)) {
-      cpf = String(900_000_000 + idx).padStart(11, "0");
+      cpf = buildValidCpfFromBase(String(900_000_000 + idx).padStart(9, "0")).replace(/\D/g, "");
     }
     seen.add(cpf);
     return { ...b, cpf: formatCpf(cpf) };

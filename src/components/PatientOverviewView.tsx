@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
-import LoadingState from "@/components/ui/LoadingState";
-import Alert from "@/components/ui/Alert";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Overview = {
   patient: {
@@ -65,52 +66,60 @@ type Overview = {
   }[];
 };
 
+type ClinicalData = {
+  medications: { medication: string; dosage: string; frequency: string; statusLabel: string }[];
+  examOrders: { examName: string; statusLabel: string; resultSummary: string | null }[];
+  protocols: { templateName: string; statusLabel: string; progressPercent: number }[];
+  overview: { profile: { allergies: { substance: string }[]; bloodType: string | null } } | null;
+};
+
+type PatientOverviewPayload = {
+  overview: Overview | null;
+  clinical: ClinicalData | null;
+};
+
 export default function PatientOverviewView({
   patientId,
 }: {
   patientId: string;
 }) {
-  const [overview, setOverview] = useState<Overview | null>(null);
-  const [clinical, setClinical] = useState<{
-    medications: { medication: string; dosage: string; frequency: string; statusLabel: string }[];
-    examOrders: { examName: string; statusLabel: string; resultSummary: string | null }[];
-    protocols: { templateName: string; statusLabel: string; progressPercent: number }[];
-    overview: { profile: { allergies: { substance: string }[]; bloodType: string | null } } | null;
-  } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const loadData = useCallback(async () => {
+    const [overviewRes, clinicalRes] = await Promise.all([
+      fetchJson<{ overview?: Overview }>(
+        `/api/interno/patients/${patientId}/overview`,
+        undefined,
+        "Erro ao carregar beneficiário",
+      ),
+      fetchJson<{ clinical?: ClinicalData }>(`/api/interno/patients/${patientId}/clinical`),
+    ]);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const [res, clinicalRes] = await Promise.all([
-        fetch(`/api/interno/patients/${patientId}/overview`),
-        fetch(`/api/interno/patients/${patientId}/clinical`),
-      ]);
-      const data = await res.json();
-      const clinicalData = await clinicalRes.json();
-      if (!active) return;
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao carregar beneficiário");
-      } else {
-        setOverview(data.overview);
-      }
-      if (clinicalRes.ok) setClinical(clinicalData.clinical);
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
+    if (!overviewRes.ok) return overviewRes;
+
+    return {
+      ok: true as const,
+      data: {
+        overview: overviewRes.data.overview ?? null,
+        clinical: clinicalRes.ok ? (clinicalRes.data.clinical ?? null) : null,
+      } satisfies PatientOverviewPayload,
+      status: overviewRes.status,
     };
   }, [patientId]);
 
-  if (loading) return <LoadingState message="Carregando Cliente 360°..." />;
-  if (error || !overview) {
-    return <Alert tone="danger">{error ?? "Beneficiário não encontrado"}</Alert>;
-  }
+  const { data, loading, error, reload } = useAsyncData<PatientOverviewPayload>(loadData, [patientId]);
 
-  const { patient, summary } = overview;
+  const overview = data?.overview ?? null;
+  const clinical = data?.clinical ?? null;
 
   return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error ?? (!overview && !loading ? "Beneficiário não encontrado" : null)}
+      loadingMessage="Carregando Cliente 360°..."
+      onRetry={() => void reload()}
+    >
+      {overview && (() => {
+        const { patient, summary } = overview;
+        return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-center gap-3">
         <ExportButtons
@@ -412,5 +421,8 @@ export default function PatientOverviewView({
         )}
       </section>
     </div>
+        );
+      })()}
+    </ViewStateBoundary>
   );
 }
