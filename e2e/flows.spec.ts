@@ -85,7 +85,7 @@ test.describe("Portal Prestador — agenda e atendimento", () => {
   });
 
   test("abre tela de atendimento quando há consulta", async ({ page }) => {
-    const link = page.getByRole("link").filter({ hasText: /atendimento|consulta|\d{2}:\d{2}/i }).first();
+    const link = page.getByRole("link", { name: /Abrir atendimento/i }).first();
     if (await link.isVisible()) {
       await link.click();
       await expect(page).toHaveURL(/\/prestador\/atendimento\//);

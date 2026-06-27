@@ -13,6 +13,7 @@ const eslintConfig = defineConfig([
     "build/**",
     ".netlify/**",
     "netlify/plugins/**",
+    "public/swagger-ui/**",
     "next-env.d.ts",
   ]),
 ]);

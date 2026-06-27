@@ -3,10 +3,11 @@ import { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "../../src/lib/timeline"
 import { monthsAgo } from "./helpers";
 import type { PatientRef } from "./scenarios";
 import type { SeedCompany } from "./companies";
+import type { ScaleConfig } from "./scale";
 import { estimateCompanyMonthlyPpu, formatBrl } from "./pricing-market";
 
 /**
- * Fechamento mensal corporativo (6 meses) — totais derivados do perfil de cada empresa,
+ * Fechamento mensal corporativo — totais derivados do perfil de cada empresa,
  * não valores fixos arbitrários. Reflete contratos B2B Pay Per Use típicos.
  */
 export async function seedMonthlyRevenueBaseline(input: {
@@ -16,8 +17,9 @@ export async function seedMonthlyRevenueBaseline(input: {
   patients: PatientRef[];
   companies: SeedCompany[];
   companyIdByIndex: Map<number, string>;
+  scale: ScaleConfig;
 }): Promise<{ months: number; totalRevenue: number }> {
-  const monthCount = 6;
+  const monthCount = input.scale.baselineMonths;
   const activeCompanies = input.companies.filter((c) => c.status === "ATIVO" && c.beneficiaryCount > 0);
   if (activeCompanies.length === 0) return { months: 0, totalRevenue: 0 };
 
@@ -53,7 +55,7 @@ export async function seedMonthlyRevenueBaseline(input: {
           patientId: anchorPatient.id,
           companyId,
           total: target,
-          status: m < 4 ? "PAGA" : "FECHADA",
+          status: m < Math.floor(monthCount * 0.67) ? "PAGA" : "FECHADA",
           createdAt: monthDate,
           items: {
             create: [
@@ -84,7 +86,7 @@ export async function seedMonthlyRevenueBaseline(input: {
         },
       });
 
-      if (m < 4) {
+      if (m < Math.floor(monthCount * 0.67)) {
         await input.prisma.payment.create({
           data: {
             invoiceId: invoice.id,

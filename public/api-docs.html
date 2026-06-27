@@ -4,10 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sistema Bibi - ServiceOS v2.1 — API (Swagger UI)</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css"
-    />
+    <link rel="canonical" href="/api/docs" />
+    <meta http-equiv="refresh" content="0; url=/api/docs" />
+    <link rel="stylesheet" href="/swagger-ui/swagger-ui.css" />
     <style>
       body { margin: 0; background: #fafafa; }
       .topbar { display: none; }
@@ -27,18 +26,13 @@
       <p>OpenAPI 3.0 · autenticação por cookie de sessão (faça login em /api/auth/login)</p>
     </header>
     <div id="swagger-ui"></div>
-    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
     <script>
-      window.onload = function () {
-        window.ui = SwaggerUIBundle({
-          url: "/openapi.yaml",
-          dom_id: "#swagger-ui",
-          deepLinking: true,
-          withCredentials: true,
-          presets: [SwaggerUIBundle.presets.apis],
-          layout: "BaseLayout",
-        });
-      };
+      window.location.replace("/api/docs");
     </script>
+    <noscript>
+      <p>
+        Redirecionando para <a href="/api/docs">/api/docs</a> — documentação Swagger UI.
+      </p>
+    </noscript>
   </body>
 </html>

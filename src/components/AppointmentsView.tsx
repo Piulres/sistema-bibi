@@ -265,6 +265,7 @@ export default function AppointmentsView() {
       <div className="space-y-8">
         <CalloutCard
           id="walk-in"
+          data-tour-id="walk-in-callout"
           variant="walk-in"
           title="Paciente particular (walk-in)"
           description="Chegou na clínica sem cadastro prévio e sem empresa PJ — cadastre e agende em um passo."

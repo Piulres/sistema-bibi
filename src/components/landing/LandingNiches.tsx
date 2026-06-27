@@ -18,7 +18,7 @@ export default function LandingNiches() {
         <LandingSectionHeader
           id="niches-heading"
           eyebrow="Multi-nicho"
-        title="Seis segmentos, uma infraestrutura"
+        title="Sete segmentos, uma infraestrutura"
         description="Cada vertical tem página dedicada com demonstração segmentada — labels, cores e portais pré-configurados para o tenant demo."
         />
 

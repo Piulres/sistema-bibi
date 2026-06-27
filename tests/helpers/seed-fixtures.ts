@@ -10,12 +10,15 @@ export const DEMO_EMAILS = {
   maria: "maria.souza@email.com",
   pedro: "pedro.almeida@email.com",
   pjTechcorp: "rh@techcorp.com",
+  buildInterno: "operacao@build.demo",
+  buildPj: "rh@incorp.demo",
+  buildPedreiro: "pedreiro.jose@build.demo",
 } as const;
 
 export const DEMO_CPFS = {
-  joao: "111.222.333-44",
-  maria: "555.666.777-88",
-  pedro: "999.000.111-22",
+  joao: "529.982.247-25",
+  maria: "390.533.447-05",
+  pedro: "153.509.460-56",
 } as const;
 
 export async function getBeneficiaryPatient(email: string) {
@@ -110,9 +113,15 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
 
     const petcare = await prisma.tenant.findFirst({
       where: { slug: "petcare" },
-      select: { id: true },
+      select: { id: true, labels: true },
     });
     if (!petcare) return true;
+    try {
+      const labels = JSON.parse(petcare.labels ?? "{}") as { appointment?: string };
+      if (labels.appointment !== "Banho/Tosa") return true;
+    } catch {
+      return true;
+    }
 
     const petcareAppts = await prisma.appointment.count({
       where: { tenantId: petcare.id },
@@ -128,6 +137,47 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
       where: { tenantId: petcare.id },
     });
     if (petCount < 10) return true;
+
+    const build = await prisma.tenant.findFirst({
+      where: { slug: "build", niche: "CONSTRUCTION" },
+      select: { id: true },
+    });
+    if (!build) return true;
+
+    const obraDemo = await prisma.project.findFirst({
+      where: { tenantId: build.id, code: "OBR-2026-002" },
+      include: { budgets: true },
+    });
+    if (!obraDemo) return true;
+    const pendingBudget = obraDemo.budgets.find((b) => b.status === "ENVIADO");
+    if (!pendingBudget) return true;
+
+    const obraComFatura = await prisma.project.findFirst({
+      where: { tenantId: build.id, code: "OBR-2026-001" },
+      include: { budgets: true },
+    });
+    const approvedBudget = obraComFatura?.budgets.find((b) => b.status === "APROVADO");
+    if (!approvedBudget?.invoiceId) return true;
+
+    const rdo = await prisma.dailyFieldReport.findFirst({
+      where: { project: { tenantId: build.id, code: "OBR-2026-001" } },
+    });
+    if (!rdo) return true;
+
+    const joaoPending = await prisma.procedureUsage.count({
+      where: { billed: false, appointment: { patient: { cpf: DEMO_CPFS.joao } } },
+    });
+    if (joaoPending < 1) return true;
+
+    const mariaPix = await prisma.payment.count({
+      where: { status: "PENDING", invoice: { patient: { cpf: DEMO_CPFS.maria } } },
+    });
+    if (mariaPix < 1) return true;
+
+    const pedroPaid = await prisma.invoice.count({
+      where: { patient: { cpf: DEMO_CPFS.pedro }, status: "PAGA" },
+    });
+    if (pedroPaid < 1) return true;
 
     return false;
   } finally {

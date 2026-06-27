@@ -386,7 +386,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       )}
 
       {show("agendar") && (
-      <section id="agendar">
+      <section id="agendar" data-tour-id="schedule-form">
       <Card>
         <SectionHeader
           title={isVet ? `Agendar ${labels.appointment.toLowerCase()}` : "Agendar consulta"}
@@ -508,7 +508,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       <div className="flex flex-wrap items-center justify-end gap-2">
         <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "resumo" }} />
       </div>
-      <Card padding="sm">
+      <Card padding="sm" data-tour-id="care-journey">
         <FlowStepper steps={[...CARE_JOURNEY_STEPS]} currentStepId={journeyStep} className="mb-4" />
         <h2 className="text-xl font-semibold text-[var(--text-primary)]">{patient.name}</h2>
         <p className="mt-1 text-sm text-[var(--text-muted)]">CPF {patient.cpf}</p>
@@ -705,6 +705,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                         variant="portal"
                         size="sm"
                         disabled={isBusy(`pix-${invoice.id}`)}
+                        data-tour-id="beneficiario-pix-pay"
                         onClick={() => payWithPix(invoice.id)}
                       >
                         {isBusy(`pix-${invoice.id}`) ? "..." : "Pagar com PIX"}

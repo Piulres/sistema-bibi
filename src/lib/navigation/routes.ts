@@ -27,6 +27,7 @@ export const INTERNO_ROUTE_LABELS: Record<string, string> = {
   "/interno/cadastros": "Cadastros",
   "/interno/estoque": "Estoque Médico",
   "/interno/crm": "CRM Corporativo",
+  "/interno/projetos": "Obras",
   "/interno/assinaturas": "Recorrência",
   "/interno/comunicacao": "Comunicação",
   "/interno/relatorios": "Relatórios",
@@ -44,6 +45,7 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
   if (pathname.startsWith("/interno/cadastros")) return "cadastros";
   if (pathname.startsWith("/interno/estoque")) return "estoque";
   if (pathname.startsWith("/interno/crm")) return "crm";
+  if (pathname.startsWith("/interno/projetos")) return "projetos";
   if (pathname.startsWith("/interno/assinaturas")) return "subscriptions";
   if (pathname.startsWith("/interno/comunicacao")) return "comunicacao";
   if (pathname.startsWith("/interno/relatorios")) return "relatorios";
@@ -65,6 +67,7 @@ export const PRESTADOR_NAV_TABS: NavTab[] = [
 
 export function resolvePrestadorActive(pathname: string): string | undefined {
   if (pathname === "/prestador/dashboard") return "dashboard";
+  if (pathname.startsWith("/prestador/campo")) return "campo";
   if (pathname === "/prestador") return "agenda";
   if (pathname.startsWith("/prestador/pacientes")) return "pacientes";
   if (pathname.startsWith("/prestador/extrato")) return "extrato";
@@ -101,6 +104,7 @@ export function resolveBeneficiarioActive(pathname: string): string | undefined 
   if (pathname === "/beneficiario" || pathname.startsWith("/beneficiario/resumo")) return "resumo";
   if (pathname.startsWith("/beneficiario/agendar")) return "agendar";
   if (pathname.startsWith("/beneficiario/agenda")) return "agenda";
+  if (pathname.startsWith("/beneficiario/obras")) return "obras";
   if (pathname.startsWith("/beneficiario/consumo")) return "consumo";
   if (pathname.startsWith("/beneficiario/faturas")) return "faturas";
   if (pathname.startsWith("/beneficiario/medicacoes")) return "medicacoes";

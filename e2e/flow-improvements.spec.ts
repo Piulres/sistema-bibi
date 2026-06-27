@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAs } from "./helpers/auth";
+import { dismissOnboardingIfVisible, loginAs } from "./helpers/auth";
 
 test.describe("Melhorias de fluxo — mapa interno", () => {
   test.beforeEach(async ({ page }) => {
@@ -17,11 +17,13 @@ test.describe("Melhorias de fluxo — mapa interno", () => {
 
 test.describe("Portal Prestador — confirmar presença", () => {
   test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "prestador", "dra.helena@bibi.health");
   });
 
   test("botão Paciente presente na tela de atendimento", async ({ page }) => {
     await page.goto("/prestador");
+    await dismissOnboardingIfVisible(page);
     await expect(page.getByRole("heading", { name: /Agenda de hoje/i })).toBeVisible();
 
     const agendadoCard = page.locator("li").filter({ hasText: "AGENDADO" }).first();
@@ -33,6 +35,7 @@ test.describe("Portal Prestador — confirmar presença", () => {
 
     const presentBtn = page.getByRole("button", { name: /Paciente presente/i });
     await expect(presentBtn).toBeVisible();
+    await presentBtn.scrollIntoViewIfNeeded();
     await presentBtn.click();
     await expect(page.getByText(/presença do paciente confirmada/i)).toBeVisible();
   });

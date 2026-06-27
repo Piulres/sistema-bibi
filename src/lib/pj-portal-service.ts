@@ -133,6 +133,30 @@ export async function getPjPortalOverview(
     });
   }
 
+  const tenant = await prisma.tenant.findUnique({
+    where: { id: tenantId },
+    select: { niche: true },
+  });
+
+  if (tenant?.niche === "CONSTRUCTION") {
+    const pendingProposals = await prisma.project.count({
+      where: {
+        tenantId,
+        companyId,
+        status: "PROPOSTA",
+        budgets: { some: { status: "ENVIADO" } },
+      },
+    });
+    if (pendingProposals > 0) {
+      alerts.push({
+        tone: "info",
+        message: `${pendingProposals} proposta(s) de obra aguardando sua aprovação.`,
+        href: "/pj/projetos",
+        actionLabel: "Ver obras",
+      });
+    }
+  }
+
   const beneficiaries = company.patients.map((p) => {
     const usages = p.appointments.flatMap((a) => a.usages);
     const consumed = usages.reduce((s, u) => s + u.priceCharged, 0);

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAs } from "./helpers/auth";
+import { dismissOnboardingIfVisible, loginAs } from "./helpers/auth";
 
 const suffix = () => Date.now().toString().slice(-6);
 
@@ -82,6 +82,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "faturamento@bibi.health");
     await page.goto("/interno/cadastros");
+    await dismissOnboardingIfVisible(page);
     await expect(page.getByText(/Carregando cadastros/i)).toHaveCount(0, { timeout: 15_000 });
   });
 

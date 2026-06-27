@@ -5,7 +5,7 @@ import {
 } from "../../src/lib/timeline";
 import { hashPassword } from "../../src/lib/password";
 import { contractActiveForStatus } from "./helpers";
-import { SEED_COMPANIES } from "./companies";
+import { resolveSeedCompanies } from "./resolve-companies";
 import {
   generateBeneficiaries,
   generatePjUsers,
@@ -30,9 +30,12 @@ import {
   type ProcedureRef,
 } from "./scenarios";
 import { resolveSeedScale } from "./scale";
+import { resolveSeedProfile } from "./profile";
 import { seedVitacareTenant } from "./vitacare";
 import { seedNicheTenants } from "./niche-tenants";
 import { seedAllNicheOperational, nicheDemoCredentials } from "./niche-operational";
+import { seedConstructionProjects } from "./construction-projects";
+import { seedConstructionRoadmap } from "./construction-roadmap";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
@@ -56,7 +59,10 @@ export type SeedRunResult = {
 /** Repopula o banco com a massa demo (mesmo fluxo do `prisma db seed`). */
 export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResult> {
   const startedAt = Date.now();
+  const profile = resolveSeedProfile();
   const scale = resolveSeedScale();
+  const seedCompanies = resolveSeedCompanies();
+  console.log(`Perfil do seed: ${profile.profile} (SEED_PROFILE) — ${profile.description}`);
   console.log(`Escala do seed: ${scale.scale} (SEED_SCALE)`);
   console.log("Limpando dados existentes...");
   await prisma.timelineEvent.deleteMany();
@@ -85,6 +91,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.pricingRule.deleteMany();
   await prisma.procedure.deleteMany();
   await prisma.patient.deleteMany();
+  await prisma.attachment.deleteMany();
+  await prisma.projectTask.deleteMany();
+  await prisma.budgetLineItem.deleteMany();
+  await prisma.budget.deleteMany();
+  await prisma.project.deleteMany();
   await prisma.user.deleteMany();
   await prisma.company.deleteMany();
   await prisma.tenant.deleteMany();
@@ -113,9 +124,9 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   });
 
   console.log("Criando tenant white-label VitaCare (dados no final do seed)...");
-  console.log(`Criando ${SEED_COMPANIES.length} empresas (PJ) e pipeline CRM...`);
+  console.log(`Criando ${seedCompanies.length} empresas (PJ) e pipeline CRM...`);
   const companyIdByIndex = new Map<number, string>();
-  for (const seed of SEED_COMPANIES) {
+  for (const seed of seedCompanies) {
     const company = await prisma.company.create({
       data: {
         name: seed.name,
@@ -204,7 +215,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     },
   });
 
-  const pjUsers = generatePjUsers(SEED_COMPANIES);
+  const pjUsers = generatePjUsers(seedCompanies, profile);
   for (const pj of pjUsers) {
     const companyId = companyIdByIndex.get(pj.companyIndex);
     if (!companyId) continue;
@@ -237,14 +248,14 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   }
 
   const discountByCompanyIndex = new Map<number, number>();
-  for (const seed of SEED_COMPANIES) {
+  for (const seed of seedCompanies) {
     if (seed.clinicalDiscount) {
       discountByCompanyIndex.set(seed.index, seed.clinicalDiscount);
     }
   }
 
   console.log("Criando regras de precificacao dinamica (descontos corporativos)...");
-  for (const seed of SEED_COMPANIES) {
+  for (const seed of seedCompanies) {
     if (!seed.clinicalDiscount) continue;
     const companyId = companyIdByIndex.get(seed.index);
     if (!companyId) continue;
@@ -266,7 +277,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await seedMedicalStock(prisma, tenant.id, procedures);
 
   console.log("Criando beneficiarios...");
-  const beneficiaries = ensureUniqueCpfs(generateBeneficiaries(SEED_COMPANIES));
+  const beneficiaries = ensureUniqueCpfs(generateBeneficiaries(seedCompanies));
   const patientIdByDemo = new Map<string, string>();
   const patientRefs: PatientRef[] = [];
 
@@ -650,7 +661,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     discountByCompanyIndex,
     patients: patientRefs,
     excludePatientIds,
-    companies: SEED_COMPANIES,
+    companies: seedCompanies,
     scale,
   });
 
@@ -664,14 +675,15 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   });
   massStats.beneficiaryUsers = beneficiaryUsers;
 
-  console.log("Criando baseline de receita mensal deterministica (6 meses)...");
+  console.log(`Criando baseline de receita mensal deterministica (${scale.baselineMonths} meses)...`);
   const baseline = await seedMonthlyRevenueBaseline({
     prisma,
     tenantId: tenant.id,
     internoId: interno.id,
     patients: patientRefs,
-    companies: SEED_COMPANIES,
+    companies: seedCompanies,
     companyIdByIndex,
+    scale,
   });
   console.log(`  Baseline: ${baseline.months} meses · R$ ${baseline.totalRevenue.toFixed(2)}`);
 
@@ -802,6 +814,12 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("\nMassa operacional multi-nicho (histórico + futuro)...");
   const nicheOperational = await seedAllNicheOperational(prisma, DEMO_PASSWORD, scale);
 
+  console.log("\nObras demo Build Engenharia (CONSTRUCTION)...");
+  const projectCount = await seedConstructionProjects(prisma);
+  console.log(`  +${projectCount} obras com orçamento, cronograma e anexos`);
+  const roadmapCount = await seedConstructionRoadmap(prisma);
+  if (roadmapCount) console.log("  +massa roadmap Engenharia Civil (caixa, BDI, pipeline, contratos)");
+
   const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
   const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });
   const pjCount = await prisma.user.count({ where: { tenantId: tenant.id, role: "PJ" } });
@@ -815,7 +833,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log(`  Escala: ${scale.scale}`);
   console.log(`  Empresas Bibi (clientes PJ): ${companyCount}`);
   console.log(`  Beneficiarios Bibi: ${patientCount}`);
-  console.log(`  Usuarios PJ: ${pjCount}`);
+  console.log(`  Usuarios PJ: ${pjCount} (perfil ${profile.profile}, ${profile.pjUsersPerCompany.min}–${profile.pjUsersPerCompany.max}/cliente)`);
   console.log(`  Prestadores: ${providerIds.length}`);
   console.log(`  Agendamentos Bibi: ${appointmentCount}`);
   console.log(`  Faturas Bibi: ${invoiceCount}`);
@@ -847,7 +865,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     console.log(`  ${cred.niche.padEnd(10)} interno: ${cred.interno} · prestador: ${cred.prestador}`);
     console.log(`  ${"".padEnd(10)} beneficiário: ${cred.beneficiario} · PJ: ${cred.pj}`);
   }
-  console.log("\nSEED_SCALE=small|medium|large no .env controla volume da massa");
+  console.log("\nSEED_PROFILE=market|operation-1y · SEED_SCALE=small|medium|large|operation-1y no .env");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
 
   return {

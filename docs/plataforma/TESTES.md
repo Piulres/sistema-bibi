@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~121** Route Handlers · **73** paths no OpenAPI (`public/openapi.yaml`).
+**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~123** Route Handlers · **123** paths no OpenAPI (`public/openapi.yaml`).
 
 ---
 
@@ -38,12 +38,37 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 **Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).
 
+**Mapa completo da massa (perfis, portais, segmentos):** [`MASSA_TESTES.md`](MASSA_TESTES.md) — inclui perfil `operation-1y` (20 clientes, 3–9 usuários PJ, 1 ano).
+
+**Inteligência de mercado e rotina diária por segmento:** [`docs/segmentos/INTELIGENCIA_OPERACIONAL_2026.md`](../segmentos/INTELIGENCIA_OPERACIONAL_2026.md)
+
+**Massa rica multi-nicho:** todos os 5 tenants nicho recebem RBAC interno (3 usuários), estoque, perfil clínico, pricing B2B, baseline, webhooks e 3 personas estrela (PPU/PIX/particular). PetCare: label `Banho/Tosa`.
+
+**Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts`
+
 | Fixture | E-mail / CPF | Uso típico |
 |---------|----------------|------------|
 | João Pereira | `joao.pereira@email.com` / `111.222.333-44` | PEP, timeline, consumo pendente PPU |
 | Maria Souza | `maria.souza@email.com` | Fatura FECHADA + PIX pendente |
 | Pedro Almeida | `pedro.almeida@email.com` | Particular, fatura PAGA |
 | Dra. Helena | `dra.helena@bibi.health` | Prestador com CRM/SP, export PEP |
+| Build interno | `operacao@build.demo` | Obras + aprovar RDO/diária |
+| Build pedreiro | `pedreiro.jose@build.demo` | Portal `/prestador/campo` |
+| Build PJ | `rh@incorp.demo` | Aprovar proposta `OBR-2026-002` |
+
+### Obras / Engenharia Civil
+
+| Caso | O que valida |
+|------|----------------|
+| Labels `CONSTRUCTION` | Glossário Obra, Dossiê técnico, Vistoria |
+| `listProjectsForCompany` | 3 obras Incorp Alpha no seed |
+| `approveBudget` + PDF | Fatura emitida, buffer `%PDF` |
+| `getProjectForCompany` | URLs de anexo PJ |
+| API interno build | Lista, pipeline, detalhe, dependências, PDF, reject |
+| API PJ Incorp | Lista, alerta overview, approve → invoice, PDF |
+| Isolamento | MEDICAL interno lista vazia; TechCorp PJ sem obras/alertas |
+
+Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`
 
 ---
 
@@ -176,7 +201,7 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 ### Beneficiário (5) — 🔑 BENEFICIARIO
 ### Compartilhado (2) — procedures, branding/logo
 
-Contrato OpenAPI: `public/openapi.yaml` — candidato a testes de contrato (não implementado).
+Contrato OpenAPI: `public/openapi.yaml` — Swagger UI em `/api/docs` (ver [`API_DOCS.md`](API_DOCS.md)).
 
 ---
 
@@ -236,6 +261,8 @@ Senha única: `bibi123`
 | PJ | `rh@techcorp.com` |
 | Beneficiário | `joao.pereira@email.com` |
 | Beneficiário (particular) | `pedro.almeida@email.com` |
+| Build interno | `operacao@build.demo` |
+| Build PJ (Incorp Alpha) | `rh@incorp.demo` |
 
 ### Specs E2E (`e2e/`)
 

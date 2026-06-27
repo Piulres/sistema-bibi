@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils/cn";
@@ -25,11 +27,14 @@ export default function MobileSectionDrawer({
   title = "Seções",
   className,
 }: Props) {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const activeSection = sections.find((s) => s.id === activeId);
+  const activeSection =
+    sections.find((s) => s.href && pathname.startsWith(s.href)) ??
+    sections.find((s) => s.id === activeId);
   const currentLabel = activeSection?.label ?? title;
 
   useEffect(() => {
@@ -109,17 +114,31 @@ export default function MobileSectionDrawer({
                   <ul className="space-y-0.5">
                     {sections.map((section) => (
                       <li key={section.id}>
-                        <button
-                          type="button"
-                          onClick={() => selectSection(section.id)}
-                          className={cn(
-                            "block w-full rounded-[var(--radius-button)] px-3 py-2.5 text-left text-sm font-medium transition",
-                            activeId === section.id ? activeClass : idleClass,
-                          )}
-                          aria-current={activeId === section.id ? "true" : undefined}
-                        >
-                          {section.label}
-                        </button>
+                        {section.href ? (
+                          <Link
+                            href={section.href}
+                            onClick={() => setOpen(false)}
+                            className={cn(
+                              "block w-full rounded-[var(--radius-button)] px-3 py-2.5 text-left text-sm font-medium transition",
+                              pathname.startsWith(section.href) ? activeClass : idleClass,
+                            )}
+                            aria-current={pathname.startsWith(section.href) ? "page" : undefined}
+                          >
+                            {section.label}
+                          </Link>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => selectSection(section.id)}
+                            className={cn(
+                              "block w-full rounded-[var(--radius-button)] px-3 py-2.5 text-left text-sm font-medium transition",
+                              activeId === section.id ? activeClass : idleClass,
+                            )}
+                            aria-current={activeId === section.id ? "true" : undefined}
+                          >
+                            {section.label}
+                          </button>
+                        )}
                       </li>
                     ))}
                   </ul>

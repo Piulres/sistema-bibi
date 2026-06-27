@@ -65,15 +65,14 @@ export default function LandingCta({ branding, niche = "MEDICAL", description }:
               className="min-w-[12rem]"
             />
             <LandingTrackedCta
-              href="/openapi.yaml"
+              href="/api/docs"
               event="cta_demo_click"
               location="cta-footer-api"
               variant="hero-ghost"
               size="lg"
               className="min-w-[12rem]"
-              external
             >
-              Ver API (OpenAPI)
+              Ver API (Swagger)
             </LandingTrackedCta>
           </div>
         </div>

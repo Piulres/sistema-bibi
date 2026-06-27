@@ -209,7 +209,7 @@ export default function BillingView() {
           />
         </div>
 
-        <section>
+        <section data-tour-id="billing-pending">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <SectionHeader
               title="Procedimentos a faturar (Pay Per Use)"
@@ -236,7 +236,10 @@ export default function BillingView() {
                     <p className="text-sm text-[var(--text-muted)]">{g.company ?? "Particular"}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <Link href={`/interno/beneficiarios/${g.patientId}?from=/interno`}>
+                    <Link
+                      href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
+                      data-tour-id="billing-cliente-360"
+                    >
                       <Button variant="secondary" size="sm">
                         Cliente 360°
                       </Button>

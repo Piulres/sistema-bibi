@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import ScrollableNavRail from "@/components/ui/ScrollableNavRail";
@@ -8,6 +10,8 @@ import MobileSectionDrawer from "@/components/layout/MobileSectionDrawer";
 export type SectionNavItem = {
   id: string;
   label: string;
+  /** Rota absoluta — quando definida, navega em vez de âncora na mesma página. */
+  href?: string;
 };
 
 type Props = {
@@ -26,7 +30,10 @@ export default function SectionNav({
   className,
   drawerTitle = "Seções da página",
 }: Props) {
-  const [activeId, setActiveId] = useState(() => sections[0]?.id ?? "");
+  const pathname = usePathname();
+  const routeSection = sections.find((s) => s.href && pathname.startsWith(s.href));
+  const [anchorActiveId, setActiveId] = useState(() => sections[0]?.id ?? "");
+  const activeId = routeSection?.id ?? anchorActiveId;
 
   const handleClick = useCallback((id: string) => {
     const el = document.getElementById(id);
@@ -38,6 +45,8 @@ export default function SectionNav({
   }, []);
 
   useEffect(() => {
+    if (routeSection) return;
+
     let active = true;
 
     (async () => {
@@ -72,7 +81,7 @@ export default function SectionNav({
       active = false;
       observer.disconnect();
     };
-  }, [sections]);
+  }, [sections, pathname, routeSection]);
 
   return (
     <div className={className} data-tour-id="portal-nav">
@@ -89,20 +98,36 @@ export default function SectionNav({
           aria-label="Seções da página"
           className="flex w-max min-w-full gap-2 border-b border-[var(--border-default)] pb-px"
         >
-          {sections.map((section) => (
-            <button
-              key={section.id}
-              type="button"
-              onClick={() => handleClick(section.id)}
-              className={cn(
-                "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
-                activeId === section.id ? activeClass : idleClass,
-              )}
-              aria-current={activeId === section.id ? "true" : undefined}
-            >
-              {section.label}
-            </button>
-          ))}
+          {sections.map((section) =>
+            section.href ? (
+              <Link
+                key={section.id}
+                href={section.href}
+                data-tour-nav={section.id}
+                className={cn(
+                  "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
+                  pathname.startsWith(section.href) ? activeClass : idleClass,
+                )}
+                aria-current={pathname.startsWith(section.href) ? "page" : undefined}
+              >
+                {section.label}
+              </Link>
+            ) : (
+              <button
+                key={section.id}
+                type="button"
+                data-tour-nav={section.id}
+                onClick={() => handleClick(section.id)}
+                className={cn(
+                  "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
+                  activeId === section.id ? activeClass : idleClass,
+                )}
+                aria-current={activeId === section.id ? "true" : undefined}
+              >
+                {section.label}
+              </button>
+            ),
+          )}
         </nav>
       </ScrollableNavRail>
     </div>

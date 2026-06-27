@@ -5,7 +5,7 @@ import { PrismaClient } from "@prisma/client";
 import { isTestSeedStale } from "./seed-fixtures";
 
 const TEST_DB_PATH = join(process.cwd(), "prisma", "test.db");
-const TEST_DATABASE_URL = `file:${TEST_DB_PATH}`;
+  const TEST_DATABASE_URL = `file:${TEST_DB_PATH}?mode=rwc`;
 
 let testPrisma: PrismaClient | undefined;
 

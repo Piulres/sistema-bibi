@@ -68,7 +68,7 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
 
   it("cobertura: todas as rotas com guard", () => {
     const guardedCount = routes.length - withoutModuleGuard.length;
-    expect(INTERNO_MODULES.length).toBe(13);
+    expect(INTERNO_MODULES.length).toBe(14);
     expect(guardedCount).toBe(routes.length);
   });
 });

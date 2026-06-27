@@ -15,6 +15,8 @@ function estoqueTabLabel(niche: NicheId): string {
       return "Insumos spa";
     case "EDUCATION":
       return "Materiais";
+    case "CONSTRUCTION":
+      return "Materiais de obra";
     default:
       return "Estoque";
   }
@@ -22,13 +24,20 @@ function estoqueTabLabel(niche: NicheId): string {
 
 /** Abas do portal interno com termos do nicho. */
 export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab[] {
-  return [
+  const tabs: NavTab[] = [
     { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" as InternoModule },
     { href: "/interno", label: "Faturamento", key: "billing" },
     { href: "/interno/agenda", label: labels.appointments, key: "agenda" },
     { href: "/interno/cadastros", label: `Cadastros · ${labels.beneficiaries}`, key: "cadastros" },
     { href: "/interno/estoque", label: estoqueTabLabel(niche), key: "estoque" },
     { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
+  ];
+
+  if (niche === "CONSTRUCTION") {
+    tabs.push({ href: "/interno/projetos", label: labels.patients, key: "projetos" });
+  }
+
+  tabs.push(
     { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
     { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
     { href: "/interno/relatorios", label: "Relatórios", key: "relatorios" },
@@ -36,26 +45,44 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
     { href: "/interno/branding", label: "White Label", key: "branding" },
     { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
     { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
-  ];
+  );
+
+  return tabs;
 }
 
 /** Abas do prestador com termos do nicho. */
-export function buildPrestadorNavTabs(labels: NicheLabels): NavTab[] {
-  return [
+export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): NavTab[] {
+  const tabs: NavTab[] = [
     { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
+  ];
+
+  if (niche === "CONSTRUCTION") {
+    tabs.push({ href: "/prestador/campo", label: "Campo", key: "campo" });
+  }
+
+  tabs.push(
     { href: "/prestador", label: "Agenda", key: "agenda" },
-    { href: "/prestador/pacientes", label: labels.patients, key: "pacientes" },
+    { href: "/prestador/pacientes", label: labels.beneficiaries, key: "pacientes" },
     { href: "/prestador/extrato", label: "Extrato", key: "extrato" },
     { href: "/prestador/relatorios", label: "Relatórios", key: "relatorios" },
-  ];
+  );
+
+  return tabs;
 }
 
 /** Abas do beneficiário com termos do nicho. */
-export function buildBeneficiarioNavTabs(labels: NicheLabels): NavTab[] {
-  return [
+export function buildBeneficiarioNavTabs(labels: NicheLabels, niche?: NicheId): NavTab[] {
+  const tabs: NavTab[] = [
     { href: "/beneficiario/agendar", label: "Agendar", key: "agendar" },
     { href: "/beneficiario/resumo", label: "Resumo", key: "resumo" },
     { href: "/beneficiario/agenda", label: "Agenda", key: "agenda" },
+  ];
+
+  if (niche === "CONSTRUCTION") {
+    tabs.push({ href: "/beneficiario/obras", label: labels.patients, key: "obras" });
+  }
+
+  tabs.push(
     { href: "/beneficiario/consumo", label: "Consumo", key: "consumo" },
     { href: "/beneficiario/faturas", label: "Faturas", key: "faturas" },
     { href: "/beneficiario/medicacoes", label: "Medicações", key: "medicacoes" },
@@ -64,17 +91,23 @@ export function buildBeneficiarioNavTabs(labels: NicheLabels): NavTab[] {
     { href: "/beneficiario/assinatura", label: "Assinatura", key: "assinatura" },
     { href: "/beneficiario/prontuario", label: labels.medicalRecord, key: "prontuario" },
     { href: "/beneficiario/historico", label: "Histórico", key: "historico" },
-  ];
+  );
+
+  return tabs;
 }
 
 /** Seções do portal PJ. */
-export function buildPjSectionNav(labels: NicheLabels) {
-  return [
+export function buildPjSectionNav(labels: NicheLabels, niche?: NicheId) {
+  const sections: { id: string; label: string; href?: string }[] = [
     { id: "resumo", label: "Resumo" },
     { id: "beneficiarios", label: labels.beneficiaries },
     { id: "assinaturas", label: "Assinaturas" },
     { id: "faturas", label: "Faturas" },
-  ] as const;
+  ];
+  if (niche === "CONSTRUCTION") {
+    sections.splice(1, 0, { id: "projetos", label: labels.patients, href: "/pj/projetos" });
+  }
+  return sections;
 }
 
 function companiesTabLabel(labels: NicheLabels): string {

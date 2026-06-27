@@ -1,6 +1,7 @@
-import type { NicheId } from "../../src/lib/niche/types";
+import type { NicheId, NicheLabels } from "../../src/lib/niche/types";
 import type { CompanyStatus } from "../../src/lib/company-crm";
 import type { SeedCompany } from "./companies";
+import { demoCpf } from "./helpers";
 
 export type NicheProcedureSeed = {
   code: string;
@@ -63,6 +64,8 @@ export type NicheOperationalConfig = {
   pjName: string;
   telemedicineRatio: number;
   sectorProfiles: Record<string, { procedureCodes: string[]; reasons: readonly string[] }>;
+  /** Sobrescreve labels do tenant (ex.: PetCare appointment → Banho/Tosa) */
+  labelOverrides?: Partial<NicheLabels>;
 };
 
 const VET_PROCEDURES: NicheProcedureSeed[] = [
@@ -153,6 +156,24 @@ const EDUCATION_PROCEDURES: NicheProcedureSeed[] = [
   { code: "EDU-RET", name: "Acompanhamento Pedagógico", category: "SESSAO", serviceType: "EDUCACAO", basePrice: 130 },
 ];
 
+const CONSTRUCTION_PROCEDURES: NicheProcedureSeed[] = [
+  { code: "ENG-VIS", name: "Vistoria Técnica Inicial", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 450 },
+  { code: "ENG-HT", name: "Hora Técnica de Engenheiro", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 350 },
+  { code: "ENG-LAU", name: "Laudo Estrutural", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 2500 },
+  { code: "ENG-ART", name: "Emissão de ART", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 180 },
+  { code: "ENG-FIS", name: "Fiscalização de Obra (mensal)", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 3200 },
+  { code: "ENG-PROJ", name: "Projeto Arquitetônico (m²)", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 85 },
+  { code: "ENG-INS", name: "Inspeção Predial", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 1800 },
+  { code: "ENG-ORC", name: "Orçamento de Reforma", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 950 },
+  { code: "ENG-TOP", name: "Topografia / Levantamento", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 1200 },
+  { code: "ENG-MAN", name: "Manutenção Predial (visita)", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 380 },
+  { code: "ENG-RET", name: "Retorno Vistoria Técnica", category: "CONSULTA", serviceType: "ENGENHARIA", basePrice: 220 },
+  { code: "ENG-PER", name: "Perícia Técnica Judicial", category: "SERVICO", serviceType: "ENGENHARIA", basePrice: 4500 },
+  { code: "ENG-DIA", name: "Diária de mão de obra", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 280 },
+  { code: "ENG-DIA-ENC", name: "Diária — encanador", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 300 },
+  { code: "ENG-DIA-PIN", name: "Diária — pintor", category: "SESSAO", serviceType: "ENGENHARIA", basePrice: 260 },
+];
+
 export const NICHE_BENEFIT_PRODUCTS = {
   VET: {
     AUXILIO_PET: { billingCycle: "MENSAL" as const, amount: 89.9, description: "Auxílio pet — crédito Pay Per Use mensal" },
@@ -174,12 +195,17 @@ export const NICHE_BENEFIT_PRODUCTS = {
     EDUCORP: { billingCycle: "MENSAL" as const, amount: 99.9, description: "Educação corporativa — crédito de aulas" },
     IDIOMAS: { billingCycle: "MENSAL" as const, amount: 129.9, description: "Inglês corporativo — aulas mensais" },
   },
+  CONSTRUCTION: {
+    MANUT_PRED: { billingCycle: "MENSAL" as const, amount: 199.9, description: "Manutenção predial — visitas técnicas mensais" },
+    FISCAL_OBRA: { billingCycle: "TRIMESTRAL" as const, amount: 899.9, description: "Fiscalização de obra trimestral" },
+  },
 } as const;
 
 export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
   {
     niche: "VET",
     slug: "petcare",
+    labelOverrides: { appointment: "Banho/Tosa", appointments: "Banho/Tosa" },
     procedures: VET_PROCEDURES,
     providers: [
       { email: "dr.rafael@petcare.demo", name: "Dr. Rafael Mendes", specialty: "Clínica Geral Veterinária", councilType: "CRMV", councilNumber: "12345", councilUf: "SP", phone: "(11) 3456-9001" },
@@ -223,7 +249,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Carlos Mendes",
-        cpf: "111.333.555-77",
+        cpf: demoCpf(101),
         email: "tutor@petcare.demo",
         birthDate: new Date(1985, 3, 12),
         phone: "(11) 98765-4321",
@@ -231,11 +257,19 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Fernanda Lima",
-        cpf: "222.444.666-88",
+        cpf: demoCpf(102),
         email: "fernanda.tutor@petcare.demo",
         birthDate: new Date(1990, 7, 22),
         phone: "(11) 97654-3210",
         companyIndex: 2,
+      },
+      {
+        name: "Sandra Oliveira",
+        cpf: demoCpf(103),
+        email: "particular@petcare.demo",
+        birthDate: new Date(1983, 2, 9),
+        phone: "(11) 96543-2108",
+        companyIndex: 0,
       },
     ],
     starPets: [
@@ -302,7 +336,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Patricia Souza",
-        cpf: "333.555.777-99",
+        cpf: demoCpf(201),
         email: "paciente@smile.demo",
         birthDate: new Date(1988, 1, 15),
         phone: "(11) 96543-2109",
@@ -310,11 +344,19 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Roberto Dias",
-        cpf: "444.666.888-00",
+        cpf: demoCpf(202),
         email: "roberto.dental@smile.demo",
         birthDate: new Date(1975, 10, 3),
         phone: "(11) 95432-1098",
         companyIndex: 3,
+      },
+      {
+        name: "Helena Particular",
+        cpf: demoCpf(203),
+        email: "particular@smile.demo",
+        birthDate: new Date(1990, 5, 20),
+        phone: "(11) 94321-0987",
+        companyIndex: 0,
       },
     ],
     pjEmail: "rh@corpodont.demo",
@@ -375,7 +417,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Mariana Costa",
-        cpf: "555.777.999-11",
+        cpf: demoCpf(301),
         email: "cliente@lex.demo",
         birthDate: new Date(1982, 5, 8),
         phone: "(11) 94321-0987",
@@ -383,11 +425,19 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Eduardo Prado",
-        cpf: "666.888.000-22",
+        cpf: demoCpf(302),
         email: "eduardo.lex@lex.demo",
         birthDate: new Date(1978, 11, 20),
         phone: "(11) 93210-9876",
         companyIndex: 3,
+      },
+      {
+        name: "Carlos Particular",
+        cpf: demoCpf(303),
+        email: "particular@lex.demo",
+        birthDate: new Date(1985, 8, 14),
+        phone: "(11) 92109-8765",
+        companyIndex: 0,
       },
     ],
     pjEmail: "rh@assjur.demo",
@@ -448,7 +498,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Juliana Ribeiro",
-        cpf: "777.999.111-33",
+        cpf: demoCpf(401),
         email: "cliente@zen.demo",
         birthDate: new Date(1992, 8, 25),
         phone: "(11) 92109-8765",
@@ -456,11 +506,19 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Marcos Vieira",
-        cpf: "888.000.222-44",
+        cpf: demoCpf(402),
         email: "marcos.zen@zen.demo",
         birthDate: new Date(1980, 2, 14),
         phone: "(11) 91098-7654",
         companyIndex: 3,
+      },
+      {
+        name: "Renata Particular",
+        cpf: demoCpf(403),
+        email: "particular@zen.demo",
+        birthDate: new Date(1988, 11, 3),
+        phone: "(11) 90987-6543",
+        companyIndex: 0,
       },
     ],
     pjEmail: "rh@wellcorp.demo",
@@ -521,7 +579,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Lucas Ferreira",
-        cpf: "999.111.333-55",
+        cpf: demoCpf(501),
         email: "aluno@eduprime.demo",
         birthDate: new Date(1995, 4, 18),
         phone: "(11) 90987-6543",
@@ -529,11 +587,19 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Camila Torres",
-        cpf: "000.222.444-66",
+        cpf: demoCpf(502),
         email: "camila.edu@eduprime.demo",
         birthDate: new Date(1987, 9, 7),
         phone: "(11) 89876-5432",
         companyIndex: 3,
+      },
+      {
+        name: "Bruno Particular",
+        cpf: demoCpf(503),
+        email: "particular@eduprime.demo",
+        birthDate: new Date(1993, 1, 28),
+        phone: "(11) 88765-4321",
+        companyIndex: 0,
       },
     ],
     pjEmail: "rh@educorp.demo",
@@ -546,6 +612,81 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       Varejo: { procedureCodes: ["EDU-AUL", "EDU-MAT", "EDU-RET", "EDU-CUR"], reasons: ["Aula particular — reforço matemática", "Curso intensivo — Excel avançado"] },
       Educação: { procedureCodes: ["EDU-WKS", "EDU-WEB", "EDU-ID", "EDU-MEN"], reasons: ["Workshop corporativo — liderança", "Avaliação de nivelamento — idiomas"] },
       Agronegócio: { procedureCodes: ["EDU-AUL", "EDU-CUR", "EDU-TEA", "EDU-RET"], reasons: ["Aula particular — reforço matemática", "Acompanhamento pedagógico — retorno"] },
+    },
+  },
+  {
+    niche: "CONSTRUCTION",
+    slug: "build",
+    procedures: CONSTRUCTION_PROCEDURES,
+    providers: [
+      { email: "eng.carlos@build.demo", name: "Eng. Carlos Mendes", specialty: "Engenharia Civil", councilType: "CREA", councilNumber: "123456", councilUf: "SP", phone: "(11) 3456-9501" },
+      { email: "arq.maria@build.demo", name: "Arq. Maria Santos", specialty: "Arquitetura", councilType: "CAU", councilNumber: "A234567", councilUf: "SP", phone: "(11) 3456-9502" },
+      { email: "eng.paulo@build.demo", name: "Eng. Paulo Ribeiro", specialty: "Estruturas", councilType: "CREA", councilNumber: "345678", councilUf: "RJ", phone: "(21) 3456-9503" },
+      { email: "pedreiro.jose@build.demo", name: "José Ferreira", specialty: "Pedreiro", councilType: "OUTRO", councilNumber: "—", councilUf: "SP", phone: "(11) 98765-1100" },
+      { email: "pintor.luis@build.demo", name: "Luís Andrade", specialty: "Pintor", councilType: "OUTRO", councilNumber: "—", councilUf: "SP", phone: "(11) 98765-2200" },
+    ],
+    companies: [
+      { name: "Incorp Alpha", cnpj: "66.100.200/0001-01", status: "ATIVO", sector: "Construção Civil", beneficiaries: 12, clinicalDiscount: 0.9 },
+      { name: "TechBuild Corp", cnpj: "66.200.300/0001-02", status: "ATIVO", sector: "Tecnologia", beneficiaries: 8 },
+      { name: "Financeira Imob", cnpj: "66.300.400/0001-03", status: "ATIVO", sector: "Financeiro", beneficiaries: 15 },
+      { name: "Varejo Urbano", cnpj: "66.400.500/0001-04", status: "ATIVO", sector: "Varejo", beneficiaries: 6 },
+      { name: "Indústria Steel", cnpj: "66.500.600/0001-05", status: "ATIVO", sector: "Indústria", beneficiaries: 20, clinicalDiscount: 0.85 },
+      { name: "Logística Obra", cnpj: "66.600.700/0001-06", status: "NEGOCIACAO", sector: "Logística", beneficiaries: 0 },
+      { name: "Hotelaria Premium", cnpj: "66.700.800/0001-07", status: "ATIVO", sector: "Hospitalidade", beneficiaries: 10 },
+      { name: "Startup PropTech", cnpj: "66.800.900/0001-08", status: "PROPOSTA", sector: "HealthTech", beneficiaries: 0 },
+    ],
+    appointmentReasons: [
+      "Vistoria técnica — reforma torre A",
+      "Laudo estrutural — edifício comercial",
+      "Fiscalização mensal — canteiro de obras",
+      "Inspeção predial — entrega de chaves",
+      "Orçamento de reforma — área comum",
+      "Emissão de ART — projeto estrutural",
+      "Topografia — levantamento do terreno",
+      "Manutenção predial — infiltração",
+      "Hora técnica — parecer de adequação",
+      "Projeto arquitetônico — avaliação inicial",
+      "Retorno vistoria — acompanhamento",
+      "Reunião técnica — incorporadora",
+    ],
+    recordSnippets: [
+      "Vistoria realizada. Fissuras superficiais identificadas — sem comprometimento estrutural.",
+      "Laudo estrutural concluído. Recomendações de reforço documentadas.",
+      "Fiscalização de obra — conformidade com projeto aprovado.",
+      "Inspeção predial entregue. Pendências elétricas e hidráulicas listadas.",
+      "Orçamento de reforma elaborado com composições de custo unitário.",
+      "ART emitida e registrada no CREA-SP.",
+      "Topografia concluída. Curvas de nível entregues em DWG/PDF.",
+      "Manutenção predial — infiltração tratada com impermeabilização.",
+    ],
+    starPatients: [
+      {
+        name: "Fernando Costa",
+        cpf: demoCpf(601),
+        email: "cliente@build.demo",
+        birthDate: new Date(1985, 3, 12),
+        phone: "(11) 98765-4321",
+        companyIndex: 1,
+      },
+      {
+        name: "Patricia Lima",
+        cpf: demoCpf(602),
+        email: "patricia.build@build.demo",
+        birthDate: new Date(1979, 7, 28),
+        phone: "(11) 97654-3210",
+        companyIndex: 3,
+      },
+    ],
+    pjEmail: "rh@incorp.demo",
+    pjName: "RH Incorp Alpha",
+    telemedicineRatio: 0.05,
+    sectorProfiles: {
+      "Construção Civil": { procedureCodes: ["ENG-VIS", "ENG-FIS", "ENG-LAU", "ENG-ART"], reasons: ["Vistoria técnica — reforma torre A", "Fiscalização mensal — canteiro de obras"] },
+      Tecnologia: { procedureCodes: ["ENG-INS", "ENG-MAN", "ENG-ORC", "ENG-HT"], reasons: ["Inspeção predial — entrega de chaves", "Manutenção predial — infiltração"] },
+      Financeiro: { procedureCodes: ["ENG-PROJ", "ENG-LAU", "ENG-VIS", "ENG-TOP"], reasons: ["Projeto arquitetônico — avaliação inicial", "Laudo estrutural — edifício comercial"] },
+      Indústria: { procedureCodes: ["ENG-FIS", "ENG-LAU", "ENG-ART", "ENG-VIS"], reasons: ["Fiscalização mensal — canteiro de obras", "Emissão de ART — projeto estrutural"] },
+      Varejo: { procedureCodes: ["ENG-ORC", "ENG-MAN", "ENG-VIS", "ENG-INS"], reasons: ["Orçamento de reforma — área comum", "Vistoria técnica — reforma torre A"] },
+      Hospitalidade: { procedureCodes: ["ENG-INS", "ENG-MAN", "ENG-ORC", "ENG-HT"], reasons: ["Inspeção predial — entrega de chaves", "Manutenção predial — infiltração"] },
     },
   },
 ];

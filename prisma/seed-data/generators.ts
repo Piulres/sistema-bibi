@@ -7,12 +7,15 @@ import {
 import {
   beneficiaryEmail,
   birthDateForAge,
+  buildValidCpfFromBase,
   formatCpf,
   phoneForIndex,
   pick,
   pjEmailFromCompany,
+  pjRoleEmail,
   seedCpf,
 } from "./helpers";
+import type { SeedProfileConfig } from "./profile";
 
 export type GeneratedBeneficiary = {
   name: string;
@@ -28,7 +31,7 @@ export type GeneratedBeneficiary = {
 const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
   joao: {
     name: "João Pereira",
-    cpf: "111.222.333-44",
+    cpf: "529.982.247-25",
     birthDate: new Date("1985-04-12"),
     phone: "(11) 98888-1111",
     email: "joao.pereira@email.com",
@@ -36,7 +39,7 @@ const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
   },
   maria: {
     name: "Maria Souza",
-    cpf: "555.666.777-88",
+    cpf: "390.533.447-05",
     birthDate: new Date("1992-09-30"),
     phone: "(11) 97777-2222",
     email: "maria.souza@email.com",
@@ -44,7 +47,7 @@ const DEMO_BENEFICIARIES: Record<string, Partial<GeneratedBeneficiary>> = {
   },
   pedro: {
     name: "Pedro Almeida",
-    cpf: "999.000.111-22",
+    cpf: "153.509.460-56",
     birthDate: new Date("1978-01-05"),
     phone: "(11) 96666-3333",
     email: "pedro.almeida@email.com",
@@ -125,19 +128,63 @@ export type PjUserSeed = {
   email: string;
   name: string;
   companyIndex: number;
+  /** Papel na equipe corporativa (RH, Financeiro…) */
+  role?: string;
 };
 
-/** Usuários PJ para empresas com contrato ativo ou inadimplente. */
-export function generatePjUsers(companies: SeedCompany[]): PjUserSeed[] {
-  const contractStatuses: CompanyStatus[] = ["ATIVO", "INADIMPLENTE"];
+const PJ_TEAM_ROLES = [
+  { suffix: "rh", label: "RH" },
+  { suffix: "financeiro", label: "Financeiro" },
+  { suffix: "beneficios", label: "Benefícios" },
+  { suffix: "compras", label: "Compras" },
+  { suffix: "gestor", label: "Gestor" },
+  { suffix: "operacoes", label: "Operações" },
+  { suffix: "juridico", label: "Jurídico" },
+  { suffix: "ti", label: "TI" },
+  { suffix: "diretoria", label: "Diretoria" },
+] as const;
 
-  return companies
-    .filter((c) => contractStatuses.includes(c.status))
-    .map((company) => ({
-      email: company.pjEmail ?? pjEmailFromCompany(company.name, company.index),
-      name: `RH ${company.name.split(" ")[0]}`,
-      companyIndex: company.index,
-    }));
+function pjUserCount(company: SeedCompany, profile: SeedProfileConfig): number {
+  const { min, max } = profile.pjUsersPerCompany;
+  if (min === max) return min;
+  const span = max - min + 1;
+  return min + (company.index % span);
+}
+
+/** Usuários PJ para empresas com contrato ativo ou inadimplente. */
+export function generatePjUsers(
+  companies: SeedCompany[],
+  profile?: Pick<SeedProfileConfig, "pjUsersPerCompany">,
+): PjUserSeed[] {
+  const contractStatuses: CompanyStatus[] = ["ATIVO", "INADIMPLENTE"];
+  const pjProfile = profile ?? { pjUsersPerCompany: { min: 1, max: 1 } };
+  const result: PjUserSeed[] = [];
+
+  for (const company of companies) {
+    if (!contractStatuses.includes(company.status)) continue;
+
+    const count = pjUserCount(company, { pjUsersPerCompany: pjProfile.pjUsersPerCompany } as SeedProfileConfig);
+    const companyShort = company.name.split(" ")[0] ?? company.name;
+
+    for (let i = 0; i < count; i++) {
+      const role = PJ_TEAM_ROLES[i]!;
+      const email =
+        i === 0 && company.pjEmail
+          ? company.pjEmail
+          : i === 0
+            ? pjEmailFromCompany(company.name, company.index)
+            : pjRoleEmail(company.name, company.index, role.suffix);
+
+      result.push({
+        email,
+        name: `${role.label} ${companyShort}`,
+        companyIndex: company.index,
+        role: role.label,
+      });
+    }
+  }
+
+  return result;
 }
 
 /** Garante CPF único na lista (fallback se colisão). */
@@ -146,7 +193,7 @@ export function ensureUniqueCpfs(beneficiaries: GeneratedBeneficiary[]): Generat
   return beneficiaries.map((b, idx) => {
     let cpf = b.cpf.replace(/\D/g, "");
     if (seen.has(cpf)) {
-      cpf = String(900_000_000 + idx).padStart(11, "0");
+      cpf = buildValidCpfFromBase(String(900_000_000 + idx).padStart(9, "0")).replace(/\D/g, "");
     }
     seen.add(cpf);
     return { ...b, cpf: formatCpf(cpf) };

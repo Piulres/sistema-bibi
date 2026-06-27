@@ -2,6 +2,7 @@ import type { PrismaClient } from "@prisma/client";
 import type { ScaleConfig } from "./scale";
 import type { SeedCompany } from "./companies";
 import { contractActiveForStatus } from "./helpers";
+import { resolveSeedProfile } from "./profile";
 import {
   beneficiaryEmail,
   birthDateForAge,
@@ -25,6 +26,12 @@ import {
   type SeedMassStats,
 } from "./scenarios";
 import { seedPetClinicalDemo } from "./pet-clinical-demo";
+import {
+  resolveNicheOperationalScale,
+  seedNicheInternoTeam,
+  seedNicheRichMass,
+} from "./niche-rich-seed";
+import type { StarPatientRef } from "./niche-star-flows";
 
 export type NicheOperationalSummary = {
   niche: string;
@@ -50,6 +57,7 @@ const NICHE_CPF_BASE: Record<string, number> = {
   LEGAL: 30_000,
   SPA: 40_000,
   EDUCATION: 50_000,
+  CONSTRUCTION: 60_000,
 };
 
 async function seedSingleNicheOperational(
@@ -63,10 +71,14 @@ async function seedSingleNicheOperational(
     select: { id: true, niche: true },
   });
 
+  const profile = resolveSeedProfile();
+
   const interno = await prisma.user.findFirstOrThrow({
     where: { tenantId: tenant.id, role: "INTERNO" },
     select: { id: true },
   });
+
+  await seedNicheInternoTeam(prisma, password, tenant.id, config.slug);
 
   const providers = await prisma.user.findMany({
     where: { tenantId: tenant.id, role: "PRESTADOR" },
@@ -133,6 +145,7 @@ async function seedSingleNicheOperational(
 
   const patientRefs: PatientRef[] = [];
   const starPatientIds = new Set<string>();
+  const starRefs: StarPatientRef[] = [];
   const tutorEmailToPatientId = new Map<string, string>();
   let patientSeq = 0;
 
@@ -174,6 +187,12 @@ async function seedSingleNicheOperational(
       companyIndex: star.companyIndex,
     });
     starPatientIds.add(patient.id);
+    starRefs.push({
+      patientId: patient.id,
+      name: star.name,
+      email: star.email,
+      companyId,
+    });
     tutorEmailToPatientId.set(star.email, patient.id);
     patientSeq += 1;
   }
@@ -282,13 +301,7 @@ async function seedSingleNicheOperational(
     clinicalDiscount: c.clinicalDiscount,
   }));
 
-  const nicheScale: ScaleConfig = {
-    ...scale,
-    appointmentCount: Math.max(35, Math.round(scale.appointmentCount * 0.45)),
-    messageCount: Math.max(12, Math.round(scale.messageCount * 0.35)),
-    beneficiaryPortalUsers: Math.min(6, scale.beneficiaryPortalUsers),
-    historyDays: scale.historyDays,
-  };
+  const nicheScale = resolveNicheOperationalScale(scale, profile);
 
   const operational = await seedOperationalMass({
     prisma,
@@ -329,6 +342,26 @@ async function seedSingleNicheOperational(
       pets: starPetsForClinical,
     });
   }
+
+  const rich = await seedNicheRichMass({
+    prisma,
+    password,
+    tenantId: tenant.id,
+    config,
+    scale: nicheScale,
+    profile,
+    procedures,
+    providerIds,
+    internoId: interno.id,
+    companyIdByIndex,
+    discountByCompanyIndex,
+    patients: patientRefs,
+    starPatientIds,
+    starRefs,
+  });
+  console.log(
+    `    +rich: ${rich.pjUsers} PJ · ${rich.pricingRules} regras · ${rich.stockProducts} SKUs`,
+  );
 
   const portalUsers = await seedBeneficiaryPortalUsers({
     prisma,
