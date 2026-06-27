@@ -82,6 +82,17 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 
 ---
 
+## Comercial e captação
+
+| Documento | Conteúdo |
+|-----------|----------|
+| [`comercial/README.md`](comercial/README.md) | Índice — vendas e marketing por segmento |
+| [`comercial/MODULOS_COMUNS.md`](comercial/MODULOS_COMUNS.md) | Features compartilhadas (4 portais + plataforma) |
+| [`comercial/ESTRATEGIA_SEGMENTOS.md`](comercial/ESTRATEGIA_SEGMENTOS.md) | Técnicas de captação por nicho |
+| [`segmentos/README.md`](segmentos/README.md) | Playbook `COMERCIAL.md` em cada vertical |
+
+---
+
 ## Versões e releases
 
 | Documento | Conteúdo |

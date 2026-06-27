@@ -30,6 +30,10 @@ Catálogo demo: aulas particulares, mentoria, workshops, inglês, certificaçõe
 
 - [Pesquisa de mercado EDUCATION](./pesquisa.md)
 
+## Comercial
+
+- [Playbook de captação e vendas EDUCATION](./COMERCIAL.md)
+
 ## Código
 
 - Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`

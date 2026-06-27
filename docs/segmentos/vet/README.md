@@ -32,6 +32,10 @@ Catálogo demo: consulta, vacinação, exames, cirurgia, internação e estétic
 
 - [Pesquisa de mercado VET](./pesquisa.md)
 
+## Comercial
+
+- [Playbook de captação e vendas VET](./COMERCIAL.md)
+
 ## Código
 
 - Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`
