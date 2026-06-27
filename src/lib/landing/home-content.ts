@@ -2,14 +2,36 @@ import { PLATFORM } from "@/lib/platform";
 import { SALES_SITE_SECTIONS } from "@/lib/platform/structure";
 import type { LandingFeature, LandingFaqItem } from "@/lib/niche/landing-content";
 
-/** Conteúdo da home — foco no produto Sistema Bibi (não segmento). */
+const PURPOSE_SECTION = SALES_SITE_SECTIONS.find((s) => s.id === "propositos")!;
+const AUDIENCE_SECTION = SALES_SITE_SECTIONS.find((s) => s.id === "para-quem")!;
+
+/** Conteúdo da home — foco em captação (dor → solução → prova). */
 export const HOME_HERO = {
   badge: `${PLATFORM.versionLabel} · Pay Per Use Multi-Nicho`,
-  headline: "Infraestrutura Pay Per Use",
-  headlineAccent: "para serviços profissionais",
-  description: PLATFORM.description,
+  headline: "Pare de pagar por elegibilidade.",
+  headlineAccent: "Cobre só pelo que foi usado.",
+  description:
+    "Plataforma Pay Per Use com quatro portais integrados — o RH audita cada consulta, sessão ou serviço em tempo real, com preço congelado no atendimento.",
   subline:
-    "Uma plataforma horizontal que atende saúde, veterinária, odontologia, jurídico, bem-estar e educação — com white label, quatro portais integrados e vocabulário adaptável por segmento.",
+    "Saúde, veterinária, odontologia, jurídico, bem-estar e educação na mesma infraestrutura — com white label e vocabulário do seu segmento.",
+  roiHighlight: "Até ~87% de economia",
+  roiDetail: "vs. plano fechado · cenário 500 vidas, 15% de utilização",
+} as const;
+
+export const HOME_AUDIENCE = {
+  title: "Feito para operações que precisam de transparência",
+  description:
+    "De clínicas credenciadas a programas corporativos de benefícios — um motor transacional com a cara da sua marca.",
+  purpose: {
+    title: PURPOSE_SECTION.title,
+    description: PURPOSE_SECTION.description,
+    bullets: PURPOSE_SECTION.bullets,
+  },
+  audience: {
+    title: AUDIENCE_SECTION.title,
+    description: AUDIENCE_SECTION.description,
+    bullets: AUDIENCE_SECTION.bullets,
+  },
 } as const;
 
 export const HOME_PRODUCT = {
@@ -99,6 +121,6 @@ export const HOME_FAQ: LandingFaqItem[] = [
 ];
 
 export const HOME_CTA =
-  "Explore a demonstração com os quatro portais, fluxo Pay Per Use e white label configurável para cada operação.";
+  "Veja os quatro portais em ação — fluxo Pay Per Use, white label e demonstração do seu segmento em poucos cliques.";
 
 export const HOME_FOOTER_TAGLINE = PLATFORM.tagline;

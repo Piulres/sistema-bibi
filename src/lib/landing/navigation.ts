@@ -6,14 +6,16 @@ export type LandingNavItem = {
   external?: boolean;
 };
 
-/** Âncoras da home — área principal do produto. */
+/** Âncoras da home — funil de captação. */
 export const HOME_NAV_ANCHORS: LandingNavItem[] = [
-  { href: "#produto", label: "Produto" },
-  { href: "#visao", label: "Visão" },
-  { href: "#valores", label: "Valores" },
-  { href: "#novidades", label: "Novidades" },
+  { href: "#solucao", label: "Solução" },
+  { href: "#demo-video", label: "Demo" },
+  { href: "#roi", label: "ROI" },
+  { href: "#comparativo", label: "Comparativo" },
+  { href: "#para-quem", label: "Para quem" },
   { href: "#segmentos", label: "Segmentos" },
   { href: "#portais", label: "Portais" },
+  { href: "#contato", label: "Contato" },
   { href: "#faq", label: "FAQ" },
 ];
 

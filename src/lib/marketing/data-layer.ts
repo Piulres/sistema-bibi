@@ -28,6 +28,20 @@ export type DataLayerEvent =
       segment_slug: string;
       niche: string;
       utm?: UtmParams;
+    }
+  | {
+      event: "roi_calculator_change";
+      segment: string;
+      eligible: number;
+      utilization_pct: number;
+      savings_pct: number;
+      page_path: string;
+    }
+  | {
+      event: "lead_form_submit";
+      segment: string;
+      page_path: string;
+      utm?: UtmParams;
     };
 
 declare global {

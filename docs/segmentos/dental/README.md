@@ -30,6 +30,10 @@ Catálogo demo: consulta, profilaxia, canal, ortodontia, implante, clareamento e
 
 - [Pesquisa de mercado DENTAL](./pesquisa.md)
 
+## Comercial
+
+- [Playbook de captação e vendas DENTAL](./COMERCIAL.md)
+
 ## Código
 
 - Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`
