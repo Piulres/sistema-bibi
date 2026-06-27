@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { dismissOnboardingIfVisible, loginAs } from "./helpers/auth";
+import { expectFeedbackMessage, confirmDialog } from "./helpers/feedback";
 
 const suffix = () => Date.now().toString().slice(-6);
 
@@ -42,6 +43,11 @@ function generateValidCnpj(): string {
 /** Item na listagem (modo leitura — texto visível no DOM). */
 function listItemByText(page: import("@playwright/test").Page, text: string) {
   return page.getByRole("listitem").filter({ hasText: text });
+}
+
+/** Item na listagem pelo código único do procedimento (evita colisão entre runs do CI). */
+function listItemByCode(page: import("@playwright/test").Page, code: string) {
+  return page.getByRole("listitem").filter({ hasText: code });
 }
 
 /** Linha em edição inline (única com botão Salvar na listagem). */
@@ -94,9 +100,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await form.locator("label").filter({ hasText: /^CPF$/ }).locator("input").fill(generateValidCpf());
     await form.locator('input[type="date"]').fill("1990-01-15");
     await form.getByRole("button", { name: "Cadastrar" }).click();
-    await expect(page.getByText(new RegExp(`Beneficiário ${name} cadastrado`))).toBeVisible({
-      timeout: 10_000,
-    });
+    await expectFeedbackMessage(page, new RegExp(`Beneficiário ${name} cadastrado`));
     await expect(page.getByRole("link", { name })).toBeVisible();
   });
 
@@ -108,9 +112,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await form.locator("label").filter({ hasText: /Razão social/ }).locator("input").fill(name);
     await form.locator("label").filter({ hasText: /^CNPJ$/ }).locator("input").fill(generateValidCnpj());
     await form.getByRole("button", { name: "Cadastrar" }).click();
-    await expect(page.getByText(new RegExp(`Empresa ${name} cadastrada`))).toBeVisible({
-      timeout: 10_000,
-    });
+    await expectFeedbackMessage(page, new RegExp(`Empresa ${name} cadastrada`));
 
     const row = listItemByText(page, name);
     await row.scrollIntoViewIfNeeded();
@@ -119,35 +121,37 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await expect(editRow).toBeVisible();
     await editRow.getByRole("textbox").first().fill(`${name} (editada)`);
     await editRow.getByRole("button", { name: "Salvar" }).click();
-    await expect(page.getByText(/Empresa .* atualizada/)).toBeVisible({ timeout: 10_000 });
+    await expectFeedbackMessage(page, /Empresa .* atualizada/);
     await expect(listItemByText(page, `${name} (editada)`)).toBeVisible();
   });
 
   test("CREATE + UPDATE + DELETE procedimento", async ({ page }) => {
     await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Procedimentos" }).click();
     const code = `E2E${suffix()}`;
+    const procName = `Procedimento E2E ${suffix()}`;
+    const editedName = `${procName} Editado`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Novo procedimento" }) }).first();
     const form = card.locator("form");
     await form.locator("label").filter({ hasText: /^Código$/ }).locator("input").fill(code);
-    await form.locator("label").filter({ hasText: /^Nome$/ }).locator("input").fill("Procedimento E2E");
+    await form.locator("label").filter({ hasText: /^Nome$/ }).locator("input").fill(procName);
     await form.locator("label").filter({ hasText: /Preço/ }).locator("input").fill("199");
     await form.getByRole("button", { name: "Cadastrar" }).click();
-    await expect(page.getByText(new RegExp(`Procedimento ${code} cadastrado`))).toBeVisible({
-      timeout: 10_000,
-    });
+    await expectFeedbackMessage(page, new RegExp(`Procedimento ${code} cadastrado`));
 
-    const row = listItemByText(page, code);
+    const row = listItemByCode(page, code);
     await row.scrollIntoViewIfNeeded();
     await row.getByRole("button", { name: "Editar" }).click();
     const editRow = editingListItem(page);
     await expect(editRow).toBeVisible();
-    await editRow.getByRole("textbox").nth(1).fill("Procedimento E2E Editado");
+    await editRow.getByRole("textbox").nth(1).fill(editedName);
     await editRow.getByRole("button", { name: "Salvar" }).click();
-    await expect(page.getByText(/Procedimento .* atualizado/)).toBeVisible({ timeout: 10_000 });
+    await expectFeedbackMessage(page, new RegExp(`Procedimento ${code} atualizado`));
 
-    const rowAfterEdit = listItemByText(page, "Procedimento E2E Editado");
+    const rowAfterEdit = listItemByCode(page, code);
     await rowAfterEdit.scrollIntoViewIfNeeded();
     await rowAfterEdit.getByRole("button", { name: "Excluir" }).click();
+    await confirmDialog(page, { title: "Confirmar exclusão", action: "Excluir" });
+    await expectFeedbackMessage(page, /Procedimento excluído/i);
     await expect(rowAfterEdit).toHaveCount(0, { timeout: 10_000 });
   });
 
@@ -160,9 +164,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await form.locator("label").filter({ hasText: /^E-mail$/ }).locator("input").fill(`dr.e2e.${id}@bibi.health`);
     await form.locator("label").filter({ hasText: /^Senha$/ }).locator("input").fill("bibi123");
     await form.getByRole("button", { name: "Criar usuário" }).click();
-    await expect(page.getByText(new RegExp(`Usuário Dr E2E ${id} criado`))).toBeVisible({
-      timeout: 10_000,
-    });
+    await expectFeedbackMessage(page, new RegExp(`Usuário Dr E2E ${id} criado`));
     await expect(page.getByText(`dr.e2e.${id}@bibi.health`)).toBeVisible();
   });
 });
