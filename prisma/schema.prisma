@@ -48,6 +48,13 @@ model Tenant {
   projects              Project[]
   attachments           Attachment[]
   fieldReports          DailyFieldReport[]
+  constructionPipeline  ConstructionPipelineEntry[]
+  constructionGoals     ConstructionSalesGoal[]
+  indirectExpenses      CompanyIndirectExpense[]
+  projectEnvironments   ProjectEnvironment[]
+  projectCashEntries    ProjectCashEntry[]
+  projectAllocations    ProjectAllocation[]
+  projectContracts      ProjectContract[]
 }
 
 /// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
@@ -119,6 +126,7 @@ model User {
   assignedTasks     ProjectTask[]      @relation("TaskAssignee")
   uploadedAttachments Attachment[]     @relation("AttachmentUploader")
   fieldReports      DailyFieldReport[] @relation("FieldReportAuthor")
+  projectAllocations ProjectAllocation[] @relation("AllocationProvider")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -150,6 +158,7 @@ model Company {
   invoices     Invoice[]
   subscriptions Subscription[]
   projects     Project[]
+  pipelineEntries ConstructionPipelineEntry[]
 }
 
 /// Beneficiario / paciente. Pode ser individual ou vinculado a uma empresa (PJ).
@@ -822,9 +831,16 @@ model Project {
   budgets Budget[]
   tasks   ProjectTask[]
   fieldReports DailyFieldReport[]
+  environments ProjectEnvironment[]
+  cashEntries ProjectCashEntry[]
+  allocations ProjectAllocation[]
+  contracts ProjectContract[]
+  pipelineEntries ConstructionPipelineEntry[]
 
   /// FECHADO | DIARIA | MISTO — modelo de cobrança predominante da obra
   billingMode String @default("MISTO")
+  /// RESIDENCIAL | CORPORATIVO
+  projectType String @default("RESIDENCIAL")
 
   @@unique([tenantId, code])
   @@index([tenantId, status])
@@ -854,6 +870,7 @@ model Budget {
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   lineItems BudgetLineItem[]
+  bdiBreakdown BudgetBdiBreakdown?
 
   @@index([projectId])
 }
@@ -865,6 +882,8 @@ model BudgetLineItem {
   unit        String @default("un")
   quantity    Float  @default(1)
   unitPrice   Float  @default(0)
+  laborCost   Float  @default(0)
+  materialCost Float @default(0)
   total       Float  @default(0)
   sortOrder   Int    @default(0)
 
@@ -873,6 +892,9 @@ model BudgetLineItem {
 
   procedureId String?
   procedure   Procedure? @relation(fields: [procedureId], references: [id])
+
+  environmentId String?
+  environment   ProjectEnvironment? @relation(fields: [environmentId], references: [id])
 }
 
 /// Tarefa do cronograma de obra.
@@ -887,6 +909,10 @@ model ProjectTask {
   endDate         DateTime?
   progressPercent Float     @default(0)
   sortOrder       Int       @default(0)
+  plannedLaborCost    Float @default(0)
+  plannedMaterialCost Float @default(0)
+  actualLaborCost     Float @default(0)
+  actualMaterialCost  Float @default(0)
   createdAt       DateTime  @default(now())
 
   projectId String
@@ -957,4 +983,205 @@ model Attachment {
   uploadedBy   User?  @relation("AttachmentUploader", fields: [uploadedById], references: [id])
 
   @@index([tenantId, entityType, entityId])
+}
+
+/// Decomposição do BDI por orçamento.
+model BudgetBdiBreakdown {
+  id              String @id @default(cuid())
+  administration  Float  @default(0)
+  risk            Float  @default(0)
+  profit          Float  @default(0)
+  taxes           Float  @default(0)
+  financial       Float  @default(0)
+
+  budgetId String @unique
+  budget   Budget @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+}
+
+/// Ambiente/ambiente da obra para orçamento por medidas.
+model ProjectEnvironment {
+  id              String  @id @default(cuid())
+  name            String
+  environmentType String  @default("RESIDENCIAL")
+  length          Float?
+  width           Float?
+  height          Float?
+  floorArea       Float?
+  wallArea        Float?
+  ceilingArea     Float?
+  notes           String?
+  sortOrder       Int     @default(0)
+  createdAt       DateTime @default(now())
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  lineItems BudgetLineItem[]
+
+  @@index([projectId])
+}
+
+/// Lançamento de caixa por obra (orçado × realizado).
+/// type: ENTRADA | SAIDA · category: CONTRATO | MEDICAO | MATERIAL | MAO_OBRA | ADIANTAMENTO | INDIRETA | OUTRO
+model ProjectCashEntry {
+  id            String   @id @default(cuid())
+  type          String
+  category      String
+  description   String
+  amount        Float
+  isPlanned     Boolean  @default(false)
+  entryDate     DateTime
+  referenceType String?
+  referenceId   String?
+  createdAt     DateTime @default(now())
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, entryDate])
+  @@index([tenantId, type])
+}
+
+/// Alocação de prestador em obra.
+/// contractType: FECHADO | DIARIA · status: ATIVO | ENCERRADO | CANCELADO
+model ProjectAllocation {
+  id            String   @id @default(cuid())
+  trade         String
+  contractType  String   @default("DIARIA")
+  contractValue Float    @default(0)
+  dailyRate     Float?
+  status        String   @default("ATIVO")
+  notes         String?
+  createdAt     DateTime @default(now())
+
+  tenantId   String
+  tenant     Tenant @relation(fields: [tenantId], references: [id])
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   User   @relation("AllocationProvider", fields: [providerId], references: [id])
+
+  payments ProjectAllocationPayment[]
+
+  @@index([projectId])
+  @@index([providerId])
+}
+
+/// Pagamento ou adiantamento de prestador na obra.
+/// paymentType: PAGAMENTO | ADIANTAMENTO
+model ProjectAllocationPayment {
+  id          String   @id @default(cuid())
+  amount      Float
+  paymentType String   @default("PAGAMENTO")
+  paymentDate DateTime
+  notes       String?
+  status      String   @default("REALIZADO")
+  createdAt   DateTime @default(now())
+
+  allocationId String
+  allocation   ProjectAllocation @relation(fields: [allocationId], references: [id], onDelete: Cascade)
+
+  @@index([allocationId])
+}
+
+/// Contrato principal da obra.
+/// status: RASCUNHO | ENVIADO | ASSINADO | CANCELADO
+model ProjectContract {
+  id             String    @id @default(cuid())
+  contractNumber String
+  title          String
+  totalValue     Float     @default(0)
+  signedAt       DateTime?
+  status         String    @default("RASCUNHO")
+  notes          String?
+  createdAt      DateTime  @default(now())
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  addendums ContractAddendum[]
+
+  @@unique([tenantId, contractNumber])
+  @@index([projectId])
+}
+
+/// Aditivo contratual vinculado à obra.
+/// status: RASCUNHO | APROVADO | ASSINADO | CANCELADO
+model ContractAddendum {
+  id                String    @id @default(cuid())
+  addendumNumber    Int
+  title             String
+  description       String?
+  valueDelta        Float     @default(0)
+  scheduleDeltaDays Int       @default(0)
+  status            String    @default("RASCUNHO")
+  signedAt          DateTime?
+  createdAt         DateTime  @default(now())
+
+  contractId String
+  contract   ProjectContract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@index([contractId])
+}
+
+/// Lead/pipeline comercial de obras.
+/// status: LEAD | VISITA | ORCAMENTO | PROPOSTA | NEGOCIACAO | GANHO | PERDIDO
+model ConstructionPipelineEntry {
+  id             String    @id @default(cuid())
+  contactName    String
+  projectName    String?
+  estimatedValue Float     @default(0)
+  status         String    @default("LEAD")
+  probability    Float     @default(0)
+  expectedClose  DateTime?
+  notes          String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  tenantId  String
+  tenant    Tenant  @relation(fields: [tenantId], references: [id])
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id])
+  projectId String?
+  project   Project? @relation(fields: [projectId], references: [id])
+
+  @@index([tenantId, status])
+}
+
+/// Meta comercial mensal (faturamento + cobertura BDI).
+model ConstructionSalesGoal {
+  id                String @id @default(cuid())
+  year              Int
+  month             Int
+  targetRevenue     Float  @default(0)
+  targetBdiCoverage Float  @default(0)
+  notes             String?
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@unique([tenantId, year, month])
+}
+
+/// Despesa indireta da empresa (não vinculada a obra específica).
+/// category: ADMINISTRATIVO | FROTA | ALUGUEL | IMPOSTO | OUTRO
+model CompanyIndirectExpense {
+  id          String   @id @default(cuid())
+  category    String
+  description String
+  amount      Float
+  isPlanned   Boolean  @default(false)
+  expenseDate DateTime
+  createdAt   DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  @@index([tenantId, expenseDate])
 }

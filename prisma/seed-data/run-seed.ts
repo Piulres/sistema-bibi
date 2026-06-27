@@ -35,6 +35,7 @@ import { seedVitacareTenant } from "./vitacare";
 import { seedNicheTenants } from "./niche-tenants";
 import { seedAllNicheOperational, nicheDemoCredentials } from "./niche-operational";
 import { seedConstructionProjects } from "./construction-projects";
+import { seedConstructionRoadmap } from "./construction-roadmap";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
@@ -816,6 +817,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("\nObras demo Build Engenharia (CONSTRUCTION)...");
   const projectCount = await seedConstructionProjects(prisma);
   console.log(`  +${projectCount} obras com orçamento, cronograma e anexos`);
+  const roadmapCount = await seedConstructionRoadmap(prisma);
+  if (roadmapCount) console.log("  +massa roadmap Engenharia Civil (caixa, BDI, pipeline, contratos)");
 
   const companyCount = await prisma.company.count({ where: { tenantId: tenant.id } });
   const patientCount = await prisma.patient.count({ where: { tenantId: tenant.id } });

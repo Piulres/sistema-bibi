@@ -71,11 +71,18 @@ export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): Nav
 }
 
 /** Abas do beneficiário com termos do nicho. */
-export function buildBeneficiarioNavTabs(labels: NicheLabels): NavTab[] {
-  return [
+export function buildBeneficiarioNavTabs(labels: NicheLabels, niche?: NicheId): NavTab[] {
+  const tabs: NavTab[] = [
     { href: "/beneficiario/agendar", label: "Agendar", key: "agendar" },
     { href: "/beneficiario/resumo", label: "Resumo", key: "resumo" },
     { href: "/beneficiario/agenda", label: "Agenda", key: "agenda" },
+  ];
+
+  if (niche === "CONSTRUCTION") {
+    tabs.push({ href: "/beneficiario/obras", label: labels.patients, key: "obras" });
+  }
+
+  tabs.push(
     { href: "/beneficiario/consumo", label: "Consumo", key: "consumo" },
     { href: "/beneficiario/faturas", label: "Faturas", key: "faturas" },
     { href: "/beneficiario/medicacoes", label: "Medicações", key: "medicacoes" },
@@ -84,7 +91,9 @@ export function buildBeneficiarioNavTabs(labels: NicheLabels): NavTab[] {
     { href: "/beneficiario/assinatura", label: "Assinatura", key: "assinatura" },
     { href: "/beneficiario/prontuario", label: labels.medicalRecord, key: "prontuario" },
     { href: "/beneficiario/historico", label: "Histórico", key: "historico" },
-  ];
+  );
+
+  return tabs;
 }
 
 /** Seções do portal PJ. */

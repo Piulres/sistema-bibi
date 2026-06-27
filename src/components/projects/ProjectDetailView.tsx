@@ -11,6 +11,12 @@ import {
 } from "@/lib/project/constants";
 import ScheduleTimeline from "@/components/projects/ScheduleTimeline";
 import FieldReportsPanel from "@/components/projects/FieldReportsPanel";
+import ProjectCashPanel from "@/components/projects/ProjectCashPanel";
+import ProjectAllocationsPanel from "@/components/projects/ProjectAllocationsPanel";
+import ProjectEnvironmentsPanel from "@/components/projects/ProjectEnvironmentsPanel";
+import ProjectBdiPanel from "@/components/projects/ProjectBdiPanel";
+import ProjectContractsPanel from "@/components/projects/ProjectContractsPanel";
+import ProjectFinancialPanel from "@/components/projects/ProjectFinancialPanel";
 
 type LineItem = {
   description: string;
@@ -78,7 +84,18 @@ type Project = {
   attachments: Attachment[];
 };
 
-type Tab = "resumo" | "orcamento" | "cronograma" | "campo" | "anexos";
+type Tab =
+  | "resumo"
+  | "orcamento"
+  | "ambientes"
+  | "bdi"
+  | "cronograma"
+  | "financeiro"
+  | "caixa"
+  | "equipe"
+  | "campo"
+  | "contratos"
+  | "anexos";
 
 function formatBrl(value: number): string {
   return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -327,8 +344,14 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
   const tabs: { id: Tab; label: string }[] = [
     { id: "resumo", label: "Resumo" },
     { id: "orcamento", label: "Orçamento" },
+    { id: "ambientes", label: "Ambientes" },
+    { id: "bdi", label: "BDI" },
     { id: "cronograma", label: "Cronograma" },
+    { id: "financeiro", label: "Físico-financeiro" },
+    { id: "caixa", label: "Caixa" },
+    { id: "equipe", label: "Equipe" },
     { id: "campo", label: "Campo" },
+    { id: "contratos", label: "Contratos" },
     { id: "anexos", label: `Anexos (${project.attachments.length})` },
   ];
 
@@ -719,7 +742,21 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
         </div>
       )}
 
+      {tab === "ambientes" && <ProjectEnvironmentsPanel projectId={projectId} />}
+
+      {tab === "bdi" && (
+        <ProjectBdiPanel projectId={projectId} budgetId={activeBudget?.id} />
+      )}
+
+      {tab === "financeiro" && <ProjectFinancialPanel projectId={projectId} />}
+
+      {tab === "caixa" && <ProjectCashPanel projectId={projectId} />}
+
+      {tab === "equipe" && <ProjectAllocationsPanel projectId={projectId} />}
+
       {tab === "campo" && <FieldReportsPanel projectId={projectId} />}
+
+      {tab === "contratos" && <ProjectContractsPanel projectId={projectId} />}
 
       {tab === "anexos" && (
         <div className="space-y-4">

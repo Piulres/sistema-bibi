@@ -12,8 +12,8 @@ import { useLabels } from "@/hooks/useLabels";
 export default function BeneficiarioNav() {
   const pathname = usePathname();
   const active = resolveBeneficiarioActive(pathname);
-  const { labels } = useLabels();
-  const tabs = useMemo(() => buildBeneficiarioNavTabs(labels), [labels]);
+  const { labels, niche } = useLabels();
+  const tabs = useMemo(() => buildBeneficiarioNavTabs(labels, niche), [labels, niche]);
 
   return (
     <div className="mt-6" data-tour-id="portal-nav">
