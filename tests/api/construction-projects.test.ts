@@ -170,11 +170,13 @@ describe("API — Obras CONSTRUCTION", () => {
       expect(obraAlert.message).toMatch(/proposta/i);
     });
 
-    it("POST approve emite fatura quando orçamento ENVIADO", async () => {
+    it("POST approve PJ registra aprovação comercial (sem fatura imediata)", async () => {
       const project = await getBuildProject("OBR-2026-002");
       const budget = project.budgets.find((b) => b.status === "ENVIADO");
       if (!budget) {
-        expect(project.budgets.some((b) => b.status === "APROVADO")).toBe(true);
+        expect(project.budgets.some((b) => b.status === "APROVADO" || b.status === "APROVADO_PJ")).toBe(
+          true,
+        );
         return;
       }
 
@@ -191,11 +193,46 @@ describe("API — Obras CONSTRUCTION", () => {
       );
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.invoiceId).toBeTruthy();
-      expect(body.budget.status).toBe("APROVADO");
+      expect(body.budget.status).toBe("APROVADO_PJ");
+      expect(body.invoiceId).toBeUndefined();
 
       const after = await prisma.invoice.count();
-      expect(after).toBe(before + 1);
+      expect(after).toBe(before);
+    });
+
+    it("POST approve interno fatura após aprovação PJ", async () => {
+      const project = await getBuildProject("OBR-2026-002");
+      const budget = project.budgets.find((b) => b.status === "APROVADO_PJ" || b.status === "ENVIADO");
+      if (!budget) return;
+
+      if (budget.status === "ENVIADO") {
+        await pjBudgetsPost(
+          new Request(`http://localhost/api/pj/projects/${project.id}/budgets`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "approve", budgetId: budget.id }),
+          }),
+          { params: Promise.resolve({ id: project.id }) },
+        );
+      }
+
+      await setSessionForEmail(DEMO_EMAILS.buildInterno);
+      const fresh = await getBuildProject("OBR-2026-002");
+      const pjApproved = fresh.budgets.find((b) => b.status === "APROVADO_PJ");
+      if (!pjApproved) return;
+
+      const res = await internoBudgetsPost(
+        new Request(`http://localhost/api/interno/projects/${project.id}/budgets`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "approve", budgetId: pjApproved.id }),
+        }),
+        { params: Promise.resolve({ id: project.id }) },
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.budget.status).toBe("APROVADO");
+      expect(body.invoiceId).toBeTruthy();
     });
 
     it("GET PDF proposta PJ retorna PDF", async () => {
@@ -238,6 +275,15 @@ describe("API — Obras CONSTRUCTION", () => {
       expect(body.projects.some((p: { code: string }) => p.code === "OBR-2026-001")).toBe(true);
     });
 
+    it("GET /api/prestador/campo/projects inclui diária da alocação", async () => {
+      const { GET } = await import("@/app/api/prestador/campo/projects/route");
+      const res = await GET();
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      const obra = body.projects.find((p: { code: string }) => p.code === "OBR-2026-001");
+      expect(obra?.dailyRate).toBe(280);
+    });
+
     it("POST field-report registra diária", async () => {
       const project = await getBuildProject("OBR-2026-001");
       const { POST } = await import("@/app/api/prestador/field-reports/route");
@@ -257,6 +303,33 @@ describe("API — Obras CONSTRUCTION", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.report.workDone).toContain("homologação");
+    });
+  });
+
+  describe("Portal beneficiário (cliente obra)", () => {
+    beforeEach(async () => {
+      await setSessionForEmail(DEMO_EMAILS.buildCliente);
+    });
+
+    it("GET /api/beneficiario/projects lista obras da empresa", async () => {
+      const { GET } = await import("@/app/api/beneficiario/projects/route");
+      const res = await GET();
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.projects.some((p: { code: string }) => p.code === "OBR-2026-001")).toBe(true);
+    });
+
+    it("GET /api/beneficiario/projects/[id] retorna detalhe da obra", async () => {
+      const project = await getBuildProject("OBR-2026-001");
+      const { GET } = await import("@/app/api/beneficiario/projects/[id]/route");
+      const res = await GET(
+        new Request(`http://localhost/api/beneficiario/projects/${project.id}`),
+        { params: Promise.resolve({ id: project.id }) },
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.project.code).toBe("OBR-2026-001");
+      expect(body.project.tasks.length).toBeGreaterThan(0);
     });
   });
 

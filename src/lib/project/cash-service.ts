@@ -128,6 +128,45 @@ export async function getProjectCashSummary(
   };
 }
 
+/** Espelha faturamento/pagamento no caixa da obra (idempotente por referência). */
+export async function mirrorProjectCashEntry(input: {
+  tenantId: string;
+  projectId: string;
+  type: "ENTRADA" | "SAIDA";
+  category: string;
+  description: string;
+  amount: number;
+  referenceType: string;
+  referenceId: string;
+  entryDate?: Date;
+}): Promise<void> {
+  const prisma = await getPrisma();
+  const existing = await prisma.projectCashEntry.findFirst({
+    where: {
+      tenantId: input.tenantId,
+      projectId: input.projectId,
+      referenceType: input.referenceType,
+      referenceId: input.referenceId,
+    },
+  });
+  if (existing) return;
+
+  await prisma.projectCashEntry.create({
+    data: {
+      tenantId: input.tenantId,
+      projectId: input.projectId,
+      type: input.type,
+      category: input.category,
+      description: input.description,
+      amount: input.amount,
+      isPlanned: false,
+      entryDate: input.entryDate ?? new Date(),
+      referenceType: input.referenceType,
+      referenceId: input.referenceId,
+    },
+  });
+}
+
 function mapCashEntry(row: {
   id: string;
   type: string;

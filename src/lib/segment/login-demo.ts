@@ -10,6 +10,11 @@ import {
 const PJ_DEMO_EMAIL = "rh@techcorp.com";
 const BENEFICIARIO_DEMO_EMAIL = "joao.pereira@email.com";
 
+/** Fallback quando ref não tem e-mail de segmento (legado MEDICAL). */
+export function demoEmailForPortalFallback(portal: PortalKey): string {
+  return portal === "pj" ? PJ_DEMO_EMAIL : BENEFICIARIO_DEMO_EMAIL;
+}
+
 export const PORTAL_LOGIN_PATHS: Record<PortalKey, string> = {
   prestador: "/login",
   interno: "/interno/login",
@@ -38,9 +43,9 @@ export function demoEmailForPortal(ref: SegmentTenantRef, portal: PortalKey): st
     case "prestador":
       return ref.providerEmail;
     case "pj":
-      return PJ_DEMO_EMAIL;
+      return ref.pjEmail;
     case "beneficiario":
-      return BENEFICIARIO_DEMO_EMAIL;
+      return ref.beneficiaryEmail;
   }
 }
 

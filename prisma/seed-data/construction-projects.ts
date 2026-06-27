@@ -33,7 +33,37 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
   const alreadySeeded = await prisma.project.findFirst({
     where: { tenantId: tenant.id, code: "OBR-2026-001" },
   });
-  if (alreadySeeded) return 0;
+  if (alreadySeeded) {
+    const obra001 = await prisma.project.findFirst({
+      where: { tenantId: tenant.id, code: "OBR-2026-001" },
+      include: { tasks: { where: { name: "Alvenaria" }, take: 1 } },
+    });
+    if (obra001 && pedreiroJose) {
+      const existingRdo = await prisma.dailyFieldReport.findFirst({
+        where: { tenantId: tenant.id, projectId: obra001.id, authorId: pedreiroJose.id },
+      });
+      if (!existingRdo) {
+        await prisma.dailyFieldReport.create({
+          data: {
+            tenantId: tenant.id,
+            projectId: obra001.id,
+            taskId: obra001.tasks[0]?.id ?? null,
+            authorId: pedreiroJose.id,
+            reportDate: new Date(),
+            trade: "PEDREIRO",
+            locationNote: "12º andar — área molhada",
+            workDone:
+              "Conclusão de 12 m² de alvenaria no banheiro principal. Argamassa aplicada.",
+            pendingWork: "Aguardar cura para iniciar revestimento. Necessário 2 sacos de cimento.",
+            progressPercent: 65,
+            diariaAmount: 280,
+            status: "ENVIADO",
+          },
+        });
+      }
+    }
+    return 0;
+  }
 
   const projects = [
     {
@@ -213,11 +243,13 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
               progressPercent: t.progressPercent,
               sortOrder: t.sortOrder,
               assigneeId:
-                t.name === "Demolição" && pedreiroJose
+                t.name === "Alvenaria" && pedreiroJose
                   ? pedreiroJose.id
-                  : t.status === "EM_ANDAMENTO"
-                    ? engPaulo?.id
-                    : manager?.id,
+                  : t.name === "Demolição"
+                    ? engPaulo?.id ?? manager?.id
+                    : t.status === "EM_ANDAMENTO"
+                      ? engPaulo?.id
+                      : manager?.id,
               startDate: start,
               endDate: end,
             };
@@ -240,10 +272,18 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
     }
 
     if (spec.budget.status === "APROVADO" && company) {
-      const patient = await prisma.patient.findFirst({
-        where: { tenantId: tenant.id, companyId: company.id },
-        orderBy: { createdAt: "asc" },
+      const clienteUser = await prisma.user.findFirst({
+        where: { tenantId: tenant.id, email: "cliente@build.demo", patientId: { not: null } },
+        select: { patientId: true },
       });
+      const patient = clienteUser?.patientId
+        ? await prisma.patient.findFirst({
+            where: { id: clienteUser.patientId, tenantId: tenant.id, companyId: company.id },
+          })
+        : await prisma.patient.findFirst({
+            where: { tenantId: tenant.id, companyId: company.id },
+            orderBy: { createdAt: "asc" },
+          });
       const budget = project.budgets[0];
       if (patient && budget) {
         const invoice = await prisma.invoice.create({
@@ -290,22 +330,28 @@ export async function seedConstructionProjects(prisma: PrismaClient): Promise<nu
     include: { tasks: { where: { name: "Alvenaria" }, take: 1 } },
   });
   if (obra001 && pedreiroJose) {
-    await prisma.dailyFieldReport.create({
-      data: {
-        tenantId: tenant.id,
-        projectId: obra001.id,
-        taskId: obra001.tasks[0]?.id ?? null,
-        authorId: pedreiroJose.id,
-        reportDate: new Date(),
-        trade: "PEDREIRO",
-        locationNote: "12º andar — área molhada",
-        workDone: "Conclusão de 12 m² de alvenaria no banheiro principal. Argamassa aplicada.",
-        pendingWork: "Aguardar cura para iniciar revestimento. Necessário 2 sacos de cimento.",
-        progressPercent: 65,
-        diariaAmount: 280,
-        status: "ENVIADO",
-      },
+    const existingRdo = await prisma.dailyFieldReport.findFirst({
+      where: { tenantId: tenant.id, projectId: obra001.id, authorId: pedreiroJose.id },
     });
+    if (!existingRdo) {
+      await prisma.dailyFieldReport.create({
+        data: {
+          tenantId: tenant.id,
+          projectId: obra001.id,
+          taskId: obra001.tasks[0]?.id ?? null,
+          authorId: pedreiroJose.id,
+          reportDate: new Date(),
+          trade: "PEDREIRO",
+          locationNote: "12º andar — área molhada",
+          workDone:
+            "Conclusão de 12 m² de alvenaria no banheiro principal. Argamassa aplicada.",
+          pendingWork: "Aguardar cura para iniciar revestimento. Necessário 2 sacos de cimento.",
+          progressPercent: 65,
+          diariaAmount: 280,
+          status: "ENVIADO",
+        },
+      });
+    }
   }
 
   return count;

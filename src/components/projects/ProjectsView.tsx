@@ -56,7 +56,8 @@ export default function ProjectsView() {
   const [msg, setMsg] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [form, setForm] = useState({ code: "", name: "", addressCity: "", companyName: "" });
+  const [form, setForm] = useState({ code: "", name: "", addressCity: "", companyId: "" });
+  const [companies, setCompanies] = useState<{ id: string; name: string }[]>([]);
 
   const load = useCallback(async () => {
     const res = await fetch("/api/interno/projects?view=pipeline");
@@ -83,6 +84,19 @@ export default function ProjectsView() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!showForm) return;
+    let active = true;
+    (async () => {
+      const res = await fetch("/api/interno/projects/meta");
+      const json = await res.json();
+      if (active && res.ok) setCompanies(json.companies ?? []);
+    })();
+    return () => {
+      active = false;
+    };
+  }, [showForm]);
+
   async function createProject(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -95,6 +109,7 @@ export default function ProjectsView() {
           code: form.code,
           name: form.name,
           addressCity: form.addressCity || null,
+          companyId: form.companyId || null,
         }),
       });
       const json = await res.json();
@@ -104,7 +119,7 @@ export default function ProjectsView() {
       }
       setMsg(`Obra ${json.project.code} criada`);
       setShowForm(false);
-      setForm({ code: "", name: "", addressCity: "", companyName: "" });
+      setForm({ code: "", name: "", addressCity: "", companyId: "" });
       await load();
     } finally {
       setBusy(false);
@@ -176,6 +191,21 @@ export default function ProjectsView() {
               placeholder="Reforma Torre A"
               className="mt-1 w-full rounded-md border border-[var(--border-default)] px-3 py-2"
             />
+          </label>
+          <label className="block text-sm sm:col-span-2">
+            Empresa contratante (PJ)
+            <select
+              value={form.companyId}
+              onChange={(e) => setForm((f) => ({ ...f, companyId: e.target.value }))}
+              className="mt-1 w-full rounded-md border border-[var(--border-default)] px-3 py-2"
+            >
+              <option value="">Sem vínculo (interno apenas)</option>
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
+            </select>
           </label>
           <label className="block text-sm sm:col-span-2">
             Cidade

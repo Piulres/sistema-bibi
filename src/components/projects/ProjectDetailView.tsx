@@ -75,7 +75,9 @@ type Project = {
   addressStreet: string | null;
   addressCity: string | null;
   addressState: string | null;
+  companyId: string | null;
   companyName: string | null;
+  managerId: string | null;
   managerName: string | null;
   startDate: string | null;
   endDate: string | null;
@@ -136,6 +138,11 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
   });
 
   const [uploadCategory, setUploadCategory] = useState("PLANTA");
+  const [meta, setMeta] = useState<{
+    companies: { id: string; name: string }[];
+    managers: { id: string; name: string; email: string }[];
+  }>({ companies: [], managers: [] });
+  const [linkForm, setLinkForm] = useState({ companyId: "", managerId: "" });
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/interno/projects/${projectId}`);
@@ -146,6 +153,10 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
     }
     const p = json.project as Project;
     setProject(p);
+    setLinkForm({
+      companyId: p.companyId ?? "",
+      managerId: p.managerId ?? "",
+    });
     const active = p.budgets.find((b) => b.status !== "SUBSTITUIDO") ?? p.budgets[0];
     if (active) {
       setBudgetForm({
@@ -168,6 +179,23 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
   useEffect(() => {
     let active = true;
     (async () => {
+      const res = await fetch("/api/interno/projects/meta");
+      const json = await res.json();
+      if (active && res.ok) {
+        setMeta({
+          companies: json.companies ?? [],
+          managers: json.managers ?? [],
+        });
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
       const res = await fetch(`/api/interno/projects/${projectId}`);
       const json = await res.json();
       if (!active) return;
@@ -175,6 +203,10 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
       else {
         const p = json.project as Project;
         setProject(p);
+        setLinkForm({
+          companyId: p.companyId ?? "",
+          managerId: p.managerId ?? "",
+        });
         const b = p.budgets.find((x) => x.status !== "SUBSTITUIDO") ?? p.budgets[0];
         if (b) {
           setBudgetForm({
@@ -199,6 +231,31 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
   }, [projectId]);
 
   const activeBudget = project?.budgets.find((b) => b.status !== "SUBSTITUIDO") ?? project?.budgets[0];
+
+  async function saveLinks(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/interno/projects/${projectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          companyId: linkForm.companyId || null,
+          managerId: linkForm.managerId || null,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setMsg(json.error ?? "Erro ao salvar vínculos");
+        return;
+      }
+      setMsg("Empresa e gerente atualizados");
+      await load();
+    } finally {
+      setBusy(false);
+    }
+  }
 
   async function saveBudget() {
     if (!activeBudget) return;
@@ -403,6 +460,48 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
 
       {tab === "resumo" && (
         <div className="grid gap-4 sm:grid-cols-2">
+          <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 sm:col-span-2">
+            <h3 className="font-medium text-[var(--text-primary)]">Vínculos</h3>
+            <form onSubmit={saveLinks} className="mt-3 grid gap-3 sm:grid-cols-2">
+              <label className="text-sm">
+                Empresa contratante
+                <select
+                  value={linkForm.companyId}
+                  onChange={(e) => setLinkForm((f) => ({ ...f, companyId: e.target.value }))}
+                  className="mt-1 w-full rounded-md border px-2 py-1.5"
+                >
+                  <option value="">Nenhuma</option>
+                  {meta.companies.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-sm">
+                Gerente da obra
+                <select
+                  value={linkForm.managerId}
+                  onChange={(e) => setLinkForm((f) => ({ ...f, managerId: e.target.value }))}
+                  className="mt-1 w-full rounded-md border px-2 py-1.5"
+                >
+                  <option value="">Nenhum</option>
+                  {meta.managers.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="submit"
+                disabled={busy}
+                className="rounded-md bg-[var(--brand-primary)] px-4 py-2 text-sm text-white sm:col-span-2 disabled:opacity-50"
+              >
+                Salvar vínculos
+              </button>
+            </form>
+          </section>
           <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4">
             <h3 className="font-medium text-[var(--text-primary)]">Local</h3>
             <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -566,7 +665,34 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
             </>
           )}
 
-          {activeBudget.status === "ENVIADO" && (
+          {activeBudget.status === "ENVIADO" && project.companyName && (
+            <p className="text-sm text-amber-800">
+              Aguardando aprovação do cliente (PJ) antes de faturar.
+            </p>
+          )}
+
+          {activeBudget.status === "APROVADO_PJ" && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => budgetAction("approve")}
+                className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+              >
+                Finalizar aprovação e faturar
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => budgetAction("reject")}
+                className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
+              >
+                Recusar proposta
+              </button>
+            </div>
+          )}
+
+          {activeBudget.status === "ENVIADO" && !project.companyName && (
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -584,6 +710,19 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
               >
                 Recusar proposta
               </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => budgetAction("new-version")}
+                className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+              >
+                Nova revisão
+              </button>
+            </div>
+          )}
+
+          {activeBudget.status === "ENVIADO" && project.companyName && (
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 disabled={busy}

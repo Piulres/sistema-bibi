@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
-import { listPipeline, upsertPipelineEntry } from "@/lib/project/pipeline-service";
+import { listPipeline, upsertPipelineEntry, convertPipelineToProject } from "@/lib/project/pipeline-service";
 
 export async function GET() {
   try {
@@ -16,6 +16,14 @@ export async function POST(request: Request) {
   try {
     const user = await requireInternoModule("projetos");
     const body = (await request.json()) as Record<string, unknown>;
+    const action = String(body.action ?? "upsert");
+
+    if (action === "convert") {
+      const result = await convertPipelineToProject(user.tenantId, String(body.entryId ?? ""), user.id);
+      if ("error" in result) return NextResponse.json({ error: result.error }, { status: 400 });
+      return NextResponse.json(result);
+    }
+
     const result = await upsertPipelineEntry(user.tenantId, {
       id: body.id ? String(body.id) : undefined,
       contactName: String(body.contactName ?? ""),

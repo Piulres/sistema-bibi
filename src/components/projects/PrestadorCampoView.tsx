@@ -16,6 +16,7 @@ type Project = {
   activeTaskId: string | null;
   activeTaskName: string | null;
   billingMode: string;
+  dailyRate: number | null;
 };
 
 type Report = {
@@ -69,7 +70,12 @@ export default function PrestadorCampoView() {
     setForm((f) => {
       if (f.projectId || projectList.length === 0) return f;
       const p = projectList[0];
-      return { ...f, projectId: p.id, taskId: p.activeTaskId ?? "" };
+      return {
+        ...f,
+        projectId: p.id,
+        taskId: p.activeTaskId ?? "",
+        diariaAmount: p.dailyRate != null ? String(p.dailyRate) : "",
+      };
     });
   }, []);
 
@@ -195,6 +201,8 @@ export default function PrestadorCampoView() {
                   ...f,
                   projectId: e.target.value,
                   taskId: p?.activeTaskId ?? "",
+                  diariaAmount:
+                    p?.dailyRate != null ? String(p.dailyRate) : f.diariaAmount,
                 }));
               }}
               className="mt-1 w-full rounded border px-3 py-2"
@@ -311,7 +319,11 @@ export default function PrestadorCampoView() {
                 value={form.diariaAmount}
                 onChange={(e) => setForm((f) => ({ ...f, diariaAmount: e.target.value }))}
                 className="mt-1 w-full rounded border px-3 py-2"
-                placeholder="Cobrança por dia"
+                placeholder={
+                  selected?.dailyRate != null
+                    ? `Sugerido: R$ ${selected.dailyRate.toFixed(2)}`
+                    : "Cobrança por dia"
+                }
               />
             </label>
           </div>

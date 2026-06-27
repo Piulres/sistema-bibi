@@ -72,6 +72,17 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.subscriptionCharge.deleteMany();
   await prisma.subscription.deleteMany();
   await prisma.invoiceItem.deleteMany();
+  await prisma.dailyFieldReport.deleteMany();
+  await prisma.projectAllocationPayment.deleteMany();
+  await prisma.projectAllocation.deleteMany();
+  await prisma.projectCashEntry.deleteMany();
+  await prisma.projectEnvironment.deleteMany();
+  await prisma.budgetBdiBreakdown.deleteMany();
+  await prisma.contractAddendum.deleteMany();
+  await prisma.projectContract.deleteMany();
+  await prisma.constructionPipelineEntry.deleteMany();
+  await prisma.constructionSalesGoal.deleteMany();
+  await prisma.companyIndirectExpense.deleteMany();
   await prisma.invoice.deleteMany();
   await prisma.procedureUsage.deleteMany();
   await prisma.stockMovement.deleteMany();
