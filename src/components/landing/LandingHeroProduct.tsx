@@ -1,14 +1,43 @@
-import Link from "next/link";
+"use client";
+
+import { Suspense, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { HOME_HERO } from "@/lib/landing/home-content";
+import { readHeroSegmentParam, resolveHomeHeroVariant } from "@/lib/landing/hero-variants";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
-import { SEGMENT_ACCESS_HREF } from "@/lib/landing/navigation";
 import { landingCtaClasses } from "@/components/landing/landing-cta";
 import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
 import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
 
 export default function LandingHeroProduct() {
+  return (
+    <Suspense fallback={<LandingHeroProductFallback />}>
+      <LandingHeroProductInner />
+    </Suspense>
+  );
+}
+
+function LandingHeroProductFallback() {
+  return (
+    <section
+      aria-labelledby="hero-heading"
+      className="landing-mesh-hero relative min-h-[28rem] overflow-hidden text-[var(--text-inverse)]"
+    />
+  );
+}
+
+function LandingHeroProductInner() {
+  const searchParams = useSearchParams();
+  const variant = useMemo(
+    () => resolveHomeHeroVariant(readHeroSegmentParam(searchParams)),
+    [searchParams],
+  );
+
+  const badge = variant.badge ?? HOME_HERO.badge;
+  const roiDetail = variant.roiDetail ?? HOME_HERO.roiDetail;
+
   return (
     <section
       aria-labelledby="hero-heading"
@@ -28,22 +57,32 @@ export default function LandingHeroProduct() {
         <div>
           <p className="landing-fade-in inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-1.5 text-sm font-medium text-white/90 backdrop-blur-sm">
             <LandingIcon name="shield" className="h-4 w-4 text-[var(--brand-accent)]" />
-            {HOME_HERO.badge}
+            {badge}
           </p>
 
           <h1
             id="hero-heading"
             className="landing-fade-in mt-8 text-4xl tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.08]"
           >
-            <span className="font-light">{HOME_HERO.headline}</span>{" "}
-            <span className="font-bold">{HOME_HERO.headlineAccent}</span>
+            <span className="font-light">{variant.headline}</span>{" "}
+            <span className="font-bold">{variant.headlineAccent}</span>
           </h1>
 
           <p className="landing-fade-in mt-6 max-w-xl text-lg leading-relaxed text-white/80 sm:text-xl">
-            {HOME_HERO.description}
+            {variant.description}
           </p>
 
           <p className="landing-fade-in mt-4 max-w-xl text-sm text-white/55">{HOME_HERO.subline}</p>
+
+          <div
+            className="landing-fade-in mt-8 inline-flex flex-col gap-1 rounded-2xl border border-[var(--brand-accent)]/30 bg-[var(--brand-accent)]/10 px-5 py-4 sm:flex-row sm:items-center sm:gap-4"
+            role="note"
+          >
+            <p className="text-2xl font-bold tracking-tight text-[var(--brand-accent)]">
+              {HOME_HERO.roiHighlight}
+            </p>
+            <p className="text-sm text-white/70">{roiDetail}</p>
+          </div>
 
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <LandingTrackedCta
@@ -54,30 +93,27 @@ export default function LandingHeroProduct() {
               size="lg"
               className="group"
             >
-              Acessar portais
+              Ver demonstração ao vivo
               <LandingIcon
                 name="arrow-right"
                 className="h-5 w-5 transition group-hover:translate-x-0.5"
               />
             </LandingTrackedCta>
             <LandingWhatsAppCta variant="hero-ghost" size="lg" location="hero-home" />
-            <Link
-              href={SEGMENT_ACCESS_HREF}
-              className={landingCtaClasses("hero-ghost", "lg")}
-            >
-              Acesso segmentado
-            </Link>
+            <a href="#segmentos" className={landingCtaClasses("hero-ghost", "lg")}>
+              Escolher meu segmento
+            </a>
           </div>
 
           <ul
             className="landing-fade-in mt-10 flex flex-wrap gap-2"
             aria-label="Diferenciais da plataforma"
           >
-            {LANDING_TRUST_BADGES.map((badge) => (
-              <li key={badge}>
+            {LANDING_TRUST_BADGES.map((badgeItem) => (
+              <li key={badgeItem}>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/5 px-3 py-1 text-xs font-medium text-white/75">
                   <LandingIcon name="check" className="h-3.5 w-3.5 text-[var(--brand-accent)]" />
-                  {badge}
+                  {badgeItem}
                 </span>
               </li>
             ))}

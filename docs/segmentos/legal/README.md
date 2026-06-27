@@ -30,6 +30,10 @@ Catálogo demo: consulta, hora técnica, parecer, contratos, trabalhista, LGPD e
 
 - [Pesquisa de mercado LEGAL](./pesquisa.md)
 
+## Comercial
+
+- [Playbook de captação e vendas LEGAL](./COMERCIAL.md)
+
 ## Código
 
 - Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`

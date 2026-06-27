@@ -86,6 +86,20 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 ---
 
+## Comercial e captação
+
+| Documento | Conteúdo |
+|-----------|----------|
+| [`comercial/README.md`](comercial/README.md) | Índice — vendas e marketing por segmento |
+| [`comercial/MODULOS_COMUNS.md`](comercial/MODULOS_COMUNS.md) | Features compartilhadas (4 portais + plataforma) |
+| [`comercial/BENCHMARKS_POR_NICHO.md`](comercial/BENCHMARKS_POR_NICHO.md) | Concorrentes e matriz por vertical |
+| [`comercial/CALCULADORA_ROI.md`](comercial/CALCULADORA_ROI.md) | Calculadora ROI da homepage |
+| [`comercial/PLANO_HOMEPAGE.md`](comercial/PLANO_HOMEPAGE.md) | Plano de captação na homepage |
+| [`comercial/ESTRATEGIA_SEGMENTOS.md`](comercial/ESTRATEGIA_SEGMENTOS.md) | Técnicas de captação por nicho |
+| [`segmentos/README.md`](segmentos/README.md) | Playbook `COMERCIAL.md` em cada vertical |
+
+---
+
 ## Versões e releases
 
 | Documento | Conteúdo |

@@ -30,6 +30,10 @@ Catálogo demo: massagem, yoga, day spa, drenagem, facial e sessões corporativa
 
 - [Pesquisa de mercado SPA](./pesquisa.md)
 
+## Comercial
+
+- [Playbook de captação e vendas SPA](./COMERCIAL.md)
+
 ## Código
 
 - Seed: `prisma/seed-data/niche-catalogs.ts` · `prisma/seed-data/niche-operational.ts`

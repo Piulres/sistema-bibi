@@ -1,10 +1,10 @@
 import { PLATFORM } from "@/lib/platform";
 
 export const LANDING_STATS = [
+  { value: "~87%", label: "economia vs. plano fechado", suffix: "" },
+  { value: "6", label: "segmentos na mesma plataforma", suffix: "" },
   { value: "4", label: "portais integrados", suffix: "" },
-  { value: "Pay Per Use", label: "cobrança por uso real", suffix: "" },
-  { value: "100%", label: "nuvem e multi-tenant", suffix: "" },
-  { value: "LGPD", label: "conformidade nativa", suffix: "" },
+  { value: "Price Snapshot", label: "preço congelado no atendimento", suffix: "" },
 ] as const;
 
 export const LANDING_TRUST_BADGES = [

@@ -2,14 +2,20 @@ import type { BrandingTokens } from "@/lib/theme/tokens";
 import LandingHeader from "@/components/landing/LandingHeader";
 import LandingHeroProduct from "@/components/landing/LandingHeroProduct";
 import LandingStats from "@/components/landing/LandingStats";
+import LandingSocialProof from "@/components/landing/LandingSocialProof";
 import {
   LandingHomeProduct,
   LandingHomeValues,
   LandingHomeVision,
 } from "@/components/landing/LandingHomeProduct";
+import LandingHomeAudience from "@/components/landing/LandingHomeAudience";
 import LandingProblem from "@/components/landing/LandingProblem";
 import LandingSolution from "@/components/landing/LandingSolution";
-import LandingRoi from "@/components/landing/LandingRoi";
+import LandingRoiCalculator from "@/components/landing/LandingRoiCalculator";
+import LandingCompare from "@/components/landing/LandingCompare";
+import LandingValidatedScenarios from "@/components/landing/LandingValidatedScenarios";
+import LandingDemoVideo from "@/components/landing/LandingDemoVideo";
+import LandingLeadForm from "@/components/landing/LandingLeadForm";
 import LandingChangelog from "@/components/landing/LandingChangelog";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingPortals from "@/components/landing/LandingPortals";
@@ -30,7 +36,7 @@ type Props = {
   branding: BrandingTokens;
 };
 
-/** Home — produto, visão, valores e acesso aos 4 portais (sem foco de nicho). */
+/** Home — funil de captação: dor → solução → prova → segmento → demo. */
 export default function LandingHomePageView({ branding }: Props) {
   return (
     <>
@@ -39,21 +45,27 @@ export default function LandingHomePageView({ branding }: Props) {
       <main id="conteudo-principal" className="flex-1">
         <LandingHeroProduct />
         <LandingStats />
-        <LandingHomeProduct />
-        <LandingHomeVision />
-        <LandingHomeValues />
+        <LandingSocialProof />
         <LandingProblem />
         <LandingSolution />
-        <LandingRoi />
-        <LandingChangelog />
+        <LandingDemoVideo />
+        <LandingRoiCalculator />
+        <LandingValidatedScenarios />
+        <LandingCompare />
+        <LandingHomeAudience />
+        <LandingNiches />
         <LandingFeatures
           sectionId="recursos"
           featuresSection={HOME_FEATURES_SECTION}
           features={HOME_FEATURES}
         />
-        <LandingNiches />
+        <LandingHomeProduct />
+        <LandingHomeVision />
+        <LandingHomeValues />
         <LandingPortals niche="MEDICAL" branding={branding} />
         <LandingFaq items={HOME_FAQ} />
+        <LandingChangelog />
+        <LandingLeadForm />
         <LandingCta branding={branding} niche="MEDICAL" description={HOME_CTA} />
       </main>
       <LandingFooter branding={branding} context="home" footerTagline={HOME_FOOTER_TAGLINE} />
