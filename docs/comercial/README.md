@@ -16,6 +16,7 @@ Documentação de **vendas, marketing e posicionamento por segmento**. Complemen
 | Plano e mudanças na homepage | [`PLANO_HOMEPAGE.md`](PLANO_HOMEPAGE.md) |
 | **Prompt campanhas marketing** | [`PROMPT_CAMPANHAS_MARKETING.md`](PROMPT_CAMPANHAS_MARKETING.md) |
 | **Papel do agente em marketing** | [`PAPEL_DO_AGENTE_MARKETING.md`](PAPEL_DO_AGENTE_MARKETING.md) |
+| Validação de testes (pacote comercial) | [`VALIDACAO_TESTES.md`](VALIDACAO_TESTES.md) |
 | Técnicas por vertical | [`ESTRATEGIA_SEGMENTOS.md`](ESTRATEGIA_SEGMENTOS.md) |
 | Segmento específico | [`../segmentos/README.md`](../segmentos/README.md) → `COMERCIAL.md` |
 | ROI saúde (referência) | [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md) |
@@ -34,6 +35,7 @@ docs/comercial/
 ├── PLANO_HOMEPAGE.md         ← plano e registro de mudanças na home
 ├── PROMPT_CAMPANHAS_MARKETING.md  ← prompt para iniciar campanhas
 ├── PAPEL_DO_AGENTE_MARKETING.md   ← o que o agente pode/não pode em marketing
+├── VALIDACAO_TESTES.md       ← registro de testes do pacote comercial
 └── ESTRATEGIA_SEGMENTOS.md   ← matriz de captação e links por nicho
 
 docs/segmentos/{niche}/

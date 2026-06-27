@@ -142,7 +142,10 @@ Solução · Demo · ROI · Comparativo · Para quem · Segmentos · Portais · 
 npm run lint
 npm test -- roi-calculator lead-form
 npm run docs:verify
-npm run dev   # / e /?utm_segment=vet
+npm run pre-release    # pacote completo (lint + build Netlify)
+npm run dev            # / e /?utm_segment=vet
 ```
+
+Registro completo: [`VALIDACAO_TESTES.md`](VALIDACAO_TESTES.md) (jun/2026 — 410 unit, pre-release OK, E2E 121/130).
 
 *Plano vivo — atualizar ao fechar cada iteração da homepage.*

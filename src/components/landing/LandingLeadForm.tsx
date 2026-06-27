@@ -57,6 +57,8 @@ function LandingLeadFormInner() {
     e.preventDefault();
     setError(null);
 
+    if (!config) return;
+
     if (!name.trim() || !company.trim() || !email.trim()) {
       setError("Preencha nome, empresa e e-mail.");
       return;
