@@ -33,6 +33,7 @@ export default function AssistantProvider({ pageContext, children }: Props) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [actions, setActions] = useState<AssistantAction[]>([]);
+  const [sessionState, setSessionState] = useState<string | undefined>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,7 +55,7 @@ export default function AssistantProvider({ pageContext, children }: Props) {
         const res = await fetch("/api/assistant/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: nextMessages, pageContext }),
+          body: JSON.stringify({ messages: nextMessages, pageContext, sessionState }),
         });
         const data = await res.json();
         if (!res.ok) {
@@ -63,13 +64,18 @@ export default function AssistantProvider({ pageContext, children }: Props) {
         }
         setMessages((prev) => [...prev, data.message]);
         if (data.actions) setActions(filterAssistantActions(data.actions));
+        if (typeof data.sessionState === "string") {
+          setSessionState(data.sessionState);
+        } else if (data.sessionState === null) {
+          setSessionState(undefined);
+        }
       } catch {
         setError("Falha de conexão com o assistente.");
       } finally {
         setLoading(false);
       }
     },
-    [loading, messages, pageContext],
+    [loading, messages, pageContext, sessionState],
   );
 
   const confirmAction = useCallback(
@@ -91,6 +97,7 @@ export default function AssistantProvider({ pageContext, children }: Props) {
         }
         setMessages((prev) => [...prev, data.message]);
         setActions([]);
+        setSessionState(undefined);
       } catch {
         setError("Falha de conexão ao confirmar.");
       } finally {

@@ -26,15 +26,20 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-async function chatTurn(history: AssistantMessage[], userText: string) {
+async function chatTurn(
+  history: AssistantMessage[],
+  userText: string,
+  sessionState?: string,
+) {
   const messages: AssistantMessage[] = [...history, { role: "user", content: userText }];
-  const res = await postAssistantChat(messages);
+  const res = await postAssistantChat(messages, undefined, sessionState);
   expect(res.status).toBe(200);
   const body = await parseAssistantChatResponse(res);
   expect(isHumanized(body.message.content)).toBe(true);
   return {
     messages: [...messages, body.message] as AssistantMessage[],
     body,
+    sessionState: body.sessionState,
   };
 }
 
@@ -77,16 +82,19 @@ describe("Integração — fluxo do assistente via API", () => {
 
     it("guia até confirmação e persiste agendamento", async () => {
       let messages: AssistantMessage[] = [];
+      let sessionState: string | undefined;
 
-      const step1 = await chatTurn(messages, "preciso marcar uma consulta");
+      const step1 = await chatTurn(messages, "preciso marcar uma consulta", sessionState);
       messages = step1.messages;
+      sessionState = step1.sessionState;
       expect(step1.body.message.content).toMatch(/para quem|paciente/i);
 
-      const step2 = await chatTurn(messages, "é pro João Pereira");
+      const step2 = await chatTurn(messages, "é pro João Pereira", sessionState);
       messages = step2.messages;
+      sessionState = step2.sessionState;
       expect(step2.body.message.content).toMatch(/prestador|data|horário|João/i);
 
-      const step3 = await chatTurn(messages, uniqueAppointmentPhrase());
+      const step3 = await chatTurn(messages, uniqueAppointmentPhrase(), sessionState);
       messages = step3.messages;
       const confirmAction = step3.body.actions?.find((a) => a.type === "confirm");
       expect(confirmAction?.pendingActionId).toBeTruthy();
@@ -137,7 +145,7 @@ describe("Integração — fluxo do assistente via API", () => {
             )
           : undefined;
 
-      const step2 = await chatTurn(step1.messages, helena?.label ?? "1");
+      const step2 = await chatTurn(step1.messages, helena?.label ?? "1", step1.sessionState);
       expect(step2.body.actions?.some((a) => a.type === "confirm")).toBe(true);
     });
   });
