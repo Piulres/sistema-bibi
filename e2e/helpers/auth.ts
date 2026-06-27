@@ -3,7 +3,7 @@ import { expect, type Page } from "@playwright/test";
 export type PortalKey = "prestador" | "interno" | "pj" | "beneficiario";
 
 const ALL_PORTALS: PortalKey[] = ["prestador", "interno", "pj", "beneficiario"];
-const ONBOARDING_VERSION = 1;
+const ONBOARDING_VERSION = 3;
 
 const LOGIN_PATHS: Record<PortalKey, string> = {
   prestador: "/login",
@@ -24,7 +24,9 @@ export async function skipOnboardingTours(page: Page): Promise<void> {
   await page.addInitScript(
     ({ portals, version }) => {
       const key = "bibi_onboarding";
-      let state: Record<string, { completed: boolean; version: number; completedAt: string }> = {};
+      let state: {
+        routes?: Record<string, { completed: boolean; version: number; dismissed?: boolean }>;
+      } & Record<string, { completed: boolean; version: number; completedAt: string }> = {};
       try {
         state = JSON.parse(localStorage.getItem(key) || "{}") as typeof state;
       } catch {
@@ -33,6 +35,21 @@ export async function skipOnboardingTours(page: Page): Promise<void> {
       const completedAt = new Date().toISOString();
       for (const portal of portals) {
         state[portal] = { completed: true, version, completedAt };
+      }
+      state.routes = state.routes ?? {};
+      const routeKeys = [
+        "interno:billing",
+        "interno:agenda",
+        "interno:cadastros",
+        "interno:seguranca",
+        "interno:cliente-360",
+        "prestador:atendimento",
+        "beneficiario:faturas",
+        "beneficiario:agendar",
+        "pj:main",
+      ];
+      for (const routeKey of routeKeys) {
+        state.routes[routeKey] = { completed: true, version, dismissed: false };
       }
       localStorage.setItem(key, JSON.stringify(state));
     },

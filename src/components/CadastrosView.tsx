@@ -1263,7 +1263,7 @@ export default function CadastrosView() {
       {tab === "pricing" && <CadastrosPricingTab />}
 
       {tab === "operations" && (
-        <div className="space-y-6">
+        <div className="space-y-6" data-tour-id="cadastros-crud-map">
           <Card>
             <SectionHeader
               title="Mapa de operações CRUD"

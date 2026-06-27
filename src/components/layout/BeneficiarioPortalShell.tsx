@@ -21,7 +21,7 @@ export default function BeneficiarioPortalShell({ user, assistantEnabled = true,
   const portal = PORTALS.beneficiario;
 
   return (
-    <OnboardingProvider portal="beneficiario" labels={user.labels}>
+    <OnboardingProvider portal="beneficiario" labels={user.labels} niche={user.niche}>
       <PortalShell
         portal="beneficiario"
         portalLabel={user.labels.portalBeneficiary}

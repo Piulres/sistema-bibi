@@ -1,6 +1,6 @@
 import type { PortalKey } from "@/lib/roles";
 import type { OnboardingContext, OnboardingStep } from "../types";
-import { filterStepsForRoute } from "../match-route";
+import { matchesRoute } from "../match-route";
 import { filterByPermissions } from "../feature-map";
 import { buildInternoTour } from "./interno";
 import { buildPrestadorTour } from "./prestador";
@@ -14,21 +14,74 @@ const BUILDERS: Record<PortalKey, (ctx: OnboardingContext) => OnboardingStep[]> 
   beneficiario: buildBeneficiarioTour,
 };
 
+const MAIN_MAX_ORDER = 99;
+
 function sortSteps(steps: OnboardingStep[]): OnboardingStep[] {
   return [...steps].sort((a, b) => (a.order ?? 500) - (b.order ?? 500));
 }
 
-/** Monta passos do tour com labels, RBAC e filtro por rota. */
+function permitSteps(portal: PortalKey, ctx: OnboardingContext): OnboardingStep[] {
+  const raw = BUILDERS[portal](ctx);
+  return portal === "interno" ? filterByPermissions(raw, ctx.permissions) : raw;
+}
+
+function dedupeContentFallback(steps: OnboardingStep[]): OnboardingStep[] {
+  const specificTargets = new Set(
+    steps.filter((s) => s.route && s.id.startsWith("page-")).map((s) => s.target),
+  );
+  return steps.filter((step) => step.id !== "content-fallback" || !specificTargets.has(step.target));
+}
+
+/** Tour principal — intro + nav condensado + assistente (sem passos por rota). */
+export function buildMainTourSteps(
+  portal: PortalKey,
+  ctx: OnboardingContext,
+  pathname: string,
+): OnboardingStep[] {
+  const permitted = permitSteps(portal, ctx);
+  const main = permitted.filter((s) => !s.route && (s.order ?? 500) <= MAIN_MAX_ORDER);
+
+  const landingPage = permitted.filter(
+    (s) =>
+      s.route &&
+      matchesRoute(pathname, s.route) &&
+      s.id.startsWith("page-") &&
+      (s.order ?? 500) < 110,
+  );
+
+  return dedupeContentFallback(sortSteps([...main, ...landingPage]));
+}
+
+/** Micro-tour — hotspots e detalhes da rota atual (primeira visita ao módulo). */
+export function buildMicroTourSteps(
+  portal: PortalKey,
+  ctx: OnboardingContext,
+  pathname: string,
+): OnboardingStep[] {
+  const permitted = permitSteps(portal, ctx);
+  const micro = permitted.filter(
+    (s) => s.route && matchesRoute(pathname, s.route) && (s.order ?? 500) >= 100,
+  );
+  return dedupeContentFallback(sortSteps(micro));
+}
+
+/** Portal PJ — página única; todos os passos de uma vez. */
+export function buildFullTourSteps(
+  portal: PortalKey,
+  ctx: OnboardingContext,
+  pathname: string,
+): OnboardingStep[] {
+  return buildTourSteps(portal, ctx, pathname);
+}
+
+/** Monta passos legados com labels, RBAC e filtro por rota. */
 export function buildTourSteps(
   portal: PortalKey,
   ctx: OnboardingContext,
   pathname: string,
 ): OnboardingStep[] {
-  const raw = BUILDERS[portal](ctx);
-  const permitted =
-    portal === "interno" ? filterByPermissions(raw, ctx.permissions) : raw;
-
-  const routeFiltered = filterStepsForRoute(permitted, pathname);
+  const permitted = permitSteps(portal, ctx);
+  const routeFiltered = permitted.filter((step) => matchesRoute(pathname, step.route));
 
   const specificTargets = new Set(
     routeFiltered.filter((s) => s.route).map((s) => s.target),

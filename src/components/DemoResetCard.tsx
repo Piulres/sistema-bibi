@@ -74,7 +74,7 @@ export default function DemoResetCard({ isAdmin }: Props) {
   }
 
   return (
-    <Card className="border-amber-200 bg-amber-50/50">
+    <Card className="border-amber-200 bg-amber-50/50" data-tour-id="demo-reset">
       <SectionHeader
         title="Modo demo — restaurar dados"
         description="Apaga todos os dados e repopula o banco com a massa original do seed (50 clientes, fluxos demo, VitaCare). Use antes de apresentações ou após testes."

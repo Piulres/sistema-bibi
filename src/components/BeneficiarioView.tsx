@@ -692,6 +692,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                       <Button
                         variant="portal"
                         size="sm"
+                        data-tour-id="beneficiario-pix-pay"
                         disabled={busy === `pix-${invoice.id}`}
                         onClick={() => payWithPix(invoice.id)}
                       >

@@ -53,6 +53,7 @@ export default function MobileNavDrawer({
       <button
         ref={triggerRef}
         type="button"
+        data-tour-id="mobile-nav-trigger"
         onClick={() => setOpen(true)}
         className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
         aria-expanded={open}
@@ -105,6 +106,7 @@ export default function MobileNavDrawer({
                   <li key={tab.href}>
                     <Link
                       href={tab.href}
+                      data-tour-nav={tab.key}
                       onClick={() => setOpen(false)}
                       className={cn(
                         "block rounded-[var(--radius-button)] px-3 py-2.5 text-sm font-medium transition",

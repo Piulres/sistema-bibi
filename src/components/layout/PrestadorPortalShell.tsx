@@ -22,7 +22,7 @@ export default function PrestadorPortalShell({ user, assistantEnabled = true, ch
   const portal = PORTALS.prestador;
 
   return (
-    <OnboardingProvider portal="prestador" labels={user.labels}>
+    <OnboardingProvider portal="prestador" labels={user.labels} niche={user.niche}>
       <PortalShell
         portal="prestador"
         portalLabel={user.labels.portalProvider}
