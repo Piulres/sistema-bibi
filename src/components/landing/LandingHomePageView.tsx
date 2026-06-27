@@ -13,6 +13,9 @@ import LandingProblem from "@/components/landing/LandingProblem";
 import LandingSolution from "@/components/landing/LandingSolution";
 import LandingRoiCalculator from "@/components/landing/LandingRoiCalculator";
 import LandingCompare from "@/components/landing/LandingCompare";
+import LandingValidatedScenarios from "@/components/landing/LandingValidatedScenarios";
+import LandingDemoVideo from "@/components/landing/LandingDemoVideo";
+import LandingLeadForm from "@/components/landing/LandingLeadForm";
 import LandingChangelog from "@/components/landing/LandingChangelog";
 import LandingFeatures from "@/components/landing/LandingFeatures";
 import LandingPortals from "@/components/landing/LandingPortals";
@@ -45,7 +48,9 @@ export default function LandingHomePageView({ branding }: Props) {
         <LandingSocialProof />
         <LandingProblem />
         <LandingSolution />
+        <LandingDemoVideo />
         <LandingRoiCalculator />
+        <LandingValidatedScenarios />
         <LandingCompare />
         <LandingHomeAudience />
         <LandingNiches />
@@ -60,6 +65,7 @@ export default function LandingHomePageView({ branding }: Props) {
         <LandingPortals niche="MEDICAL" branding={branding} />
         <LandingFaq items={HOME_FAQ} />
         <LandingChangelog />
+        <LandingLeadForm />
         <LandingCta branding={branding} niche="MEDICAL" description={HOME_CTA} />
       </main>
       <LandingFooter branding={branding} context="home" footerTagline={HOME_FOOTER_TAGLINE} />

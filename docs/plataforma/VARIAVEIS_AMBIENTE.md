@@ -40,6 +40,7 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
 | `NEXT_PUBLIC_SALES_WHATSAPP` | Não | — | CTA comercial WhatsApp na landing |
 | `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Não | mensagem padrão | Texto pré-preenchido no wa.me |
+| `NEXT_PUBLIC_DEMO_VIDEO_URL` | Não | — | URL YouTube para embed em `#demo-video` na home |
 | `NEXT_PUBLIC_MARKETING_ENABLED` | Não | `false` | Liga GTM/pixels (`true` em prod) |
 | `NEXT_PUBLIC_GTM_ID` | Não | — | Google Tag Manager |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Não | — | Meta Pixel (opcional se usar só GTM) |
@@ -282,6 +283,7 @@ Injetada automaticamente pela Netlify com a URL do deploy. Usada como fallback d
 |----------|-----|
 | `NEXT_PUBLIC_SALES_WHATSAPP` | Número E.164 (`+5511970828949`). Se vazio, o botão **Fale com um especialista** não aparece. |
 | `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Mensagem inicial no WhatsApp. |
+| `NEXT_PUBLIC_DEMO_VIDEO_URL` | URL YouTube para vídeo em `#demo-video` (home). |
 | `NEXT_PUBLIC_MARKETING_ENABLED` | `true` para injetar tags. Manter `false` em dev/CI. |
 | `NEXT_PUBLIC_GTM_ID` | Container GTM (hub recomendado). |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Pixel Meta direto (opcional). |

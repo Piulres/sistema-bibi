@@ -9,11 +9,13 @@ export type LandingNavItem = {
 /** Âncoras da home — funil de captação. */
 export const HOME_NAV_ANCHORS: LandingNavItem[] = [
   { href: "#solucao", label: "Solução" },
+  { href: "#demo-video", label: "Demo" },
   { href: "#roi", label: "ROI" },
   { href: "#comparativo", label: "Comparativo" },
   { href: "#para-quem", label: "Para quem" },
   { href: "#segmentos", label: "Segmentos" },
   { href: "#portais", label: "Portais" },
+  { href: "#contato", label: "Contato" },
   { href: "#faq", label: "FAQ" },
 ];
 

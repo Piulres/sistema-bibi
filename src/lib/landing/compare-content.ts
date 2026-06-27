@@ -1,3 +1,5 @@
+import type { RoiSegmentKey } from "@/lib/landing/roi-calculator";
+
 /** Comparativo homepage — ServiceOS vs modelo tradicional vs referência de mercado. */
 export type CompareRow = {
   criterion: string;
@@ -56,3 +58,22 @@ export const HOME_COMPARE_FOOTNOTES = [
   "Wellness: Wellhub estimado R$ 35–70/colaborador/mês — acesso, não sessão auditável.",
   "Detalhes por nicho: docs/comercial/BENCHMARKS_POR_NICHO.md",
 ] as const;
+
+/** Rótulo da coluna "mercado" por segmento (campanha UTM). */
+export const COMPARE_MARKET_LABEL_BY_SEGMENT: Record<RoiSegmentKey, string> = {
+  MEDICAL: "Conexa / operadoras",
+  VET: "Guapeco / plano pet",
+  DENTAL: "Odontoprev / Clinicorp",
+  LEGAL: "Astrea / ADVBox",
+  SPA: "Wellhub / Buddha Spa",
+  EDUCATION: "Udemy Business / Hotmart",
+};
+
+export function compareIntroForSegment(segment: RoiSegmentKey | null) {
+  if (!segment) return HOME_COMPARE_INTRO;
+  const market = COMPARE_MARKET_LABEL_BY_SEGMENT[segment];
+  return {
+    title: HOME_COMPARE_INTRO.title,
+    description: `${HOME_COMPARE_INTRO.description} Referência desta campanha: ${market}.`,
+  };
+}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
@@ -11,10 +12,12 @@ import {
   formatPct,
   type RoiSegmentKey,
 } from "@/lib/landing/roi-calculator";
+import { pushDataLayer } from "@/lib/marketing/data-layer";
 
 const SEGMENT_KEYS = Object.keys(ROI_SEGMENT_PRESETS) as RoiSegmentKey[];
 
 export default function LandingRoiCalculator() {
+  const pathname = usePathname();
   const [segment, setSegment] = useState<RoiSegmentKey>("MEDICAL");
   const preset = ROI_SEGMENT_PRESETS[segment];
 
@@ -24,15 +27,7 @@ export default function LandingRoiCalculator() {
   const [unitPrice, setUnitPrice] = useState(preset.unitPrice);
   const [platformFee, setPlatformFee] = useState(preset.platformFee);
 
-  function applyPreset(key: RoiSegmentKey) {
-    const next = ROI_SEGMENT_PRESETS[key];
-    setSegment(key);
-    setEligible(next.defaultEligible);
-    setUtilizationPct(next.defaultUtilizationPct);
-    setTraditionalTicket(next.traditionalTicket);
-    setUnitPrice(next.unitPrice);
-    setPlatformFee(next.platformFee);
-  }
+  const trackTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const result = useMemo(
     () =>
@@ -45,6 +40,45 @@ export default function LandingRoiCalculator() {
       }),
     [eligible, utilizationPct, traditionalTicket, unitPrice, platformFee],
   );
+
+  const trackCalculator = useCallback(
+    (nextSegment: RoiSegmentKey) => {
+      const r = computeRoi({
+        eligible,
+        utilizationPct,
+        traditionalTicket,
+        unitPrice,
+        platformFee,
+      });
+      pushDataLayer({
+        event: "roi_calculator_change",
+        segment: nextSegment,
+        eligible,
+        utilization_pct: utilizationPct,
+        savings_pct: Math.round(r.savingsPct * 10) / 10,
+        page_path: pathname,
+      });
+    },
+    [eligible, utilizationPct, traditionalTicket, unitPrice, platformFee, pathname],
+  );
+
+  useEffect(() => {
+    if (trackTimeout.current) clearTimeout(trackTimeout.current);
+    trackTimeout.current = setTimeout(() => trackCalculator(segment), 600);
+    return () => {
+      if (trackTimeout.current) clearTimeout(trackTimeout.current);
+    };
+  }, [segment, eligible, utilizationPct, traditionalTicket, unitPrice, platformFee, trackCalculator]);
+
+  function applyPreset(key: RoiSegmentKey) {
+    const next = ROI_SEGMENT_PRESETS[key];
+    setSegment(key);
+    setEligible(next.defaultEligible);
+    setUtilizationPct(next.defaultUtilizationPct);
+    setTraditionalTicket(next.traditionalTicket);
+    setUnitPrice(next.unitPrice);
+    setPlatformFee(next.platformFee);
+  }
 
   return (
     <section id="roi" aria-labelledby="roi-heading" className="mx-auto max-w-6xl px-6 py-24">
