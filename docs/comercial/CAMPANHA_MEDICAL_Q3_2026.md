@@ -1,5 +1,7 @@
 # Campanha MEDICAL Q3 2026 — Sistema Bibi - ServiceOS
 
+> **Índice de campanhas:** [`CAMPANHAS_Q3_2026.md`](CAMPANHAS_Q3_2026.md)
+
 Plano operacional de captação B2B para o vertical **saúde corporativa** (`MEDICAL`).
 
 | Campo | Valor |

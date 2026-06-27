@@ -15,6 +15,7 @@ Documentação de **vendas, marketing e posicionamento por segmento**. Complemen
 | Calculadora ROI (home) | [`CALCULADORA_ROI.md`](CALCULADORA_ROI.md) |
 | Plano e mudanças na homepage | [`PLANO_HOMEPAGE.md`](PLANO_HOMEPAGE.md) |
 | **Prompt campanhas marketing** | [`PROMPT_CAMPANHAS_MARKETING.md`](PROMPT_CAMPANHAS_MARKETING.md) |
+| **Índice campanhas Q3 2026** | [`CAMPANHAS_Q3_2026.md`](CAMPANHAS_Q3_2026.md) |
 | **Campanha MEDICAL Q3 2026** | [`CAMPANHA_MEDICAL_Q3_2026.md`](CAMPANHA_MEDICAL_Q3_2026.md) |
 | **Papel do agente em marketing** | [`PAPEL_DO_AGENTE_MARKETING.md`](PAPEL_DO_AGENTE_MARKETING.md) |
 | Validação de testes (pacote comercial) | [`VALIDACAO_TESTES.md`](VALIDACAO_TESTES.md) |
@@ -35,7 +36,8 @@ docs/comercial/
 ├── CALCULADORA_ROI.md        ← fórmulas e presets da calculadora na home
 ├── PLANO_HOMEPAGE.md         ← plano e registro de mudanças na home
 ├── PROMPT_CAMPANHAS_MARKETING.md  ← prompt para iniciar campanhas
-├── CAMPANHA_MEDICAL_Q3_2026.md    ← plano operacional MEDICAL (exemplo)
+├── CAMPANHAS_Q3_2026.md           ← índice dos planos por nicho
+├── CAMPANHA_*_Q3_2026.md          ← plano operacional por vertical (6 nichos)
 ├── PAPEL_DO_AGENTE_MARKETING.md   ← o que o agente pode/não pode em marketing
 ├── VALIDACAO_TESTES.md       ← registro de testes do pacote comercial
 └── ESTRATEGIA_SEGMENTOS.md   ← matriz de captação e links por nicho

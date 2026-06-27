@@ -153,11 +153,12 @@ Hero personalizado via `utm_segment` ou `segment`. Calculadora ROI com preset po
 
 | # | Entrega | Status |
 |---|---------|--------|
-| 1 | `COMERCIAL.md` em cada pasta de segmento | Em andamento |
-| 2 | ROI modelado por vertical (além de saúde) | Roadmap doc |
-| 3 | Battle cards (1 página vs. concorrente) | Roadmap doc |
-| 4 | Scripts de demo gravados (`docs/evidencias/`) | Parcial |
-| 5 | Copy A/B na landing por `niche` | Roadmap produto |
+| 1 | `COMERCIAL.md` em cada pasta de segmento | ✅ |
+| 2 | Planos de campanha Q3 2026 por nicho | ✅ [`CAMPANHAS_Q3_2026.md`](CAMPANHAS_Q3_2026.md) |
+| 3 | ROI modelado por vertical (além de saúde) | ✅ presets calculadora · doc formal ROI_REFERENCIA só saúde |
+| 4 | Battle cards (1 página vs. concorrente) | ✅ em cada `CAMPANHA_*_Q3_2026.md` |
+| 5 | Scripts de demo gravados (`docs/evidencias/`) | Parcial |
+| 6 | Copy A/B na landing por `niche` | ✅ hero `utm_segment` |
 
 ---
 

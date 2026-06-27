@@ -84,7 +84,7 @@ O hero lê `utm_segment` ou `segment` — ver `src/lib/landing/hero-variants.ts`
 | `SPA` | Wellness por sessão usada | Gympass com <20% uso | Agendar demo NR-1 |
 | `EDUCATION` | Crédito por aula realizada | Udemy/Alura ociosa | Simular L&D Pay Per Use |
 
-Detalhes e ICP em cada `docs/segmentos/{niche}/COMERCIAL.md`.
+Detalhes e ICP em cada `docs/segmentos/{niche}/COMERCIAL.md`. Planos operacionais: [`CAMPANHAS_Q3_2026.md`](CAMPANHAS_Q3_2026.md).
 
 ---
 
