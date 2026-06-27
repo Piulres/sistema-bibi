@@ -5,7 +5,7 @@ import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import InternoNav from "@/components/InternoNav";
 import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
-import { ToastProvider } from "@/components/ui/Toast";
+import FeedbackProvider from "@/components/ui/FeedbackProvider";
 import { PORTALS } from "@/lib/roles";
 import { INTERNO_PUBLIC_PATHS } from "@/lib/navigation";
 import type { SessionUser } from "@/lib/session";
@@ -32,7 +32,7 @@ export default function InternoPortalShell({ user, assistantEnabled = true, chil
 
   return (
     <OnboardingProvider portal="interno" labels={user.labels} permissions={user.internoPermissions}>
-      <ToastProvider>
+      <FeedbackProvider>
         <PortalShell
           portal="interno"
           portalLabel={`Operação · ${user.labels.beneficiaries}`}
@@ -50,7 +50,7 @@ export default function InternoPortalShell({ user, assistantEnabled = true, chil
           </AssistantShell>
         </PortalShell>
         <OnboardingTour />
-      </ToastProvider>
+      </FeedbackProvider>
     </OnboardingProvider>
   );
 }

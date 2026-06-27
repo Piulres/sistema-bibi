@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import Alert from "@/components/ui/Alert";
 import SectionHeader from "@/components/ui/SectionHeader";
-import Input from "@/components/ui/Input";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { fetchJson } from "@/lib/ui/api-feedback";
+import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 type DemoResetStatus = {
   enabled: boolean;
@@ -20,53 +22,34 @@ type Props = {
 
 export default function DemoResetCard({ isAdmin }: Props) {
   const router = useRouter();
-  const [status, setStatus] = useState<DemoResetStatus | null>(null);
-  const [confirm, setConfirm] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const { isBusy, run } = useAsyncAction();
 
-  const load = useCallback(async () => {
-    const res = await fetch("/api/interno/demo/reset");
-    if (res.ok) {
-      setStatus(await res.json());
-    }
-  }, []);
+  const loadStatus = useCallback(
+    () => fetchJson<DemoResetStatus>("/api/interno/demo/reset", undefined, "Erro ao carregar status do demo"),
+    [],
+  );
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      await load();
-      if (!active) return;
-    })();
-    return () => {
-      active = false;
-    };
-  }, [load]);
+  const { data: status } = useAsyncData(loadStatus, []);
 
-  async function handleReset(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    setSuccess(null);
-    try {
-      const res = await fetch("/api/interno/demo/reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ confirm: confirm.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao restaurar modo demo");
-        return;
-      }
-      setSuccess(data.message ?? "Modo demo restaurado");
-      await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/interno/login");
-      router.refresh();
-    } finally {
-      setBusy(false);
-    }
+  async function handleReset() {
+    await run(
+      "demo-reset",
+      () =>
+        fetch("/api/interno/demo/reset", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirm: "RESTAURAR" }),
+        }),
+      {
+        confirm: confirmPresets.demoReset(),
+        successMessage: "Modo demo restaurado",
+        onSuccess: async () => {
+          await fetch("/api/auth/logout", { method: "POST" });
+          router.push("/interno/login");
+          router.refresh();
+        },
+      },
+    );
   }
 
   if (!isAdmin || !status?.enabled) {
@@ -80,40 +63,24 @@ export default function DemoResetCard({ isAdmin }: Props) {
         description="Apaga todos os dados e repopula o banco com a massa original do seed (50 clientes, fluxos demo, VitaCare). Use antes de apresentações ou após testes."
       />
 
-      {error && (
-        <Alert tone="danger" className="mt-4">
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert tone="success" className="mt-4">
-          {success}
-        </Alert>
-      )}
-
       <ul className="mt-4 list-inside list-disc space-y-1 text-sm text-[var(--text-secondary)]">
         <li>Todos os cadastros, faturas, agendamentos e integrações serão substituídos</li>
         <li>Sua sessão atual será encerrada — será necessário fazer login novamente</li>
         <li>Operação irreversível (não há backup automático)</li>
       </ul>
 
-      <form onSubmit={handleReset} className="mt-6 space-y-4">
-        <Input
-          label='Confirme digitando RESTAURAR'
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          placeholder="RESTAURAR"
-          autoComplete="off"
-          disabled={busy || status.inProgress}
-        />
+      <div className="mt-6">
         <Button
-          type="submit"
+          type="button"
           variant="danger"
-          disabled={busy || status.inProgress || confirm.trim().toUpperCase() !== "RESTAURAR"}
+          disabled={isBusy("demo-reset") || status.inProgress}
+          onClick={() => void handleReset()}
         >
-          {busy ? "Restaurando modo demo..." : "Restaurar estado original do seed"}
+          {isBusy("demo-reset") || status.inProgress
+            ? "Restaurando modo demo..."
+            : "Restaurar estado original do seed"}
         </Button>
-      </form>
+      </div>
     </Card>
   );
 }

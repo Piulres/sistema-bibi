@@ -3,6 +3,7 @@
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import SectionNav from "@/components/ui/SectionNav";
+import FeedbackProvider from "@/components/ui/FeedbackProvider";
 import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { PORTALS } from "@/lib/roles";
 import { PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
@@ -25,6 +26,7 @@ export default function PjPortalShell({ user, assistantEnabled = true, children 
 
   return (
     <OnboardingProvider portal="pj" labels={user.labels}>
+      <FeedbackProvider>
       <PortalShell
         portal="pj"
         portalLabel={`Portal ${user.labels.company}`}
@@ -48,6 +50,7 @@ export default function PjPortalShell({ user, assistantEnabled = true, children 
         </AssistantShell>
       </PortalShell>
       <OnboardingTour />
+      </FeedbackProvider>
     </OnboardingProvider>
   );
 }

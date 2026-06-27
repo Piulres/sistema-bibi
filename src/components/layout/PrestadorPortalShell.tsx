@@ -3,6 +3,7 @@
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import PrestadorNav from "@/components/PrestadorNav";
+import FeedbackProvider from "@/components/ui/FeedbackProvider";
 import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { PORTALS } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
@@ -23,6 +24,7 @@ export default function PrestadorPortalShell({ user, assistantEnabled = true, ch
 
   return (
     <OnboardingProvider portal="prestador" labels={user.labels}>
+      <FeedbackProvider>
       <PortalShell
         portal="prestador"
         portalLabel={user.labels.portalProvider}
@@ -40,6 +42,7 @@ export default function PrestadorPortalShell({ user, assistantEnabled = true, ch
         </AssistantShell>
       </PortalShell>
       <OnboardingTour />
+      </FeedbackProvider>
     </OnboardingProvider>
   );
 }

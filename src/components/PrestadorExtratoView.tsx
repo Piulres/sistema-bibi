@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import LoadingState from "@/components/ui/LoadingState";
-import Alert from "@/components/ui/Alert";
+import { useCallback } from "react";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import StatCard from "@/components/ui/StatCard";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Extrato = {
   periodLabel: string;
@@ -29,28 +30,29 @@ type Extrato = {
   }[];
 };
 
+type ExtratoPayload = {
+  extrato?: Extrato;
+};
+
 export default function PrestadorExtratoView() {
-  const [extrato, setExtrato] = useState<Extrato | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const loadExtrato = useCallback(
+    () =>
+      fetchJson<ExtratoPayload>("/api/prestador/extrato", undefined, "Erro ao carregar extrato"),
+    [],
+  );
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const res = await fetch("/api/prestador/extrato");
-      const data = await res.json();
-      if (!active) return;
-      if (!res.ok) setError(data.error ?? "Erro ao carregar extrato");
-      else setExtrato(data.extrato);
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { data, loading, error, reload } = useAsyncData(loadExtrato, []);
 
-  if (error) return <Alert tone="danger">{error}</Alert>;
-  if (!extrato) return <LoadingState message="Carregando extrato..." />;
+  const extrato = data?.extrato ?? null;
 
   return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error}
+      loadingMessage="Carregando extrato..."
+      onRetry={() => void reload()}
+    >
+      {extrato && (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <p className="text-sm text-[var(--text-muted)]">Período: {extrato.periodLabel}</p>
@@ -125,5 +127,7 @@ export default function PrestadorExtratoView() {
         )}
       </section>
     </div>
+      )}
+    </ViewStateBoundary>
   );
 }

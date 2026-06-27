@@ -14,7 +14,8 @@ import type { TimelineEventMetadata } from "@/lib/change-management";
 import { RESTORE_CONFIRM_PHRASE } from "@/lib/change-management/policy";
 import { TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
 import ExportButtons from "@/components/ExportButtons";
-import { useToast } from "@/components/ui/Toast";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 type AuditEvent = {
   id: string;
@@ -98,8 +99,7 @@ export default function AuditoriaView() {
   const [page, setPage] = useState(1);
   const [refreshToken, setRefreshToken] = useState(0);
   const [expandedDiffIds, setExpandedDiffIds] = useState<Set<string>>(new Set());
-  const [restoreBusy, setRestoreBusy] = useState<string | null>(null);
-  const { showToast } = useToast();
+  const { isBusy, run } = useAsyncAction();
 
   useEffect(() => {
     let active = true;
@@ -144,23 +144,22 @@ export default function AuditoriaView() {
   }
 
   async function restoreEvent(event: AuditEvent) {
-    setRestoreBusy(event.id);
-    try {
-      const res = await fetch(`/api/interno/audit/${event.id}/restore`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ confirm: RESTORE_CONFIRM_PHRASE }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        showToast({ message: data.error ?? "Falha ao restaurar", tone: "danger" });
-        return;
-      }
-      showToast({ message: "Versão restaurada com sucesso", tone: "success" });
-      setRefreshToken((t) => t + 1);
-    } finally {
-      setRestoreBusy(null);
-    }
+    await run(
+      `restore-${event.id}`,
+      () =>
+        fetch(`/api/interno/audit/${event.id}/restore`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ confirm: RESTORE_CONFIRM_PHRASE }),
+        }),
+      {
+        confirm: confirmPresets.restoreAudit(),
+        successMessage: "Versão restaurada com sucesso",
+        onSuccess: async () => {
+          setRefreshToken((t) => t + 1);
+        },
+      },
+    );
   }
 
   if (loading && !data) {
@@ -301,10 +300,10 @@ export default function AuditoriaView() {
                             variant="secondary"
                             size="sm"
                             className="ml-2"
-                            disabled={restoreBusy === event.id}
+                            disabled={isBusy(`restore-${event.id}`)}
                             onClick={() => restoreEvent(event)}
                           >
-                            {restoreBusy === event.id ? "Restaurando…" : "Restaurar versão"}
+                            {isBusy(`restore-${event.id}`) ? "Restaurando…" : "Restaurar versão"}
                           </Button>
                         )}
                       </div>

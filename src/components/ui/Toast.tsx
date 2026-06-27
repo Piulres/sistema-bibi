@@ -18,6 +18,18 @@ type ToastContextValue = {
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
+const toneClass = {
+  info: "border-[var(--status-info-text)]/25",
+  success: "border-[var(--status-success-text)]/25",
+  danger: "border-[var(--status-danger-text)]/25",
+} as const;
+
+const toneMessageClass = {
+  info: "text-[var(--text-secondary)]",
+  success: "text-[var(--status-success-text)]",
+  danger: "text-[var(--status-danger-text)]",
+} as const;
+
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<ToastItem[]>([]);
 
@@ -47,9 +59,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {items.map((toast) => (
           <div
             key={toast.id}
-            className="pointer-events-auto rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-lg"
+            className={`pointer-events-auto rounded-xl border bg-[var(--surface-card)] p-4 shadow-lg ${toneClass[toast.tone ?? "info"]}`}
           >
-            <p className="text-sm text-[var(--text-secondary)]">{toast.message}</p>
+            <p className={`text-sm ${toneMessageClass[toast.tone ?? "info"]}`}>{toast.message}</p>
             <div className="mt-2 flex gap-2">
               {toast.actionLabel && toast.onAction && (
                 <Button

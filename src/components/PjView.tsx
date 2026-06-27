@@ -1,14 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback } from "react";
 import Card from "@/components/ui/Card";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
-import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { fetchJson } from "@/lib/ui/api-feedback";
 
 type AlertItem = {
   tone: "warning" | "danger" | "info";
@@ -67,33 +69,23 @@ const alertTone = {
 };
 
 export default function PjView() {
-  const [data, setData] = useState<Overview | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const loadOverview = useCallback(
+    () => fetchJson<Overview>("/api/pj/overview", undefined, "Falha ao carregar dados da empresa"),
+    [],
+  );
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/pj/overview");
-        const d = await res.json();
-        if (!active) return;
-        if (!res.ok) setError(d.error ?? "Falha ao carregar dados da empresa");
-        else setData(d);
-      } catch {
-        if (active) setError("Falha ao carregar dados da empresa");
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
-
-  if (error) return <Alert tone="danger">{error}</Alert>;
-  if (!data) return <LoadingState message="Carregando dados da empresa..." />;
-
-  const { company, alerts, beneficiaries, invoices, subscriptions, summary } = data;
+  const { data, loading, error, reload } = useAsyncData(loadOverview, []);
 
   return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error}
+      loadingMessage="Carregando dados da empresa..."
+      onRetry={() => void reload()}
+    >
+      {data && (() => {
+        const { company, alerts, beneficiaries, invoices, subscriptions, summary } = data;
+        return (
     <div className="space-y-8">
       {alerts.length > 0 && (
         <div className="space-y-2">
@@ -233,5 +225,8 @@ export default function PjView() {
         )}
       </section>
     </div>
+        );
+      })()}
+    </ViewStateBoundary>
   );
 }

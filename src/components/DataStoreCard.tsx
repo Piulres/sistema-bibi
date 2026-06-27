@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import Alert from "@/components/ui/Alert";
 import SectionHeader from "@/components/ui/SectionHeader";
-import Input from "@/components/ui/Input";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { fetchJson } from "@/lib/ui/api-feedback";
+import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 type DataStoreStatus = {
   mode: "demo" | "operation";
@@ -22,58 +24,41 @@ type Props = {
 
 export default function DataStoreCard({ isAdmin }: Props) {
   const router = useRouter();
-  const [status, setStatus] = useState<DataStoreStatus | null>(null);
+  const { isBusy, run } = useAsyncAction();
   const [targetMode, setTargetMode] = useState<"demo" | "operation">("operation");
-  const [confirm, setConfirm] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    const res = await fetch("/api/interno/data-store");
-    if (res.ok) {
-      setStatus(await res.json());
-    }
-  }, []);
+  const loadStatus = useCallback(
+    () => fetchJson<DataStoreStatus>("/api/interno/data-store", undefined, "Erro ao carregar modo de dados"),
+    [],
+  );
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      await load();
-      if (!active) return;
-    })();
-    return () => {
-      active = false;
-    };
-  }, [load]);
+  const { data: status, reload } = useAsyncData(loadStatus, []);
 
-  async function handleSwitch(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    setSuccess(null);
-    try {
-      const res = await fetch("/api/interno/data-store", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: targetMode, confirm: confirm.trim() }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao alternar modo de dados");
-        return;
-      }
-      setSuccess(data.message ?? "Modo alterado");
-      setConfirm("");
-      await load();
-      if (data.logoutRecommended) {
-        await fetch("/api/auth/logout", { method: "POST" });
-        router.push("/interno/login");
-        router.refresh();
-      }
-    } finally {
-      setBusy(false);
-    }
+  async function handleSwitch(mode: "demo" | "operation") {
+    const targetLabel = mode === "operation" ? "Operação (real)" : "Demo (teste)";
+    const confirmPhrase = mode === "operation" ? "OPERAR" : "DEMO";
+
+    await run(
+      `switch-${mode}`,
+      () =>
+        fetch("/api/interno/data-store", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mode, confirm: confirmPhrase }),
+        }),
+      {
+        confirm: confirmPresets.switchDataStore(targetLabel),
+        successMessage: `Modo ${targetLabel} ativado`,
+        onSuccess: async (body) => {
+          await reload();
+          if (body.logoutRecommended) {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/interno/login");
+            router.refresh();
+          }
+        },
+      },
+    );
   }
 
   if (!isAdmin || !status?.canSwitch) {
@@ -81,7 +66,6 @@ export default function DataStoreCard({ isAdmin }: Props) {
   }
 
   const isDemo = status.mode === "demo";
-  const expectedConfirm = targetMode === "operation" ? "OPERAR" : "DEMO";
 
   return (
     <Card className="border-teal-200 bg-teal-50/40">
@@ -108,17 +92,6 @@ export default function DataStoreCard({ isAdmin }: Props) {
         </span>
       </div>
 
-      {error && (
-        <Alert tone="danger" className="mt-4">
-          {error}
-        </Alert>
-      )}
-      {success && (
-        <Alert tone="success" className="mt-4">
-          {success}
-        </Alert>
-      )}
-
       <ul className="mt-4 list-inside list-disc space-y-1 text-sm text-[var(--text-secondary)]">
         <li>
           <strong>Demo</strong> — 50 empresas, beneficiários e fluxos de apresentação (somente leitura
@@ -131,53 +104,36 @@ export default function DataStoreCard({ isAdmin }: Props) {
         <li>A troca afeta todos os portais simultaneamente — faça login novamente após alternar</li>
       </ul>
 
-      <form onSubmit={handleSwitch} className="mt-6 space-y-4">
-        <div className="flex flex-wrap gap-3">
-          <Button
-            type="button"
-            variant={targetMode === "operation" ? "primary" : "secondary"}
-            onClick={() => {
-              setTargetMode("operation");
-              setConfirm("");
-            }}
-            disabled={busy}
-          >
-            Ir para operação
-          </Button>
-          <Button
-            type="button"
-            variant={targetMode === "demo" ? "primary" : "secondary"}
-            onClick={() => {
-              setTargetMode("demo");
-              setConfirm("");
-            }}
-            disabled={busy}
-          >
-            Voltar para demo
-          </Button>
-        </div>
-
-        <Input
-          label={`Confirme digitando ${expectedConfirm}`}
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          placeholder={expectedConfirm}
-          autoComplete="off"
-          disabled={busy}
-        />
-
+      <div className="mt-6 flex flex-wrap gap-3">
         <Button
-          type="submit"
+          type="button"
           variant={targetMode === "operation" ? "primary" : "secondary"}
-          disabled={busy || confirm.trim().toUpperCase() !== expectedConfirm}
+          onClick={() => setTargetMode("operation")}
+          disabled={isBusy("switch-operation")}
         >
-          {busy
+          Ir para operação
+        </Button>
+        <Button
+          type="button"
+          variant={targetMode === "demo" ? "primary" : "secondary"}
+          onClick={() => setTargetMode("demo")}
+          disabled={isBusy("switch-demo")}
+        >
+          Voltar para demo
+        </Button>
+        <Button
+          type="button"
+          variant={targetMode === "operation" ? "primary" : "secondary"}
+          disabled={isBusy(`switch-${targetMode}`)}
+          onClick={() => void handleSwitch(targetMode)}
+        >
+          {isBusy(`switch-${targetMode}`)
             ? "Alternando..."
             : targetMode === "operation"
               ? "Ativar modo operação"
               : "Ativar modo demo"}
         </Button>
-      </form>
+      </div>
     </Card>
   );
 }

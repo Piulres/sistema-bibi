@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
-import LoadingState from "@/components/ui/LoadingState";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -14,6 +14,10 @@ import AppointmentCard from "@/components/ui/AppointmentCard";
 import PixQrDisplay from "@/components/ui/PixQrDisplay";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 import { useLabels } from "@/hooks/useLabels";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { fetchJson } from "@/lib/ui/api-feedback";
+import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 export type BeneficiarioSection =
   | "agendar"
@@ -155,16 +159,8 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   const { niche, labels } = useLabels();
   const isVet = niche === "VET";
   const show = (id: BeneficiarioSection) => !section || section === id;
-  const [overview, setOverview] = useState<Overview | null>(null);
-  const [clinical, setClinical] = useState<ClinicalData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState<string | null>(null);
-  const [msg, setMsg] = useState<string | null>(null);
+  const { isBusy, run, showToast } = useAsyncAction();
   const [pixState, setPixState] = useState<PixState | null>(null);
-  const [providers, setProviders] = useState<{ id: string; name: string }[]>([]);
-  const [procedures, setProcedures] = useState<{ id: string; name: string }[]>([]);
-  const [pets, setPets] = useState<{ id: string; name: string; speciesLabel: string }[]>([]);
   const [slots, setSlots] = useState<
     { start: string; label: string; providerId?: string; providerName?: string }[]
   >([]);
@@ -179,45 +175,50 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     modality: "PRESENCIAL",
   });
 
-  const reloadOverview = async () => {
-    const res = await fetch("/api/beneficiario/overview");
-    const data = await res.json();
-    if (res.ok) setOverview(data.overview);
-  };
+  const loadInitialData = useCallback(async () => {
+    const fetches: Promise<ReturnType<typeof fetchJson>>[] = [
+      fetchJson<{ overview?: Overview }>("/api/beneficiario/overview", undefined, "Erro ao carregar seus dados"),
+      fetchJson<{ providers?: { id: string; name: string }[] }>("/api/beneficiario/providers"),
+      fetchJson<{ clinical?: ClinicalData }>("/api/beneficiario/clinical"),
+      fetchJson<{ procedures?: { id: string; name: string }[] }>("/api/procedures"),
+    ];
+    if (isVet) {
+      fetches.push(fetchJson<{ pets?: { id: string; name: string; speciesLabel: string }[] }>("/api/beneficiario/pets"));
+    }
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const fetches: Promise<Response>[] = [
-        fetch("/api/beneficiario/overview"),
-        fetch("/api/beneficiario/providers"),
-        fetch("/api/beneficiario/clinical"),
-        fetch("/api/procedures"),
-      ];
-      if (isVet) fetches.push(fetch("/api/beneficiario/pets"));
+    const responses = await Promise.all(fetches);
+    const overviewRes = responses[0] as Awaited<ReturnType<typeof fetchJson<{ overview?: Overview }>>>;
+    if (!overviewRes.ok) return overviewRes;
 
-      const responses = await Promise.all(fetches);
-      const [overviewRes, providersRes, clinicalRes, proceduresRes, petsRes] = responses;
-      const overviewData = await overviewRes.json();
-      const providersData = await providersRes.json();
-      const clinicalData = await clinicalRes.json();
-      const proceduresData = await proceduresRes.json();
-      if (!active) return;
-      if (!overviewRes.ok) setError(overviewData.error ?? "Erro ao carregar seus dados");
-      else setOverview(overviewData.overview);
-      if (clinicalRes.ok) setClinical(clinicalData.clinical);
-      setProviders(providersData.providers ?? []);
-      setProcedures(proceduresData.procedures ?? []);
-      if (petsRes) {
-        const petsData = await petsRes.json();
-        setPets(petsData.pets ?? []);
-      }
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
+    const providersRes = responses[1] as Awaited<ReturnType<typeof fetchJson<{ providers?: { id: string; name: string }[] }>>>;
+    const clinicalRes = responses[2] as Awaited<ReturnType<typeof fetchJson<{ clinical?: ClinicalData }>>>;
+    const proceduresRes = responses[3] as Awaited<ReturnType<typeof fetchJson<{ procedures?: { id: string; name: string }[] }>>>;
+    const petsRes = isVet ? responses[4] : undefined;
+
+    return {
+      ok: true as const,
+      data: {
+        overview: overviewRes.data.overview ?? null,
+        clinical: clinicalRes.ok ? (clinicalRes.data.clinical ?? null) : null,
+        providers: providersRes.ok ? (providersRes.data.providers ?? []) : [],
+        procedures: proceduresRes.ok ? (proceduresRes.data.procedures ?? []) : [],
+        pets: petsRes?.ok ? (petsRes.data.pets ?? []) : [],
+      },
+      status: overviewRes.status,
     };
   }, [isVet]);
+
+  const { data, loading, error, reload } = useAsyncData(loadInitialData, [isVet]);
+
+  const overview = data?.overview ?? null;
+  const clinical = data?.clinical ?? null;
+  const providers = data?.providers ?? [];
+  const procedures = data?.procedures ?? [];
+  const pets = data?.pets ?? [];
+
+  const reloadOverview = useCallback(async () => {
+    await reload();
+  }, [reload]);
 
   useEffect(() => {
     let active = true;
@@ -248,101 +249,102 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     e.preventDefault();
     if (!scheduleForm.slot) return;
     const selectedSlot = slots.find((s) => s.start === scheduleForm.slot);
-    setBusy("book");
-    setMsg(null);
-    try {
-      const res = await fetch("/api/beneficiario/appointments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          providerId: scheduleForm.noProviderPreference
-            ? selectedSlot?.providerId
-            : scheduleForm.providerId,
-          procedureId: scheduleForm.procedureId || undefined,
-          petId: isVet ? scheduleForm.petId : null,
-          scheduledAt: scheduleForm.slot,
-          reason: scheduleForm.reason,
-          modality: scheduleForm.modality,
-          autoAssignProvider: scheduleForm.noProviderPreference && !selectedSlot?.providerId,
+    await run(
+      "book",
+      () =>
+        fetch("/api/beneficiario/appointments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            providerId: scheduleForm.noProviderPreference
+              ? selectedSlot?.providerId
+              : scheduleForm.providerId,
+            procedureId: scheduleForm.procedureId || undefined,
+            petId: isVet ? scheduleForm.petId : null,
+            scheduledAt: scheduleForm.slot,
+            reason: scheduleForm.reason,
+            modality: scheduleForm.modality,
+            autoAssignProvider: scheduleForm.noProviderPreference && !selectedSlot?.providerId,
+          }),
         }),
-      });
-      const data = await res.json();
-      if (!res.ok) setMsg(data.error ?? "Erro ao agendar");
-      else {
-        setMsg("Consulta agendada! Aguarde confirmação da clínica.");
-        await reloadOverview();
-      }
-    } finally {
-      setBusy(null);
-    }
+      {
+        successMessage: "Consulta agendada! Aguarde confirmação da clínica.",
+        onSuccess: async () => {
+          await reloadOverview();
+        },
+      },
+    );
   }
 
-  async function cancelAppointment(id: string) {
-    setBusy(`cancel-${id}`);
-    setMsg(null);
-    try {
-      const res = await fetch(`/api/beneficiario/appointments/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "cancel" }),
-      });
-      const data = await res.json();
-      if (!res.ok) setMsg(data.error ?? "Erro ao cancelar");
-      else {
-        setMsg("Consulta cancelada com sucesso.");
-        await reloadOverview();
-      }
-    } finally {
-      setBusy(null);
-    }
+  async function cancelAppointment(id: string, whenLabel: string) {
+    await run(
+      `cancel-${id}`,
+      () =>
+        fetch(`/api/beneficiario/appointments/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "cancel" }),
+        }),
+      {
+        confirm: confirmPresets.cancelAppointment(whenLabel),
+        successMessage: "Consulta cancelada com sucesso.",
+        onSuccess: async () => {
+          await reloadOverview();
+        },
+      },
+    );
   }
 
   async function payWithPix(invoiceId: string) {
-    setBusy(`pix-${invoiceId}`);
-    setMsg(null);
-    try {
-      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, { method: "POST" });
-      const data = await res.json();
-      if (!res.ok) setMsg(data.error ?? "Erro ao gerar PIX");
-      else {
-        setPixState({
-          invoiceId,
-          paymentId: data.payment.id,
-          pixCopyPaste: data.pixCopyPaste ?? data.payment.pixCopyPaste ?? "",
-        });
-        setMsg("Cobrança PIX gerada — copie o código abaixo");
-      }
-    } finally {
-      setBusy(null);
-    }
+    await run(
+      `pix-${invoiceId}`,
+      () => fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, { method: "POST" }),
+      {
+        silentSuccess: true,
+        onSuccess: (body) => {
+          const payment = body.payment as { id: string; pixCopyPaste?: string };
+          setPixState({
+            invoiceId,
+            paymentId: payment.id,
+            pixCopyPaste: String(body.pixCopyPaste ?? payment.pixCopyPaste ?? ""),
+          });
+          showToast({
+            message: "Cobrança PIX gerada — copie o código abaixo",
+            tone: "success",
+          });
+        },
+      },
+    );
   }
 
-  async function confirmPix(invoiceId: string, paymentId: string) {
-    setBusy(`confirm-${invoiceId}`);
-    setMsg(null);
-    try {
-      const res = await fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ paymentId }),
-      });
-      const data = await res.json();
-      if (!res.ok) setMsg(data.error ?? "Erro ao confirmar PIX");
-      else {
-        setMsg("Pagamento PIX confirmado");
-        setPixState(null);
-        await reloadOverview();
-      }
-    } finally {
-      setBusy(null);
-    }
+  async function confirmPix(invoiceId: string, paymentId: string, totalLabel: string) {
+    await run(
+      `confirm-${invoiceId}`,
+      () =>
+        fetch(`/api/beneficiario/invoices/${invoiceId}/pay`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ paymentId }),
+        }),
+      {
+        confirm: confirmPresets.confirmPix(totalLabel),
+        successMessage: "Pagamento PIX confirmado",
+        onSuccess: async () => {
+          setPixState(null);
+          await reloadOverview();
+        },
+      },
+    );
   }
 
-  if (loading) return <LoadingState message="Carregando seu painel..." />;
-  if (error || !overview) {
-    return <Alert tone="danger">{error ?? "Dados indisponíveis"}</Alert>;
-  }
-
+  return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error}
+      loadingMessage="Carregando seu painel..."
+      onRetry={() => void reload()}
+    >
+      {overview && (() => {
   const { patient, summary, nextAppointment } = overview;
   const activeSubscription = overview.subscriptions.find((s) => s.status === "ATIVA");
   const journeyStep = resolveCareJourneyStep({
@@ -354,9 +356,6 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
   return (
     <div className="space-y-8">
-      {msg && (show("agendar") || show("agenda") || show("faturas")) && (
-        <Alert tone="info">{msg}</Alert>
-      )}
       {pixState && show("faturas") && (
         <Alert tone="info">
           <p className="font-medium">PIX gerado</p>
@@ -365,10 +364,13 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
             className="mt-3"
             variant="portal"
             size="sm"
-            disabled={busy === `confirm-${pixState.invoiceId}`}
-            onClick={() => confirmPix(pixState.invoiceId, pixState.paymentId)}
+            disabled={isBusy(`confirm-${pixState.invoiceId}`)}
+            onClick={() => {
+              const inv = overview.invoices.find((i) => i.id === pixState.invoiceId);
+              confirmPix(pixState.invoiceId, pixState.paymentId, inv?.totalLabel ?? "PIX");
+            }}
           >
-            {busy === `confirm-${pixState.invoiceId}` ? "Confirmando..." : "Confirmar pagamento PIX"}
+            {isBusy(`confirm-${pixState.invoiceId}`) ? "Confirmando..." : "Confirmar pagamento PIX"}
           </Button>
         </Alert>
       )}
@@ -482,8 +484,8 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
             </select>
           </label>
           <div className="flex items-end">
-            <Button type="submit" variant="portal" disabled={busy === "book" || !scheduleForm.slot}>
-              {busy === "book" ? "Agendando..." : "Agendar"}
+            <Button type="submit" variant="portal" disabled={isBusy("book") || !scheduleForm.slot}>
+              {isBusy("book") ? "Agendando..." : "Agendar"}
             </Button>
           </div>
         </form>
@@ -601,10 +603,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                       <Button
                         variant="secondary"
                         size="sm"
-                        disabled={busy === `cancel-${appointment.id}`}
-                        onClick={() => cancelAppointment(appointment.id)}
+                        disabled={isBusy(`cancel-${appointment.id}`)}
+                        onClick={() => cancelAppointment(appointment.id, appointment.scheduledAtLabel)}
                       >
-                        {busy === `cancel-${appointment.id}` ? "Cancelando..." : "Cancelar"}
+                        {isBusy(`cancel-${appointment.id}`) ? "Cancelando..." : "Cancelar"}
                       </Button>
                     ) : null
                   }
@@ -692,10 +694,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                       <Button
                         variant="portal"
                         size="sm"
-                        disabled={busy === `pix-${invoice.id}`}
+                        disabled={isBusy(`pix-${invoice.id}`)}
                         onClick={() => payWithPix(invoice.id)}
                       >
-                        {busy === `pix-${invoice.id}` ? "..." : "Pagar com PIX"}
+                        {isBusy(`pix-${invoice.id}`) ? "..." : "Pagar com PIX"}
                       </Button>
                     )}
                   </div>
@@ -927,5 +929,8 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       </section>
       )}
     </div>
+  );
+      })()}
+    </ViewStateBoundary>
   );
 }
