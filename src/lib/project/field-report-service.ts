@@ -261,8 +261,13 @@ export async function createFieldReport(input: {
       id: input.projectId,
       ...providerProjectAccessFilter(input.tenantId, input.authorId),
     },
+    select: { billingMode: true },
   });
   if (!canAccess) return { error: "Você não está alocado nesta obra" };
+
+  if (input.diariaAmount && input.diariaAmount > 0 && canAccess.billingMode === "FECHADO") {
+    return { error: "Esta obra é de contrato fechado — diárias não são faturáveis no RDO" };
+  }
 
   if (input.taskId) {
     const task = await prisma.projectTask.findFirst({
@@ -361,9 +366,12 @@ export async function approveAndBillFieldReport(input: {
   if (!report) return { error: "RDO não encontrado" };
   if (report.status !== "ENVIADO") return { error: "Somente RDOs enviados podem ser aprovados" };
 
+  const diariaAmount = report.diariaAmount ?? 0;
+  const billDiaria = diariaAmount > 0 && report.project.billingMode !== "FECHADO";
+
   let invoiceId: string | undefined;
 
-  if (report.diariaAmount && report.diariaAmount > 0) {
+  if (billDiaria) {
     const patient = report.project.companyId
       ? await resolveInvoicePatientForCompany(
           input.tenantId,
@@ -380,13 +388,13 @@ export async function approveAndBillFieldReport(input: {
         tenantId: input.tenantId,
         patientId: patient.id,
         companyId: report.project.companyId,
-        total: report.diariaAmount,
+        total: diariaAmount,
         status: "FECHADA",
         items: {
           create: [
             {
               description: `${report.project.code} — Diária ${fieldTradeLabel(report.trade)} (${report.author.name}) — ${new Date(report.reportDate).toLocaleDateString("pt-BR")}`,
-              amount: report.diariaAmount,
+              amount: diariaAmount,
             },
           ],
         },
@@ -400,7 +408,7 @@ export async function approveAndBillFieldReport(input: {
       type: "SAIDA",
       category: "MAO_OBRA",
       description: `Diária ${fieldTradeLabel(report.trade)} — ${report.author.name}`,
-      amount: report.diariaAmount,
+      amount: diariaAmount,
       referenceType: "DailyFieldReport",
       referenceId: report.id,
       entryDate: report.reportDate,
@@ -441,7 +449,7 @@ export async function approveAndBillFieldReport(input: {
     entityId: report.projectId,
     action: TIMELINE_ACTIONS.UPDATED,
     description: invoiceId
-      ? `RDO aprovado e diária faturada — ${formatBRL(report.diariaAmount!)}`
+      ? `RDO aprovado e diária faturada — ${formatBRL(diariaAmount)}`
       : "RDO de campo aprovado",
     createdBy: input.approvedBy,
   });

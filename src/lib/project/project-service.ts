@@ -547,7 +547,9 @@ export async function upsertBudget(input: {
     where: { id: budgetId, projectId: input.projectId },
   });
   if (!budget) return { error: "Orçamento não encontrado" };
-  if (budget.status === "APROVADO") return { error: "Orçamento aprovado não pode ser editado" };
+  if (budget.status === "APROVADO" || budget.status === "APROVADO_PJ") {
+    return { error: "Orçamento aprovado não pode ser editado" };
+  }
 
   await prisma.budgetLineItem.deleteMany({ where: { budgetId } });
   await prisma.budget.update({
@@ -613,6 +615,51 @@ export async function sendBudget(input: {
   return { budget: updatedBudget, project: detail };
 }
 
+/** Aprovação comercial do cliente (PJ) — etapa 1 da dupla aprovação. */
+export async function approveBudgetByPj(input: {
+  tenantId: string;
+  projectId: string;
+  budgetId: string;
+  updatedBy: string;
+  approvedByPjUserId: string;
+}): Promise<{ budget: BudgetView; project: ProjectDetail } | { error: string }> {
+  const prisma = await getPrisma();
+  const budget = await prisma.budget.findFirst({
+    where: { id: input.budgetId, project: { id: input.projectId, tenantId: input.tenantId } },
+    include: { lineItems: true, project: true },
+  });
+  if (!budget) return { error: "Orçamento não encontrado" };
+  if (budget.status !== "ENVIADO") {
+    return { error: "Somente propostas enviadas podem ser aprovadas pelo cliente" };
+  }
+  if (!budget.project.companyId) {
+    return { error: "Obra sem empresa vinculada — aprovação é feita pelo escritório" };
+  }
+
+  await prisma.budget.update({
+    where: { id: budget.id },
+    data: {
+      status: "APROVADO_PJ",
+      approvedByPjUserId: input.approvedByPjUserId,
+    },
+  });
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.BUDGET,
+    entityId: budget.id,
+    action: TIMELINE_ACTIONS.UPDATED,
+    description: `Orçamento v${budget.version} aprovado pelo cliente (PJ)`,
+    createdBy: input.updatedBy,
+  });
+
+  const detail = await getProjectDetail(input.tenantId, input.projectId);
+  const updatedBudget = detail?.budgets.find((b) => b.id === budget.id);
+  if (!detail || !updatedBudget) return { error: "Erro ao carregar obra" };
+  return { budget: updatedBudget, project: detail };
+}
+
+/** Aprovação final do escritório — etapa 2 (fatura). Exige APROVADO_PJ quando há empresa. */
 export async function approveBudget(input: {
   tenantId: string;
   projectId: string;
@@ -629,8 +676,17 @@ export async function approveBudget(input: {
     include: { lineItems: true, project: true },
   });
   if (!budget) return { error: "Orçamento não encontrado" };
-  if (budget.status !== "ENVIADO") return { error: "Somente propostas enviadas podem ser aprovadas" };
   if (budget.invoiceId) return { error: "Orçamento já faturado" };
+
+  const requiresPjApproval = Boolean(budget.project.companyId);
+  const allowedStatus = requiresPjApproval ? "APROVADO_PJ" : "ENVIADO";
+  if (budget.status !== allowedStatus) {
+    return {
+      error: requiresPjApproval
+        ? "Aguardando aprovação do cliente (PJ) antes de faturar"
+        : "Somente propostas enviadas podem ser aprovadas",
+    };
+  }
 
   const invoiceResult = await createInvoiceFromBudget({
     tenantId: input.tenantId,
@@ -680,7 +736,9 @@ export async function rejectBudget(input: {
     where: { id: input.budgetId, project: { id: input.projectId, tenantId: input.tenantId } },
   });
   if (!budget) return { error: "Orçamento não encontrado" };
-  if (budget.status !== "ENVIADO") return { error: "Somente propostas enviadas podem ser recusadas" };
+  if (budget.status !== "ENVIADO" && budget.status !== "APROVADO_PJ") {
+    return { error: "Somente propostas enviadas podem ser recusadas" };
+  }
 
   await prisma.budget.update({
     where: { id: budget.id },

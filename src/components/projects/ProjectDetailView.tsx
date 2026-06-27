@@ -665,7 +665,34 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
             </>
           )}
 
-          {activeBudget.status === "ENVIADO" && (
+          {activeBudget.status === "ENVIADO" && project.companyName && (
+            <p className="text-sm text-amber-800">
+              Aguardando aprovação do cliente (PJ) antes de faturar.
+            </p>
+          )}
+
+          {activeBudget.status === "APROVADO_PJ" && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => budgetAction("approve")}
+                className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+              >
+                Finalizar aprovação e faturar
+              </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => budgetAction("reject")}
+                className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
+              >
+                Recusar proposta
+              </button>
+            </div>
+          )}
+
+          {activeBudget.status === "ENVIADO" && !project.companyName && (
             <div className="flex flex-wrap gap-2">
               <button
                 type="button"
@@ -683,6 +710,19 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
               >
                 Recusar proposta
               </button>
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => budgetAction("new-version")}
+                className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+              >
+                Nova revisão
+              </button>
+            </div>
+          )}
+
+          {activeBudget.status === "ENVIADO" && project.companyName && (
+            <div className="flex flex-wrap gap-2">
               <button
                 type="button"
                 disabled={busy}

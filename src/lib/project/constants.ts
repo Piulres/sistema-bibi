@@ -25,6 +25,7 @@ export function projectStatusLabel(status: string): string {
 export const BUDGET_STATUSES = [
   { value: "RASCUNHO", label: "Rascunho" },
   { value: "ENVIADO", label: "Enviado" },
+  { value: "APROVADO_PJ", label: "Aprovado pelo cliente" },
   { value: "APROVADO", label: "Aprovado" },
   { value: "REJEITADO", label: "Rejeitado" },
   { value: "SUBSTITUIDO", label: "Substituído" },
