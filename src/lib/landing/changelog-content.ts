@@ -26,10 +26,43 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.2.0",
+    version: "2.3.0",
     label: PLATFORM.versionLabel,
-    date: "25/06/2026",
+    date: "27/06/2026",
     status: "current",
+    summary:
+      "Onboarding em duas fases com micro-tours por módulo, segmento Engenharia Civil (ERP obras) e documentação OpenAPI completa.",
+    highlights: [
+      {
+        title: "Onboarding v3",
+        items: [
+          "Tour principal condensado + micro-tours na primeira visita a cada módulo",
+          "Hotspots: Cliente 360°, PIX, PEP, demo reset e mapa CRUD",
+          "Mobile: drawer com data-tour-nav e botão Tour em todas as telas",
+        ],
+      },
+      {
+        title: "Engenharia Civil",
+        items: [
+          "ERP empreiteira: pipeline, obras, orçamentos, BDI, caixa e diário de campo",
+          "Portais interno, prestador (campo), PJ e beneficiário (obras)",
+        ],
+      },
+      {
+        title: "Plataforma",
+        items: [
+          "OpenAPI 123 rotas + Swagger UI em /api/docs",
+          "Massas demo enriquecidas multi-segmento (SEED_PROFILE)",
+        ],
+      },
+    ],
+    testStats: "415+ testes Vitest · 128+ E2E · pre-release OK",
+  },
+  {
+    version: "2.2.0",
+    label: "Sistema Bibi - ServiceOS v2.2",
+    date: "25/06/2026",
+    status: "previous",
     summary:
       "Tour guiado de onboarding nos 4 portais com spotlight, hotspots pulsantes e textos adaptados por nicho.",
     highlights: [
