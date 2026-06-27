@@ -97,6 +97,7 @@ Mapeamento ServiceOS genérico → vocabulário do segmento.
 | Labels | Overrides em `Tenant.labels` |
 | Landing | Keywords em `landing-content.ts` |
 | Compliance | Regulatório específico (se houver) |
+| Comercial | Criar/atualizar `docs/segmentos/{segmento}/COMERCIAL.md` (ver [`../comercial/ESTRATEGIA_SEGMENTOS.md`](../comercial/ESTRATEGIA_SEGMENTOS.md)) |
 
 ---
 

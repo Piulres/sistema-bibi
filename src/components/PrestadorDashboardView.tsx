@@ -1,14 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import LoadingState from "@/components/ui/LoadingState";
-import Alert from "@/components/ui/Alert";
+import { useCallback } from "react";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import Card from "@/components/ui/Card";
 import StatCard from "@/components/ui/StatCard";
 import CalloutCard from "@/components/ui/CalloutCard";
 import StatusBadge from "@/components/ui/StatusBadge";
 import Button from "@/components/ui/Button";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Dashboard = {
   generatedAtLabel: string;
@@ -38,30 +39,35 @@ type Dashboard = {
   }[];
 };
 
+type DashboardPayload = {
+  dashboard?: Dashboard;
+};
+
 export default function PrestadorDashboardView() {
-  const [dashboard, setDashboard] = useState<Dashboard | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const loadDashboard = useCallback(
+    () =>
+      fetchJson<DashboardPayload>(
+        "/api/prestador/dashboard",
+        undefined,
+        "Erro ao carregar indicadores",
+      ),
+    [],
+  );
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const res = await fetch("/api/prestador/dashboard");
-      const data = await res.json();
-      if (!active) return;
-      if (!res.ok) setError(data.error ?? "Erro ao carregar indicadores");
-      else setDashboard(data.dashboard);
-    })();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { data, loading, error, reload } = useAsyncData(loadDashboard, []);
 
-  if (error) return <Alert tone="danger">{error}</Alert>;
-  if (!dashboard) return <LoadingState message="Carregando indicadores..." />;
-
-  const { kpis, nextAppointment, todayQueue } = dashboard;
+  const dashboard = data?.dashboard ?? null;
 
   return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error}
+      loadingMessage="Carregando indicadores..."
+      onRetry={() => void reload()}
+    >
+      {dashboard && (() => {
+        const { kpis, nextAppointment, todayQueue } = dashboard;
+        return (
     <div className="space-y-8">
       <p className="text-xs text-[var(--text-muted)]">Atualizado em {dashboard.generatedAtLabel}</p>
 
@@ -148,5 +154,8 @@ export default function PrestadorDashboardView() {
         )}
       </section>
     </div>
+        );
+      })()}
+    </ViewStateBoundary>
   );
 }

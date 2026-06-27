@@ -29,6 +29,10 @@ Senha: **`bibi123`**
 - [Expansão segmento saúde 2026](./pesquisa-expansao-2026.md)
 - [Síntese consultor](../pesquisa/09-sintese-consultor-senior.md) (ROI corporativo)
 
+## Comercial
+
+- [Playbook de captação e vendas MEDICAL](./COMERCIAL.md)
+
 ## Código
 
 - Labels: `NICHE_MASTER_LABELS.MEDICAL` em `src/constants/niches.ts`

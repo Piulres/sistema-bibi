@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 import StatusBadge from "@/components/ui/StatusBadge";
-import LoadingState from "@/components/ui/LoadingState";
-import Alert from "@/components/ui/Alert";
+import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import Breadcrumbs from "@/components/ui/Breadcrumbs";
 import ExportButtons from "@/components/ExportButtons";
 import { buildPatientHistoryBreadcrumbs } from "@/lib/navigation";
@@ -12,6 +11,8 @@ import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical
 import TabBar from "@/components/ui/TabBar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
 import Card from "@/components/ui/Card";
+import { useAsyncData } from "@/hooks/useAsyncData";
+import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Overview = {
   subjectType?: "patient" | "pet";
@@ -67,53 +68,86 @@ type Overview = {
 };
 
 export default function PrestadorPatientHistoryView({ patientId }: { patientId: string }) {
-  const [overview, setOverview] = useState<Overview | null>(null);
-  const [clinicalSidebar, setClinicalSidebar] = useState<ClinicalSidebarData | null>(null);
-  const [subjectType, setSubjectType] = useState<"patient" | "pet">("patient");
-  const [tutorPatientId, setTutorPatientId] = useState<string | null>(null);
   const [historyTab, setHistoryTab] = useState<"historico" | "medicacao" | "exames" | "protocolos" | "perfil" | "vacinas">("historico");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      const [res, clinicalRes] = await Promise.all([
-        fetch(`/api/prestador/patients/${patientId}/overview`),
-        fetch(`/api/prestador/patients/${patientId}/clinical-overview`),
-      ]);
-      const data = await res.json();
-      const clinicalData = await clinicalRes.json();
-      if (!active) return;
-      if (!res.ok) {
-        setError(data.error ?? "Erro ao carregar histórico");
-      } else {
-        setOverview(data.overview);
-        setSubjectType(data.overview.subjectType ?? "patient");
-        setTutorPatientId(data.overview.tutorPatientId ?? null);
-      }
-      if (clinicalRes.ok) {
-        const o = clinicalData.overview;
-        setClinicalSidebar({
-          profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
-          activeMedications: o.activeMedications,
-          pendingExams: o.pendingExams,
-          activeProtocols: o.activeProtocols ?? [],
-          vaccines: o.vaccines,
-        });
-      }
-      setLoading(false);
-    })();
-    return () => {
-      active = false;
+  const loadHistory = useCallback(async () => {
+    const [res, clinicalRes] = await Promise.all([
+      fetchJson<{ overview?: Overview }>(
+        `/api/prestador/patients/${patientId}/overview`,
+        undefined,
+        "Erro ao carregar histórico",
+      ),
+      fetchJson<{ overview?: ClinicalSidebarData & { profile: ClinicalSidebarData["profile"] } }>(
+        `/api/prestador/patients/${patientId}/clinical-overview`,
+      ),
+    ]);
+
+    if (!res.ok) return res;
+
+    let clinicalSidebar: ClinicalSidebarData | null = null;
+    if (clinicalRes.ok && clinicalRes.data.overview) {
+      const o = clinicalRes.data.overview;
+      clinicalSidebar = {
+        profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
+        activeMedications: o.activeMedications,
+        pendingExams: o.pendingExams,
+        activeProtocols: o.activeProtocols ?? [],
+        vaccines: o.vaccines,
+      };
+    }
+
+    const overview = res.data.overview ?? null;
+
+    return {
+      ok: true as const,
+      data: {
+        overview,
+        clinicalSidebar,
+        subjectType: (overview?.subjectType ?? "patient") as "patient" | "pet",
+        tutorPatientId: overview?.tutorPatientId ?? null,
+      },
+      status: res.status,
     };
   }, [patientId]);
 
-  if (loading) return <LoadingState message="Carregando histórico do paciente..." />;
-  if (error || !overview) {
-    return <Alert tone="danger">{error ?? "Paciente não encontrado"}</Alert>;
+  const { data, loading, error, reload, setData } = useAsyncData(loadHistory, [patientId]);
+
+  const overview = data?.overview ?? null;
+  const clinicalSidebar = data?.clinicalSidebar ?? null;
+  const subjectType = data?.subjectType ?? "patient";
+  const tutorPatientId = data?.tutorPatientId ?? null;
+
+  async function refreshClinicalSidebar() {
+    const clinicalRes = await fetchJson<{ overview?: ClinicalSidebarData & { profile: ClinicalSidebarData["profile"] } }>(
+      `/api/prestador/patients/${patientId}/clinical-overview`,
+    );
+    if (clinicalRes.ok && clinicalRes.data.overview) {
+      const o = clinicalRes.data.overview;
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              clinicalSidebar: {
+                profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
+                activeMedications: o.activeMedications,
+                pendingExams: o.pendingExams,
+                activeProtocols: o.activeProtocols ?? [],
+                vaccines: o.vaccines,
+              },
+            }
+          : prev,
+      );
+    }
   }
 
+  return (
+    <ViewStateBoundary
+      loading={loading}
+      error={error ?? (!overview && !loading ? "Paciente não encontrado" : null)}
+      loadingMessage="Carregando histórico do paciente..."
+      onRetry={() => void reload()}
+    >
+      {overview && (() => {
   const { patient, summary } = overview;
   const isPet = subjectType === "pet";
   const clinicalPatientId = isPet && tutorPatientId ? tutorPatientId : patientId;
@@ -125,21 +159,6 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
     ...(isPet ? [{ key: "vacinas", label: "Vacinas" }] : []),
     { key: "perfil", label: "Perfil clínico" },
   ] as const;
-
-  async function refreshClinicalSidebar() {
-    const clinicalRes = await fetch(`/api/prestador/patients/${patientId}/clinical-overview`);
-    const clinicalData = await clinicalRes.json();
-    if (clinicalRes.ok) {
-      const o = clinicalData.overview;
-      setClinicalSidebar({
-        profile: { ...o.profile, bloodType: o.profile.bloodType ?? null },
-        activeMedications: o.activeMedications,
-        pendingExams: o.pendingExams,
-        activeProtocols: o.activeProtocols ?? [],
-        vaccines: o.vaccines,
-      });
-    }
-  }
 
   return (
     <div className="space-y-8">
@@ -400,5 +419,8 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
         </div>
       </div>
     </div>
+  );
+      })()}
+    </ViewStateBoundary>
   );
 }

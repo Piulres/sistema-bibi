@@ -119,7 +119,7 @@ describe("Massa demo — cobertura por portal", () => {
       const joaoPending = await prisma.procedureUsage.count({
         where: {
           billed: false,
-          appointment: { patient: { cpf: "111.222.333-44" } },
+          appointment: { patient: { cpf: "529.982.247-25" } },
         },
       });
       expect(joaoPending).toBeGreaterThanOrEqual(1);
@@ -127,20 +127,20 @@ describe("Massa demo — cobertura por portal", () => {
       const mariaPix = await prisma.payment.count({
         where: {
           status: "PENDING",
-          invoice: { patient: { cpf: "555.666.777-88" } },
+          invoice: { patient: { cpf: "390.533.447-05" } },
         },
       });
       expect(mariaPix).toBeGreaterThanOrEqual(1);
 
       const pedroPaid = await prisma.invoice.count({
-        where: { patient: { cpf: "999.000.111-22" }, status: "PAGA" },
+        where: { patient: { cpf: "153.509.460-56" }, status: "PAGA" },
       });
       expect(pedroPaid).toBeGreaterThanOrEqual(1);
     });
 
     it("PEP e Care Chart no João", async () => {
       const joao = await prisma.patient.findFirstOrThrow({
-        where: { cpf: "111.222.333-44" },
+        where: { cpf: "529.982.247-25" },
       });
       const [records, profile] = await Promise.all([
         prisma.medicalRecord.count({ where: { patientId: joao.id } }),

@@ -100,6 +100,10 @@ export const ASSISTANT_SCENARIOS: AssistantScenario[] = [
   { id: "vet-ben-help", role: "BENEFICIARIO", category: "niche", niche: "VET", phrase: "como agendar atendimento?", expectedTool: "explain_capability" },
   { id: "legal-int-help", role: "INTERNO", category: "niche", niche: "LEGAL", phrase: "Como cadastrar cliente?", expectedTool: "explain_capability" },
   { id: "edu-prest-agenda", role: "PRESTADOR", category: "niche", niche: "EDUCATION", phrase: "Minha agenda de hoje", expectedTool: "list_my_appointments" },
+  { id: "vet-int-search-pets", role: "INTERNO", category: "niche", niche: "VET", phrase: "buscar pet Thor", expectedTool: "search_pets", internoProfile: "RECEPCAO" },
+  { id: "vet-int-draft-appt", role: "INTERNO", category: "draft", niche: "VET", phrase: "agendar atendimento para o pet Thor do tutor João amanhã às 10h", expectedTool: "draft_create_appointment", internoProfile: "RECEPCAO" },
+  { id: "spa-int-agenda", role: "INTERNO", category: "niche", niche: "SPA", phrase: "Quantos agendamentos temos hoje?", expectedTool: "count_appointments" },
+  { id: "dental-int-help", role: "INTERNO", category: "niche", niche: "DENTAL", phrase: "Como funciona o agendamento na plataforma?", expectedTool: "explain_capability" },
 
   // ── Fallback / erro ──────────────────────────────────────────────────
   { id: "int-fallback-gibberish", role: "INTERNO", category: "error", phrase: "xyzqwerty blabla", notes: "Deve cair em fallback humanizado" },

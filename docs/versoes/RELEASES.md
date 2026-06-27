@@ -14,24 +14,24 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
-| **Pacote fechado na `main` (aguarda deploy)** | **2.3.0** — merge `dev` @ `84bccb9` |
-| **Integração** | `dev` — sincronizada com `main` após release |
-| **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
+| **Pacote fechado na `main` (aguarda deploy)** | **2.3.0** — merge `dev` @ `05a63eb` |
+| **Integração `dev`** | **v2.3.0** — validado (`pre-release` + 495 Vitest + 138 E2E) |
 | **Pacote anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.0** — onboarding fase 2, construction ERP, OpenAPI |
+| **Integração** | `dev` | **v2.3.0** — assistente, construction ERP, onboarding fase 2, OpenAPI |
 | **Release** | `main` | **v2.3.0** — aguarda deploy manual |
 | **Netlify** | **sistema-bibi.netlify.app** | **v2.2.0** — deploy `6a3ea6c5` @ `2c38248` (25/06/2026) |
+| **Preview** | deploy draft | Após merge `dev` → `main` e `pre-release` na `main` |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.3.0`** | `84bccb9` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
+| **`v2.3.0`** | `05a63eb` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | merge `dev`→`main` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
@@ -43,24 +43,38 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Pacote fechado na main (aguarda deploy)
+---
 
-### `v2.3.0` — Sistema Bibi - ServiceOS (onboarding fase 2 + Engenharia Civil)
+## Pacote fechado na dev (aguarda deploy)
+
+### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + onboarding fase 2)
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.3.0` *(pendente)* |
-| **Commit** | `84bccb9` |
-| **PRs** | [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction [#145](https://github.com/Piulres/sistema-bibi/pull/145)+ |
+| **Tag git** | `v2.3.0` *(pendente deploy)* |
+| **Commit** | `05a63eb` (main) |
+| **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148), [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+ |
+| **Doc** | [`V2_3.md`](V2_3.md) · [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md) |
+| **Validação dev** | [`evidencias/V2_3_VALIDACAO_DEV.md`](../evidencias/V2_3_VALIDACAO_DEV.md) |
 
 **Inclui (além de v2.2.0):**
 
-- **Onboarding v3:** tour em duas fases (principal + micro-tours por rota), mobile, hotspots comerciais
-- **Engenharia Civil:** ERP empreiteira — pipeline, obras, orçamentos, BDI, caixa, campo
+- **Assistente operacional:** estado serverless (tokens HMAC), confirmação de ações em Netlify, anti-repetição multi-turno
+- **Assistente multi-nicho:** RAG por segmento, procedimentos do catálogo do tenant, copiloto contextual por página
+- **VET:** agendamento com tutor + pet (`search_pets`, auto-seleção de pet único)
+- **Onboarding v3:** tour em duas fases, micro-tours por módulo, mobile, hotspots ([#152](https://github.com/Piulres/sistema-bibi/pull/152))
+- **Engenharia Civil:** ERP empreiteira — pipeline, obras, orçamentos, BDI, caixa, RDO, portal campo, dupla aprovação e metas
 - **OpenAPI:** 123 rotas documentadas + Swagger UI (`/api/docs`)
-- **Massas demo:** SEED_PROFILE, operation-1y, fluxos multi-segmento enriquecidos
+- **Massa demo:** seeds ricos multi-segmento + perfil `operation-1y`
 
-**Testes:** 415+ Vitest · 128+ E2E · `pre-release` OK.
+**Publicar (humano):**
+
+```bash
+git checkout dev && git pull && npm run pre-release
+git checkout main && git pull && git merge dev && npm run pre-release
+npx netlify deploy --prod --message "v2.3.0: assistente multi-nicho + Engenharia Civil"
+git tag -a v2.3.0 -m "Release 2.3.0"
+```
 
 ---
 
@@ -191,7 +205,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
-| **2.1.x** | [`V2_1.md`](V2_1.md) | ✅ **`v2.1.0` em produção** (Voa Fase 1 integrada) |
+| **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
+| **2.2.x** | onboarding tour | ✅ **`v2.2.0` em produção** |
+| **2.3.x** | [`V2_3.md`](V2_3.md) | 🟡 **Validado na `dev`** — aguarda merge + deploy |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---

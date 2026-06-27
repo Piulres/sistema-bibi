@@ -23,9 +23,17 @@ import {
   rememberOperationDraft,
   rememberPendingChoice,
   clearPendingChoice,
+  exportMockContext,
+  applyMockContext,
+  clearMockContext,
 } from "@/lib/assistant/provider/mock-context";
 import { isDraftToolName } from "@/lib/assistant/provider/mock-draft-flow";
 import { isChoiceDraftResult } from "@/lib/assistant/types";
+import {
+  decodeAssistantSessionState,
+  encodeAssistantSessionState,
+} from "@/lib/assistant/session-state";
+import { recordAssistantToolUse } from "@/lib/assistant/analytics";
 
 async function resolvePlan(
   user: SessionUser,
@@ -48,6 +56,7 @@ export async function runAssistantChat(input: {
   user: SessionUser;
   messages: AssistantMessage[];
   pageContext?: string;
+  sessionState?: string;
 }): Promise<AssistantChatResult> {
   const tools = getToolsForUser(input.user);
   const ctx = { user: input.user, labels: input.user.labels };
@@ -56,6 +65,16 @@ export async function runAssistantChat(input: {
     return {
       message: { role: "assistant", content: runnerUnavailable() },
     };
+  }
+
+  clearMockContext(input.user.id);
+  const restored = decodeAssistantSessionState(input.sessionState, input.user.id);
+  if (restored) {
+    applyMockContext(input.user.id, {
+      lastIntent: restored.lastIntent,
+      operationDraft: restored.operationDraft,
+      pendingChoice: restored.pendingChoice,
+    });
   }
 
   const systemPrompt = buildAssistantSystemPrompt(input.user, input.pageContext);
@@ -83,6 +102,7 @@ export async function runAssistantChat(input: {
       assertToolPermission(input.user, tool);
       const result = await tool.handler(ctx, call.arguments);
       trace?.push({ name: call.name, ok: true });
+      void recordAssistantToolUse(input.user, call.name, true, input.pageContext);
 
       if (isDraftToolResult(result)) {
         pendingActionId = result.pendingActionId;
@@ -115,6 +135,7 @@ export async function runAssistantChat(input: {
           ? error.message
           : toolExecutionError();
       trace?.push({ name: call.name, ok: false, error: message });
+      void recordAssistantToolUse(input.user, call.name, false, input.pageContext);
       sections.push(message);
     }
   }
@@ -127,5 +148,6 @@ export async function runAssistantChat(input: {
     actions: actions?.length ? actions : undefined,
     pendingActionId,
     toolTrace: process.env.NODE_ENV === "development" ? trace : undefined,
+    sessionState: encodeAssistantSessionState(input.user.id, exportMockContext(input.user.id)),
   };
 }

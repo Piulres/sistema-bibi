@@ -122,6 +122,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
 
       const resolved = await resolveAppointmentDraft({
         tenantId: ctx.user.tenantId,
+        niche: ctx.user.niche,
         labels: ctx.labels,
         data,
         tool: "draft_book_appointment",
@@ -154,6 +155,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         type: "book_appointment",
         data: {
           patientId: ctx.user.patientId,
+          petId: finalData.petId ?? null,
           providerId: finalData.providerId!,
           procedureId: finalData.procedureId,
           scheduledAt: scheduled.toISOString(),
@@ -166,6 +168,9 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         pendingActionId,
         preview: `Agendar ${ctx.labels.appointment.toLowerCase()} com ${provider?.name ?? "prestador"}`,
         summary: {
+          ...(ctx.user.niche === "VET" && resolved.petLabel
+            ? { [ctx.labels.patient]: resolved.petLabel }
+            : {}),
           [ctx.labels.provider]: provider?.name ?? finalData.providerName ?? "—",
           Horário: scheduled.toLocaleString("pt-BR"),
           ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),

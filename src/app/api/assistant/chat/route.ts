@@ -54,6 +54,7 @@ export async function POST(request: Request) {
       user,
       messages,
       pageContext: typeof body.pageContext === "string" ? body.pageContext : undefined,
+      sessionState: typeof body.sessionState === "string" ? body.sessionState : undefined,
     });
 
     return NextResponse.json(result);

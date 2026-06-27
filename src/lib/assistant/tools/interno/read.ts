@@ -217,4 +217,34 @@ export const internoReadTools: AssistantToolDefinition[] = [
       };
     },
   },
+  {
+    name: "search_pets",
+    description: "Busca pets por nome, raça ou tutor (segmento veterinário).",
+    parameters: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Nome do pet, tutor ou raça" },
+      },
+      required: ["query"],
+    },
+    requiredModule: "cadastros",
+    handler: async (ctx, args) => {
+      if (ctx.user.niche !== "VET") {
+        return { error: "Busca de pets disponível apenas no segmento veterinário." };
+      }
+      const query = ((args as { query?: string }).query ?? "").trim();
+      const { listPets } = await import("@/lib/pet-service");
+      const pets = await listPets(ctx.user.tenantId, query ? { q: query } : undefined);
+      return {
+        count: pets.length,
+        pets: pets.slice(0, 10).map((p) => ({
+          id: p.id,
+          name: p.name,
+          species: p.speciesLabel,
+          tutor: p.tutorName,
+          breed: p.breed,
+        })),
+      };
+    },
+  },
 ];

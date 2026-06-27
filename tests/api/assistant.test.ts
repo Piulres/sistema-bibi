@@ -6,6 +6,7 @@ import { scenariosWithExpectedTool } from "@/lib/assistant/scenarios";
 import { clearMockContext } from "@/lib/assistant/provider/mock-match";
 import { createPendingAction } from "@/lib/assistant/pending-actions";
 import { jsonRequest } from "../helpers/request";
+import { uniqueTestCpf } from "../helpers/unique-cpf";
 import {
   clearSessionMock,
   sessionMockState,
@@ -253,5 +254,108 @@ describe("API — /api/assistant/confirm", () => {
       confirmed: true,
     });
     expect(res.status).toBe(410);
+  });
+
+  it("cancelamento revoga confirmação subsequente", async () => {
+    const prisma = getTestPrisma();
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+    });
+    await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
+
+    const pendingId = createPendingAction(user.id, user.tenantId, {
+      type: "create_patient",
+      data: {
+        name: "Cancel Guard",
+        cpf: uniqueTestCpf(),
+        birthDate: "1990-01-01",
+      },
+    });
+
+    const cancel = await postAssistantConfirm({ pendingActionId: pendingId, confirmed: false });
+    expect(cancel.status).toBe(200);
+
+    const replay = await postAssistantConfirm({ pendingActionId: pendingId, confirmed: true });
+    expect(replay.status).toBe(410);
+  });
+
+  it("RECEPCAO não confirma create_user (apenas ADMIN)", async () => {
+    const prisma = getTestPrisma();
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+    });
+    await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
+
+    const pendingId = createPendingAction(user.id, user.tenantId, {
+      type: "create_user",
+      data: {
+        name: "Atacante",
+        email: `atk-${Date.now()}@test.com`,
+        role: "INTERNO",
+        internoProfile: "ADMIN",
+      },
+    });
+
+    const res = await postAssistantConfirm({
+      pendingActionId: pendingId,
+      confirmed: true,
+      password: "bibi123",
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it("rejeita reutilização do mesmo pendingActionId na confirmação", async () => {
+    const prisma = getTestPrisma();
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+    });
+    await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
+
+    const pendingId = createPendingAction(user.id, user.tenantId, {
+      type: "create_patient",
+      data: {
+        name: `Replay Guard ${Date.now()}`,
+        cpf: uniqueTestCpf(),
+        birthDate: "1990-01-01",
+      },
+    });
+
+    const first = await postAssistantConfirm({ pendingActionId: pendingId, confirmed: true });
+    expect(first.status).toBe(200);
+
+    const replay = await postAssistantConfirm({ pendingActionId: pendingId, confirmed: true });
+    expect(replay.status).toBe(410);
+    const body = await replay.json();
+    expect(body.error).toMatch(/já foi utilizada|expirada|inválida/i);
+  });
+
+  it("permite nova tentativa após falha de execução", async () => {
+    const prisma = getTestPrisma();
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: DEMO_EMAILS.internoAdmin },
+    });
+    await setSessionForEmail(DEMO_EMAILS.internoAdmin);
+
+    const pendingId = createPendingAction(user.id, user.tenantId, {
+      type: "create_user",
+      data: {
+        name: "Retry User",
+        email: `retry-${Date.now()}@test.com`,
+        role: "PRESTADOR",
+      },
+    });
+
+    const withoutPassword = await postAssistantConfirm({
+      pendingActionId: pendingId,
+      confirmed: true,
+    });
+    expect(withoutPassword.status).toBe(400);
+
+    const withPassword = await postAssistantConfirm({
+      pendingActionId: pendingId,
+      confirmed: true,
+      password: "bibi123",
+    });
+    expect(withPassword.status).toBe(200);
   });
 });

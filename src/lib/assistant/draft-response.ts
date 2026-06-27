@@ -21,15 +21,16 @@ export function buildIncompleteDraftResult(
   args: Record<string, unknown>,
   labels: NicheLabels,
   missing?: string[],
+  niche?: import("@/lib/niche/types").NicheId,
 ): IncompleteDraftResult {
-  const gaps = missing ?? getMissingFieldsForTool(tool, args);
-  const partial = formatPartialSummary(tool, args, labels);
+  const gaps = missing ?? getMissingFieldsForTool(tool, args, niche);
+  const partial = formatPartialSummary(tool, args, labels, niche);
   return {
     __assistant_incomplete: true,
     tool,
     missing: gaps,
     partial,
-    guidance: buildDraftGuidance(tool, gaps, labels, partial),
+    guidance: buildDraftGuidance(tool, gaps, labels, partial, niche),
   };
 }
 
@@ -38,9 +39,10 @@ export function buildResolveIncompleteResult(
   error: string,
   args: Record<string, unknown>,
   labels: NicheLabels,
+  niche?: import("@/lib/niche/types").NicheId,
 ): IncompleteDraftResult {
-  const partial = formatPartialSummary(tool, args, labels);
-  const missing = getMissingFieldsForTool(tool, args);
+  const partial = formatPartialSummary(tool, args, labels, niche);
+  const missing = getMissingFieldsForTool(tool, args, niche);
   return {
     __assistant_incomplete: true,
     tool,

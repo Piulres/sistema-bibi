@@ -52,10 +52,11 @@ Complementa [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md) (matriz t
 ## Uso recomendado
 
 1. **Produto / roadmap** — `03-estrategia-produto-posicionamento.md` (Memed, WhatsApp, SBIS).
-2. **Comercial / CFO** — [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) (ROI ~87%) ou [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) · fonte canônica [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
-3. **Pitch / visão** — doc 03 (mensagem curta) e doc 04 (ecossistema).
-4. **Arquitetura** — [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) + doc 01 (posicionamento vs mercado).
-5. **Implementação vs mercado** — cruzar doc 01 com [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md).
-6. **Segmento específico** — [`../segmentos/README.md`](../segmentos/README.md) + template [`TEMPLATE_PESQUISA_NICHO.md`](TEMPLATE_PESQUISA_NICHO.md).
+2. **Comercial / captação por nicho** — [`../comercial/ESTRATEGIA_SEGMENTOS.md`](../comercial/ESTRATEGIA_SEGMENTOS.md) + `docs/segmentos/{niche}/COMERCIAL.md`.
+3. **Comercial / CFO** — [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) (ROI ~87%) ou [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) · fonte canônica [`../plataforma/ROI_REFERENCIA.md`](../plataforma/ROI_REFERENCIA.md).
+4. **Pitch / visão** — doc 03 (mensagem curta) e doc 04 (ecossistema).
+5. **Arquitetura** — [`../versoes/V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) + doc 01 (posicionamento vs mercado).
+6. **Implementação vs mercado** — cruzar doc 01 com [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md).
+7. **Segmento específico** — [`../segmentos/README.md`](../segmentos/README.md) + template [`TEMPLATE_PESQUISA_NICHO.md`](TEMPLATE_PESQUISA_NICHO.md).
 
 *Documentos de pesquisa — não substituem due diligence comercial nem validação contratual.*

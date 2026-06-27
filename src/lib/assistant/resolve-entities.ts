@@ -168,6 +168,38 @@ export async function listAllProviderOptions(tenantId: string): Promise<EntityOp
   }));
 }
 
+export async function resolvePetByName(
+  tenantId: string,
+  patientId: string,
+  petName?: string,
+  petId?: string,
+): Promise<EntityResolveResult> {
+  if (petId) return { status: "unique", id: petId, label: petName ?? petId };
+  if (!petName?.trim()) return { status: "none" };
+
+  const { listPets } = await import("@/lib/pet-service");
+  const pets = await listPets(tenantId, { patientId, q: petName });
+  const options: EntityOption[] = pets.map((pet) => ({
+    id: pet.id,
+    label: pet.name,
+    detail: [pet.speciesLabel, pet.breed, pet.tutorName].filter(Boolean).join(" · "),
+  }));
+  return resolveFromOptions(options, petName);
+}
+
+export async function listPetsForPatient(
+  tenantId: string,
+  patientId: string,
+): Promise<EntityOption[]> {
+  const { listPets } = await import("@/lib/pet-service");
+  const pets = await listPets(tenantId, { patientId });
+  return pets.map((pet) => ({
+    id: pet.id,
+    label: pet.name,
+    detail: [pet.speciesLabel, pet.breed].filter(Boolean).join(" · "),
+  }));
+}
+
 export async function listAllProcedureOptions(tenantId: string): Promise<EntityOption[]> {
   const procedures = await listProcedures(tenantId);
   return procedures.map((procedure) => ({

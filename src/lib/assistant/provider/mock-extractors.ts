@@ -173,15 +173,38 @@ export function extractProviderListIntent(raw: string): {
   return result;
 }
 
+export function extractPetName(raw: string): string | undefined {
+  const patterns = [
+    /(?:pet|pets)\s+([A-Za-zÀ-ú][A-Za-zÀ-ú.'-]{1,30}?)(?=\s+do\b|\s+de\b|\s+com\b|\s+amanha|\s+amanhã|\s+hoje|$)/i,
+    /do\s+pet\s+([A-Za-zÀ-ú][A-Za-zÀ-ú.'-]{1,30})/i,
+    /(?:para|pro)\s+(?:o|a)\s+pet\s+([A-Za-zÀ-ú][A-Za-zÀ-ú.'-]{1,30})/i,
+  ];
+  for (const pattern of patterns) {
+    const match = raw.match(pattern);
+    if (match?.[1]) return match[1].trim();
+  }
+  return undefined;
+}
+
+export function extractTutorName(raw: string): string | undefined {
+  const match = raw.match(
+    /(?:tutor|tutora|do\s+tutor|da\s+tutora)\s+([A-Za-zÀ-ú][A-Za-zÀ-ú\s.'-]{2,50}?)(?=\s*,|\s+pet\b|\s+com\b|\s+amanha|\s+amanhã|$)/i,
+  );
+  return match?.[1]?.trim();
+}
+
 export function extractCreateAppointmentArgs(raw: string): Record<string, unknown> {
   const dateHint = extractDateHint(raw);
   const time = extractTimeOptional(raw);
-  const patientName = extractSearchQuery(raw) ?? extractBarePatientName(raw);
+  const tutorName = extractTutorName(raw);
+  const patientName = tutorName ?? extractSearchQuery(raw) ?? extractBarePatientName(raw);
+  const petName = extractPetName(raw);
   const providerName = extractProviderName(raw);
   const procedureName = extractProcedureName(raw);
   const providerIntent = extractProviderListIntent(raw);
   return {
     ...(patientName ? { patientName } : {}),
+    ...(petName ? { petName } : {}),
     ...(providerName ? { providerName } : {}),
     ...(procedureName ? { procedureName } : {}),
     ...(dateHint ? { date: dateHint } : {}),
@@ -265,6 +288,8 @@ export function isDraftContinuation(
   if (extractProcedureName(raw)) return true;
   if (extractProviderListIntent(raw).providerUnknown) return true;
   if (extractProviderListIntent(raw).bookByProcedure) return true;
+  if (extractPetName(raw)) return true;
+  if (extractTutorName(raw)) return true;
   if (extractBarePatientName(raw)) return true;
   if (extractSearchQuery(raw)) return true;
   if (extractEmail(raw)) return true;
@@ -323,7 +348,6 @@ export function extractRole(text: string): string {
 export function extractCreateUserArgs(raw: string): Record<string, unknown> | null {
   const email = extractEmail(raw);
   if (!email) return null;
-  const password = extractPassword(raw) ?? "bibi123";
   const withoutEmail = raw.replace(email, "").replace(/senha\s+\S+/i, "");
   const namePatterns = [
     /(?:criar|cadastrar|adicionar|novo|registrar)\s+usu[aá]rio\s*[:\-]?\s*(.+)/i,
@@ -337,7 +361,7 @@ export function extractCreateUserArgs(raw: string): Record<string, unknown> | nu
       break;
     }
   }
-  return { name, email, password, role: extractRole(raw) };
+  return { name, email, role: extractRole(raw) };
 }
 
 export function extractCreatePatientArgs(raw: string): Record<string, unknown> | null {
@@ -380,13 +404,12 @@ export function dateRangeFromText(text: string): { from?: string; to?: string } 
   return { from: "hoje" };
 }
 
-/** Confirma se texto parece pergunta de follow-up curta. */
+/** Confirma se texto parece pergunta de follow-up curta (só data ou continuação explícita). */
 export function isFollowUpPhrase(text: string): boolean {
   const t = normalizeMockText(text);
   return (
     /^(e|mas|ok|entao|então)\s/.test(t) ||
-    /^(e\s+)?(ontem|hoje|amanha)$/.test(t) ||
-    t.length < 28
+    /^(e\s+)?(ontem|hoje|amanha)$/.test(t)
   );
 }
 

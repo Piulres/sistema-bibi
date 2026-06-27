@@ -1,6 +1,7 @@
 import type { NicheId, NicheLabels } from "../../src/lib/niche/types";
 import type { CompanyStatus } from "../../src/lib/company-crm";
 import type { SeedCompany } from "./companies";
+import { demoCpf } from "./helpers";
 
 export type NicheProcedureSeed = {
   code: string;
@@ -248,7 +249,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Carlos Mendes",
-        cpf: "111.333.555-77",
+        cpf: demoCpf(101),
         email: "tutor@petcare.demo",
         birthDate: new Date(1985, 3, 12),
         phone: "(11) 98765-4321",
@@ -256,7 +257,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Fernanda Lima",
-        cpf: "222.444.666-88",
+        cpf: demoCpf(102),
         email: "fernanda.tutor@petcare.demo",
         birthDate: new Date(1990, 7, 22),
         phone: "(11) 97654-3210",
@@ -264,7 +265,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Sandra Oliveira",
-        cpf: "101.101.101-01",
+        cpf: demoCpf(103),
         email: "particular@petcare.demo",
         birthDate: new Date(1983, 2, 9),
         phone: "(11) 96543-2108",
@@ -335,7 +336,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Patricia Souza",
-        cpf: "333.555.777-99",
+        cpf: demoCpf(201),
         email: "paciente@smile.demo",
         birthDate: new Date(1988, 1, 15),
         phone: "(11) 96543-2109",
@@ -343,7 +344,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Roberto Dias",
-        cpf: "444.666.888-00",
+        cpf: demoCpf(202),
         email: "roberto.dental@smile.demo",
         birthDate: new Date(1975, 10, 3),
         phone: "(11) 95432-1098",
@@ -351,7 +352,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Helena Particular",
-        cpf: "102.102.102-02",
+        cpf: demoCpf(203),
         email: "particular@smile.demo",
         birthDate: new Date(1990, 5, 20),
         phone: "(11) 94321-0987",
@@ -416,7 +417,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Mariana Costa",
-        cpf: "555.777.999-11",
+        cpf: demoCpf(301),
         email: "cliente@lex.demo",
         birthDate: new Date(1982, 5, 8),
         phone: "(11) 94321-0987",
@@ -424,7 +425,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Eduardo Prado",
-        cpf: "666.888.000-22",
+        cpf: demoCpf(302),
         email: "eduardo.lex@lex.demo",
         birthDate: new Date(1978, 11, 20),
         phone: "(11) 93210-9876",
@@ -432,7 +433,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Carlos Particular",
-        cpf: "103.103.103-03",
+        cpf: demoCpf(303),
         email: "particular@lex.demo",
         birthDate: new Date(1985, 8, 14),
         phone: "(11) 92109-8765",
@@ -497,7 +498,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Juliana Ribeiro",
-        cpf: "777.999.111-33",
+        cpf: demoCpf(401),
         email: "cliente@zen.demo",
         birthDate: new Date(1992, 8, 25),
         phone: "(11) 92109-8765",
@@ -505,7 +506,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Marcos Vieira",
-        cpf: "888.000.222-44",
+        cpf: demoCpf(402),
         email: "marcos.zen@zen.demo",
         birthDate: new Date(1980, 2, 14),
         phone: "(11) 91098-7654",
@@ -513,7 +514,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Renata Particular",
-        cpf: "104.104.104-04",
+        cpf: demoCpf(403),
         email: "particular@zen.demo",
         birthDate: new Date(1988, 11, 3),
         phone: "(11) 90987-6543",
@@ -578,7 +579,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Lucas Ferreira",
-        cpf: "999.111.333-55",
+        cpf: demoCpf(501),
         email: "aluno@eduprime.demo",
         birthDate: new Date(1995, 4, 18),
         phone: "(11) 90987-6543",
@@ -586,7 +587,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Camila Torres",
-        cpf: "000.222.444-66",
+        cpf: demoCpf(502),
         email: "camila.edu@eduprime.demo",
         birthDate: new Date(1987, 9, 7),
         phone: "(11) 89876-5432",
@@ -594,7 +595,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Bruno Particular",
-        cpf: "105.105.105-05",
+        cpf: demoCpf(503),
         email: "particular@eduprime.demo",
         birthDate: new Date(1993, 1, 28),
         phone: "(11) 88765-4321",
@@ -661,7 +662,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
     starPatients: [
       {
         name: "Fernando Costa",
-        cpf: "661.222.333-44",
+        cpf: demoCpf(601),
         email: "cliente@build.demo",
         birthDate: new Date(1985, 3, 12),
         phone: "(11) 98765-4321",
@@ -669,7 +670,7 @@ export const NICHE_OPERATIONAL_CONFIGS: NicheOperationalConfig[] = [
       },
       {
         name: "Patricia Lima",
-        cpf: "662.333.444-55",
+        cpf: demoCpf(602),
         email: "patricia.build@build.demo",
         birthDate: new Date(1979, 7, 28),
         phone: "(11) 97654-3210",

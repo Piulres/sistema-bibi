@@ -31,14 +31,15 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/06/2026",
     status: "current",
     summary:
-      "Onboarding em duas fases com micro-tours por módulo, segmento Engenharia Civil (ERP obras) e documentação OpenAPI completa.",
+      "Assistente operacional serverless multi-nicho, ERP Engenharia Civil e onboarding guiado em duas fases nos 4 portais.",
     highlights: [
       {
-        title: "Onboarding v3",
+        title: "Assistente operacional",
         items: [
-          "Tour principal condensado + micro-tours na primeira visita a cada módulo",
-          "Hotspots: Cliente 360°, PIX, PEP, demo reset e mapa CRUD",
-          "Mobile: drawer com data-tour-nav e botão Tour em todas as telas",
+          "Estado de sessão assinado (HMAC) — confirmação de ações funciona na Netlify",
+          "RAG e procedimentos adaptados ao catálogo e vocabulário de cada nicho",
+          "Copiloto contextual com sugestões por página nos 4 portais",
+          "VET: agendamento tutor + pet com busca e auto-seleção",
         ],
       },
       {
@@ -46,17 +47,19 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         items: [
           "ERP empreiteira: pipeline, obras, orçamentos, BDI, caixa e diário de campo",
           "Portais interno, prestador (campo), PJ e beneficiário (obras)",
+          "Dupla aprovação, metas e pipeline comercial → obra",
         ],
       },
       {
-        title: "Plataforma",
+        title: "Onboarding e plataforma",
         items: [
+          "Tour em duas fases + micro-tours por módulo, mobile e hotspots",
           "OpenAPI 123 rotas + Swagger UI em /api/docs",
-          "Massas demo enriquecidas multi-segmento (SEED_PROFILE)",
+          "Massas demo enriquecidas multi-segmento",
         ],
       },
     ],
-    testStats: "415+ testes Vitest · 128+ E2E · pre-release OK",
+    testStats: "495 testes Vitest · 138 E2E · pre-release OK",
   },
   {
     version: "2.2.0",
@@ -112,73 +115,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       {
         title: "VET / Pet",
         items: [
-          "Entidade Pet com ficha clínica, vacinas e medicação",
-          "Walk-in com pet e listas clínicas do tutor",
-          "Demo PetCare com branding e vocabulário veterinário",
-        ],
-      },
-      {
-        title: "Operação e integração",
-        items: [
-          "Change management: reversão de faturas, PPU e estoque",
-          "Importação JSON/CSV de cadastros (patients, providers, companies, procedures)",
-          "OpenAPI v2.1 com +15 paths documentados",
-        ],
-      },
-      {
-        title: "Landing e marketing",
-        items: [
-          "CTA WhatsApp, SEO enriquecido e tags UTM",
-          "Identidade visual Energia Brasileira",
-          "Home produto e landings por segmento",
-          "Seção #novidades com changelog v2.1 e v2.0",
-        ],
-      },
-      {
-        title: "Segmentos e demo",
-        items: [
-          "Cores por nicho (pills, landing, login) via segment-colors",
-          "Login demo alterna automaticamente para modo demo por segmento",
-          "ROI ~91% e preços mercado 2026 documentados",
-        ],
-      },
-      {
-        title: "Voa Health (Fase 1)",
-        items: [
-          "Painel embed no atendimento do prestador",
-          "Importação de documentos clínicos para o PEP",
-          "APIs /voa e /voa/import com testes automatizados",
+          "Entidade Pet com ficha clínica, vacinas e walk-in",
+          "APIs nos portais interno, prestador e beneficiário",
         ],
       },
     ],
     testStats: "395 testes Vitest · 128 E2E · pre-release OK",
-  },
-  {
-    version: "2.0.0",
-    label: "Sistema Bibi - ServiceOS v2.0",
-    date: "23/06/2026",
-    status: "previous",
-    summary:
-      "Marca oficial ServiceOS, arquitetura multi-nicho com white label e seis segmentos de demonstração.",
-    highlights: [
-      {
-        title: "Multi-nicho",
-        items: [
-          "Tenant.niche e useLabels() para vocabulário adaptável",
-          "Roteamento por tenant (?tenant=) e cookie bibi_segment",
-          "Demos: PetCare, Smile, Lex, Zen, EduPrime e Horizonte Saúde",
-        ],
-      },
-      {
-        title: "Plataforma",
-        items: [
-          "Quatro portais integrados (Interno, Prestador, PJ, Beneficiário)",
-          "ROI demonstrável (~87%) com transparência auditável",
-          "Massas demo e operação validadas com db:verify",
-        ],
-      },
-    ],
-    testStats: "163 testes Vitest · db:verify demo + operation",
   },
 ];
 

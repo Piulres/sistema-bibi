@@ -1,5 +1,7 @@
 import "server-only";
+import type { NicheId } from "@/lib/niche/types";
 import type { NicheLabels } from "@/lib/niche/types";
+import { requiresPet } from "@/lib/vet-niche";
 import {
   buildDraftGuidanceText,
   buildResolveErrorGuidance as humanizeResolveError,
@@ -38,6 +40,8 @@ export function stripDraftMeta(args: OperationDraftArgs): OperationDraftArgs {
 type AppointmentArgs = {
   patientName?: string;
   patientId?: string;
+  petName?: string;
+  petId?: string;
   providerName?: string;
   providerId?: string;
   procedureName?: string;
@@ -74,14 +78,19 @@ function readyForProviderPick(data: AppointmentArgs, tool: string): boolean {
 export function getMissingFieldsForTool(
   tool: string,
   args: OperationDraftArgs,
+  niche?: NicheId,
 ): string[] {
+  const needsPet = requiresPet(niche);
   switch (tool) {
     case "draft_create_appointment":
     case "draft_book_appointment": {
       const data = args as AppointmentArgs;
       const missing: string[] = [];
       if (tool === "draft_create_appointment" && !data.patientName?.trim() && !data.patientId) {
-        missing.push("patientName");
+        missing.push(needsPet ? "tutorName" : "patientName");
+      }
+      if (needsPet && (data.patientId || data.patientName?.trim()) && !data.petName?.trim() && !data.petId) {
+        missing.push("petName");
       }
       if (isProcedureFirst(data) && !data.procedureName?.trim() && !data.procedureId) {
         missing.push("procedureName");
@@ -97,10 +106,9 @@ export function getMissingFieldsForTool(
     }
     case "draft_create_user": {
       const missing: string[] = [];
-      const data = args as { name?: string; email?: string; password?: string; role?: string };
+      const data = args as { name?: string; email?: string; role?: string };
       if (!data.name?.trim()) missing.push("name");
       if (!data.email?.trim()) missing.push("email");
-      if (!data.password?.trim()) missing.push("password");
       if (!data.role?.trim()) missing.push("role");
       return missing;
     }
@@ -122,21 +130,27 @@ export function buildDraftGuidance(
   missing: string[],
   labels: NicheLabels,
   partial: Record<string, string>,
+  niche?: NicheId,
 ): string {
-  return buildDraftGuidanceText({ tool, missing, labels, partial });
+  return buildDraftGuidanceText({ tool, missing, labels, partial, niche });
 }
 
 export function formatPartialSummary(
   tool: string,
   args: OperationDraftArgs,
   labels: NicheLabels,
+  niche?: NicheId,
 ): Record<string, string> {
+  const needsPet = requiresPet(niche);
   switch (tool) {
     case "draft_create_appointment":
     case "draft_book_appointment": {
       const data = args as AppointmentArgs;
       const partial: Record<string, string> = {};
-      if (data.patientName) partial[labels.patient] = data.patientName;
+      if (data.patientName) {
+        partial[needsPet ? labels.beneficiary : labels.patient] = data.patientName;
+      }
+      if (data.petName) partial[labels.patient] = data.petName;
       if (data.providerName) partial[labels.provider] = data.providerName;
       if (data.procedureName) partial[labels.procedure] = data.procedureName;
       if (data.date) partial.Data = data.date;

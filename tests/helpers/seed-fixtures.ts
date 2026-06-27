@@ -17,9 +17,9 @@ export const DEMO_EMAILS = {
 } as const;
 
 export const DEMO_CPFS = {
-  joao: "111.222.333-44",
-  maria: "555.666.777-88",
-  pedro: "999.000.111-22",
+  joao: "529.982.247-25",
+  maria: "390.533.447-05",
+  pedro: "153.509.460-56",
 } as const;
 
 export async function getBeneficiaryPatient(email: string) {

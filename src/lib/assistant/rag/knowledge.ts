@@ -13,7 +13,7 @@ export type KnowledgeChunk = {
 let cache: KnowledgeChunk[] | null = null;
 
 function loadMarkdown(relativePath: string, source: string): KnowledgeChunk[] {
-  const fullPath = join(process.cwd(), relativePath);
+  const fullPath = join(/* turbopackIgnore: true */ process.cwd(), relativePath);
   let raw: string;
   try {
     raw = readFileSync(fullPath, "utf8");

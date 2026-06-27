@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginAs } from "./helpers/auth";
+import { expectFeedbackMessage } from "./helpers/feedback";
 
 /** CPF válido único (dígitos verificadores corretos). */
 function generateValidCpf(): string {
@@ -82,10 +83,10 @@ test.describe("Portal Interno — walk-in particular", () => {
     await walkInForm.locator("#walkin-time").fill(slotTime);
 
     await page.getByRole("button", { name: /Cadastrar e agendar agora/i }).click();
-    await expect(page.getByText(/Walk-in:.*cadastrado.*agendado/i)).toBeVisible({ timeout: 15_000 });
+    await expectFeedbackMessage(page, /Walk-in cadastrado e agendado/i);
 
     const card = page.locator(".ds-card").filter({ hasText: walkInName }).last();
     await card.getByRole("button", { name: /Confirmar chegada/i }).click();
-    await expect(page.getByText(/Chegada confirmada/i)).toBeVisible();
+    await expectFeedbackMessage(page, /Chegada confirmada/i);
   });
 });

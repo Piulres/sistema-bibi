@@ -3,6 +3,7 @@
 import PortalShell from "@/components/layout/PortalShell";
 import AssistantShell from "@/components/assistant/AssistantShell";
 import BeneficiarioNav from "@/components/BeneficiarioNav";
+import FeedbackProvider from "@/components/ui/FeedbackProvider";
 import { OnboardingProvider, OnboardingTour } from "@/components/onboarding";
 import { PORTALS } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
@@ -22,6 +23,7 @@ export default function BeneficiarioPortalShell({ user, assistantEnabled = true,
 
   return (
     <OnboardingProvider portal="beneficiario" labels={user.labels} niche={user.niche}>
+      <FeedbackProvider>
       <PortalShell
         portal="beneficiario"
         portalLabel={user.labels.portalBeneficiary}
@@ -39,6 +41,7 @@ export default function BeneficiarioPortalShell({ user, assistantEnabled = true,
         </AssistantShell>
       </PortalShell>
       <OnboardingTour />
+      </FeedbackProvider>
     </OnboardingProvider>
   );
 }

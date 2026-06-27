@@ -1,16 +1,19 @@
 # Segmentos ServiceOS v2.0
 
-Cada pasta deste diretório documenta um **vertical** suportado pela plataforma: glossário de labels, contas demo, pesquisa de mercado e links para código.
+Cada pasta deste diretório documenta um **vertical** suportado pela plataforma: glossário de labels, contas demo, pesquisa de mercado, **playbook comercial** e links para código.
 
-| Segmento | `niche` | Pasta | Pesquisa |
-|----------|---------|-------|----------|
-| Saúde | `MEDICAL` | [`medical/`](medical/) | [`pesquisa-expansao-2026.md`](medical/pesquisa-expansao-2026.md) |
-| Veterinária | `VET` | [`vet/`](vet/) | [`pesquisa.md`](vet/pesquisa.md) |
-| Odontologia | `DENTAL` | [`dental/`](dental/) | [`pesquisa.md`](dental/pesquisa.md) |
-| Jurídico | `LEGAL` | [`legal/`](legal/) | [`pesquisa.md`](legal/pesquisa.md) |
-| Bem-estar | `SPA` | [`spa/`](spa/) | [`pesquisa.md`](spa/pesquisa.md) |
-| Educação | `EDUCATION` | [`education/`](education/) | [`pesquisa.md`](education/pesquisa.md) |
-| Engenharia | `CONSTRUCTION` | [`construction/`](construction/) | — |
+> **Features comuns a todos os nichos:** [`../comercial/MODULOS_COMUNS.md`](../comercial/MODULOS_COMUNS.md)
+> **Estratégia de captação por segmento:** [`../comercial/ESTRATEGIA_SEGMENTOS.md`](../comercial/ESTRATEGIA_SEGMENTOS.md)
+
+| Segmento | `niche` | Pasta | Comercial | Pesquisa |
+|----------|---------|-------|-----------|----------|
+| Saúde | `MEDICAL` | [`medical/`](medical/) | [`COMERCIAL.md`](medical/COMERCIAL.md) | [`pesquisa-expansao-2026.md`](medical/pesquisa-expansao-2026.md) |
+| Veterinária | `VET` | [`vet/`](vet/) | [`COMERCIAL.md`](vet/COMERCIAL.md) | [`pesquisa.md`](vet/pesquisa.md) |
+| Odontologia | `DENTAL` | [`dental/`](dental/) | [`COMERCIAL.md`](dental/COMERCIAL.md) | [`pesquisa.md`](dental/pesquisa.md) |
+| Jurídico | `LEGAL` | [`legal/`](legal/) | [`COMERCIAL.md`](legal/COMERCIAL.md) | [`pesquisa.md`](legal/pesquisa.md) |
+| Bem-estar | `SPA` | [`spa/`](spa/) | [`COMERCIAL.md`](spa/COMERCIAL.md) | [`pesquisa.md`](spa/pesquisa.md) |
+| Educação | `EDUCATION` | [`education/`](education/) | [`COMERCIAL.md`](education/COMERCIAL.md) | [`pesquisa.md`](education/pesquisa.md) |
+| Engenharia | `CONSTRUCTION` | [`construction/`](construction/) | — | — |
 
 **Validar Engenharia:** `/?tenant=build` → `operacao@build.demo` (interno) ou `rh@incorp.demo` (PJ) · obras `OBR-2026-*` · ver [`construction/README.md`](construction/README.md).
 

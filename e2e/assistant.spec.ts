@@ -46,4 +46,20 @@ test.describe("Assistente — chat nos portais", () => {
       timeout: 15_000,
     });
   });
+
+  test("VET PetCare: consulta agenda com vocabulário do nicho", async ({ page }) => {
+    await loginAs(page, "interno", "operacao@petcare.demo", "bibi123", "petcare");
+    await page.goto("/interno/agenda?tenant=petcare");
+
+    await page.getByRole("button", { name: /abrir assistente/i }).click();
+    await expect(page.getByRole("dialog", { name: /assistente/i })).toBeVisible();
+
+    const input = page.getByPlaceholder(/pergunte ou peça uma ação/i);
+    await input.fill("Quantos atendimentos temos hoje?");
+    await input.press("Enter");
+
+    await expect(page.getByRole("dialog")).toContainText(/atendimento|agendamento|hoje|pet/i, {
+      timeout: 15_000,
+    });
+  });
 });
