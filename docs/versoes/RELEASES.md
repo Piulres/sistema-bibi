@@ -9,15 +9,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Status agora (25/06/2026)
+## Status agora (26/06/2026)
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — **Sistema Bibi - ServiceOS** — deploy `6a3ea6c5` @ `2c38248` |
 | **Versão anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
+| **Próximo pacote (homologação `dev`)** | **2.3.0** — assistente multi-nicho + Engenharia Civil + onboarding fase 2 |
 | **Commit release v2.2** | `2c38248` |
 | `main` | **v2.2.0** — onboarding tour publicado |
-| `dev` | **v2.1.0** — aguarda merge de `main` |
+| `dev` | **v2.3.0** — validado (`pre-release` + 490 Vitest + 138 E2E) — aguarda merge → `main` + deploy |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
 | **Pacote anterior** | **v2.1.0** — deploy `6a3d525f` @ `07c7a7e` (24/06/2026) |
 
@@ -25,10 +26,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.1.0** — aguarda merge `main` |
+| **Integração** | `dev` | **v2.3.0** — homologação completa (PR assistente + construction + onboarding #152) |
 | **Release** | `main` | **v2.2.0** — onboarding tour ([#142](https://github.com/Piulres/sistema-bibi/pull/142)) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v2.2.0** — deploy `6a3ea6c5` @ `2c38248` (25/06/2026) |
-| **Preview** | deploy draft | `6a3ea6c5` @ `2c38248` — validado antes da publicação |
+| **Preview** | deploy draft | Após merge `dev` → `main` e `pre-release` na `main` |
 
 ### Tags git (histórico)
 
@@ -42,6 +43,38 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
 | `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |
 | `v1.0.0` | `685cc21` | POC inicial |
+
+---
+
+## Próximo pacote (validado — aguarda deploy)
+
+### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + homologação dev) *(rascunho)*
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.3.0` (a criar após deploy) |
+| **Branch** | `dev` — integrar PRs [#148](https://github.com/Piulres/sistema-bibi/pull/148), [#149](https://github.com/Piulres/sistema-bibi/pull/149) |
+| **Doc** | [`V2_3.md`](V2_3.md) |
+| **Validação** | `npm run pre-release` ✅ · 490 Vitest · 138 E2E · `docs:verify` · `db:verify` |
+
+**Inclui (além de v2.2.0):**
+
+- **Assistente operacional:** estado serverless (tokens HMAC), confirmação de ações em Netlify, anti-repetição multi-turno
+- **Assistente multi-nicho:** RAG por segmento, procedimentos do catálogo do tenant, copiloto contextual por página
+- **VET:** agendamento com tutor + pet (`search_pets`, auto-seleção de pet único)
+- **Engenharia Civil (CONSTRUCTION):** obras, RDO, portal campo, faturamento por diária, Gantt, pipeline comercial, caixa/BDI
+- **Onboarding fase 2:** tour em duas fases, mobile, hotspots ([#152](https://github.com/Piulres/sistema-bibi/pull/152))
+- **API docs:** Swagger UI em `/api/docs` (assets self-hosted)
+- **Massa demo:** seeds ricos em todos os segmentos + perfil `operation-1y`
+
+**Publicar (humano):**
+
+```bash
+git checkout dev && git pull && npm run pre-release
+git checkout main && git pull && git merge dev && npm run pre-release
+npx netlify deploy --prod --message "v2.3.0: assistente multi-nicho + Engenharia Civil"
+git tag -a v2.3.0 -m "Release 2.3.0"
+```
 
 ---
 
@@ -172,7 +205,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **1.2.x** | [`V1_2.md`](V1_2.md) | Histórico (substituído por v2.0) |
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
-| **2.1.x** | [`V2_1.md`](V2_1.md) | ✅ **`v2.1.0` em produção** (Voa Fase 1 integrada) |
+| **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
+| **2.2.x** | onboarding tour | ✅ **`v2.2.0` em produção** |
+| **2.3.x** | [`V2_3.md`](V2_3.md) | 🟡 **Validado na `dev`** — aguarda merge + deploy |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---

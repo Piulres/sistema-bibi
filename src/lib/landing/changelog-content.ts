@@ -26,10 +26,45 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.2.0",
+    version: "2.3.0",
     label: PLATFORM.versionLabel,
-    date: "25/06/2026",
+    date: "26/06/2026",
     status: "current",
+    summary:
+      "Assistente operacional robusto em produção serverless, multi-nicho com VET (pet), módulo Engenharia Civil e onboarding guiado fase 2.",
+    highlights: [
+      {
+        title: "Assistente operacional",
+        items: [
+          "Estado de sessão assinado (HMAC) — confirmação de ações funciona na Netlify",
+          "RAG e procedimentos adaptados ao catálogo e vocabulário de cada nicho",
+          "Copiloto contextual com sugestões por página nos 4 portais",
+          "VET: agendamento tutor + pet com busca e auto-seleção",
+        ],
+      },
+      {
+        title: "Engenharia Civil",
+        items: [
+          "Obras com orçamento, cronograma Gantt e anexos",
+          "RDO e portal de campo para prestadores",
+          "Faturamento por diária, pipeline comercial e caixa/BDI",
+        ],
+      },
+      {
+        title: "Onboarding e API",
+        items: [
+          "Tour guiado fase 2 — mobile, hotspots e duas fases por portal",
+          "Documentação interativa da API em /api/docs (Swagger UI)",
+        ],
+      },
+    ],
+    testStats: "490 testes Vitest · 138 E2E · pre-release OK",
+  },
+  {
+    version: "2.2.0",
+    label: "Sistema Bibi - ServiceOS v2.2",
+    date: "25/06/2026",
+    status: "previous",
     summary:
       "Tour guiado de onboarding nos 4 portais com spotlight, hotspots pulsantes e textos adaptados por nicho.",
     highlights: [

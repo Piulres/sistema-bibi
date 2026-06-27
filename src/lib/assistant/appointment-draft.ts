@@ -135,9 +135,10 @@ export async function resolveAppointmentDraft(input: {
   }
 
   let petLabel: string | undefined;
-  if (needsPet && data.patientId) {
+  const tutorPatientId = data.patientId;
+  if (needsPet && tutorPatientId) {
     if (!data.petId && !data.petName?.trim()) {
-      const pets = await listPetsForPatient(tenantId, data.patientId);
+      const pets = await listPetsForPatient(tenantId, tutorPatientId);
       if (pets.length === 1) {
         data = { ...data, petId: pets[0]!.id, petName: pets[0]!.label };
         petLabel = pets[0]!.label;
@@ -158,7 +159,7 @@ export async function resolveAppointmentDraft(input: {
     if (data.petId || data.petName?.trim()) {
       const petResult = await resolvePetByName(
         tenantId,
-        data.patientId,
+        tutorPatientId,
         data.petName,
         data.petId,
       );
