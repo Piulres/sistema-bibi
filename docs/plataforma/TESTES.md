@@ -3,7 +3,20 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **384** casos Vitest · **128** testes Playwright E2E (10 specs × 2 projetos) · **~123** Route Handlers · **123** paths no OpenAPI (`public/openapi.yaml`).
+**Ground truth (jun/2026):** **415+** casos Vitest · **128+** testes Playwright E2E · **123** Route Handlers · **123** paths no OpenAPI.
+
+### Onboarding tour (v3)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Match de rotas wildcard | `tests/unit/onboarding.test.ts` | `/interno/beneficiarios/*`, agenda* |
+| Tour principal condensado | idem | ≤7 passos no dashboard interno |
+| Micro-tour faturamento | idem | `page-billing`, `billing-cliente-360` |
+| Micro-tour atendimento | idem | hotspot `atendimento-pep` |
+| Persistência dismissed / routes | idem | `storage.ts` v3 |
+| E2E isolamento | `e2e/helpers/auth.ts` | `skipOnboardingTours()` |
+
+Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
 ---
 

@@ -17,6 +17,7 @@
 | API (Swagger / OpenAPI) | [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) |
 | Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
+| Tour guiado (onboarding) | [`produto/ONBOARDING_TOUR.md`](produto/ONBOARDING_TOUR.md) |
 | Demo multi-nicho | [`segmentos/README.md`](segmentos/README.md) |
 
 ---
@@ -47,8 +48,9 @@ docs/
 | Jurídico | [`segmentos/legal/`](segmentos/legal/) | Lex & Partners | `operacao@lex.demo` |
 | Bem-estar | [`segmentos/spa/`](segmentos/spa/) | Zen Studio | `operacao@zen.demo` |
 | Educação | [`segmentos/education/`](segmentos/education/) | EduPrime | `operacao@eduprime.demo` |
+| Engenharia | [`segmentos/construction/`](segmentos/construction/) | Build Corp | `operacao@build.demo` |
 
-Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LEGAL`, etc.
+Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=build`, etc.
 
 ---
 
@@ -78,6 +80,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 | Documento | Conteúdo |
 |-----------|----------|
 | [`produto/FLUXOS.md`](produto/FLUXOS.md) | Fluxos E2E nos quatro portais |
+| [`produto/ONBOARDING_TOUR.md`](produto/ONBOARDING_TOUR.md) | Tour guiado v3 (duas fases, micro-tours) |
 | [`produto/JORNADA_CLIENTE.md`](produto/JORNADA_CLIENTE.md) | Jornada UX por portal |
 | [`produto/AUDITORIA_FLUXOS.md`](produto/AUDITORIA_FLUXOS.md) | Gaps mapeados |
 
@@ -87,7 +90,8 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.1.0 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.3.0 na main** (produção v2.2.0) |
+| [`versoes/V2_3.md`](versoes/V2_3.md) | Changelog v2.3 — onboarding fase 2, construction, OpenAPI |
 | [`versoes/V2_1.md`](versoes/V2_1.md) | Changelog v2.1 — assistente, VET, change-mgmt, import |
 | [`versoes/V2_0.md`](versoes/V2_0.md) | Escopo ServiceOS v2.0 |
 | [`versoes/V2_0_ARCHITECTURE.md`](versoes/V2_0_ARCHITECTURE.md) | Arquitetura multi-nicho |
