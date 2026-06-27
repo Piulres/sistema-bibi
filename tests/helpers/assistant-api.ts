@@ -7,12 +7,13 @@ const CONFIRM_URL = "http://localhost/api/assistant/confirm";
 export async function postAssistantChat(
   messages: AssistantMessage[],
   pageContext?: string,
+  sessionState?: string,
 ): Promise<Response> {
   const { POST } = await import("@/app/api/assistant/chat/route");
   return POST(
     jsonRequest(CHAT_URL, {
       method: "POST",
-      body: { messages, pageContext },
+      body: { messages, pageContext, sessionState },
     }),
   );
 }
@@ -37,5 +38,6 @@ export async function parseAssistantChatResponse(res: Response) {
     message: AssistantMessage;
     actions?: { type: string; pendingActionId?: string }[];
     toolTrace?: unknown[];
+    sessionState?: string;
   };
 }

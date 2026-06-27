@@ -380,13 +380,12 @@ export function dateRangeFromText(text: string): { from?: string; to?: string } 
   return { from: "hoje" };
 }
 
-/** Confirma se texto parece pergunta de follow-up curta. */
+/** Confirma se texto parece pergunta de follow-up curta (só data ou continuação explícita). */
 export function isFollowUpPhrase(text: string): boolean {
   const t = normalizeMockText(text);
   return (
     /^(e|mas|ok|entao|então)\s/.test(t) ||
-    /^(e\s+)?(ontem|hoje|amanha)$/.test(t) ||
-    t.length < 28
+    /^(e\s+)?(ontem|hoje|amanha)$/.test(t)
   );
 }
 
