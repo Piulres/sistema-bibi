@@ -53,6 +53,23 @@ export function greetingHelp(): string {
   return "Como posso ajudar? Use os atalhos abaixo ou descreva o que precisa.";
 }
 
+export function draftStuckHint(labels: NicheLabels, tool: string): string {
+  if (tool === "draft_create_appointment" || tool === "draft_book_appointment") {
+    return [
+      `Ainda estou montando o ${labels.appointment.toLowerCase()}.`,
+      `Me passe o que falta em uma frase — por exemplo: *${labels.patient} João, amanhã às 15h com Dra Helena*.`,
+      `Ou diga *cancelar* para recomeçar.`,
+    ].join("\n");
+  }
+  if (tool === "draft_create_patient") {
+    return "Para cadastrar, envie nome, CPF e data de nascimento em uma mensagem.";
+  }
+  if (tool === "draft_create_user") {
+    return "Para criar o usuário, informe nome, e-mail, senha e perfil (prestador, interno, PJ ou beneficiário).";
+  }
+  return "Não captei essa parte. Pode reformular com mais detalhes?";
+}
+
 export function portalFallbackIntro(portalLabel: string): string {
   return `Ainda não captei o que você precisa no **${portalLabel}**. Algumas ideias:`;
 }

@@ -215,11 +215,14 @@ describe("assistant draft multi-turn", () => {
     };
 
     const messages: { role: "user" | "assistant"; content: string }[] = [];
+    let sessionState: string | undefined;
 
     const step1 = await runAssistantChat({
       user,
       messages: [...messages, { role: "user", content: "preciso marcar uma consulta" }],
+      sessionState,
     });
+    sessionState = step1.sessionState;
     expect(step1.message.content).toMatch(/Para quem|paciente/i);
     expect(step1.actions).toBeUndefined();
 
@@ -228,7 +231,9 @@ describe("assistant draft multi-turn", () => {
     const step2 = await runAssistantChat({
       user,
       messages: [...messages, { role: "user", content: "é pro João Pereira" }],
+      sessionState,
     });
+    sessionState = step2.sessionState;
     expect(step2.message.content).toMatch(/João|Prestador|Dra|data|horário/i);
 
     messages.push({ role: "user", content: "é pro João Pereira" }, step2.message);
@@ -236,6 +241,7 @@ describe("assistant draft multi-turn", () => {
     const step3 = await runAssistantChat({
       user,
       messages: [...messages, { role: "user", content: "amanhã às 15h com a Dra Helena" }],
+      sessionState,
     });
     expect(step3.actions?.some((a) => a.type === "confirm")).toBe(true);
     expect(step3.message.content).toMatch(/confirme/i);
@@ -365,6 +371,7 @@ describe("assistant disambiguation", () => {
         step1.message,
         { role: "user", content: helena?.label ?? "1" },
       ],
+      sessionState: step1.sessionState,
     });
 
     expect(step2.actions?.some((a) => a.type === "confirm")).toBe(true);
@@ -493,7 +500,7 @@ describe("assistant portal concepts", () => {
 });
 
 describe("assistant pending actions", () => {
-  it("cria e consome ação pendente", () => {
+  it("cria e consome ação pendente assinada", () => {
     const id = createPendingAction("u1", "t1", {
       type: "create_user",
       data: {
@@ -503,18 +510,77 @@ describe("assistant pending actions", () => {
         role: "PRESTADOR",
       },
     });
+    expect(id.startsWith("pa.")).toBe(true);
     const payload = consumePendingAction(id, "u1", "t1");
     expect(payload?.type).toBe("create_user");
-    expect(consumePendingAction(id, "u1", "t1")).toBeNull();
+    expect(consumePendingAction(id, "u1", "t1")?.type).toBe("create_user");
   });
 
-  it("cancela ação pendente", () => {
+  it("cancela ação pendente assinada", () => {
     const id = createPendingAction("u1", "t1", {
       type: "create_patient",
       data: { name: "Ana", cpf: "52998224725", birthDate: "1990-01-01" },
     });
     expect(cancelPendingAction(id, "u1", "t1")).toBe(true);
-    expect(consumePendingAction(id, "u1", "t1")).toBeNull();
+    expect(consumePendingAction(id, "u1", "t1")).not.toBeNull();
+  });
+});
+
+describe("assistant session state (serverless)", () => {
+  it("persiste draft multi-turno via sessionState entre requisições stateless", async () => {
+    const prisma = getTestPrisma();
+    const dbUser = await prisma.user.findFirst({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+      include: { tenant: { include: { branding: true } } },
+    });
+    const niche = isNicheId(dbUser!.tenant!.niche) ? dbUser!.tenant!.niche : "MEDICAL";
+    const user: SessionUser = {
+      id: "stateless-draft-user",
+      name: dbUser!.name,
+      email: dbUser!.email,
+      role: dbUser!.role,
+      tenantId: dbUser!.tenantId,
+      tenantSlug: dbUser!.tenant!.slug,
+      companyId: null,
+      patientId: null,
+      tenantName: dbUser!.tenant!.name,
+      companyName: null,
+      patientName: null,
+      internoProfile: dbUser!.internoProfile,
+      internoPermissions: resolveInternoPermissions(dbUser!.role, dbUser!.internoProfile),
+      branding: applyNicheBrandingDefaults(niche, CLINIC_BRANDING_DEFAULTS),
+      niche,
+      labels: mergeNicheLabels(niche, dbUser!.tenant!.labels),
+    };
+
+    const step1 = await runAssistantChat({
+      user,
+      messages: [{ role: "user", content: "preciso marcar uma consulta" }],
+    });
+    expect(step1.sessionState).toBeTruthy();
+
+    const step2 = await runAssistantChat({
+      user,
+      messages: [
+        { role: "user", content: "preciso marcar uma consulta" },
+        step1.message,
+        { role: "user", content: "é pro João Pereira" },
+      ],
+      sessionState: step1.sessionState,
+    });
+    expect(step2.message.content).toMatch(/João|prestador|data|horário/i);
+  });
+
+  it("não repete a mesma pergunta quando o draft está travado", () => {
+    const user = adminUser();
+    clearMockContext(user.id);
+    const tools = getToolsForUser(user);
+    const toolNames = new Set(tools.map((t) => t.name));
+
+    planMockFromIntents("preciso marcar uma consulta", user, toolNames);
+    const stuck = planMockFromIntents("oi", user, toolNames);
+    expect(stuck.toolCalls).toHaveLength(0);
+    expect(stuck.fallback).toMatch(/ainda estou montando|reformular/i);
   });
 });
 

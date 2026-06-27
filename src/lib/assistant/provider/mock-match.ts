@@ -33,7 +33,7 @@ import {
   buildPortalHelpFallback,
   resolvePortalFollowUpTool,
 } from "@/lib/assistant/portal-concepts";
-import { choiceNotRecognized, greetingHelp } from "@/lib/assistant/humanize";
+import { choiceNotRecognized, draftStuckHint, greetingHelp } from "@/lib/assistant/humanize";
 import {
   isDraftToolName,
   mergeDraftArgs,
@@ -157,6 +157,9 @@ function tryDraftContinuation(
   if (!tool || !toolNames.has(tool)) return null;
 
   const incoming = extractIncrementalArgs(tool, raw);
+  if (Object.keys(incoming).length === 0) {
+    return null;
+  }
   const merged = mergeDraftArgs(activeDraft?.args ?? {}, incoming);
   rememberOperationDraft(user.id, tool, merged);
   rememberLastIntent(user.id, tool);
@@ -260,13 +263,22 @@ export function planMockFromIntents(
   if (calls.length === 0) {
     const activeDraft = getOperationDraft(user.id);
     if (activeDraft && toolNames.has(activeDraft.tool)) {
+      const incoming = extractIncrementalArgs(activeDraft.tool, raw);
+      if (Object.keys(incoming).length > 0) {
+        const merged = mergeDraftArgs(activeDraft.args ?? {}, incoming);
+        rememberOperationDraft(user.id, activeDraft.tool, merged);
+        return {
+          toolCalls: [
+            {
+              name: activeDraft.tool,
+              arguments: stripDraftMeta(merged),
+            },
+          ],
+        };
+      }
       return {
-        toolCalls: [
-          {
-            name: activeDraft.tool,
-            arguments: stripDraftMeta(activeDraft.args),
-          },
-        ],
+        toolCalls: [],
+        fallback: draftStuckHint(user.labels, activeDraft.tool),
       };
     }
     return {
