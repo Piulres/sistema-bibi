@@ -1,10 +1,10 @@
-# Documentação Sistema Bibi - ServiceOS v2.0
+# Documentação Sistema Bibi - ServiceOS v2.3
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Última revisão factual:** junho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
+> **Última revisão factual:** junho/2026 — pacote **v2.3.0** na `main` (onboarding v3, Engenharia Civil, OpenAPI). Produção: **v2.2.0** — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
-> **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre seis. Comece pelo segmento do seu tenant ou pela documentação de plataforma.
+> **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre sete. Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
 ---
 
@@ -15,7 +15,8 @@
 | Desenvolvedor / agente IA | [`AGENTS.md`](../AGENTS.md) · [`prompts/README.md`](prompts/README.md) |
 | Operações e deploy | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) |
 | API (Swagger / OpenAPI) | [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) |
-| Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
+| Onboarding guiado (tour v3) | [`plataforma/ONBOARDING.md`](plataforma/ONBOARDING.md) |
+| Escopo v2.3 | [`versoes/V2_3.md`](versoes/V2_3.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
 | Demo multi-nicho | [`segmentos/README.md`](segmentos/README.md) |
 
@@ -47,8 +48,9 @@ docs/
 | Jurídico | [`segmentos/legal/`](segmentos/legal/) | Lex & Partners | `operacao@lex.demo` |
 | Bem-estar | [`segmentos/spa/`](segmentos/spa/) | Zen Studio | `operacao@zen.demo` |
 | Educação | [`segmentos/education/`](segmentos/education/) | EduPrime | `operacao@eduprime.demo` |
+| Engenharia Civil | [`segmentos/construction/`](segmentos/construction/) | Build Engenharia | `operacao@build.demo` |
 
-Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LEGAL`, etc.
+Senha demo universal: **`bibi123`**. Preview landing: `/?tenant=build`, `/?niche=VET`, `/?niche=LEGAL`, etc.
 
 ---
 
@@ -69,6 +71,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 | [`plataforma/ROI_REFERENCIA.md`](plataforma/ROI_REFERENCIA.md) | ROI Pay Per Use — fórmulas e sensibilidade (saúde) |
 | [`plataforma/NOTEBOOKLM.md`](plataforma/NOTEBOOKLM.md) | Corpus RAG |
 | [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md) | Dev sem deploy automático |
+| [`plataforma/ONBOARDING.md`](plataforma/ONBOARDING.md) | Product tour v3 nos portais |
 | [`plataforma/LANDING_CHANGELOG.md`](plataforma/LANDING_CHANGELOG.md) | Manutenção do bloco Novidades na home |
 
 ---
@@ -87,7 +90,9 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?niche=LE
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.1.0 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.3.0 na main** · **v2.2.0 em produção** |
+| [`versoes/V2_3.md`](versoes/V2_3.md) | Changelog v2.3 — onboarding v3, Engenharia Civil, OpenAPI |
+| [`versoes/V2_2.md`](versoes/V2_2.md) | Changelog v2.2 — onboarding tour inicial |
 | [`versoes/V2_1.md`](versoes/V2_1.md) | Changelog v2.1 — assistente, VET, change-mgmt, import |
 | [`versoes/V2_0.md`](versoes/V2_0.md) | Escopo ServiceOS v2.0 |
 | [`versoes/V2_0_ARCHITECTURE.md`](versoes/V2_0_ARCHITECTURE.md) | Arquitetura multi-nicho |

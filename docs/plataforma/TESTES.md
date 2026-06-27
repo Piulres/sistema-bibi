@@ -63,12 +63,28 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 | Labels `CONSTRUCTION` | Glossário Obra, Dossiê técnico, Vistoria |
 | `listProjectsForCompany` | 3 obras Incorp Alpha no seed |
 | `approveBudget` + PDF | Fatura emitida, buffer `%PDF` |
+| Dupla aprovação PJ | `APROVADO_PJ` → interno `APROVADO` + invoice |
+| Pipeline → obra | Lead convertido em obra `ORCAMENTO` |
 | `getProjectForCompany` | URLs de anexo PJ |
 | API interno build | Lista, pipeline, detalhe, dependências, PDF, reject |
 | API PJ Incorp | Lista, alerta overview, approve → invoice, PDF |
 | Isolamento | MEDICAL interno lista vazia; TechCorp PJ sem obras/alertas |
 
 Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`
+
+### Onboarding guiado (tour v3)
+
+| Caso | O que valida |
+|------|----------------|
+| `match-route` | Filtro de passos por rota (`*` prefix) |
+| `route-scope` | Chaves `interno:agenda`, `cliente-360`, `pj:projetos` |
+| `feature-map` | Passos interno/prestador/beneficiário com labels |
+| `storage` | `bibi_onboarding` — completed, dismissed, reset por portal |
+| `ONBOARDING_VERSION` | Bump reinicia tours |
+| E2E auto-start | `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true` em `playwright.config.ts` |
+| E2E skip manual | `e2e/helpers/auth.ts` → `skipOnboardingTours()` |
+
+Arquivo: `tests/unit/onboarding.test.ts` · Doc: [`ONBOARDING.md`](ONBOARDING.md)
 
 ---
 

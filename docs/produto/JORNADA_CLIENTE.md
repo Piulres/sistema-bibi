@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v2.0** — labels por tenant, landing segmentada, tenants demo multi-nicho.
+Última revisão: **ServiceOS v2.3** — onboarding v3, segmento CONSTRUCTION, labels por tenant.
 
 ---
 
@@ -52,7 +52,24 @@ O cliente (clínica, pet shop, escritório) **não vê um ERP genérico** — v�
 | Copy da landing por nicho | ✅ |
 | Labels dinâmicos em nav/cadastros | ✅ parcial |
 | Homepage 100% custom por tenant | 🟡 tagline + branding |
+| Product tour guiado (onboarding v3) | ✅ — ver [`ONBOARDING.md`](../plataforma/ONBOARDING.md) |
 | Wizard onboarding (escolher nicho) | ❌ roadmap |
+
+---
+
+## 0.1 Product tour (onboarding v3)
+
+Tour automático na **primeira visita** a cada portal, com **micro-tours** por módulo na primeira visita a cada rota.
+
+| Aspecto | Comportamento |
+|---------|---------------|
+| Reinício | Botão **Tour** no header de cada portal |
+| Textos | Adaptados por nicho (`useLabels()`) |
+| Mobile | Drawer **Módulos** com `data-tour-nav` |
+| Persistência | `localStorage` → chave `bibi_onboarding` |
+| E2E/CI | `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true` |
+
+Detalhes técnicos: [`plataforma/ONBOARDING.md`](../plataforma/ONBOARDING.md).
 
 ---
 
