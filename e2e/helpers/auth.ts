@@ -72,9 +72,13 @@ export async function loginAs(
   portal: PortalKey,
   email: string,
   password = "bibi123",
+  tenantSlug?: string,
 ): Promise<void> {
   await skipOnboardingTours(page);
-  await page.goto(LOGIN_PATHS[portal]);
+  const loginPath = tenantSlug
+    ? `${LOGIN_PATHS[portal]}?tenant=${encodeURIComponent(tenantSlug)}`
+    : LOGIN_PATHS[portal];
+  await page.goto(loginPath);
   await page.getByLabel(/e-mail/i).fill(email);
   await page.getByLabel(/senha/i).fill(password);
   await page.getByRole("button", { name: /entrar/i }).click();

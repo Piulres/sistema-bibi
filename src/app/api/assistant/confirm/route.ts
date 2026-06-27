@@ -2,7 +2,9 @@ import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { isAssistantEnabled } from "@/lib/assistant/config";
 import { executePendingAction } from "@/lib/assistant/confirm-executor";
-import { cancelPendingAction, consumePendingAction } from "@/lib/assistant/pending-actions";
+import { cancelPendingAction } from "@/lib/assistant/pending-actions";
+import { tryMarkPendingJtiConsumed } from "@/lib/assistant/pending-consumed";
+import { decodePendingEnvelope } from "@/lib/assistant/session-state";
 import type { AssistantConfirmRequest } from "@/lib/assistant/types";
 
 /** Confirma ou cancela ação pendente do assistente. */
@@ -32,12 +34,17 @@ export async function POST(request: Request) {
       });
     }
 
-    const payload = consumePendingAction(body.pendingActionId, user.id, user.tenantId);
-    if (!payload) {
+    const envelope = decodePendingEnvelope(body.pendingActionId, user.id, user.tenantId);
+    if (!envelope) {
       return NextResponse.json({ error: "Ação expirada ou inválida." }, { status: 410 });
     }
 
-    const result = await executePendingAction(user, payload, body.password);
+    const firstUse = await tryMarkPendingJtiConsumed(envelope.jti);
+    if (!firstUse) {
+      return NextResponse.json({ error: "Esta confirmação já foi utilizada." }, { status: 410 });
+    }
+
+    const result = await executePendingAction(user, envelope.payload, body.password);
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }

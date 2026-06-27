@@ -33,6 +33,7 @@ import {
   decodeAssistantSessionState,
   encodeAssistantSessionState,
 } from "@/lib/assistant/session-state";
+import { recordAssistantToolUse } from "@/lib/assistant/analytics";
 
 async function resolvePlan(
   user: SessionUser,
@@ -101,6 +102,7 @@ export async function runAssistantChat(input: {
       assertToolPermission(input.user, tool);
       const result = await tool.handler(ctx, call.arguments);
       trace?.push({ name: call.name, ok: true });
+      void recordAssistantToolUse(input.user, call.name, true, input.pageContext);
 
       if (isDraftToolResult(result)) {
         pendingActionId = result.pendingActionId;
@@ -133,6 +135,7 @@ export async function runAssistantChat(input: {
           ? error.message
           : toolExecutionError();
       trace?.push({ name: call.name, ok: false, error: message });
+      void recordAssistantToolUse(input.user, call.name, false, input.pageContext);
       sections.push(message);
     }
   }

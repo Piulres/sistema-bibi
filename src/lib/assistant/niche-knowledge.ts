@@ -54,6 +54,13 @@ const NICHE_SNIPPETS: NicheSnippet[] = [
       "Alunos e instrutores usam agenda de aulas. O assistente mostra próximas aulas, extrato do instrutor e permite preparar agendamentos de aula com confirmação.",
     tags: ["aula", "aluno", "instrutor", "agendar", "matrícula"],
   },
+  {
+    niche: "CONSTRUCTION",
+    title: "Obras e empreiteira",
+    content:
+      "No segmento Engenharia Civil use Projetos/Obras para pipeline comercial, orçamento, cronograma e RDO. O assistente ajuda com resumo da operação; agendamentos seguem o catálogo do tenant. Prestadores registram diário de campo em Campo.",
+    tags: ["obra", "projeto", "rdo", "campo", "orçamento", "empreiteira", "engenharia"],
+  },
 ];
 
 function tokenize(text: string): string[] {

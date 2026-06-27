@@ -254,4 +254,29 @@ describe("API — /api/assistant/confirm", () => {
     });
     expect(res.status).toBe(410);
   });
+
+  it("rejeita reutilização do mesmo pendingActionId na confirmação", async () => {
+    const prisma = getTestPrisma();
+    const user = await prisma.user.findUniqueOrThrow({
+      where: { email: DEMO_EMAILS.internoRecepcao },
+    });
+    await setSessionForEmail(DEMO_EMAILS.internoRecepcao);
+
+    const pendingId = createPendingAction(user.id, user.tenantId, {
+      type: "create_patient",
+      data: {
+        name: `Replay Guard ${Date.now()}`,
+        cpf: "39053344705",
+        birthDate: "1990-01-01",
+      },
+    });
+
+    const first = await postAssistantConfirm({ pendingActionId: pendingId, confirmed: true });
+    expect(first.status).toBe(200);
+
+    const replay = await postAssistantConfirm({ pendingActionId: pendingId, confirmed: true });
+    expect(replay.status).toBe(410);
+    const body = await replay.json();
+    expect(body.error).toMatch(/já foi utilizada|expirada|inválida/i);
+  });
 });

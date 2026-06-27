@@ -21,6 +21,16 @@ describe("assistant multi-nicho", () => {
     expect(chunks[0]?.content).toMatch(/pet|tutor/i);
   });
 
+  it("RAG retorna snippet Engenharia Civil", () => {
+    const chunks = searchNicheKnowledge(
+      "CONSTRUCTION",
+      "obra rdo campo",
+      NICHE_MASTER_LABELS.CONSTRUCTION,
+    );
+    expect(chunks.length).toBeGreaterThan(0);
+    expect(chunks[0]?.content).toMatch(/obra|rdo|campo/i);
+  });
+
   it("resolve procedimento do catálogo do tenant petcare", async () => {
     const prisma = getTestPrisma();
     const tenant = await prisma.tenant.findFirst({ where: { slug: "petcare" } });
