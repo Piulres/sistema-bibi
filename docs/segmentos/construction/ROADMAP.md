@@ -1,6 +1,18 @@
 # Roadmap Engenharia Civil — Pacotes 1–5
 
-Especificação dos módulos entregues na branch `cursor/construction-roadmap-a43a`.
+Especificação dos módulos entregues no pacote **v2.3.0** (merge `dev` → `main`).
+
+## Fase 2 (v2.3.0)
+
+| Entrega | Detalhe |
+|---------|---------|
+| Dupla aprovação | PJ → `APROVADO_PJ` · interno → `APROVADO` + fatura |
+| Pipeline → obra | `convertPipelineToProject` — lead vira obra `ORCAMENTO` |
+| Metas BDI | `ConstructionSalesGoal` — cobertura vs orçamentos aprovados |
+| Nav beneficiário | Apenas obras, resumo, faturas, histórico |
+| RDO | `billingMode FECHADO` bloqueia diária no campo |
+
+Commit de referência: `84bccb9` · testes em `construction-projects.test.ts`, `project.test.ts`.
 
 ## Pacote 1 — Fundação financeira
 

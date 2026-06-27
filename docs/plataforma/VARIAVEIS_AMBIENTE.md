@@ -44,6 +44,7 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | `NEXT_PUBLIC_GTM_ID` | Não | — | Google Tag Manager |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Não | — | Meta Pixel (opcional se usar só GTM) |
 | `NEXT_PUBLIC_GOOGLE_ADS_ID` | Não | — | Google Ads / gtag (opcional) |
+| `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO` | Não | *(ausente = ligado)* | Desliga auto-start do tour (E2E/CI) |
 | `SEED_SCALE` | Não | `medium` | Volume da massa no seed |
 | `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
 | `RUN_SEED_ON_BUILD` | Não | `true` em demo | Seed no build Netlify (`false` em operação) |
@@ -348,6 +349,16 @@ COMMUNICATION_PROVIDER=console
 - `DATABASE_URL` sobrescrito em runtime dos testes de integração/API
 
 Ver também: [`TESTES.md`](TESTES.md).
+
+### Playwright ([`playwright.config.ts`](../playwright.config.ts))
+
+Além de `CI=true`, o servidor de testes define:
+
+```env
+NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true
+```
+
+Evita que o tour guiado intercepte cliques no E2E. O botão **Tour** manual continua disponível. Ver [`ONBOARDING.md`](ONBOARDING.md).
 
 ---
 

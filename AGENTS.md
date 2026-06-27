@@ -13,7 +13,7 @@ segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`
 (`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
 **Pay Per Use** sobre qualquer tipo de serviço (consulta médica, hora jurídica, aula de yoga…).
 
-**Multi-nicho (v2.0):** cada `Tenant` possui `niche` (`MEDICAL`|`VET`|`DENTAL`|`LEGAL`|`SPA`|`EDUCATION`)
+**Multi-nicho (v2.0+):** cada `Tenant` possui `niche` (`MEDICAL`|`VET`|`DENTAL`|`LEGAL`|`SPA`|`EDUCATION`|`CONSTRUCTION`)
 e `labels` (JSON) para tradução automática da UI.
 
 **Dicionário mestre (obrigatório):** `src/constants/niches.ts` — `NICHE_MASTER_LABELS` com todas as chaves tipadas (`NicheLabelKey`). Novo nicho = novo bloco aqui; o TypeScript falha se faltar termo.
@@ -36,8 +36,10 @@ e `labels` (JSON) para tradução automática da UI.
 | LEGAL | Cliente | Advogado | Serviço jurídico | Atendimento | Cliente |
 | SPA | Cliente | Profissional | Sessão | Agendamento | Cliente |
 | EDUCATION | Aluno | Instrutor | Aula | Aula | Aluno |
+| CONSTRUCTION | Obra | Prof. de obra | Serviço executável | Diária | Cliente |
 
 \* Demo PetCare no seed sobrescreve `appointment` → "Banho/Tosa" via `Tenant.labels`.
+\*\* Engenharia Civil: demo `/?tenant=build` · `docs/segmentos/construction/README.md`
 
 Paletas white label por nicho. Ver `docs/versoes/V2_0.md` e `docs/versoes/V2_0_ARCHITECTURE.md`.
 
@@ -47,7 +49,8 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v2.1.0`** — **Sistema Bibi - ServiceOS** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md` (deploy atual).
+(cota Netlify). Produção: **`v2.2.0`** · pacote **`v2.3.0`** na `main` (aguarda deploy) — ver `docs/versoes/RELEASES.md`.
+**Onboarding guiado:** tour v3 (main + micro-tours) — `docs/plataforma/ONBOARDING.md` · `ONBOARDING_VERSION = 3`.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
@@ -84,6 +87,8 @@ Massa demo (PR #31): **50 empresas PJ**, **199 beneficiários**, **27 usuários 
 | Beneficiário | `joao.pereira@email.com` |
 | Beneficiário (particular) | `pedro.almeida@email.com` |
 | VitaCare (white-label) | `operacao@vitacare.demo` |
+| Engenharia Civil (interno) | `operacao@build.demo` |
+| Engenharia Civil (PJ) | `rh@incorp.demo` |
 
 Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
@@ -107,7 +112,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.1.0`** — `docs/versoes/V2_1.md` · `docs/versoes/V2_0.md` · `docs/versoes/RELEASES.md`.
+**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.2.0`** · `main`: **`v2.3.0`** — `docs/versoes/V2_3.md` · `docs/versoes/RELEASES.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 

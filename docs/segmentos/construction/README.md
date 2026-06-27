@@ -51,14 +51,28 @@ O seed cria o tenant **Build Engenharia** (`slug: build`) com empresas PJ, benef
 
 ### Fluxos validados
 
+**Dupla aprovação (v2.3 fase 2)** — obras com empresa PJ vinculada:
+
 ```
 Interno: orçamento RASCUNHO → enviar PROPOSTA (ENVIADO)
     ↓
-PJ: aprovar → Invoice + webhook INVOICE_ISSUED
+PJ: aprovar comercialmente → status APROVADO_PJ
     ou recusar → volta para ORCAMENTO
+    ↓
+Interno: aprovar final → APROVADO + Invoice + webhook INVOICE_ISSUED
+```
 
+Obras **sem** empresa PJ: interno aprova direto a partir de `ENVIADO`.
+
+```
 Interno: tarefas EM_ANDAMENTO → obra passa para EM_OBRA
 ```
+
+**Pipeline comercial** (`/interno/projetos/pipeline`): lead → converter em obra (`ORCAMENTO`).
+
+**Metas BDI:** `ConstructionSalesGoal` — receita real vs meta mensal (orçamentos aprovados).
+
+**RDO / diária:** obras com `billingMode FECHADO` não permitem faturar diária no registro de campo.
 
 ## Módulo de obras
 
@@ -86,11 +100,15 @@ Aba **Campo** no detalhe da obra.
 
 | Rota | Descrição |
 |------|-----------|
-| `/interno/projetos` | Pipeline Kanban por status |
-| `/interno/projetos/[id]` | Resumo, orçamento, cronograma (Gantt), anexos |
+| `/interno/projetos` | Lista/Kanban de obras por status |
+| `/interno/projetos/pipeline` | Pipeline comercial (leads, conversão em obra) |
+| `/interno/projetos/financeiro` | Relatório gerencial (indiretas + físico-financeiro) |
+| `/interno/projetos/[id]` | Resumo, orçamento, cronograma (Gantt), caixa, equipe, BDI, contratos |
 | `GET /api/interno/projects` | Lista ou `?view=pipeline` |
 | `POST /api/interno/projects/[id]/budgets` | `send`, `approve`, `reject`, `new-version` |
 | `GET .../budgets/[budgetId]/pdf` | PDF da proposta |
+| `GET/POST /api/interno/construction/pipeline` | Pipeline comercial |
+| `GET /api/interno/construction/goals` | Metas BDI mensais |
 
 Nav: aba **Obras** (`labels.patients`) — **somente** quando `tenant.niche === CONSTRUCTION`.
 
@@ -107,6 +125,17 @@ Nav: aba **Obras** (`labels.patients`) — **somente** quando `tenant.niche === 
 Nav: seção **Obras** em `buildPjSectionNav` — **somente** `CONSTRUCTION`.
 
 Alerta no overview PJ quando há propostas `ENVIADO` aguardando (`pj-portal-service.ts`).
+
+### Portal beneficiário (CONSTRUCTION)
+
+| Rota | Descrição |
+|------|-----------|
+| `/beneficiario/obras` | Obras do cliente (somente leitura) |
+| `/beneficiario/resumo` | Resumo financeiro |
+| `/beneficiario/faturas` | Faturas |
+| `/beneficiario/historico` | Histórico |
+
+Nav reduzida — **sem** abas clínicas (agendar, prontuário, medicações…). Ver `buildBeneficiarioNavTabs` em `niche-nav.ts`.
 
 ## Impacto nos outros segmentos
 
