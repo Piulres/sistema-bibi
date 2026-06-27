@@ -123,3 +123,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     testStats: "395 testes Vitest · 128 E2E · pre-release OK",
   },
 ];
+
+export const CURRENT_RELEASE = CHANGELOG_RELEASES[0];
+
+export const CHANGELOG_SECTION = {
+  eyebrow: "Novidades",
+  title: "O que há de novo na demonstração",
+  description:
+    "Acompanhe as entregas do ServiceOS — pacotes fechados com funcionalidades prontas para explorar nos portais de demonstração.",
+} as const;
