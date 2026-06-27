@@ -1,5 +1,10 @@
-import type { NicheLabels } from "@/lib/niche/types";
+import type { NicheId, NicheLabels } from "@/lib/niche/types";
 import type { InternoModule } from "@/lib/interno-permissions";
+import {
+  buildBeneficiarioNavTabs,
+  buildInternoNavTabs,
+  buildPrestadorNavTabs,
+} from "@/lib/navigation/niche-nav";
 import type { OnboardingStep } from "./types";
 import { TOUR } from "./targets";
 
@@ -9,8 +14,14 @@ function step(s: StepInput): OnboardingStep {
   return s;
 }
 
-/** Features do portal interno — 13 módulos + hotspots por rota. */
-export function buildInternoFeatures(labels: NicheLabels): OnboardingStep[] {
+function navLabelsSummary(
+  tabs: { label: string }[],
+): string {
+  return tabs.map((t) => `• ${t.label}`).join("\n");
+}
+
+/** Features do portal interno — nav condensado + micro-tours por rota. */
+export function buildInternoFeatures(labels: NicheLabels, niche: NicheId = "MEDICAL"): OnboardingStep[] {
   const p = labels.patients.toLowerCase();
   const b = labels.beneficiaries.toLowerCase();
   const pr = labels.providers.toLowerCase();
@@ -30,133 +41,22 @@ export function buildInternoFeatures(labels: NicheLabels): OnboardingStep[] {
     step({
       id: "nav-overview",
       target: TOUR.nav,
-      title: "Módulos de operação",
+      title: "Navegação",
       content:
-        "As abas abaixo organizam todo o fluxo operacional. No celular, toque em «Módulos» para abrir o menu. Os próximos passos destacam cada área.",
+        "No desktop, use as abas abaixo. No celular, toque em «Módulos» para abrir o menu lateral com todos os módulos.",
       placement: "bottom",
       order: 10,
     }),
-
-    // —— Nav: um passo por módulo ——
     step({
-      id: "nav-dashboard",
-      target: TOUR.navTab("dashboard"),
-      title: "Dashboard",
-      content: "KPIs executivos, receita, pipeline CRM, pendências Pay Per Use e atalhos rápidos.",
+      id: "nav-modules",
+      target: TOUR.nav,
+      title: "Módulos de operação",
+      content: `Cada aba cobre um fluxo do tenant. Ao entrar em um módulo pela primeira vez, um tour curto destaca as ações principais.\n\n${navLabelsSummary(buildInternoNavTabs(labels, niche))}`,
       placement: "bottom",
-      module: "dashboard",
       order: 20,
     }),
-    step({
-      id: "nav-billing",
-      target: TOUR.navTab("billing"),
-      title: "Faturamento",
-      content: `Lotes Pay Per Use: agrupe ${proc} por ${labels.beneficiary.toLowerCase()}, gere faturas, cobre via PIX e exporte XML TISS.`,
-      placement: "bottom",
-      module: "billing",
-      order: 21,
-    }),
-    step({
-      id: "nav-agenda",
-      target: TOUR.navTab("agenda"),
-      title: labels.appointments,
-      content: `Agenda do dia, walk-in de particulares, novos agendamentos, confirmação de chegada e telemedicina.`,
-      placement: "bottom",
-      module: "agenda",
-      order: 22,
-    }),
-    step({
-      id: "nav-cadastros",
-      target: TOUR.navTab("cadastros"),
-      title: `Cadastros · ${labels.beneficiaries}`,
-      content: `${labels.beneficiaries}, ${pr}, empresas, ${proc}, precificação, protocolos, usuários e importação JSON/CSV.`,
-      placement: "bottom",
-      module: "cadastros",
-      order: 23,
-    }),
-    step({
-      id: "nav-estoque",
-      target: TOUR.navTab("estoque"),
-      title: "Estoque",
-      content: "Produtos, lotes com rastreabilidade FIFO, movimentações e kits vinculados a procedimentos.",
-      placement: "bottom",
-      module: "estoque",
-      order: 24,
-    }),
-    step({
-      id: "nav-crm",
-      target: TOUR.navTab("crm"),
-      title: "CRM Corporativo",
-      content: "Pipeline kanban de empresas PJ: prospect → ativo → churn, com movimentação de status.",
-      placement: "bottom",
-      module: "crm",
-      order: 25,
-    }),
-    step({
-      id: "nav-subscriptions",
-      target: TOUR.navTab("subscriptions"),
-      title: "Recorrência",
-      content: `Assinaturas mensais/anuais por ${labels.beneficiary.toLowerCase()}, geração de cobranças e faturamento automático.`,
-      placement: "bottom",
-      module: "subscriptions",
-      order: 26,
-    }),
-    step({
-      id: "nav-comunicacao",
-      target: TOUR.navTab("comunicacao"),
-      title: "Comunicação",
-      content: "Lembretes automáticos (consulta, assinatura, fatura) e fila de mensagens WhatsApp/SMS/e-mail.",
-      placement: "bottom",
-      module: "comunicacao",
-      order: 27,
-    }),
-    step({
-      id: "nav-relatorios",
-      target: TOUR.navTab("relatorios"),
-      title: "Relatórios",
-      content: "Exportação de faturamento e CRM em PDF, XLSX e CSV.",
-      placement: "bottom",
-      module: "relatorios",
-      order: 28,
-    }),
-    step({
-      id: "nav-auditoria",
-      target: TOUR.navTab("auditoria"),
-      title: "Auditoria",
-      content: "Timeline de alterações com diff, filtros e restauração de versões anteriores.",
-      placement: "bottom",
-      module: "auditoria",
-      order: 29,
-    }),
-    step({
-      id: "nav-branding",
-      target: TOUR.navTab("branding"),
-      title: "White Label",
-      content: "Presets por segmento, logo, paleta de cores, domínio customizado e preview ao vivo.",
-      placement: "bottom",
-      module: "branding",
-      order: 30,
-    }),
-    step({
-      id: "nav-integracoes",
-      target: TOUR.navTab("integracoes"),
-      title: "Integrações",
-      content: "Webhooks B2B com HMAC, eventos configuráveis e log de entregas com retry.",
-      placement: "bottom",
-      module: "integracoes",
-      order: 31,
-    }),
-    step({
-      id: "nav-seguranca",
-      target: TOUR.navTab("seguranca"),
-      title: "Segurança",
-      content: "MFA TOTP, alternância demo/operação e restauração do estado demo (ADMIN).",
-      placement: "bottom",
-      module: "seguranca",
-      order: 32,
-    }),
 
-    // —— Páginas: detalhe por rota ——
+    // —— Micro-tours: detalhe por rota ——
     step({
       id: "page-dashboard",
       target: TOUR.content,
@@ -166,6 +66,16 @@ export function buildInternoFeatures(labels: NicheLabels): OnboardingStep[] {
       placement: "top",
       route: "/interno/dashboard",
       module: "dashboard",
+      order: 100,
+    }),
+    step({
+      id: "page-billing-cliente360",
+      target: TOUR.hotspot("billing-cliente-360"),
+      title: "Cliente 360°",
+      content: `Abra a visão consolidada do ${labels.beneficiary.toLowerCase()}: consumo, faturas, timeline e exportação LGPD.`,
+      placement: "left",
+      route: "/interno",
+      module: "billing",
       order: 100,
     }),
     step({
@@ -216,11 +126,21 @@ export function buildInternoFeatures(labels: NicheLabels): OnboardingStep[] {
       target: TOUR.content,
       title: "Central de cadastros",
       content:
-        `Abas por entidade: ${b}, ${pr}, empresas, ${proc}, precificação e protocolos. Importe via JSON/CSV na aba Mapa CRUD.`,
+        `Abas por entidade: ${b}, ${pr}, empresas, ${proc}, precificação e protocolos. Use a aba Mapa CRUD para importar JSON/CSV e ver as 27 entidades.`,
       placement: "top",
       route: "/interno/cadastros*",
       module: "cadastros",
       order: 100,
+    }),
+    step({
+      id: "page-cadastros-crud",
+      target: TOUR.hotspot("cadastros-crud-map"),
+      title: "Mapa CRUD",
+      content: "Referência de todas as operações da plataforma com atalhos para telas e APIs.",
+      placement: "top",
+      route: "/interno/cadastros*",
+      module: "cadastros",
+      order: 101,
     }),
     step({
       id: "page-estoque",
@@ -312,6 +232,46 @@ export function buildInternoFeatures(labels: NicheLabels): OnboardingStep[] {
       module: "seguranca",
       order: 100,
     }),
+    step({
+      id: "page-seguranca-datastore",
+      target: TOUR.hotspot("data-store-mode"),
+      title: "Demo vs operação",
+      content: "Alterne entre massa de demonstração e ambiente operacional (dual-store). Somente ADMIN.",
+      placement: "top",
+      route: "/interno/seguranca*",
+      module: "seguranca",
+      order: 101,
+    }),
+    step({
+      id: "page-seguranca-reset",
+      target: TOUR.hotspot("demo-reset"),
+      title: "Restaurar demo",
+      content: "Volte ao estado original do seed para apresentações e testes repetíveis.",
+      placement: "top",
+      route: "/interno/seguranca*",
+      module: "seguranca",
+      order: 102,
+    }),
+    step({
+      id: "page-projetos",
+      target: TOUR.content,
+      title: labels.patients,
+      content: `Gestão de obras: pipeline, orçamentos, cronograma, BDI, caixa e relatórios financeiros por ${labels.patient.toLowerCase()}.`,
+      placement: "top",
+      route: "/interno/projetos*",
+      module: "projetos",
+      order: 100,
+    }),
+    step({
+      id: "page-cliente-360",
+      target: TOUR.content,
+      title: "Cliente 360°",
+      content: `Visão unificada do ${labels.beneficiary.toLowerCase()}: consumo Pay Per Use, faturas, assinaturas, timeline e exportação.`,
+      placement: "top",
+      route: "/interno/beneficiarios/*",
+      module: "cadastros",
+      order: 100,
+    }),
 
     step({
       id: "content-fallback",
@@ -334,7 +294,7 @@ export function buildInternoFeatures(labels: NicheLabels): OnboardingStep[] {
   ];
 }
 
-export function buildPrestadorFeatures(labels: NicheLabels): OnboardingStep[] {
+export function buildPrestadorFeatures(labels: NicheLabels, niche: NicheId = "MEDICAL"): OnboardingStep[] {
   const p = labels.patient.toLowerCase();
   const appt = labels.appointments.toLowerCase();
 
@@ -351,49 +311,17 @@ export function buildPrestadorFeatures(labels: NicheLabels): OnboardingStep[] {
       id: "nav-overview",
       target: TOUR.nav,
       title: "Navegação",
-      content: "Início, Agenda, lista de pacientes, Extrato e Relatórios — os próximos passos detalham cada aba.",
+      content: "No celular, toque no menu «Módulos» para ver todas as abas. Ao visitar cada módulo, um tour curto destaca as ações principais.",
       placement: "bottom",
       order: 10,
     }),
     step({
-      id: "nav-dashboard",
-      target: TOUR.navTab("dashboard"),
-      title: "Início",
-      content: `KPIs do dia, próximo atendimento e fila de ${appt} com atalho para abrir consulta.`,
+      id: "nav-modules",
+      target: TOUR.nav,
+      title: "Áreas do portal",
+      content: `Fluxos do ${labels.provider.toLowerCase()}:\n\n${navLabelsSummary(buildPrestadorNavTabs(labels, niche))}`,
       placement: "bottom",
       order: 20,
-    }),
-    step({
-      id: "nav-agenda",
-      target: TOUR.navTab("agenda"),
-      title: "Agenda",
-      content: `Visão Dia / Próximos / Histórico com navegação por data e link para atendimento.`,
-      placement: "bottom",
-      order: 21,
-    }),
-    step({
-      id: "nav-pacientes",
-      target: TOUR.navTab("pacientes"),
-      title: labels.patients,
-      content: `Busque por nome ou CPF e acesse a ficha clínica de cada ${p}.`,
-      placement: "bottom",
-      order: 22,
-    }),
-    step({
-      id: "nav-extrato",
-      target: TOUR.navTab("extrato"),
-      title: "Extrato",
-      content: "Resumo financeiro do período: procedimentos realizados, valores gerados e pendências.",
-      placement: "bottom",
-      order: 23,
-    }),
-    step({
-      id: "nav-relatorios",
-      target: TOUR.navTab("relatorios"),
-      title: "Relatórios",
-      content: "Exporte procedimentos e atendimentos em PDF, XLSX ou CSV.",
-      placement: "bottom",
-      order: 24,
     }),
 
     step({
@@ -452,12 +380,21 @@ export function buildPrestadorFeatures(labels: NicheLabels): OnboardingStep[] {
     }),
     step({
       id: "page-atendimento",
-      target: TOUR.content,
-      title: "Sala de atendimento",
+      target: TOUR.hotspot("atendimento-pep"),
+      title: "Prontuário (PEP)",
       content:
-        `Registre ${labels.procedures.toLowerCase()} Pay Per Use, PEP com templates, medicações, exames, materiais de estoque e assistente VOA.`,
+        `Registre ${labels.procedures.toLowerCase()} Pay Per Use, anotações clínicas com templates, medicações, exames, materiais de estoque e assistente VOA.`,
       placement: "top",
       route: "/prestador/atendimento/*",
+      order: 100,
+    }),
+    step({
+      id: "page-campo",
+      target: TOUR.content,
+      title: "Diário de obra",
+      content: `Registre apontamentos de campo, fotos e progresso das ${labels.appointments.toLowerCase()} em obra.`,
+      placement: "top",
+      route: "/prestador/campo*",
       order: 100,
     }),
 
@@ -590,7 +527,7 @@ export function buildPjFeatures(labels: NicheLabels): OnboardingStep[] {
   ];
 }
 
-export function buildBeneficiarioFeatures(labels: NicheLabels): OnboardingStep[] {
+export function buildBeneficiarioFeatures(labels: NicheLabels, niche: NicheId = "MEDICAL"): OnboardingStep[] {
   const appt = labels.appointment.toLowerCase();
   const appts = labels.appointments.toLowerCase();
   const pr = labels.provider.toLowerCase();
@@ -609,98 +546,17 @@ export function buildBeneficiarioFeatures(labels: NicheLabels): OnboardingStep[]
       target: TOUR.nav,
       title: "Menu principal",
       content:
-        "11 áreas do seu cuidado — agendar, resumo, agenda, consumo, faturas, medicações, exames, plano e histórico.",
+        "11 áreas do seu cuidado. No celular, abra o menu para navegar. Cada módulo tem um tour curto na primeira visita.",
       placement: "bottom",
       order: 10,
     }),
-
     step({
-      id: "nav-agendar",
-      target: TOUR.navTab("agendar"),
-      title: "Agendar",
-      content: `Escolha ${pr}, procedimento, data e horário para sua próxima ${appt}.`,
+      id: "nav-modules",
+      target: TOUR.nav,
+      title: "Áreas do portal",
+      content: `Seu acesso como ${labels.beneficiary.toLowerCase()}:\n\n${navLabelsSummary(buildBeneficiarioNavTabs(labels, niche))}`,
       placement: "bottom",
       order: 20,
-    }),
-    step({
-      id: "nav-resumo",
-      target: TOUR.navTab("resumo"),
-      title: "Resumo",
-      content: "Jornada de cuidado, perfil, KPIs e próximo compromisso.",
-      placement: "bottom",
-      order: 21,
-    }),
-    step({
-      id: "nav-agenda",
-      target: TOUR.navTab("agenda"),
-      title: "Agenda",
-      content: `${labels.appointments} confirmadas — cancele, acesse teleconsulta e exporte.`,
-      placement: "bottom",
-      order: 22,
-    }),
-    step({
-      id: "nav-consumo",
-      target: TOUR.navTab("consumo"),
-      title: "Consumo",
-      content: `Histórico Pay Per Use: ${labels.procedures.toLowerCase()} utilizados e valores pendentes/faturados.`,
-      placement: "bottom",
-      order: 23,
-    }),
-    step({
-      id: "nav-faturas",
-      target: TOUR.navTab("faturas"),
-      title: "Faturas",
-      content: "Faturas emitidas com itens detalhados e pagamento via PIX.",
-      placement: "bottom",
-      order: 24,
-    }),
-    step({
-      id: "nav-medicacoes",
-      target: TOUR.navTab("medicacoes"),
-      title: "Medicações",
-      content: "Prescrições ativas com dose, frequência e status.",
-      placement: "bottom",
-      order: 25,
-    }),
-    step({
-      id: "nav-exames",
-      target: TOUR.navTab("exames"),
-      title: "Exames",
-      content: "Pedidos de exame com status, agendamento e resultados.",
-      placement: "bottom",
-      order: 26,
-    }),
-    step({
-      id: "nav-plano",
-      target: TOUR.navTab("plano"),
-      title: "Plano",
-      content: `Protocolos de cuidado ativos e carteira de vacinas (quando aplicável).`,
-      placement: "bottom",
-      order: 27,
-    }),
-    step({
-      id: "nav-assinatura",
-      target: TOUR.navTab("assinatura"),
-      title: "Assinatura",
-      content: "Planos recorrentes e cobranças por ciclo.",
-      placement: "bottom",
-      order: 28,
-    }),
-    step({
-      id: "nav-prontuario",
-      target: TOUR.navTab("prontuario"),
-      title: labels.medicalRecord,
-      content: `Anotações clínicas por ${pr} com exportação PDF.`,
-      placement: "bottom",
-      order: 29,
-    }),
-    step({
-      id: "nav-historico",
-      target: TOUR.navTab("historico"),
-      title: "Histórico",
-      content: "Timeline universal de eventos do seu cuidado.",
-      placement: "bottom",
-      order: 30,
     }),
 
     step({
@@ -741,12 +597,21 @@ export function buildBeneficiarioFeatures(labels: NicheLabels): OnboardingStep[]
     }),
     step({
       id: "page-faturas",
-      target: TOUR.content,
-      title: "Faturas e PIX",
-      content: "Visualize itens da fatura, exporte PDF/XLSX e pague com PIX mock.",
-      placement: "top",
+      target: TOUR.hotspot("beneficiario-pix-pay"),
+      title: "Pagar com PIX",
+      content: "Gere o código PIX mock, copie e confirme o pagamento da fatura em aberto.",
+      placement: "left",
       route: "/beneficiario/faturas*",
       order: 100,
+    }),
+    step({
+      id: "page-faturas-list",
+      target: TOUR.content,
+      title: "Faturas e PIX",
+      content: "Visualize itens da fatura, exporte PDF/XLSX e acompanhe o status de pagamento.",
+      placement: "top",
+      route: "/beneficiario/faturas*",
+      order: 101,
     }),
     step({
       id: "page-medicacoes",

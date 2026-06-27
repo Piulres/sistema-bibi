@@ -243,7 +243,10 @@ export default function BillingView() {
                   <p className="text-sm text-[var(--text-muted)]">{g.company ?? "Particular"}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <Link href={`/interno/beneficiarios/${g.patientId}?from=/interno`}>
+                  <Link
+                    href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
+                    data-tour-id="billing-cliente-360"
+                  >
                     <Button variant="secondary" size="sm">
                       Cliente 360°
                     </Button>

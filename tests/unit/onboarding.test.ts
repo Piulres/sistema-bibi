@@ -1,12 +1,24 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { matchesRoute } from "@/lib/onboarding/match-route";
-import { buildTourSteps, countTourSteps } from "@/lib/onboarding/tours";
+import {
+  buildMainTourSteps,
+  buildMicroTourSteps,
+  buildTourSteps,
+  countTourSteps,
+} from "@/lib/onboarding/tours";
 import {
   buildInternoFeatures,
   buildBeneficiarioFeatures,
   filterByPermissions,
 } from "@/lib/onboarding/feature-map";
-import { _parseState } from "@/lib/onboarding/storage";
+import {
+  _parseState,
+  isTourDismissed,
+  markRouteTourCompleted,
+  markTourDismissed,
+  shouldAutoStartRouteTour,
+} from "@/lib/onboarding/storage";
+import { getRouteScopeKey, routeStorageKey } from "@/lib/onboarding/route-scope";
 import { ONBOARDING_VERSION } from "@/lib/onboarding/types";
 import { getDefaultLabels } from "@/lib/niche/defaults";
 
@@ -21,14 +33,33 @@ describe("onboarding match-route", () => {
   it("matches wildcard prefix routes", () => {
     expect(matchesRoute("/interno/agenda", "/interno/agenda*")).toBe(true);
     expect(matchesRoute("/interno/cadastros", "/interno/agenda*")).toBe(false);
+    expect(matchesRoute("/interno/beneficiarios/abc", "/interno/beneficiarios/*")).toBe(true);
+  });
+});
+
+describe("onboarding route-scope", () => {
+  it("resolves cliente-360 scope", () => {
+    expect(getRouteScopeKey("interno", "/interno/beneficiarios/p1")).toBe("cliente-360");
+    expect(routeStorageKey("interno", "cliente-360")).toBe("interno:cliente-360");
+  });
+
+  it("resolves atendimento scope for prestador", () => {
+    expect(getRouteScopeKey("prestador", "/prestador/atendimento/x")).toBe("atendimento");
   });
 });
 
 describe("onboarding feature-map", () => {
-  it("maps all 13 interno modules for ADMIN", () => {
+  it("uses condensed nav-modules for interno", () => {
     const features = buildInternoFeatures(labels);
-    const navModules = features.filter((s) => s.id.startsWith("nav-") && s.id !== "nav-overview");
-    expect(navModules.length).toBe(13);
+    expect(features.some((s) => s.id === "nav-modules")).toBe(true);
+    expect(features.filter((s) => s.id.startsWith("nav-") && s.id !== "nav-overview" && s.id !== "nav-modules").length).toBe(0);
+  });
+
+  it("keeps page-specific steps for micro-tours", () => {
+    const features = buildInternoFeatures(labels);
+    expect(features.some((s) => s.id === "page-agenda-walkin")).toBe(true);
+    expect(features.some((s) => s.id === "page-billing-cliente360")).toBe(true);
+    expect(features.some((s) => s.id === "page-seguranca-reset")).toBe(true);
   });
 
   it("filters interno steps by RBAC", () => {
@@ -40,41 +71,47 @@ describe("onboarding feature-map", () => {
       "estoque",
       "comunicacao",
     ]);
-    expect(recepcao.some((s) => s.id === "nav-billing")).toBe(false);
-    expect(recepcao.some((s) => s.id === "nav-agenda")).toBe(true);
+    expect(recepcao.some((s) => s.id === "page-billing")).toBe(false);
+    expect(recepcao.some((s) => s.id === "page-agenda-walkin")).toBe(true);
   });
 
-  it("maps all beneficiario nav tabs", () => {
+  it("maps condensed beneficiario nav", () => {
     const features = buildBeneficiarioFeatures(labels);
-    const navTabs = features.filter((s) => s.id.startsWith("nav-") && s.id !== "nav-overview");
-    expect(navTabs.length).toBe(11);
+    expect(features.some((s) => s.id === "nav-modules")).toBe(true);
   });
 });
 
 describe("onboarding tours", () => {
-  it("builds interno tour with page-specific steps on dashboard", () => {
-    const steps = buildTourSteps("interno", { labels }, "/interno/dashboard");
+  it("builds shorter main interno tour on dashboard", () => {
+    const steps = buildMainTourSteps("interno", { labels }, "/interno/dashboard");
     expect(steps.some((s) => s.id === "welcome")).toBe(true);
+    expect(steps.some((s) => s.id === "nav-modules")).toBe(true);
     expect(steps.some((s) => s.id === "page-dashboard")).toBe(true);
-    expect(steps.some((s) => s.id === "content-fallback")).toBe(false);
-    expect(steps.some((s) => s.id === "nav-billing")).toBe(true);
+    expect(steps.some((s) => s.id === "page-billing")).toBe(false);
+    expect(steps.length).toBeLessThanOrEqual(7);
   });
 
-  it("includes walk-in hotspot on agenda route", () => {
-    const steps = buildTourSteps("interno", { labels }, "/interno/agenda");
-    expect(steps.some((s) => s.id === "page-agenda-walkin")).toBe(true);
-    expect(steps.some((s) => s.target.includes("walk-in-callout"))).toBe(true);
-  });
-
-  it("includes billing pending hotspot on faturamento", () => {
-    const steps = buildTourSteps("interno", { labels }, "/interno");
+  it("builds micro-tour on faturamento with hotspots", () => {
+    const steps = buildMicroTourSteps("interno", { labels }, "/interno");
     expect(steps.some((s) => s.id === "page-billing")).toBe(true);
+    expect(steps.some((s) => s.id === "page-billing-cliente360")).toBe(true);
   });
 
-  it("builds complete prestador tour with all nav tabs", () => {
-    const steps = buildTourSteps("prestador", { labels }, "/prestador/dashboard");
-    expect(steps.filter((s) => s.id.startsWith("nav-")).length).toBeGreaterThanOrEqual(6);
+  it("includes walk-in hotspot on agenda micro-tour", () => {
+    const steps = buildMicroTourSteps("interno", { labels }, "/interno/agenda");
+    expect(steps.some((s) => s.id === "page-agenda-walkin")).toBe(true);
+  });
+
+  it("builds prestador main tour condensed", () => {
+    const steps = buildMainTourSteps("prestador", { labels }, "/prestador/dashboard");
+    expect(steps.some((s) => s.id === "nav-modules")).toBe(true);
     expect(steps.some((s) => s.id === "page-dashboard")).toBe(true);
+  });
+
+  it("builds prestador atendimento micro-tour with PEP hotspot", () => {
+    const steps = buildMicroTourSteps("prestador", { labels }, "/prestador/atendimento/abc");
+    expect(steps.some((s) => s.id === "page-atendimento")).toBe(true);
+    expect(steps.some((s) => s.target.includes("atendimento-pep"))).toBe(true);
   });
 
   it("builds complete PJ tour with all sections", () => {
@@ -83,30 +120,76 @@ describe("onboarding tours", () => {
     expect(steps.some((s) => s.id === "page-faturas")).toBe(true);
   });
 
-  it("builds complete beneficiario tour", () => {
-    const steps = buildTourSteps("beneficiario", { labels }, "/beneficiario/agendar");
+  it("builds beneficiario agendar micro-tour", () => {
+    const steps = buildMicroTourSteps("beneficiario", { labels }, "/beneficiario/agendar");
     expect(steps.some((s) => s.id === "page-agendar")).toBe(true);
-    expect(countTourSteps("beneficiario", { labels })).toBeGreaterThan(20);
+    expect(countTourSteps("beneficiario", { labels })).toBeGreaterThan(15);
   });
 
-  it("respects interno RBAC in built tour", () => {
-    const steps = buildTourSteps(
+  it("builds beneficiario faturas micro-tour with PIX hotspot", () => {
+    const steps = buildMicroTourSteps("beneficiario", { labels }, "/beneficiario/faturas");
+    expect(steps.some((s) => s.id === "page-faturas")).toBe(true);
+    expect(steps.some((s) => s.target.includes("beneficiario-pix-pay"))).toBe(true);
+  });
+
+  it("respects interno RBAC in micro-tour", () => {
+    const steps = buildMicroTourSteps(
       "interno",
       { labels, permissions: ["dashboard", "billing"] },
-      "/interno/dashboard",
+      "/interno/agenda",
     );
-    expect(steps.some((s) => s.id === "nav-agenda")).toBe(false);
-    expect(steps.some((s) => s.id === "nav-billing")).toBe(true);
+    expect(steps.some((s) => s.id === "page-agenda-walkin")).toBe(false);
+    const billing = buildMicroTourSteps(
+      "interno",
+      { labels, permissions: ["dashboard", "billing"] },
+      "/interno",
+    );
+    expect(billing.some((s) => s.id === "page-billing")).toBe(true);
   });
 });
 
 describe("onboarding storage", () => {
-  it("uses version 2 for new tours", () => {
-    expect(ONBOARDING_VERSION).toBe(2);
+  it("uses version 3 for new tours", () => {
+    expect(ONBOARDING_VERSION).toBe(3);
   });
 
   it("parses valid JSON state", () => {
     const state = _parseState('{"interno":{"completed":true,"version":1}}');
     expect(state.interno?.completed).toBe(true);
+  });
+
+  it("tracks dismissed main tour without completion", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("window", globalThis);
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
+      removeItem: (k: string) => {
+        store.delete(k);
+      },
+    });
+    markTourDismissed("interno");
+    expect(isTourDismissed("interno")).toBe(true);
+    vi.unstubAllGlobals();
+  });
+
+  it("tracks per-route micro-tour completion", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("window", globalThis);
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
+      removeItem: (k: string) => {
+        store.delete(k);
+      },
+    });
+    markRouteTourCompleted("interno:agenda");
+    expect(shouldAutoStartRouteTour("interno:agenda")).toBe(false);
+    expect(shouldAutoStartRouteTour("interno:billing")).toBe(true);
+    vi.unstubAllGlobals();
   });
 });

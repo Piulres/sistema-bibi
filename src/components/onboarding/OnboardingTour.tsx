@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import Button from "@/components/ui/Button";
 import { useOnboarding } from "@/components/onboarding/OnboardingProvider";
@@ -10,6 +11,7 @@ type Rect = { top: number; left: number; width: number; height: number };
 
 const PADDING = 8;
 const TOOLTIP_GAP = 12;
+const PROGRESS_BAR_THRESHOLD = 8;
 
 function getTargetRect(selector: string): Rect | null {
   const el = document.querySelector(selector);
@@ -70,7 +72,8 @@ function computeTooltipPosition(
 
 /** Overlay com spotlight e tooltip guiado — product tour. */
 export default function OnboardingTour() {
-  const { active, currentStep, currentIndex, totalSteps, nextStep, prevStep, endTour } =
+  const router = useRouter();
+  const { active, tourMode, currentStep, currentIndex, totalSteps, nextStep, prevStep, endTour } =
     useOnboarding();
   const [targetRect, setTargetRect] = useState<Rect | null>(null);
   const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 });
@@ -130,7 +133,7 @@ export default function OnboardingTour() {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") endTour(false);
-      if (e.key === "ArrowRight" || e.key === "Enter") nextStep();
+      if (e.key === "ArrowRight") nextStep();
       if (e.key === "ArrowLeft") prevStep();
     };
     window.addEventListener("keydown", onKey);
@@ -140,6 +143,8 @@ export default function OnboardingTour() {
   if (!mounted || !active || !currentStep) return null;
 
   const isLast = currentIndex >= totalSteps - 1;
+  const titleId = `onboarding-title-${currentStep.id}`;
+  const bodyId = `onboarding-body-${currentStep.id}`;
   const spotlight = targetRect
     ? {
         top: targetRect.top - PADDING,
@@ -149,8 +154,21 @@ export default function OnboardingTour() {
       }
     : null;
 
+  function handleNavigate() {
+    if (!currentStep?.navigateTo) return;
+    router.push(currentStep.navigateTo);
+    nextStep();
+  }
+
   return createPortal(
-    <div className="onboarding-root" role="dialog" aria-modal="true" aria-label="Tour guiado">
+    <div
+      className="onboarding-root"
+      role="dialog"
+      aria-modal="true"
+      aria-label={tourMode === "micro" ? "Tour do módulo" : "Tour guiado"}
+      aria-labelledby={titleId}
+      aria-describedby={bodyId}
+    >
       <div className="onboarding-backdrop" onClick={() => endTour(false)} aria-hidden />
 
       {spotlight ? (
@@ -176,6 +194,7 @@ export default function OnboardingTour() {
       >
         <div className="onboarding-tooltip-header">
           <span className="onboarding-step-badge">
+            {tourMode === "micro" ? "Módulo · " : ""}
             {currentIndex + 1} / {totalSteps}
           </span>
           <button
@@ -187,31 +206,58 @@ export default function OnboardingTour() {
             ×
           </button>
         </div>
-        <h3 className="onboarding-tooltip-title">{currentStep.title}</h3>
-        <p className="onboarding-tooltip-body">{currentStep.content}</p>
+        <h3 id={titleId} className="onboarding-tooltip-title">
+          {currentStep.title}
+        </h3>
+        <p id={bodyId} className="onboarding-tooltip-body whitespace-pre-line">
+          {currentStep.content}
+        </p>
         <div className="onboarding-tooltip-actions">
-          {currentIndex > 0 ? (
-            <Button variant="ghost" size="sm" onClick={prevStep}>
-              Anterior
-            </Button>
-          ) : (
-            <Button variant="ghost" size="sm" onClick={() => endTour(false)}>
-              Pular
-            </Button>
-          )}
+          <div className="flex flex-wrap items-center gap-2">
+            {currentIndex > 0 ? (
+              <Button variant="ghost" size="sm" onClick={prevStep}>
+                Anterior
+              </Button>
+            ) : (
+              <Button variant="ghost" size="sm" onClick={() => endTour(false)}>
+                Pular
+              </Button>
+            )}
+            {currentStep.navigateTo ? (
+              <Button variant="secondary" size="sm" onClick={handleNavigate}>
+                Ir para módulo
+              </Button>
+            ) : null}
+          </div>
           <Button variant="portal" size="sm" onClick={nextStep}>
             {isLast ? "Concluir" : "Próximo"}
           </Button>
         </div>
-        <div className="onboarding-progress">
-          {Array.from({ length: totalSteps }, (_, i) => (
+        {totalSteps > PROGRESS_BAR_THRESHOLD ? (
+          <div
+            className="onboarding-progress-bar"
+            role="progressbar"
+            aria-valuenow={currentIndex + 1}
+            aria-valuemin={1}
+            aria-valuemax={totalSteps}
+            aria-label="Progresso do tour"
+          >
             <span
-              key={i}
-              className={i === currentIndex ? "onboarding-dot active" : "onboarding-dot"}
-              aria-hidden
+              className="onboarding-progress-bar-fill"
+              style={{ width: `${((currentIndex + 1) / totalSteps) * 100}%` }}
             />
-          ))}
-        </div>
+          </div>
+        ) : (
+          <div className="onboarding-progress">
+            {Array.from({ length: totalSteps }, (_, i) => (
+              <span
+                key={i}
+                className={i === currentIndex ? "onboarding-dot active" : "onboarding-dot"}
+                aria-hidden
+              />
+            ))}
+          </div>
+        )}
       </div>
     </div>,
     document.body,
