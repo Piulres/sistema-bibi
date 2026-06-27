@@ -18,7 +18,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Próximo pacote (homologação `dev`)** | **2.3.0** — assistente multi-nicho + Engenharia Civil + onboarding fase 2 |
 | **Commit release v2.2** | `2c38248` |
 | `main` | **v2.2.0** — onboarding tour publicado |
-| `dev` | **v2.3.0** — validado (`pre-release` + 490 Vitest + 138 E2E) — aguarda merge → `main` + deploy |
+| `dev` | **v2.3.0** — validado (`pre-release` + 495 Vitest + 138 E2E) — aguarda merge → `main` + deploy |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
 | **Pacote anterior** | **v2.1.0** — deploy `6a3d525f` @ `07c7a7e` (24/06/2026) |
 
@@ -55,14 +55,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.3.0` (a criar após deploy) |
 | **Branch** | `dev` — integrar PRs [#148](https://github.com/Piulres/sistema-bibi/pull/148), [#149](https://github.com/Piulres/sistema-bibi/pull/149) |
 | **Doc** | [`V2_3.md`](V2_3.md) |
-| **Validação** | `npm run pre-release` ✅ · 490 Vitest · 138 E2E · `docs:verify` · `db:verify` |
+| **Validação** | `npm run pre-release` ✅ · 495 Vitest · 138 E2E · `docs:verify` · `db:verify` |
 
 **Inclui (além de v2.2.0):**
 
 - **Assistente operacional:** estado serverless (tokens HMAC), confirmação de ações em Netlify, anti-repetição multi-turno
 - **Assistente multi-nicho:** RAG por segmento, procedimentos do catálogo do tenant, copiloto contextual por página
 - **VET:** agendamento com tutor + pet (`search_pets`, auto-seleção de pet único)
-- **Engenharia Civil (CONSTRUCTION):** obras, RDO, portal campo, faturamento por diária, Gantt, pipeline comercial, caixa/BDI
+- **Engenharia Civil (CONSTRUCTION):** obras, RDO, portal campo, faturamento por diária, Gantt, pipeline comercial, caixa/BDI, dupla aprovação e metas
 - **Onboarding fase 2:** tour em duas fases, mobile, hotspots ([#152](https://github.com/Piulres/sistema-bibi/pull/152))
 - **API docs:** Swagger UI em `/api/docs` (assets self-hosted)
 - **Massa demo:** seeds ricos em todos os segmentos + perfil `operation-1y`

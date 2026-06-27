@@ -58,7 +58,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "490 testes Vitest · 138 E2E · pre-release OK",
+    testStats: "495 testes Vitest · 138 E2E · pre-release OK",
   },
   {
     version: "2.2.0",
