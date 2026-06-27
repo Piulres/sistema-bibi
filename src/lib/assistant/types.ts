@@ -73,6 +73,7 @@ export type PendingActionPayload =
       type: "create_appointment";
       data: {
         patientId: string;
+        petId?: string | null;
         providerId?: string;
         procedureId?: string;
         scheduledAt: string;
@@ -84,6 +85,7 @@ export type PendingActionPayload =
       type: "book_appointment";
       data: {
         patientId: string;
+        petId?: string | null;
         providerId?: string;
         procedureId?: string;
         scheduledAt: string;

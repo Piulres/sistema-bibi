@@ -127,10 +127,16 @@ export function draftFieldPrompt(
   field: string,
   labels: NicheLabels,
   tool?: string,
+  niche?: import("@/lib/niche/types").NicheId,
 ): string {
+  const needsPet = niche === "VET";
   const prompts: Record<string, string> = {
-    patientName: `Para quem será a ${labels.appointment.toLowerCase()}? Me diga o nome do ${labels.patient.toLowerCase()}.`,
-    providerName: `Com qual ${labels.provider.toLowerCase()}? Ex.: *Dra. Helena*. Se não souber, diga *não sei* ou *listar prestadores*.`,
+    patientName: needsPet
+      ? `Para qual ${labels.beneficiary.toLowerCase()}? Me diga o nome do responsável.`
+      : `Para quem será a ${labels.appointment.toLowerCase()}? Me diga o nome do ${labels.patient.toLowerCase()}.`,
+    tutorName: `Para qual ${labels.beneficiary.toLowerCase()}? Me diga o nome do responsável.`,
+    petName: `Qual o nome do ${labels.patient.toLowerCase()}? Ex.: *Thor*, *Luna*.`,
+    providerName: `Com qual ${labels.provider.toLowerCase()}? Se não souber, diga *não sei* ou *listar prestadores*.`,
     providerPick: `Escolha o ${labels.provider.toLowerCase()} na lista ou me diga o nome.`,
     procedureName: `Qual ${labels.procedure.toLowerCase()}? Ex.: *eletrocardiograma*, *consulta clínica*.`,
     date: "Para qual data? Ex.: *amanhã*, *25/06/2026*.",
@@ -161,8 +167,11 @@ export function draftRemainingFields(rest: string[]): string {
   return `\n\nDepois ainda vou precisar de: ${rest.join(" · ")}`;
 }
 
-export function appointmentDraftTip(labels: NicheLabels): string {
-  return `\n_Dica: dá para mandar tudo de uma vez — *Agendar eletrocardiograma para João Pereira amanhã às 11h* (sem precisar do nome do ${labels.provider.toLowerCase()})._`;
+export function appointmentDraftTip(labels: NicheLabels, niche?: import("@/lib/niche/types").NicheId): string {
+  if (niche === "VET") {
+    return `\n_Dica: *Marcar banho para o pet Thor do tutor João amanhã às 11h com Dr. Rafael*._`;
+  }
+  return `\n_Dica: dá para mandar tudo de uma vez — ex.: *Agendar ${labels.procedure.toLowerCase()} para João amanhã às 11h*._`;
 }
 
 export function resolvePatientHint(labels: NicheLabels, patientName?: string): string {
@@ -201,8 +210,9 @@ export function buildDraftGuidanceText(input: {
   missing: string[];
   labels: NicheLabels;
   partial: Record<string, string>;
+  niche?: import("@/lib/niche/types").NicheId;
 }): string {
-  const { tool, missing, labels, partial } = input;
+  const { tool, missing, labels, partial, niche } = input;
   const lines: string[] = [];
 
   if (Object.keys(partial).length > 0) {
@@ -214,18 +224,18 @@ export function buildDraftGuidanceText(input: {
   }
 
   const next = missing[0];
-  lines.push(next ? draftFieldPrompt(next, labels, tool) : draftMoreDetail());
+  lines.push(next ? draftFieldPrompt(next, labels, tool, niche) : draftMoreDetail());
 
   if (missing.length > 1) {
     const rest = missing
       .slice(1)
-      .map((m) => draftFieldPrompt(m, labels, tool))
+      .map((m) => draftFieldPrompt(m, labels, tool, niche))
       .join(" · ");
     lines.push(draftRemainingFields([rest]));
   }
 
   if (tool === "draft_create_appointment" || tool === "draft_book_appointment") {
-    lines.push(appointmentDraftTip(labels));
+    lines.push(appointmentDraftTip(labels, niche));
   }
 
   return lines.join("\n");

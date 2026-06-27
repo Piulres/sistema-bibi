@@ -452,6 +452,7 @@ describe("appointment draft resolver", () => {
     const { resolveAppointmentDraft } = await import("@/lib/assistant/appointment-draft");
     const result = await resolveAppointmentDraft({
       tenantId: tenant!.id,
+      niche: "MEDICAL",
       labels: NICHE_MASTER_LABELS.MEDICAL,
       data: {
         patientName: "João Pereira",
