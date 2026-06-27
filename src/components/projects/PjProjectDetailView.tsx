@@ -133,7 +133,11 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
         setMsg(json.error ?? "Erro na operação");
         return;
       }
-      setMsg(action === "approve" ? "Proposta aprovada — fatura emitida" : "Proposta recusada");
+      setMsg(
+        action === "approve"
+          ? "Aprovação registrada — aguardando faturamento pela engenharia"
+          : "Proposta recusada",
+      );
       await load();
     } finally {
       setBusy(false);
@@ -251,6 +255,12 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
                 Recusar proposta
               </button>
             </div>
+          )}
+
+          {activeBudget.status === "APROVADO_PJ" && (
+            <p className="text-sm text-[var(--text-secondary)]">
+              Proposta aprovada pela empresa — aguardando faturamento pelo escritório de engenharia.
+            </p>
           )}
 
           {activeBudget.status === "APROVADO" && (

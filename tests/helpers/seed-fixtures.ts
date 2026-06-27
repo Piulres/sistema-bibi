@@ -13,6 +13,7 @@ export const DEMO_EMAILS = {
   buildInterno: "operacao@build.demo",
   buildPj: "rh@incorp.demo",
   buildPedreiro: "pedreiro.jose@build.demo",
+  buildCliente: "cliente@build.demo",
 } as const;
 
 export const DEMO_CPFS = {

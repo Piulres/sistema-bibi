@@ -8,6 +8,15 @@ function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
+type IndirectExpense = {
+  id: string;
+  categoryLabel: string;
+  description: string;
+  amount: number;
+  isPlanned: boolean;
+  expenseDate: string;
+};
+
 export default function ConstructionFinanceView() {
   const [loading, setLoading] = useState(true);
   const [report, setReport] = useState<{
@@ -20,13 +29,17 @@ export default function ConstructionFinanceView() {
     indirectActual: number;
     projects: { projectCode: string; projectName: string; cashSummary: { balanceActual: number } }[];
   } | null>(null);
+  const [indirectExpenses, setIndirectExpenses] = useState<IndirectExpense[]>([]);
 
   useEffect(() => {
     let active = true;
     (async () => {
       const res = await fetch("/api/interno/construction/finance");
       const json = await res.json();
-      if (active && res.ok) setReport(json.report);
+      if (active && res.ok) {
+        setReport(json.report);
+        setIndirectExpenses(json.indirectExpenses ?? []);
+      }
       if (active) setLoading(false);
     })();
     return () => {
@@ -60,13 +73,30 @@ export default function ConstructionFinanceView() {
         <p className="mt-2 text-xs text-[var(--text-muted)]">
           Categorias: {INDIRECT_CATEGORIES.map((c) => c.label).join(", ")}
         </p>
+        {indirectExpenses.length > 0 && (
+          <ul className="mt-3 divide-y text-sm">
+            {indirectExpenses.map((e) => (
+              <li key={e.id} className="flex flex-wrap justify-between gap-2 py-2">
+                <span>
+                  {e.categoryLabel} — {e.description}
+                  <span className="ml-2 text-xs text-[var(--text-muted)]">
+                    {e.isPlanned ? "orçado" : "realizado"}
+                  </span>
+                </span>
+                <span>{brl(e.amount)}</span>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
       <section className="rounded-xl border p-4">
         <h3 className="font-medium">Caixa por obra</h3>
         <ul className="mt-3 divide-y text-sm">
           {report?.projects.map((p) => (
             <li key={p.projectCode} className="flex justify-between py-2">
-              <span>{p.projectCode} — {p.projectName}</span>
+              <span>
+                {p.projectCode} — {p.projectName}
+              </span>
               <span>{brl(p.cashSummary.balanceActual)}</span>
             </li>
           ))}

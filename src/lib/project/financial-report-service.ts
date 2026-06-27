@@ -221,15 +221,6 @@ export async function listProjectsForPatient(
 
   const results = [];
   for (const p of projects) {
-    const photos = await prisma.attachment.findMany({
-      where: {
-        tenantId,
-        entityType: "DailyFieldReport",
-        category: "FOTO_CAMPO",
-      },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-    });
     const fieldReportIds = (
       await prisma.dailyFieldReport.findMany({
         where: { projectId: p.id },
@@ -237,13 +228,25 @@ export async function listProjectsForPatient(
       })
     ).map((r) => r.id);
 
-    const projectPhotos = photos
-      .filter((a) => fieldReportIds.includes(a.entityId))
-      .map((a) => ({
-        id: a.id,
-        fileName: a.fileName,
-        downloadUrl: `/api/beneficiario/projects/attachments/${a.id}/download`,
-      }));
+    const photos =
+      fieldReportIds.length === 0
+        ? []
+        : await prisma.attachment.findMany({
+            where: {
+              tenantId,
+              entityType: "DailyFieldReport",
+              entityId: { in: fieldReportIds },
+              category: "FOTO_CAMPO",
+            },
+            orderBy: { createdAt: "desc" },
+            take: 6,
+          });
+
+    const projectPhotos = photos.map((a) => ({
+      id: a.id,
+      fileName: a.fileName,
+      downloadUrl: `/api/beneficiario/projects/attachments/${a.id}/download`,
+    }));
 
     results.push({
       id: p.id,

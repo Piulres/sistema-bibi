@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
-import { approveBudget, rejectBudget, getProjectForCompany } from "@/lib/project/project-service";
+import { approveBudgetByPj, rejectBudget, getProjectForCompany } from "@/lib/project/project-service";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -26,7 +26,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     if (action === "approve") {
-      const result = await approveBudget({
+      const result = await approveBudgetByPj({
         tenantId: user.tenantId,
         projectId,
         budgetId,

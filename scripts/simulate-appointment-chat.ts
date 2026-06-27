@@ -66,6 +66,7 @@ async function main() {
 
   clearMockContext(user.id);
   const messages: AssistantMessage[] = [];
+  let sessionState: string | undefined;
 
   console.log("═".repeat(60));
   console.log("SIMULAÇÃO — Agendamento via chat (mock ativo)");
@@ -106,7 +107,13 @@ async function main() {
 
     messages.push({ role: "user", content: userText });
 
-    const result = await runAssistantChat({ user, messages, pageContext: "/interno/agenda" });
+    const result = await runAssistantChat({
+      user,
+      messages,
+      pageContext: "/interno/agenda",
+      sessionState,
+    });
+    sessionState = result.sessionState;
     messages.push(result.message);
     line("Assistente", result.message.content);
 

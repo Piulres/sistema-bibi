@@ -79,6 +79,7 @@ export async function executePendingAction(
       const result = await createAppointment({
         tenantId: user.tenantId,
         patientId: payload.data.patientId,
+        petId: payload.data.petId,
         providerId: payload.data.providerId,
         procedureId: payload.data.procedureId,
         scheduledAt: new Date(payload.data.scheduledAt),
@@ -106,6 +107,7 @@ export async function executePendingAction(
       const result = await bookBeneficiaryAppointment({
         tenantId: user.tenantId,
         patientId: user.patientId,
+        petId: payload.data.petId,
         providerId: payload.data.providerId,
         procedureId: payload.data.procedureId,
         scheduledAt: new Date(payload.data.scheduledAt),

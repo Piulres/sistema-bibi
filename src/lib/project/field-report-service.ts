@@ -9,6 +9,9 @@ import {
   projectStatusLabel,
 } from "@/lib/project/constants";
 import { uploadAttachment } from "@/lib/project/project-service";
+import { providerProjectAccessFilter } from "@/lib/project/provider-access";
+import { resolveInvoicePatientForCompany } from "@/lib/project/company-patient";
+import { mirrorProjectCashEntry } from "@/lib/project/cash-service";
 import { recordTimelineEvent, TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
 
@@ -24,6 +27,8 @@ export type ProviderProjectItem = {
   billingMode: string;
   activeTaskId: string | null;
   activeTaskName: string | null;
+  /** Diária sugerida da alocação ativa do prestador nesta obra. */
+  dailyRate: number | null;
 };
 
 export type FieldReportView = {
@@ -145,16 +150,16 @@ export async function listProjectsForProvider(
 ): Promise<ProviderProjectItem[]> {
   const prisma = await getPrisma();
   const projects = await prisma.project.findMany({
-    where: {
-      tenantId,
-      OR: [{ managerId: providerId }, { tasks: { some: { assigneeId: providerId } } }],
-    },
+    where: providerProjectAccessFilter(tenantId, providerId),
     include: {
       tasks: {
         where: {
           OR: [{ assigneeId: providerId }, { status: "EM_ANDAMENTO" }],
         },
-        orderBy: { sortOrder: "asc" },
+        orderBy: [{ status: "desc" }, { sortOrder: "asc" }],
+      },
+      allocations: {
+        where: { providerId, status: "ATIVO" },
         take: 1,
       },
     },
@@ -162,7 +167,11 @@ export async function listProjectsForProvider(
   });
 
   return projects.map((p) => {
-    const task = p.tasks[0];
+    const task =
+      p.tasks.find((t) => t.assigneeId === providerId && t.status === "EM_ANDAMENTO") ??
+      p.tasks.find((t) => t.assigneeId === providerId) ??
+      p.tasks.find((t) => t.status === "EM_ANDAMENTO") ??
+      p.tasks[0];
     return {
       id: p.id,
       code: p.code,
@@ -175,6 +184,7 @@ export async function listProjectsForProvider(
       billingMode: p.billingMode,
       activeTaskId: task?.id ?? null,
       activeTaskName: task?.name ?? null,
+      dailyRate: p.allocations[0]?.dailyRate ?? null,
     };
   });
 }
@@ -249,14 +259,15 @@ export async function createFieldReport(input: {
   const canAccess = await prisma.project.findFirst({
     where: {
       id: input.projectId,
-      tenantId: input.tenantId,
-      OR: [
-        { managerId: input.authorId },
-        { tasks: { some: { assigneeId: input.authorId } } },
-      ],
+      ...providerProjectAccessFilter(input.tenantId, input.authorId),
     },
+    select: { billingMode: true },
   });
   if (!canAccess) return { error: "Você não está alocado nesta obra" };
+
+  if (input.diariaAmount && input.diariaAmount > 0 && canAccess.billingMode === "FECHADO") {
+    return { error: "Esta obra é de contrato fechado — diárias não são faturáveis no RDO" };
+  }
 
   if (input.taskId) {
     const task = await prisma.projectTask.findFirst({
@@ -355,17 +366,18 @@ export async function approveAndBillFieldReport(input: {
   if (!report) return { error: "RDO não encontrado" };
   if (report.status !== "ENVIADO") return { error: "Somente RDOs enviados podem ser aprovados" };
 
+  const diariaAmount = report.diariaAmount ?? 0;
+  const billDiaria = diariaAmount > 0 && report.project.billingMode !== "FECHADO";
+
   let invoiceId: string | undefined;
 
-  if (report.diariaAmount && report.diariaAmount > 0) {
+  if (billDiaria) {
     const patient = report.project.companyId
-      ? await prisma.patient.findFirst({
-          where: {
-            tenantId: input.tenantId,
-            companyId: report.project.companyId,
-          },
-          orderBy: { createdAt: "asc" },
-        })
+      ? await resolveInvoicePatientForCompany(
+          input.tenantId,
+          report.project.companyId,
+          "cliente@build.demo",
+        )
       : null;
     if (!patient) {
       return { error: "Não há cliente vinculado à empresa para faturar a diária" };
@@ -376,19 +388,31 @@ export async function approveAndBillFieldReport(input: {
         tenantId: input.tenantId,
         patientId: patient.id,
         companyId: report.project.companyId,
-        total: report.diariaAmount,
+        total: diariaAmount,
         status: "FECHADA",
         items: {
           create: [
             {
               description: `${report.project.code} — Diária ${fieldTradeLabel(report.trade)} (${report.author.name}) — ${new Date(report.reportDate).toLocaleDateString("pt-BR")}`,
-              amount: report.diariaAmount,
+              amount: diariaAmount,
             },
           ],
         },
       },
     });
     invoiceId = invoice.id;
+
+    await mirrorProjectCashEntry({
+      tenantId: input.tenantId,
+      projectId: report.projectId,
+      type: "SAIDA",
+      category: "MAO_OBRA",
+      description: `Diária ${fieldTradeLabel(report.trade)} — ${report.author.name}`,
+      amount: diariaAmount,
+      referenceType: "DailyFieldReport",
+      referenceId: report.id,
+      entryDate: report.reportDate,
+    });
 
     void dispatchWebhooks({
       tenantId: input.tenantId,
@@ -425,7 +449,7 @@ export async function approveAndBillFieldReport(input: {
     entityId: report.projectId,
     action: TIMELINE_ACTIONS.UPDATED,
     description: invoiceId
-      ? `RDO aprovado e diária faturada — ${formatBRL(report.diariaAmount!)}`
+      ? `RDO aprovado e diária faturada — ${formatBRL(diariaAmount)}`
       : "RDO de campo aprovado",
     createdBy: input.approvedBy,
   });
@@ -445,7 +469,10 @@ export async function approveAndBillFieldReport(input: {
 export async function canAccessFieldReportAttachment(
   tenantId: string,
   attachmentId: string,
-  opts: { role: "PRESTADOR"; userId: string } | { role: "INTERNO" },
+  opts:
+    | { role: "PRESTADOR"; userId: string }
+    | { role: "INTERNO" }
+    | { role: "BENEFICIARIO"; patientId: string },
 ): Promise<boolean> {
   const prisma = await getPrisma();
   const attachment = await prisma.attachment.findFirst({
@@ -455,7 +482,18 @@ export async function canAccessFieldReportAttachment(
   if (opts.role === "INTERNO") return true;
 
   const report = await prisma.dailyFieldReport.findFirst({
-    where: { id: attachment.entityId, tenantId, authorId: opts.userId },
+    where: { id: attachment.entityId, tenantId },
+    include: { project: { select: { companyId: true } } },
   });
-  return Boolean(report);
+  if (!report) return false;
+
+  if (opts.role === "PRESTADOR") {
+    return report.authorId === opts.userId;
+  }
+
+  if (!report.project.companyId) return false;
+  const patient = await prisma.patient.findFirst({
+    where: { id: opts.patientId, tenantId, companyId: report.project.companyId },
+  });
+  return Boolean(patient);
 }

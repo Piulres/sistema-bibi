@@ -1,7 +1,9 @@
 import "server-only";
 import type { Role } from "@/lib/roles";
+import type { NicheId } from "@/lib/niche/types";
 import type { NicheLabels } from "@/lib/niche/types";
 import { searchKnowledge, type KnowledgeChunk } from "@/lib/assistant/rag/knowledge";
+import { searchNicheKnowledge } from "@/lib/assistant/niche-knowledge";
 
 type PortalSnippet = {
   roles: Role[];
@@ -69,9 +71,11 @@ export function searchPortalKnowledge(
   query: string,
   labels: NicheLabels,
   limit = 3,
+  niche: NicheId = "MEDICAL",
 ): KnowledgeChunk[] {
   const tokens = tokenize(query);
   const labelText = Object.values(labels).join(" ");
+  const nicheHits = searchNicheKnowledge(niche, query, labels, 2);
   const global = searchKnowledge(`${query} ${labelText}`, limit);
 
   const portalHits = PORTAL_SNIPPETS.filter((snippet) => snippet.roles.includes(role))
@@ -90,7 +94,7 @@ export function searchPortalKnowledge(
       source: `portal-${role.toLowerCase()}`,
     }));
 
-  const merged = [...portalHits];
+  const merged = [...nicheHits, ...portalHits];
   for (const chunk of global) {
     if (merged.length >= limit) break;
     if (!merged.some((c) => c.id === chunk.id)) merged.push(chunk);

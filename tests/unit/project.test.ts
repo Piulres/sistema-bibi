@@ -52,6 +52,12 @@ describe("isolamento CONSTRUCTION vs outros nichos", () => {
 
     const buildPj = buildPjSectionNav(NICHE_MASTER_LABELS.CONSTRUCTION, "CONSTRUCTION");
     expect(buildPj.some((s) => s.href === "/pj/projetos")).toBe(true);
+
+    const { buildBeneficiarioNavTabs } = await import("@/lib/navigation/niche-nav");
+    const buildBenef = buildBeneficiarioNavTabs(NICHE_MASTER_LABELS.CONSTRUCTION, "CONSTRUCTION");
+    expect(buildBenef.some((t) => t.key === "obras")).toBe(true);
+    expect(buildBenef.some((t) => t.key === "medicacoes")).toBe(false);
+    expect(buildBenef.some((t) => t.key === "agendar")).toBe(false);
   });
 });
 
@@ -72,24 +78,38 @@ describe("project-service (CONSTRUCTION seed)", () => {
     expect(projects.some((p) => p.code === "OBR-2026-002")).toBe(true);
   });
 
-  it("aprova orçamento enviado e emite fatura", async () => {
+  it("aprova orçamento enviado após aprovação PJ e emite fatura", async () => {
     const { getTestPrisma } = await import("../helpers/db");
-    const { approveBudget } = await import("@/lib/project/project-service");
+    const { approveBudget, approveBudgetByPj } = await import("@/lib/project/project-service");
     const prisma = getTestPrisma();
 
     const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
     const admin = await prisma.user.findFirst({
       where: { tenantId: tenant!.id, email: "operacao@build.demo" },
     });
+    const pjUser = await prisma.user.findFirst({
+      where: { tenantId: tenant!.id, email: "rh@incorp.demo" },
+    });
     const project = await prisma.project.findFirst({
       where: { tenantId: tenant!.id, code: "OBR-2026-002" },
       include: { budgets: true },
     });
-    const budget = project!.budgets.find((b) => b.status === "ENVIADO");
+    const budget = project!.budgets.find((b) => b.status === "ENVIADO" || b.status === "APROVADO_PJ");
     if (!budget) {
       const approved = project!.budgets.find((b) => b.status === "APROVADO");
       expect(approved?.invoiceId).toBeTruthy();
       return;
+    }
+
+    if (budget.status === "ENVIADO" && pjUser) {
+      const pjStep = await approveBudgetByPj({
+        tenantId: tenant!.id,
+        projectId: project!.id,
+        budgetId: budget.id,
+        updatedBy: pjUser.id,
+        approvedByPjUserId: pjUser.id,
+      });
+      expect("error" in pjStep).toBe(false);
     }
 
     const beforeInvoices = await prisma.invoice.count({ where: { tenantId: tenant!.id } });
@@ -108,6 +128,34 @@ describe("project-service (CONSTRUCTION seed)", () => {
 
     const afterInvoices = await prisma.invoice.count({ where: { tenantId: tenant!.id } });
     expect(afterInvoices).toBe(beforeInvoices + 1);
+  });
+
+  it("bloqueia faturamento interno sem aprovação PJ quando há empresa", async () => {
+    const { getTestPrisma } = await import("../helpers/db");
+    const { approveBudget } = await import("@/lib/project/project-service");
+    const prisma = getTestPrisma();
+
+    const tenant = await prisma.tenant.findUnique({ where: { slug: "build" } });
+    const admin = await prisma.user.findFirst({
+      where: { tenantId: tenant!.id, email: "operacao@build.demo" },
+    });
+    const project = await prisma.project.findFirst({
+      where: { tenantId: tenant!.id, code: "OBR-2026-002" },
+      include: { budgets: true, company: true },
+    });
+    const budget = project!.budgets.find((b) => b.status === "ENVIADO");
+    if (!budget || !project!.companyId) return;
+
+    const result = await approveBudget({
+      tenantId: tenant!.id,
+      projectId: project!.id,
+      budgetId: budget.id,
+      updatedBy: admin!.id,
+    });
+    expect("error" in result).toBe(true);
+    if ("error" in result) {
+      expect(result.error).toMatch(/cliente/i);
+    }
   });
 
   it("gera dados para PDF de orçamento", async () => {

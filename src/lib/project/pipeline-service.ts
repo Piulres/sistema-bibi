@@ -1,6 +1,7 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { labelOf, PIPELINE_STATUSES } from "@/lib/project/construction-modules";
+import { createProject } from "@/lib/project/project-service";
 
 export type PipelineEntryView = {
   id: string;
@@ -103,6 +104,48 @@ export async function upsertPipelineEntry(
   return { data: mapPipelineEntry(row) };
 }
 
+/** Converte lead ganho em obra (ORCAMENTO) e vincula ao pipeline. */
+export async function convertPipelineToProject(
+  tenantId: string,
+  entryId: string,
+  createdBy: string,
+): Promise<{ data: PipelineEntryView; projectId: string; projectCode: string } | { error: string }> {
+  const prisma = await getPrisma();
+  const entry = await prisma.constructionPipelineEntry.findFirst({
+    where: { id: entryId, tenantId },
+    include: { company: { select: { name: true } } },
+  });
+  if (!entry) return { error: "Lead não encontrado" };
+  if (entry.projectId) return { error: "Lead já convertido em obra" };
+
+  const year = new Date().getFullYear();
+  const count = await prisma.project.count({ where: { tenantId } });
+  const code = `OBR-${year}-${String(count + 1).padStart(3, "0")}`;
+
+  const created = await createProject({
+    tenantId,
+    code,
+    name: entry.projectName?.trim() || `Obra — ${entry.contactName}`,
+    status: "ORCAMENTO",
+    companyId: entry.companyId,
+    notes: entry.notes,
+    createdBy,
+  });
+  if ("error" in created) return { error: created.error };
+
+  const row = await prisma.constructionPipelineEntry.update({
+    where: { id: entryId },
+    data: { projectId: created.project.id, status: "GANHO", probability: 100 },
+    include: { company: { select: { name: true } } },
+  });
+
+  return {
+    data: mapPipelineEntry(row),
+    projectId: created.project.id,
+    projectCode: created.project.code,
+  };
+}
+
 export async function listSalesGoals(tenantId: string, year: number): Promise<SalesGoalView[]> {
   const prisma = await getPrisma();
   const goals = await prisma.constructionSalesGoal.findMany({
@@ -114,11 +157,16 @@ export async function listSalesGoals(tenantId: string, year: number): Promise<Sa
   for (const g of goals) {
     const start = new Date(g.year, g.month - 1, 1);
     const end = new Date(g.year, g.month, 0, 23, 59, 59);
-    const invoices = await prisma.invoice.aggregate({
-      where: { tenantId, createdAt: { gte: start, lte: end }, status: { not: "CANCELADA" } },
-      _sum: { total: true },
+
+    const approvedBudgets = await prisma.budget.findMany({
+      where: {
+        status: "APROVADO",
+        approvedAt: { gte: start, lte: end },
+        project: { tenantId },
+      },
+      select: { total: true },
     });
-    const actualRevenue = invoices._sum.total ?? 0;
+    const actualRevenue = approvedBudgets.reduce((sum, b) => sum + b.total, 0);
     const coveragePercent =
       g.targetRevenue > 0 ? Math.round((actualRevenue / g.targetRevenue) * 100) : 0;
 

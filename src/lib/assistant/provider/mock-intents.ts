@@ -304,6 +304,23 @@ export const MOCK_INTENTS: readonly MockIntentDef[] = [
     ]),
   },
   {
+    tool: "search_pets",
+    roles: ["INTERNO"],
+    priority: 12,
+    triggers: T([
+      "buscar pet",
+      "buscar pets",
+      "procurar pet",
+      "listar pets",
+      "lista de pets",
+      "qual pet",
+      "pets do tutor",
+      "ficha do pet",
+      "cadastro pet",
+      "cadastro de pet",
+    ]),
+  },
+  {
     tool: "list_providers",
     roles: ["INTERNO"],
     priority: 11,

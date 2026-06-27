@@ -58,8 +58,8 @@ export const internoWriteTools: AssistantToolDefinition[] = [
       };
 
       if (!data.name?.trim() || !data.email?.trim() || !data.password?.trim() || !data.role) {
-        const missing = getMissingFieldsForTool("draft_create_user", data);
-        return buildIncompleteDraftResult("draft_create_user", data, ctx.labels, missing);
+        const missing = getMissingFieldsForTool("draft_create_user", data, ctx.user.niche);
+        return buildIncompleteDraftResult("draft_create_user", data, ctx.labels, missing, ctx.user.niche);
       }
 
       const role = data.role.toUpperCase();
@@ -118,8 +118,8 @@ export const internoWriteTools: AssistantToolDefinition[] = [
       };
 
       if (!data.name?.trim() || !data.cpf?.trim() || !data.birthDate) {
-        const missing = getMissingFieldsForTool("draft_create_patient", data);
-        return buildIncompleteDraftResult("draft_create_patient", data, ctx.labels, missing);
+        const missing = getMissingFieldsForTool("draft_create_patient", data, ctx.user.niche);
+        return buildIncompleteDraftResult("draft_create_patient", data, ctx.labels, missing, ctx.user.niche);
       }
 
       const birth = parseAssistantDate(data.birthDate);
@@ -173,6 +173,7 @@ export const internoWriteTools: AssistantToolDefinition[] = [
 
       const resolved = await resolveAppointmentDraft({
         tenantId: ctx.user.tenantId,
+        niche: ctx.user.niche,
         labels: ctx.labels,
         data,
         tool: "draft_create_appointment",
@@ -212,6 +213,7 @@ export const internoWriteTools: AssistantToolDefinition[] = [
           type: "create_appointment",
           data: {
             patientId: finalData.patientId!,
+            petId: finalData.petId ?? null,
             providerId: finalData.providerId!,
             procedureId: finalData.procedureId,
             scheduledAt: baseDate.toISOString(),
@@ -220,7 +222,9 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         },
         preview: `Agendar ${ctx.labels.appointment.toLowerCase()} para ${patient?.name ?? "paciente"}`,
         summary: {
-          [ctx.labels.patient]: patient?.name ?? finalData.patientName ?? "—",
+          ...(ctx.user.niche === "VET" && resolved.petLabel
+            ? { [ctx.labels.patient]: resolved.petLabel, [ctx.labels.beneficiary]: patient?.name ?? "—" }
+            : { [ctx.labels.patient]: patient?.name ?? finalData.patientName ?? "—" }),
           [ctx.labels.provider]: provider?.name ?? finalData.providerName ?? "—",
           Data: baseDate.toLocaleString("pt-BR"),
           ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),
