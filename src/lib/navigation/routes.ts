@@ -104,6 +104,7 @@ export function resolveBeneficiarioActive(pathname: string): string | undefined 
   if (pathname === "/beneficiario" || pathname.startsWith("/beneficiario/resumo")) return "resumo";
   if (pathname.startsWith("/beneficiario/agendar")) return "agendar";
   if (pathname.startsWith("/beneficiario/agenda")) return "agenda";
+  if (pathname.startsWith("/beneficiario/obras")) return "obras";
   if (pathname.startsWith("/beneficiario/consumo")) return "consumo";
   if (pathname.startsWith("/beneficiario/faturas")) return "faturas";
   if (pathname.startsWith("/beneficiario/medicacoes")) return "medicacoes";

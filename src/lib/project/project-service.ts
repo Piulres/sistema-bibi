@@ -848,6 +848,10 @@ export async function upsertTask(input: {
   assigneeId?: string | null;
   dependsOnId?: string | null;
   sortOrder?: number;
+  plannedLaborCost?: number;
+  plannedMaterialCost?: number;
+  actualLaborCost?: number;
+  actualMaterialCost?: number;
   updatedBy: string;
 }): Promise<{ task: TaskView } | { error: string }> {
   const prisma = await getPrisma();
@@ -874,6 +878,10 @@ export async function upsertTask(input: {
     startDate: input.startDate ? new Date(input.startDate) : null,
     endDate: input.endDate ? new Date(input.endDate) : null,
     progressPercent: input.progressPercent ?? 0,
+    plannedLaborCost: input.plannedLaborCost ?? 0,
+    plannedMaterialCost: input.plannedMaterialCost ?? 0,
+    actualLaborCost: input.actualLaborCost ?? 0,
+    actualMaterialCost: input.actualMaterialCost ?? 0,
     assigneeId: input.assigneeId ?? null,
     dependsOnId: input.dependsOnId ?? null,
     sortOrder: input.sortOrder ?? 0,
