@@ -30,7 +30,7 @@ export async function executePendingAction(
 ): Promise<ConfirmResult> {
   switch (payload.type) {
     case "create_user": {
-      const password = passwordOverride?.trim() || payload.data.password;
+      const password = passwordOverride?.trim();
       if (!password) return { ok: false, error: confirmErrorPassword() };
 
       const result = await createUser({

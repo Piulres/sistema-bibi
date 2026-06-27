@@ -50,7 +50,6 @@ export type PendingActionPayload =
       type: "create_user";
       data: {
         email: string;
-        password: string;
         name: string;
         role: string;
         internoProfile?: string | null;
@@ -161,6 +160,8 @@ export type AssistantToolDefinition<TArgs = Record<string, unknown>> = {
     required?: string[];
   };
   requiredModule?: InternoModule;
+  /** Exige perfil ADMIN no portal interno (ex.: criar usuários). */
+  requiredInternoAdmin?: boolean;
   requiredRoles?: string[];
   kind?: "read" | "draft";
   handler: (ctx: AssistantToolContext, args: TArgs) => Promise<unknown>;

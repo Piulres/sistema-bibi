@@ -14,6 +14,7 @@ import {
   createPendingAction,
   consumePendingAction,
   cancelPendingAction,
+  createLegacyPendingActionForTests,
 } from "@/lib/assistant/pending-actions";
 import type { SessionUser } from "@/lib/session";
 import { CLINIC_BRANDING_DEFAULTS } from "@/lib/theme/tokens";
@@ -124,6 +125,15 @@ describe("assistant RBAC", () => {
 
   it("READONLY não executa draft_create_user", () => {
     const user = baseUser();
+    const tool = internoWriteTools.find((t) => t.name === "draft_create_user")!;
+    expect(() => assertToolPermission(user, tool)).toThrow(AssistantPermissionError);
+  });
+
+  it("RECEPCAO não executa draft_create_user", () => {
+    const user = baseUser({
+      internoProfile: "RECEPCAO",
+      internoPermissions: resolveInternoPermissions("INTERNO", "RECEPCAO"),
+    });
     const tool = internoWriteTools.find((t) => t.name === "draft_create_user")!;
     expect(() => assertToolPermission(user, tool)).toThrow(AssistantPermissionError);
   });
@@ -507,7 +517,6 @@ describe("assistant pending actions", () => {
       data: {
         name: "João",
         email: "joao@test.com",
-        password: "bibi123",
         role: "PRESTADOR",
       },
     });
@@ -517,13 +526,13 @@ describe("assistant pending actions", () => {
     expect(consumePendingAction(id, "u1", "t1")?.type).toBe("create_user");
   });
 
-  it("cancela ação pendente assinada", () => {
-    const id = createPendingAction("u1", "t1", {
-      type: "create_patient",
+  it("cancelPendingAction legado remove UUID da memória", () => {
+    const id = createLegacyPendingActionForTests("u1", "t1", {
       data: { name: "Ana", cpf: "52998224725", birthDate: "1990-01-01" },
+      type: "create_patient",
     });
     expect(cancelPendingAction(id, "u1", "t1")).toBe(true);
-    expect(consumePendingAction(id, "u1", "t1")).not.toBeNull();
+    expect(consumePendingAction(id, "u1", "t1")).toBeNull();
   });
 });
 

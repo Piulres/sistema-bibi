@@ -106,10 +106,9 @@ export function getMissingFieldsForTool(
     }
     case "draft_create_user": {
       const missing: string[] = [];
-      const data = args as { name?: string; email?: string; password?: string; role?: string };
+      const data = args as { name?: string; email?: string; role?: string };
       if (!data.name?.trim()) missing.push("name");
       if (!data.email?.trim()) missing.push("email");
-      if (!data.password?.trim()) missing.push("password");
       if (!data.role?.trim()) missing.push("role");
       return missing;
     }
