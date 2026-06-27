@@ -16,7 +16,7 @@ export default function OnboardingTrigger() {
       onClick={onboarding.startTour}
       title="Iniciar tour guiado"
       aria-label="Iniciar tour guiado"
-      className="hidden sm:inline-flex"
+      className="inline-flex"
       data-tour-id="onboarding-trigger"
     >
       <span aria-hidden className="mr-1">

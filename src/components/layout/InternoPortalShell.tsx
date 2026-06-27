@@ -31,7 +31,7 @@ export default function InternoPortalShell({ user, assistantEnabled = true, chil
   const portal = PORTALS.interno;
 
   return (
-    <OnboardingProvider portal="interno" labels={user.labels} permissions={user.internoPermissions}>
+    <OnboardingProvider portal="interno" labels={user.labels} niche={user.niche} permissions={user.internoPermissions}>
       <ToastProvider>
         <PortalShell
           portal="interno"

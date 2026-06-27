@@ -503,7 +503,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           )}
 
           {careTab === "prontuario" && (
-        <Card padding="lg">
+        <Card padding="lg" data-tour-id="atendimento-pep">
           <SectionHeader title="Prontuário Eletrônico (PEP)" />
           <div className="mt-3 flex flex-wrap gap-2">
             <select

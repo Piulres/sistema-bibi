@@ -84,7 +84,7 @@ export default function DataStoreCard({ isAdmin }: Props) {
   const expectedConfirm = targetMode === "operation" ? "OPERAR" : "DEMO";
 
   return (
-    <Card className="border-teal-200 bg-teal-50/40">
+    <Card className="border-teal-200 bg-teal-50/40" data-tour-id="data-store-mode">
       <SectionHeader
         title="Base de dados — demo ou operação"
         description="Alterna entre a massa de teste (apresentações) e o banco real da clínica. A escolha vale para todo o site — todos os portais usam a mesma base."
