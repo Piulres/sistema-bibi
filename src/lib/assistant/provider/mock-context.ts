@@ -91,6 +91,41 @@ export function clearMockContext(userId?: string): void {
   }
 }
 
+export function exportMockContext(userId: string): {
+  lastIntent?: string;
+  operationDraft?: OperationDraft;
+  pendingChoice?: PendingChoice;
+} {
+  const lastIntent = getLastIntent(userId) ?? undefined;
+  const operationDraft = getOperationDraft(userId) ?? undefined;
+  const pendingChoice = getPendingChoice(userId) ?? undefined;
+  return {
+    ...(lastIntent ? { lastIntent } : {}),
+    ...(operationDraft ? { operationDraft } : {}),
+    ...(pendingChoice ? { pendingChoice } : {}),
+  };
+}
+
+export function applyMockContext(
+  userId: string,
+  snapshot: {
+    lastIntent?: string;
+    operationDraft?: OperationDraft;
+    pendingChoice?: PendingChoice;
+  },
+): void {
+  clearMockContext(userId);
+  if (snapshot.lastIntent) {
+    intentStore.set(userId, { tool: snapshot.lastIntent, at: Date.now() });
+  }
+  if (snapshot.operationDraft) {
+    draftStore.set(userId, { ...snapshot.operationDraft, at: Date.now() });
+  }
+  if (snapshot.pendingChoice) {
+    choiceStore.set(userId, { ...snapshot.pendingChoice, at: Date.now() });
+  }
+}
+
 /** Mapeia follow-up curto para tool quando só muda data ou confirma assunto. */
 export function resolveFollowUpTool(text: string, lastTool: string | null): string | null {
   if (!lastTool) return null;

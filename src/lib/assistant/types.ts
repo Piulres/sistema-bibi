@@ -73,6 +73,7 @@ export type PendingActionPayload =
       type: "create_appointment";
       data: {
         patientId: string;
+        petId?: string | null;
         providerId?: string;
         procedureId?: string;
         scheduledAt: string;
@@ -84,6 +85,7 @@ export type PendingActionPayload =
       type: "book_appointment";
       data: {
         patientId: string;
+        petId?: string | null;
         providerId?: string;
         procedureId?: string;
         scheduledAt: string;
@@ -185,11 +187,15 @@ export type AssistantChatResult = {
   actions?: AssistantAction[];
   pendingActionId?: string;
   toolTrace?: AssistantToolTrace[];
+  /** Token para continuar drafts multi-turno entre requisições (serverless). */
+  sessionState?: string;
 };
 
 export type AssistantChatRequest = {
   messages: AssistantMessage[];
   pageContext?: string;
+  /** Estado do assistente (draft multi-turno) — token assinado retornado na resposta anterior. */
+  sessionState?: string;
 };
 
 export type AssistantConfirmRequest = {

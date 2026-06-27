@@ -17,7 +17,7 @@ export const explainCapabilityTool: AssistantToolDefinition = {
   },
   handler: async (ctx, args) => {
     const topic = ((args as { topic?: string }).topic ?? "").trim();
-    const chunks = searchPortalKnowledge(ctx.user.role as Role, topic, ctx.labels, 3);
+    const chunks = searchPortalKnowledge(ctx.user.role as Role, topic, ctx.labels, 3, ctx.user.niche);
     return {
       topic,
       answer: formatKnowledgeAnswer(topic, chunks),
