@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import type { PendingActionPayload } from "@/lib/assistant/types";
 import { getSessionSecret } from "@/lib/security/config";
 import type { OperationDraft, PendingChoice } from "@/lib/assistant/provider/mock-context";
+import { createPendingJti } from "@/lib/assistant/pending-consumed";
 
 const PENDING_PREFIX = "pa.";
 const SESSION_PREFIX = "as.";
@@ -10,6 +11,7 @@ const PENDING_TTL_MS = 10 * 60 * 1000;
 const SESSION_TTL_MS = 15 * 60 * 1000;
 
 type PendingEnvelope = {
+  jti: string;
   userId: string;
   tenantId: string;
   exp: number;
@@ -56,6 +58,7 @@ export function encodePendingActionToken(
   payload: PendingActionPayload,
 ): string {
   const envelope: PendingEnvelope = {
+    jti: createPendingJti(),
     userId,
     tenantId,
     exp: Date.now() + PENDING_TTL_MS,
@@ -70,6 +73,15 @@ export function decodePendingActionToken(
   userId: string,
   tenantId: string,
 ): PendingActionPayload | null {
+  const envelope = decodePendingEnvelope(token, userId, tenantId);
+  return envelope?.payload ?? null;
+}
+
+export function decodePendingEnvelope(
+  token: string,
+  userId: string,
+  tenantId: string,
+): PendingEnvelope | null {
   const envelope = verifySignedPayload(token, PENDING_PREFIX, (body) => {
     try {
       return JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as PendingEnvelope;
@@ -80,7 +92,8 @@ export function decodePendingActionToken(
   if (!envelope) return null;
   if (envelope.userId !== userId || envelope.tenantId !== tenantId) return null;
   if (envelope.exp <= Date.now()) return null;
-  return envelope.payload;
+  if (!envelope.jti) return null;
+  return envelope;
 }
 
 export function isSignedPendingActionToken(token: string): boolean {
