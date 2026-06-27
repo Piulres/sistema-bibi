@@ -78,10 +78,23 @@ https://sistema-bibi.netlify.app/?utm_source=meta&utm_medium=paid_social&utm_cam
 | Evento | Quando dispara |
 |--------|----------------|
 | `page_view_enriched` | Carregamento de página com UTM na sessão |
+| `roi_calculator_change` | Usuário altera sliders/preset na calculadora `#roi` |
+| `lead_form_submit` | Envia formulário `#contato` |
 | `cta_whatsapp_click` | Clique em **Fale com um especialista** |
 | `cta_demo_click` | Clique em **Acessar demonstração** ou API |
 | `cta_portals_click` | Clique em **Acessar portais** / **Explorar portais** |
 | `segment_landing_view` | Visualização de `/segmentos/*` |
+
+**Análise diária:** funil, GA4 e planilha CRM — [`../comercial/ANALISE_DIARIA.md`](../comercial/ANALISE_DIARIA.md).
+
+### Payloads úteis (GTM variables)
+
+| Evento | Campos |
+|--------|--------|
+| `roi_calculator_change` | `segment`, `eligible`, `utilization_pct`, `savings_pct`, `page_path` |
+| `lead_form_submit` | `segment`, `page_path`, `utm_*` |
+| `cta_whatsapp_click` | `cta_location`, `page_path`, `utm_*` |
+| `segment_landing_view` | `segment_slug`, `niche`, `utm_*` |
 
 ### Exemplo de trigger GTM (WhatsApp)
 

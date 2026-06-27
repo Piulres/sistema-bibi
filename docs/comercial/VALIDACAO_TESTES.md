@@ -2,12 +2,25 @@
 
 Registro da execução completa de testes após a iteração **v4** (captação, formulário lead, comparativo dinâmico, prompt de campanhas).
 
-> **Branch:** `cursor/comercial-por-segmento-c34c` · **Commit:** `fb57016` (+ fix TS `LandingLeadForm`)  
-> **Data:** 2026-06-27 · **Ambiente:** Cursor Cloud Agent (Linux)
+> **Branch:** `dev` / `cursor/analise-diaria-docs-87f9` · **Análise diária:** [`ANALISE_DIARIA.md`](ANALISE_DIARIA.md)
 
 ---
 
-## Resumo executivo
+## Última execução (2026-06-27 — pós-merge comercial na dev)
+
+| Camada | Comando | Resultado |
+|--------|---------|-----------|
+| Lint | `npm run lint` | ✅ OK |
+| Docs | `npm run docs:verify` | ✅ OK (via pre-release) |
+| Unitário (Vitest) | `npm run test` | ✅ **509/509** (68 arquivos) |
+| Comercial (subset) | `npm test -- roi-calculator lead-form` | ✅ 7/7 |
+| Pre-release | `npm run pre-release` | ✅ OK (lint + docs + db + test + build Netlify) |
+
+**Conclusão:** pacote comercial + docs `ANALISE_DIARIA` **validado para merge/deploy**. Deploy produção continua manual — ver [`PROXIMOS_PASSOS.md`](PROXIMOS_PASSOS.md).
+
+---
+
+## Execução anterior (branch `cursor/comercial-por-segmento-c34c`)
 
 | Camada | Comando | Resultado |
 |--------|---------|-----------|

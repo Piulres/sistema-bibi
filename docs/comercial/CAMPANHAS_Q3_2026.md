@@ -52,10 +52,11 @@ Pacote de planos operacionais B2B do **Sistema Bibi - ServiceOS v2.0** — um do
 ## Checklist antes de veicular
 
 - [ ] Copy revisada (FATO vs INFERÊNCIA)
+- [ ] Deploy landing v4 em produção — [`PROXIMOS_PASSOS.md`](PROXIMOS_PASSOS.md)
+- [ ] GTM + GA4 — [`ANALISE_DIARIA.md`](ANALISE_DIARIA.md)
+- [ ] Planilha diária — [`templates/planilha-campanhas-diaria.csv`](templates/planilha-campanhas-diaria.csv)
 - [ ] Hero testado com `utm_segment`
-- [ ] GTM Preview
 - [ ] `NEXT_PUBLIC_SALES_WHATSAPP` em produção
-- [ ] Deploy humano após `npm run pre-release`
 
 ---
 

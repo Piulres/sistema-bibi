@@ -16,6 +16,8 @@ Documentação de **vendas, marketing e posicionamento por segmento**. Complemen
 | Plano e mudanças na homepage | [`PLANO_HOMEPAGE.md`](PLANO_HOMEPAGE.md) |
 | **Prompt campanhas marketing** | [`PROMPT_CAMPANHAS_MARKETING.md`](PROMPT_CAMPANHAS_MARKETING.md) |
 | **Índice campanhas Q3 2026** | [`CAMPANHAS_Q3_2026.md`](CAMPANHAS_Q3_2026.md) |
+| **Análise diária (GA4 + CRM)** | [`ANALISE_DIARIA.md`](ANALISE_DIARIA.md) |
+| **Próximos passos (release + campanha)** | [`PROXIMOS_PASSOS.md`](PROXIMOS_PASSOS.md) |
 | **Campanha MEDICAL Q3 2026** | [`CAMPANHA_MEDICAL_Q3_2026.md`](CAMPANHA_MEDICAL_Q3_2026.md) |
 | **Papel do agente em marketing** | [`PAPEL_DO_AGENTE_MARKETING.md`](PAPEL_DO_AGENTE_MARKETING.md) |
 | Validação de testes (pacote comercial) | [`VALIDACAO_TESTES.md`](VALIDACAO_TESTES.md) |
@@ -38,6 +40,9 @@ docs/comercial/
 ├── PROMPT_CAMPANHAS_MARKETING.md  ← prompt para iniciar campanhas
 ├── CAMPANHAS_Q3_2026.md           ← índice dos planos por nicho
 ├── CAMPANHA_*_Q3_2026.md          ← plano operacional por vertical (6 nichos)
+├── ANALISE_DIARIA.md              ← ritual GA4 + CRM + planilha diária
+├── PROXIMOS_PASSOS.md             ← checklist release e execução campanha
+├── templates/planilha-campanhas-diaria.csv
 ├── PAPEL_DO_AGENTE_MARKETING.md   ← o que o agente pode/não pode em marketing
 ├── VALIDACAO_TESTES.md       ← registro de testes do pacote comercial
 └── ESTRATEGIA_SEGMENTOS.md   ← matriz de captação e links por nicho

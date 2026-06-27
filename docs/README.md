@@ -96,6 +96,9 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`comercial/CALCULADORA_ROI.md`](comercial/CALCULADORA_ROI.md) | Calculadora ROI da homepage |
 | [`comercial/PLANO_HOMEPAGE.md`](comercial/PLANO_HOMEPAGE.md) | Plano de captação na homepage |
 | [`comercial/ESTRATEGIA_SEGMENTOS.md`](comercial/ESTRATEGIA_SEGMENTOS.md) | Técnicas de captação por nicho |
+| [`comercial/CAMPANHAS_Q3_2026.md`](comercial/CAMPANHAS_Q3_2026.md) | Índice campanhas por nicho |
+| [`comercial/ANALISE_DIARIA.md`](comercial/ANALISE_DIARIA.md) | Ritual GA4 + CRM + planilha diária |
+| [`comercial/PROXIMOS_PASSOS.md`](comercial/PROXIMOS_PASSOS.md) | Checklist release e execução |
 | [`segmentos/README.md`](segmentos/README.md) | Playbook `COMERCIAL.md` em cada vertical |
 
 ---
