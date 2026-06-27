@@ -14,7 +14,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
-| **Pacote fechado na `main` (aguarda deploy)** | **2.3.0** — merge `dev` @ `84bccb9` |
+| **Pacote fechado na `main` (aguarda deploy)** | **2.3.0** — merge `dev` @ `05a63eb` |
 | **Integração** | `dev` — sincronizada com `main` após release |
 | **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
 | **Pacote anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
@@ -31,7 +31,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.3.0`** | `84bccb9` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
+| **`v2.3.0`** | `05a63eb` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | merge `dev`→`main` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
@@ -50,7 +50,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.3.0` *(pendente)* |
-| **Commit** | `84bccb9` |
+| **Commit** | `05a63eb` |
 | **PRs** | [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction [#145](https://github.com/Piulres/sistema-bibi/pull/145)+ |
 
 **Inclui (além de v2.2.0):**
