@@ -1,9 +1,7 @@
-import Link from "next/link";
 import LandingIcon from "@/components/landing/LandingIcon";
 import LandingHeroPreview from "@/components/landing/LandingHeroPreview";
 import { HOME_HERO } from "@/lib/landing/home-content";
 import { LANDING_TRUST_BADGES } from "@/lib/landing/content";
-import { SEGMENT_ACCESS_HREF } from "@/lib/landing/navigation";
 import { landingCtaClasses } from "@/components/landing/landing-cta";
 import LandingWhatsAppCta from "@/components/landing/LandingWhatsAppCta";
 import LandingTrackedCta from "@/components/landing/LandingTrackedCta";
@@ -45,6 +43,16 @@ export default function LandingHeroProduct() {
 
           <p className="landing-fade-in mt-4 max-w-xl text-sm text-white/55">{HOME_HERO.subline}</p>
 
+          <div
+            className="landing-fade-in mt-8 inline-flex flex-col gap-1 rounded-2xl border border-[var(--brand-accent)]/30 bg-[var(--brand-accent)]/10 px-5 py-4 sm:flex-row sm:items-center sm:gap-4"
+            role="note"
+          >
+            <p className="text-2xl font-bold tracking-tight text-[var(--brand-accent)]">
+              {HOME_HERO.roiHighlight}
+            </p>
+            <p className="text-sm text-white/70">{HOME_HERO.roiDetail}</p>
+          </div>
+
           <div className="landing-fade-in mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <LandingTrackedCta
               href="#portais"
@@ -54,19 +62,16 @@ export default function LandingHeroProduct() {
               size="lg"
               className="group"
             >
-              Acessar portais
+              Ver demonstração ao vivo
               <LandingIcon
                 name="arrow-right"
                 className="h-5 w-5 transition group-hover:translate-x-0.5"
               />
             </LandingTrackedCta>
             <LandingWhatsAppCta variant="hero-ghost" size="lg" location="hero-home" />
-            <Link
-              href={SEGMENT_ACCESS_HREF}
-              className={landingCtaClasses("hero-ghost", "lg")}
-            >
-              Acesso segmentado
-            </Link>
+            <a href="#segmentos" className={landingCtaClasses("hero-ghost", "lg")}>
+              Escolher meu segmento
+            </a>
           </div>
 
           <ul

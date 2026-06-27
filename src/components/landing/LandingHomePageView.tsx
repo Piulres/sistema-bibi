@@ -7,6 +7,7 @@ import {
   LandingHomeValues,
   LandingHomeVision,
 } from "@/components/landing/LandingHomeProduct";
+import LandingHomeAudience from "@/components/landing/LandingHomeAudience";
 import LandingProblem from "@/components/landing/LandingProblem";
 import LandingSolution from "@/components/landing/LandingSolution";
 import LandingRoi from "@/components/landing/LandingRoi";
@@ -30,7 +31,7 @@ type Props = {
   branding: BrandingTokens;
 };
 
-/** Home — produto, visão, valores e acesso aos 4 portais (sem foco de nicho). */
+/** Home — funil de captação: dor → solução → prova → segmento → demo. */
 export default function LandingHomePageView({ branding }: Props) {
   return (
     <>
@@ -39,21 +40,22 @@ export default function LandingHomePageView({ branding }: Props) {
       <main id="conteudo-principal" className="flex-1">
         <LandingHeroProduct />
         <LandingStats />
-        <LandingHomeProduct />
-        <LandingHomeVision />
-        <LandingHomeValues />
         <LandingProblem />
         <LandingSolution />
         <LandingRoi />
-        <LandingChangelog />
+        <LandingHomeAudience />
+        <LandingNiches />
         <LandingFeatures
           sectionId="recursos"
           featuresSection={HOME_FEATURES_SECTION}
           features={HOME_FEATURES}
         />
-        <LandingNiches />
+        <LandingHomeProduct />
+        <LandingHomeVision />
+        <LandingHomeValues />
         <LandingPortals niche="MEDICAL" branding={branding} />
         <LandingFaq items={HOME_FAQ} />
+        <LandingChangelog />
         <LandingCta branding={branding} niche="MEDICAL" description={HOME_CTA} />
       </main>
       <LandingFooter branding={branding} context="home" footerTagline={HOME_FOOTER_TAGLINE} />

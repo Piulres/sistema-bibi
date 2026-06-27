@@ -165,6 +165,7 @@ Configuração atual: hero leva a `#portais` + WhatsApp. Evolução sugerida: ca
 
 | Documento | Uso |
 |-----------|-----|
+| [`BENCHMARKS_POR_NICHO.md`](BENCHMARKS_POR_NICHO.md) | Concorrentes e prós/contras por vertical |
 | [`../segmentos/README.md`](../segmentos/README.md) | Índice de segmentos |
 | [`../pesquisa/09-sintese-consultor-senior.md`](../pesquisa/09-sintese-consultor-senior.md) | Script CFO saúde |
 | [`../plataforma/BENCHMARK.md`](../plataforma/BENCHMARK.md) | POC vs. mercado |
