@@ -509,7 +509,9 @@ export default function CadastrosView() {
       {
         confirm: confirmPresets.delete(label),
         successMessage: "Procedimento excluído",
-        onSuccess: reload,
+        onSuccess: async () => {
+          await reload();
+        },
       },
     );
   }
@@ -533,7 +535,7 @@ export default function CadastrosView() {
           <ImportInterchangePanel
             entity="patients"
             entityLabel={labels.patient}
-            onImported={reload}
+            onImported={() => void reload()}
           />
           <Card>
             <SectionHeader title="Novo beneficiário" />
@@ -745,7 +747,7 @@ export default function CadastrosView() {
 
       {tab === "companies" && (
         <div className="grid gap-6 lg:grid-cols-2">
-          <ImportInterchangePanel entity="companies" entityLabel="Empresas PJ" onImported={reload} />
+          <ImportInterchangePanel entity="companies" entityLabel="Empresas PJ" onImported={() => void reload()} />
           <Card>
             <SectionHeader title="Nova empresa" description="Razão social e CNPJ são obrigatórios (padrão mercado B2B)." />
             <form onSubmit={submitCompany} className="mt-4 space-y-3">
@@ -884,7 +886,7 @@ export default function CadastrosView() {
           <ImportInterchangePanel
             entity="procedures"
             entityLabel={labels.procedure}
-            onImported={reload}
+            onImported={() => void reload()}
           />
           <Card>
             <SectionHeader title="Novo procedimento" />

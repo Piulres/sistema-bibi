@@ -134,7 +134,7 @@ export default function ComunicacaoView() {
       {
         confirm: confirmPresets.cancelMessage(patientName),
         successMessage: "Mensagem cancelada",
-        onSuccess: () => reload(),
+        onSuccess: () => { void reload(); },
       },
     );
   }

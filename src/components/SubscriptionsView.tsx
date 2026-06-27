@@ -122,7 +122,7 @@ export default function SubscriptionsView() {
         confirm: status === "CANCELADA" ? confirmPresets.cancelSubscription(patientName) : undefined,
         silentSuccess: true,
         errorMessage: "Erro ao atualizar",
-        onSuccess: () => reload(),
+        onSuccess: () => { void reload(); },
       },
     );
   }

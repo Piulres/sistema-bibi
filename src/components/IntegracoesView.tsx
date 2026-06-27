@@ -141,7 +141,7 @@ export default function IntegracoesView() {
         }),
       {
         silentSuccess: true,
-        onSuccess: () => reload(),
+        onSuccess: () => { void reload(); },
       },
     );
   }
@@ -153,7 +153,7 @@ export default function IntegracoesView() {
       {
         confirm: confirmPresets.deleteWebhook(label),
         successMessage: "Webhook removido",
-        onSuccess: () => reload(),
+        onSuccess: () => { void reload(); },
       },
     );
   }
@@ -164,7 +164,7 @@ export default function IntegracoesView() {
       () => fetch(`/api/interno/webhooks/deliveries/${id}/retry`, { method: "POST" }),
       {
         successMessage: "Retry executado",
-        onSuccess: () => reload(),
+        onSuccess: () => { void reload(); },
       },
     );
   }

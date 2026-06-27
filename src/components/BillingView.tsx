@@ -10,7 +10,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import StatCard from "@/components/ui/StatCard";
-import ExportButtons from "@/components/ui/ExportButtons";
+import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { fetchJson } from "@/lib/ui/api-feedback";

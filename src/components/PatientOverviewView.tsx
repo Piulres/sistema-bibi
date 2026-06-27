@@ -74,8 +74,8 @@ type ClinicalData = {
 };
 
 type PatientOverviewPayload = {
-  overview?: Overview;
-  clinical?: ClinicalData | null;
+  overview: Overview | null;
+  clinical: ClinicalData | null;
 };
 
 export default function PatientOverviewView({
@@ -105,7 +105,7 @@ export default function PatientOverviewView({
     };
   }, [patientId]);
 
-  const { data, loading, error, reload } = useAsyncData(loadData, [patientId]);
+  const { data, loading, error, reload } = useAsyncData<PatientOverviewPayload>(loadData, [patientId]);
 
   const overview = data?.overview ?? null;
   const clinical = data?.clinical ?? null;

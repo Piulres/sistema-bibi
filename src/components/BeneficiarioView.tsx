@@ -16,7 +16,7 @@ import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
 import { useLabels } from "@/hooks/useLabels";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
-import { fetchJson } from "@/lib/ui/api-feedback";
+import { fetchJson, type ApiResult } from "@/lib/ui/api-feedback";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 export type BeneficiarioSection =
@@ -155,6 +155,14 @@ type PixState = {
   pixCopyPaste: string;
 };
 
+type BeneficiarioData = {
+  overview: Overview | null;
+  clinical: ClinicalData | null;
+  providers: { id: string; name: string }[];
+  procedures: { id: string; name: string }[];
+  pets: { id: string; name: string; speciesLabel: string }[];
+};
+
 export default function BeneficiarioView({ section }: { section?: BeneficiarioSection }) {
   const { niche, labels } = useLabels();
   const isVet = niche === "VET";
@@ -176,7 +184,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   });
 
   const loadInitialData = useCallback(async () => {
-    const fetches: Promise<ReturnType<typeof fetchJson>>[] = [
+    const fetches: Promise<ApiResult<Record<string, unknown>>>[] = [
       fetchJson<{ overview?: Overview }>("/api/beneficiario/overview", undefined, "Erro ao carregar seus dados"),
       fetchJson<{ providers?: { id: string; name: string }[] }>("/api/beneficiario/providers"),
       fetchJson<{ clinical?: ClinicalData }>("/api/beneficiario/clinical"),
@@ -193,7 +201,9 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     const providersRes = responses[1] as Awaited<ReturnType<typeof fetchJson<{ providers?: { id: string; name: string }[] }>>>;
     const clinicalRes = responses[2] as Awaited<ReturnType<typeof fetchJson<{ clinical?: ClinicalData }>>>;
     const proceduresRes = responses[3] as Awaited<ReturnType<typeof fetchJson<{ procedures?: { id: string; name: string }[] }>>>;
-    const petsRes = isVet ? responses[4] : undefined;
+    const petsRes = isVet
+      ? (responses[4] as ApiResult<{ pets?: { id: string; name: string; speciesLabel: string }[] }>)
+      : undefined;
 
     return {
       ok: true as const,
@@ -205,10 +215,10 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         pets: petsRes?.ok ? (petsRes.data.pets ?? []) : [],
       },
       status: overviewRes.status,
-    };
+    } satisfies ApiResult<BeneficiarioData>;
   }, [isVet]);
 
-  const { data, loading, error, reload } = useAsyncData(loadInitialData, [isVet]);
+  const { data, loading, error, reload } = useAsyncData<BeneficiarioData>(loadInitialData, [isVet]);
 
   const overview = data?.overview ?? null;
   const clinical = data?.clinical ?? null;

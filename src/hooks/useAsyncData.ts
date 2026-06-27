@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { fetchJson } from "@/lib/ui/api-feedback";
+import type { ApiResult } from "@/lib/ui/api-feedback";
 
 type UseAsyncDataOptions = {
   /** Não dispara fetch automático no mount. */
@@ -14,7 +14,7 @@ type UseAsyncDataOptions = {
  * Carga inicial padronizada: loading, erro e reload.
  */
 export function useAsyncData<T extends Record<string, unknown>>(
-  loader: () => Promise<ReturnType<typeof fetchJson<T>>>,
+  loader: () => Promise<ApiResult<T>>,
   deps: readonly unknown[] = [],
   options?: UseAsyncDataOptions,
 ) {
@@ -22,7 +22,7 @@ export function useAsyncData<T extends Record<string, unknown>>(
   const [loading, setLoading] = useState(!options?.manual);
   const [error, setError] = useState<string | null>(null);
 
-  const applyResult = useCallback((result: Awaited<ReturnType<typeof fetchJson<T>>>) => {
+  const applyResult = useCallback((result: ApiResult<T>) => {
     if (result.ok) {
       setData(result.data);
       setLoading(false);

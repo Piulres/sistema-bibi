@@ -137,7 +137,9 @@ export default function CadastrosPricingTab() {
       {
         confirm: confirmPresets.delete(label),
         successMessage: "Regra excluída",
-        onSuccess: reload,
+        onSuccess: async () => {
+          await reload();
+        },
       },
     );
   }
