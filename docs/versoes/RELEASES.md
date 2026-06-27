@@ -13,21 +13,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — **Sistema Bibi - ServiceOS** — deploy `6a3ea6c5` @ `2c38248` |
-| **Versão anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
-| **Pacote fechado na `dev` (aguarda merge → `main` + deploy)** | **2.3.0** — assistente multi-nicho + Engenharia Civil + onboarding fase 2 |
-| **Commit release v2.2** | `2c38248` |
-| `main` | **v2.2.0** — onboarding tour publicado |
-| `dev` | **v2.3.0** — validado (`pre-release` + 495 Vitest + 138 E2E) |
-| **Pipeline deploy** | `npm run pre-release` → `npx netlify deploy --prod` (**com build**) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
+| **Pacote fechado na `main` (aguarda deploy)** | **2.3.0** — merge `dev` @ `05a63eb` |
+| **Integração `dev`** | **v2.3.0** — validado (`pre-release` + 495 Vitest + 138 E2E) |
 | **Pacote anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.0** — assistente serverless, construction ERP, onboarding fase 2, OpenAPI |
-| **Release** | `main` | **v2.2.0** — onboarding tour ([#142](https://github.com/Piulres/sistema-bibi/pull/142)) |
+| **Integração** | `dev` | **v2.3.0** — assistente, construction ERP, onboarding fase 2, OpenAPI |
+| **Release** | `main` | **v2.3.0** — aguarda deploy manual |
 | **Netlify** | **sistema-bibi.netlify.app** | **v2.2.0** — deploy `6a3ea6c5` @ `2c38248` (25/06/2026) |
 | **Preview** | deploy draft | Após merge `dev` → `main` e `pre-release` na `main` |
 
@@ -35,7 +31,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.3.0`** | `84bccb9` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
+| **`v2.3.0`** | `05a63eb` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | merge `dev`→`main` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
@@ -55,10 +51,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.3.0` *(pendente)* |
-| **PRs** | [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction [#145](https://github.com/Piulres/sistema-bibi/pull/145)+ |
-| **Doc** | [`V2_3.md`](V2_3.md) |
-| **Validação** | `npm run pre-release` ✅ · 495 Vitest · 138 E2E · `docs:verify` · `db:verify` |
+| **Tag git** | `v2.3.0` *(pendente deploy)* |
+| **Commit** | `05a63eb` (main) |
+| **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148), [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+ |
+| **Doc** | [`V2_3.md`](V2_3.md) · [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md) |
+| **Validação dev** | [`evidencias/V2_3_VALIDACAO_DEV.md`](../evidencias/V2_3_VALIDACAO_DEV.md) |
 
 **Inclui (além de v2.2.0):**
 
