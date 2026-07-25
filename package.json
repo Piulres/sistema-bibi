@@ -28,7 +28,8 @@
     "db:bootstrap:demo": "APP_MODE=demo RUN_SEED_ON_BUILD=true npx tsx scripts/setup-database.ts",
     "db:bootstrap:operation": "APP_MODE=operation RUN_SEED_ON_BUILD=false npx tsx scripts/setup-database.ts",
     "db:migrate:deploy": "prisma migrate deploy",
-    "db:reset": "prisma db push --force-reset && prisma db seed"
+    "db:reset": "prisma db push --force-reset && prisma db seed",
+    "smoke:netlify-pwa": "node scripts/smoke-netlify-pwa.mjs"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

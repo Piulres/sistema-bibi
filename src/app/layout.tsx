@@ -42,6 +42,10 @@ export const metadata: Metadata = {
     statusBarStyle: "default",
     title: PLATFORM.shortName,
   },
+  // iOS Safari legado ainda lê apple-mobile-web-app-capable
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
   icons: {
     apple: [{ url: "/icons/apple-touch-icon.png", sizes: "180x180" }],
     icon: [

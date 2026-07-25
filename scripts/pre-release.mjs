@@ -45,6 +45,8 @@ const steps = [
   { name: "db-verify", cmd: "npm run db:verify" },
   { name: "test", cmd: "npm test" },
   { name: "netlify-build", cmd: "npm run netlify:build" },
+  // Smoke PWA/estáticos no next start (mesmo artefato que o plugin Netlify empacota)
+  { name: "smoke-netlify-pwa", cmd: "node scripts/smoke-netlify-pwa.mjs" },
 ];
 
 for (const step of steps) {
