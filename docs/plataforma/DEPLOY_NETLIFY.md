@@ -10,17 +10,17 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 
 ---
 
-## Status atual (24/06/2026)
+## Status atual (25/07/2026)
 
 | Item | Estado |
 |------|--------|
-| Site principal | ✅ https://sistema-bibi.netlify.app |
-| Pacote em produção | **`v2.1.0`** — deploy `6a3bc7a4` @ `40e2dfc` |
-| Pacote anterior (quebrado) | deploys `6a3b8768`–`6a3b8917` — assets `/_next/static` em 404 |
-| `main` / `dev` | Sincronizadas em **`40e2dfc`** |
+| Site principal | ✅ https://sistema-bibi.netlify.app — HTTP 200 |
+| Pacote em produção | **`v2.3.0`** — deploy `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`) |
+| Pacote anterior | **v2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
+| `main` / `dev` | Sincronizadas em **`374b13e`** · tags `v2.2.0` / `v2.3.0` |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
-| Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
+| Deploy Git automático | ✅ **Stop builds ON** — publicação só manual; ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 

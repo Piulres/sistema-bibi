@@ -22,10 +22,10 @@ Checklist de execução após merge na **`dev`**. Atualizar status manualmente.
 
 | # | Ação | Responsável | Status |
 |---|------|-------------|--------|
-| 6 | Merge `dev` → `main` (fechar pacote v2.3.x ou v2.4.0 com captação) | Humano | ☐ |
-| 7 | `npm run pre-release` na `main` | Humano | ☐ |
-| 8 | Deploy produção `npx netlify deploy --prod` | Humano | ☐ |
-| 9 | Atualizar `RELEASES.md` + `changelog-content.ts` | Humano (pós-deploy confirmado) | ☐ |
+| 6 | Merge `dev` → `main` (fechar pacote v2.3.x ou v2.4.0 com captação) | Humano | ✅ 25/07/2026 — `bibi-poc-2026-07-25a` |
+| 7 | `npm run pre-release` na `main` | Humano | ✅ 25/07/2026 |
+| 8 | Deploy produção `npx netlify deploy --prod` | Humano | ✅ deploy `6a6436ef` @ `374b13e` |
+| 9 | Atualizar `RELEASES.md` + `changelog-content.ts` | Humano (pós-deploy confirmado) | ✅ 25/07/2026 |
 
 **Produção atual:** ver [`RELEASES.md`](../versoes/RELEASES.md) — landing v4 só impacta campanhas **após deploy**.
 

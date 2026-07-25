@@ -188,8 +188,8 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 - [ ] Atualizar changelog da landing: `src/lib/landing/changelog-content.ts` + `src/lib/platform.ts` + `package.json` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md)
 - [ ] Smoke test: `/#novidades` exibe a versão publicada
 - [ ] `npm run docs:verify`
+- [ ] Tag semver: `git tag -a vX.Y.Z -m "Release X.Y.Z"` + `git push origin vX.Y.Z`
 - [ ] Commit: `docs(release): fecha pacote bibi-poc-YYYY-MM-DDx`
-- [ ] (Opcional) Tag git: `git tag -a bibi-poc-...`
 
 ### 5.3 Convenção de nome
 
@@ -214,7 +214,7 @@ Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver 
 
 **Produção:** https://sistema-bibi.netlify.app
 
-**Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+**Status conhecido (25/07/2026):** **v2.3.0** no ar — deploy `6a6436ef` @ `374b13e` · HTTP 200 · **Stop builds ON**. Se retornar `503 usage_exceeded`, é cota Netlify — não é bug de código.
 
 **Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 

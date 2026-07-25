@@ -50,17 +50,27 @@ Login: `faturamento@bibi.health` → tour principal. Depois navegue para `/inter
 | [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md) | Arquitetura tour v3, mapa, persistência |
 | [`README.md`](../README.md) | Índice + segmento Construction |
 | [`plataforma/TESTES.md`](../plataforma/TESTES.md) | Seção onboarding v3 |
-| [`versoes/RELEASES.md`](../versoes/RELEASES.md) | Commit `05a63eb` |
+| [`versoes/RELEASES.md`](../versoes/RELEASES.md) | Pacote em produção v2.3.0 |
 
 ---
 
 ## Pendências conhecidas
 
-- **Produção** ainda em v2.2.0 — pacote v2.3.0 aguarda `netlify deploy --prod`
 - OpenAPI UI exibe versão legada no título Swagger (metadado `openapi.yaml`) — não bloqueia funcionalidade
 
 ---
 
-## Próximo passo
+## Produção (25/07/2026)
 
-Deploy manual após aprovação: `npm run pre-release` → `npx netlify deploy --prod`
+Pacote **v2.3.0** publicado após `npm run pre-release` — deploy Netlify `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`).
+
+| Smoke test | Resultado |
+|------------|-----------|
+| `GET /` | ✅ HTTP 200 — landing exibe **v2.3** em `#novidades` |
+| `/_next/static/chunks/*.css` | ✅ HTTP 200 |
+| `/interno/login`, `/login` | ✅ HTTP 200 |
+| `/api/docs` | ✅ HTTP 200 — Swagger UI |
+
+**Tags git:** `v2.2.0` e `v2.3.0` publicadas no remoto. **Stop builds:** ON (sem auto-deploy em push).
+
+Registro oficial: [`versoes/RELEASES.md`](../versoes/RELEASES.md).

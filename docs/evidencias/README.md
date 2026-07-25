@@ -7,7 +7,7 @@ evidência ao código que a implementa.
 - Vídeos: [`videos/`](videos/)
 - Imagens: [`imagens/`](imagens/)
 
-**Validação v2.3.0 (dev, jun/2026):** [`V2_3_VALIDACAO_DEV.md`](V2_3_VALIDACAO_DEV.md) — onboarding fase 2, micro-tours, OpenAPI, segmento Build.
+**Validação v2.3.0:** [`V2_3_VALIDACAO_DEV.md`](V2_3_VALIDACAO_DEV.md) — dev local (jun/2026) + **produção** (`bibi-poc-2026-07-25a`, jul/2026): onboarding fase 2, micro-tours, OpenAPI, segmento Build.
 
 > Ambiente validado: `npm install` → `cp .env.example .env` → `npm run db:push` →
 > `npm run db:seed` → `npm run pre-release` (lint + build Netlify, sem publicar) →
