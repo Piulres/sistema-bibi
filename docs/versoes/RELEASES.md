@@ -15,7 +15,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy _(preencher pós-deploy)_ (`bibi-poc-2026-07-25c`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a645cdc` @ `c64fc14` (`bibi-poc-2026-07-25c`) |
 | **Release `main` / `dev`** | **v2.4.0** · tag `v2.4.0` |
 | **Pacote anterior em produção** | **2.3.1** — deploy `6a643a0d` @ `12148ce` |
 
@@ -34,14 +34,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |-------|-----------|
 | Title | `Sistema Bibi - ServiceOS v2.4.0 — …` |
 | Footer | `ServiceOS v2.4.0` |
-| CSS `/_next/static` | _(após deploy)_ |
+| CSS `/_next/static` | 200 |
 | `#novidades` | current **2.4.0** |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.4.0`** | _(tip release)_ | CEDIG gestão clínica · PR #169 |
+| **`v2.4.0`** | `c64fc14` | CEDIG gestão clínica · PR #169 |
 | **`v2.3.1`** | `12148ce` | Versão no title/footer · `PLATFORM.release` |
 | **`v2.3.0`** | `374b13e` | Assistente, construction ERP, onboarding fase 2, OpenAPI + docs alinhados |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
@@ -61,11 +61,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.4.0` |
-| **Commit publicado** | _(preencher pós-deploy)_ |
+| **Commit publicado** | `c64fc14` |
 | **PRs** | [#169](https://github.com/Piulres/sistema-bibi/pull/169) |
 | **Doc** | [`V2_4.md`](V2_4.md) · [`clientes/cedig/`](../clientes/cedig/) |
 | **Inclui** | `/interno/gestao` · tabelas de preço CEDIG · seed 4 portais · correções homologação |
-| **Publicado em** | 25/07/2026 — deploy Netlify _(id)_ (`bibi-poc-2026-07-25c`) |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a645cdc` @ `c64fc14` (`bibi-poc-2026-07-25c`) |
 
 ---
 
