@@ -89,7 +89,7 @@ export type ChangelogRelease = {
 
 ---
 
-## Exemplo — promover v2.3.0 → v2.4.0
+## Exemplo — promover v2.5.0 → v2.6.0
 
 ```ts
 // 1. Adicionar nova release no topo

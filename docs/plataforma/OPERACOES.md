@@ -217,7 +217,7 @@ Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
 
-**Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+**Dados em produção:** modo **operação** (CEDIG) por padrão; demo via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---
 

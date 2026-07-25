@@ -217,8 +217,10 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Empresa PJ | `/pj/login` | `rh@techcorp.com` | `bibi123` |
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` | `bibi123` |
+| Interno CEDIG (ADMIN) | `/interno/login?tenant=cedig` | `operacao@cedig.demo` | `bibi123` |
+| Interno CEDIG (recepção) | `/interno/login?tenant=cedig` | `alana@cedig.demo` | `bibi123` |
 
-### Tenants ServiceOS multi-nicho (v2.3)
+### Tenants ServiceOS multi-nicho (v2.6)
 
 Senha única: **`bibi123`**. Cada tenant tem procedimentos e nomenclatura do nicho.
 
@@ -231,6 +233,7 @@ Senha única: **`bibi123`**. Cada tenant tem procedimentos e nomenclatura do nic
 | Bem-estar | Zen Studio | `operacao@zen.demo` | `/?tenant=zen` |
 | Educação | EduPrime | `operacao@eduprime.demo` | `/?tenant=eduprime` |
 | Engenharia | Build Corp | `operacao@build.demo` | `/?tenant=build` |
+| Clínica CEDIG | CEDIG Cruzeiro | `operacao@cedig.demo` | `/?tenant=cedig` · gestão `/interno/gestao` |
 
 Preview por nicho (fallback): `/?niche=VET`, `/?niche=LEGAL`, `/?niche=CONSTRUCTION`, etc.
 
@@ -504,7 +507,7 @@ sistema-bibi/
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/plataforma/TESTES.md`](docs/plataforma/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v2.3.0** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
+- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v2.6.0** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
   Se retornar **503 `usage_exceeded`**, é cota do plano (não regressão de código). Workflow:
   [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
   Deploy manual — [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md) · Stop builds ON.
@@ -514,8 +517,8 @@ sistema-bibi/
 
 - **Índice por segmento (ServiceOS):**
   [`docs/README.md`](docs/README.md) · [`docs/segmentos/README.md`](docs/segmentos/README.md)
-- **Changelog v2.3 (produção atual):**
-  [`docs/versoes/V2_3.md`](docs/versoes/V2_3.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
+- **Changelog v2.6.0 (produção atual):**
+  [`docs/versoes/V2_6.md`](docs/versoes/V2_6.md) · [`docs/versoes/V2_5.md`](docs/versoes/V2_5.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md)
 - **Jornada do cliente nos 4 portais (UX, gaps e melhorias):**
@@ -562,4 +565,4 @@ sistema-bibi/
 
 ---
 
-Construído como POC evoluindo para **Sistema Bibi - ServiceOS v2.3** — infraestrutura horizontal de confiança para serviços Pay Per Use.
+Construído como POC evoluindo para **Sistema Bibi - ServiceOS v2.6.0** — infraestrutura horizontal Pay Per Use multi-nicho (piloto CEDIG).
