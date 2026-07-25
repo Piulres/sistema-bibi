@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.3.0",
+    version: "2.3.1",
     label: PLATFORM.versionLabel,
-    date: "27/06/2026",
+    date: "25/07/2026",
     status: "current",
+    summary:
+      "Versão do pacote visível no título do navegador e no rodapé da home, com documentação e produção alinhadas.",
+    highlights: [
+      {
+        title: "Identidade da versão",
+        items: [
+          "Title da aplicação com semver completo (v2.3.1)",
+          "Rodapé da home exibe ServiceOS v2.3.1",
+          "Fonte única PLATFORM.release sincronizada com package.json",
+        ],
+      },
+      {
+        title: "Operação",
+        items: [
+          "Docs e RELEASES coerentes com o deploy em produção",
+          "Stop builds Netlify ativo — publicação só por pacote fechado",
+        ],
+      },
+    ],
+    testStats: "docs:verify · openapi:verify · pre-release",
+  },
+  {
+    version: "2.3.0",
+    label: "Sistema Bibi - ServiceOS v2.3",
+    date: "27/06/2026",
+    status: "previous",
     summary:
       "Assistente operacional serverless multi-nicho, ERP Engenharia Civil e onboarding guiado em duas fases nos 4 portais.",
     highlights: [
@@ -87,40 +113,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats: "403 testes Vitest · 128 E2E · pre-release OK",
-  },
-  {
-    version: "2.1.0",
-    label: "Sistema Bibi - ServiceOS v2.1",
-    date: "24/06/2026",
-    status: "previous",
-    summary:
-      "Pacote pós-POC com segurança endurecida, assistente nos 4 portais, módulo VET (Pet), change management reversível e importação JSON/CSV.",
-    highlights: [
-      {
-        title: "Segurança",
-        items: [
-          "Validação HMAC do cookie de sessão no proxy",
-          "Rate limit em login e MFA",
-          "Headers CSP/HSTS e RBAC de usuários restrito a ADMIN",
-        ],
-      },
-      {
-        title: "Assistente operacional",
-        items: [
-          "Chat nos 4 portais com mock de 350+ gatilhos",
-          "Ações com confirmação e desambiguação multi-turno",
-          "Agendamento por procedimento sem prestador obrigatório",
-        ],
-      },
-      {
-        title: "VET / Pet",
-        items: [
-          "Entidade Pet com ficha clínica, vacinas e walk-in",
-          "APIs nos portais interno, prestador e beneficiário",
-        ],
-      },
-    ],
-    testStats: "395 testes Vitest · 128 E2E · pre-release OK",
   },
 ];
 

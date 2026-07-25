@@ -11,39 +11,28 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v2.3.0** fechado e republicado: código × GitHub × Netlify × docs alinhados.
+> Pacote **v2.3.1** — versão no title/footer da home + identidade `PLATFORM.release`.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.0** — deploy `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`) |
-| **Release `main`** | **v2.3.0** — tip sync com `dev` · tag `v2.3.0` @ `374b13e` |
-| **Integração `dev`** | **v2.3.0** — tip = `main` |
-| **Pacote anterior em produção** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.1** — deploy pendente registrar (`bibi-poc-2026-07-25b`) |
+| **Release `main` / `dev`** | **v2.3.1** (após merge deste pacote) |
+| **Pacote anterior em produção** | **2.3.0** — deploy `6a6436ef` @ `374b13e` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.0** — sync com `main` |
-| **Release** | `main` | **v2.3.0** · tag `v2.3.0` @ `374b13e` (commits só-docs após o deploy são esperados) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.0** — deploy `6a6436ef` (25/07/2026) · HTTP 200 · **Stop builds ON** |
-| **Preview** | deploy-preview | Desligado via Stop builds (publicação só manual) |
-
-### Fechamento do pacote (25/07/2026)
-
-| Item | Estado |
-|------|--------|
-| Site no ar | ✅ HTTP 200 — `#novidades` **v2.3.0** · CSS `/_next/static` 200 · logins 200 · `/api/docs` 200 |
-| `main` = `dev` | ✅ sincronizadas |
-| Tags git `v2.2.0` / `v2.3.0` | ✅ publicadas no remoto |
-| Netlify `stop_builds` | ✅ **True** — sem auto-deploy em push |
-| `pre-release` | ✅ OK antes do deploy |
-| Docs / AGENTS / rules | ✅ alinhados a produção v2.3.0 |
+| **Integração** | `dev` | **v2.3.1** |
+| **Release** | `main` | **v2.3.1** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.1** · **Stop builds ON** |
+| **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v2.3.1`** | tip release | Versão no title/footer · `PLATFORM.release` |
 | **`v2.3.0`** | `374b13e` | Assistente, construction ERP, onboarding fase 2, OpenAPI + docs alinhados |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | `cd16555` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
@@ -57,7 +46,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + onboarding fase 2)
+### `v2.3.1` — Sistema Bibi - ServiceOS (versão no title e footer)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.3.1` |
+| **Inclui** | Title com `v{PLATFORM.release}` · footer da home com versão · sync package/changelog/OpenAPI |
+| **Publicado em** | 25/07/2026 — `bibi-poc-2026-07-25b` (deploy id após publicação) |
+
+---
+
+### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + onboarding fase 2) *(substituído por v2.3.1)*
 
 | Campo | Valor |
 |-------|-------|
@@ -211,7 +210,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **2.3.x** | [`V2_3.md`](V2_3.md) | ✅ **`v2.3.0` em produção** — deploy `6a6436ef` @ `374b13e` |
+| **2.3.x** | [`V2_3.md`](V2_3.md) | ✅ **`v2.3.1` em produção** (patch: versão no title/footer) |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---

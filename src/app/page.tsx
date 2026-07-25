@@ -13,7 +13,7 @@ type PageProps = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = `${PLATFORM.name} — ${PLATFORM.tagline}`;
+  const title = `${PLATFORM.name} v${PLATFORM.release} — ${PLATFORM.tagline}`;
 
   return buildLandingMetadata({
     title,

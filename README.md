@@ -1,4 +1,4 @@
-# Sistema Bibi - ServiceOS v2.3 — Infraestrutura Pay Per Use Multi-Nicho
+# Sistema Bibi - ServiceOS v2.3.1 — Infraestrutura Pay Per Use Multi-Nicho
 
 > Plataforma **ServiceOS** multi-nicho para faturamento Pay Per Use em saúde, veterinária,
 > odontologia, jurídico, bem-estar, educação e engenharia. White label por tenant, quatro portais
@@ -6,13 +6,13 @@
 
 | | |
 |--|--|
-| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v2.3.0** · deploy `6a6436ef` (`bibi-poc-2026-07-25a`) |
-| **Código** | `main` = `dev` · tags `v2.2.0` / `v2.3.0` |
+| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v2.3.1** |
+| **Código** | `main` = `dev` · tag `v2.3.1` |
 | **Publicação** | Manual (`pre-release` → `netlify deploy --prod`) · **Stop builds ON** |
 | **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V2_3.md`](docs/versoes/V2_3.md) |
 
 > **GitHub About** (painel do repositório — a API do agente não altera Description/Website):  
-> Description: `Sistema Bibi - ServiceOS v2.3 — Infraestrutura Pay Per Use multi-nicho`  
+> Description: `Sistema Bibi - ServiceOS v2.3.1 — Infraestrutura Pay Per Use multi-nicho`  
 > Website: `https://sistema-bibi.netlify.app`
 
 ---
