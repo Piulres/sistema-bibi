@@ -12,10 +12,26 @@ A home (`/`) exibe a seção **Novidades** (`#novidades`) com o changelog curado
 |---------|-------|
 | `src/lib/landing/changelog-content.ts` | **Fonte da UI** — releases, highlights, datas, testes |
 | `src/components/landing/LandingChangelog.tsx` | Componente visual (acordeão + destaque) |
-| `src/lib/platform.ts` | `PLATFORM.version` e `PLATFORM.versionLabel` (badge do hero e changelog) |
-| `package.json` | Campo `version` (semver do pacote) |
+| `src/lib/platform.ts` | Identidade e versão — ver tabela abaixo |
+| `package.json` | Campo `version` (semver completo, igual a `PLATFORM.release`) |
 | `docs/versoes/RELEASES.md` | Registro oficial do que está em produção |
 | `docs/versoes/VX_Y.md` | Changelog detalhado da versão (ex.: `V2_1.md`) |
+
+### Campos de versão (`src/lib/platform.ts`)
+
+| Campo | Exemplo | Uso |
+|-------|---------|-----|
+| `version` | `"2.3"` | Major.minor — prefixo de marketing e agrupamento de changelog |
+| `release` | `"2.3.1"` | Semver completo — **title**, **footer**, `package.json`, OpenAPI |
+| `versionLabel` | `"Sistema Bibi - ServiceOS v2.3.1"` | Badges do hero, login, segment banner |
+
+**Onde a versão aparece na UI (desde v2.3.1):**
+
+| Superfície | Fonte | Formato |
+|------------|-------|---------|
+| `<title>` / metadata (`layout.tsx`) | `PLATFORM.release` | `… v2.3.1 — …` |
+| Footer copyright (`LandingFooter`) | `PLATFORM.release` | `v2.3.1` · `ServiceOS v2.3.1` |
+| Badge do hero / changelog | `PLATFORM.versionLabel` | `Sistema Bibi - ServiceOS v2.3.1` |
 
 ---
 
@@ -37,7 +53,10 @@ A home (`/`) exibe a seção **Novidades** (`#novidades`) com o changelog curado
 Execute **na mesma sessão** que atualiza `RELEASES.md` e `src/lib/platform.ts`:
 
 - [ ] `package.json` → `"version": "X.Y.Z"`
-- [ ] `src/lib/platform.ts` → `version: "X.Y"` e `versionLabel: "Sistema Bibi - ServiceOS vX.Y"`
+- [ ] `src/lib/platform.ts`:
+  - [ ] `version: "X.Y"` (major.minor)
+  - [ ] `release: "X.Y.Z"` (semver completo — **igual** ao `package.json`)
+  - [ ] `versionLabel: "Sistema Bibi - ServiceOS vX.Y.Z"`
 - [ ] `src/lib/landing/changelog-content.ts`:
   - [ ] Nova release no topo de `CHANGELOG_RELEASES` com `status: "current"`
   - [ ] Release anterior com `status: "previous"` (manter no máximo **2–3** releases na home)
@@ -75,7 +94,7 @@ Execute **na mesma sessão** que atualiza `RELEASES.md` e `src/lib/platform.ts`:
 
 ```ts
 export type ChangelogRelease = {
-  version: string;           // "2.3.0" — alinhar com package.json
+  version: string;           // "2.3.1" — alinhar com package.json / PLATFORM.release
   label: string;             // PLATFORM.versionLabel na release current
   date: string;              // "27/06/2026"
   status: "current" | "previous";
@@ -85,11 +104,11 @@ export type ChangelogRelease = {
 };
 ```
 
-**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **2.3.0**).
+**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **2.3.1**).
 
 ---
 
-## Exemplo — promover v2.3.0 → v2.4.0
+## Exemplo — promover v2.3.1 → v2.4.0
 
 ```ts
 // 1. Adicionar nova release no topo
@@ -106,8 +125,8 @@ export type ChangelogRelease = {
 },
 // 2. Rebaixar a anterior
 {
-  version: "2.3.0",
-  label: "Sistema Bibi - ServiceOS v2.3",
+  version: "2.3.1",
+  label: "Sistema Bibi - ServiceOS v2.3.1",
   status: "previous",
   // ...
 },
@@ -121,8 +140,8 @@ Remover releases muito antigas da home (manter 2–3). Histórico completo perma
 
 `npm run docs:verify` verifica:
 
-- `package.json#version` = primeira release `current` em `changelog-content.ts`
-- `PLATFORM.version` é prefixo da versão current (ex.: `"2.3"` ↔ `"2.3.0"`)
+- `package.json#version` = `PLATFORM.release` = primeira release `current` em `changelog-content.ts`
+- `PLATFORM.version` é prefixo major.minor da versão current (ex.: `"2.3"` ↔ `"2.3.1"`)
 
 ---
 

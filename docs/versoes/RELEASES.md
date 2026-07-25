@@ -302,7 +302,7 @@ A seção **Novidades** (`/#novidades`) apresenta o changelog para demonstraçõ
 | Momento | Arquivo |
 |---------|---------|
 | Ao fechar pacote | `src/lib/landing/changelog-content.ts` |
-| Junto com release | `src/lib/platform.ts`, `package.json` |
+| Junto com release | `src/lib/platform.ts` (`release`, `versionLabel`), `package.json` |
 | Instruções completas | [`../plataforma/LANDING_CHANGELOG.md`](../plataforma/LANDING_CHANGELOG.md) |
 
 **Regra:** quando este arquivo marca uma versão como **em produção**, a home deve exibir a mesma versão em destaque. `npm run docs:verify` valida o alinhamento.

@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (25/07/2026):** **v2.3.0** — deploy `6a6436ef` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_3.md`](../versoes/V2_3.md).
+**Produção (25/07/2026):** **v2.3.1** — patch title/footer · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_3.md`](../versoes/V2_3.md).
 
 ---
 
