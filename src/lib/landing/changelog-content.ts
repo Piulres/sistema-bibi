@@ -1,78 +1,184 @@
-import type { LandingChangelogContent } from "@/lib/landing/types";
+import { PLATFORM } from "@/lib/platform";
+
+export type ChangelogHighlight = {
+  title: string;
+  items: string[];
+};
+
+export type ChangelogRelease = {
+  version: string;
+  label: string;
+  date: string;
+  status: "current" | "previous";
+  summary: string;
+  highlights: ChangelogHighlight[];
+  testStats?: string;
+};
 
 /**
- * Conteúdo da seção #novidades na home.
- * Atualizar ao fechar cada pacote — ver docs/plataforma/LANDING_CHANGELOG.md
- * e docs/versoes/RELEASES.md.
+ * Changelog curado da landing (#novidades).
+ *
+ * Fonte de verdade da UI — não parsear RELEASES.md em runtime.
+ * Manutenção obrigatória ao fechar pacote: docs/plataforma/LANDING_CHANGELOG.md
+ *
+ * Sincronizar com: package.json, src/lib/platform.ts, docs/versoes/RELEASES.md, VX_Y.md
+ * Validar: npm run docs:verify
  */
-export const landingChangelog: LandingChangelogContent = {
-  eyebrow: "Novidades",
-  title: "O que há de novo no Sistema Bibi",
-  subtitle:
-    "Pacotes fechados do ServiceOS — do multi-segmento ao núcleo clínico CEDIG com pontes Pay Per Use.",
-  currentRelease: {
+export const CHANGELOG_RELEASES: ChangelogRelease[] = [
+  {
     version: "2.6.0",
-    dateLabel: "Julho 2026",
-    badge: "Pronto para produção",
+    label: PLATFORM.versionLabel,
+    date: "25/07/2026",
+    status: "current",
     summary:
-      "CEDIG ponta a ponta (fase 2+F): gestão clínica → Patient/Appointment/PPU, export financeiro, labels, PJ×3 e E2E. Empilha o login tenant/portal da v2.5.0.",
+      "CEDIG fase 2+F: o lançamento na gestão alimenta agenda, extrato PPU e fatura; export do mês; empilha login tenant/portal (v2.5).",
     highlights: [
       {
-        title: "Ponte clínica → Pay Per Use",
-        description:
-          "ClinicExamLaunch vira Patient + Appointment REALIZADO + ProcedureUsage + Invoice (e Payment quando não é convênio), com FKs rastreáveis.",
+        title: "Fluxo ponta a ponta",
+        items: [
+          "Lançamento gera Appointment REALIZADO + ProcedureUsage + Invoice/Payment",
+          "Agenda → botão Lançar na gestão com dados pré-preenchidos",
+          "Convênio fecha fatura na empresa; particular marca pagamento",
+        ],
       },
       {
-        title: "Export financeiro CEDIG",
-        description:
-          "CSV por competência no portal interno — lançamentos, exames e totais alinhados à clínica.",
-      },
-      {
-        title: "White-label + PJ CEDIG",
-        description:
-          "Labels CLINIC_* no dicionário, três empresas demo (CentralMed, Bem Saúde, Dr Saúde) e E2E da ponte no CI.",
-      },
-      {
-        title: "Login com tenant e portal (v2.5)",
-        description:
-          "Campo de tenant digitável, seletor de portal e validação de acesso — base empilhada neste pacote.",
+        title: "Operação",
+        items: [
+          "Exportar mês (Excel) em /interno/gestao",
+          "READONLY não altera lançamentos/despesas",
+          "Coluna Ponte na lista de lançamentos (SYNCED / PARTIAL / FAILED)",
+        ],
       },
     ],
+    testStats: "clinic-finance-bridge · e2e/cedig-gestao 6/6 · docs:verify · lint",
   },
-  previousReleases: [
-    {
-      version: "2.5.0",
-      title: "Login com tenant e seletor de portal",
-      summary:
-        "Campo de tenant digitável, seletor de portal e validação de acesso — base da v2.6.",
-    },
-    {
-      version: "2.4.0",
-      title: "Núcleo clínico CEDIG",
-      summary:
-        "Módulo clínico no Interno: pacientes, agenda, prontuário, financeiro e convênios — sem faturamento PPU.",
-    },
-    {
-      version: "2.3.0",
-      title: "Dual-store e operação limpa",
-      summary:
-        "Seletor demo/operação, operation.db sem massa fictícia e bootstrap CEDIG na clínica.",
-    },
-    {
-      version: "2.2.0",
-      title: "White-label e multi-tenant",
-      summary:
-        "Landing por segmento, login com escopo de tenant e isolamento de dados por clínica.",
-    },
-    {
-      version: "2.1.0",
-      title: "ServiceOS multi-segmento",
-      summary:
-        "Pay Per Use horizontal, seis nichos e quatro portais com labels por tenant.",
-    },
-  ],
-  cta: {
-    label: "Ver documentação de releases",
-    href: "https://github.com/Piulres/sistema-bibi/blob/main/docs/versoes/RELEASES.md",
+  {
+    version: "2.5.0",
+    label: "Sistema Bibi - ServiceOS v2.5.0",
+    date: "25/07/2026",
+    status: "previous",
+    summary:
+      "Login com tenant digitável e seletor de portal — empilhado no pacote v2.6.0.",
+    highlights: [
+      {
+        title: "Acesso",
+        items: [
+          "Campo de tenant (slug) no login",
+          "Seletor de portal Prestador / Interno / PJ / Beneficiário",
+          "Validação de acesso por tenant + role (login-access.ts)",
+        ],
+      },
+    ],
+    testStats: "login-access · docs:verify · lint",
   },
-};
+  {
+    version: "2.4.0",
+    label: "Sistema Bibi - ServiceOS v2.4.0",
+    date: "25/07/2026",
+    status: "previous",
+    summary:
+      "Piloto CEDIG Cruzeiro: gestão clínica com lançamentos, despesas e indicadores automáticos — a secretária lança, o sistema calcula.",
+    highlights: [
+      {
+        title: "Gestão clínica (CEDIG)",
+        items: [
+          "Nova aba /interno/gestao — lançamentos por paciente, despesas e KPIs",
+          "Tabelas Particular, CentralMed, Bem Saúde e Dr Saúde com valor sugerido",
+          "Produção por médico, frascos de biópsia, ticket médio e lucro operacional",
+        ],
+      },
+    ],
+    testStats: "clinic-finance · RBAC · pre-release",
+  },
+  {
+    version: "2.3.1",
+    label: "Sistema Bibi - ServiceOS v2.3.1",
+    date: "25/07/2026",
+    status: "previous",
+    summary:
+      "Versão do pacote visível no título do navegador e no rodapé da home, com documentação e produção alinhadas.",
+    highlights: [
+      {
+        title: "Identidade da versão",
+        items: [
+          "Title da aplicação com semver completo (v2.3.1)",
+          "Rodapé da home exibe ServiceOS v2.3.1",
+          "Fonte única PLATFORM.release sincronizada com package.json",
+        ],
+      },
+    ],
+    testStats: "docs:verify · openapi:verify · pre-release",
+  },
+  {
+    version: "2.3.0",
+    label: "Sistema Bibi - ServiceOS v2.3",
+    date: "27/06/2026",
+    status: "previous",
+    summary:
+      "Assistente operacional serverless multi-nicho, ERP Engenharia Civil e onboarding guiado em duas fases nos 4 portais.",
+    highlights: [
+      {
+        title: "Assistente operacional",
+        items: [
+          "Estado de sessão assinado (HMAC) — confirmação de ações funciona na Netlify",
+          "RAG e procedimentos adaptados ao catálogo e vocabulário de cada nicho",
+          "Copiloto contextual com sugestões por página nos 4 portais",
+          "VET: agendamento tutor + pet com busca e auto-seleção",
+        ],
+      },
+      {
+        title: "Engenharia Civil",
+        items: [
+          "ERP empreiteira: pipeline, obras, orçamentos, BDI, caixa e diário de campo",
+          "Portais interno, prestador (campo), PJ e beneficiário (obras)",
+          "Dupla aprovação, metas e pipeline comercial → obra",
+        ],
+      },
+      {
+        title: "Onboarding e plataforma",
+        items: [
+          "Tour em duas fases + micro-tours por módulo, mobile e hotspots",
+          "OpenAPI 123 rotas + Swagger UI em /api/docs",
+          "Massas demo enriquecidas multi-segmento",
+        ],
+      },
+    ],
+    testStats: "495 testes Vitest · 138 E2E · pre-release OK",
+  },
+  {
+    version: "2.2.0",
+    label: "Sistema Bibi - ServiceOS v2.2",
+    date: "25/06/2026",
+    status: "previous",
+    summary:
+      "Tour guiado de onboarding nos 4 portais com spotlight, hotspots pulsantes e textos adaptados por nicho.",
+    highlights: [
+      {
+        title: "Onboarding guiado",
+        items: [
+          "Product tour automático na primeira visita a cada portal",
+          "Spotlight, hotspots e tooltips posicionados automaticamente",
+          "Passos contextuais por rota (faturamento, agenda, agendar…)",
+          "Botão Tour no header para reiniciar o guia a qualquer momento",
+        ],
+      },
+      {
+        title: "Multi-nicho",
+        items: [
+          "Textos do tour usam labels do tenant (paciente, pet, cliente…)",
+          "Tours dedicados: interno, prestador, PJ e beneficiário",
+        ],
+      },
+    ],
+    testStats: "403 testes Vitest · 128 E2E · pre-release OK",
+  },
+];
+
+export const CURRENT_RELEASE = CHANGELOG_RELEASES[0];
+
+export const CHANGELOG_SECTION = {
+  eyebrow: "Novidades",
+  title: "O que há de novo na demonstração",
+  description:
+    "Acompanhe as entregas do ServiceOS — pacotes fechados com funcionalidades prontas para explorar nos portais de demonstração.",
+} as const;
