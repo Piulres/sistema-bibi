@@ -24,10 +24,10 @@ Checklist de execução após merge na **`dev`**. Atualizar status manualmente.
 |---|------|-------------|--------|
 | 6 | Merge `dev` → `main` (fechar pacote v2.3.x) | Humano | ✅ 25/07/2026 |
 | 7 | `npm run pre-release` na `main` | Humano / agente | ✅ 25/07/2026 |
-| 8 | Deploy produção `npx netlify deploy --prod` | Humano / agente | ✅ `6a6436ef` (`bibi-poc-2026-07-25a`) |
-| 9 | Atualizar `RELEASES.md` + `changelog-content.ts` | Humano / agente | ✅ v2.3.0 em produção |
+| 8 | Deploy produção `npx netlify deploy --prod` | Humano / agente | ✅ `6a643a0d` (`bibi-poc-2026-07-25b`, patch v2.3.1) |
+| 9 | Atualizar `RELEASES.md` + `changelog-content.ts` | Humano / agente | ✅ v2.3.1 em produção |
 
-**Produção atual:** **v2.3.0** — ver [`RELEASES.md`](../versoes/RELEASES.md). Landing v4 e campanhas Q3 já podem usar o site publicado.
+**Produção atual:** **v2.3.1** — ver [`RELEASES.md`](../versoes/RELEASES.md). Title/footer exibem `PLATFORM.release`; landing v4 e campanhas Q3 já podem usar o site publicado.
 
 ---
 

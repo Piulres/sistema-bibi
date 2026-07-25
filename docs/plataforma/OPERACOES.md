@@ -197,7 +197,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v2.3.1`** — **Sistema Bibi - ServiceOS** (`bibi-poc-2026-07-25b`). Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -212,7 +212,7 @@ Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver 
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v2.3.0** · Stop builds **ON**  
+**Produção:** https://sistema-bibi.netlify.app · **v2.3.1** · Stop builds **ON**  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
@@ -284,6 +284,7 @@ Pedido de validação
 | Quando | Atualizar |
 |--------|-----------|
 | Fechar pacote em produção | `docs/versoes/RELEASES.md` |
+| Versão visível (title/footer) | `src/lib/platform.ts` (`PLATFORM.release`), `changelog-content.ts` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md) |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |

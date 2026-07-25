@@ -41,6 +41,8 @@ Relação 1:1 com `Tenant`. O seed cria dois tenants demo:
 
 **Sistema Bibi - ServiceOS** é a marca da **plataforma** (landing/marketing), não de um tenant. Ver `PLATFORM_BRANDING` em `src/lib/theme/tokens.ts` e `PLATFORM` em `src/lib/platform.ts`.
 
+**Versão visível na UI:** `PLATFORM.release` (semver completo) alimenta o `<title>`, metadados (`layout.tsx`) e o rodapé da home (`LandingFooter`). Manutenção ao fechar pacote: [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md).
+
 ## Identidade visual — Energia Brasileira
 
 Paleta padrão da plataforma (v2.0):

@@ -504,7 +504,7 @@ sistema-bibi/
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/plataforma/TESTES.md`](docs/plataforma/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v2.3.0** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
+- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v2.3.1** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
   Se retornar **503 `usage_exceeded`**, é cota do plano (não regressão de código). Workflow:
   [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
   Deploy manual — [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md) · Stop builds ON.
