@@ -75,9 +75,9 @@ Execute **na mesma sessão** que atualiza `RELEASES.md` e `src/lib/platform.ts`:
 
 ```ts
 export type ChangelogRelease = {
-  version: string;           // "2.1.0" — alinhar com package.json
+  version: string;           // "2.3.0" — alinhar com package.json
   label: string;             // PLATFORM.versionLabel na release current
-  date: string;              // "24/06/2026"
+  date: string;              // "27/06/2026"
   status: "current" | "previous";
   summary: string;
   highlights: { title: string; items: string[] }[];
@@ -85,16 +85,16 @@ export type ChangelogRelease = {
 };
 ```
 
-**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current`.
+**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **2.3.0**).
 
 ---
 
-## Exemplo — promover v2.1.0 → v2.2.0
+## Exemplo — promover v2.3.0 → v2.4.0
 
 ```ts
 // 1. Adicionar nova release no topo
 {
-  version: "2.2.0",
+  version: "2.4.0",
   label: PLATFORM.versionLabel,
   date: "DD/MM/AAAA",
   status: "current",
@@ -106,8 +106,8 @@ export type ChangelogRelease = {
 },
 // 2. Rebaixar a anterior
 {
-  version: "2.1.0",
-  label: "Sistema Bibi - ServiceOS v2.1",
+  version: "2.3.0",
+  label: "Sistema Bibi - ServiceOS v2.3",
   status: "previous",
   // ...
 },
@@ -122,7 +122,7 @@ Remover releases muito antigas da home (manter 2–3). Histórico completo perma
 `npm run docs:verify` verifica:
 
 - `package.json#version` = primeira release `current` em `changelog-content.ts`
-- `PLATFORM.version` é prefixo da versão current (ex.: `"2.1"` ↔ `"2.1.0"`)
+- `PLATFORM.version` é prefixo da versão current (ex.: `"2.3"` ↔ `"2.3.0"`)
 
 ---
 

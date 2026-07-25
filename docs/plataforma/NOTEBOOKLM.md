@@ -1,4 +1,4 @@
-# Sistema Bibi - ServiceOS v2.0 — Base de Conhecimento (NotebookLM)
+# Sistema Bibi - ServiceOS v2.3 — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 Última atualização: reflete **ServiceOS v2.0** (multi-nicho), **white label** (tema escuro, logos Blobs),
@@ -393,10 +393,10 @@ src/
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção:
+- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v2.3.0**:
   https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
-  Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual).
-  Pode retornar **503 `usage_exceeded`** (cota Netlify — não é bug de código).
+  Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual; Stop builds ON).
+  Se retornar **503 `usage_exceeded`**, é cota Netlify — não é bug de código.
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
 - Validação XSD TISS completa pendente (export XML mock — Tier 4)
 - Verificação de domínio custom é manual na POC (sem challenge DNS automático)
@@ -408,7 +408,7 @@ src/
 | Documento | Conteúdo |
 |-----------|----------|
 | `docs/README.md` | Índice da documentação por segmento |
-| `docs/segmentos/README.md` | Segmentos ServiceOS v2.0 |
+| `docs/segmentos/README.md` | Segmentos ServiceOS (multi-nicho) |
 | `docs/produto/FLUXOS.md` | Fluxos de usuário e negócio (todos os portais) |
 | `docs/produto/JORNADA_CLIENTE.md` | Jornada UX nos 4 portais, gaps e backlog priorizado |
 | `docs/plataforma/BENCHMARK.md` | Matriz Ações × Benchmark (iClinic, Feegow, ERPMed) |

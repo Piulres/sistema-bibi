@@ -6,15 +6,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Cursor Cloud specific instructions
 
-### O que é o Sistema Bibi - ServiceOS (v2.0)
+### O que é o Sistema Bibi - ServiceOS (v2.3)
 Infraestrutura horizontal **ServiceOS** — plataforma **multi-segmento** Pay Per Use com **quatro portais**
 segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
 (`/beneficiario/login` → `/beneficiario`). Núcleo de negócio: faturamento
 **Pay Per Use** sobre qualquer tipo de serviço (consulta médica, hora jurídica, aula de yoga…).
 
-**Multi-nicho (v2.0):** cada `Tenant` possui `niche` (`MEDICAL`|`VET`|`DENTAL`|`LEGAL`|`SPA`|`EDUCATION`)
-e `labels` (JSON) para tradução automática da UI.
+**Multi-nicho:** cada `Tenant` possui `niche`
+(`MEDICAL`|`VET`|`DENTAL`|`LEGAL`|`SPA`|`EDUCATION`|`CONSTRUCTION`) e `labels` (JSON) para UI.
 
 **Dicionário mestre (obrigatório):** `src/constants/niches.ts` — `NICHE_MASTER_LABELS` com todas as chaves tipadas (`NicheLabelKey`). Novo nicho = novo bloco aqui; o TypeScript falha se faltar termo.
 
@@ -36,18 +36,19 @@ e `labels` (JSON) para tradução automática da UI.
 | LEGAL | Cliente | Advogado | Serviço jurídico | Atendimento | Cliente |
 | SPA | Cliente | Profissional | Sessão | Agendamento | Cliente |
 | EDUCATION | Aluno | Instrutor | Aula | Aula | Aluno |
+| CONSTRUCTION | Cliente | Engenheiro | Serviço de obra | Obra | Cliente |
 
 \* Demo PetCare no seed sobrescreve `appointment` → "Banho/Tosa" via `Tenant.labels`.
 
-Paletas white label por nicho. Ver `docs/versoes/V2_0.md` e `docs/versoes/V2_0_ARCHITECTURE.md`.
+Paletas white label por nicho. Ver `docs/versoes/V2_3.md`, `docs/versoes/V2_0.md` e `docs/versoes/V2_0_ARCHITECTURE.md`.
 
 **Tiers mergeados (PRs #17–#23):** ciclo de receita (PIX mock), operação (CRUD,
 agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
-**Produção:** https://sistema-bibi.netlify.app — pode retornar **503 `usage_exceeded`**
-(cota Netlify). Produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md` (deploy atual).
+**Produção:** **`v2.3.0`** @ https://sistema-bibi.netlify.app · deploy `6a6436ef` · ver `docs/versoes/RELEASES.md`.
+Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON** — deploy só manual.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).

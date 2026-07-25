@@ -10,17 +10,18 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 
 ---
 
-## Status atual (24/06/2026)
+## Status atual (25/07/2026)
 
 | Item | Estado |
 |------|--------|
-| Site principal | ✅ https://sistema-bibi.netlify.app |
-| Pacote em produção | **`v2.1.0`** — deploy `6a3bc7a4` @ `40e2dfc` |
-| Pacote anterior (quebrado) | deploys `6a3b8768`–`6a3b8917` — assets `/_next/static` em 404 |
-| `main` / `dev` | Sincronizadas em **`40e2dfc`** |
+| Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
+| Pacote em produção | **`v2.3.0`** — deploy `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`) |
+| Pacote anterior | **`v2.2.0`** — deploy `6a3ea6c5` @ `2c38248` |
+| `main` / `dev` | Sincronizadas · tip com docs de release (`544baa1+`) |
+| Tags git | ✅ `v2.2.0` · `v2.3.0` |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
-| Deploy Git automático | ⚠️ **Desligar** — ver [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) |
+| Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
 | Prisma `binaryTargets` | ✅ `native` + `rhel-openssl-3.0.x` |
 
@@ -70,7 +71,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | `COMMUNICATION_PROVIDER` | Não | `console` (POC) ou `sendgrid`/`twilio`/`meta` |
 | `TELEMEDICINE_BASE_URL` | Não | URL base das salas virtuais mock |
 | `SEED_SCALE` | Não | `medium` — volume do seed no build |
-| `ALLOW_DEMO_RESET` | Não | `true` — botão restaurar demo na UI |
+| `ALLOW_DEMO_RESET` | Não | `false` em produção / `true` em deploy-preview |
 | `NETLIFY` | Auto | `true` (já no `netlify.toml`) |
 | `NODE_VERSION` | Não | `22` (já no `netlify.toml`) |
 

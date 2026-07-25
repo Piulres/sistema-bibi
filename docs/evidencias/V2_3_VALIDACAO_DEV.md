@@ -56,11 +56,10 @@ Login: `faturamento@bibi.health` → tour principal. Depois navegue para `/inter
 
 ## Pendências conhecidas
 
-- **Produção** ainda em v2.2.0 — pacote v2.3.0 aguarda `netlify deploy --prod`
-- OpenAPI UI exibe versão legada no título Swagger (metadado `openapi.yaml`) — não bloqueia funcionalidade
+- ~~Produção em v2.2.0~~ → **resolvido 25/07/2026:** produção **v2.3.0** · deploy `6a6436ef` (`bibi-poc-2026-07-25a`) · tags `v2.2.0`/`v2.3.0`
 
 ---
 
-## Próximo passo
+## Publicação
 
-Deploy manual após aprovação: `npm run pre-release` → `npx netlify deploy --prod`
+✅ `npm run pre-release` → `npx netlify deploy --prod` · registrado em [`RELEASES.md`](../versoes/RELEASES.md).

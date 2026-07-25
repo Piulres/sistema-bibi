@@ -16,16 +16,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **2.3.0** — deploy `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`) |
-| **Release `main`** | **v2.3.0** — tip `374b13e` · tag `v2.3.0` |
-| **Integração `dev`** | **v2.3.0** — tip = `main` (`374b13e`) |
+| **Release `main`** | **v2.3.0** — tip sync com `dev` · tag `v2.3.0` @ `374b13e` |
+| **Integração `dev`** | **v2.3.0** — tip = `main` |
 | **Pacote anterior em produção** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.0** — tip `374b13e` (sync com `main`) |
-| **Release** | `main` | **v2.3.0** — tip `374b13e` · tag `v2.3.0` |
+| **Integração** | `dev` | **v2.3.0** — sync com `main` |
+| **Release** | `main` | **v2.3.0** · tag `v2.3.0` @ `374b13e` (commits só-docs após o deploy são esperados) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v2.3.0** — deploy `6a6436ef` (25/07/2026) · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds (publicação só manual) |
 
@@ -34,7 +34,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Item | Estado |
 |------|--------|
 | Site no ar | ✅ HTTP 200 — `#novidades` **v2.3.0** · CSS `/_next/static` 200 · logins 200 · `/api/docs` 200 |
-| `main` = `dev` | ✅ tip `374b13e` |
+| `main` = `dev` | ✅ sincronizadas |
 | Tags git `v2.2.0` / `v2.3.0` | ✅ publicadas no remoto |
 | Netlify `stop_builds` | ✅ **True** — sem auto-deploy em push |
 | `pre-release` | ✅ OK antes do deploy |
