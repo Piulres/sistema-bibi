@@ -62,7 +62,7 @@ Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .e
 | **Obrigatória** | Sim |
 | **Formato** | `file:./dev.db` (path relativo ao `prisma/schema.prisma`) |
 | **Onde** | `prisma/schema.prisma`, `src/lib/db.ts` |
-| **Comportamento** | Em **Lambda/Netlify**, `db.ts` copia `prisma/dev.db` → `/tmp/bibi-dev.db` (único diretório gravável). No build CI, não redireciona para `/tmp`. |
+| **Comportamento** | Com `DUAL_DATA_STORE=true`, `getPrisma()` resolve `demo.db` ou `operation.db` (local) ou `/tmp/bibi-*.db` (Lambda). Sem dual-store, em Lambda copia `prisma/dev.db` → `/tmp`. No build CI, não redireciona para `/tmp`. |
 
 ```env
 DATABASE_URL="file:./dev.db"

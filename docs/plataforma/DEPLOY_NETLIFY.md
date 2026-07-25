@@ -166,6 +166,8 @@ Configure scheduled functions ou serviço externo para chamar:
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
 | Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
+| Prestador/cadastro some após criar (modo operação) | Versão antiga sem flush imediato ou login no tenant errado | Deploy ≥ `2.4.0h` (`673c507`); criar em operação; login prestador com `?tenant={slug}` (ex.: `cedig`) |
+| Login prestador recém-criado falha | Portal ou tenant incorreto | `/login?tenant=cedig` — mensagem de mismatch indica o slug correto |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
 | Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
 

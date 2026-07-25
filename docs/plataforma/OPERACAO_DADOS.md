@@ -19,7 +19,7 @@ O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados �
 
 - Configuração persistida em **Netlify Blobs** (`bibi-config/data-store-mode`)
 - Banco de **operação** persistido em **Netlify Blobs** (`bibi-databases/operation.db`)
-- Escritas no modo operação são salvas automaticamente após mutações (debounce ~1,5s)
+- Escritas no modo operação fazem **flush imediato** no Blob após cada mutação Prisma (create/update/delete)
 
 **Sem Postgres:** a operação real usa SQLite + Blobs como armazenamento compartilhado entre instâncias Lambda.
 
@@ -99,7 +99,21 @@ Para voltar à demo: confirmar com `DEMO`.
 
 **Proteção:** com o site em **operação**, acessar `/segmentos/*`, `?tenant=petcare` ou e-mails demo **não** rebaixa automaticamente para demo (isso apagava walk-ins na Netlify). Só o ADMIN em Segurança volta à demo.
 
-**Persistência:** escritas no modo operação fazem flush imediato no Blob (não só debounce 1,5s). Cada `getPrisma()` rehidrata `/tmp` se o Blob estiver mais novo — evita prestador/walk-in “criado e sumiu” entre Lambdas.
+### Persistência Lambda (modo operação)
+
+Na Netlify, cada instância Lambda mantém o SQLite em `/tmp/bibi-operation.db` (único diretório gravável). O Blob `bibi-databases/operation.db` é a fonte compartilhada entre cold starts.
+
+| Etapa | O que acontece | Código |
+|-------|----------------|--------|
+| **Leitura** | `getPrisma()` compara `metadata.updatedAt` do Blob com a cópia local; se o remoto for mais novo, rehidrata `/tmp` e invalida o cache Prisma | `syncOperationDatabaseFromBlob()` em `db.ts` |
+| **Escrita** | Após cada mutação Prisma (create/update/delete), grava o arquivo inteiro no Blob com `updatedAt` ISO | `flushOperationDatabasePersist()` via extensão `$extends` em `db.ts` |
+| **Consistência** | Store Blobs com `consistency: "strong"`; não rehidrata enquanto houver flush pendente | `sqlite-blob-persistence.ts` |
+
+**Sintoma corrigido (deploy `2.4.0h`):** prestador ou walk-in “criado e sumiu” — o debounce de 1,5s perdia writes se a Lambda encerrasse antes do timer; a leitura seguinte podia cair em outra instância com `/tmp` desatualizado.
+
+**Login de prestador criado em operação:** usar o portal correto com o tenant da conta — ex.: `/login?tenant=cedig` (não `/interno/login`). Em mismatch de tenant, a mensagem de login indica o `?tenant=` esperado (`buildSegmentMismatchMessage`).
+
+**Dev local:** sem Lambda, o SQLite fica em `prisma/operation.db` — flush e rehidratação do Blob não se aplicam.
 
 ### Provisionar CEDIG na operação
 

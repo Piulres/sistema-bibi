@@ -152,7 +152,7 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | Modo | Conteúdo | Persistência em produção |
 |------|----------|--------------------------|
 | **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
-| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
+| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs — flush imediato após write + rehidratação em `getPrisma()` |
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 

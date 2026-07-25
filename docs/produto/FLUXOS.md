@@ -574,6 +574,8 @@ Quando `DUAL_DATA_STORE=true` (dev e Netlify):
 2. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local.
 3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
 4. APIs usam `getPrisma()` → banco conforme modo ativo.
+5. **Modo operação na Lambda:** cada write Prisma faz flush imediato em `bibi-databases/operation.db`; cada `getPrisma()` rehidrata `/tmp` se o Blob tiver `updatedAt` mais novo (`db.ts` + `sqlite-blob-persistence.ts`). Evita cadastros que “somem” entre instâncias.
+6. **Prestador criado em operação:** login em `/login?tenant={slug}` do tenant da conta (ex.: CEDIG → `?tenant=cedig`).
 
 ### 8.8 Persistência de segmento (landing)
 
