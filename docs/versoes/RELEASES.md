@@ -11,40 +11,38 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v2.6.0** — CEDIG fase 2+F + login v2.5.0 **pronto para deploy**.  
-> Produção ainda em **v2.4.0** até `npx netlify deploy --prod` (humano).
+> Pacote **v2.6.0** — CEDIG fase 2+F + login v2.5.0 **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a64feeb` @ `673c507` (`bibi-poc-2026-07-25h`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.6.0** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release código (`dev` / `main`)** | **v2.6.0** — pronto para publish · empilha v2.5.0 |
+| **Release `main` / `dev`** | **v2.6.0** · tag `v2.6.0` |
 | **Pacote anterior em produção** | **2.4.0** — CEDIG gestão clínica |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.6.0** (login + CEDIG pontes + skill agentes) |
-| **Release** | `main` | **v2.6.0** após merge de release · prod ainda 2.4.0 |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.4.0** · **Stop builds ON** · aguarda deploy manual |
+| **Integração** | `dev` | **v2.6.0** |
+| **Release** | `main` | **v2.6.0** · tag `v2.6.0` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.6.0** · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
-### Smoke (25/07/2026) — produção atual v2.4.0
+### Smoke (25/07/2026) — produção v2.6.0
 
 | Check | Resultado |
 |-------|-----------|
-| Title | `Sistema Bibi - ServiceOS v2.4.0 — …` |
-| Footer | `ServiceOS v2.4.0` |
+| Title | `Sistema Bibi - ServiceOS v2.6.0 — …` |
 | CSS `/_next/static` | 200 |
-| `#novidades` | current **2.6.0** no código · prod ainda 2.4.0 até deploy |
-| Modo operação + Alana CEDIG | OK (`provision-cedig`) |
+| `#novidades` | current **2.6.0** |
+| Logins `/login`, `/interno/login`, `/pj/login`, `/beneficiario/login` | 200 |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.6.0`** | _(após deploy)_ | CEDIG fase 2+F — ponte PPU + export + v2.5 login |
+| **`v2.6.0`** | `579f686` | CEDIG fase 2+F — ponte PPU + export + v2.5 login · #186–#189 · #193 |
 | **`v2.5.0`** | _(empilhado)_ | Login tenant digitável + seletor de portal · PR #186 |
 | **`v2.4.0`** | `c64fc14` | CEDIG gestão clínica · PR #169 |
 | **`v2.3.1`** | `12148ce` | Versão no title/footer · `PLATFORM.release` |
@@ -61,26 +59,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.6.0` — Sistema Bibi - ServiceOS (CEDIG fase 2+F · pontes) *(pronto para deploy)*
+### `v2.6.0` — Sistema Bibi - ServiceOS (CEDIG fase 2+F · pontes)
 
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.6.0` |
-| **Commit publicado** | _(preencher pós-deploy)_ |
-| **PRs** | [#186](https://github.com/Piulres/sistema-bibi/pull/186) · [#187](https://github.com/Piulres/sistema-bibi/pull/187) · [#188](https://github.com/Piulres/sistema-bibi/pull/188) |
+| **Commit publicado** | `579f686` |
+| **PRs** | [#186](https://github.com/Piulres/sistema-bibi/pull/186) · [#187](https://github.com/Piulres/sistema-bibi/pull/187) · [#188](https://github.com/Piulres/sistema-bibi/pull/188) · [#189](https://github.com/Piulres/sistema-bibi/pull/189) · [#193](https://github.com/Piulres/sistema-bibi/pull/193) |
 | **Doc** | [`V2_6.md`](V2_6.md) · [`V2_5.md`](V2_5.md) · [`clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) |
-| **Inclui** | Ponte gestão→Patient/Appointment/PPU/Invoice · export CSV · labels CLINIC_* · PJ×3 · E2E · login tenant/portal (v2.5) · skill agentes |
-| **Publicado em** | _(aguardando `netlify deploy --prod` — humano)_ |
-
-### Publicação (humano)
-
-```bash
-git checkout main && git pull origin main
-npm run pre-release
-npx netlify deploy --prod   # NÃO usar --no-build
-```
-
-Depois: marcar esta seção como **publicado**, topo “Produção: v2.6.0”, tag `v2.6.0`.
+| **Inclui** | Ponte gestão→Patient/Appointment/PPU/Invoice · export · labels CLINIC_* · PJ×3 · E2E · login tenant/portal (v2.5) · skill agentes · matriz CRUD testes |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
 
 ---
 
@@ -96,7 +84,7 @@ Depois: marcar esta seção como **publicado**, topo “Produção: v2.6.0”, t
 
 ---
 
-### `v2.4.0` — Sistema Bibi - ServiceOS (CEDIG gestão clínica) *(em produção; substituído por v2.6.0 após deploy)*
+### `v2.4.0` — Sistema Bibi - ServiceOS (CEDIG gestão clínica) *(substituído por v2.6.0)*
 
 | Campo | Valor |
 |-------|-------|

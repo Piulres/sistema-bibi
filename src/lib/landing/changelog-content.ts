@@ -50,7 +50,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "clinic-finance-bridge · e2e/cedig-gestao 6/6 · docs:verify · lint",
+    testStats: "clinic-finance-bridge · system-crud-matrix · e2e · docs:verify · pre-release · deploy 2.6.0",
   },
   {
     version: "2.5.0",
