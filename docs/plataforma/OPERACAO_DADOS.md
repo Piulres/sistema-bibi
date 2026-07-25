@@ -103,7 +103,17 @@ Para voltar à demo: confirmar com `DEMO`.
 
 ### Provisionar CEDIG na operação
 
-O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem pacientes/PJ nem histórico de homologação).
+O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem pacientes/PJ demo nem histórico de homologação).
+Opções em `ensureCedigTenant` (`cedig-catalog.ts`):
+
+| Flag | Demo (`portalMass`) | Operação (`commercialLayer`) |
+|------|---------------------|------------------------------|
+| `portalMass` | ✅ pacientes + beneficiários + PJ `rh@*.demo` | ❌ |
+| `commercialLayer` | ✅ (com PJ demo) | ✅ empresas CentralMed/Bem Saúde/Dr Saúde + `PricingRule` — **sem** logins `rh@*.demo` |
+| `seedHistory` | ✅ lançamentos/agenda homologação | ❌ |
+
+`db:verify` em `operation.db` exige: 2 tenants (`bibi-saude`, `cedig`), ≤3 empresas (só convênios CEDIG), 0 pacientes, sem massa TechCorp.
+
 Se a base em Blobs for anterior a esse bootstrap, um ADMIN pode chamar:
 
 ```bash

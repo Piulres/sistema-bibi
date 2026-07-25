@@ -154,6 +154,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 |-------|-------|
 | scrypt hash/verify | ✅ `password.test.ts` |
 | Login API (portal, credenciais) | ✅ `auth-and-cron.test.ts` |
+| Tenant/porta no login (v2.5) | ✅ `login-access.test.ts` — `normalizeTenantSlug`, `buildLoginAccessHref` |
 | MFA TOTP + challenge HMAC | ✅ `mfa-tokens.test.ts` |
 | Cookie session HMAC | ⚠️ indireto via MFA (mesmo algoritmo) |
 | Logout / me | ❌ |
@@ -184,6 +185,17 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | Lembretes cron | ✅ auth cron |
 | Comunicação console | ❌ |
 | Branding validation | ✅ unit |
+
+### Gestão clínica / CEDIG (v2.6)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Helpers da ponte (CPF provisório, map pagamento) | `tests/unit/clinic-finance-bridge.test.ts` | Funções puras em `bridge-helpers.ts` |
+| Ponte com Prisma (Patient + Appointment + PPU) | `tests/unit/clinic-finance-bridge-integration.test.ts` | `bridgeExamLaunchToOperations` |
+| Serviço gestão (KPIs, lançamentos) | `tests/unit/clinic-finance.test.ts` | `clinic-finance/service.ts` |
+| E2E piloto CEDIG (6 cenários) | `e2e/cedig-gestao.spec.ts` | Lançamento SYNCED · agenda prefill · export · labels · PJ · dashboard |
+
+Doc de fluxo: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 · piloto: [`clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md).
 
 ---
 

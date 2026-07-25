@@ -212,7 +212,7 @@ Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver 
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v2.3.0** · Stop builds **ON**  
+**Produção:** https://sistema-bibi.netlify.app · **v2.4.0** (código **v2.6.0** na `main`) · Stop builds **ON**  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
@@ -230,6 +230,7 @@ Regras obrigatórias para Cursor, Cloud Agent e assistentes. Implementadas em:
 | `.cursor/rules/operacoes-bibi.mdc` | Always apply | Operações core, token budget, matriz de decisão |
 | `.cursor/rules/netlify-release.mdc` | Inteligente (deploy/release) | Netlify, deploy com build, cota, checklist publicação |
 | `.cursor/rules/stack-nextjs.mdc` | Globs `src/**`, `prisma/**` | Next 16, Prisma 6, ESLint, UI |
+| `.cursor/skills/serviceos-dev-quality/SKILL.md` | Feature/bugfix/testes | Fluxo diagnóstico → padrões → Vitest → PR → `dev` (`/serviceos-dev-quality`) |
 
 Detalhes também em `AGENTS.md`.
 
@@ -238,6 +239,7 @@ Detalhes também em `AGENTS.md`.
 | Ação | Motivo |
 |------|--------|
 | Ler `AGENTS.md` e `docs/plataforma/OPERACOES.md` | Contexto do projeto |
+| Ler `.cursor/skills/serviceos-dev-quality/SKILL.md` em tarefas de código | Padrões do repo, testes, PR → `dev` |
 | `npm run dev` / testes locais | Validar sem custo |
 | `npm run lint` antes de finalizar | Qualidade |
 | Abrir PR com base **`dev`** | Integração antes de release |

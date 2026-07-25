@@ -107,6 +107,8 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (escolhe tabela Particular/CentralMed/…; valor sugere sozinho).
 4. Admin/financeiro: aba **Despesas** + **Indicadores**.
 
+### Credenciais — massa **demo** (`demo.db`, `?tenant=cedig`)
+
 | Portal | Login | Senha |
 |--------|-------|-------|
 | Interno ADMIN | `operacao@cedig.demo` | `bibi123` |
@@ -116,6 +118,16 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | PJ Bem Saúde | `rh@bemsaude.demo` | `bibi123` |
 | PJ Dr Saúde | `rh@drsaude.demo` | `bibi123` |
 | Beneficiário | `maria.cedig@email.com` | `bibi123` |
+
+### Credenciais — modo **operação** (`operation.db` / Netlify Blobs)
+
+| Portal | Login | Senha | Notas |
+|--------|-------|-------|-------|
+| Interno ADMIN | `operacao@cedig.demo` | `bibi123` | Provision/bootstrap CEDIG |
+| Secretária | `alana@cedig.demo` | `bibi123` | `/interno/gestao` |
+| Prestador | e-mail criado em Cadastros | `bibi123` (sugerida) | `/login?tenant=cedig` — **não** `/interno/login` |
+| PJ convênio | — | — | Empresas + `PricingRule` existem; **sem** `rh@*.demo` na operação |
+| Beneficiário | — | — | Sem massa fictícia — criar conforme piloto real |
 
 ---
 

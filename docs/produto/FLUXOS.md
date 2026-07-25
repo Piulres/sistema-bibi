@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v2.3** (produção jul/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v2.6** (código jul/2026; produção **v2.4.0** até deploy): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -14,7 +14,7 @@ ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev,
 ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
 ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
 
-**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384).
+**Última revisão factual:** julho/2026 — login v2.5, gestão clínica v2.6, `src/lib/navigation/routes.ts`, seed e testes Vitest.
 
 ---
 
@@ -182,6 +182,27 @@ sequenceDiagram
 | Beneficiário | `/beneficiario` |
 
 **Logout:** `POST /api/auth/logout` — remove cookie (botão Sair em `PortalShell`).
+
+### 2.1.1 Clínica e portal no login (v2.5)
+
+**UI** (`LoginForm` em `/login`, `/interno/login`, `/pj/login`, `/beneficiario/login`):
+
+| Controle | Comportamento |
+|----------|---------------|
+| Campo **Clínica / tenant** | Slug digitável (ex.: `cedig`, `petcare`, `horizonte`) |
+| Botão **Aplicar clínica** | Normaliza slug → navega com `?tenant=` e atualiza branding |
+| Select **Portal** | Alterna Interno · Prestador · PJ · Beneficiário (muda URL de login) |
+
+Helpers: `src/lib/auth/login-access.ts` — `normalizeTenantSlug`, `buildLoginAccessHref`, `LOGIN_PORTAL_OPTIONS`.
+
+**API** — corpo adicional opcional: `tenantSlug` (além de `email`, `password`, `portal`). O handler (`src/app/api/auth/login/route.ts`) executa:
+
+1. `ensureDataStoreForSegmentAccess({ tenantSlug, email })` — alinha modo demo/operação ao tenant ou e-mail.
+2. `validateUserSegmentAccess(request, user, { tenantSlug })` — `user.tenant.slug` deve coincidir com o slug solicitado.
+
+**Pitfall CEDIG prestador:** login em `/login?tenant=cedig` (Portal **Prestador**), não `/interno/login`. Mensagem de mismatch de tenant indica portal ou slug errado — ver [`../clientes/cedig/GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md).
+
+Doc de release: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ### 2.2 MFA TOTP (Tier 4)
 
@@ -395,6 +416,38 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 | Restaurar seed demo | `POST /api/interno/demo/reset` | Somente ADMIN + modo demo + `ALLOW_DEMO_RESET` |
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
+
+### 4.11 Gestão clínica e ponte PPU (v2.6)
+
+Módulo **MEDICAL/DENTAL** — piloto CEDIG. Rota `/interno/gestao` · componente `ClinicFinanceView` · RBAC módulo `gestao` (`interno-permissions.ts`). Nav: `niche-nav.ts` (só nichos clínicos).
+
+| Aba | Ação na UI | API | Efeito |
+|-----|------------|-----|--------|
+| Lançamentos | Registrar linha (paciente, médico, tabela, pagamento, valor) | `POST /api/interno/clinic-finance/launches` | `ClinicExamLaunch` + **ponte automática** |
+| Lançamentos | Listar / filtrar | `GET /api/interno/clinic-finance/launches` | Coluna `bridgeStatus` (SYNCED / PARTIAL / FAILED) |
+| Despesas | CRUD despesas operacionais | `POST/PATCH /api/interno/clinic-finance/expenses` | `ClinicExpense` |
+| Indicadores | KPIs do mês | `GET /api/interno/clinic-finance/launches` (agregados na view) | Receita, despesas, lucro, produção por médico |
+| Export | Excel mensal | `GET /api/interno/clinic-finance/export` | CSV/Excel tabular |
+
+**Ponte operacional** (`src/lib/clinic-finance/bridge.ts`) — ao registrar lançamento:
+
+```text
+ClinicExamLaunch
+  → ensure Patient (provisório se necessário; não sobrescreve companyId existente)
+  → Appointment status=REALIZADO
+  → ProcedureUsage (priceCharged = valor recebido)
+  → Invoice FECHADA (+ Payment se pagamento ≠ CONVENIO)
+```
+
+FKs no lançamento: `appointmentId`, `usageId`, `invoiceId` · `bridgeStatus` + `bridgeNote`.
+
+**Agenda → gestão:** em `AppointmentsView`, botão **Lançar na gestão** abre `/interno/gestao` com prefill (paciente, médico, procedimento).
+
+**RBAC escrita:** perfil **READONLY** vê gestão (KPIs/leitura) mas `POST` de lançamentos/despesas retorna 403.
+
+**Fora do núcleo PPU genérico:** gestão clínica é camada CEDIG (`cedig-pricing.ts`, tabelas Particular/CentralMed/Bem Saúde/Dr Saúde). Não substitui faturamento interno `/interno/faturamento` para tenants sem módulo.
+
+Piloto: [`../clientes/cedig/README.md`](../clientes/cedig/README.md) · mapa fase 2: [`../clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) · release: [`../versoes/V2_6.md`](../versoes/V2_6.md).
 
 ---
 

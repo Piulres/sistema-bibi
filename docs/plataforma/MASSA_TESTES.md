@@ -56,9 +56,11 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 | `eduprime` | EDUCATION | Educação | ~8 |
 | `cedig` | MEDICAL | Piloto CEDIG Cruzeiro (endoscopia) | — |
 
-**CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`docs/clientes/cedig/HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
+**CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`docs/clientes/cedig/HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
 
-**Modo operação** (`operation.db`): tenant `bibi-saude` — bootstrap mínimo (5 usuários, 14 procedimentos, sem clientes). Ver `operation-bootstrap.ts`.
+**Massa demo CEDIG** (`demo.db` / `?tenant=cedig`): PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · histórico com ponte SYNCED.
+
+**Modo operação** (`operation.db`): tenants `bibi-saude` (bootstrap mínimo) + `cedig` (equipe + catálogo + **commercialLayer** — empresas/regras de preço sem pacientes fictícios nem logins PJ demo). Ver `operation-bootstrap.ts` · `scripts/verify-databases.mjs`.
 
 Documentação por segmento: [`docs/segmentos/README.md`](../segmentos/README.md)
 
