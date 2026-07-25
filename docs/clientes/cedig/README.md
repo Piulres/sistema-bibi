@@ -113,6 +113,8 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | Secretária | `alana@cedig.demo` | `bibi123` |
 | Prestador | `bruno.dias@cedig.demo` | `bibi123` |
 | PJ CentralMed | `rh@centralmed.demo` | `bibi123` |
+| PJ Bem Saúde | `rh@bemsaude.demo` | `bibi123` |
+| PJ Dr Saúde | `rh@drsaude.demo` | `bibi123` |
 | Beneficiário | `maria.cedig@email.com` | `bibi123` |
 
 ---
@@ -126,7 +128,7 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | **C** | Homologação browser 4 portais + gestão | ✅ assistida 2026-07-25 · falta humano in loco |
 | **D** | Ponte lançamento → agenda + PPU + fatura/pagamento | ✅ v2.6 · [`FASE_2.md`](FASE_2.md) |
 | **E** | Export Excel mensal + agenda “Lançar na gestão” | ✅ v2.6 |
-| **F** | Beneficiário/PJ polimento + E2E Playwright CEDIG | Backlog |
+| **F** | Beneficiário labels · PJ Bem/Dr Saúde · seed bridge · E2E · dashboard | ✅ v2.6 |
 
 Mapa de gaps e validação: [`FASE_2.md`](FASE_2.md).
 

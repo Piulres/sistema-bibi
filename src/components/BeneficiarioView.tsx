@@ -179,7 +179,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     petId: "",
     date: new Date().toISOString().slice(0, 10),
     slot: "",
-    reason: "Consulta de rotina",
+    reason: `${labels.appointment} de rotina`,
     modality: "PRESENCIAL",
   });
 
@@ -278,7 +278,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
           }),
         }),
       {
-        successMessage: "Consulta agendada! Aguarde confirmação da clínica.",
+        successMessage: `${labels.appointment} agendado(a)! Aguarde confirmação da clínica.`,
         onSuccess: async () => {
           await reloadOverview();
         },
@@ -297,7 +297,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         }),
       {
         confirm: confirmPresets.cancelAppointment(whenLabel),
-        successMessage: "Consulta cancelada com sucesso.",
+        successMessage: `${labels.appointment} cancelado(a) com sucesso.`,
         onSuccess: async () => {
           await reloadOverview();
         },
@@ -389,11 +389,11 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       <section id="agendar" data-tour-id="schedule-form">
       <Card>
         <SectionHeader
-          title={isVet ? `Agendar ${labels.appointment.toLowerCase()}` : "Agendar consulta"}
+          title={`Agendar ${labels.appointment.toLowerCase()}`}
           description={
             isVet
-              ? `Escolha o ${labels.patient.toLowerCase()}, procedimento, data e horário. O prestador pode ser indicado ou atribuído automaticamente.`
-              : "Escolha o procedimento, data e horário. O prestador pode ser indicado ou atribuído automaticamente."
+              ? `Escolha o ${labels.patient.toLowerCase()}, ${labels.procedure.toLowerCase()}, data e horário. O prestador pode ser indicado ou atribuído automaticamente.`
+              : `Escolha o ${labels.procedure.toLowerCase()}, data e horário. O prestador pode ser indicado ou atribuído automaticamente.`
           }
         />
         <form onSubmit={bookAppointment} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -414,7 +414,9 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
             </label>
           )}
           <label className="block text-sm">
-            <span className="text-[var(--text-secondary)]">Procedimento (opcional)</span>
+            <span className="text-[var(--text-secondary)]">
+              {labels.procedure} (opcional)
+            </span>
             <select
               className="mt-1 w-full rounded border px-3 py-2"
               value={scheduleForm.procedureId}
@@ -525,30 +527,30 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
         <StatCard
-          label="Próximo atendimento"
+          label={`Próximo ${labels.appointment.toLowerCase()}`}
           value={nextAppointment?.scheduledAtLabel ?? "Nenhum"}
           hint={
             nextAppointment
-              ? `${nextAppointment.providerName} · ${nextAppointment.reason ?? "Consulta"}`
+              ? `${nextAppointment.providerName} · ${nextAppointment.reason ?? labels.appointment}`
               : undefined
           }
-          info="Data e horário da sua próxima consulta confirmada ou agendada."
+          info={`Data e horário do seu próximo ${labels.appointment.toLowerCase()} confirmado ou agendado.`}
         />
         <StatCard
-          label="Consultas"
+          label={labels.appointments}
           value={summary.totalAppointments}
-          info="Total de consultas registradas na clínica."
+          info={`Total de ${labels.appointments.toLowerCase()} registrados na operação.`}
         />
         <StatCard
-          label="Procedimentos"
+          label={labels.procedures}
           value={summary.totalUsages}
-          info="Procedimentos Pay Per Use já utilizados."
+          info={`${labels.procedures} Pay Per Use já utilizados.`}
         />
         <StatCard
           label="Pendente (Pay Per Use)"
           value={summary.pendingAmountLabel}
           tone="warning"
-          info="Valor de procedimentos utilizados ainda não faturados."
+          info={`Valor de ${labels.procedures.toLowerCase()} utilizados ainda não faturados.`}
         />
         <StatCard
           label="Total faturado"
@@ -571,13 +573,13 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionHeader
             title="Minha agenda"
-            description="Consultas agendadas e histórico recente."
+            description={`${labels.appointments} agendados e histórico recente.`}
           />
           <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "agenda" }} />
         </div>
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
-            Nenhum atendimento registrado.
+            Nenhum {labels.appointment.toLowerCase()} registrado.
           </p>
         ) : (
           <div className="mt-3 space-y-3">
@@ -602,7 +604,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                         rel="noreferrer"
                         className="text-xs text-[var(--portal-accent)] hover:underline"
                       >
-                        Entrar na teleconsulta
+                        Entrar na videochamada
                       </a>
                     ) : appointment.reason ? (
                       <span className="text-xs text-[var(--text-muted)]">{appointment.reason}</span>
@@ -640,14 +642,16 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
           <ExportButtons baseUrl="/api/beneficiario/export" query={{ section: "consumo" }} />
         </div>
         {overview.usages.length === 0 ? (
-          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
+            Nenhum {labels.procedure.toLowerCase()} registrado.
+          </p>
         ) : (
           <div className="mt-3 overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
             <table className="w-full min-w-[32rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-2 font-medium">Procedimento</th>
-                  <th className="px-4 py-2 font-medium">Atendimento</th>
+                  <th className="px-4 py-2 font-medium">{labels.procedure}</th>
+                  <th className="px-4 py-2 font-medium">{labels.appointment}</th>
                   <th className="px-4 py-2 font-medium">Situação</th>
                   <th className="px-4 py-2 text-right font-medium">Valor</th>
                 </tr>

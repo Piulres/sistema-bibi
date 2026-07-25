@@ -61,7 +61,7 @@ test.describe("Portal Beneficiário — self-service", () => {
 
   test("formulário de agendamento visível", async ({ page }) => {
     await page.goto("/beneficiario/agendar");
-    await expect(page.getByRole("heading", { name: "Agendar consulta" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: /Agendar (consulta|exame|atendimento)/i })).toBeVisible();
   });
 
   test("seções de agenda, consumo e faturas", async ({ page }) => {

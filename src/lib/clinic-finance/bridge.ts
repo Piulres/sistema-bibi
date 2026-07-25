@@ -1,7 +1,5 @@
-import "server-only";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
-import { consumeProcedureKit } from "@/lib/stock-service";
 import {
   recordTimelineEvent,
   TIMELINE_ACTIONS,
@@ -54,7 +52,8 @@ export async function ensureClinicPatient(input: {
       where: { id: input.patientId, tenantId: input.tenantId },
     });
     if (!existing) return { error: "Paciente não encontrado neste tenant." };
-    if (companyId && existing.companyId !== companyId) {
+    // Não sobrescreve vínculo PJ existente — companyId da fatura vem da tabela.
+    if (companyId && !existing.companyId) {
       await prisma.patient.update({
         where: { id: existing.id },
         data: { companyId },
@@ -68,7 +67,7 @@ export async function ensureClinicPatient(input: {
     where: { tenantId: input.tenantId, name },
   });
   if (byName) {
-    if (companyId && byName.companyId !== companyId) {
+    if (companyId && !byName.companyId) {
       await prisma.patient.update({
         where: { id: byName.id },
         data: { companyId },
@@ -246,6 +245,8 @@ export async function bridgeExamLaunchToOperations(input: {
         createdBy: input.createdById ?? undefined,
       });
       try {
+        // Import dinâmico: seed Prisma não pode carregar `server-only` do stock-service.
+        const { consumeProcedureKit } = await import("@/lib/stock-service");
         await consumeProcedureKit({
           tenantId: input.tenantId,
           procedureId: launch.procedureId,

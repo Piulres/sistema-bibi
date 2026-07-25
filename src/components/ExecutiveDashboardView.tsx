@@ -45,9 +45,22 @@ type Dashboard = {
     createdAtLabel: string;
     actorName: string | null;
   }[];
+  clinicFinance: {
+    year: number;
+    month: number;
+    examCount: number;
+    revenueLabel: string;
+    expensesLabel: string;
+    profitLabel: string;
+  } | null;
 };
 
 const quickLinks = [
+  {
+    href: "/interno/gestao",
+    label: "Gestão clínica",
+    desc: "Lançamentos, despesas e KPIs do piloto (fonte operacional CEDIG)",
+  },
   { href: "/interno", label: "Faturamento", desc: "Gerar faturas Pay Per Use" },
   { href: "/interno/crm", label: "CRM", desc: "Pipeline de empresas" },
   { href: "/interno/assinaturas", label: "Recorrência", desc: "Assinaturas e cobranças" },
@@ -84,6 +97,48 @@ export default function ExecutiveDashboardView() {
       {dashboard && (
         <div className="space-y-8">
           <p className="text-xs text-[var(--text-muted)]">Atualizado em {dashboard.generatedAtLabel}</p>
+
+          <p
+            className="rounded-lg border border-[var(--border-default)] bg-[var(--surface-muted)] px-3 py-2 text-sm text-[var(--text-secondary)]"
+            data-cursor-id="dashboard-gestao-hint"
+          >
+            Receita operacional do piloto (lançamentos + despesas) fica em{" "}
+            <Link href="/interno/gestao" className="font-medium text-[var(--portal-accent)] underline">
+              Gestão clínica
+            </Link>
+            . Este painel resume faturamento PPU e CRM — exames lançados na gestão também geram
+            fatura aqui (sem somar duas vezes a receita operacional).
+          </p>
+
+          {dashboard.clinicFinance && (
+            <section data-cursor-id="dashboard-clinic-finance">
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                Gestão clínica ({String(dashboard.clinicFinance.month).padStart(2, "0")}/
+                {dashboard.clinicFinance.year})
+              </h2>
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <StatCard
+                  label="Exames lançados"
+                  value={String(dashboard.clinicFinance.examCount)}
+                />
+                <StatCard
+                  label="Receita (lançamentos)"
+                  value={dashboard.clinicFinance.revenueLabel}
+                  tone="accent"
+                />
+                <StatCard
+                  label="Despesas"
+                  value={dashboard.clinicFinance.expensesLabel}
+                  tone="warning"
+                />
+                <StatCard
+                  label="Lucro operacional"
+                  value={dashboard.clinicFinance.profitLabel}
+                  tone="success"
+                />
+              </div>
+            </section>
+          )}
 
           <section>
             <h2 className="text-sm font-semibold uppercase tracking-wider text-[var(--text-muted)]">

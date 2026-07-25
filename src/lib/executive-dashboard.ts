@@ -1,6 +1,7 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { companyStatusLabel } from "@/lib/company-crm";
+import { getClinicFinanceKpis } from "@/lib/clinic-finance/service";
 import { formatBRL } from "@/lib/pricing";
 import { monthsForBillingCycle } from "@/lib/subscription";
 
@@ -68,6 +69,15 @@ export type ExecutiveDashboardData = {
     createdAtLabel: string;
     actorName: string | null;
   }[];
+  /** KPIs do módulo Gestão clínica (mês corrente) — não misturar com total faturado PPU. */
+  clinicFinance: {
+    year: number;
+    month: number;
+    examCount: number;
+    revenueLabel: string;
+    expensesLabel: string;
+    profitLabel: string;
+  } | null;
 };
 
 /**
@@ -196,6 +206,32 @@ export async function getExecutiveDashboard(
   const actorMap = new Map(actors.map((a) => [a.id, a.name]));
 
   const now = new Date();
+  const launchCount = await prisma.clinicExamLaunch.count({
+    where: {
+      tenantId,
+      performedAt: {
+        gte: new Date(now.getFullYear(), now.getMonth(), 1),
+        lt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
+      },
+    },
+  });
+
+  let clinicFinance: ExecutiveDashboardData["clinicFinance"] = null;
+  if (launchCount > 0) {
+    const clinic = await getClinicFinanceKpis(
+      tenantId,
+      now.getFullYear(),
+      now.getMonth() + 1,
+    );
+    clinicFinance = {
+      year: clinic.year,
+      month: clinic.month,
+      examCount: clinic.examCount,
+      revenueLabel: formatBRL(clinic.revenue),
+      expensesLabel: formatBRL(clinic.totalExpenses),
+      profitLabel: formatBRL(clinic.operatingProfit),
+    };
+  }
 
   return {
     generatedAt: now.toISOString(),
@@ -229,5 +265,6 @@ export async function getExecutiveDashboard(
       createdAtLabel: dateTime(event.createdAt),
       actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
     })),
+    clinicFinance,
   };
 }
