@@ -4,6 +4,8 @@
 
 > **Produção:** **v2.6.0** @ https://sistema-bibi.netlify.app — [`versoes/RELEASES.md`](versoes/RELEASES.md) · [`versoes/V2_6.md`](versoes/V2_6.md).
 
+> **Próxima linha (WIP):** **v3.0** mobile PWA/app shell — [`versoes/V3_0.md`](versoes/V3_0.md) (não altera produção).
+
 > **Última revisão factual:** julho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
@@ -118,6 +120,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | Documento | Conteúdo |
 |-----------|----------|
 | [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.6.0 em produção** |
+| [`versoes/V3_0.md`](versoes/V3_0.md) | **WIP** — v3.0 mobile PWA / app shell |
 | [`versoes/V2_6.md`](versoes/V2_6.md) | Changelog v2.6 — CEDIG pontes PPU + export |
 | [`versoes/V2_5.md`](versoes/V2_5.md) | Changelog v2.5 — login tenant/portal |
 | [`versoes/V2_4.md`](versoes/V2_4.md) | Changelog v2.4 — CEDIG gestão clínica |

@@ -19,6 +19,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
 | **Release `main` / `dev`** | **v2.6.0** · tag `v2.6.0` |
 | **Pacote anterior em produção** | **2.4.0** — CEDIG gestão clínica |
+| **Próxima linha (WIP)** | **v3.0** — mobile PWA/app shell · [`V3_0.md`](V3_0.md) · **não** altera produção |
+
+### Em desenvolvimento — `v3.0` (isolado)
+
+Trilha **ServiceOS v3.0** (experiência app no celular). Branches `cursor/serviceos-v3-*`.
+**Não** bumpa `PLATFORM.release` até fechar o pacote. Features paralelas em outras
+branches não devem misturar escopo nesta linha — ver [`V3_0.md`](V3_0.md).
 
 ### Sincronização de ambientes
 
@@ -266,6 +273,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
 | **2.3.x** | [`V2_3.md`](V2_3.md) | Histórico — title/footer · assistente · obras |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | 🚧 Em desenvolvimento — PWA / app shell mobile |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---

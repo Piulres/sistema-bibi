@@ -98,6 +98,12 @@ export default function LandingFooter({
               {PLATFORM.shortName} v{PLATFORM.release}
             </span>
             <Link
+              href="/instalar"
+              className="rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            >
+              Instalar app
+            </Link>
+            <Link
               href="/interno/login"
               className="rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             >
