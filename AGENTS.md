@@ -48,7 +48,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** **`v2.4.0`** @ https://sistema-bibi.netlify.app · ver `docs/versoes/RELEASES.md`.
-Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
+Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Em modo operação, tenant CEDIG vem no bootstrap (`operation.db`); ver `docs/plataforma/OPERACAO_DADOS.md` § Provisionar CEDIG. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).

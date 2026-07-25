@@ -29,7 +29,7 @@ Credenciais (`/?tenant=cedig`, senha `bibi123`) — massa demo e bootstrap de **
 - `alexandre.marcal@cedig.demo` · `luiza.lage@cedig.demo` · `bruno.dias@cedig.demo` · `luiza.zeraik@cedig.demo` · `fernanda.auto@cedig.demo`
 - `operacao@cedig.demo` — ADMIN
 
-Em produção (modo operação): provisionar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }` se o tenant ainda não existir na base Blobs.
+Em produção (modo operação): o tenant CEDIG já vem no bootstrap de `operation.db`. Se a base em Blobs for anterior a esse pacote, um ADMIN pode re-sincronizar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }`. Runbook completo: [`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md) § Provisionar CEDIG.
 
 ---
 
@@ -118,7 +118,7 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | Fase | Entrega | Status |
 |------|---------|--------|
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
-| **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
+| **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ demo `/?tenant=cedig` · ✅ operação (`operation-bootstrap` + `provision-cedig`) |
 | **C** | Homologação browser 4 portais + gestão | ✅ assistida 2026-07-25 · falta humano in loco |
 | **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
 | **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
@@ -135,3 +135,4 @@ Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROT
 - UI: `src/components/ClinicFinanceView.tsx`
 - API: `/api/interno/clinic-finance/*`
 - Catálogo / equipe seed: `prisma/seed-data/cedig-catalog.ts`
+- Provisionamento operação: `src/lib/operation/provision-cedig.ts` · `POST /api/interno/operation/provision-cedig`

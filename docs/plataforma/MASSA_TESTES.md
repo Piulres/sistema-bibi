@@ -58,7 +58,7 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 
 **CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`docs/clientes/cedig/HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
 
-**Modo operação** (`operation.db`): tenant `bibi-saude` — bootstrap mínimo (5 usuários, 14 procedimentos, sem clientes). Ver `operation-bootstrap.ts`.
+**Modo operação** (`operation.db`): tenant principal `bibi-saude` (5 usuários internos, 14 procedimentos genéricos) **+** tenant `cedig` (equipe, catálogo endoscopia, empresas institucionais e massa mínima dos 4 portais — **sem** histórico de homologação). Ver `operation-bootstrap.ts` e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § Provisionar CEDIG.
 
 Documentação por segmento: [`docs/segmentos/README.md`](../segmentos/README.md)
 

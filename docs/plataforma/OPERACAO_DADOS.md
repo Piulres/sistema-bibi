@@ -99,15 +99,83 @@ Para voltar à demo: confirmar com `DEMO`.
 
 ### Provisionar CEDIG na operação
 
-O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo, sem histórico de homologação).
-Se a base em Blobs for anterior a esse bootstrap, um ADMIN pode chamar:
+O piloto **CEDIG Cruzeiro** (`slug=cedig`) faz parte do bootstrap de operação desde `v2.4.x`.
+Fonte única: `ensureCedigTenant()` em `prisma/seed-data/cedig-catalog.ts` — usada pelo bootstrap
+(`operation-bootstrap.ts`) e pelo endpoint de provisionamento (`src/lib/operation/provision-cedig.ts`).
 
-```bash
-POST /api/interno/operation/provision-cedig
-{ "confirm": "CEDIG" }
+#### O que entra no modo operação
+
+| Incluído | Excluído (só no demo) |
+|----------|------------------------|
+| Tenant + branding teal CEDIG | Lançamentos/despesas de homologação (`seedHistory`) |
+| Labels UI “Exame” (não “Consulta”) | Massa PJ/beneficiários do seed geral (`horizonte`) |
+| Catálogo de 5 exames (`CEDIG-*`) | |
+| Equipe (secretária, enfermagem, médicos, ADMIN) | |
+| Empresas institucionais (CentralMed, Bem Saúde, Dr Saúde) | |
+| Pacientes + logins PJ/Beneficiário mínimos (4 portais) | |
+
+**Quando já vem pronto:** build Netlify (`operation.db` no artefato) ou `npm run db:bootstrap:operation` local.
+
+**Quando chamar o endpoint:** base de operação em Blobs criada **antes** desse bootstrap (deploy antigo) ou
+após editar `cedig-catalog.ts` e precisar sincronizar equipe/catálogo sem rebuild.
+
+#### Endpoint (idempotente)
+
+| Campo | Valor |
+|-------|-------|
+| **Rota** | `POST /api/interno/operation/provision-cedig` |
+| **Auth** | Sessão interna **ADMIN** (`internoProfile=ADMIN`) |
+| **Módulo RBAC** | `seguranca` (mesmo guard das rotas de `/interno/seguranca`) |
+| **Body** | `{ "confirm": "CEDIG" }` — case-insensitive, espaços ignorados |
+| **Persistência** | Se modo ativo = `operation`, grava `operation.db` em Blobs imediatamente |
+| **Timeline** | Evento `DATA_STORE_CHANGED` no tenant do admin que chamou |
+
+Respostas típicas:
+
+```json
+// 200 — tenant novo
+{
+  "message": "CEDIG Cruzeiro provisionado — equipe e catálogo prontos.",
+  "tenantId": "…",
+  "created": true,
+  "procedures": 5,
+  "mode": "operation"
+}
+
+// 200 — tenant já existia (re-sincroniza catálogo/equipe)
+{
+  "message": "CEDIG Cruzeiro já existia — catálogo e equipe atualizados.",
+  "created": false,
+  "procedures": 5,
+  "mode": "operation"
+}
+
+// 400 — confirmação ausente ou incorreta
+{ "error": "Digite \"CEDIG\" para confirmar" }
+
+// 403 — não é ADMIN
+{ "error": "Acesso negado" }
 ```
 
-Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
+Exemplo com sessão (substitua o cookie após login como `faturamento@bibi.health`):
+
+```bash
+curl -sS -X POST http://localhost:3000/api/interno/operation/provision-cedig \
+  -H 'Content-Type: application/json' \
+  -H 'Cookie: bibi_session=SEU_TOKEN' \
+  -d '{"confirm":"CEDIG"}'
+```
+
+Em produção: mesmo fluxo com `https://sistema-bibi.netlify.app`, após `/interno/seguranca` → **Ir para operação** (`OPERAR`).
+
+#### Validar após provisionar
+
+1. `/?tenant=cedig` — branding e cookie `bibi_segment`
+2. Login `alana@cedig.demo` / `bibi123` → `/interno/gestao`
+3. Credenciais completas: [`docs/clientes/cedig/README.md`](../clientes/cedig/README.md)
+
+**Pitfall:** chamar o endpoint no modo **demo** também funciona (`seedHistory: true` inclui histórico de homologação).
+Para piloto real, confirme o seletor em `/interno/seguranca` antes de provisionar.
 
 ---
 
@@ -140,6 +208,8 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 - Modo ativo: `src/lib/data-store-mode.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
+- Provisionamento CEDIG: `src/lib/operation/provision-cedig.ts` · `src/app/api/interno/operation/provision-cedig/route.ts`
+- Catálogo CEDIG: `prisma/seed-data/cedig-catalog.ts`
 - UI seletor: `src/components/DataStoreCard.tsx`
 - API: `GET|POST /api/interno/data-store`
 - Reset demo: `src/lib/demo-reset.ts`

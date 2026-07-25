@@ -129,8 +129,9 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | LEGAL (Lex) | `operacao@lex.demo` |
 | SPA (Zen) | `operacao@zen.demo` |
 | EDUCATION (EduPrime) | `operacao@eduprime.demo` |
+| CEDIG (piloto) | `alana@cedig.demo` · `/?tenant=cedig` · `/interno/gestao` |
 
-Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
+Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](../produto/FLUXOS.md). Piloto CEDIG: [`clientes/cedig/README.md`](../clientes/cedig/README.md).
 
 ### 4.3 Banco de dados local e demo vs operação
 
@@ -152,7 +153,9 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | Modo | Conteúdo | Persistência em produção |
 |------|----------|--------------------------|
 | **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
-| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
+| **Operação** | Bootstrap mínimo + tenant CEDIG; dados reais pelo uso | Netlify Blobs |
+
+**Piloto CEDIG em operação:** após alternar para modo operação, validar `/?tenant=cedig`. Bases Blobs antigas: `POST /api/interno/operation/provision-cedig` (ADMIN, body `{ "confirm": "CEDIG" }`). Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § Provisionar CEDIG.
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 

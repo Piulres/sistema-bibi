@@ -9,10 +9,22 @@ Complementa [`README.md`](README.md). Massa geral: [`docs/plataforma/MASSA_TESTE
 
 ## Pré-condições
 
+### Massa demo (homologação com histórico)
+
 ```bash
 npm run db:push && npm run db:seed
 npm run dev   # http://localhost:3000
 ```
+
+### Massa operação (piloto sem histórico demo)
+
+```bash
+npm run db:bootstrap:operation   # ou db:bootstrap:demo + /interno/seguranca → OPERAR
+npm run dev
+# CEDIG já incluso — ou POST /api/interno/operation/provision-cedig se base antiga
+```
+
+Ver [`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md) § Provisionar CEDIG.
 
 | Item | Valor |
 |------|-------|
