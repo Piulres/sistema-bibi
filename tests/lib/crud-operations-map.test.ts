@@ -21,6 +21,12 @@ describe("crud-operations-map", () => {
     expect(names).toContain("MFA (TOTP)");
     expect(names).toContain("Lembretes automáticos");
     expect(names).toContain("Entrega de webhook");
+    expect(names).toContain("Pet (VET)");
+    expect(names).toContain("Regra de precificação");
+    expect(names).toContain("Protocolo clínico");
+    expect(names).toContain("Lançamento clínico (CEDIG)");
+    expect(names).toContain("Despesa clínica (CEDIG)");
+    expect(names).toContain("Produto de estoque");
   });
 
   it("filtra por portal", () => {

@@ -92,7 +92,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await expect(page.getByText(/Carregando cadastros/i)).toHaveCount(0, { timeout: 15_000 });
   });
 
-  test("CREATE + READ beneficiário", async ({ page }) => {
+  test("CREATE + READ + UPDATE beneficiário", async ({ page }) => {
     const name = `E2E Benef ${suffix()}`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Novo beneficiário" }) }).first();
     const form = card.locator("form");
@@ -102,6 +102,16 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await form.getByRole("button", { name: "Cadastrar" }).click();
     await expectFeedbackMessage(page, new RegExp(`Beneficiário ${name} cadastrado`));
     await expect(page.getByRole("link", { name })).toBeVisible();
+
+    const row = listItemByText(page, name);
+    await row.scrollIntoViewIfNeeded();
+    await row.getByRole("button", { name: "Editar" }).click();
+    const editRow = editingListItem(page);
+    await expect(editRow).toBeVisible();
+    await editRow.getByRole("textbox").first().fill(`${name} Edit`);
+    await editRow.getByRole("button", { name: "Salvar" }).click();
+    await expectFeedbackMessage(page, /Beneficiário .* atualizado|atualizado/i);
+    await expect(page.getByRole("link", { name: `${name} Edit` })).toBeVisible();
   });
 
   test("CREATE + UPDATE empresa", async ({ page }) => {
@@ -155,18 +165,30 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await expect(rowAfterEdit).toHaveCount(0, { timeout: 10_000 });
   });
 
-  test("CREATE usuário prestador", async ({ page }) => {
+  test("CREATE + UPDATE usuário prestador", async ({ page }) => {
     await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Usuários" }).click();
     const id = suffix();
+    const name = `Dr E2E ${id}`;
+    const email = `dr.e2e.${id}@bibi.health`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Novo usuário" }) }).first();
     const form = card.locator("form");
-    await form.locator("label").filter({ hasText: /^Nome$/ }).locator("input").fill(`Dr E2E ${id}`);
-    await form.locator("label").filter({ hasText: /^E-mail$/ }).locator("input").fill(`dr.e2e.${id}@bibi.health`);
+    await form.locator("label").filter({ hasText: /^Nome$/ }).locator("input").fill(name);
+    await form.locator("label").filter({ hasText: /^E-mail$/ }).locator("input").fill(email);
     await form.locator("label").filter({ hasText: /^Senha$/ }).locator("input").fill("bibi123");
     await form.getByRole("button", { name: "Criar usuário" }).click();
     // Toast de PRESTADOR: "{nome} criado. Entrar em /login?tenant=…"
-    await expectFeedbackMessage(page, new RegExp(`Dr E2E ${id} criado`));
-    await expect(page.getByText(`dr.e2e.${id}@bibi.health`)).toBeVisible();
+    await expectFeedbackMessage(page, new RegExp(`${name} criado`));
+    await expect(page.getByText(email)).toBeVisible();
+
+    const row = listItemByText(page, email);
+    await row.scrollIntoViewIfNeeded();
+    await row.getByRole("button", { name: "Editar" }).click();
+    const editRow = editingListItem(page);
+    await expect(editRow).toBeVisible();
+    await editRow.getByRole("textbox").first().fill(`${name} Edit`);
+    await editRow.getByRole("button", { name: "Salvar" }).click();
+    await expectFeedbackMessage(page, /Usuário .* atualizado|atualizado/i);
+    await expect(page.getByText(`${name} Edit`)).toBeVisible();
   });
 });
 

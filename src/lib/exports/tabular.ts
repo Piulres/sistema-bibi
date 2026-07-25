@@ -33,10 +33,18 @@ export function buildCsvFromTabular(data: TabularExport): string {
   return serializeInterchangeDataset(dataset, "csv");
 }
 
+/** ExcelJS rejeita * ? : \ / [ ] no nome da aba. */
+function safeWorksheetName(raw: string): string {
+  const cleaned = raw.replace(/[*?:\\/[\]]/g, "-").trim() || "Planilha";
+  return cleaned.slice(0, 31);
+}
+
 export async function buildXlsxBufferFromTabular(data: TabularExport): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = PLATFORM.name;
-  const sheet = workbook.addWorksheet(data.sheetName ?? data.title.slice(0, 31));
+  const sheet = workbook.addWorksheet(
+    safeWorksheetName(data.sheetName ?? data.title),
+  );
 
   sheet.addRow([data.title]);
   if (data.subtitle) sheet.addRow([data.subtitle]);

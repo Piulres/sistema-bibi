@@ -119,6 +119,71 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     delete: none,
   },
   {
+    entity: "Pet (VET)",
+    portal: "Interno",
+    description: "Animal vinculado ao tutor — disponível no segmento veterinário.",
+    create: [ui("Novo pet", "/interno/cadastros → Pets", "POST /api/interno/pets")],
+    read: [ui("Listar pets", "/interno/cadastros → Pets", "GET /api/interno/pets")],
+    update: [ui("Editar pet", "/interno/cadastros → Pets", "PATCH /api/interno/pets/[id]")],
+    delete: none,
+  },
+  {
+    entity: "Regra de precificação",
+    portal: "Interno",
+    description: "Multiplicador B2B por empresa × procedimento.",
+    create: [
+      ui("Nova regra", "/interno/cadastros → Precificação", "POST /api/interno/pricing-rules"),
+    ],
+    read: [ui("Listar regras", "/interno/cadastros → Precificação", "GET /api/interno/pricing-rules")],
+    update: [ui("Editar", "/interno/cadastros → Precificação", "PUT /api/interno/pricing-rules/[id]")],
+    delete: [ui("Excluir", "/interno/cadastros → Precificação", "DELETE /api/interno/pricing-rules/[id]")],
+  },
+  {
+    entity: "Protocolo clínico",
+    portal: "Interno",
+    create: [
+      ui("Novo protocolo", "/interno/cadastros → Protocolos", "POST /api/interno/protocol-templates"),
+    ],
+    read: [
+      ui("Listar templates", "/interno/cadastros → Protocolos", "GET /api/interno/protocol-templates"),
+    ],
+    update: [
+      ui("Editar / desativar", "/interno/cadastros → Protocolos", "PATCH /api/interno/protocol-templates/[id]"),
+    ],
+    delete: none,
+  },
+  {
+    entity: "Produto de estoque",
+    portal: "Interno",
+    create: [ui("Novo produto", "/interno/estoque", "POST /api/interno/stock/products")],
+    read: [ui("Catálogo e alertas", "/interno/estoque", "GET /api/interno/stock/products")],
+    update: [ui("Editar produto", "/interno/estoque", "PATCH /api/interno/stock/products/[id]")],
+    delete: [{ label: "— (desativar via active=false)", exposure: "ui" }],
+  },
+  {
+    entity: "Lançamento clínico (CEDIG)",
+    portal: "Interno",
+    description: "Exame lançado na gestão → ponte Patient/Appointment/PPU/Invoice.",
+    create: [
+      ui("Novo lançamento", "/interno/gestao", "POST /api/interno/clinic-finance/launches"),
+    ],
+    read: [
+      ui("Lista do mês", "/interno/gestao", "GET /api/interno/clinic-finance/launches"),
+      ui("Meta (médicos/exames)", "/interno/gestao", "GET /api/interno/clinic-finance/meta"),
+      download("Export mês", "/interno/gestao", "GET /api/interno/clinic-finance/export"),
+    ],
+    update: none,
+    delete: none,
+  },
+  {
+    entity: "Despesa clínica (CEDIG)",
+    portal: "Interno",
+    create: [ui("Nova despesa", "/interno/gestao", "POST /api/interno/clinic-finance/expenses")],
+    read: [ui("Lista do mês", "/interno/gestao", "GET /api/interno/clinic-finance/expenses")],
+    update: none,
+    delete: none,
+  },
+  {
     entity: "Agendamento",
     portal: "Interno",
     create: [

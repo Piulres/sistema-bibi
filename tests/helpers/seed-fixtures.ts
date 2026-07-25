@@ -14,6 +14,12 @@ export const DEMO_EMAILS = {
   buildPj: "rh@incorp.demo",
   buildPedreiro: "pedreiro.jose@build.demo",
   buildCliente: "cliente@build.demo",
+  /** Niche VET — CRUD de pets */
+  petcareInterno: "operacao@petcare.demo",
+  petcareTutor: "tutor@petcare.demo",
+  /** CEDIG — gestão clínica */
+  cedigAdmin: "operacao@cedig.demo",
+  cedigRecepcao: "alana@cedig.demo",
 } as const;
 
 export const DEMO_CPFS = {

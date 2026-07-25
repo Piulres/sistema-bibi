@@ -20,6 +20,24 @@ Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
 ---
 
+## Matriz CRUD (obrigatório)
+
+Toda entidade do mapa canônico (`src/lib/crud-operations-map.ts`, UI em
+`/interno/cadastros?tab=operations`) deve ter teste automatizado que exercite
+as operações suportadas (C/R/U/D).
+
+| Camada | Onde | Papel |
+|--------|------|--------|
+| Registro | `tests/lib/crud-coverage-registry.ts` | Liga entidade → arquivos de teste |
+| Gate | `tests/lib/crud-coverage.test.ts` | Falha se faltar entidade ou arquivo |
+| API (preferido) | `tests/api/cadastros-crud.test.ts` · `tests/api/system-crud-matrix.test.ts` · demais `tests/api/*` | Happy path + RBAC leve |
+| E2E (smoke UI) | `e2e/cadastros-crud.spec.ts` · `e2e/cedig-gestao.spec.ts` · `e2e/walkin-particular.spec.ts` | Confirma formulários e toasts |
+
+**Regra para PRs:** nova entidade CRUD = entrada no mapa + entrada no registry +
+teste API (E2E só se houver UI crítica). Validar com `npm run test`.
+
+---
+
 ## Pirâmide de testes
 
 ```
