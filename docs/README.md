@@ -107,7 +107,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.3.0 na main** (produção v2.2.0) |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.3.0 em produção** (`main` tip) |
 | [`versoes/V2_3.md`](versoes/V2_3.md) | Changelog v2.3 — onboarding fase 2, construction, OpenAPI |
 | [`versoes/V2_1.md`](versoes/V2_1.md) | Changelog v2.1 — assistente, VET, change-mgmt, import |
 | [`versoes/V2_0.md`](versoes/V2_0.md) | Escopo ServiceOS v2.0 |

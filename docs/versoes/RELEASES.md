@@ -9,31 +9,45 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Status agora (27/06/2026)
+## Status agora (25/07/2026)
+
+> Auditoria cruzada: código (`package.json` / `PLATFORM` / changelog) × GitHub (`main`/`dev`) × Netlify (deploy publicado) × docs.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
-| **Pacote fechado na `main` (aguarda deploy)** | **2.3.0** — merge `dev` @ `05a63eb` |
-| **Integração `dev`** | **v2.3.0** — validado (`pre-release` + 495 Vitest + 138 E2E) |
-| **Pacote anterior em produção** | **2.1.0** — deploy `6a3d525f` @ `07c7a7e` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.0** — deploy `6a3f68e8` @ `38a3885` |
+| **Release `main`** | **v2.3.0** — tip `38a3885` (merge [#160](https://github.com/Piulres/sistema-bibi/pull/160)) |
+| **Integração `dev`** | **v2.3.0** — tip `fe84aea` (main = merge commit de `dev`) |
+| **Pacote anterior em produção** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.0** — assistente, construction ERP, onboarding fase 2, OpenAPI |
-| **Release** | `main` | **v2.3.0** — aguarda deploy manual |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.2.0** — deploy `6a3ea6c5` @ `2c38248` (25/06/2026) |
-| **Preview** | deploy draft | Após merge `dev` → `main` e `pre-release` na `main` |
+| **Integração** | `dev` | **v2.3.0** — assistente, construction ERP, onboarding fase 2, OpenAPI + pós-release (#151–#160) |
+| **Release** | `main` | **v2.3.0** — tip `38a3885` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.0** — deploy `6a3f68e8` @ `38a3885` (27/06/2026) · HTTP 200 |
+| **Preview** | deploy-preview | Ligado ao GitHub (ex.: `dev`) |
+
+### Observações da auditoria (25/07/2026)
+
+| Achado | Estado |
+|--------|--------|
+| Site no ar | ✅ HTTP 200 — landing mostra `#novidades` com **v2.3.0** current |
+| `main` ≈ `dev` | ✅ tip de `main` é o merge de `dev` (#160); `dev` em `fe84aea` |
+| Tags git `v2.2.0` / `v2.3.0` | ❌ **ainda não criadas** no remoto (última tag: `v2.1.0`) |
+| GitHub Releases | ❌ nenhuma release publicada na UI do GitHub |
+| Netlify `stop_builds` | ⚠️ **False** — builds de produção acompanham push/`main` (política documentada pedia Stop builds) |
+| `package-lock.json` version | ⚠️ raiz ainda em `2.2.0` enquanto `package.json` = `2.3.0` |
+| AGENTS.md / rules | ⚠️ citavam produção `v2.1.0` / `v2.0.0` — corrigidos nesta consolidação |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.3.0`** | `05a63eb` | Onboarding fase 2, construction ERP, OpenAPI *(pendente deploy)* |
-| **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
-| **`v2.1.0`** | merge `dev`→`main` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
+| **`v2.3.0`** | `05a63eb` (pacote) · prod tip `38a3885` | Assistente, construction ERP, onboarding fase 2, OpenAPI *(tag pendente)* |
+| **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais *(tag pendente)* |
+| **`v2.1.0`** | `cd16555` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
 | `v1.2.0` | `485819a` | Care Chart, exports, homepage — substituído por v2.0 |
 | `v1.1.0` | `8c8cd01` | Care Chart (substituído) |
@@ -41,21 +55,32 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |
 | `v1.0.0` | `685cc21` | POC inicial |
 
----
+**Pendência humana (tags):**
+
+```bash
+git checkout main && git pull
+git tag -a v2.2.0 2c38248 -m "Release 2.2.0 — onboarding tour"
+git tag -a v2.3.0 38a3885 -m "Release 2.3.0 — assistente multi-nicho + Engenharia Civil"
+git push origin v2.2.0 v2.3.0
+```
 
 ---
 
-## Pacote fechado na dev (aguarda deploy)
+## Pacote em produção (fechado)
 
 ### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + onboarding fase 2)
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.3.0` *(pendente deploy)* |
-| **Commit** | `05a63eb` (main) |
-| **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148), [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+ |
+| **Tag git** | `v2.3.0` *(pendente criar no remoto)* |
+| **Commit publicado** | `38a3885` (main tip — merge [#160](https://github.com/Piulres/sistema-bibi/pull/160)) |
+| **Commit do pacote** | `05a63eb` (prepare v2.3.0) — produção inclui commits posteriores (#151–#160) |
+| **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148)*, [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+, [#156](https://github.com/Piulres/sistema-bibi/pull/156)–[#160](https://github.com/Piulres/sistema-bibi/pull/160) |
 | **Doc** | [`V2_3.md`](V2_3.md) · [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md) |
-| **Validação dev** | [`evidencias/V2_3_VALIDACAO_DEV.md`](../evidencias/V2_3_VALIDACAO_DEV.md) |
+| **Validação** | [`evidencias/V2_3_VALIDACAO_DEV.md`](../evidencias/V2_3_VALIDACAO_DEV.md) |
+| **Publicado em** | 27/06/2026 — deploy Netlify `6a3f68e8` @ `38a3885` (publicado após deploy `6a3f390d` @ `05a63eb`) |
+
+\* PR #148 permanece aberto no GitHub, mas o conteúdo equivalente já entrou via merges posteriores na `dev`/`main`.
 
 **Inclui (além de v2.2.0):**
 
@@ -66,25 +91,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Engenharia Civil:** ERP empreiteira — pipeline, obras, orçamentos, BDI, caixa, RDO, portal campo, dupla aprovação e metas
 - **OpenAPI:** 123 rotas documentadas + Swagger UI (`/api/docs`)
 - **Massa demo:** seeds ricos multi-segmento + perfil `operation-1y`
-
-**Publicar (humano):**
-
-```bash
-git checkout dev && git pull && npm run pre-release
-git checkout main && git pull && git merge dev && npm run pre-release
-npx netlify deploy --prod --message "v2.3.0: assistente multi-nicho + Engenharia Civil"
-git tag -a v2.3.0 -m "Release 2.3.0"
-```
+- **Pós-pacote já no ar:** segurança assistente (RBAC/JTI), landing/comercial Q3, UX de loading/toasts (#151–#160)
 
 ---
 
-## Pacote em produção (fechado)
-
-### `v2.2.0` — Sistema Bibi - ServiceOS (onboarding guiado)
+### `v2.2.0` — Sistema Bibi - ServiceOS (onboarding guiado) *(substituído por v2.3.0)*
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.2.0` |
+| **Tag git** | `v2.2.0` *(pendente criar no remoto)* |
 | **PRs** | [#142](https://github.com/Piulres/sistema-bibi/pull/142) |
 | **Publicado em** | 25/06/2026 — deploy Netlify `6a3ea6c5` @ `2c38248` |
 
@@ -206,8 +221,8 @@ git tag -a v2.3.0 -m "Release 2.3.0"
 | **1.3.x** | [`V1_3.md`](V1_3.md) | Incorporado em **v2.0.0** (estoque médico) |
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
-| **2.2.x** | onboarding tour | ✅ **`v2.2.0` em produção** |
-| **2.3.x** | [`V2_3.md`](V2_3.md) | 🟡 **Validado na `dev`** — aguarda merge + deploy |
+| **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
+| **2.3.x** | [`V2_3.md`](V2_3.md) | ✅ **`v2.3.0` em produção** — deploy `6a3f68e8` @ `38a3885` |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
@@ -236,7 +251,7 @@ git tag -a v2.3.0 -m "Release 2.3.0"
 
 | Versão | Commit | Data (UTC) | Estado |
 |--------|--------|------------|--------|
-| **`v2.0.0`** | `49edb90` | 23/06/2026 | ✅ **Em produção** — deploy `6a3a9973` |
+| **`v2.0.0`** | `49edb90` | 23/06/2026 | ✅ Histórico — substituído (deploy `6a3a9973`) |
 | **`v1.3.0`** | `e372c01` | 23/06/2026 | ✅ Incorporado em v2.0.0 |
 | **`v1.2.0`** | `485819a` | 23/06/2026 | ✅ Substituído |
 | `v1.1.0` | `8c8cd01` | 22/06/2026 | ✅ Substituído |
