@@ -2,7 +2,7 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v2.3.1** @ https://sistema-bibi.netlify.app — [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V2_3.md`](versoes/V2_3.md).
+> **Produção:** **v2.4.0** @ https://sistema-bibi.netlify.app — [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V2_4.md`](versoes/V2_4.md).
 
 > **Última revisão factual:** julho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
 
@@ -117,7 +117,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.3.1 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.4.0 em produção** |
 | [`versoes/V2_3.md`](versoes/V2_3.md) | Changelog v2.3 — onboarding fase 2, construction, OpenAPI |
 | [`versoes/V2_1.md`](versoes/V2_1.md) | Changelog v2.1 — assistente, VET, change-mgmt, import |
 | [`versoes/V2_0.md`](versoes/V2_0.md) | Escopo ServiceOS v2.0 |

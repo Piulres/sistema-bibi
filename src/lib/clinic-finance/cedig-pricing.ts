@@ -146,7 +146,8 @@ export function suggestCedigAmount(
   // Mucosectomia só soma se o exame base NÃO for já a mucosectomia terapêutica
   const mucoCount = Math.max(0, Math.floor(Number(input.mucosectomies ?? 0)));
   if (mucoCount > 0 && input.procedureCode !== "CEDIG-MUCO") {
-    const mucoUnit = EXAM_PRICES["CEDIG-MUCO"][billingTable];
+    const mucoUnit =
+      EXAM_PRICES["CEDIG-MUCO"][billingTable] ?? EXAM_PRICES["CEDIG-MUCO"].PARTICULAR;
     breakdown.push({
       label: `Mucosectomia × ${mucoCount}`,
       amount: mucoUnit * mucoCount,

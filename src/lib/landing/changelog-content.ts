@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.3.1",
+    version: "2.4.0",
     label: PLATFORM.versionLabel,
     date: "25/07/2026",
     status: "current",
+    summary:
+      "Piloto CEDIG Cruzeiro: gestão clínica com lançamentos, despesas e indicadores automáticos — a secretária lança, o sistema calcula.",
+    highlights: [
+      {
+        title: "Gestão clínica (CEDIG)",
+        items: [
+          "Nova aba /interno/gestao — lançamentos por paciente, despesas e KPIs",
+          "Tabelas Particular, CentralMed, Bem Saúde e Dr Saúde com valor sugerido",
+          "Produção por médico, frascos de biópsia, ticket médio e lucro operacional",
+        ],
+      },
+      {
+        title: "Operação multi-portal",
+        items: [
+          "Tenant seed cedig com equipe, catálogo de exames e massa dos 4 portais",
+          "Prestador vê pacientes da agenda e da gestão clínica",
+          "Labels Exame no contexto MEDICAL / CEDIG",
+        ],
+      },
+    ],
+    testStats: "clinic-finance · RBAC · pre-release",
+  },
+  {
+    version: "2.3.1",
+    label: "Sistema Bibi - ServiceOS v2.3.1",
+    date: "25/07/2026",
+    status: "previous",
     summary:
       "Versão do pacote visível no título do navegador e no rodapé da home, com documentação e produção alinhadas.",
     highlights: [
@@ -39,13 +66,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Title da aplicação com semver completo (v2.3.1)",
           "Rodapé da home exibe ServiceOS v2.3.1",
           "Fonte única PLATFORM.release sincronizada com package.json",
-        ],
-      },
-      {
-        title: "Operação",
-        items: [
-          "Docs e RELEASES coerentes com o deploy em produção",
-          "Stop builds Netlify ativo — publicação só por pacote fechado",
         ],
       },
     ],

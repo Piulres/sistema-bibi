@@ -11,36 +11,37 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v2.3.1** — versão no title/footer da home + identidade `PLATFORM.release`.
+> Pacote **v2.4.0** — piloto CEDIG gestão clínica (lançamentos, despesas, KPIs).
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.1** — deploy `6a643a0d` @ `12148ce` (`bibi-poc-2026-07-25b`) |
-| **Release `main` / `dev`** | **v2.3.1** · tip `12148ce` · tag `v2.3.1` |
-| **Pacote anterior em produção** | **2.3.0** — deploy `6a6436ef` @ `374b13e` |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy _(preencher pós-deploy)_ (`bibi-poc-2026-07-25c`) |
+| **Release `main` / `dev`** | **v2.4.0** · tag `v2.4.0` |
+| **Pacote anterior em produção** | **2.3.1** — deploy `6a643a0d` @ `12148ce` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.1** · tip `12148ce` |
-| **Release** | `main` | **v2.3.1** · tip `12148ce` · tag `v2.3.1` |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.1** — deploy `6a643a0d` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v2.4.0** |
+| **Release** | `main` | **v2.4.0** · tag `v2.4.0` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.4.0** · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Smoke (25/07/2026)
 
 | Check | Resultado |
 |-------|-----------|
-| Title | `Sistema Bibi - ServiceOS v2.3.1 — …` |
-| Footer | `ServiceOS v2.3.1` |
-| CSS `/_next/static` | 200 |
-| `#novidades` | current **2.3.1** |
+| Title | `Sistema Bibi - ServiceOS v2.4.0 — …` |
+| Footer | `ServiceOS v2.4.0` |
+| CSS `/_next/static` | _(após deploy)_ |
+| `#novidades` | current **2.4.0** |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v2.4.0`** | _(tip release)_ | CEDIG gestão clínica · PR #169 |
 | **`v2.3.1`** | `12148ce` | Versão no title/footer · `PLATFORM.release` |
 | **`v2.3.0`** | `374b13e` | Assistente, construction ERP, onboarding fase 2, OpenAPI + docs alinhados |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
@@ -55,7 +56,20 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.3.1` — Sistema Bibi - ServiceOS (versão no title e footer)
+### `v2.4.0` — Sistema Bibi - ServiceOS (CEDIG gestão clínica)
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v2.4.0` |
+| **Commit publicado** | _(preencher pós-deploy)_ |
+| **PRs** | [#169](https://github.com/Piulres/sistema-bibi/pull/169) |
+| **Doc** | [`V2_4.md`](V2_4.md) · [`clientes/cedig/`](../clientes/cedig/) |
+| **Inclui** | `/interno/gestao` · tabelas de preço CEDIG · seed 4 portais · correções homologação |
+| **Publicado em** | 25/07/2026 — deploy Netlify _(id)_ (`bibi-poc-2026-07-25c`) |
+
+---
+
+### `v2.3.1` — Sistema Bibi - ServiceOS (versão no title e footer) *(substituído por v2.4.0)*
 
 | Campo | Valor |
 |-------|-------|
@@ -66,7 +80,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + onboarding fase 2) *(substituído por v2.3.1)*
+### `v2.3.0` — Sistema Bibi - ServiceOS (assistente + obras + onboarding fase 2) *(histórico)*
 
 | Campo | Valor |
 |-------|-------|
