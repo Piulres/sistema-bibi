@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **415+** casos Vitest · **128+** testes Playwright E2E · **123** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **529** casos Vitest · **128+** testes Playwright E2E · **123** Route Handlers · **123** paths no OpenAPI.
 
 ### Onboarding tour (v3)
 
@@ -286,6 +286,27 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+
+### Smoke produção — piloto CEDIG
+
+Script bash (não roda no CI): `scripts/cedig-golive-smoke.sh` — **21 asserts** contra https://sistema-bibi.netlify.app.
+
+| Camada | Cobertura |
+|--------|-----------|
+| Infra | Versão na home · CSS estático 200 |
+| Dual-store | Modo operação · não rebaixa após landing de segmento |
+| Auth | `operacao@cedig.demo` · `alana@cedig.demo` · mismatch tenant |
+| RBAC | RECEPCAO não cria usuário (403) |
+| Cadastros | Prestador criado persiste entre sessões · login portal prestador |
+| Agenda | Walk-in `autoAssignProvider` persiste após re-login |
+| Gestão | KPIs + meta (médicos CEDIG) |
+| HTTP | `/?tenant=cedig`, gestão, agenda, cadastros, login prestador |
+
+```bash
+bash scripts/cedig-golive-smoke.sh
+```
+
+Roteiro humano (15 min) e resultado da bateria: [`clientes/cedig/GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md).
 
 ---
 

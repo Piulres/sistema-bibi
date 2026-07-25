@@ -168,6 +168,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
 | Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
+| Aceite piloto CEDIG pós-deploy | Smoke manual não rodado | `bash scripts/cedig-golive-smoke.sh` — ver [`clientes/cedig/GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md) |
 
 ---
 

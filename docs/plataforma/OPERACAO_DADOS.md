@@ -113,7 +113,7 @@ POST /api/interno/operation/provision-cedig
 
 Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
 
----
+Revalidar produção: `bash scripts/cedig-golive-smoke.sh` — [`clientes/cedig/GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md).
 
 ## Limitações conhecidas
 

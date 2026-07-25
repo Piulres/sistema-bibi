@@ -13,9 +13,28 @@ Validação pré-apresentação / uso em produção.
 | lint / docs:verify / db:verify | OK |
 | `npm run pre-release` | OK |
 | Playwright `e2e/walkin-particular` (chromium) | **2 passed** |
-| Smoke API produção CEDIG | **21/21 OK** (script `/tmp/cedig-golive-smoke.sh`) |
+| Smoke API produção CEDIG | **21/21 OK** (`scripts/cedig-golive-smoke.sh`) |
 
 Fluxos críticos cobertos no smoke: modo operação estável, criar prestador + listar em nova sessão + login, walk-in persistente, RBAC Alana, gestão/KPIs, páginas HTTP.
+
+### Reexecutar o smoke (produção)
+
+Pré-requisitos: site no ar (não `503 usage_exceeded`), `curl` + `python3`, credenciais demo em `AGENTS.md`.
+
+```bash
+bash scripts/cedig-golive-smoke.sh
+```
+
+| Seção | O que valida |
+|-------|----------------|
+| 1 | Home exibe `2.4.0` · CSS `/_next/static` 200 |
+| 2–3 | Modo **operação** · não rebaixa após `/segmentos/*` |
+| 4–6 | Logins CEDIG · RBAC Alana 403 · criar prestador + persistência + login `/login?tenant=cedig` |
+| 7 | Walk-in com `autoAssignProvider` persiste em nova sessão |
+| 8 | KPIs e meta (≥5 médicos) em `/api/interno/clinic-finance/*` |
+| 9 | HTTP 200/302 nas rotas piloto |
+
+O script usa `BASE=https://sistema-bibi.netlify.app` (editável no topo do arquivo). Se o modo não for operação, tenta restaurar via ADMIN plataforma + `provision-cedig`.
 
 ---
 

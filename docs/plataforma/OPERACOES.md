@@ -89,7 +89,15 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
----
+### Scripts bash (validação pontual)
+
+| Script | Quando usar |
+|--------|-------------|
+| `bash scripts/cedig-golive-smoke.sh` | Smoke **produção** CEDIG (21 asserts API + HTTP) — após deploy ou antes de demo ao cliente |
+| `node scripts/verify-databases.mjs` | Integridade `demo.db` + `operation.db` (também via `npm run db:verify`) |
+| `node scripts/verify-docs.mjs` | Links e versão na doc (`npm run docs:verify`) |
+
+Detalhes CEDIG: [`clientes/cedig/GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md).
 
 ## 4. Operações de desenvolvimento
 
@@ -184,6 +192,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 - [ ] `npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"`
 - [ ] Smoke test: `/_next/static/chunks/*.css` retorna **200**
 - [ ] Smoke test: landing + um login por portal
+- [ ] Piloto CEDIG em operação: `bash scripts/cedig-golive-smoke.sh` — **21/21** (ver [`GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md))
 - [ ] Atualizar [`RELEASES.md`](../versoes/RELEASES.md) (mover rascunho → produção)
 - [ ] Atualizar changelog da landing: `src/lib/landing/changelog-content.ts` + `src/lib/platform.ts` + `package.json` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md)
 - [ ] Smoke test: `/#novidades` exibe a versão publicada
@@ -197,7 +206,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v2.4.0`** — **Sistema Bibi - ServiceOS** (piloto CEDIG). Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -212,7 +221,7 @@ Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver 
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v2.3.0** · Stop builds **ON**  
+**Produção:** https://sistema-bibi.netlify.app · **v2.4.0** · Stop builds **ON**  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
@@ -286,6 +295,7 @@ Pedido de validação
 | Fechar pacote em produção | `docs/versoes/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
+| Piloto CEDIG / go-live | `clientes/cedig/GO_LIVE_CHECKLIST.md`, `clientes/cedig/README.md` |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
@@ -314,6 +324,7 @@ Pedido de validação
 | Documento | Conteúdo |
 |-----------|----------|
 | [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) | Demo vs operação, dual SQLite, Blobs, seletor |
+| [`clientes/cedig/GO_LIVE_CHECKLIST.md`](../clientes/cedig/GO_LIVE_CHECKLIST.md) | Aceite piloto CEDIG + smoke produção |
 | [`WORKFLOW_CURSOR.md`](WORKFLOW_CURSOR.md) | Resumo workflow Cursor |
 | [`RELEASES.md`](../versoes/RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |

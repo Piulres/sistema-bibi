@@ -42,9 +42,9 @@ docs/
 
 ## Clientes (piloto)
 
-| Cliente | Doc |
-|---------|-----|
-| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) |
+| Cliente | Doc | Validação produção |
+|---------|-----|-------------------|
+| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) | [`GO_LIVE_CHECKLIST.md`](clientes/cedig/GO_LIVE_CHECKLIST.md) · `bash scripts/cedig-golive-smoke.sh` |
 
 ---
 
