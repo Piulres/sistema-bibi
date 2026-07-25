@@ -393,6 +393,7 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 | MFA TOTP | `POST /api/auth/mfa/setup`, `verify` | Segundo fator para interno |
 | Alternar demo/operação | `GET/PATCH /api/interno/data-store` | Quando `DUAL_DATA_STORE=true` |
 | Restaurar seed demo | `POST /api/interno/demo/reset` | Somente ADMIN + modo demo + `ALLOW_DEMO_RESET` |
+| Proteção operação | `ensureDataStoreForSegmentAccess` | Landings `/segmentos` e tenants demo **não** rebaixam operação → demo |
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 
@@ -572,14 +573,19 @@ Quando `DUAL_DATA_STORE=true` (dev e Netlify):
 
 1. Build gera `demo.db` + `operation.db` (`scripts/netlify-build.mjs`).
 2. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local.
-3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
+3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard` (confirmação `OPERAR` / `DEMO`).
 4. APIs usam `getPrisma()` → banco conforme modo ativo.
+5. **Proteção operação:** com o site em modo **operação**, landings `/segmentos/*`, `?tenant=petcare` e logins demo **não** rebaixam para demo — evita perda de walk-in e dados CEDIG na Netlify. Só ADMIN em Segurança volta à demo.
+6. **Promoção demo → operação:** `?tenant=bibi-saude` ou `?tenant=cedig` ainda alterna automaticamente para operação quando o site está em demo.
+
+Detalhes e tabela de gatilhos: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) · código: `ensureDataStoreForSegmentAccess`.
 
 ### 8.8 Persistência de segmento (landing)
 
 1. Visitante abre `/?tenant=petcare` (ou outro slug).
-2. Cliente chama `POST /api/segment/persist` → cookie `bibi_segment`.
-3. Navegação subsequente mantém tenant sem repetir query string.
+2. Servidor chama `ensureDataStoreForSegmentAccess` (dual-store) antes de resolver tenant.
+3. Cliente chama `POST /api/segment/persist` → cookie `bibi_segment`.
+4. Navegação subsequente mantém tenant sem repetir query string.
 
 ### 8.9 Melhorias de fluxo (jornada clínica)
 

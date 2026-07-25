@@ -99,6 +99,26 @@ Para voltar à demo: confirmar com `DEMO`.
 
 **Proteção:** com o site em **operação**, acessar `/segmentos/*`, `?tenant=petcare` ou e-mails demo **não** rebaixa automaticamente para demo (isso apagava walk-ins na Netlify). Só o ADMIN em Segurança volta à demo.
 
+### Seleção automática por segmento (`ensureDataStoreForSegmentAccess`)
+
+Quando `DUAL_DATA_STORE=true`, o modo ativo pode ser ajustado **antes** do login ou da landing de segmento. Implementação: `src/lib/data-store/ensure-data-store-for-segment.ts`.
+
+| Gatilho | Onde | Efeito quando site está em **demo** | Efeito quando site está em **operação** |
+|---------|------|-------------------------------------|-------------------------------------------|
+| `?tenant=bibi-saude` ou `?tenant=cedig` | Landing, login, `POST /api/segment/persist` | Alterna para **operação** | Mantém operação |
+| `?tenant=petcare` (ou outro slug de segmento demo) | Idem | Mantém demo | **Não** rebaixa para demo |
+| `/segmentos/*` | `src/app/segmentos/[slug]/page.tsx` | Grava demo | **Não** rebaixa para demo |
+| E-mail exclusivo demo (ex.: `operacao@petcare.demo`) | `POST /api/auth/login` | Grava demo | **Não** rebaixa para demo |
+| `?niche=VET` (nicho ≠ `MEDICAL`) | `resolveSegmentFromHeaders` | Grava demo | **Não** rebaixa para demo |
+
+**Tenants de operação** (`OPERATION_TENANT_SLUGS`): `bibi-saude` (bootstrap padrão) e `cedig` (piloto CEDIG). Slugs de segmento demo (petcare, horizonte, lex…) **não** forçam operação quando o site já está em demo — só `bibi-saude` e `cedig` promovem demo → operação.
+
+**E-mails compartilhados** (`faturamento@bibi.health`, prestador Horizonte): o tenant vem de `?tenant=` / cookie; não disparam troca automática por e-mail.
+
+**Volta à demo:** somente ADMIN em `/interno/seguranca` com confirmação `DEMO` (`POST /api/interno/data-store`). Navegar em landings de segmento **não** é suficiente.
+
+Testes: `tests/unit/ensure-data-store-for-segment.test.ts`.
+
 ### Provisionar CEDIG na operação
 
 O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem pacientes/PJ nem histórico de homologação).

@@ -154,6 +154,8 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
 | **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
 
+**Pitfall:** em produção com dual-store, navegar em `/segmentos/*` ou `?tenant=petcare` **não** rebaixa operação → demo (proteção contra perda de walk-in/CEDIG). Volta à demo só via ADMIN em Segurança (`DEMO`).
+
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---

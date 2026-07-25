@@ -27,6 +27,8 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 3. Entre com `operacao@petcare.demo` — contas de outro tenant são bloqueadas
 4. Confirme badge **ServiceOS v2.0** + nicho no header e nav do segmento
 
+**Site em modo operação (produção):** abrir `/segmentos/*` ou `?tenant=petcare` **não** volta o site à massa demo — a base real permanece em operação (walk-in e CEDIG não somem). Para apresentar um segmento com massa seed, ADMIN alterna explicitamente em `/interno/seguranca` (`DEMO`). Ver [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
+
 ## Roteamento por segmento
 
 | Entrada | Exemplo | Resolve |
