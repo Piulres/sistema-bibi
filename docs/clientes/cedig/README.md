@@ -101,6 +101,14 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (escolhe tabela Particular/CentralMed/…; valor sugere sozinho).
 4. Admin/financeiro: aba **Despesas** + **Indicadores**.
 
+| Portal | Login | Senha |
+|--------|-------|-------|
+| Interno ADMIN | `operacao@cedig.demo` | `bibi123` |
+| Secretária | `alana@cedig.demo` | `bibi123` |
+| Prestador | `bruno.dias@cedig.demo` | `bibi123` |
+| PJ CentralMed | `rh@centralmed.demo` | `bibi123` |
+| Beneficiário | `maria.cedig@email.com` | `bibi123` |
+
 ---
 
 ## Roadmap do piloto
