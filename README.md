@@ -6,8 +6,8 @@
 
 | | |
 |--|--|
-| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v2.3.1** |
-| **Código** | `main` = `dev` · tag `v2.3.1` |
+| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v2.3.1** · deploy `6a643a0d` (`bibi-poc-2026-07-25b`) |
+| **Código** | `main` = `dev` @ `12148ce` · tag `v2.3.1` |
 | **Publicação** | Manual (`pre-release` → `netlify deploy --prod`) · **Stop builds ON** |
 | **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V2_3.md`](docs/versoes/V2_3.md) |
 

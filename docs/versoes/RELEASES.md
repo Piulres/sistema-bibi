@@ -15,24 +15,33 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.1** — deploy pendente registrar (`bibi-poc-2026-07-25b`) |
-| **Release `main` / `dev`** | **v2.3.1** (após merge deste pacote) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.1** — deploy `6a643a0d` @ `12148ce` (`bibi-poc-2026-07-25b`) |
+| **Release `main` / `dev`** | **v2.3.1** · tip `12148ce` · tag `v2.3.1` |
 | **Pacote anterior em produção** | **2.3.0** — deploy `6a6436ef` @ `374b13e` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.1** |
-| **Release** | `main` | **v2.3.1** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.1** · **Stop builds ON** |
+| **Integração** | `dev` | **v2.3.1** · tip `12148ce` |
+| **Release** | `main` | **v2.3.1** · tip `12148ce` · tag `v2.3.1` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.1** — deploy `6a643a0d` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Smoke (25/07/2026)
+
+| Check | Resultado |
+|-------|-----------|
+| Title | `Sistema Bibi - ServiceOS v2.3.1 — …` |
+| Footer | `ServiceOS v2.3.1` |
+| CSS `/_next/static` | 200 |
+| `#novidades` | current **2.3.1** |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.3.1`** | tip release | Versão no title/footer · `PLATFORM.release` |
+| **`v2.3.1`** | `12148ce` | Versão no title/footer · `PLATFORM.release` |
 | **`v2.3.0`** | `374b13e` | Assistente, construction ERP, onboarding fase 2, OpenAPI + docs alinhados |
 | **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | `cd16555` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
@@ -51,8 +60,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.3.1` |
+| **Commit publicado** | `12148ce` |
 | **Inclui** | Title com `v{PLATFORM.release}` · footer da home com versão · sync package/changelog/OpenAPI |
-| **Publicado em** | 25/07/2026 — `bibi-poc-2026-07-25b` (deploy id após publicação) |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a643a0d` @ `12148ce` (`bibi-poc-2026-07-25b`) |
 
 ---
 

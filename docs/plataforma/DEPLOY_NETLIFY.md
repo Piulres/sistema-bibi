@@ -15,10 +15,10 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.3.0`** — deploy `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`) |
-| Pacote anterior | **`v2.2.0`** — deploy `6a3ea6c5` @ `2c38248` |
-| `main` / `dev` | Sincronizadas · tip com docs de release (`544baa1+`) |
-| Tags git | ✅ `v2.2.0` · `v2.3.0` |
+| Pacote em produção | **`v2.3.1`** — deploy `6a643a0d` @ `12148ce` (`bibi-poc-2026-07-25b`) |
+| Pacote anterior | **`v2.3.0`** — deploy `6a6436ef` @ `374b13e` |
+| `main` / `dev` | Sincronizadas · tip `12148ce` |
+| Tags git | ✅ `v2.2.0` · `v2.3.0` · `v2.3.1` |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
