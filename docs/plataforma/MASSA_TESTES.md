@@ -58,7 +58,7 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 
 **CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`docs/clientes/cedig/HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
 
-**Modo operação** (`operation.db`): tenant `bibi-saude` — bootstrap mínimo (5 usuários, 14 procedimentos, sem clientes). Ver `operation-bootstrap.ts`.
+**Modo operação** (`operation.db`): tenants `bibi-saude` (bootstrap mínimo) e `cedig` (piloto). Slugs demo (`horizonte`, `petcare`…) promovem `demo` **somente** se o site ainda não está em operação — ver `ensure-data-store-for-segment.ts`. Ver `operation-bootstrap.ts`.
 
 Documentação por segmento: [`docs/segmentos/README.md`](../segmentos/README.md)
 

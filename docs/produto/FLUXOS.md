@@ -575,6 +575,8 @@ Quando `DUAL_DATA_STORE=true` (dev e Netlify):
 3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
 4. APIs usam `getPrisma()` → banco conforme modo ativo.
 
+**Alinhamento com segmento:** `ensureDataStoreForSegmentAccess` promove automaticamente a `demo` ao abrir tenant/landing/e-mail de segmento — **exceto** se o site já está em `operation` (proteção v2.4.0f: não rebaixa para demo). Tenants de operação: `bibi-saude`, `cedig`. Detalhes: [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) § Alinhamento automático.
+
 ### 8.8 Persistência de segmento (landing)
 
 1. Visitante abre `/?tenant=petcare` (ou outro slug).

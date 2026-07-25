@@ -124,6 +124,7 @@ DUAL_DATA_STORE=true
 | **Onde** | Netlify Blobs (`bibi-config/data-store-mode`) ou `prisma/.data-store-mode` em dev |
 | **UI** | `/interno/seguranca` → card “Base de dados” (ADMIN) — confirmação `OPERAR` / `DEMO` |
 | **API** | `GET\|POST /api/interno/data-store` |
+| **Proteção** | Em modo `operation`, landing/tenant demo **não** rebaixa automaticamente para `demo` (`ensureDataStoreForSegmentAccess`) |
 
 Modo inicial opcional no painel Netlify (antes da primeira troca na UI):
 

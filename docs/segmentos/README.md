@@ -37,3 +37,17 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 | Cookie `bibi_segment` | Após landing/login | Persiste entre páginas |
 
 Senha: **`bibi123`**
+
+## Dual-store (demo vs operação)
+
+Com `DUAL_DATA_STORE=true` (produção Netlify), o tenant demo pode **sugerir** o banco `demo` ao visitar `/segmentos/*` ou `?tenant=petcare` — mas **não** se o site já está em **modo operação**.
+
+| Tipo de tenant | Slugs | Efeito no banco |
+|----------------|-------|-----------------|
+| Segmento demo | `horizonte`, `petcare`, `smile`, `lex`, `zen`, `eduprime`, `build`… | Promove `demo` **somente** se modo atual ≠ `operation` |
+| Operação real | `bibi-saude`, `cedig` | Promove `operation` |
+| Piloto CEDIG | `cedig` | Operação + provision via API se Blobs vazio |
+
+**Pitfall (corrigido v2.4.0f):** abrir `/segmentos/saude` em produção com CEDIG em operação **não** deve voltar ao `demo.db` — walk-ins e lançamentos somem se o modo rebaixa. Volta à demo: só ADMIN em `/interno/seguranca` → `DEMO`.
+
+Fonte: `src/lib/data-store/ensure-data-store-for-segment.ts` · [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).

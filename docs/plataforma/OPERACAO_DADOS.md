@@ -99,6 +99,24 @@ Para voltar à demo: confirmar com `DEMO`.
 
 **Proteção:** com o site em **operação**, acessar `/segmentos/*`, `?tenant=petcare` ou e-mails demo **não** rebaixa automaticamente para demo (isso apagava walk-ins na Netlify). Só o ADMIN em Segurança volta à demo.
 
+### Alinhamento automático demo ↔ segmento
+
+`ensureDataStoreForSegmentAccess` (`src/lib/data-store/ensure-data-store-for-segment.ts`) escolhe o banco ao navegar ou autenticar:
+
+| Entrada | Modo alvo (se site **não** está em operação) |
+|---------|-----------------------------------------------|
+| `?tenant=` slug de segmento demo (`petcare`, `horizonte`, `lex`…) | `demo` |
+| Landing `/segmentos/*` | `demo` |
+| E-mail exclusivo de tenant demo (`operacao@petcare.demo`) | `demo` |
+| `?niche=` ≠ `MEDICAL` (sem tenant explícito) | `demo` |
+| `?tenant=bibi-saude` ou `?tenant=cedig` | `operation` |
+
+**Regra de proteção (v2.4.0f):** se o modo atual já é `operation`, **nunca** aplicar troca automática para `demo`. Visitantes podem abrir landings de segmento sem perder walk-ins, lançamentos CEDIG ou `operation.db` em Blobs.
+
+Pontos de chamada: `POST /api/auth/login`, `POST /api/segment/persist`, páginas `/segmentos/[slug]`, `resolveSegmentContext` (`src/lib/segment/resolve.ts`).
+
+Tenants de operação (não forçam massa demo): `bibi-saude`, `cedig`. Demais slugs de `SEGMENT_TENANTS` são demo.
+
 ### Provisionar CEDIG na operação
 
 O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem pacientes/PJ nem histórico de homologação).
@@ -140,6 +158,7 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 ## Referências
 
 - Modo ativo: `src/lib/data-store-mode.ts`
+- Alinhamento segmento ↔ banco: `src/lib/data-store/ensure-data-store-for-segment.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
 - UI seletor: `src/components/DataStoreCard.tsx`

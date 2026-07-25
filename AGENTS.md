@@ -135,6 +135,7 @@ Mapa completo: [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVE
 - `SEED_SCALE` — volume da massa (`small` | `medium` | `large`)
 - `ALLOW_DEMO_RESET` — restaurar demo na UI (somente modo **demo** ativo)
 - **Demo vs operação:** `/interno/seguranca` (ADMIN) — `docs/plataforma/OPERACAO_DADOS.md`
+- **Proteção operação:** com dual-store ativo, `/segmentos/*` e tenants demo **não** rebaixam automaticamente de `operation` → `demo` (v2.4.0f); tenants de operação: `bibi-saude`, `cedig`
 
 ### Navegação SPA (layouts persistentes)
 
