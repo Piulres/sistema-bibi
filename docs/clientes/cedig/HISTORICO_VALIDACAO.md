@@ -123,23 +123,36 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 | **A — Piloto gestão (Alana + admin)** | ✅ Sim | Core do pedido; homologado no browser |
 | **B — Prestador (médicos)** | ✅ Ponte v2.6 | Agenda REALIZADO + extrato via ProcedureUsage |
 | **C — PJ / Beneficiário** | ✅ Massa + labels | PJ×3 + PricingRules; Beneficiário Exame |
-| **D — Produção white-label** | ⏳ | Deploy pacote v2.6 + modo **operação** |
+| **D — Produção white-label** | ✅ v2.6.0 | Publicado em produção · modo **operação** |
 | **E — Export Excel / ligação PPU** | ✅ v2.6 | Ver [`FASE_2.md`](FASE_2.md) |
 | **F — E2E + dashboard KPIs gestão** | ✅ v2.6 | `e2e/cedig-gestao.spec.ts` |
 
 ### Veredito
 
-**Pode entregar ao cliente o piloto de gestão clínica + pontes fase 2** (planilha → ferramenta + PPU/portais técnicos).
+**Pode entregar ao cliente o piloto de gestão clínica + pontes fase 2** (planilha → ferramenta + PPU/portais técnicos) — **v2.6.0 em produção**.
 
-**Não vender ainda como “os 4 portais CEDIG em produção plena”** até homologação humana in loco e deploy do pacote.
+**Não vender ainda como “os 4 portais CEDIG em produção plena”** até homologação humana in loco.  
+Trilha **v3.0** (PWA) é WIP paralelo — fora do pitch CEDIG desta sessão.
 
 ### Checklist antes de mostrar ao cliente
 
-1. Merge + deploy do pacote v2.6 (quando autorizar)
-2. Modo **operação** + branding final (logo real, se houver)
-3. Treinar Alana com [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) (15 min)
-4. Validar ponte: lançamento → Prestador / Faturamento / PJ
+1. Produção **v2.6.0** + modo **operação** (ver [`RELEASES.md`](../../versoes/RELEASES.md) · [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md))
+2. Branding final (logo real, se houver)
+3. Treinar Alana + dono com [`TREINAMENTO.md`](TREINAMENTO.md) (30–45 min) — prática [`TREINAMENTO_ROTEIRO_PRATICO.md`](TREINAMENTO_ROTEIRO_PRATICO.md)
+4. Validar ponte: lançamento → **SYNCED** → Prestador / Faturamento / PJ
 5. Coletar feedback in loco
+
+---
+
+### 2026-07-25e — Treinamento atualizado (pós v2.6 / trilha v3.0)
+
+| Item | Resultado |
+|------|-----------|
+| Entregas | `TREINAMENTO.md` · `TREINAMENTO_ROTEIRO_PRATICO.md` · `TREINAMENTO_SLIDES.md` · `GUIA_RAPIDO_ALANA.md` |
+| Base | Produção **v2.6.0** · pontes [`FASE_2.md`](FASE_2.md) · login tenant/portal (v2.5) |
+| Novidades no roteiro | Ponte **SYNCED** · export Excel · agenda **Lançar na gestão** |
+| v3.0 | Mencionado como WIP PWA — **fora** do foco da sessão CEDIG |
+| PR | #176 (rebase em `dev`) |
 
 ---
 

@@ -104,8 +104,9 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 
 1. Produção em **modo operação** — `/interno/seguranca` → `OPERAR` ([`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md)).
 2. White label CEDIG — `/interno/branding`.
-3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (escolhe tabela Particular/CentralMed/…; valor sugere sozinho).
-4. Admin/financeiro: aba **Despesas** + **Indicadores**.
+3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (valor sugere sozinho; Ponte **SYNCED** = amarrado em agenda/PPU).
+4. Admin/financeiro: aba **Despesas** + **Indicadores** (+ export Excel).
+5. **Apresentação / treino in loco:** [`TREINAMENTO.md`](TREINAMENTO.md) (30–45 min).
 
 | Portal | Login | Senha |
 |--------|-------|-------|
@@ -132,7 +133,18 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 
 Mapa de gaps e validação: [`FASE_2.md`](FASE_2.md).
 
-Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
+### Pacote de treinamento (apresentação ao cliente · v2.6)
+
+| Doc | Uso |
+|-----|-----|
+| [`TREINAMENTO.md`](TREINAMENTO.md) | Roteiro do apresentador (blocos 0–5, fala + cliques) |
+| [`TREINAMENTO_ROTEIRO_PRATICO.md`](TREINAMENTO_ROTEIRO_PRATICO.md) | Exercícios da Alana + gabarito (inclui Ponte SYNCED) |
+| [`TREINAMENTO_SLIDES.md`](TREINAMENTO_SLIDES.md) | Outline de slides |
+| [`GUIA_RAPIDO_ALANA.md`](GUIA_RAPIDO_ALANA.md) | Folha imprimível da secretária |
+
+Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro técnico: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
+
+> **Versões:** produção CEDIG = **v2.6.0**. Trilha **v3.0** (PWA/mobile) é paralela e não muda o roteiro de treino — ver [`V3_0.md`](../../versoes/V3_0.md).
 
 ---
 

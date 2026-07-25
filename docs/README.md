@@ -46,7 +46,7 @@ docs/
 
 | Cliente | Doc |
 |---------|-----|
-| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) |
+| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) · treino [`clientes/cedig/TREINAMENTO.md`](clientes/cedig/TREINAMENTO.md) · fase 2 [`clientes/cedig/FASE_2.md`](clientes/cedig/FASE_2.md) |
 
 ---
 
