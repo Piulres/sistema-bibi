@@ -152,9 +152,9 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | Modo | Conteúdo | Persistência em produção |
 |------|----------|--------------------------|
 | **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
-| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
+| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs (flush imediato + sync entre Lambdas) |
 
-Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+**Armadilha Netlify:** em modo demo, cada Lambda tem `/tmp` isolado — walk-ins somem entre requests. Em operação, `getPrisma()` rehidrata do Blob; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § Runtime Lambda.
 
 ---
 

@@ -24,7 +24,7 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 
 1. Landing: `/?tenant=petcare` (recomendado) ou `/?niche=VET`
 2. Clique em um portal — o link leva `?tenant=petcare` no login
-3. Entre com `operacao@petcare.demo` — contas de outro tenant são bloqueadas
+3. Entre com `operacao@petcare.demo` — contas de outro tenant são bloqueadas (**403** com `?tenant=<slug-da-conta>` na mensagem)
 4. Confirme badge **ServiceOS v2.0** + nicho no header e nav do segmento
 
 ## Roteamento por segmento

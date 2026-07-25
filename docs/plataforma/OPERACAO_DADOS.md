@@ -19,9 +19,40 @@ O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados �
 
 - Configuração persistida em **Netlify Blobs** (`bibi-config/data-store-mode`)
 - Banco de **operação** persistido em **Netlify Blobs** (`bibi-databases/operation.db`)
-- Escritas no modo operação são salvas automaticamente após mutações (debounce ~1,5s)
+- Escritas no modo operação fazem **flush imediato** no Blob após cada mutação Prisma (create/update/delete)
 
 **Sem Postgres:** a operação real usa SQLite + Blobs como armazenamento compartilhado entre instâncias Lambda.
+
+### Runtime Lambda (modo operação)
+
+Na Netlify, cada instância Lambda trabalha com SQLite em `/tmp/bibi-operation.db`. O Blob `bibi-databases/operation.db` é a fonte compartilhada entre cold starts.
+
+```mermaid
+sequenceDiagram
+  participant A as Lambda A
+  participant Tmp as /tmp/bibi-operation.db
+  participant Blob as Netlify Blobs
+  participant B as Lambda B
+
+  A->>Tmp: Prisma write (ex.: prestador)
+  A->>Blob: flushOperationDatabasePersist()
+  B->>Blob: getPrisma() → syncOperationDatabaseFromBlob()
+  Blob-->>B: rehidrata /tmp se updatedAt mudou
+  B->>Tmp: lê dados gravados por A
+```
+
+| Etapa | Função | Quando |
+|-------|--------|--------|
+| Escrita local | Prisma em `/tmp` | Toda mutação no modo operação |
+| Flush Blob | `flushOperationDatabasePersist()` | Após cada write Prisma (`db.ts` extension) |
+| Rehidratação | `syncOperationDatabaseFromBlob()` | Em todo `getPrisma()` no modo operação |
+| Metadata | `updatedAt` no Blob | Evita copiar `/tmp` desnecessariamente |
+
+**Por que flush imediato:** o debounce de 1,5s (`scheduleOperationDatabasePersist`) perdia cadastros quando a Lambda encerrava antes do timer — sintoma: prestador ou walk-in “criado e sumiu”.
+
+**Proteção na sync:** `syncOperationDatabaseFromBlob` não sobrescreve `/tmp` enquanto houver persistência pendente (`persistTimer` ou `persistInFlight`), para não perder writes locais.
+
+**Dev local:** sem Lambda — arquivos em `prisma/operation.db` ou `prisma/.data-store-mode`; flush/sync não se aplicam.
 
 ---
 
@@ -99,7 +130,7 @@ Para voltar à demo: confirmar com `DEMO`.
 
 **Proteção:** com o site em **operação**, acessar `/segmentos/*`, `?tenant=petcare` ou e-mails demo **não** rebaixa automaticamente para demo (isso apagava walk-ins na Netlify). Só o ADMIN em Segurança volta à demo.
 
-**Persistência:** escritas no modo operação fazem flush imediato no Blob (não só debounce 1,5s). Cada `getPrisma()` rehidrata `/tmp` se o Blob estiver mais novo — evita prestador/walk-in “criado e sumiu” entre Lambdas.
+**Persistência:** ver seção [Runtime Lambda](#runtime-lambda-modo-operação) — flush imediato + rehidratação em `getPrisma()`.
 
 ### Provisionar CEDIG na operação
 

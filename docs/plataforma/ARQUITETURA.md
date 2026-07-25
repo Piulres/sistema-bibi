@@ -121,7 +121,42 @@ O `proxy.ts` é o substituto do middleware no **Next.js 16** — exclusivo desta
 
 Cookie `bibi_session`: `userId` + HMAC com `SESSION_SECRET`; `httpOnly`, `sameSite=lax`, 8h de validade.
 
----
+### 0.4 Dual-store SQLite + Blobs (demo vs operação)
+
+Em produção Netlify, o mesmo deploy embute duas bases SQLite; o modo ativo escolhe qual usar:
+
+```mermaid
+flowchart TB
+  subgraph Build["Build Netlify"]
+    DemoDB["demo.db<br/>(seed completo)"]
+    OpDB["operation.db<br/>(bootstrap mínimo)"]
+  end
+  subgraph Runtime["Runtime Lambda"]
+  Mode["getDataStoreMode()<br/>Blobs: bibi-config"]
+  DemoTmp["/tmp/bibi-demo.db<br/>(cópia do build)"]
+  OpTmp["/tmp/bibi-operation.db"]
+  end
+  subgraph Persist["Persistência operação"]
+  Flush["flushOperationDatabasePersist()"]
+  Blob["Blobs: bibi-databases/operation.db"]
+  Sync["syncOperationDatabaseFromBlob()"]
+  end
+  Mode -->|demo| DemoTmp
+  Mode -->|operation| OpTmp
+  DemoDB -.-> DemoTmp
+  OpDB -.-> OpTmp
+  OpTmp --> Flush --> Blob
+  Blob --> Sync --> OpTmp
+```
+
+| Componente | Arquivo |
+|------------|---------|
+| Modo ativo | `src/lib/data-store-mode.ts` |
+| Cliente Prisma + extension de flush | `src/lib/db.ts` |
+| Blob read/write/sync | `src/lib/sqlite-blob-persistence.ts` |
+| UI seletor | `src/components/DataStoreCard.tsx` |
+
+Runbook completo: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ## 1. Visão de componentes
 

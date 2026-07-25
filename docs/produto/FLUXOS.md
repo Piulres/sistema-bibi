@@ -183,6 +183,16 @@ sequenceDiagram
 
 **Logout:** `POST /api/auth/logout` — remove cookie (botão Sair em `PortalShell`).
 
+**Validação de tenant no login** (`validateUserSegmentAccess` em `src/lib/segment/auth.ts`):
+
+1. O segmento ativo no site (`?tenant=`, cookie `bibi_segment` ou domínio) define o tenant esperado.
+2. Se `user.tenantId` ≠ tenant do site → **403** com mensagem que aponta o slug correto.
+3. Exemplo: prestador CEDIG em `/login` sem `?tenant=cedig` → *"Esta conta pertence a CEDIG Cruzeiro… Acesse com ?tenant=cedig."*
+
+Mensagens: `src/lib/segment/auth-messages.ts` · teste: `tests/unit/segment-auth-message.test.ts`.
+
+**Prestador criado em Cadastros:** após `POST` de usuário com role `PRESTADOR`, a UI orienta login em `/login?tenant=<slug>` (não `/interno/login`).
+
 ### 2.2 MFA TOTP (Tier 4)
 
 Quando `User.mfaEnabled = true`:
@@ -571,9 +581,25 @@ cada operação com tela, rota API e tipo de exposição (UI, Download, API-only
 Quando `DUAL_DATA_STORE=true` (dev e Netlify):
 
 1. Build gera `demo.db` + `operation.db` (`scripts/netlify-build.mjs`).
-2. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local.
+2. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local (`prisma/.data-store-mode`).
 3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
 4. APIs usam `getPrisma()` → banco conforme modo ativo.
+
+**Produção (modo operação):**
+
+| Camada | Comportamento |
+|--------|---------------|
+| Escrita | Prisma em `/tmp/bibi-operation.db` |
+| Persistência | `flushOperationDatabasePersist()` após cada mutação |
+| Leitura cross-Lambda | `syncOperationDatabaseFromBlob()` em todo `getPrisma()` |
+| Armazenamento | Blob `bibi-databases/operation.db` (metadata `updatedAt`) |
+
+Detalhes e diagrama: [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) § Runtime Lambda.
+
+**Armadilhas:**
+
+- Modo **demo** na Netlify: walk-ins e cadastros não sobrevivem entre instâncias Lambda — usar **operação** para piloto real.
+- Acessar `/segmentos/*` ou `?tenant=petcare` **não** rebaixa operação → demo (proteção em `ensureDataStoreForSegmentAccess`).
 
 ### 8.8 Persistência de segmento (landing)
 

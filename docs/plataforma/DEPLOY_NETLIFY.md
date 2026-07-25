@@ -143,7 +143,7 @@ Configure scheduled functions ou serviço externo para chamar:
 ## Limitações conhecidas da POC na Netlify
 
 - **Modo demo** — SQLite copiado para `/tmp` por instância Lambda; escrita não compartilhada entre cold starts (OK para apresentação).
-- **Modo operação** — SQLite + **Netlify Blobs** (`bibi-databases/operation.db`); escritas compartilhadas entre instâncias. Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
+- **Modo operação** — SQLite + **Netlify Blobs** (`bibi-databases/operation.db`); cada write faz flush imediato e `getPrisma()` rehidrata `/tmp` entre Lambdas. Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 - **Seed no build** — gera `demo.db` com massa completa; cada deploy recria o snapshot demo.
 - **Seletor demo/operação** — `/interno/seguranca` (ADMIN); persistência do modo em Blobs (`bibi-config/data-store-mode`).
 - **Logos** — `@netlify/blobs` em produção; filesystem local em `next dev` puro.
@@ -166,6 +166,8 @@ Configure scheduled functions ou serviço externo para chamar:
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
 | Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
+| Cadastro some após criar (modo operação) | `/tmp` stale ou flush perdido (versões antigas) | Atualizar para build com flush imediato; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § Runtime Lambda |
+| Login 403 com mensagem de tenant | Conta de outro tenant no portal errado | Usar `?tenant=<slug-da-conta>` (ex.: `/login?tenant=cedig` para prestador CEDIG) |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
 | Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
 
