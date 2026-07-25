@@ -1,6 +1,7 @@
 /**
  * Catálogo operacional CEDIG Cruzeiro — endoscopia / colonoscopia.
- * Usado no seed de demo e pode ser aplicado ao tenant em modo operação.
+ * Preços base (Procedure.basePrice) = tabela Particular.
+ * Tabelas CentralMed / Bem Saúde / Dr Saúde: `src/lib/clinic-finance/cedig-pricing.ts`.
  */
 import type { PrismaClient } from "@prisma/client";
 import { serializeTenantLabels } from "../../src/constants/niches";
@@ -11,10 +12,10 @@ const DEMO_PASSWORD = hashPassword("bibi123");
 export const CEDIG_PROCEDURES = [
   {
     code: "CEDIG-ENDO",
-    name: "Endoscopia digestiva alta",
+    name: "Endoscopia Digestiva Alta",
     category: "EXAME",
     serviceType: "ENDOSCOPIA",
-    basePrice: 650,
+    basePrice: 750,
     tissCode: null as string | null,
   },
   {
@@ -22,7 +23,7 @@ export const CEDIG_PROCEDURES = [
     name: "Colonoscopia",
     category: "EXAME",
     serviceType: "ENDOSCOPIA",
-    basePrice: 900,
+    basePrice: 1450,
     tissCode: null,
   },
   {
@@ -30,7 +31,23 @@ export const CEDIG_PROCEDURES = [
     name: "Endoscopia + Colonoscopia",
     category: "EXAME",
     serviceType: "ENDOSCOPIA",
-    basePrice: 1400,
+    basePrice: 2000,
+    tissCode: null,
+  },
+  {
+    code: "CEDIG-MUCO",
+    name: "Colonoscopia terapêutica com mucosectomia",
+    category: "EXAME",
+    serviceType: "ENDOSCOPIA",
+    basePrice: 3200,
+    tissCode: null,
+  },
+  {
+    code: "CEDIG-RESP",
+    name: "Teste respiratório",
+    category: "EXAME",
+    serviceType: "DIAGNOSTICO",
+    basePrice: 500,
     tissCode: null,
   },
 ] as const;
@@ -43,6 +60,95 @@ export const CEDIG_LABEL_OVERRIDES = {
   procedures: "Exames",
   service: "Exame endoscópico",
 } as const;
+
+/** Equipe operacional CEDIG (seed demo). */
+export const CEDIG_STAFF = [
+  {
+    email: "operacao@cedig.demo",
+    name: "Operação CEDIG",
+    role: "INTERNO",
+    internoProfile: "ADMIN",
+    specialty: null as string | null,
+  },
+  {
+    email: "alana@cedig.demo",
+    name: "Alana",
+    role: "INTERNO",
+    internoProfile: "RECEPCAO",
+    specialty: "Secretária",
+  },
+  {
+    email: "recepcao@cedig.demo",
+    name: "Alana (Recepção CEDIG)",
+    role: "INTERNO",
+    internoProfile: "RECEPCAO",
+    specialty: "Secretária",
+  },
+  {
+    email: "joao.marcos@cedig.demo",
+    name: "João Marcos",
+    role: "INTERNO",
+    internoProfile: "RECEPCAO",
+    specialty: "Enfermeiro",
+  },
+  {
+    email: "marcia@cedig.demo",
+    name: "Márcia",
+    role: "INTERNO",
+    internoProfile: "RECEPCAO",
+    specialty: "Técnica de enfermagem",
+  },
+  {
+    email: "alexandre.marcal@cedig.demo",
+    name: "Dr. Alexandre Marçal",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+  {
+    email: "luiza.lage@cedig.demo",
+    name: "Dra. Luiza Lage",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+  {
+    email: "bruno.dias@cedig.demo",
+    name: "Dr. Bruno Dias",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+  {
+    email: "luiza.zeraik@cedig.demo",
+    name: "Dra. Luiza Zeraik",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+  {
+    email: "fernanda.auto@cedig.demo",
+    name: "Dra. Fernanda Auto",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+  // aliases legados do primeiro seed
+  {
+    email: "bruno@cedig.demo",
+    name: "Dr. Bruno Dias",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+  {
+    email: "luiza@cedig.demo",
+    name: "Dra. Luiza Lage",
+    role: "PRESTADOR",
+    internoProfile: null,
+    specialty: "Endoscopia digestiva",
+  },
+] as const;
 
 export async function upsertCedigProcedures(
   prisma: PrismaClient,
@@ -65,6 +171,36 @@ export async function upsertCedigProcedures(
   return count;
 }
 
+async function upsertCedigStaff(prisma: PrismaClient, tenantId: string) {
+  for (const u of CEDIG_STAFF) {
+    const exists = await prisma.user.findUnique({ where: { email: u.email } });
+    if (exists) {
+      await prisma.user.update({
+        where: { id: exists.id },
+        data: {
+          name: u.name,
+          role: u.role,
+          internoProfile: u.internoProfile,
+          specialty: u.specialty,
+          tenantId,
+        },
+      });
+      continue;
+    }
+    await prisma.user.create({
+      data: {
+        email: u.email,
+        name: u.name,
+        password: DEMO_PASSWORD,
+        role: u.role,
+        internoProfile: u.internoProfile,
+        specialty: u.specialty,
+        tenantId,
+      },
+    });
+  }
+}
+
 /**
  * Garante tenant CEDIG (demo ou operação) com branding e catálogo.
  * Idempotente por slug `cedig`.
@@ -83,6 +219,7 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
         labels: serializeTenantLabels("MEDICAL", { ...CEDIG_LABEL_OVERRIDES }),
       },
     });
+    await upsertCedigStaff(prisma, existing.id);
     return { tenantId: existing.id, created: false, procedures };
   }
 
@@ -109,53 +246,7 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
   });
 
   const procedures = await upsertCedigProcedures(prisma, tenant.id);
-
-  const users = [
-    {
-      email: "operacao@cedig.demo",
-      name: "Operação CEDIG",
-      role: "INTERNO",
-      internoProfile: "ADMIN",
-      specialty: null as string | null,
-    },
-    {
-      email: "recepcao@cedig.demo",
-      name: "Secretária CEDIG",
-      role: "INTERNO",
-      internoProfile: "RECEPCAO",
-      specialty: null,
-    },
-    {
-      email: "bruno@cedig.demo",
-      name: "Dr. Bruno",
-      role: "PRESTADOR",
-      internoProfile: null,
-      specialty: "Endoscopia digestiva",
-    },
-    {
-      email: "luiza@cedig.demo",
-      name: "Dra. Luiza",
-      role: "PRESTADOR",
-      internoProfile: null,
-      specialty: "Endoscopia digestiva",
-    },
-  ] as const;
-
-  for (const u of users) {
-    const exists = await prisma.user.findUnique({ where: { email: u.email } });
-    if (exists) continue;
-    await prisma.user.create({
-      data: {
-        email: u.email,
-        name: u.name,
-        password: DEMO_PASSWORD,
-        role: u.role,
-        internoProfile: u.internoProfile,
-        specialty: u.specialty,
-        tenantId: tenant.id,
-      },
-    });
-  }
+  await upsertCedigStaff(prisma, tenant.id);
 
   return { tenantId: tenant.id, created: true, procedures };
 }

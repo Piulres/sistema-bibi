@@ -885,8 +885,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   }
   console.log("\nCEDIG Cruzeiro — senha bibi123 · /?tenant=cedig");
   console.log("  Interno ADMIN  -> operacao@cedig.demo");
-  console.log("  Secretária     -> recepcao@cedig.demo");
-  console.log("  Prestador      -> bruno@cedig.demo · luiza@cedig.demo");
+  console.log("  Secretária     -> alana@cedig.demo (ou recepcao@cedig.demo)");
+  console.log("  Enfermagem     -> joao.marcos@cedig.demo · marcia@cedig.demo");
+  console.log(
+    "  Médicos        -> alexandre.marcal · luiza.lage · bruno.dias · luiza.zeraik · fernanda.auto @cedig.demo",
+  );
   console.log("  Gestão clínica -> /interno/gestao");
   console.log("\nSEED_PROFILE=market|operation-1y · SEED_SCALE=small|medium|large|operation-1y no .env");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");

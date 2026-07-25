@@ -2,12 +2,26 @@
 export const CLINIC_EXPENSE_CATEGORIES = [
   { id: "LABORATORIO", label: "Laboratório de biópsias" },
   { id: "ANESTESISTA", label: "Anestesista" },
-  { id: "PESSOAL", label: "Pagamento de equipe (Bruno, Luiza…)" },
+  {
+    id: "PESSOAL",
+    label: "Pagamento de equipe (médicos, Alana, João Marcos, Márcia…)",
+  },
   { id: "INSUMOS", label: "Insumos e materiais" },
   { id: "MEDICAMENTOS", label: "Medicamentos" },
   { id: "TAXA_CARTAO", label: "Taxas de cartão" },
   { id: "OUTRAS", label: "Outras despesas" },
 ] as const;
+
+export {
+  CEDIG_PRICE_TABLES,
+  CEDIG_POLYPECTOMY_TIERS,
+  cedigPriceTableLabel,
+  cedigPolypectomyTierLabel,
+  suggestCedigAmount,
+  getCedigExamBasePrice,
+  type CedigPriceTableId,
+  type CedigPolypectomyTierId,
+} from "@/lib/clinic-finance/cedig-pricing";
 
 export type ClinicExpenseCategoryId =
   (typeof CLINIC_EXPENSE_CATEGORIES)[number]["id"];

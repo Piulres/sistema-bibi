@@ -5,7 +5,15 @@ import {
   clinicExpenseCategoryLabel,
   clinicPaymentMethodLabel,
 } from "@/lib/clinic-finance/constants";
-import { CEDIG_PROCEDURES, CEDIG_LABEL_OVERRIDES } from "../../prisma/seed-data/cedig-catalog";
+import {
+  getCedigExamBasePrice,
+  suggestCedigAmount,
+} from "@/lib/clinic-finance/cedig-pricing";
+import {
+  CEDIG_PROCEDURES,
+  CEDIG_LABEL_OVERRIDES,
+  CEDIG_STAFF,
+} from "../../prisma/seed-data/cedig-catalog";
 
 describe("clinic-finance constants", () => {
   it("expõe categorias pedidas pelo CEDIG", () => {
@@ -24,14 +32,77 @@ describe("clinic-finance constants", () => {
 });
 
 describe("cedig catalog", () => {
-  it("tem endoscopia e colonoscopia", () => {
+  it("tem exames diagnósticos, mucosectomia e teste respiratório", () => {
     const codes = CEDIG_PROCEDURES.map((p) => p.code);
     expect(codes).toContain("CEDIG-ENDO");
     expect(codes).toContain("CEDIG-COLO");
+    expect(codes).toContain("CEDIG-ENDO-COLO");
+    expect(codes).toContain("CEDIG-MUCO");
+    expect(codes).toContain("CEDIG-RESP");
+  });
+
+  it("usa preço Particular como basePrice do catálogo", () => {
+    const endo = CEDIG_PROCEDURES.find((p) => p.code === "CEDIG-ENDO");
+    const colo = CEDIG_PROCEDURES.find((p) => p.code === "CEDIG-COLO");
+    expect(endo?.basePrice).toBe(750);
+    expect(colo?.basePrice).toBe(1450);
   });
 
   it("sobrescreve labels para Exame", () => {
     expect(CEDIG_LABEL_OVERRIDES.appointment).toBe("Exame");
     expect(CEDIG_LABEL_OVERRIDES.procedures).toBe("Exames");
+  });
+
+  it("cadastra equipe médica e operacional", () => {
+    const names = CEDIG_STAFF.map((u) => u.name);
+    expect(names.some((n) => n.includes("Alexandre Marçal"))).toBe(true);
+    expect(names.some((n) => n.includes("Bruno Dias"))).toBe(true);
+    expect(names.some((n) => n.includes("Luiza Lage"))).toBe(true);
+    expect(names.some((n) => n.includes("Luiza Zeraik"))).toBe(true);
+    expect(names.some((n) => n.includes("Fernanda Auto"))).toBe(true);
+    expect(names).toContain("Alana");
+    expect(names).toContain("João Marcos");
+    expect(names).toContain("Márcia");
+  });
+});
+
+describe("cedig pricing tables", () => {
+  it("diferencia Particular e CentralMed nos exames", () => {
+    expect(getCedigExamBasePrice("CEDIG-ENDO", "PARTICULAR")).toBe(750);
+    expect(getCedigExamBasePrice("CEDIG-ENDO", "CENTRALMED")).toBe(650);
+    expect(getCedigExamBasePrice("CEDIG-COLO", "PARTICULAR")).toBe(1450);
+    expect(getCedigExamBasePrice("CEDIG-COLO", "CENTRALMED")).toBe(1250);
+    expect(getCedigExamBasePrice("CEDIG-ENDO-COLO", "PARTICULAR")).toBe(2000);
+    expect(getCedigExamBasePrice("CEDIG-ENDO-COLO", "CENTRALMED")).toBe(1900);
+  });
+
+  it("preço do teste respiratório por tabela", () => {
+    expect(getCedigExamBasePrice("CEDIG-RESP", "PARTICULAR")).toBe(500);
+    expect(getCedigExamBasePrice("CEDIG-RESP", "BEM_SAUDE")).toBe(450);
+    expect(getCedigExamBasePrice("CEDIG-RESP", "DR_SAUDE")).toBe(450);
+    expect(getCedigExamBasePrice("CEDIG-RESP", "CENTRALMED")).toBe(400);
+  });
+
+  it("sugere valor com biópsia, polipectomia e clip", () => {
+    const sug = suggestCedigAmount({
+      procedureCode: "CEDIG-COLO",
+      priceTable: "CENTRALMED",
+      biopsies: 2,
+      polypectomies: 1,
+      polypectomyTier: "INTERMEDIARIA",
+      clips: 1,
+    });
+    expect(sug).not.toBeNull();
+    // 1250 + 2*150 + 800 + 800 = 3150
+    expect(sug!.total).toBe(3150);
+  });
+
+  it("mucosectomia terapêutica não duplica o valor base", () => {
+    const sug = suggestCedigAmount({
+      procedureCode: "CEDIG-MUCO",
+      priceTable: "PARTICULAR",
+      mucosectomies: 1,
+    });
+    expect(sug!.total).toBe(3200);
   });
 });

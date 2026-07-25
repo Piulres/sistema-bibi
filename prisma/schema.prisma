@@ -1196,14 +1196,20 @@ model CompanyIndirectExpense {
 /// Lançamento operacional de exame (piloto clínicas como CEDIG).
 /// Um registro por paciente/exame — preenchimento pela secretária.
 /// paymentMethod: DINHEIRO | PIX | CARTAO | CONVENIO | TRANSFERENCIA | OUTRO
+/// priceTable: PARTICULAR | CENTRALMED | BEM_SAUDE | DR_SAUDE
+/// polypectomyTier: SIMPLES | INTERMEDIARIA | AVANCADA | COMPLEXA (opcional)
 model ClinicExamLaunch {
   id              String   @id @default(cuid())
   performedAt     DateTime @default(now())
   patientName     String
   paymentMethod   String
+  /// Tabela de preço usada no lançamento (Particular / CentralMed / convênios)
+  priceTable      String   @default("PARTICULAR")
   amountReceived  Float
   biopsies        Int      @default(0)
   polypectomies   Int      @default(0)
+  /// Faixa de polipectomia quando houver (define preço unitário sugerido)
+  polypectomyTier String?
   mucosectomies   Int      @default(0)
   clips           Int      @default(0)
   notes           String?

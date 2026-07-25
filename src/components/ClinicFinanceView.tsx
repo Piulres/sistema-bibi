@@ -1,8 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import { useToast } from "@/components/ui/Toast";
+import { suggestCedigAmount } from "@/lib/clinic-finance/cedig-pricing";
+import type {
+  CedigPolypectomyTierId,
+  CedigPriceTableId,
+} from "@/lib/clinic-finance/cedig-pricing";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -17,9 +22,11 @@ type Launch = {
   performedAt: string;
   patientName: string;
   paymentMethodLabel: string;
+  priceTableLabel?: string;
   amountReceived: number;
   biopsies: number;
   polypectomies: number;
+  polypectomyTierLabel?: string;
   mucosectomies: number;
   clips: number;
   provider: { name: string };
@@ -70,6 +77,8 @@ export default function ClinicFinanceView() {
   const [procedures, setProcedures] = useState<Procedure[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<Option[]>([]);
   const [expenseCategories, setExpenseCategories] = useState<Option[]>([]);
+  const [priceTables, setPriceTables] = useState<Option[]>([]);
+  const [polypectomyTiers, setPolypectomyTiers] = useState<Option[]>([]);
   const [launches, setLaunches] = useState<Launch[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [kpis, setKpis] = useState<Kpis | null>(null);
@@ -78,10 +87,12 @@ export default function ClinicFinanceView() {
     patientName: "",
     providerId: "",
     procedureId: "",
+    priceTable: "PARTICULAR",
     paymentMethod: "PIX",
     amountReceived: "",
     biopsies: "0",
     polypectomies: "0",
+    polypectomyTier: "",
     mucosectomies: "0",
     clips: "0",
     notes: "",
@@ -94,6 +105,58 @@ export default function ClinicFinanceView() {
     amount: "",
     expenseDate: now.toISOString().slice(0, 10),
   });
+
+  const selectedProcedure = procedures.find((p) => p.id === form.procedureId);
+
+  const suggestion = useMemo(() => {
+    if (!selectedProcedure) return null;
+    return suggestCedigAmount({
+      procedureCode: selectedProcedure.code,
+      priceTable: form.priceTable as CedigPriceTableId,
+      biopsies: Number(form.biopsies),
+      polypectomies: Number(form.polypectomies),
+      polypectomyTier: (form.polypectomyTier || null) as CedigPolypectomyTierId | null,
+      mucosectomies: Number(form.mucosectomies),
+      clips: Number(form.clips),
+    });
+  }, [
+    selectedProcedure,
+    form.priceTable,
+    form.biopsies,
+    form.polypectomies,
+    form.polypectomyTier,
+    form.mucosectomies,
+    form.clips,
+  ]);
+
+  function applySuggestion() {
+    if (!suggestion) return;
+    setForm((f) => ({ ...f, amountReceived: String(suggestion.total) }));
+  }
+
+  function patchForm(
+    patch: Partial<typeof form>,
+    opts?: { keepAmount?: boolean },
+  ) {
+    setForm((f) => {
+      const next = { ...f, ...patch };
+      if (opts?.keepAmount) return next;
+      const proc = procedures.find((p) => p.id === next.procedureId);
+      if (!proc) return next;
+      const sug = suggestCedigAmount({
+        procedureCode: proc.code,
+        priceTable: next.priceTable as CedigPriceTableId,
+        biopsies: Number(next.biopsies),
+        polypectomies: Number(next.polypectomies),
+        polypectomyTier: (next.polypectomyTier ||
+          null) as CedigPolypectomyTierId | null,
+        mucosectomies: Number(next.mucosectomies),
+        clips: Number(next.clips),
+      });
+      if (!sug) return next;
+      return { ...next, amountReceived: String(sug.total) };
+    });
+  }
 
   async function loadAll() {
     setLoading(true);
@@ -114,16 +177,28 @@ export default function ClinicFinanceView() {
       setProcedures(meta.procedures ?? []);
       setPaymentMethods(meta.paymentMethods ?? []);
       setExpenseCategories(meta.expenseCategories ?? []);
-      setForm((f) => ({
-        ...f,
-        providerId: f.providerId || meta.providers?.[0]?.id || "",
-        procedureId: f.procedureId || meta.procedures?.[0]?.id || "",
-        amountReceived:
-          f.amountReceived ||
-          (meta.procedures?.[0]?.basePrice != null
-            ? String(meta.procedures[0].basePrice)
-            : ""),
-      }));
+      setPriceTables(meta.priceTables ?? []);
+      setPolypectomyTiers(meta.polypectomyTiers ?? []);
+      setForm((f) => {
+        const firstProc = meta.procedures?.[0];
+        const nextProcId = f.procedureId || firstProc?.id || "";
+        const proc =
+          (meta.procedures as Procedure[] | undefined)?.find((p) => p.id === nextProcId) ??
+          firstProc;
+        const sug = proc
+          ? suggestCedigAmount({
+              procedureCode: proc.code,
+              priceTable: (f.priceTable || "PARTICULAR") as CedigPriceTableId,
+            })
+          : null;
+        return {
+          ...f,
+          providerId: f.providerId || meta.providers?.[0]?.id || "",
+          procedureId: nextProcId,
+          amountReceived:
+            f.amountReceived || (sug ? String(sug.total) : String(proc?.basePrice ?? "")),
+        };
+      });
     }
     if (launchesRes.ok) setLaunches(launchesJson.launches ?? []);
     if (expensesRes.ok) setExpenses(expensesJson.expenses ?? []);
@@ -154,6 +229,7 @@ export default function ClinicFinanceView() {
         amountReceived: Number(form.amountReceived),
         biopsies: Number(form.biopsies),
         polypectomies: Number(form.polypectomies),
+        polypectomyTier: form.polypectomyTier || null,
         mucosectomies: Number(form.mucosectomies),
         clips: Number(form.clips),
         performedAt: form.performedAt,
@@ -174,6 +250,7 @@ export default function ClinicFinanceView() {
       patientName: "",
       biopsies: "0",
       polypectomies: "0",
+      polypectomyTier: "",
       mucosectomies: "0",
       clips: "0",
       notes: "",
@@ -243,7 +320,7 @@ export default function ClinicFinanceView() {
           />
         </label>
         <p className="text-sm text-[var(--text-secondary)]">
-          A secretária só lança dados. Os indicadores calculam sozinhos.
+          Menus prontos + valor sugerido pela tabela. Alana só confirma e salva.
         </p>
       </div>
 
@@ -279,7 +356,9 @@ export default function ClinicFinanceView() {
                 required
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.patientName}
-                onChange={(e) => setForm({ ...form, patientName: e.target.value })}
+                onChange={(e) =>
+                  patchForm({ patientName: e.target.value }, { keepAmount: true })
+                }
                 placeholder="Nome completo"
               />
             </label>
@@ -289,7 +368,9 @@ export default function ClinicFinanceView() {
                 type="date"
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.performedAt}
-                onChange={(e) => setForm({ ...form, performedAt: e.target.value })}
+                onChange={(e) =>
+                  patchForm({ performedAt: e.target.value }, { keepAmount: true })
+                }
               />
             </label>
             <label className="text-sm">
@@ -298,11 +379,34 @@ export default function ClinicFinanceView() {
                 required
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.providerId}
-                onChange={(e) => setForm({ ...form, providerId: e.target.value })}
+                onChange={(e) =>
+                  patchForm({ providerId: e.target.value }, { keepAmount: true })
+                }
               >
                 {providers.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm">
+              Tabela de preço *
+              <select
+                required
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.priceTable}
+                onChange={(e) => patchForm({ priceTable: e.target.value })}
+              >
+                {(priceTables.length
+                  ? priceTables
+                  : [
+                      { id: "PARTICULAR", label: "Particular" },
+                      { id: "CENTRALMED", label: "CentralMed" },
+                    ]
+                ).map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
                   </option>
                 ))}
               </select>
@@ -313,14 +417,7 @@ export default function ClinicFinanceView() {
                 required
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.procedureId}
-                onChange={(e) => {
-                  const proc = procedures.find((p) => p.id === e.target.value);
-                  setForm({
-                    ...form,
-                    procedureId: e.target.value,
-                    amountReceived: proc ? String(proc.basePrice) : form.amountReceived,
-                  });
-                }}
+                onChange={(e) => patchForm({ procedureId: e.target.value })}
               >
                 {procedures.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -335,7 +432,9 @@ export default function ClinicFinanceView() {
                 required
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.paymentMethod}
-                onChange={(e) => setForm({ ...form, paymentMethod: e.target.value })}
+                onChange={(e) =>
+                  patchForm({ paymentMethod: e.target.value }, { keepAmount: true })
+                }
               >
                 {paymentMethods.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -343,6 +442,69 @@ export default function ClinicFinanceView() {
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="text-sm">
+              Biópsias (frascos) — R$ 150/un
+              <input
+                type="number"
+                min={0}
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.biopsies}
+                onChange={(e) => patchForm({ biopsies: e.target.value })}
+              />
+            </label>
+            <label className="text-sm">
+              Tipo de polipectomia
+              <select
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.polypectomyTier}
+                onChange={(e) =>
+                  patchForm({
+                    polypectomyTier: e.target.value,
+                    polypectomies:
+                      e.target.value && form.polypectomies === "0"
+                        ? "1"
+                        : form.polypectomies,
+                  })
+                }
+              >
+                <option value="">Nenhuma</option>
+                {polypectomyTiers.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm">
+              Qtd. polipectomias
+              <input
+                type="number"
+                min={0}
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.polypectomies}
+                onChange={(e) => patchForm({ polypectomies: e.target.value })}
+              />
+            </label>
+            <label className="text-sm">
+              Mucosectomias (extra)
+              <input
+                type="number"
+                min={0}
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.mucosectomies}
+                onChange={(e) => patchForm({ mucosectomies: e.target.value })}
+              />
+            </label>
+            <label className="text-sm">
+              Clips hemostáticos
+              <input
+                type="number"
+                min={0}
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.clips}
+                onChange={(e) => patchForm({ clips: e.target.value })}
+              />
             </label>
             <label className="text-sm">
               Valor recebido (R$) *
@@ -353,35 +515,49 @@ export default function ClinicFinanceView() {
                 step="0.01"
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.amountReceived}
-                onChange={(e) => setForm({ ...form, amountReceived: e.target.value })}
+                onChange={(e) =>
+                  patchForm({ amountReceived: e.target.value }, { keepAmount: true })
+                }
               />
             </label>
-            {(
-              [
-                ["biopsies", "Biópsias (frascos)"],
-                ["polypectomies", "Polipectomias"],
-                ["mucosectomies", "Mucosectomias"],
-                ["clips", "Clips"],
-              ] as const
-            ).map(([key, label]) => (
-              <label key={key} className="text-sm">
-                {label}
-                <input
-                  type="number"
-                  min={0}
-                  className="mt-1 w-full rounded-lg border px-3 py-2"
-                  value={form[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
-                />
-              </label>
-            ))}
+            {suggestion && (
+              <div className="sm:col-span-2 lg:col-span-3 rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <p>
+                    Sugestão pela tabela:{" "}
+                    <strong>{brl(suggestion.total)}</strong>
+                  </p>
+                  <button
+                    type="button"
+                    onClick={applySuggestion}
+                    className="text-[var(--brand-primary)] underline"
+                  >
+                    Usar sugestão
+                  </button>
+                </div>
+                <ul className="mt-1 text-xs text-[var(--text-muted)]">
+                  {suggestion.breakdown.map((b) => (
+                    <li key={b.label}>
+                      {b.label}: {brl(b.amount)}
+                    </li>
+                  ))}
+                </ul>
+                {(form.priceTable === "BEM_SAUDE" || form.priceTable === "DR_SAUDE") &&
+                  selectedProcedure?.code !== "CEDIG-RESP" && (
+                    <p className="mt-1 text-xs text-[var(--text-muted)]">
+                      Bem Saúde / Dr Saúde: preço próprio só no teste respiratório; demais
+                      itens usam a tabela Particular.
+                    </p>
+                  )}
+              </div>
+            )}
             <label className="text-sm sm:col-span-2 lg:col-span-3">
               Observações
               <input
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.notes}
                 onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="Opcional"
+                placeholder="Complexidade, materiais especiais, avaliação individualizada…"
               />
             </label>
             <div className="sm:col-span-2 lg:col-span-3">
@@ -407,6 +583,7 @@ export default function ClinicFinanceView() {
                   <th className="px-3 py-2">Data</th>
                   <th className="px-3 py-2">Paciente</th>
                   <th className="px-3 py-2">Médico</th>
+                  <th className="px-3 py-2">Tabela</th>
                   <th className="px-3 py-2">Exame</th>
                   <th className="px-3 py-2">Pagamento</th>
                   <th className="px-3 py-2">Valor</th>
@@ -421,6 +598,7 @@ export default function ClinicFinanceView() {
                     </td>
                     <td className="px-3 py-2">{l.patientName}</td>
                     <td className="px-3 py-2">{l.provider.name}</td>
+                    <td className="px-3 py-2">{l.priceTableLabel ?? "—"}</td>
                     <td className="px-3 py-2">{l.procedure.name}</td>
                     <td className="px-3 py-2">{l.paymentMethodLabel}</td>
                     <td className="px-3 py-2">{brl(l.amountReceived)}</td>
@@ -431,7 +609,7 @@ export default function ClinicFinanceView() {
                 ))}
                 {launches.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-3 py-6 text-center text-[var(--text-muted)]">
+                    <td colSpan={8} className="px-3 py-6 text-center text-[var(--text-muted)]">
                       Nenhum lançamento neste mês.
                     </td>
                   </tr>
@@ -476,7 +654,7 @@ export default function ClinicFinanceView() {
                 onChange={(e) =>
                   setExpenseForm({ ...expenseForm, description: e.target.value })
                 }
-                placeholder="Ex.: Pagamento Bruno — julho"
+                placeholder="Ex.: Pagamento Dr. Bruno Dias — julho"
               />
             </label>
             <label className="text-sm">

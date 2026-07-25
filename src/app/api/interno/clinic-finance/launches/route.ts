@@ -32,9 +32,13 @@ export async function POST(request: Request) {
       providerId: String(body.providerId ?? ""),
       procedureId: String(body.procedureId ?? ""),
       paymentMethod: String(body.paymentMethod ?? ""),
+      priceTable: body.priceTable ? String(body.priceTable) : "PARTICULAR",
       amountReceived: Number(body.amountReceived ?? 0),
       biopsies: Number(body.biopsies ?? 0),
       polypectomies: Number(body.polypectomies ?? 0),
+      polypectomyTier: body.polypectomyTier
+        ? String(body.polypectomyTier)
+        : null,
       mucosectomies: Number(body.mucosectomies ?? 0),
       clips: Number(body.clips ?? 0),
       notes: body.notes ? String(body.notes) : undefined,

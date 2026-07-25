@@ -8,8 +8,77 @@
 | **Segmento** | `MEDICAL` (endoscopia digestiva) |
 | **Slug sugerido** | `cedig` |
 | **Contato público** | (12) 3199-7871 · WhatsApp |
-| **Foco clínico** | Endoscopia · Colonoscopia |
+| **Foco clínico** | Endoscopia · Colonoscopia · Teste respiratório |
 | **Não confundir** | Clínica CEDIG de São Paulo (Vila Mariana/Tucuruvi) é outra rede |
+
+---
+
+## Equipe (operação)
+
+| Papel | Nome |
+|-------|------|
+| Secretária | Alana |
+| Enfermeiro | João Marcos |
+| Téc. enfermagem | Márcia |
+| Médicos | Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Auto |
+
+Seed demo (`/?tenant=cedig`, senha `bibi123`):
+
+- `alana@cedig.demo` / `recepcao@cedig.demo` — secretária
+- `joao.marcos@cedig.demo` · `marcia@cedig.demo`
+- `alexandre.marcal@cedig.demo` · `luiza.lage@cedig.demo` · `bruno.dias@cedig.demo` · `luiza.zeraik@cedig.demo` · `fernanda.auto@cedig.demo`
+- `operacao@cedig.demo` — ADMIN
+
+---
+
+## Tabelas de preço
+
+Fonte: tabelas institucionais do cliente. Motor: `src/lib/clinic-finance/cedig-pricing.ts`.
+
+### Exames diagnósticos
+
+| Exame | Particular | CentralMed |
+|-------|------------|------------|
+| Endoscopia Digestiva Alta | R$ 750 | R$ 650 |
+| Colonoscopia | R$ 1.450 | R$ 1.250 |
+| Endoscopia + Colonoscopia | R$ 2.000 | R$ 1.900 |
+
+### Teste respiratório
+
+| Tabela | Valor |
+|--------|-------|
+| Particular | R$ 500 |
+| Bem Saúde / Dr Saúde | R$ 450 |
+| CentralMed | R$ 400 |
+
+### Biópsias
+
+R$ 150 por frasco (todas as tabelas).
+
+### Polipectomias
+
+| Faixa | Particular | CentralMed |
+|-------|------------|------------|
+| Simples ≤ 5 mm | R$ 550 | R$ 550 |
+| Intermediária 5–10 mm | R$ 850 | R$ 800 |
+| Avançada 10–15 mm | R$ 1.200 | R$ 1.150 |
+| Complexa 15–20 mm | R$ 1.600 | R$ 1.400 |
+
+### Mucosectomia (colonoscopia terapêutica)
+
+- Particular: a partir de R$ 3.200  
+- CentralMed: a partir de R$ 3.100  
+- Inclui agulha injetora, solução para lifting e 1 alça padrão
+
+### Clips / OPME
+
+| Item | Particular | CentralMed |
+|------|------------|------------|
+| Clip hemostático | R$ 900 | R$ 800 |
+
+Materiais especiais podem ser cobrados à parte (campo observações no lançamento).
+
+**Bem Saúde / Dr Saúde:** preço próprio só no teste respiratório; demais itens usam Particular no cálculo sugerido.
 
 ---
 
@@ -17,36 +86,20 @@
 
 Substituir a planilha por gestão profissional, **simples para a secretária** e útil para decisão:
 
-1. **Uma aba de lançamentos** — 1 linha por paciente (paciente, médico, tipo de exame, pagamento, valor, biópsias, polipectomias, mucosectomias, clips).
-2. **Uma aba de despesas** — laboratório, anestesista, Bruno, Luiza, insumos, medicamentos, taxas de cartão, outras.
+1. **Uma aba de lançamentos** — 1 linha por paciente (paciente, médico, tipo de exame, tabela, pagamento, valor, biópsias, polipectomias, mucosectomias, clips).
+2. **Uma aba de despesas** — laboratório, anestesista, equipe, insumos, medicamentos, taxas de cartão, outras.
 3. **Indicadores automáticos** — receita, despesas, lucro operacional, exames por tipo, produção por médico, frascos para lab, ticket médio, lucro por exame.
 
-A secretária **não faz contas** — só lança; o sistema calcula.
-
----
-
-## O que o ServiceOS já tinha vs o pedido
-
-| Necessidade CEDIG | Antes | Agora (módulo Gestão clínica) |
-|-------------------|-------|-------------------------------|
-| Faturamento / receita | ✅ Pay Per Use + faturas | Mantido |
-| Lançamento 1 paciente/exame com contadores | ❌ | ✅ `ClinicExamLaunch` |
-| Despesas mensais (opex) | ❌ (só obras/construction) | ✅ `ClinicExpense` |
-| KPIs lucro / ticket / produção | ❌ | ✅ `/interno/gestao` |
-| Catálogo endoscopia | ❌ seed genérico | ✅ procedimentos CEDIG |
-| Dual-store operação | ✅ | Usar modo **operação** |
+A secretária **não faz contas** — menus prontos + valor sugerido; o sistema calcula os indicadores.
 
 ---
 
 ## Como usar no piloto
 
 1. Produção em **modo operação** — `/interno/seguranca` → `OPERAR` ([`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md)).
-2. White label CEDIG — `/interno/branding` (nome, cores, logo).
-3. Cadastro de médicos (Bruno, Luiza, etc.) em Cadastros → Prestadores.
-4. Secretária: `/interno/gestao` → aba **Lançamentos**.
-5. Admin/financeiro: aba **Despesas** + **Indicadores**.
-
-Credenciais iniciais: as do bootstrap de operação (ou usuários criados no tenant CEDIG).
+2. White label CEDIG — `/interno/branding`.
+3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (escolhe tabela Particular/CentralMed/…; valor sugere sozinho).
+4. Admin/financeiro: aba **Despesas** + **Indicadores**.
 
 ---
 
@@ -55,8 +108,8 @@ Credenciais iniciais: as do bootstrap de operação (ou usuários criados no ten
 | Fase | Entrega | Status |
 |------|---------|--------|
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
-| **B** | Tenant CEDIG (branding, labels “Exame”, catálogo, usuários demo) | ✅ seed `/?tenant=cedig` |
-| **C** | Homologação com secretária (UX + exemplos) | Pendente humano |
+| **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
+| **C** | Homologação com Alana (UX + exemplos) | Pendente humano |
 | **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
 | **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
 
@@ -64,8 +117,9 @@ Credenciais iniciais: as do bootstrap de operação (ou usuários criados no ten
 
 ## Referências de código
 
+- Tabelas de preço: `src/lib/clinic-finance/cedig-pricing.ts`
 - Constantes: `src/lib/clinic-finance/constants.ts`
 - Serviço: `src/lib/clinic-finance/service.ts`
 - UI: `src/components/ClinicFinanceView.tsx`
 - API: `/api/interno/clinic-finance/*`
-- Catálogo seed: `prisma/seed-data/cedig-catalog.ts`
+- Catálogo / equipe seed: `prisma/seed-data/cedig-catalog.ts`

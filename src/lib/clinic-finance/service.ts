@@ -7,6 +7,16 @@ import {
   type ClinicExpenseCategoryId,
   type ClinicPaymentMethodId,
 } from "@/lib/clinic-finance/constants";
+import {
+  CEDIG_POLYPECTOMY_TIERS,
+  CEDIG_PRICE_TABLES,
+  cedigPolypectomyTierLabel,
+  cedigPriceTableLabel,
+  isCedigPolypectomyTierId,
+  isCedigPriceTableId,
+  suggestCedigAmount,
+  type CedigPriceTableId,
+} from "@/lib/clinic-finance/cedig-pricing";
 
 function monthRange(year: number, month: number) {
   const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
@@ -50,9 +60,11 @@ export type CreateExamLaunchInput = {
   providerId: string;
   procedureId: string;
   paymentMethod: string;
+  priceTable?: string;
   amountReceived: number;
   biopsies?: number;
   polypectomies?: number;
+  polypectomyTier?: string | null;
   mucosectomies?: number;
   clips?: number;
   notes?: string;
@@ -72,9 +84,20 @@ export async function createExamLaunch(
   const paymentOk = CLINIC_PAYMENT_METHODS.some((p) => p.id === input.paymentMethod);
   if (!paymentOk) return { error: "Forma de pagamento inválida." } as const;
 
+  const priceTableRaw = input.priceTable || "PARTICULAR";
+  if (!isCedigPriceTableId(priceTableRaw)) {
+    return { error: "Tabela de preço inválida." } as const;
+  }
+  const priceTable: CedigPriceTableId = priceTableRaw;
+
   const amount = Number(input.amountReceived);
   if (!Number.isFinite(amount) || amount < 0) {
     return { error: "Valor recebido inválido." } as const;
+  }
+
+  const tierRaw = input.polypectomyTier?.trim() || null;
+  if (tierRaw && !isCedigPolypectomyTierId(tierRaw)) {
+    return { error: "Tipo de polipectomia inválido." } as const;
   }
 
   const [provider, procedure] = await Promise.all([
@@ -101,9 +124,11 @@ export async function createExamLaunch(
       providerId: provider.id,
       procedureId: procedure.id,
       paymentMethod: input.paymentMethod as ClinicPaymentMethodId,
+      priceTable,
       amountReceived: amount,
       biopsies: nonNeg(input.biopsies),
       polypectomies: nonNeg(input.polypectomies),
+      polypectomyTier: tierRaw,
       mucosectomies: nonNeg(input.mucosectomies),
       clips: nonNeg(input.clips),
       notes: input.notes?.trim() || null,
@@ -124,9 +149,11 @@ function serializeLaunch(launch: {
   performedAt: Date;
   patientName: string;
   paymentMethod: string;
+  priceTable: string;
   amountReceived: number;
   biopsies: number;
   polypectomies: number;
+  polypectomyTier: string | null;
   mucosectomies: number;
   clips: number;
   notes: string | null;
@@ -139,9 +166,13 @@ function serializeLaunch(launch: {
     patientName: launch.patientName,
     paymentMethod: launch.paymentMethod,
     paymentMethodLabel: clinicPaymentMethodLabel(launch.paymentMethod),
+    priceTable: launch.priceTable,
+    priceTableLabel: cedigPriceTableLabel(launch.priceTable),
     amountReceived: launch.amountReceived,
     biopsies: launch.biopsies,
     polypectomies: launch.polypectomies,
+    polypectomyTier: launch.polypectomyTier,
+    polypectomyTierLabel: cedigPolypectomyTierLabel(launch.polypectomyTier),
     mucosectomies: launch.mucosectomies,
     clips: launch.clips,
     notes: launch.notes,
@@ -338,5 +369,33 @@ export async function getClinicFinanceMeta(tenantId: string) {
     procedures,
     paymentMethods: CLINIC_PAYMENT_METHODS,
     expenseCategories: CLINIC_EXPENSE_CATEGORIES,
+    priceTables: CEDIG_PRICE_TABLES,
+    polypectomyTiers: CEDIG_POLYPECTOMY_TIERS,
   };
+}
+
+/** Sugestão de valor a partir das tabelas CEDIG (para a secretária). */
+export function previewCedigAmount(input: {
+  procedureCode: string;
+  priceTable: string;
+  biopsies?: number;
+  polypectomies?: number;
+  polypectomyTier?: string | null;
+  mucosectomies?: number;
+  clips?: number;
+}) {
+  if (!isCedigPriceTableId(input.priceTable)) return null;
+  const tier =
+    input.polypectomyTier && isCedigPolypectomyTierId(input.polypectomyTier)
+      ? input.polypectomyTier
+      : null;
+  return suggestCedigAmount({
+    procedureCode: input.procedureCode,
+    priceTable: input.priceTable,
+    biopsies: input.biopsies,
+    polypectomies: input.polypectomies,
+    polypectomyTier: tier,
+    mucosectomies: input.mucosectomies,
+    clips: input.clips,
+  });
 }
