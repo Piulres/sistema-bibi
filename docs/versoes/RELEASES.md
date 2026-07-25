@@ -36,6 +36,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Footer | `ServiceOS v2.4.0` |
 | CSS `/_next/static` | 200 |
 | `#novidades` | current **2.4.0** |
+| Modo operação + Alana CEDIG | OK (`provision-cedig`) |
 
 ### Tags git (histórico)
 
