@@ -1,10 +1,12 @@
-# Documentação Sistema Bibi - ServiceOS v2.0
+# Documentação Sistema Bibi - ServiceOS v2.3
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Última revisão factual:** junho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
+> **Produção:** **v2.3.0** @ https://sistema-bibi.netlify.app — [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V2_3.md`](versoes/V2_3.md).
 
-> **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre seis. Comece pelo segmento do seu tenant ou pela documentação de plataforma.
+> **Última revisão factual:** julho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
+
+> **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
 ---
 

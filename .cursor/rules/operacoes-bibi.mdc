@@ -27,7 +27,7 @@ dev local → lint → PR → merge dev → merge main → [humano] deploy manua
 | `dev` | **Integração** — destino de todos os PRs (draft ou não) |
 | `main` | **Release** — só recebe merge de `dev` ao fechar pacote |
 
-`main` à frente de produção é **normal**. Produção ≠ último commit. **PRs de feature nunca abrem direto na `main`.**
+`main` pode ficar à frente de produção após commits só de docs pós-deploy — isso é normal. Produção = último **deploy** registrado em `RELEASES.md`, não necessariamente o tip. **PRs de feature nunca abrem direto na `main`.**
 
 ## Matriz rápida — o que fazer
 

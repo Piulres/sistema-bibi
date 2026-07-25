@@ -1,8 +1,19 @@
-# Sistema Bibi - ServiceOS v2.0 — Infraestrutura Pay Per Use Multi-Nicho
+# Sistema Bibi - ServiceOS v2.3 — Infraestrutura Pay Per Use Multi-Nicho
 
 > Plataforma **ServiceOS** multi-nicho para faturamento Pay Per Use em saúde, veterinária,
-> odontologia, jurídico, bem-estar e educação. White label por tenant, quatro portais segregados
-> e transparência total de consumo — sem a "caixa preta" da sinistralidade.
+> odontologia, jurídico, bem-estar, educação e engenharia. White label por tenant, quatro portais
+> segregados e transparência total de consumo — sem a "caixa preta" da sinistralidade.
+
+| | |
+|--|--|
+| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v2.3.0** · deploy `6a6436ef` (`bibi-poc-2026-07-25a`) |
+| **Código** | `main` = `dev` · tags `v2.2.0` / `v2.3.0` |
+| **Publicação** | Manual (`pre-release` → `netlify deploy --prod`) · **Stop builds ON** |
+| **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V2_3.md`](docs/versoes/V2_3.md) |
+
+> **GitHub About** (painel do repositório — a API do agente não altera Description/Website):  
+> Description: `Sistema Bibi - ServiceOS v2.3 — Infraestrutura Pay Per Use multi-nicho`  
+> Website: `https://sistema-bibi.netlify.app`
 
 ---
 
@@ -207,19 +218,21 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` | `bibi123` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` | `bibi123` |
 
-### Tenants ServiceOS multi-nicho (v2.0)
+### Tenants ServiceOS multi-nicho (v2.3)
 
 Senha única: **`bibi123`**. Cada tenant tem procedimentos e nomenclatura do nicho.
 
-| Nicho | Tenant demo | Login interno (ADMIN) |
-|-------|-------------|------------------------|
-| Veterinária | PetCare | `operacao@petcare.demo` |
-| Odontologia | Smile Odonto | `operacao@smile.demo` |
-| Jurídico | Lex & Partners | `operacao@lex.demo` |
-| Bem-estar | Zen Studio | `operacao@zen.demo` |
-| Educação | EduPrime | `operacao@eduprime.demo` |
+| Nicho | Tenant demo | Login interno (ADMIN) | Preview |
+|-------|-------------|------------------------|---------|
+| Saúde | Clínica Horizonte | `faturamento@bibi.health` | `/?tenant=horizonte` ou default |
+| Veterinária | PetCare | `operacao@petcare.demo` | `/?tenant=petcare` |
+| Odontologia | Smile Odonto | `operacao@smile.demo` | `/?tenant=smile` |
+| Jurídico | Lex & Partners | `operacao@lex.demo` | `/?tenant=lex` |
+| Bem-estar | Zen Studio | `operacao@zen.demo` | `/?tenant=zen` |
+| Educação | EduPrime | `operacao@eduprime.demo` | `/?tenant=eduprime` |
+| Engenharia | Build Corp | `operacao@build.demo` | `/?tenant=build` |
 
-Preview de nicho na landing local: `/?niche=VET`, `/?niche=LEGAL`, etc.
+Preview por nicho (fallback): `/?niche=VET`, `/?niche=LEGAL`, `/?niche=CONSTRUCTION`, etc.
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma
 > conta em outro portal retorna erro de acesso.
@@ -491,16 +504,18 @@ sistema-bibi/
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/plataforma/TESTES.md`](docs/plataforma/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app (pode retornar **503** por cota).
-  Pacotes fechados: [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md). Workflow Cursor:
+- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v2.3.0** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
+  Se retornar **503 `usage_exceeded`**, é cota do plano (não regressão de código). Workflow:
   [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
-  Deploy manual apenas quando necessário — ver [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md).
+  Deploy manual — [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md) · Stop builds ON.
 - **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres para alta escala, validação XSD TISS completa.
 
 ## 14. Documentação adicional
 
-- **Índice por segmento (ServiceOS v2.0):**
+- **Índice por segmento (ServiceOS):**
   [`docs/README.md`](docs/README.md) · [`docs/segmentos/README.md`](docs/segmentos/README.md)
+- **Changelog v2.3 (produção atual):**
+  [`docs/versoes/V2_3.md`](docs/versoes/V2_3.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md)
 - **Jornada do cliente nos 4 portais (UX, gaps e melhorias):**
@@ -513,7 +528,7 @@ sistema-bibi/
   [`docs/pesquisa/README.md`](docs/pesquisa/README.md)
 - **Ações × Benchmark (Bibi vs iClinic/Feegow/ERPMed):**
   [`docs/plataforma/BENCHMARK.md`](docs/plataforma/BENCHMARK.md)
-- **Arquitetura ServiceOS v2.0 (multi-nicho):**
+- **Arquitetura multi-nicho (base v2.0):**
   [`docs/versoes/V2_0.md`](docs/versoes/V2_0.md) · [`docs/versoes/V2_0_ARCHITECTURE.md`](docs/versoes/V2_0_ARCHITECTURE.md)
 - **Arquitetura e diagramas** (componentes, ER e fluxos Mermaid):
   [`docs/plataforma/ARQUITETURA.md`](docs/plataforma/ARQUITETURA.md)
@@ -547,4 +562,4 @@ sistema-bibi/
 
 ---
 
-Construído como POC evoluindo para **Sistema Bibi - ServiceOS v2.0** — infraestrutura horizontal de confiança para serviços Pay Per Use.
+Construído como POC evoluindo para **Sistema Bibi - ServiceOS v2.3** — infraestrutura horizontal de confiança para serviços Pay Per Use.
