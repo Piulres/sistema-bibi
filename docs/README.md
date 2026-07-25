@@ -1,4 +1,4 @@
-# Documentação Sistema Bibi - ServiceOS v2.3
+# Documentação Sistema Bibi - ServiceOS v2.4
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
@@ -118,6 +118,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | Documento | Conteúdo |
 |-----------|----------|
 | [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v2.4.0 em produção** |
+| [`versoes/V2_4.md`](versoes/V2_4.md) | Changelog v2.4 — gestão clínica CEDIG (`/interno/gestao`) |
 | [`versoes/V2_3.md`](versoes/V2_3.md) | Changelog v2.3 — onboarding fase 2, construction, OpenAPI |
 | [`versoes/V2_1.md`](versoes/V2_1.md) | Changelog v2.1 — assistente, VET, change-mgmt, import |
 | [`versoes/V2_0.md`](versoes/V2_0.md) | Escopo ServiceOS v2.0 |

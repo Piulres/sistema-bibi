@@ -226,11 +226,13 @@ flowchart LR
   subgraph RECEPCAO
     D2[Dashboard] --> AG[Agenda]
     D2 --> CAD[Cadastros]
+    D2 --> GES[Gestão clínica]
     D2 --> COM[Comunicação]
   end
 
   subgraph FATURAMENTO
     D3[Dashboard] --> B2[Faturamento]
+    D3 --> GES2[Gestão clínica]
     D3 --> SUB2[Recorrência]
     D3 --> REL[Relatórios]
   end
@@ -242,6 +244,7 @@ flowchart LR
 | Faturamento | `/interno` | Pendências PPU → gerar fatura → PIX / marcar paga → TISS XML |
 | Agenda | `/interno/agenda` | CRUD agendamentos, **walk-in particular**, check-in, modalidade TELE |
 | Cadastros | `/interno/cadastros` | Beneficiários, empresas, procedimentos, usuários (criar + **editar**) |
+| Gestão clínica | `/interno/gestao` | Lançamentos diários, despesas opex, KPIs — piloto CEDIG (`MEDICAL`/`DENTAL`) |
 | Mapa CRUD | `/interno/cadastros?tab=operations` | 27 entidades — telas, rotas API, filtro por portal |
 | CRM | `/interno/crm` | Pipeline lead → ativo (kanban) |
 | Recorrência | `/interno/assinaturas` | Assinaturas → gerar cobranças → faturar |
@@ -265,7 +268,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
-| Baixa | 13 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
+| Baixa | 14 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
 
 **Melhorias visuais implementadas (2026-06):** `StatCard` unificado em dashboard/PJ/beneficiário/faturamento; `FlowStepper` na jornada PPU; `CalloutCard` + `AppointmentCard` na agenda interna e prestador; `TabBar` em Cadastros; `EmptyState` com título e dica.
 
