@@ -318,6 +318,18 @@ CI=true npm run test:e2e
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
+### `db:verify` — integridade das massas
+
+Script: `scripts/verify-databases.mjs` · comando: `npm run db:verify`.
+
+| Base | Validação principal |
+|------|---------------------|
+| `demo.db` | 7 tenants de segmento, usuários demo âncora, volume mínimo de PJ/beneficiários |
+| `operation.db` | 2 tenants (`bibi-saude` + `cedig`), equipe essencial, ≥14 procedimentos, **sem** PJ nem pacientes |
+| `dev.db` | Tamanho idêntico a `demo.db` |
+
+Detalhes e flags do CEDIG (`portalMass`, `seedHistory`): [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · mapa de massa: [`MASSA_TESTES.md`](MASSA_TESTES.md).
+
 ---
 
 ## Referências

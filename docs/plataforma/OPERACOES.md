@@ -86,6 +86,7 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
 | `npm run db:bootstrap:operation` | Só `operation.db` (bootstrap mínimo) | Piloto operação local |
+| `npm run db:verify` | Valida `demo.db` + `operation.db` pós-bootstrap | CI, `pre-release`, após seed |
 | `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
@@ -152,7 +153,7 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | Modo | Conteúdo | Persistência em produção |
 |------|----------|--------------------------|
 | **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
-| **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
+| **Operação** | Bootstrap mínimo (`bibi-saude` + `cedig`); dados reais pelo uso | Netlify Blobs |
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 

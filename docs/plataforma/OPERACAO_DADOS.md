@@ -67,6 +67,36 @@ npm run db:setup
 npm run db:verify
 ```
 
+### Composição do `operation.db` (bootstrap)
+
+O bootstrap (`prisma/seed-data/operation-bootstrap.ts`) cria **dois tenants** `MEDICAL`:
+
+| Tenant | Slug | Conteúdo | Excluído na operação |
+|--------|------|----------|----------------------|
+| Clínica Bibi Saúde | `bibi-saude` | 5 usuários internos/prestador, 14 procedimentos genéricos | — |
+| CEDIG Cruzeiro | `cedig` | Equipe clínica + catálogo de exames (`cedig-catalog.ts`) | Pacientes, PJ, histórico de homologação |
+
+Flags em `ensureCedigTenant()`:
+
+| Flag | Demo (`demo.db`) | Operação (`operation.db`) |
+|------|------------------|---------------------------|
+| `portalMass` | `true` — pacientes + PJ CentralMed | `false` |
+| `seedHistory` | `true` — lançamentos/agenda de homologação | `false` |
+
+Dados reais (pacientes, empresas, lançamentos) entram pelo uso do sistema em produção — o bootstrap não pré-popula CRM B2B nem beneficiários.
+
+### Validação `db:verify`
+
+Script: `scripts/verify-databases.mjs` · integrado ao CI e `npm run pre-release`.
+
+| Base | O que valida |
+|------|--------------|
+| `demo.db` | 7 tenants de segmento (`horizonte`…`eduprime`), usuários âncora, ≥50 PJ (ou ≥20 com `SEED_PROFILE=operation-1y`), ≥100 beneficiários |
+| `operation.db` | Exatamente 2 tenants (`bibi-saude`, `cedig`), ambos `MEDICAL`, usuários essenciais (incl. `alana@cedig.demo`), ≥14 procedimentos, **0 empresas PJ e 0 pacientes** |
+| `dev.db` | Espelha `demo.db` em tamanho (legado local) |
+
+> O tenant `cedig` na demo tem massa completa (4 portais + histórico), mas `db:verify` só exige os 7 slugs de segmento em `demo.db`. A presença do CEDIG na operação é validada explicitamente em `operation.db`.
+
 **Dev local:** dual-store habilitado por padrão. Modo salvo em `prisma/.data-store-mode`.
 
 ```bash

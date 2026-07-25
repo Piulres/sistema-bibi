@@ -58,7 +58,7 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 
 **CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`docs/clientes/cedig/HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
 
-**Modo operação** (`operation.db`): tenant `bibi-saude` — bootstrap mínimo (5 usuários, 14 procedimentos, sem clientes). Ver `operation-bootstrap.ts`.
+**Modo operação** (`operation.db`): **2 tenants** — `bibi-saude` (5 usuários + 14 procedimentos genéricos) e `cedig` (equipe + catálogo de exames, **sem** pacientes/PJ nem histórico de homologação). `db:verify` exige 0 empresas e 0 pacientes na base. Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) e `operation-bootstrap.ts`.
 
 Documentação por segmento: [`docs/segmentos/README.md`](../segmentos/README.md)
 
@@ -170,7 +170,14 @@ Validação: `?tenant=petcare` → login bloqueia contas de outro tenant.
 | `tests/lib/seed-mass-portal.test.ts` | Entidades mínimas **por portal** e **por segmento** |
 | `tests/unit/seed-profile.test.ts` | Perfil `operation-1y` e glossário comum |
 | `tests/security/tenant-isolation.test.ts` | Horizonte ≠ PetCare (cross-tenant 404) |
-| `scripts/verify-databases.mjs` | Integridade pós-seed (`demo.db` + `operation.db`) |
+| `scripts/verify-databases.mjs` | Integridade pós-seed (`demo.db` + `operation.db`) — ver tabela abaixo |
+
+#### Regras do `db:verify`
+
+| Arquivo | Tenants esperados | Usuários âncora | Massa mínima |
+|---------|-------------------|-----------------|--------------|
+| `demo.db` | 7 slugs de segmento | `faturamento@`, `dra.helena@`, `operacao@petcare.demo`, `joao.pereira@`, `rh@techcorp.com` | ≥50 PJ (`market`) ou ≥20 (`operation-1y`), ≥100 pacientes |
+| `operation.db` | `bibi-saude`, `cedig` | equipe Bibi + `alana@cedig.demo`, `operacao@cedig.demo` | ≥14 procedimentos; **0** empresas e **0** pacientes |
 
 ```bash
 # Testes usam SEED_SCALE=small + SEED_PROFILE=market (rápido)
@@ -209,7 +216,7 @@ SEED_PROFILE=operation-1y npm run db:verify
 
 | Agregado | Aproximado (`medium`) |
 |----------|----------------------|
-| Tenants | 7 |
+| Tenants | 8 (7 segmentos + CEDIG piloto) |
 | Empresas (todos) | 90–100 |
 | Pacientes (todos) | 350–450 |
 | Agendamentos (todos) | 400–500 |

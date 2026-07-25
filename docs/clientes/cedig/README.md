@@ -31,6 +31,17 @@ Credenciais (`/?tenant=cedig`, senha `bibi123`) — massa demo e bootstrap de **
 
 Em produção (modo operação): provisionar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }` se o tenant ainda não existir na base Blobs.
 
+### Demo vs operação
+
+| Massa | `demo.db` (apresentação) | `operation.db` (produção) |
+|-------|--------------------------|---------------------------|
+| Equipe + catálogo | ✅ | ✅ |
+| Pacientes portal (`maria.cedig@…`) | ✅ `portalMass: true` | ❌ |
+| PJ CentralMed (`rh@centralmed.demo`) | ✅ | ❌ |
+| Histórico gestão (lançamentos demo) | ✅ `seedHistory: true` | ❌ |
+
+Homologação dos 4 portais usa a **demo** (`/?tenant=cedig` em modo demo). Piloto real em **operação** começa só com equipe e catálogo — dados entram pelo uso diário.
+
 ---
 
 ## Tabelas de preço
