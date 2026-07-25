@@ -11,42 +11,41 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Auditoria cruzada: código (`package.json` / `PLATFORM` / changelog) × GitHub (`main`/`dev`) × Netlify (deploy publicado) × docs.
+> Pacote **v2.3.0** fechado e republicado: código × GitHub × Netlify × docs alinhados.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.0** — deploy `6a3f68e8` @ `38a3885` |
-| **Release `main`** | **v2.3.0** — tip `38a3885` (merge [#160](https://github.com/Piulres/sistema-bibi/pull/160)) |
-| **Integração `dev`** | **v2.3.0** — tip `fe84aea` (main = merge commit de `dev`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.3.0** — deploy `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`) |
+| **Release `main`** | **v2.3.0** — tip `374b13e` · tag `v2.3.0` |
+| **Integração `dev`** | **v2.3.0** — tip = `main` (`374b13e`) |
 | **Pacote anterior em produção** | **2.2.0** — deploy `6a3ea6c5` @ `2c38248` |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.3.0** — assistente, construction ERP, onboarding fase 2, OpenAPI + pós-release (#151–#160) |
-| **Release** | `main` | **v2.3.0** — tip `38a3885` |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.0** — deploy `6a3f68e8` @ `38a3885` (27/06/2026) · HTTP 200 |
-| **Preview** | deploy-preview | Ligado ao GitHub (ex.: `dev`) |
+| **Integração** | `dev` | **v2.3.0** — tip `374b13e` (sync com `main`) |
+| **Release** | `main` | **v2.3.0** — tip `374b13e` · tag `v2.3.0` |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.3.0** — deploy `6a6436ef` (25/07/2026) · HTTP 200 · **Stop builds ON** |
+| **Preview** | deploy-preview | Desligado via Stop builds (publicação só manual) |
 
-### Observações da auditoria (25/07/2026)
+### Fechamento do pacote (25/07/2026)
 
-| Achado | Estado |
-|--------|--------|
-| Site no ar | ✅ HTTP 200 — landing mostra `#novidades` com **v2.3.0** current |
-| `main` ≈ `dev` | ✅ tip de `main` é o merge de `dev` (#160); `dev` em `fe84aea` |
-| Tags git `v2.2.0` / `v2.3.0` | ❌ **ainda não criadas** no remoto (última tag: `v2.1.0`) |
-| GitHub Releases | ❌ nenhuma release publicada na UI do GitHub |
-| Netlify `stop_builds` | ⚠️ **False** — builds de produção acompanham push/`main` (política documentada pedia Stop builds) |
-| `package-lock.json` version | ⚠️ raiz ainda em `2.2.0` enquanto `package.json` = `2.3.0` |
-| AGENTS.md / rules | ⚠️ citavam produção `v2.1.0` / `v2.0.0` — corrigidos nesta consolidação |
+| Item | Estado |
+|------|--------|
+| Site no ar | ✅ HTTP 200 — `#novidades` **v2.3.0** · CSS `/_next/static` 200 · logins 200 · `/api/docs` 200 |
+| `main` = `dev` | ✅ tip `374b13e` |
+| Tags git `v2.2.0` / `v2.3.0` | ✅ publicadas no remoto |
+| Netlify `stop_builds` | ✅ **True** — sem auto-deploy em push |
+| `pre-release` | ✅ OK antes do deploy |
+| Docs / AGENTS / rules | ✅ alinhados a produção v2.3.0 |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.3.0`** | `05a63eb` (pacote) · prod tip `38a3885` | Assistente, construction ERP, onboarding fase 2, OpenAPI *(tag pendente)* |
-| **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais *(tag pendente)* |
+| **`v2.3.0`** | `374b13e` | Assistente, construction ERP, onboarding fase 2, OpenAPI + docs alinhados |
+| **`v2.2.0`** | `2c38248` | Onboarding tour guiado nos 4 portais |
 | **`v2.1.0`** | `cd16555` | Assistente, VET/Pet, change-mgmt, import, segurança pós-POC |
 | **`v2.0.0`** | `e823fe4` | ServiceOS multi-nicho + v1.3 estoque |
 | `v1.2.0` | `485819a` | Care Chart, exports, homepage — substituído por v2.0 |
@@ -54,16 +53,6 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
 | `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |
 | `v1.0.0` | `685cc21` | POC inicial |
-
-**Pendência humana (tags):**
-
-```bash
-git checkout main && git pull
-git tag -a v2.2.0 2c38248 -m "Release 2.2.0 — onboarding tour"
-git tag -a v2.3.0 38a3885 -m "Release 2.3.0 — assistente multi-nicho + Engenharia Civil"
-git push origin v2.2.0 v2.3.0
-```
-
 ---
 
 ## Pacote em produção (fechado)
@@ -72,13 +61,13 @@ git push origin v2.2.0 v2.3.0
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.3.0` *(pendente criar no remoto)* |
-| **Commit publicado** | `38a3885` (main tip — merge [#160](https://github.com/Piulres/sistema-bibi/pull/160)) |
-| **Commit do pacote** | `05a63eb` (prepare v2.3.0) — produção inclui commits posteriores (#151–#160) |
-| **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148)*, [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+, [#156](https://github.com/Piulres/sistema-bibi/pull/156)–[#160](https://github.com/Piulres/sistema-bibi/pull/160) |
+| **Tag git** | `v2.3.0` |
+| **Commit publicado** | `374b13e` (main tip — docs alinhados + merge [#160](https://github.com/Piulres/sistema-bibi/pull/160)/[#161](https://github.com/Piulres/sistema-bibi/pull/161)) |
+| **Commit do pacote** | `05a63eb` (prepare v2.3.0) — produção inclui commits posteriores (#151–#161) |
+| **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148)*, [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+, [#156](https://github.com/Piulres/sistema-bibi/pull/156)–[#161](https://github.com/Piulres/sistema-bibi/pull/161) |
 | **Doc** | [`V2_3.md`](V2_3.md) · [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md) |
 | **Validação** | [`evidencias/V2_3_VALIDACAO_DEV.md`](../evidencias/V2_3_VALIDACAO_DEV.md) |
-| **Publicado em** | 27/06/2026 — deploy Netlify `6a3f68e8` @ `38a3885` (publicado após deploy `6a3f390d` @ `05a63eb`) |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`; anterior `6a3f68e8` @ `38a3885`) |
 
 \* PR #148 permanece aberto no GitHub, mas o conteúdo equivalente já entrou via merges posteriores na `dev`/`main`.
 
@@ -99,7 +88,7 @@ git push origin v2.2.0 v2.3.0
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.2.0` *(pendente criar no remoto)* |
+| **Tag git** | `v2.2.0` |
 | **PRs** | [#142](https://github.com/Piulres/sistema-bibi/pull/142) |
 | **Publicado em** | 25/06/2026 — deploy Netlify `6a3ea6c5` @ `2c38248` |
 
@@ -222,7 +211,7 @@ git push origin v2.2.0 v2.3.0
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **2.3.x** | [`V2_3.md`](V2_3.md) | ✅ **`v2.3.0` em produção** — deploy `6a3f68e8` @ `38a3885` |
+| **2.3.x** | [`V2_3.md`](V2_3.md) | ✅ **`v2.3.0` em produção** — deploy `6a6436ef` @ `374b13e` |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
