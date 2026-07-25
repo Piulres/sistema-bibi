@@ -17,4 +17,4 @@ Fonte: homologação browser 2026-07-25 · [`HISTORICO_VALIDACAO.md`](HISTORICO_
 | P2-d | Média | “Criar usuário” falha na recepção (Alana) | ✅ esperado RBAC ADMIN; UI esconde formulário + aviso (`operacao@cedig.demo`) |
 | P1-e | Alta | Prestador criado some / login falha | ✅ flush Blob imediato + sync entre Lambdas; login exige `/login?tenant=cedig` (mensagem corrigida) |
 
-Backlog (não nesta leva): export Excel · lançamento → fatura PPU · E2E Playwright · Beneficiário “Consulta” residual em `BeneficiarioView`.
+Backlog fase 2/F (v2.6): ✅ export Excel · ✅ lançamento → PPU · ✅ E2E `cedig-gestao` · ✅ Beneficiário labels Exame · ✅ PJ Bem/Dr Saúde. Restante: homologação humana in loco + deploy.

@@ -23,9 +23,11 @@ export async function provisionCedigForOperation(): Promise<{
   const mode = await getDataStoreMode();
   const prisma = await getPrisma();
   const result = await ensureCedigTenant(prisma, {
-    // Operação: equipe + catálogo. Demo: massa de portal + histórico de homologação.
+    // Operação: equipe + catálogo + empresas/PJ/PricingRules (sem pacientes fictícios).
+    // Demo: + massa de portal + histórico de homologação.
     seedHistory: mode === "demo",
     portalMass: mode === "demo",
+    commercialLayer: true,
   });
 
   if (mode === "operation") {

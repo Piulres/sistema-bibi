@@ -2,6 +2,7 @@ import "server-only";
 import { NextResponse } from "next/server";
 import { getSessionUser, type SessionUser } from "@/lib/session";
 import {
+  canInternoWrite,
   hasInternoPermission,
   isInternoAdmin,
   type InternoModule,
@@ -36,6 +37,17 @@ export async function requireInternoModule(module: InternoModule): Promise<Sessi
   const user = await requireUser(["INTERNO"]);
   if (!hasInternoPermission(user.role, user.internoProfile, module)) {
     throw new ApiAuthError(403, "Sem permissão para este módulo");
+  }
+  return user;
+}
+
+/** Módulo interno + perfil com permissão de escrita (bloqueia READONLY). */
+export async function requireInternoModuleWrite(
+  module: InternoModule,
+): Promise<SessionUser> {
+  const user = await requireInternoModule(module);
+  if (!canInternoWrite(user.role, user.internoProfile)) {
+    throw new ApiAuthError(403, "Perfil somente leitura — alteração não permitida");
   }
   return user;
 }

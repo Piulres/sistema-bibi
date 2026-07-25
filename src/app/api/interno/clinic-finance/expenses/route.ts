@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import {
+  requireInternoModule,
+  requireInternoModuleWrite,
+  authErrorResponse,
+} from "@/lib/api-auth";
 import {
   createClinicExpense,
   listClinicExpenses,
@@ -24,7 +28,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("gestao");
+    const user = await requireInternoModuleWrite("gestao");
     const body = (await request.json()) as Record<string, unknown>;
     const result = await createClinicExpense(user.tenantId, {
       category: String(body.category ?? ""),

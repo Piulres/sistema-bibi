@@ -11,23 +11,23 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v2.5.0** — login com tenant digitável + seletor de portal (**pendente deploy**).  
-> Produção ainda em **v2.4.0** até publicação manual.
+> Pacote **v2.6.0** — CEDIG fase 2+F + login v2.5.0 **pronto para deploy**.  
+> Produção ainda em **v2.4.0** até `npx netlify deploy --prod` (humano).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a64feeb` @ `673c507` (`bibi-poc-2026-07-25h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev` (código)** | **v2.5.0** — login tenant/portal · aguarda deploy |
+| **Release código (`dev` / `main`)** | **v2.6.0** — pronto para publish · empilha v2.5.0 |
 | **Pacote anterior em produção** | **2.4.0** — CEDIG gestão clínica |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.5.0** (pendente merge/PR) |
-| **Release** | `main` | **v2.4.0** em prod · **v2.5.0** após merge + deploy |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.4.0** · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v2.6.0** (login + CEDIG pontes + skill agentes) |
+| **Release** | `main` | **v2.6.0** após merge de release · prod ainda 2.4.0 |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.4.0** · **Stop builds ON** · aguarda deploy manual |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Smoke (25/07/2026) — produção atual v2.4.0
@@ -37,14 +37,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Title | `Sistema Bibi - ServiceOS v2.4.0 — …` |
 | Footer | `ServiceOS v2.4.0` |
 | CSS `/_next/static` | 200 |
-| `#novidades` | current **2.5.0** (após merge; prod ainda 2.4.0 até deploy) |
+| `#novidades` | current **2.6.0** no código · prod ainda 2.4.0 até deploy |
 | Modo operação + Alana CEDIG | OK (`provision-cedig`) |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v2.5.0`** | _(após deploy)_ | Login tenant + portal |
+| **`v2.6.0`** | _(após deploy)_ | CEDIG fase 2+F — ponte PPU + export + v2.5 login |
+| **`v2.5.0`** | _(empilhado)_ | Login tenant digitável + seletor de portal · PR #186 |
 | **`v2.4.0`** | `c64fc14` | CEDIG gestão clínica · PR #169 |
 | **`v2.3.1`** | `12148ce` | Versão no title/footer · `PLATFORM.release` |
 | **`v2.3.0`** | `374b13e` | Assistente, construction ERP, onboarding fase 2, OpenAPI + docs alinhados |
@@ -60,19 +61,42 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v2.5.0` — Sistema Bibi - ServiceOS (login tenant + portal) *(pendente deploy)*
+### `v2.6.0` — Sistema Bibi - ServiceOS (CEDIG fase 2+F · pontes) *(pronto para deploy)*
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v2.5.0` |
+| **Tag git** | `v2.6.0` |
 | **Commit publicado** | _(preencher pós-deploy)_ |
-| **Doc** | [`V2_5.md`](V2_5.md) |
-| **Inclui** | Campo clínica/tenant no login · seletor dos 4 portais · Aplicar clínica |
-| **Publicado em** | _(aguardando `netlify deploy --prod`)_ |
+| **PRs** | [#186](https://github.com/Piulres/sistema-bibi/pull/186) · [#187](https://github.com/Piulres/sistema-bibi/pull/187) · [#188](https://github.com/Piulres/sistema-bibi/pull/188) |
+| **Doc** | [`V2_6.md`](V2_6.md) · [`V2_5.md`](V2_5.md) · [`clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) |
+| **Inclui** | Ponte gestão→Patient/Appointment/PPU/Invoice · export CSV · labels CLINIC_* · PJ×3 · E2E · login tenant/portal (v2.5) · skill agentes |
+| **Publicado em** | _(aguardando `netlify deploy --prod` — humano)_ |
+
+### Publicação (humano)
+
+```bash
+git checkout main && git pull origin main
+npm run pre-release
+npx netlify deploy --prod   # NÃO usar --no-build
+```
+
+Depois: marcar esta seção como **publicado**, topo “Produção: v2.6.0”, tag `v2.6.0`.
 
 ---
 
-### `v2.4.0` — Sistema Bibi - ServiceOS (CEDIG gestão clínica) *(substituído por v2.5.0 após deploy)*
+### `v2.5.0` — Login com tenant e seletor de portal *(empilhado em v2.6.0)*
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | _(não publicar isolado)_ |
+| **PRs** | [#186](https://github.com/Piulres/sistema-bibi/pull/186) |
+| **Doc** | [`V2_5.md`](V2_5.md) |
+| **Inclui** | Tenant digitável · seletor de portal · `login-access.ts` · cookie `bibi_segment` |
+| **Status** | Empilhado no pacote v2.6.0 |
+
+---
+
+### `v2.4.0` — Sistema Bibi - ServiceOS (CEDIG gestão clínica) *(em produção; substituído por v2.6.0 após deploy)*
 
 | Campo | Valor |
 |-------|-------|
@@ -250,7 +274,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **2.5.x** | [`V2_5.md`](V2_5.md) | ⏳ **`v2.5.0` pendente deploy** (login tenant + portal) |
+| **2.6.x** | [`V2_6.md`](V2_6.md) | ⏳ **`v2.6.0` pendente deploy** (CEDIG pontes PPU) |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | ✅ **`v2.4.0` em produção** (CEDIG gestão clínica) |
 | **2.3.x** | [`V2_3.md`](V2_3.md) | Histórico — title/footer · assistente · obras |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |

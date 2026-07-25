@@ -17,6 +17,8 @@ import {
   suggestCedigAmount,
   type CedigPriceTableId,
 } from "@/lib/clinic-finance/cedig-pricing";
+import { bridgeExamLaunchToOperations } from "@/lib/clinic-finance/bridge";
+import type { TabularExport } from "@/lib/exports/tabular";
 
 function monthRange(year: number, month: number) {
   const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
@@ -94,6 +96,10 @@ export type CreateExamLaunchInput = {
   clips?: number;
   notes?: string;
   patientId?: string;
+  /** Agenda de origem — reutiliza appointment (status → REALIZADO). */
+  appointmentId?: string;
+  /** Default true — gera Appointment + ProcedureUsage + Invoice. */
+  syncOperations?: boolean;
   createdById?: string;
 };
 
@@ -156,7 +162,7 @@ export async function createExamLaunch(
     return Number.isFinite(v) && v >= 0 ? v : 0;
   };
 
-  const launch = await prisma.clinicExamLaunch.create({
+  let launch = await prisma.clinicExamLaunch.create({
     data: {
       tenantId,
       performedAt: input.performedAt ? new Date(input.performedAt) : new Date(),
@@ -174,6 +180,7 @@ export async function createExamLaunch(
       notes: input.notes?.trim() || null,
       patientId,
       createdById: input.createdById || null,
+      bridgeStatus: input.syncOperations === false ? "SKIPPED" : null,
     },
     include: {
       provider: { select: { id: true, name: true } },
@@ -181,7 +188,24 @@ export async function createExamLaunch(
     },
   });
 
-  return { launch: serializeLaunch(launch) } as const;
+  let bridge = null;
+  if (input.syncOperations !== false) {
+    bridge = await bridgeExamLaunchToOperations({
+      tenantId,
+      launchId: launch.id,
+      appointmentId: input.appointmentId,
+      createdById: input.createdById,
+    });
+    launch = await prisma.clinicExamLaunch.findFirstOrThrow({
+      where: { id: launch.id },
+      include: {
+        provider: { select: { id: true, name: true } },
+        procedure: { select: { id: true, name: true, code: true } },
+      },
+    });
+  }
+
+  return { launch: serializeLaunch(launch), bridge } as const;
 }
 
 function serializeLaunch(launch: {
@@ -197,6 +221,11 @@ function serializeLaunch(launch: {
   mucosectomies: number;
   clips: number;
   notes: string | null;
+  bridgeStatus?: string | null;
+  bridgeNote?: string | null;
+  appointmentId?: string | null;
+  usageId?: string | null;
+  invoiceId?: string | null;
   provider: { id: string; name: string };
   procedure: { id: string; name: string; code: string };
 }) {
@@ -216,6 +245,11 @@ function serializeLaunch(launch: {
     mucosectomies: launch.mucosectomies,
     clips: launch.clips,
     notes: launch.notes,
+    bridgeStatus: launch.bridgeStatus ?? null,
+    bridgeNote: launch.bridgeNote ?? null,
+    appointmentId: launch.appointmentId ?? null,
+    usageId: launch.usageId ?? null,
+    invoiceId: launch.invoiceId ?? null,
     provider: launch.provider,
     procedure: launch.procedure,
     labVials: launch.biopsies, // frascos ≈ biópsias na operação CEDIG
@@ -444,4 +478,94 @@ export function previewCedigAmount(input: {
     mucosectomies: input.mucosectomies,
     clips: input.clips,
   });
+}
+
+/** Export mensal (planilha) — lançamentos + despesas + KPIs. */
+export async function buildClinicFinanceMonthExport(
+  tenantId: string,
+  year?: number,
+  month?: number,
+): Promise<TabularExport> {
+  const { year: y, month: m } = parseMonth(year, month);
+  const [launches, expenses, kpis] = await Promise.all([
+    listExamLaunches(tenantId, y, m),
+    listClinicExpenses(tenantId, y, m),
+    getClinicFinanceKpis(tenantId, y, m),
+  ]);
+
+  const money = (n: number) =>
+    n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  const rows: Record<string, string | number | null>[] = [
+    {
+      tipo: "KPI",
+      data: `${String(m).padStart(2, "0")}/${y}`,
+      paciente: "—",
+      medico: "—",
+      exame: "Receita / Despesas / Lucro",
+      tabela: "—",
+      pagamento: "—",
+      valor: money(kpis.revenue),
+      biópsias: kpis.totalsCounters.biopsies,
+      polipectomias: kpis.totalsCounters.polypectomies,
+      mucosectomias: kpis.totalsCounters.mucosectomies,
+      clips: kpis.totalsCounters.clips,
+      ponte: "—",
+      observacoes: `Despesas ${money(kpis.totalExpenses)} · Lucro ${money(kpis.operatingProfit)} · Exames ${kpis.examCount}`,
+    },
+    ...launches.map((l) => ({
+      tipo: "LANCAMENTO",
+      data: l.performedAt.slice(0, 10),
+      paciente: l.patientName,
+      medico: l.provider.name,
+      exame: l.procedure.name,
+      tabela: l.priceTableLabel,
+      pagamento: l.paymentMethodLabel,
+      valor: money(l.amountReceived),
+      biópsias: l.biopsies,
+      polipectomias: l.polypectomies,
+      mucosectomias: l.mucosectomies,
+      clips: l.clips,
+      ponte: l.bridgeStatus ?? "",
+      observacoes: l.notes ?? l.bridgeNote ?? "",
+    })),
+    ...expenses.map((e) => ({
+      tipo: "DESPESA",
+      data: e.expenseDate.slice(0, 10),
+      paciente: "—",
+      medico: "—",
+      exame: e.categoryLabel,
+      tabela: "—",
+      pagamento: "—",
+      valor: money(e.amount),
+      biópsias: 0,
+      polipectomias: 0,
+      mucosectomias: 0,
+      clips: 0,
+      ponte: "—",
+      observacoes: e.description,
+    })),
+  ];
+
+  return {
+    title: `Gestão clínica ${String(m).padStart(2, "0")}/${y}`,
+    subtitle: "Lançamentos, despesas e indicadores — CEDIG / ServiceOS",
+    columns: [
+      { key: "tipo", header: "Tipo" },
+      { key: "data", header: "Data" },
+      { key: "paciente", header: "Paciente" },
+      { key: "medico", header: "Médico" },
+      { key: "exame", header: "Exame / categoria" },
+      { key: "tabela", header: "Tabela" },
+      { key: "pagamento", header: "Pagamento" },
+      { key: "valor", header: "Valor (R$)" },
+      { key: "biópsias", header: "Biópsias" },
+      { key: "polipectomias", header: "Polipectomias" },
+      { key: "mucosectomias", header: "Mucosectomias" },
+      { key: "clips", header: "Clips" },
+      { key: "ponte", header: "Ponte PPU" },
+      { key: "observacoes", header: "Observações" },
+    ],
+    rows,
+  };
 }

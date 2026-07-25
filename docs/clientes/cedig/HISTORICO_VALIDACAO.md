@@ -121,24 +121,25 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 | Pacote | Pronto? | Comentário |
 |--------|---------|------------|
 | **A — Piloto gestão (Alana + admin)** | ✅ Sim | Core do pedido; homologado no browser |
-| **B — Prestador (médicos)** | 🟡 Shell OK | Sem histórico clínico ainda; pacientes só após atendimentos |
-| **C — PJ / Beneficiário** | 🟡 Shell + massa mínima | Login e nav OK; sem jornada PPU/fatura real CEDIG |
-| **D — Produção white-label** | ⏳ | Merge PR #169 → `dev` → `main` + deploy + modo **operação** |
-| **E — Export Excel / ligação PPU** | ❌ Backlog | Combinar como fase 2 |
+| **B — Prestador (médicos)** | ✅ Ponte v2.6 | Agenda REALIZADO + extrato via ProcedureUsage |
+| **C — PJ / Beneficiário** | ✅ Massa + labels | PJ×3 + PricingRules; Beneficiário Exame |
+| **D — Produção white-label** | ⏳ | Deploy pacote v2.6 + modo **operação** |
+| **E — Export Excel / ligação PPU** | ✅ v2.6 | Ver [`FASE_2.md`](FASE_2.md) |
+| **F — E2E + dashboard KPIs gestão** | ✅ v2.6 | `e2e/cedig-gestao.spec.ts` |
 
 ### Veredito
 
-**Pode entregar ao cliente o piloto de gestão clínica (Pacote A)** — é exatamente o que o dono descreveu (planilha → ferramenta).
+**Pode entregar ao cliente o piloto de gestão clínica + pontes fase 2** (planilha → ferramenta + PPU/portais técnicos).
 
-**Não vender ainda como “os 4 portais CEDIG em produção plena”.** Os portais Prestador/PJ/Beneficiário abrem e estão coerentes, mas são casca + massa demo sem operação real (agenda/faturas/PEP cheios).
+**Não vender ainda como “os 4 portais CEDIG em produção plena”** até homologação humana in loco e deploy do pacote.
 
 ### Checklist antes de mostrar ao cliente
 
-1. Merge + deploy do PR #169 (quando autorizar)
+1. Merge + deploy do pacote v2.6 (quando autorizar)
 2. Modo **operação** + branding final (logo real, se houver)
 3. Treinar Alana com [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) (15 min)
-4. Deixar claro: piloto = gestão financeira/operacional da secretária; demais portais na fase seguinte
-5. Coletar feedback in loco e só então priorizar Excel / PPU automático
+4. Validar ponte: lançamento → Prestador / Faturamento / PJ
+5. Coletar feedback in loco
 
 ---
 

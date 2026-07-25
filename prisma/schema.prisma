@@ -446,6 +446,7 @@ model Appointment {
   medicationPrescriptions MedicationPrescription[]
   examOrders     ExamOrder[]
   protocolEnrollments PatientProtocolEnrollment[]
+  clinicExamLaunch ClinicExamLaunch?
 }
 
 /// Uso efetivo de procedimento (nucleo do Pay Per Use).
@@ -464,6 +465,7 @@ model ProcedureUsage {
   procedure   Procedure @relation(fields: [procedureId], references: [id])
 
   invoiceItem InvoiceItem?
+  clinicExamLaunch ClinicExamLaunch?
 }
 
 /// Prontuario Eletronico do Paciente (PEP).
@@ -616,6 +618,7 @@ model Invoice {
   payments Payment[]
   budget Budget?
   fieldReports DailyFieldReport[]
+  clinicExamLaunch ClinicExamLaunch?
 }
 
 model InvoiceItem {
@@ -1214,6 +1217,9 @@ model ClinicExamLaunch {
   clips           Int      @default(0)
   notes           String?
   createdAt       DateTime @default(now())
+  /// Ponte fase 2: SYNCED | PARTIAL | FAILED | SKIPPED
+  bridgeStatus    String?
+  bridgeNote      String?
 
   tenantId String
   tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
@@ -1228,6 +1234,14 @@ model ClinicExamLaunch {
 
   patientId String?
   patient   Patient? @relation(fields: [patientId], references: [id])
+
+  /// Agenda / PPU / fatura gerados a partir do lançamento (fase 2)
+  appointmentId String?      @unique
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  usageId       String?      @unique
+  usage         ProcedureUsage? @relation(fields: [usageId], references: [id])
+  invoiceId     String?      @unique
+  invoice       Invoice?     @relation(fields: [invoiceId], references: [id])
 
   createdById String?
   createdBy   User?   @relation("ClinicExamLaunchCreatedBy", fields: [createdById], references: [id])

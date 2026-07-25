@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import Link from "next/link";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
@@ -22,9 +23,12 @@ type Appointment = {
   status: string;
   modality: string;
   telemedicineUrl: string | null;
+  patientId: string;
   patientName: string;
   petName: string | null;
+  providerId: string;
   providerName: string;
+  procedureId: string | null;
   reason: string | null;
 };
 
@@ -624,6 +628,15 @@ export default function AppointmentsView() {
                         >
                           Confirmar chegada
                         </Button>
+                      )}
+                      {a.status !== "CANCELADO" && a.status !== "FALTOU" && (
+                        <Link
+                          href={`/interno/gestao?appointmentId=${encodeURIComponent(a.id)}&patientId=${encodeURIComponent(a.patientId)}&patientName=${encodeURIComponent(a.patientName)}&providerId=${encodeURIComponent(a.providerId)}${a.procedureId ? `&procedureId=${encodeURIComponent(a.procedureId)}` : ""}`}
+                          className="inline-flex items-center rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-2.5 py-1 text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
+                          data-cursor-id="agenda-launch-gestao"
+                        >
+                          Lançar na gestão
+                        </Link>
                       )}
                       <select
                         className="rounded border border-[var(--border-muted)] bg-[var(--surface-card)] px-2 py-1 text-sm"

@@ -6,6 +6,9 @@
 import type { PrismaClient } from "@prisma/client";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { hashPassword } from "../../src/lib/password";
+import { getCedigExamBasePrice } from "../../src/lib/clinic-finance/cedig-pricing";
+import type { CedigPriceTableId } from "../../src/lib/clinic-finance/cedig-pricing";
+import { bridgeExamLaunchToOperations } from "../../src/lib/clinic-finance/bridge";
 
 const DEMO_PASSWORD = hashPassword("bibi123");
 
@@ -203,8 +206,60 @@ async function upsertCedigStaff(prisma: PrismaClient, tenantId: string) {
   }
 }
 
-/** Empresas institucionais + pacientes + acessos PJ/Beneficiário (demo dos 4 portais). */
-async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
+/** Multiplicadores PPU por convênio (base = Particular). */
+async function upsertCedigPricingRules(
+  prisma: PrismaClient,
+  tenantId: string,
+  companyIds: Record<string, string>,
+) {
+  const tableByCompany: { company: string; table: CedigPriceTableId }[] = [
+    { company: "CentralMed", table: "CENTRALMED" },
+    { company: "Bem Saúde", table: "BEM_SAUDE" },
+    { company: "Dr Saúde", table: "DR_SAUDE" },
+  ];
+
+  for (const proc of CEDIG_PROCEDURES) {
+    const row = await prisma.procedure.findUnique({
+      where: { tenantId_code: { tenantId, code: proc.code } },
+    });
+    if (!row || row.basePrice <= 0) continue;
+
+    for (const { company, table } of tableByCompany) {
+      const companyId = companyIds[company];
+      if (!companyId) continue;
+      const price = getCedigExamBasePrice(proc.code, table);
+      if (price == null) continue;
+      const multiplier = Number((price / row.basePrice).toFixed(4));
+      const existing = await prisma.pricingRule.findFirst({
+        where: { procedureId: row.id, companyId },
+      });
+      const description = `CEDIG ${proc.code} · ${company}`;
+      if (existing) {
+        await prisma.pricingRule.update({
+          where: { id: existing.id },
+          data: { multiplier, description },
+        });
+      } else {
+        await prisma.pricingRule.create({
+          data: {
+            procedureId: row.id,
+            companyId,
+            multiplier,
+            description,
+          },
+        });
+      }
+    }
+  }
+}
+
+/** Empresas + PricingRules (+ PJ demo opcional). Em operação: empresas/regras sem logins PJ fictícios. */
+async function upsertCedigCommercialLayer(
+  prisma: PrismaClient,
+  tenantId: string,
+  options: { includePjUsers?: boolean } = {},
+): Promise<Record<string, string>> {
+  const includePjUsers = options.includePjUsers !== false;
   const companies = [
     {
       name: "CentralMed",
@@ -261,30 +316,61 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
     }
   }
 
-  const pjEmail = "rh@centralmed.demo";
-  const pjExisting = await prisma.user.findUnique({ where: { email: pjEmail } });
-  if (pjExisting) {
-    await prisma.user.update({
-      where: { id: pjExisting.id },
-      data: {
-        name: "RH CentralMed",
-        role: "PJ",
-        tenantId,
-        companyId: companyIds.CentralMed,
-      },
-    });
-  } else {
-    await prisma.user.create({
-      data: {
-        email: pjEmail,
-        name: "RH CentralMed",
-        password: DEMO_PASSWORD,
-        role: "PJ",
-        tenantId,
-        companyId: companyIds.CentralMed,
-      },
-    });
+  const pjUsers = [
+    {
+      email: "rh@centralmed.demo",
+      name: "RH CentralMed",
+      companyId: companyIds.CentralMed,
+    },
+    {
+      email: "rh@bemsaude.demo",
+      name: "RH Bem Saúde",
+      companyId: companyIds["Bem Saúde"],
+    },
+    {
+      email: "rh@drsaude.demo",
+      name: "RH Dr Saúde",
+      companyId: companyIds["Dr Saúde"],
+    },
+  ] as const;
+
+  if (includePjUsers) {
+    for (const pj of pjUsers) {
+      const pjExisting = await prisma.user.findUnique({ where: { email: pj.email } });
+      if (pjExisting) {
+        await prisma.user.update({
+          where: { id: pjExisting.id },
+          data: {
+            name: pj.name,
+            role: "PJ",
+            tenantId,
+            companyId: pj.companyId,
+          },
+        });
+      } else {
+        await prisma.user.create({
+          data: {
+            email: pj.email,
+            name: pj.name,
+            password: DEMO_PASSWORD,
+            role: "PJ",
+            tenantId,
+            companyId: pj.companyId,
+          },
+        });
+      }
+    }
   }
+
+  await upsertCedigPricingRules(prisma, tenantId, companyIds);
+  return companyIds;
+}
+
+/** Pacientes + acessos Beneficiário (demo dos 4 portais). */
+async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
+  const companyIds = await upsertCedigCommercialLayer(prisma, tenantId, {
+    includePjUsers: true,
+  });
 
   const patients = [
     {
@@ -383,6 +469,44 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
 /**
  * Histórico mínimo para demos dos 4 portais (idempotente por notes marker).
  */
+async function bridgeUnsyncedCedigLaunches(
+  prisma: PrismaClient,
+  tenantId: string,
+): Promise<void> {
+  const pending = await prisma.clinicExamLaunch.findMany({
+    where: {
+      tenantId,
+      OR: [{ appointmentId: null }, { usageId: null }, { invoiceId: null }],
+    },
+    select: { id: true },
+    take: 20,
+  });
+  if (pending.length === 0) return;
+
+  // Seed escreve em DATABASE_URL; getPrisma() no dual-store pode apontar outro .db.
+  const prevDual = process.env.DUAL_DATA_STORE;
+  process.env.DUAL_DATA_STORE = "false";
+  try {
+    const { invalidatePrismaCache } = await import("../../src/lib/db");
+    await invalidatePrismaCache();
+    for (const row of pending) {
+      await bridgeExamLaunchToOperations({
+        tenantId,
+        launchId: row.id,
+      });
+    }
+  } finally {
+    if (prevDual === undefined) delete process.env.DUAL_DATA_STORE;
+    else process.env.DUAL_DATA_STORE = prevDual;
+    try {
+      const { invalidatePrismaCache } = await import("../../src/lib/db");
+      await invalidatePrismaCache();
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
 async function seedCedigOperationalHistory(
   prisma: PrismaClient,
   tenantId: string,
@@ -391,7 +515,10 @@ async function seedCedigOperationalHistory(
   const existingLaunch = await prisma.clinicExamLaunch.findFirst({
     where: { tenantId, notes: { contains: marker } },
   });
-  if (existingLaunch) return;
+  if (existingLaunch) {
+    await bridgeUnsyncedCedigLaunches(prisma, tenantId);
+    return;
+  }
 
   const bruno = await prisma.user.findUnique({
     where: { email: "bruno.dias@cedig.demo" },
@@ -485,8 +612,8 @@ async function seedCedigOperationalHistory(
         procedureId: colo.id,
         performedAt: at(10, -2),
         paymentMethod: "CONVENIO",
-        priceTable: "CENTRALMED",
-        amountReceived: 1250,
+        priceTable: "BEM_SAUDE",
+        amountReceived: 1450,
         notes: `${marker} C2 homolog`,
       },
       {
@@ -512,12 +639,14 @@ async function seedCedigOperationalHistory(
         procedureId: resp.id,
         performedAt: at(11, -1),
         paymentMethod: "CONVENIO",
-        priceTable: "BEM_SAUDE",
-        amountReceived: 450,
+        priceTable: "CENTRALMED",
+        amountReceived: 400,
         notes: `${marker} C4 homolog`,
       },
     ],
   });
+
+  await bridgeUnsyncedCedigLaunches(prisma, tenantId);
 
   await prisma.clinicExpense.createMany({
     data: [
@@ -542,8 +671,13 @@ async function seedCedigOperationalHistory(
 export type EnsureCedigTenantOptions = {
   /** Inclui lançamentos/agenda de homologação (padrão: true na massa demo). */
   seedHistory?: boolean;
-  /** Inclui pacientes/PJ de portal (padrão: true na massa demo; false na operação). */
+  /** Inclui pacientes + beneficiários demo (padrão: true na massa demo; false na operação). */
   portalMass?: boolean;
+  /**
+   * Empresas + PricingRules + PJ demo (padrão: true).
+   * Em operação: true sem pacientes fictícios — desbloqueia faturamento convênio.
+   */
+  commercialLayer?: boolean;
 };
 
 /**
@@ -560,6 +694,7 @@ export async function ensureCedigTenant(
 }> {
   const seedHistory = options.seedHistory !== false;
   const portalMass = options.portalMass !== false;
+  const commercialLayer = options.commercialLayer !== false;
   const existing = await prisma.tenant.findUnique({ where: { slug: "cedig" } });
   if (existing) {
     const procedures = await upsertCedigProcedures(prisma, existing.id);
@@ -572,6 +707,8 @@ export async function ensureCedigTenant(
     await upsertCedigStaff(prisma, existing.id);
     if (portalMass) {
       await upsertCedigPortalMass(prisma, existing.id);
+    } else if (commercialLayer) {
+      await upsertCedigCommercialLayer(prisma, existing.id, { includePjUsers: false });
     }
     if (seedHistory) {
       await seedCedigOperationalHistory(prisma, existing.id);
@@ -605,6 +742,8 @@ export async function ensureCedigTenant(
   await upsertCedigStaff(prisma, tenant.id);
   if (portalMass) {
     await upsertCedigPortalMass(prisma, tenant.id);
+  } else if (commercialLayer) {
+    await upsertCedigCommercialLayer(prisma, tenant.id, { includePjUsers: false });
   }
   if (seedHistory) {
     await seedCedigOperationalHistory(prisma, tenant.id);

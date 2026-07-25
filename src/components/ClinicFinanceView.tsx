@@ -30,8 +30,18 @@ type Launch = {
   polypectomyTierLabel?: string;
   mucosectomies: number;
   clips: number;
+  bridgeStatus?: string | null;
+  bridgeNote?: string | null;
   provider: { name: string };
   procedure: { name: string };
+};
+
+type Prefill = {
+  appointmentId?: string;
+  patientId?: string;
+  patientName?: string;
+  providerId?: string;
+  procedureId?: string;
 };
 
 type Expense = {
@@ -65,7 +75,7 @@ type Kpis = {
 
 type Tab = "lancamentos" | "despesas" | "indicadores";
 
-export default function ClinicFinanceView() {
+export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   const { showToast } = useToast();
   const now = new Date();
   const [tab, setTab] = useState<Tab>("lancamentos");
@@ -86,10 +96,11 @@ export default function ClinicFinanceView() {
   const [kpis, setKpis] = useState<Kpis | null>(null);
 
   const [form, setForm] = useState({
-    patientId: "",
-    patientName: "",
-    providerId: "",
-    procedureId: "",
+    appointmentId: prefill?.appointmentId ?? "",
+    patientId: prefill?.patientId ?? "",
+    patientName: prefill?.patientName ? decodeURIComponent(prefill.patientName) : "",
+    providerId: prefill?.providerId ?? "",
+    procedureId: prefill?.procedureId ?? "",
     priceTable: "PARTICULAR",
     paymentMethod: "PIX",
     amountReceived: "",
@@ -231,6 +242,7 @@ export default function ClinicFinanceView() {
       body: JSON.stringify({
         ...form,
         patientId: form.patientId || undefined,
+        appointmentId: form.appointmentId || undefined,
         amountReceived: Number(form.amountReceived),
         biopsies: Number(form.biopsies),
         polypectomies: Number(form.polypectomies),
@@ -249,9 +261,25 @@ export default function ClinicFinanceView() {
       });
       return;
     }
-    showToast({ message: "Lançamento registrado.", tone: "success" });
+    const bridge = json.bridge as
+      | { bridgeStatus?: string; bridgeNote?: string | null }
+      | null
+      | undefined;
+    const bridgeMsg =
+      bridge?.bridgeStatus === "SYNCED"
+        ? " Agenda, extrato do médico e fatura atualizados."
+        : bridge?.bridgeStatus === "PARTIAL"
+          ? ` Ponte parcial: ${bridge.bridgeNote ?? "verifique faturamento"}.`
+          : bridge?.bridgeStatus === "FAILED"
+            ? ` Lançamento ok; ponte falhou: ${bridge.bridgeNote ?? "erro"}.`
+            : "";
+    showToast({
+      message: `Lançamento registrado.${bridgeMsg}`,
+      tone: bridge?.bridgeStatus === "FAILED" ? "info" : "success",
+    });
     setForm((f) => ({
       ...f,
+      appointmentId: "",
       patientId: "",
       patientName: "",
       biopsies: "0",
@@ -262,6 +290,11 @@ export default function ClinicFinanceView() {
       notes: "",
     }));
     await loadAll();
+  }
+
+  function exportMonth() {
+    const q = `year=${year}&month=${month}&format=xlsx`;
+    window.location.href = `/api/interno/clinic-finance/export?${q}`;
   }
 
   async function submitExpense(e: React.FormEvent) {
@@ -328,7 +361,24 @@ export default function ClinicFinanceView() {
         <p className="text-sm text-[var(--text-secondary)]">
           Menus prontos + valor sugerido pela tabela. Alana só confirma e salva.
         </p>
+        <button
+          type="button"
+          onClick={exportMonth}
+          className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+          data-tour-id="clinic-finance-export"
+        >
+          Exportar mês (Excel)
+        </button>
       </div>
+
+      {form.appointmentId ? (
+        <p
+          className="rounded-lg border border-teal-200 bg-teal-50/60 px-3 py-2 text-sm text-[var(--text-secondary)]"
+          data-cursor-id="clinic-finance-from-agenda"
+        >
+          Prefill da agenda — ao salvar, o exame fica REALIZADO e gera uso PPU + fatura.
+        </p>
+      ) : null}
 
       <div className="flex flex-wrap gap-2 border-b border-[var(--border-default)] pb-2">
         {tabs.map((t) => (
@@ -354,7 +404,7 @@ export default function ClinicFinanceView() {
             className="grid gap-3 rounded-xl border border-[var(--border-default)] p-4 sm:grid-cols-2 lg:grid-cols-3"
           >
             <p className="sm:col-span-2 lg:col-span-3 text-sm font-medium text-[var(--text-primary)]">
-              Novo lançamento (1 paciente = 1 linha)
+              Novo lançamento (1 paciente = 1 linha) — sincroniza Prestador e Faturamento
             </p>
             <label className="text-sm sm:col-span-2">
               Paciente cadastrado
@@ -622,6 +672,7 @@ export default function ClinicFinanceView() {
                   <th className="px-3 py-2">Pagamento</th>
                   <th className="px-3 py-2">Valor</th>
                   <th className="px-3 py-2">Bio/Pól/Muc/Clip</th>
+                  <th className="px-3 py-2">Ponte</th>
                 </tr>
               </thead>
               <tbody>
@@ -639,11 +690,17 @@ export default function ClinicFinanceView() {
                     <td className="px-3 py-2 whitespace-nowrap">
                       {l.biopsies}/{l.polypectomies}/{l.mucosectomies}/{l.clips}
                     </td>
+                    <td
+                      className="px-3 py-2 text-xs"
+                      title={l.bridgeNote ?? undefined}
+                    >
+                      {l.bridgeStatus ?? "—"}
+                    </td>
                   </tr>
                 ))}
                 {launches.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-3 py-6 text-center text-[var(--text-muted)]">
+                    <td colSpan={9} className="px-3 py-6 text-center text-[var(--text-muted)]">
                       Nenhum lançamento neste mês.
                     </td>
                   </tr>

@@ -125,10 +125,18 @@ async function verifyOperation() {
       errors.push(`operation.db: esperado ≥${MIN_PROCEDURES_OPERATION} procedimentos, encontrado ${procedures}`);
     }
 
-    const companies = await prisma.company.count();
+    const companies = await prisma.company.findMany({ select: { name: true, tenantId: true } });
     const patients = await prisma.patient.count();
-    if (companies > 0) {
-      errors.push(`operation.db: não deve ter empresas PJ na massa inicial (${companies})`);
+    // CEDIG em operação pode ter até 3 empresas institucionais (convênio) — sem pacientes demo.
+    const allowedCedigCompanies = new Set(["CentralMed", "Bem Saúde", "Dr Saúde"]);
+    const unexpected = companies.filter((c) => !allowedCedigCompanies.has(c.name));
+    if (unexpected.length > 0) {
+      errors.push(
+        `operation.db: empresas fora do bootstrap CEDIG: ${unexpected.map((c) => c.name).join(", ")}`,
+      );
+    }
+    if (companies.length > 3) {
+      errors.push(`operation.db: esperado ≤3 empresas CEDIG, encontrado ${companies.length}`);
     }
     if (patients > 0) {
       errors.push(`operation.db: não deve ter pacientes na massa inicial (${patients})`);

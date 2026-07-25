@@ -12,6 +12,7 @@ import TabBar from "@/components/ui/TabBar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
 import Card from "@/components/ui/Card";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Overview = {
@@ -68,6 +69,7 @@ type Overview = {
 };
 
 export default function PrestadorPatientHistoryView({ patientId }: { patientId: string }) {
+  const { labels } = useLabels();
   const [historyTab, setHistoryTab] = useState<"historico" | "medicacao" | "exames" | "protocolos" | "perfil" | "vacinas">("historico");
 
   const loadHistory = useCallback(async () => {
@@ -185,8 +187,16 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
               query={{ section: "summary" }}
             />
             <div className="text-right text-sm text-[var(--text-muted)]">
-              {summary.lastVisitLabel && <p>Última consulta: {summary.lastVisitLabel}</p>}
-              {summary.nextVisitLabel && <p>Próxima consulta: {summary.nextVisitLabel}</p>}
+              {summary.lastVisitLabel && (
+                <p>
+                  Último {labels.appointment.toLowerCase()}: {summary.lastVisitLabel}
+                </p>
+              )}
+              {summary.nextVisitLabel && (
+                <p>
+                  Próximo {labels.appointment.toLowerCase()}: {summary.nextVisitLabel}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -222,9 +232,12 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
       <section>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-[var(--text-primary)]">Histórico de atendimentos</h2>
+            <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+              Histórico de {labels.appointments.toLowerCase()}
+            </h2>
             <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Todas as consultas deste paciente com você, do mais recente ao mais antigo.
+              Todos os {labels.appointments.toLowerCase()} deste {labels.patient.toLowerCase()} com
+              você, do mais recente ao mais antigo.
             </p>
           </div>
           <ExportButtons
