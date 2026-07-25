@@ -54,6 +54,9 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 | `lex` | LEGAL | Jurídico | ~8 |
 | `zen` | SPA | Bem-estar | ~8 |
 | `eduprime` | EDUCATION | Educação | ~8 |
+| `cedig` | MEDICAL | Piloto CEDIG Cruzeiro (endoscopia) | — |
+
+**CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
 
 **Modo operação** (`operation.db`): tenant `bibi-saude` — bootstrap mínimo (5 usuários, 14 procedimentos, sem clientes). Ver `operation-bootstrap.ts`.
 

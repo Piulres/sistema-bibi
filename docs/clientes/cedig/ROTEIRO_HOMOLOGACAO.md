@@ -109,7 +109,21 @@ npm run dev   # http://localhost:3000
 
 | Campo | Valor |
 |-------|-------|
-| Data | _(preencher após run)_ |
-| Ambiente | local `localhost:3000` |
-| Resultado | _(OK / falhas)_ |
-| Evidências | `/opt/cursor/artifacts/` ou `docs/evidencias/` |
+| Data | 2026-07-25 |
+| Ambiente | local `localhost:3000` · tenant `cedig` · `alana@cedig.demo` |
+| Modelo | Claude 4.6 Sonnet (computerUse) |
+| Resultado | ✅ **OK** — C1–C4, D1–D2 e KPIs aprovados |
+| Fix na sessão | `getPrisma()` em `clinic-finance/service.ts` (bloqueava a tela) |
+| Evidências | `/opt/cursor/artifacts/cedig-homologacao/` |
+
+### Valores observados vs esperados
+
+| Caso | Esperado | Observado |
+|------|----------|-----------|
+| C1 Endoscopia Particular + 1 biópsia | R$ 900 | R$ 900 |
+| C2 Colonoscopia CentralMed | R$ 1.250 | R$ 1.250 |
+| C3 Colo + polipectomia intermediária + clip | R$ 3.200 | R$ 3.200 |
+| C4 Teste respiratório Bem Saúde | R$ 450 | R$ 450 |
+| D Lab + Pessoal | R$ 300 + R$ 500 | OK |
+
+Bugs UX: nenhum na execução.
