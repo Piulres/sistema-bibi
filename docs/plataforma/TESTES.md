@@ -339,7 +339,15 @@ npm run test && npm run build
 CI=true npm run test:e2e
 ```
 
-`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+`npm run pre-release` executa o pipeline completo antes do deploy (espelha CI + Netlify build):
+
+1. `lint` → `docs:verify` → `openapi:verify`
+2. `db:bootstrap:demo` (`SEED_SCALE=small`) → `db:verify`
+3. `npm test` (Vitest)
+4. `netlify:build`
+5. **`smoke-netlify-pwa`** — sobe `next start` no artefato e valida manifest PWA, ícones e `/_next/static` (v3.0)
+
+Script: `scripts/pre-release.mjs` · smoke: `scripts/smoke-netlify-pwa.mjs` · também via `npm run smoke:netlify-pwa`.
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 

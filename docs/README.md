@@ -62,7 +62,9 @@ docs/
 | Educação | [`segmentos/education/`](segmentos/education/) | EduPrime | `operacao@eduprime.demo` |
 | Engenharia | [`segmentos/construction/`](segmentos/construction/) | Build Corp | `operacao@build.demo` |
 
-Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=build`, etc.
+> **Tenant vs nicho:** um nicho pode ter vários tenants. O piloto **CEDIG Cruzeiro** (`/?tenant=cedig`) usa nicho **`MEDICAL`** (Saúde), não um vertical próprio — ver [`segmentos/README.md`](segmentos/README.md#tenant-vs-nicho) e [`clientes/cedig/README.md`](clientes/cedig/README.md).
+
+Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=build`, `/?tenant=cedig`, etc.
 
 ---
 

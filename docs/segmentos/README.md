@@ -20,6 +20,23 @@ Cada pasta deste diretório documenta um **vertical** suportado pela plataforma:
 **Código canônico de labels:** [`src/constants/niches.ts`](../../src/constants/niches.ts)  
 **Template para novo segmento:** [`../pesquisa/TEMPLATE_PESQUISA_NICHO.md`](../pesquisa/TEMPLATE_PESQUISA_NICHO.md)
 
+## Tenant vs nicho
+
+| Conceito | Campo / entrada | Exemplo | O que define |
+|----------|-----------------|---------|--------------|
+| **Nicho** (vertical) | `Tenant.niche` | `MEDICAL`, `VET`, `LEGAL` | Glossário padrão (`NICHE_MASTER_LABELS`), landing fallback (`?niche=`) |
+| **Tenant** (clínica/cliente) | `Tenant.slug` | `horizonte`, `cedig`, `petcare` | Branding, catálogo, usuários, labels override — resolvido por `?tenant=` |
+
+Um **nicho** pode ter **vários tenants**. O piloto **CEDIG Cruzeiro** é tenant `cedig` no nicho **`MEDICAL`** (Saúde) — não é um nicho próprio. Ver [`clientes/cedig/README.md`](../clientes/cedig/README.md).
+
+| Nicho | Tenants demo (seed) |
+|-------|---------------------|
+| `MEDICAL` | Horizonte (`horizonte`), VitaCare (`vitacare`), **CEDIG** (`cedig`) |
+| `VET` | PetCare (`petcare`) |
+| `CONSTRUCTION` | Build Corp (`build`) |
+
+Resolução: `src/lib/segment/resolve.ts` — prioridade `?tenant=` → cookie `bibi_segment` → domínio → `?niche=`.
+
 ## Como validar um segmento em demo
 
 1. Landing: `/?tenant=petcare` (recomendado) ou `/?niche=VET`

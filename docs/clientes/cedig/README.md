@@ -2,10 +2,13 @@
 
 **Tenant piloto** do ServiceOS em operação real — Centro de Endoscopia e Diagnóstico (Cruzeiro/SP).
 
+> **Tenant, não nicho:** CEDIG é o slug `cedig` — um **tenant** no nicho **`MEDICAL`** (Saúde), como Horizonte e VitaCare. Não existe `niche=CEDIG`; use `/?tenant=cedig`. Glossário e labels vêm de `NICHE_MASTER_LABELS.MEDICAL` com overrides do tenant (ex.: `appointment` → "Exame"). Ver [`segmentos/README.md`](../../segmentos/README.md#tenant-vs-nicho).
+
 | Campo | Valor |
 |-------|-------|
 | **Site** | [cedigcruzeiro.com.br](https://www.cedigcruzeiro.com.br) |
-| **Segmento** | `MEDICAL` (endoscopia digestiva) |
+| **Nicho** | `MEDICAL` (Saúde — endoscopia digestiva) |
+| **Tenant** | `cedig` (`Tenant.slug`) |
 | **Slug sugerido** | `cedig` |
 | **Contato público** | (12) 3199-7871 · WhatsApp |
 | **Foco clínico** | Endoscopia · Colonoscopia · Teste respiratório |

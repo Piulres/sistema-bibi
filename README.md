@@ -235,6 +235,8 @@ Senha única: **`bibi123`**. Cada tenant tem procedimentos e nomenclatura do nic
 | Engenharia | Build Corp | `operacao@build.demo` | `/?tenant=build` |
 | Saúde | CEDIG Cruzeiro | `operacao@cedig.demo` | `/?tenant=cedig` · gestão `/interno/gestao` |
 
+> CEDIG é **tenant** `cedig` no nicho **Saúde** (`MEDICAL`) — não é um nicho/vertical próprio. Vários tenants podem compartilhar o mesmo nicho; ver [`docs/segmentos/README.md`](docs/segmentos/README.md#tenant-vs-nicho).
+
 Preview por nicho (fallback): `/?niche=VET`, `/?niche=LEGAL`, `/?niche=CONSTRUCTION`, etc.
 
 > Cada conta só acessa o portal correspondente ao seu `role`; tentar usar uma

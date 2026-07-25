@@ -73,15 +73,21 @@ flowchart LR
 
 ### 0.3 Tenants demo multi-nicho (seed)
 
+> **Tenant vs nicho:** `?tenant=` resolve o slug (`cedig`, `petcare`…); o nicho vem de `Tenant.niche`. Vários tenants podem compartilhar o mesmo nicho (ex.: Horizonte e CEDIG são ambos `MEDICAL`).
+
 | Nicho | Tenant (slug) | Login interno | Preview landing |
 |-------|---------------|---------------|-----------------|
+| MEDICAL | Clínica Horizonte (`horizonte`) | `faturamento@bibi.health` | `/` ou `/?tenant=horizonte` |
+| MEDICAL | CEDIG Cruzeiro (`cedig`) — piloto | `operacao@cedig.demo` | `/?tenant=cedig` · gestão `/interno/gestao` |
+| MEDICAL | VitaCare (`vitacare`) | `operacao@vitacare.demo` | `/?tenant=vitacare` |
 | VET | PetCare (`petcare`) | `operacao@petcare.demo` | `/?tenant=petcare` ou `/?niche=VET` |
 | DENTAL | Smile Odonto (`smile`) | `operacao@smile.demo` | `/?tenant=smile` ou `/?niche=DENTAL` |
 | LEGAL | Lex & Partners (`lex`) | `operacao@lex.demo` | `/?tenant=lex` ou `/?niche=LEGAL` |
 | SPA | Zen Studio (`zen`) | `operacao@zen.demo` | `/?tenant=zen` ou `/?niche=SPA` |
 | EDUCATION | EduPrime (`eduprime`) | `operacao@eduprime.demo` | `/?tenant=eduprime` ou `/?niche=EDUCATION` |
+| CONSTRUCTION | Build Corp (`build`) | `operacao@build.demo` | `/?tenant=build` ou `/?niche=CONSTRUCTION` |
 
-Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`. **FATO:** tenants de nicho têm apenas interno + prestador no seed (sem PJ/beneficiário dedicados).
+Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts` (nichos) + `cedig-catalog.ts` (CEDIG). **FATO:** tenants de nicho genéricos têm apenas interno + prestador no seed; CEDIG tem massa completa (4 portais + gestão clínica).
 
 ### 0.4 Landing por nicho
 
