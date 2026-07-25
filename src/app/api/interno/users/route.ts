@@ -14,6 +14,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    // RBAC: criar usuário é exclusivo de ADMIN (recepção só lista).
     const user = await requireInternoAdmin();
     const body = (await request.json()) as {
       email?: string;

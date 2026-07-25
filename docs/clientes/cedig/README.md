@@ -31,6 +31,8 @@ Credenciais (`/?tenant=cedig`, senha `bibi123`) — massa demo e bootstrap de **
 
 Em produção (modo operação): provisionar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }` se o tenant ainda não existir na base Blobs.
 
+**Criar usuários** (Cadastros → Usuários): somente ADMIN — `operacao@cedig.demo`. A conta Alana (`RECEPCAO`) lista usuários, mas não cria/edita (RBAC).
+
 ---
 
 ## Tabelas de preço
