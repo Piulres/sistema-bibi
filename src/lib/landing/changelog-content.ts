@@ -50,7 +50,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "clinic-finance-bridge · docs:verify · lint",
+    testStats: "clinic-finance-bridge · e2e/cedig-gestao 6/6 · docs:verify · lint",
   },
   {
     version: "2.4.0",

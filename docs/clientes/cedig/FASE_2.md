@@ -58,8 +58,8 @@ Código: `src/lib/clinic-finance/bridge.ts` · `bridge-helpers.ts`.
 1. `npm run db:seed` (ou ensure CEDIG) — massa com lançamentos SYNCED  
 2. Alana `/interno/gestao` → lançar → coluna Ponte **SYNCED**  
 3. Agenda → **Lançar na gestão**  
-4. Prestador `bruno.dias@cedig.demo` · Beneficiário `maria.cedig@email.com` · PJ `rh@centralmed.demo`  
-5. `npx playwright test e2e/cedig-gestao.spec.ts`  
-6. Exportar mês (Excel)
+4. Prestador `bruno.dias@cedig.demo` · Beneficiário `maria.cedig@email.com` · PJ `rh@centralmed.demo` / `rh@bemsaude.demo` / `rh@drsaude.demo`  
+5. `npx playwright test e2e/cedig-gestao.spec.ts --project=chromium` (6/6)  
+6. Exportar mês (Excel) · Dashboard mostra KPIs da gestão no mês corrente
 
 Credenciais: [`README.md`](README.md).
