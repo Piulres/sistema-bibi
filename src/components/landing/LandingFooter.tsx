@@ -6,6 +6,7 @@ import { landingNavItems } from "@/lib/landing/navigation";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
 import { PORTALS } from "@/lib/roles";
+import { PLATFORM } from "@/lib/platform";
 
 type Props = {
   branding: BrandingTokens;
@@ -47,6 +48,9 @@ export default function LandingFooter({
               {tagline}
             </p>
             <p className="mt-4 text-xs text-[var(--text-muted)]">{branding.platformLabel}</p>
+            <p className="mt-2 text-xs font-medium text-[var(--text-secondary)]">
+              {PLATFORM.versionLabel}
+            </p>
           </div>
 
           <nav aria-label="Links do rodapé">
@@ -84,9 +88,15 @@ export default function LandingFooter({
 
         <div className="mt-12 flex flex-col gap-2 border-t border-[var(--border-default)] pt-6 text-xs text-[var(--text-muted)] sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {year} {branding.displayName}. Demonstração POC do produto.
+            © {year} {branding.displayName}. Demonstração POC do produto.{" "}
+            <span className="font-medium text-[var(--text-secondary)]">
+              v{PLATFORM.release}
+            </span>
           </p>
-          <p>
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <span aria-label={`Versão ${PLATFORM.release}`}>
+              {PLATFORM.shortName} v{PLATFORM.release}
+            </span>
             <Link
               href="/interno/login"
               className="rounded-sm underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
