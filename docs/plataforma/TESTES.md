@@ -339,7 +339,20 @@ npm run test && npm run build
 CI=true npm run test:e2e
 ```
 
-`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+`npm run pre-release` executa o mesmo bootstrap antes de `db:verify`, depois `netlify:build` e **`smoke-netlify-pwa`** (rotas PWA + estáticos no `next start`).
+
+### Smoke PWA (`smoke-netlify-pwa`)
+
+Script: `scripts/smoke-netlify-pwa.mjs` · comando: `npm run smoke:netlify-pwa`.
+
+| Check | Esperado |
+|-------|----------|
+| `/`, `/instalar`, `/login`, `/interno/login` | 200 HTML |
+| `/manifest.webmanifest` | `display: standalone` + ícones |
+| `/icons/*` | 200 PNG |
+| Home HTML | `rel="manifest"`, metas Apple, chunk CSS `/_next/static` |
+
+Incluído no `pre-release` após `netlify:build`. Doc operacional: [`PWA_MOBILE.md`](PWA_MOBILE.md).
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 

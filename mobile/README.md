@@ -6,7 +6,7 @@ Fase A da v3.0 é PWA (`/instalar` + manifest).
 
 ## Isolamento
 
-- Não altera `PLATFORM.release` (produção continua v2.4.x até fechar o pacote 3.0).
+- Não altera `PLATFORM.release` (produção **v2.6.0** até fechar o pacote 3.0).
 - Não entra no `npm run build` do Next.js.
 - Trabalho em branches `cursor/serviceos-v3-*`.
 

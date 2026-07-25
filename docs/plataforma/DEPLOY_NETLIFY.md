@@ -15,7 +15,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.6.0`** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
+| Pacote em produção | **`v2.6.0`** — deploy `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`) |
 | Pacote anterior | **`v2.4.0`** — CEDIG gestão clínica |
 | `main` / `dev` | Sincronizadas · tag `v2.6.0` |
 | Tags git | ✅ `v2.4.0` · `v2.5.0` (empilhado) · `v2.6.0` |

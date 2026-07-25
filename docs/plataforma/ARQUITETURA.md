@@ -11,6 +11,8 @@ e são renderizados automaticamente no GitHub.
 >
 > **Deploy Netlify:** [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) · produção: https://sistema-bibi.netlify.app
 >
+> **PWA / mobile (v3.0):** [`PWA_MOBILE.md`](PWA_MOBILE.md) · escopo: [`V3_0.md`](../versoes/V3_0.md)
+>
 > **Operações (dev, release, IA):** [`OPERACOES.md`](OPERACOES.md) · pacotes: [`RELEASES.md`](../versoes/RELEASES.md)
 >
 > **ServiceOS v2.0 (multi-nicho):** [`V2_0.md`](../versoes/V2_0.md) · [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) — `Tenant.niche`, `Tenant.labels`, `useLabels()`

@@ -84,6 +84,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`plataforma/NOTEBOOKLM.md`](plataforma/NOTEBOOKLM.md) | Corpus RAG |
 | [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md) | Dev sem deploy automático |
 | [`plataforma/LANDING_CHANGELOG.md`](plataforma/LANDING_CHANGELOG.md) | Manutenção do bloco Novidades na home |
+| [`plataforma/PWA_MOBILE.md`](plataforma/PWA_MOBILE.md) | PWA standalone — `/instalar`, manifest, smoke |
 
 ---
 

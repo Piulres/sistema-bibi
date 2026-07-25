@@ -129,7 +129,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
 | Média | Notificações mock (`COMMUNICATION_PROVIDER=console`) | Adapter real (e-mail/SMS/WhatsApp) |
 | Baixa | Sem carteirinha digital | Card com QR + dados do plano corporativo |
-| Baixa | Sem PWA / app nativo | PWA instalável com push de lembrete |
+| Baixa | PWA sem offline/push | Fundação em prod (`/instalar`, manifest) — SW e push na v3.0 · [`plataforma/PWA_MOBILE.md`](../plataforma/PWA_MOBILE.md) |
 
 **Código:** `src/components/BeneficiarioView.tsx` · APIs em `src/app/api/beneficiario/`
 
