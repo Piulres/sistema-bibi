@@ -571,9 +571,11 @@ cada operação com tela, rota API e tipo de exposição (UI, Download, API-only
 Quando `DUAL_DATA_STORE=true` (dev e Netlify):
 
 1. Build gera `demo.db` + `operation.db` (`scripts/netlify-build.mjs`).
-2. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local.
-3. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
-4. APIs usam `getPrisma()` → banco conforme modo ativo.
+2. `operation.db` inclui tenants `bibi-saude` + `cedig` (equipe + catálogo; sem PJ/pacientes).
+3. Modo ativo persiste em Blobs (`data-store-mode`) ou arquivo local.
+4. ADMIN alterna em `/interno/seguranca` via `DataStoreCard`.
+5. APIs usam `getPrisma()` → banco conforme modo ativo.
+6. Bases Blobs legadas: `POST /api/interno/operation/provision-cedig` (ADMIN, confirma `CEDIG`).
 
 ### 8.8 Persistência de segmento (landing)
 

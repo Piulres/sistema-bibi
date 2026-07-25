@@ -13,7 +13,7 @@ Um único site (`sistema-bibi.netlify.app`) com **duas bases SQLite** embutidas 
 | Base | Arquivo | Conteúdo |
 |------|---------|------------|
 | **Demo** | `prisma/demo.db` | Massa completa do seed (50 PJ, beneficiários, fluxos) |
-| **Operação** | `prisma/operation.db` | Schema + bootstrap mínimo (tenant, usuários, catálogo) |
+| **Operação** | `prisma/operation.db` | Bootstrap mínimo: `bibi-saude` + `cedig` (equipe + catálogo; sem PJ/pacientes) |
 
 O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados — demo ou operação** (somente ADMIN).
 
@@ -109,6 +109,31 @@ POST /api/interno/operation/provision-cedig
 
 Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
 
+**Demo vs operação** (`ensureCedigTenant` em `prisma/seed-data/cedig-catalog.ts`):
+
+| Flag | Demo (`demo.db`) | Operação (`operation.db`) |
+|------|------------------|---------------------------|
+| `portalMass` | ✅ pacientes, PJ, beneficiários | ❌ greenfield |
+| `seedHistory` | ✅ agenda, launches, despesas | ❌ histórico vazio |
+
+Em produção com Blobs **anteriores** ao bootstrap v2.4.0, use `provision-cedig` para alinhar equipe e catálogo sem recriar a base.
+
+### Validação (`db:verify`)
+
+`scripts/verify-databases.mjs` valida o bootstrap de operação:
+
+| Check | Esperado |
+|-------|----------|
+| Tenants | `bibi-saude` + `cedig` (2) |
+| Nicho | `MEDICAL` em ambos |
+| Usuários | 5 internos Bibi + `alana@cedig.demo` + `operacao@cedig.demo` |
+| Procedimentos | ≥ 14 (catálogo Bibi + CEDIG) |
+| Empresas PJ / pacientes | **0** (massa cresce pelo uso) |
+
+```bash
+npm run db:bootstrap:demo && npm run db:verify
+```
+
 ---
 
 ## Limitações conhecidas
@@ -140,6 +165,7 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 - Modo ativo: `src/lib/data-store-mode.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
+- Provision CEDIG: `src/lib/operation/provision-cedig.ts` · `POST /api/interno/operation/provision-cedig`
 - UI seletor: `src/components/DataStoreCard.tsx`
 - API: `GET|POST /api/interno/data-store`
 - Reset demo: `src/lib/demo-reset.ts`

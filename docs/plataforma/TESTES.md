@@ -318,6 +318,14 @@ CI=true npm run test:e2e
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 
+**Checks de `operation.db`** (`scripts/verify-databases.mjs`):
+
+- 2 tenants: `bibi-saude` + `cedig` (MEDICAL)
+- Usuários essenciais Bibi + `alana@cedig.demo` / `operacao@cedig.demo`
+- ≥ 14 procedimentos; **0** empresas PJ e **0** pacientes
+
+Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § Validação.
+
 ---
 
 ## Referências

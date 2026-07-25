@@ -58,7 +58,7 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 
 **CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · roteiro [`docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`docs/clientes/cedig/HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.
 
-**Modo operação** (`operation.db`): tenant `bibi-saude` — bootstrap mínimo (5 usuários, 14 procedimentos, sem clientes). Ver `operation-bootstrap.ts`.
+**Modo operação** (`operation.db`): tenants `bibi-saude` + `cedig` — bootstrap mínimo (7 usuários essenciais, ≥14 procedimentos, **sem** empresas PJ nem pacientes). CEDIG traz só equipe + catálogo (`portalMass: false`, `seedHistory: false`). Ver `operation-bootstrap.ts` · `cedig-catalog.ts`.
 
 Documentação por segmento: [`docs/segmentos/README.md`](../segmentos/README.md)
 
@@ -170,7 +170,7 @@ Validação: `?tenant=petcare` → login bloqueia contas de outro tenant.
 | `tests/lib/seed-mass-portal.test.ts` | Entidades mínimas **por portal** e **por segmento** |
 | `tests/unit/seed-profile.test.ts` | Perfil `operation-1y` e glossário comum |
 | `tests/security/tenant-isolation.test.ts` | Horizonte ≠ PetCare (cross-tenant 404) |
-| `scripts/verify-databases.mjs` | Integridade pós-seed (`demo.db` + `operation.db`) |
+| `scripts/verify-databases.mjs` | Integridade pós-seed: demo (7 tenants) + operação (`bibi-saude` + `cedig`, 0 PJ/pacientes) |
 
 ```bash
 # Testes usam SEED_SCALE=small + SEED_PROFILE=market (rápido)
@@ -209,7 +209,7 @@ SEED_PROFILE=operation-1y npm run db:verify
 
 | Agregado | Aproximado (`medium`) |
 |----------|----------------------|
-| Tenants | 7 |
+| Tenants | 8 (inclui `cedig`) |
 | Empresas (todos) | 90–100 |
 | Pacientes (todos) | 350–450 |
 | Agendamentos (todos) | 400–500 |
@@ -221,7 +221,7 @@ SEED_PROFILE=operation-1y npm run db:verify
 | Lacuna | Status |
 |--------|--------|
 | E2E por segmento (petcare, smile…) | ❌ só Horizonte |
-| `operation.db` com massa quente | ❌ só bootstrap |
+| `operation.db` com massa quente | ❌ só bootstrap (2 tenants, sem PJ/pacientes) |
 | PetCare label `appointment` → "Banho/Tosa" no seed | ✅ aplicado |
 | Testes de carga com 20 clientes × 9 usuários | ❌ futuro |
 
