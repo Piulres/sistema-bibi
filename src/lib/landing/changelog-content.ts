@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.4.0",
+    version: "2.5.0",
     label: PLATFORM.versionLabel,
     date: "25/07/2026",
     status: "current",
+    summary:
+      "Login unificado: escolha o portal e digite a clínica (tenant) na mesma tela — sem depender só da URL.",
+    highlights: [
+      {
+        title: "Acesso",
+        items: [
+          "Campo Clínica / tenant nas telas de login (ex.: cedig, horizonte)",
+          "Seletor dos 4 portais (Interno, Prestador, PJ, Beneficiário) no formulário",
+          "Aplicar clínica atualiza branding e atalho ?tenant= antes de entrar",
+        ],
+      },
+      {
+        title: "Operação",
+        items: [
+          "Mantém atalhos de segmento demo e cookie bibi_segment",
+          "Mensagens de tenant incorreto apontam o ?tenant= da conta",
+        ],
+      },
+    ],
+    testStats: "login-access · docs:verify · pre-release",
+  },
+  {
+    version: "2.4.0",
+    label: "Sistema Bibi - ServiceOS v2.4.0",
+    date: "25/07/2026",
+    status: "previous",
     summary:
       "Piloto CEDIG Cruzeiro: gestão clínica com lançamentos, despesas e indicadores automáticos — a secretária lança, o sistema calcula.",
     highlights: [

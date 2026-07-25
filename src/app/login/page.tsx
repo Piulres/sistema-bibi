@@ -15,12 +15,15 @@ export default async function PrestadorLoginPage({ searchParams }: PageProps) {
   const context = await getLoginSegmentContext({ tenantSlug: tenantParam, nicheParam });
   const tenantRef = resolveSegmentTenantRef(context.tenantSlug, context.niche);
 
+  const demoEmail = demoEmailForPortal(tenantRef, "prestador");
+
   return (
     <LoginForm
+      key={`prestador-${context.tenantSlug ?? ""}-${demoEmail}`}
       portal="prestador"
       title={`Portal do ${context.labels.portalProvider.replace("Portal do ", "")}`}
       subtitle={`Acesse agenda e registros de ${context.labels.procedures.toLowerCase()} da operação ${context.tenantName ?? tenantRef.tenant}.`}
-      demoEmail={demoEmailForPortal(tenantRef, "prestador")}
+      demoEmail={demoEmail}
       demoPassword="bibi123"
       branding={context.branding}
       segmentContext={context}

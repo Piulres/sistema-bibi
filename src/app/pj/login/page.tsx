@@ -15,12 +15,15 @@ export default async function PjLoginPage({ searchParams }: PageProps) {
   const context = await getLoginSegmentContext({ tenantSlug: tenantParam, nicheParam });
   const tenantRef = resolveSegmentTenantRef(context.tenantSlug, context.niche);
 
+  const demoEmail = demoEmailForPortal(tenantRef, "pj");
+
   return (
     <LoginForm
+      key={`pj-${context.tenantSlug ?? ""}-${demoEmail}`}
       portal="pj"
       title={`Portal ${context.labels.company}`}
       subtitle={`Gestão de contratos e ${context.labels.beneficiaries.toLowerCase()} — ${context.tenantName ?? tenantRef.tenant}.`}
-      demoEmail={demoEmailForPortal(tenantRef, "pj")}
+      demoEmail={demoEmail}
       demoPassword="bibi123"
       branding={context.branding}
       segmentContext={context}

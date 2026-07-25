@@ -14,6 +14,11 @@ import { nicheDemoLabel } from "@/lib/niche/demo-accounts";
 import { appendSegmentToPath } from "@/lib/segment/types";
 import { segmentPillStyle } from "@/lib/theme/segment-colors";
 import { PLATFORM } from "@/lib/platform";
+import {
+  buildLoginAccessHref,
+  LOGIN_PORTAL_OPTIONS,
+  normalizeTenantSlug,
+} from "@/lib/auth/login-access";
 import SegmentContextBanner from "@/components/segment/SegmentContextBanner";
 import SegmentCookiePersist from "@/components/segment/SegmentCookiePersist";
 import { PORTAL_THEMES } from "@/lib/theme/portals";
@@ -35,6 +40,9 @@ type Props = {
   nicheDemos?: LoginNicheDemoOption[];
 };
 
+const fieldClass =
+  "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
+
 export default function LoginForm({
   portal,
   title,
@@ -48,16 +56,36 @@ export default function LoginForm({
   const router = useRouter();
   const [email, setEmail] = useState(demoEmail);
   const [password, setPassword] = useState(demoPassword);
+  const [tenantSlug, setTenantSlug] = useState(segmentContext?.tenantSlug ?? "");
+  const [selectedPortal, setSelectedPortal] = useState<PortalKey>(portal);
   const [mfaToken, setMfaToken] = useState<string | null>(null);
   const [mfaCode, setMfaCode] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const portalTheme = PORTAL_THEMES[portal];
+  const portalTheme = PORTAL_THEMES[selectedPortal];
+
+  function goToAccess(nextPortal: PortalKey, nextTenant: string) {
+    const href = buildLoginAccessHref(nextPortal, nextTenant);
+    router.push(href);
+    router.refresh();
+  }
+
+  function applyTenant() {
+    const slug = normalizeTenantSlug(tenantSlug);
+    setTenantSlug(slug);
+    goToAccess(selectedPortal, slug);
+  }
+
+  function onPortalChange(next: PortalKey) {
+    setSelectedPortal(next);
+    goToAccess(next, tenantSlug);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    const slug = normalizeTenantSlug(tenantSlug);
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -65,8 +93,8 @@ export default function LoginForm({
         body: JSON.stringify({
           email,
           password,
-          portal,
-          tenantSlug: segmentContext?.tenantSlug ?? undefined,
+          portal: selectedPortal,
+          tenantSlug: slug || undefined,
         }),
       });
       const data = await res.json();
@@ -92,6 +120,7 @@ export default function LoginForm({
     if (!mfaToken) return;
     setError(null);
     setLoading(true);
+    const slug = normalizeTenantSlug(tenantSlug);
     try {
       const res = await fetch("/api/auth/mfa/verify", {
         method: "POST",
@@ -99,7 +128,7 @@ export default function LoginForm({
         body: JSON.stringify({
           mfaToken,
           code: mfaCode,
-          tenantSlug: segmentContext?.tenantSlug ?? undefined,
+          tenantSlug: slug || undefined,
         }),
       });
       const data = await res.json();
@@ -117,7 +146,7 @@ export default function LoginForm({
   }
 
   return (
-    <TenantTheme branding={branding} portal={portal} className="flex flex-1 flex-col">
+    <TenantTheme branding={branding} portal={selectedPortal} className="flex flex-1 flex-col">
       <Suspense fallback={null}>
         <SegmentCookiePersist
           tenantSlug={segmentContext?.tenantSlug}
@@ -150,6 +179,54 @@ export default function LoginForm({
 
             {!mfaToken ? (
               <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+                <label className="block text-sm" htmlFor="login-portal">
+                  <span className="font-medium text-[var(--text-secondary)]">Portal</span>
+                  <select
+                    id="login-portal"
+                    className={fieldClass}
+                    value={selectedPortal}
+                    onChange={(e) => onPortalChange(e.target.value as PortalKey)}
+                    data-tour-id="login-portal-select"
+                  >
+                    {LOGIN_PORTAL_OPTIONS.map((option) => (
+                      <option key={option.key} value={option.key}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <div>
+                  <Input
+                    label="Clínica / tenant"
+                    id="login-tenant"
+                    name="tenant"
+                    autoComplete="organization"
+                    placeholder="ex.: cedig, horizonte, petcare"
+                    value={tenantSlug}
+                    onChange={(e) => setTenantSlug(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        applyTenant();
+                      }
+                    }}
+                    info="Slug da operação (?tenant=). CEDIG: digite cedig e clique em Aplicar."
+                    data-tour-id="login-tenant-input"
+                  />
+                  <div className="mt-2 flex justify-end">
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => applyTenant()}
+                      data-tour-id="login-tenant-apply"
+                    >
+                      Aplicar clínica
+                    </Button>
+                  </div>
+                </div>
+
                 <Input
                   label="E-mail"
                   id="email"
@@ -217,7 +294,7 @@ export default function LoginForm({
                 {nicheDemos && nicheDemos.length > 0 && (
                   <div className="mt-3 space-y-2">
                     <p className="text-xs font-medium text-[var(--text-secondary)]">
-                      {PLATFORM.versionLabel} — experimente outro segmento:
+                      {PLATFORM.versionLabel} — atalhos de segmento:
                     </p>
                     <div className="flex flex-wrap gap-1.5">
                       {nicheDemos.map((demo) => {
@@ -225,7 +302,7 @@ export default function LoginForm({
                         return (
                           <Link
                             key={demo.niche}
-                            href={appendSegmentToPath(PORTAL_LOGIN_PATHS[portal], {
+                            href={appendSegmentToPath(PORTAL_LOGIN_PATHS[selectedPortal], {
                               tenantSlug: demo.slug,
                             })}
                             className={`rounded-full border px-2.5 py-1 text-[11px] font-medium transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${

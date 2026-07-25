@@ -19,12 +19,15 @@ export default async function InternoLoginPage({ searchParams }: PageProps) {
 
   const tenantRef = resolveSegmentTenantRef(context.tenantSlug, context.niche);
 
+  const demoEmail = demoEmailForPortal(tenantRef, "interno");
+
   return (
     <LoginForm
+      key={`interno-${context.tenantSlug ?? ""}-${demoEmail}`}
       portal="interno"
       title="Portal Interno"
       subtitle={`Administre operação e faturamento de ${context.tenantName ?? tenantRef.tenant}.`}
-      demoEmail={demoEmailForPortal(tenantRef, "interno")}
+      demoEmail={demoEmail}
       demoPassword="bibi123"
       branding={context.branding}
       segmentContext={context}

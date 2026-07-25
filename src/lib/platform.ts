@@ -3,10 +3,10 @@ export const PLATFORM = {
   name: "Sistema Bibi - ServiceOS",
   shortName: "ServiceOS",
   /** Major.minor — prefixo de `release` / package.json (docs:verify). */
-  version: "2.4",
+  version: "2.5",
   /** Semver completo do pacote em produção (title, footer, badges). */
-  release: "2.4.0",
-  versionLabel: "Sistema Bibi - ServiceOS v2.4.0",
+  release: "2.5.0",
+  versionLabel: "Sistema Bibi - ServiceOS v2.5.0",
   tagline: "Infraestrutura Pay Per Use multi-nicho para serviços profissionais",
   description:
     "Sistema Bibi - ServiceOS: plataforma Pay Per Use com quatro portais integrados, white label por tenant e vocabulário adaptável por segmento (saúde, veterinária, odontologia, jurídico, bem-estar, educação e engenharia).",

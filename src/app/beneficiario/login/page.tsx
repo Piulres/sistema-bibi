@@ -15,12 +15,15 @@ export default async function BeneficiarioLoginPage({ searchParams }: PageProps)
   const context = await getLoginSegmentContext({ tenantSlug: tenantParam, nicheParam });
   const tenantRef = resolveSegmentTenantRef(context.tenantSlug, context.niche);
 
+  const demoEmail = demoEmailForPortal(tenantRef, "beneficiario");
+
   return (
     <LoginForm
+      key={`beneficiario-${context.tenantSlug ?? ""}-${demoEmail}`}
       portal="beneficiario"
       title={`Portal do ${context.labels.beneficiary}`}
       subtitle={`Agenda, consumo e faturas para ${context.labels.beneficiaries.toLowerCase()} da operação ${context.tenantName ?? tenantRef.tenant}.`}
-      demoEmail={demoEmailForPortal(tenantRef, "beneficiario")}
+      demoEmail={demoEmail}
       demoPassword="bibi123"
       branding={context.branding}
       segmentContext={context}
