@@ -15,7 +15,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a64fae0` @ `989363c` (`bibi-poc-2026-07-25g`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a64feeb` @ `673c507` (`bibi-poc-2026-07-25h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
 | **Release `main` / `dev`** | **v2.4.0** · tag `v2.4.0` |
 | **Pacote anterior em produção** | **2.3.1** — deploy `6a643a0d` @ `12148ce` |
