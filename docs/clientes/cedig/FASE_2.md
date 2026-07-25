@@ -35,7 +35,7 @@ Alana agenda/cadastra
 | Dashboard → atalho Gestão clínica | ✅ |
 | E2E Playwright `e2e/cedig-gestao.spec.ts` | ✅ |
 
-**Ainda não vender como “4 portais plenos em produção”** até homologação humana in loco e deploy do pacote.
+**Ainda não vender como “4 portais plenos em produção”** até homologação humana in loco (pacote **v2.6.0** já publicado — ver [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md)).
 
 ---
 

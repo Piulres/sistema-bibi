@@ -6,7 +6,7 @@ Guia para explorar, testar e validar o contrato **OpenAPI 3.0** do **Sistema Bib
 |---------|-----------|----------------|
 | **Swagger UI (interativo)** | http://localhost:3000/api/docs | https://sistema-bibi.netlify.app/api/docs |
 | **Spec YAML** | http://localhost:3000/openapi.yaml | https://sistema-bibi.netlify.app/openapi.yaml |
-| **Paths documentados** | 123 (cobertura total dos Route Handlers) | idem |
+| **Paths documentados** | 123 de 160 Route Handlers (`openapi:verify` avisa 37 pendentes) | idem |
 | Legado (redirect) | `/api-docs.html` → `/api/docs` | idem |
 
 Fonte da spec: [`public/openapi.yaml`](../../public/openapi.yaml) · Fluxos de negócio: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §11.
@@ -144,7 +144,11 @@ Ao criar ou alterar Route Handlers em `src/app/api/**/route.ts`:
 2. Refine manualmente summaries/schemas dos endpoints críticos (Voa, estoque, billing)
 3. Rode `npm run openapi:verify` — paths documentados sem handler correspondente **falham**
 
-O sync automático cobre **123 paths** (paridade com Route Handlers). Endpoints novos recebem documentação mínima; enriqueça descrições conforme necessário.
+O sync automático cobre **123 paths** no YAML. **37** Route Handlers ainda não
+têm entrada no OpenAPI (ex.: `clinic-finance/*`, construction `projects/*`,
+`attachments/*`) — `npm run openapi:verify` lista os órfãos como aviso. Endpoints
+novos recebem documentação mínima após `openapi:sync`; enriqueça summaries/schemas
+dos endpoints críticos manualmente.
 
 Roadmap: testes de contrato de resposta (P1 em [`TESTES.md`](TESTES.md)).
 

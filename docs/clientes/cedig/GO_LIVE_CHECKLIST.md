@@ -9,7 +9,7 @@ Validação pré-apresentação / uso em produção.
 
 | Camada | Resultado |
 |--------|-----------|
-| Vitest | **529** testes OK |
+| Vitest | **550** testes OK (76 arquivos) |
 | lint / docs:verify / db:verify | OK |
 | `npm run pre-release` | OK |
 | Playwright `e2e/walkin-particular` (chromium) | **2 passed** |

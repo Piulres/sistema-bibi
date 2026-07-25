@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **529+** casos Vitest · **12** specs Playwright E2E · **~160** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **550** casos Vitest (76 arquivos) · **12** specs Playwright E2E · **160** Route Handlers · **123** paths no OpenAPI (**37** handlers ainda sem spec — ver `npm run openapi:verify`).
 
 ### Onboarding tour (v3)
 
@@ -35,6 +35,11 @@ as operações suportadas (C/R/U/D).
 
 **Regra para PRs:** nova entidade CRUD = entrada no mapa + entrada no registry +
 teste API (E2E só se houver UI crítica). Validar com `npm run test`.
+
+`tests/api/system-crud-matrix.test.ts` cobre entidades sem suite dedicada em
+`cadastros-crud.test.ts` — entre elas: pets, pricing-rules, protocol-templates,
+webhooks/deliveries, messages, branding, clinic-finance (launches, expenses, export, meta)
+e change-management. Complementa o gate do registry sem substituir E2E de UI.
 
 ---
 
@@ -207,7 +212,11 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa das rotas API
 
-**FATO:** existem **~100** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **58** paths — subconjunto intencional para integradores.
+**FATO:** existem **160** Route Handlers em `src/app/api/`. O contrato OpenAPI
+documenta **123** paths (`public/openapi.yaml`). **37** handlers ainda não estão
+no YAML — principalmente `clinic-finance/*`, construction (`projects`, `attachments`)
+e alguns endpoints internos recentes. Rode `npm run openapi:sync` ao adicionar
+rotas novas; `openapi:verify` emite aviso (não falha) para handlers órfãos.
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
