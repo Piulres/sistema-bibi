@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v2.3** (produção jul/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v2.4** (produção jul/2026): gestão clínica (`/interno/gestao`) no piloto CEDIG; vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · pacote: [`../versoes/V2_4.md`](../versoes/V2_4.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -258,10 +258,11 @@ flowchart LR
 | `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal, export CSV/PDF |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
+| `gestao` | `/interno/gestao` | `ClinicFinanceView` | Lançamentos, despesas e KPIs clínicos (MEDICAL/DENTAL) |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav: **13 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
+Nav: **14 módulos** em `INTERNO_NAV_TABS` (`routes.ts`) — aba `gestao` exibida só em `MEDICAL`/`DENTAL` via `buildInternoNavTabs` (`niche-nav.ts`). Filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.1 Faturamento (`BillingView`)
 
@@ -395,6 +396,25 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 | Restaurar seed demo | `POST /api/interno/demo/reset` | Somente ADMIN + modo demo + `ALLOW_DEMO_RESET` |
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
+
+### 4.11 Gestão clínica (`ClinicFinanceView`) — v2.4
+
+**Nichos:** `MEDICAL` · `DENTAL` · **Piloto:** tenant CEDIG (`/?tenant=cedig`).
+
+Substitui a planilha operacional da secretária — **não integra** com faturamento PPU (`Invoice` / `ProcedureUsage`).
+
+| Aba UI | Ação | API | Efeito |
+|--------|------|-----|--------|
+| Lançamentos | Listar | `GET /api/interno/clinic-finance/launches?year=&month=` | `ClinicExamLaunch` do mês |
+| Lançamentos | Criar | `POST /api/interno/clinic-finance/launches` | 1 linha/paciente; valida médico, exame, tabela e pagamento |
+| Despesas | Listar | `GET /api/interno/clinic-finance/expenses?year=&month=` | `ClinicExpense` do mês |
+| Despesas | Criar | `POST /api/interno/clinic-finance/expenses` | Opex por categoria (`LABORATORIO`, `PESSOAL`, …) |
+| Indicadores | KPIs | `GET /api/interno/clinic-finance/kpis?year=&month=` | Receita, lucro, ticket, produção por médico |
+| *(meta)* | Catálogos | `GET /api/interno/clinic-finance/meta` | Médicos, exames, pacientes, tabelas de preço, formas de pagamento |
+
+**Sugestão de valor:** UI chama `suggestCedigAmount()` (`cedig-pricing.ts`) ao mudar exame/tabela/contadores — secretária confirma ou ajusta `amountReceived`.
+
+Serviço: `src/lib/clinic-finance/service.ts` · Doc cliente: [`../clientes/cedig/README.md`](../clientes/cedig/README.md) · changelog: [`../versoes/V2_4.md`](../versoes/V2_4.md).
 
 ---
 
@@ -615,6 +635,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | auditoria | ✓ | ✓ | ✗ | ✓ |
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
+| gestao | ✓ | ✓ | ✓ | ✓ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
 
 ### Onde é aplicado
@@ -623,7 +644,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD, **clinic-finance/** (gestão clínica) |
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.
@@ -715,7 +736,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
 `companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*` ·
+`clinic-finance/*` (gestão clínica v2.4 — ver §4.11)
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`

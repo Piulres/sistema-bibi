@@ -146,6 +146,8 @@ Ao criar ou alterar Route Handlers em `src/app/api/**/route.ts`:
 
 O sync automático cobre **123 paths** (paridade com Route Handlers). Endpoints novos recebem documentação mínima; enriqueça descrições conforme necessário.
 
+**Gap conhecido (v2.4.0):** gestão clínica — `GET/POST /api/interno/clinic-finance/{meta,launches,expenses,kpis}` ainda não constam no YAML. Contrato e fluxo: [`FLUXOS.md`](../produto/FLUXOS.md) §4.11 · [`V2_4.md`](../versoes/V2_4.md). Rodar `openapi:sync` ao fechar o pacote.
+
 Roadmap: testes de contrato de resposta (P1 em [`TESTES.md`](TESTES.md)).
 
 ---
