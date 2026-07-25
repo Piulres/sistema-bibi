@@ -187,8 +187,11 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await expect(editRow).toBeVisible();
     await editRow.getByRole("textbox").first().fill(`${name} Edit`);
     await editRow.getByRole("button", { name: "Salvar" }).click();
-    await expectFeedbackMessage(page, /Usuário .* atualizado|atualizado/i);
-    await expect(page.getByText(`${name} Edit`)).toBeVisible();
+    await expectFeedbackMessage(page, new RegExp(`Usuário ${name} Edit atualizado`));
+    // Escopo na listagem — evita strict mode com o texto do toast
+    await expect(
+      listItemByText(page, email).getByText(`${name} Edit`, { exact: true }),
+    ).toBeVisible();
   });
 });
 
