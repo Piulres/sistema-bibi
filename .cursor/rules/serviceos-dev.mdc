@@ -1,15 +1,15 @@
 ---
-description: ServiceOS v2.3 — labels, segmentos e nomenclatura em código novo. Complementa AGENTS.md e docs/prompts/.
+description: ServiceOS v2.6 — labels, segmentos e nomenclatura em código novo. Complementa AGENTS.md e docs/prompts/.
 alwaysApply: true
 ---
 
-# ServiceOS v2.3 — desenvolvimento
+# ServiceOS v2.6 — desenvolvimento
 
 Fonte: `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` · Segmentos: `docs/segmentos/README.md` · Escopo: `docs/versoes/V2_3.md` · Base multi-nicho: `docs/versoes/V2_0.md`
 
 ## Nomenclatura (obrigatório em código/docs novos)
 
-- Produto: **Sistema Bibi - ServiceOS** / **ServiceOS v2.3** — não *HealthOS*, não *ServiceOS Bibi*
+- Produto: **Sistema Bibi - ServiceOS** / **ServiceOS v2.6** — não *HealthOS*, não *ServiceOS Bibi*
 - Saúde = segmento `MEDICAL`, um entre seis — não assumir HealthTech em copy genérica
 - Tenant: `Tenant.slug` (`?tenant=petcare`) + `Tenant.niche` + `Tenant.labels`
 

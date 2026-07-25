@@ -262,8 +262,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **2.6.x** | [`V2_6.md`](V2_6.md) | ⏳ **`v2.6.0` pendente deploy** (CEDIG pontes PPU) |
-| **2.4.x** | [`V2_4.md`](V2_4.md) | ✅ **`v2.4.0` em produção** (CEDIG gestão clínica) |
+| **2.6.x** | [`V2_6.md`](V2_6.md) | ✅ **`v2.6.0` em produção** (CEDIG pontes PPU + login v2.5) |
+| **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
+| **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
 | **2.3.x** | [`V2_3.md`](V2_3.md) | Histórico — title/footer · assistente · obras |
 | **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 

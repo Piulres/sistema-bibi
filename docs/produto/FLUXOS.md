@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v2.3** (produção jul/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v2.6** (produção jul/2026): vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -14,7 +14,7 @@ ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev,
 ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
 ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
 
-**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384).
+**Última revisão factual:** julho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest.
 
 ---
 
@@ -147,7 +147,9 @@ flowchart TB
 
 **UI:** `LoginForm` em cada portal → **API:** `POST /api/auth/login`
 
-Body: `{ email, password, portal }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+Body: `{ email, password, portal, tenantSlug? }` — `portal`: `prestador` | `interno` | `pj` | `beneficiario`
+
+`tenantSlug` (opcional): slug digitado no campo **Clínica / tenant** do `LoginForm`. Quando informado, a API valida se o usuário pertence ao tenant ativo (`validateUserSegmentAccess` em `src/lib/segment/auth.ts`). Mismatch → **403** com mensagem amigável (`buildSegmentMismatchMessage`).
 
 ```mermaid
 sequenceDiagram
@@ -183,7 +185,21 @@ sequenceDiagram
 
 **Logout:** `POST /api/auth/logout` — remove cookie (botão Sair em `PortalShell`).
 
-### 2.2 MFA TOTP (Tier 4)
+### 2.2 Login unificado (v2.5)
+
+**UI:** `LoginForm` em todos os portais · **Helpers:** `src/lib/auth/login-access.ts`
+
+| Recurso | Comportamento |
+|---------|---------------|
+| Campo tenant | Slug digitável (`cedig`, `petcare`…) — normalizado por `normalizeTenantSlug` |
+| Aplicar clínica | Atualiza `?tenant=` na URL e branding via cookie `bibi_segment` |
+| Seletor de portal | `LOGIN_PORTAL_OPTIONS` — navega para `/login`, `/interno/login`, `/pj/login` ou `/beneficiario/login` |
+| Dual-store | `ensureDataStoreForSegmentAccess` — garante banco demo/operação antes do login |
+| Erro de segmento | 403 se credencial válida mas tenant errado (ex.: login CEDIG com usuário Horizonte) |
+
+Doc detalhada: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+
+### 2.3 MFA TOTP (Tier 4)
 
 Quando `User.mfaEnabled = true`:
 
@@ -249,6 +265,7 @@ flowchart LR
 | `dashboard` | `/interno/dashboard` | `ExecutiveDashboardView` | KPIs executivos |
 | `billing` | `/interno` | `BillingView` | Pay Per Use, faturas, PIX, TISS |
 | `agenda` | `/interno/agenda` | `AppointmentsView` | CRUD agenda |
+| `gestao` | `/interno/gestao` | `ClinicFinanceView` | Gestão clínica CEDIG — lançamentos, despesas, KPIs, export |
 | `cadastros` | `/interno/cadastros` | `CadastrosView` | Pacientes, empresas, procedimentos, usuários |
 | `estoque` | `/interno/estoque` | `StockView` | Produtos, lotes, movimentações, kits por procedimento, alertas |
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
@@ -261,7 +278,7 @@ flowchart LR
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav: **13 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
+Nav: **14 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL` (`niche-nav.ts`). Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.1 Faturamento (`BillingView`)
 
@@ -288,6 +305,7 @@ Serviço: `src/lib/invoice-service.ts`
 | Alterar | `PATCH /api/interno/appointments/[id]` | Status/modalidade |
 | **Walk-in particular** | `POST /api/interno/patients` + `POST /api/interno/appointments` | Cadastro sem `companyId` + agendamento `AGENDADO` na mesma tela |
 | **Check-in** | `PATCH .../appointments/[id]` `{ status: "CONFIRMADO" }` | Paciente chegou à clínica (AGENDADO → CONFIRMADO) |
+| **Lançar na gestão** | Navega para `/interno/gestao` com prefill | Disponível em nichos MEDICAL/DENTAL — dados do agendamento pré-preenchidos |
 
 **Fluxo walk-in (paciente não PJ):**
 
@@ -306,6 +324,23 @@ sequenceDiagram
 ```
 
 Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicine.ts`
+
+### 4.2.1 Gestão clínica CEDIG (`ClinicFinanceView`) — v2.4 / v2.6
+
+**Rota:** `/interno/gestao` · **RBAC:** módulo `gestao` (ADMIN/FATURAMENTO/RECEPCAO write; READONLY somente leitura)  
+**Visível em:** nichos `MEDICAL` e `DENTAL` apenas.
+
+| Ação | API | Efeito |
+|------|-----|--------|
+| Listar lançamentos | `GET /api/interno/clinic-finance/launches` | Exames com status de ponte |
+| Criar lançamento | `POST /api/interno/clinic-finance/launches` | Dispara `bridgeExamLaunchToOperations` |
+| Despesas | `GET/POST /api/interno/clinic-finance/expenses` | Despesas operacionais |
+| KPIs | `GET /api/interno/clinic-finance/kpis` | Dashboard da gestão |
+| Export mensal | `GET /api/interno/clinic-finance/export` | Excel do mês |
+
+**Ponte automática (v2.6):** ao registrar lançamento, `src/lib/clinic-finance/bridge.ts` cria ou vincula `Patient`, `Appointment`, `ProcedureUsage` e `Invoice`. Estados: `bridgeStatus` = `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`.
+
+Doc completa: [`../clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) · [`../versoes/V2_6.md`](../versoes/V2_6.md).
 
 ### 4.3 Cadastros (`CadastrosView`)
 

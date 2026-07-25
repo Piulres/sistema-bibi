@@ -1,7 +1,7 @@
 # Checklist go-live — CEDIG Cruzeiro
 
 Validação pré-apresentação / uso em produção.  
-**Produção:** https://sistema-bibi.netlify.app · pacote **v2.4.0** · modo **operação**
+**Produção:** https://sistema-bibi.netlify.app · pacote **v2.6.0** · modo **operação**
 
 ---
 
@@ -54,6 +54,6 @@ Fluxos críticos cobertos no smoke: modo operação estável, criar prestador + 
 
 ## Pronto para cliente?
 
-**Sim — piloto Gestão + agenda/walk-in + usuários ADMIN**, com produção em operação e smoke verde.
+**Sim — piloto Gestão + agenda/walk-in + usuários ADMIN + ponte PPU (v2.6)**, com produção em operação e smoke verde.
 
-Ainda **não** vender como “4 portais plenos CEDIG” (PPU/Excel = fase 2). Ver [`README.md`](README.md) roadmap.
+Fase 2 (lançamento → fatura PPU / export Excel) **entregue em v2.6.0**. Ver [`FASE_2.md`](FASE_2.md).

@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **415+** casos Vitest · **128+** testes Playwright E2E · **123** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **529+** casos Vitest · **12** specs Playwright E2E · **~160** Route Handlers · **123** paths no OpenAPI.
 
 ### Onboarding tour (v3)
 
@@ -42,7 +42,7 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 ```
                     ┌─────────────┐
-                    │  E2E        │  Playwright — 10 specs (desktop + mobile)
+                    │  E2E        │  Playwright — 12 specs (desktop + mobile)
                     ├─────────────┤
                     │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
@@ -301,9 +301,16 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
+| `interno-modules.spec.ts` | Módulos interno (nav `INTERNO_NAV_TABS` — **sem** `/interno/gestao`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU |
+| `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
+| `assistant.spec.ts` | Assistente operacional serverless |
+| `api-docs.spec.ts` | Swagger UI `/api-docs` |
+| `flow-improvements.spec.ts` | Melhorias de fluxo multi-portal |
+| `interno-reports.spec.ts` | Relatórios interno |
+| `mobile-nav.spec.ts` | Navegação mobile drawer |
 
 ---
 

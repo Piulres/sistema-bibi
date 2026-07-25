@@ -77,6 +77,15 @@ Ao escrever ou reescrever:
 | Integração DB | `tests/unit/*-integration.test.ts` | Serviços que usam Prisma (massa seed) |
 | API / fluxo | `tests/api/` ou e2e | Contratos críticos |
 | E2E | `e2e/*.spec.ts` | Jornada multi-portal / piloto cliente |
+| **CRUD matrix** | `tests/lib/crud-coverage-registry.ts` + `tests/api/system-crud-matrix.test.ts` | Nova entidade no mapa → registry + teste API obrigatório |
+
+**Domínios com docs canônicas:**
+
+| Domínio | Onde ler antes de codar |
+|---------|-------------------------|
+| CEDIG / gestão clínica | `docs/clientes/cedig/FASE_2.md` · `src/lib/clinic-finance/bridge.ts` |
+| Login tenant/portal | `docs/versoes/V2_5.md` · `src/lib/auth/login-access.ts` · `src/lib/segment/auth.ts` |
+| Matriz CRUD | `src/lib/crud-operations-map.ts` · `docs/plataforma/TESTES.md` §Matriz CRUD |
 
 Rodar o mínimo relevante:
 

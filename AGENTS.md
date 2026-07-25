@@ -142,7 +142,7 @@ Mapa completo: [`docs/plataforma/VARIAVEIS_AMBIENTE.md`](docs/plataforma/VARIAVE
 
 | Portal | Layout | Nav | Breadcrumbs |
 |--------|--------|-----|-------------|
-| Interno | `src/app/interno/layout.tsx` | `InternoNav` — **13 abas** + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
+| Interno | `src/app/interno/layout.tsx` | `InternoNav` — **14 abas** (+ Gestão clínica condicional MEDICAL/DENTAL) + drawer mobile | Cliente 360° (`buildPatientBreadcrumbs`) |
 | Prestador | `src/app/prestador/layout.tsx` | `PrestadorNav` | Atendimento (`buildAtendimentoBreadcrumbs`) |
 | PJ | `src/app/pj/layout.tsx` | `SectionNav` — 4 seções | — |
 | Beneficiário | `src/app/beneficiario/layout.tsx` | `SectionNav` — **11 abas** | — |
