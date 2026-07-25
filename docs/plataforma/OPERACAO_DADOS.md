@@ -44,7 +44,7 @@ O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados �
 | `DATA_STORE_MODE` | — | Modo inicial se Blobs vazio (`demo` \| `operation`) |
 | `APP_MODE` | `demo` | Legado — mapeia para modo inicial |
 | `RUN_SEED_ON_BUILD` | `true` | Gera `demo.db` com seed no build |
-| `ALLOW_DEMO_RESET` | `true` | Botão restaurar demo (somente modo demo ativo) |
+| `ALLOW_DEMO_RESET` | `false` (prod) / `true` (deploy-preview) | Botão restaurar demo (somente modo demo ativo) |
 | `DATABASE_URL` | `file:./dev.db` | Legado local; build usa `demo.db` |
 
 Lógica: `src/lib/data-store-mode.ts` · runtime: `src/lib/db.ts` · Blobs: `src/lib/sqlite-blob-persistence.ts`
