@@ -201,6 +201,176 @@ async function upsertCedigStaff(prisma: PrismaClient, tenantId: string) {
   }
 }
 
+/** Empresas institucionais + pacientes + acessos PJ/Beneficiário (demo dos 4 portais). */
+async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
+  const companies = [
+    {
+      name: "CentralMed",
+      cnpj: "12.345.678/0001-91",
+      tradeName: "CentralMed — encaminhamentos CEDIG",
+      status: "ATIVO",
+      email: "contato@centralmed.demo",
+    },
+    {
+      name: "Bem Saúde",
+      cnpj: "23.456.789/0001-02",
+      tradeName: "Bem Saúde",
+      status: "ATIVO",
+      email: "contato@bemsaude.demo",
+    },
+  ] as const;
+
+  const companyIds: Record<string, string> = {};
+  for (const c of companies) {
+    const existing = await prisma.company.findUnique({ where: { cnpj: c.cnpj } });
+    if (existing) {
+      await prisma.company.update({
+        where: { id: existing.id },
+        data: {
+          name: c.name,
+          tradeName: c.tradeName,
+          status: c.status,
+          email: c.email,
+          contractActive: true,
+          tenantId,
+        },
+      });
+      companyIds[c.name] = existing.id;
+    } else {
+      const created = await prisma.company.create({
+        data: {
+          name: c.name,
+          cnpj: c.cnpj,
+          tradeName: c.tradeName,
+          status: c.status,
+          email: c.email,
+          contractActive: true,
+          tenantId,
+        },
+      });
+      companyIds[c.name] = created.id;
+    }
+  }
+
+  const pjEmail = "rh@centralmed.demo";
+  const pjExisting = await prisma.user.findUnique({ where: { email: pjEmail } });
+  if (pjExisting) {
+    await prisma.user.update({
+      where: { id: pjExisting.id },
+      data: {
+        name: "RH CentralMed",
+        role: "PJ",
+        tenantId,
+        companyId: companyIds.CentralMed,
+      },
+    });
+  } else {
+    await prisma.user.create({
+      data: {
+        email: pjEmail,
+        name: "RH CentralMed",
+        password: DEMO_PASSWORD,
+        role: "PJ",
+        tenantId,
+        companyId: companyIds.CentralMed,
+      },
+    });
+  }
+
+  const patients = [
+    {
+      name: "Maria Silva Cedig",
+      cpf: "901.111.222-33",
+      email: "maria.cedig@email.com",
+      phone: "(12) 98888-1001",
+      birthDate: new Date("1985-03-12"),
+      companyName: "CentralMed" as const,
+      bondType: "TITULAR",
+    },
+    {
+      name: "José Santos Cedig",
+      cpf: "901.222.333-44",
+      email: "jose.cedig@email.com",
+      phone: "(12) 98888-1002",
+      birthDate: new Date("1978-07-22"),
+      companyName: "Bem Saúde" as const,
+      bondType: "TITULAR",
+    },
+    {
+      name: "Ana Particular Cedig",
+      cpf: "901.333.444-55",
+      email: "ana.cedig@email.com",
+      phone: "(12) 98888-1003",
+      birthDate: new Date("1992-11-05"),
+      companyName: null,
+      bondType: null,
+    },
+  ];
+
+  for (const pat of patients) {
+    const companyId = pat.companyName ? companyIds[pat.companyName] : null;
+    const existing = await prisma.patient.findUnique({ where: { cpf: pat.cpf } });
+    let patientId: string;
+    if (existing) {
+      await prisma.patient.update({
+        where: { id: existing.id },
+        data: {
+          name: pat.name,
+          email: pat.email,
+          phone: pat.phone,
+          birthDate: pat.birthDate,
+          tenantId,
+          companyId,
+          bondType: pat.bondType,
+          consentAt: existing.consentAt ?? new Date(),
+          consentVersion: existing.consentVersion ?? "v1-poc",
+        },
+      });
+      patientId = existing.id;
+    } else {
+      const created = await prisma.patient.create({
+        data: {
+          name: pat.name,
+          cpf: pat.cpf,
+          email: pat.email,
+          phone: pat.phone,
+          birthDate: pat.birthDate,
+          tenantId,
+          companyId,
+          bondType: pat.bondType ?? undefined,
+          consentAt: new Date(),
+          consentVersion: "v1-poc",
+        },
+      });
+      patientId = created.id;
+    }
+
+    const userExisting = await prisma.user.findUnique({ where: { email: pat.email } });
+    if (userExisting) {
+      await prisma.user.update({
+        where: { id: userExisting.id },
+        data: {
+          name: pat.name,
+          role: "BENEFICIARIO",
+          tenantId,
+          patientId,
+        },
+      });
+    } else {
+      await prisma.user.create({
+        data: {
+          email: pat.email,
+          name: pat.name,
+          password: DEMO_PASSWORD,
+          role: "BENEFICIARIO",
+          tenantId,
+          patientId,
+        },
+      });
+    }
+  }
+}
+
 /**
  * Garante tenant CEDIG (demo ou operação) com branding e catálogo.
  * Idempotente por slug `cedig`.
@@ -220,6 +390,7 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
       },
     });
     await upsertCedigStaff(prisma, existing.id);
+    await upsertCedigPortalMass(prisma, existing.id);
     return { tenantId: existing.id, created: false, procedures };
   }
 
@@ -247,6 +418,7 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
 
   const procedures = await upsertCedigProcedures(prisma, tenant.id);
   await upsertCedigStaff(prisma, tenant.id);
+  await upsertCedigPortalMass(prisma, tenant.id);
 
   return { tenantId: tenant.id, created: true, procedures };
 }

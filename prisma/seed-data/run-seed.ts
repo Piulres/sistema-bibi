@@ -101,6 +101,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   await prisma.appointment.deleteMany();
   await prisma.pet.deleteMany();
   await prisma.pricingRule.deleteMany();
+  await prisma.clinicExamLaunch.deleteMany();
+  await prisma.clinicExpense.deleteMany();
   await prisma.procedure.deleteMany();
   await prisma.patient.deleteMany();
   await prisma.attachment.deleteMany();
@@ -890,6 +892,8 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log(
     "  Médicos        -> alexandre.marcal · luiza.lage · bruno.dias · luiza.zeraik · fernanda.auto @cedig.demo",
   );
+  console.log("  PJ CentralMed  -> rh@centralmed.demo");
+  console.log("  Beneficiário   -> maria.cedig@email.com · jose.cedig@email.com · ana.cedig@email.com");
   console.log("  Gestão clínica -> /interno/gestao");
   console.log("\nSEED_PROFILE=market|operation-1y · SEED_SCALE=small|medium|large|operation-1y no .env");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
