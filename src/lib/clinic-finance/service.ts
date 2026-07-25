@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/db";
+import { getPrisma } from "@/lib/db";
 import {
   CLINIC_EXPENSE_CATEGORIES,
   CLINIC_PAYMENT_METHODS,
@@ -32,6 +32,7 @@ function parseMonth(year?: number, month?: number) {
 }
 
 export async function listClinicProviders(tenantId: string) {
+  const prisma = await getPrisma();
   return prisma.user.findMany({
     where: { tenantId, role: "PRESTADOR" },
     select: { id: true, name: true, specialty: true },
@@ -40,6 +41,7 @@ export async function listClinicProviders(tenantId: string) {
 }
 
 export async function listClinicExamProcedures(tenantId: string) {
+  const prisma = await getPrisma();
   return prisma.procedure.findMany({
     where: {
       tenantId,
@@ -100,6 +102,7 @@ export async function createExamLaunch(
     return { error: "Tipo de polipectomia inválido." } as const;
   }
 
+  const prisma = await getPrisma();
   const [provider, procedure] = await Promise.all([
     prisma.user.findFirst({
       where: { id: input.providerId, tenantId, role: "PRESTADOR" },
@@ -187,6 +190,7 @@ export async function listExamLaunches(
   year?: number,
   month?: number,
 ) {
+  const prisma = await getPrisma();
   const { start, end } = parseMonth(year, month);
   const rows = await prisma.clinicExamLaunch.findMany({
     where: { tenantId, performedAt: { gte: start, lt: end } },
@@ -220,6 +224,7 @@ export async function createClinicExpense(
     return { error: "Valor da despesa inválido." } as const;
   }
 
+  const prisma = await getPrisma();
   const expense = await prisma.clinicExpense.create({
     data: {
       tenantId,
@@ -248,6 +253,7 @@ export async function listClinicExpenses(
   year?: number,
   month?: number,
 ) {
+  const prisma = await getPrisma();
   const { start, end } = parseMonth(year, month);
   const rows = await prisma.clinicExpense.findMany({
     where: { tenantId, expenseDate: { gte: start, lt: end } },
@@ -268,6 +274,7 @@ export async function getClinicFinanceKpis(
   year?: number,
   month?: number,
 ) {
+  const prisma = await getPrisma();
   const { year: y, month: m, start, end } = parseMonth(year, month);
   const [launches, expenses] = await Promise.all([
     prisma.clinicExamLaunch.findMany({
