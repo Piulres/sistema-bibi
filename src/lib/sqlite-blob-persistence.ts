@@ -15,6 +15,8 @@ const TMP_OPERATION_DB = "/tmp/bibi-operation.db";
 
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 let persistInFlight: Promise<void> | null = null;
+/** Versão do Blob já materializada em /tmp nesta instância Lambda. */
+let localBlobUpdatedAt: string | null = null;
 
 function resolveBuildArtifact(mode: DataStoreMode): string {
   if (mode === "demo") {
@@ -34,6 +36,18 @@ function localRuntimePath(mode: DataStoreMode): string {
   return join(process.cwd(), "prisma", "operation.db");
 }
 
+async function readOperationBlobUpdatedAt(): Promise<string | null> {
+  try {
+    const { getStore } = await import("@netlify/blobs");
+    const store = getStore({ name: BLOB_STORE, consistency: "strong" });
+    const meta = await store.getMetadata(OPERATION_BLOB_KEY);
+    const updatedAt = meta?.metadata?.updatedAt;
+    return typeof updatedAt === "string" ? updatedAt : null;
+  } catch {
+    return null;
+  }
+}
+
 async function readOperationFromBlob(): Promise<Buffer | null> {
   try {
     const { getStore } = await import("@netlify/blobs");
@@ -46,19 +60,20 @@ async function readOperationFromBlob(): Promise<Buffer | null> {
   }
 }
 
-async function writeOperationToBlob(filePath: string): Promise<boolean> {
+async function writeOperationToBlob(filePath: string): Promise<string | null> {
   try {
     const { getStore } = await import("@netlify/blobs");
     const store = getStore({ name: BLOB_STORE, consistency: "strong" });
     const buffer = readFileSync(filePath);
     const arrayBuffer = new ArrayBuffer(buffer.length);
     new Uint8Array(arrayBuffer).set(buffer);
+    const updatedAt = new Date().toISOString();
     await store.set(OPERATION_BLOB_KEY, arrayBuffer, {
-      metadata: { updatedAt: new Date().toISOString() },
+      metadata: { updatedAt },
     });
-    return true;
+    return updatedAt;
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -83,15 +98,48 @@ async function ensureLambdaDemoDb(): Promise<string> {
 }
 
 async function ensureLambdaOperationDb(): Promise<string> {
-  const fromBlob = await readOperationFromBlob();
-  if (fromBlob) {
-    writeFileSync(TMP_OPERATION_DB, fromBlob);
+  const synced = await syncOperationDatabaseFromBlob();
+  if (existsSync(TMP_OPERATION_DB)) {
+    void synced;
     return TMP_OPERATION_DB;
   }
 
   const bootstrap = resolveBuildArtifact("operation");
   copyIfNewer(bootstrap, TMP_OPERATION_DB);
   return TMP_OPERATION_DB;
+}
+
+/**
+ * Rehidrata `/tmp` a partir do Blob se houver versão mais nova.
+ * Não sobrescreve enquanto houver persistência pendente (evita perder writes locais).
+ * @returns true se o arquivo local foi substituído
+ */
+export async function syncOperationDatabaseFromBlob(): Promise<boolean> {
+  if (!isLambdaSqliteRuntime()) return false;
+
+  if (persistInFlight || persistTimer) {
+    return false;
+  }
+
+  const remoteUpdatedAt = await readOperationBlobUpdatedAt();
+  if (
+    existsSync(TMP_OPERATION_DB) &&
+    remoteUpdatedAt &&
+    remoteUpdatedAt === localBlobUpdatedAt
+  ) {
+    return false;
+  }
+
+  const fromBlob = await readOperationFromBlob();
+  if (!fromBlob) {
+    return false;
+  }
+
+  const hadLocal = existsSync(TMP_OPERATION_DB);
+  const previousSize = hadLocal ? readFileSync(TMP_OPERATION_DB).length : -1;
+  writeFileSync(TMP_OPERATION_DB, fromBlob);
+  localBlobUpdatedAt = remoteUpdatedAt ?? `size:${fromBlob.length}`;
+  return !hadLocal || previousSize !== fromBlob.length || remoteUpdatedAt !== null;
 }
 
 /** Resolve o caminho absoluto do arquivo SQLite para o modo informado. */
@@ -119,7 +167,10 @@ export async function persistOperationDatabaseNow(): Promise<void> {
   }
 
   persistInFlight = (async () => {
-    await writeOperationToBlob(TMP_OPERATION_DB);
+    const updatedAt = await writeOperationToBlob(TMP_OPERATION_DB);
+    if (updatedAt) {
+      localBlobUpdatedAt = updatedAt;
+    }
   })();
 
   try {
@@ -127,6 +178,18 @@ export async function persistOperationDatabaseNow(): Promise<void> {
   } finally {
     persistInFlight = null;
   }
+}
+
+/**
+ * Cancela o debounce e grava o Blob imediatamente.
+ * Usar após mutações — evita perder cadastro se a Lambda encerrar antes do timer.
+ */
+export async function flushOperationDatabasePersist(): Promise<void> {
+  if (persistTimer) {
+    clearTimeout(persistTimer);
+    persistTimer = null;
+  }
+  await persistOperationDatabaseNow();
 }
 
 /** Agenda persistência debounced após escritas no banco de operação. */

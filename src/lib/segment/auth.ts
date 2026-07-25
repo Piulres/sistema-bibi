@@ -4,6 +4,7 @@ import { isNicheId, type NicheId } from "@/lib/niche/types";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import { resolveSegmentFromLoginRequest } from "@/lib/segment/resolve";
 import { toLoginSegmentPayload } from "@/lib/segment/login-context";
+import { buildSegmentMismatchMessage } from "@/lib/segment/auth-messages";
 
 export type SegmentAuthError = {
   ok: false;
@@ -29,14 +30,20 @@ export async function validateUserSegmentAccess(
       where: { id: user.tenantId },
       select: { name: true, slug: true, niche: true },
     });
-    const expectedName = segment.tenantName ?? segment.tenantSlug ?? "esta operação";
+    const currentPortal = segment.tenantName ?? segment.tenantSlug ?? "outra operação";
+    const userName = userTenant?.name ?? "sua clínica";
     const userNiche = userTenant?.niche && isNicheId(userTenant.niche)
       ? getNicheConfig(userTenant.niche).name
       : "outro segmento";
     return {
       ok: false,
       status: 403,
-      message: `Esta conta pertence a ${userTenant?.name ?? userNiche}. Acesse pelo portal de ${expectedName} (?tenant=${segment.tenantSlug ?? "…"}).`,
+      message: buildSegmentMismatchMessage({
+        userName,
+        userSlug: userTenant?.slug,
+        currentPortal,
+        userNicheFallback: userNiche,
+      }),
     };
   }
   return { ok: true, expectedTenantId: segment.tenantId };

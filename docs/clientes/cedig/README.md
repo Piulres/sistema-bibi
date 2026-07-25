@@ -33,6 +33,8 @@ Em produção (modo operação): provisionar com `POST /api/interno/operation/pr
 
 **Criar usuários** (Cadastros → Usuários): somente ADMIN — `operacao@cedig.demo`. A conta Alana (`RECEPCAO`) lista usuários, mas não cria/edita (RBAC).
 
+**Login do prestador criado:** `/login?tenant=cedig` (Portal Prestador) · e-mail/senha do cadastro — senha padrão sugerida `bibi123`. Não usar `/interno/login`.
+
 ---
 
 ## Tabelas de preço

@@ -8,9 +8,10 @@ import {
 import { getDataStoreMode, isDualDataStoreEnabled, type DataStoreMode } from "@/lib/data-store-mode";
 import {
   ensureSqliteDatabasePath,
+  flushOperationDatabasePersist,
   isSqliteWriteAction,
   persistOperationDatabaseNow,
-  scheduleOperationDatabasePersist,
+  syncOperationDatabaseFromBlob,
 } from "@/lib/sqlite-blob-persistence";
 
 type PrismaCache = {
@@ -49,7 +50,8 @@ async function createPrismaClient(databaseUrl: string, modeKey: PrismaCache["mod
           async $allOperations({ operation, query, args }) {
             const result = await query(args);
             if (isSqliteWriteAction(operation)) {
-              scheduleOperationDatabasePersist();
+              // Flush imediato: debounce de 1,5s perdia creates se a Lambda encerrasse cedo.
+              await flushOperationDatabasePersist();
             }
             return result;
           },
@@ -102,6 +104,15 @@ export async function getPrisma(): Promise<PrismaClient> {
   }
 
   const mode = await getDataStoreMode();
+
+  // Operação na Lambda: rehidrata do Blob se outra instância gravou (ex.: prestador criado).
+  if (mode === "operation" && isLambdaSqliteRuntime()) {
+    const refreshed = await syncOperationDatabaseFromBlob();
+    if (refreshed && prismaCache) {
+      await prismaCache.client.$disconnect();
+      prismaCache = null;
+    }
+  }
 
   if (prismaCache?.mode === mode || (prismaCache?.mode === "postgres" && isPostgresDatabaseUrl())) {
     return prismaCache.client;

@@ -99,6 +99,8 @@ Para voltar à demo: confirmar com `DEMO`.
 
 **Proteção:** com o site em **operação**, acessar `/segmentos/*`, `?tenant=petcare` ou e-mails demo **não** rebaixa automaticamente para demo (isso apagava walk-ins na Netlify). Só o ADMIN em Segurança volta à demo.
 
+**Persistência:** escritas no modo operação fazem flush imediato no Blob (não só debounce 1,5s). Cada `getPrisma()` rehidrata `/tmp` se o Blob estiver mais novo — evita prestador/walk-in “criado e sumiu” entre Lambdas.
+
 ### Provisionar CEDIG na operação
 
 O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem pacientes/PJ nem histórico de homologação).

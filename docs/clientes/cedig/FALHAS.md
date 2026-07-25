@@ -15,5 +15,6 @@ Fonte: homologação browser 2026-07-25 · [`HISTORICO_VALIDACAO.md`](HISTORICO_
 | P1-c | Alta | Walk-in “não funciona” / some da agenda | ✅ causa: modo **demo** na Netlify (Lambda `/tmp`); uso exige **modo operação** + aviso na agenda |
 | P1-d | Alta | Modo operação rebaixado ao abrir `/segmentos` | ✅ `ensureDataStoreForSegmentAccess` não faz operation→demo automático |
 | P2-d | Média | “Criar usuário” falha na recepção (Alana) | ✅ esperado RBAC ADMIN; UI esconde formulário + aviso (`operacao@cedig.demo`) |
+| P1-e | Alta | Prestador criado some / login falha | ✅ flush Blob imediato + sync entre Lambdas; login exige `/login?tenant=cedig` (mensagem corrigida) |
 
 Backlog (não nesta leva): export Excel · lançamento → fatura PPU · E2E Playwright · Beneficiário “Consulta” residual em `BeneficiarioView`.

@@ -448,8 +448,14 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
       {
         silentSuccess: true,
         onSuccess: async (body) => {
-          const user = body.user as { name: string };
-          showToast({ message: `Usuário ${user.name} criado`, tone: "success" });
+          const user = body.user as { name: string; email?: string; role?: string };
+          const isProvider = user.role === "PRESTADOR";
+          showToast({
+            message: isProvider
+              ? `${user.name} criado. Entrar em /login?tenant=… (Portal Prestador) com o e-mail e a senha definidos`
+              : `Usuário ${user.name} criado`,
+            tone: "success",
+          });
           setUserForm({
             name: "",
             email: "",
