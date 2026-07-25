@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.4.0",
+    version: "2.6.0",
     label: PLATFORM.versionLabel,
     date: "25/07/2026",
     status: "current",
+    summary:
+      "CEDIG fase 2: o lançamento na gestão alimenta agenda do médico, extrato PPU e fatura — e a secretária exporta o mês em Excel.",
+    highlights: [
+      {
+        title: "Fluxo ponta a ponta",
+        items: [
+          "Lançamento gera Appointment REALIZADO + ProcedureUsage + Invoice/Payment",
+          "Agenda → botão Lançar na gestão com dados pré-preenchidos",
+          "Convênio fecha fatura na empresa; particular marca pagamento",
+        ],
+      },
+      {
+        title: "Operação",
+        items: [
+          "Exportar mês (Excel) em /interno/gestao",
+          "READONLY não altera lançamentos/despesas",
+          "Coluna Ponte na lista de lançamentos (SYNCED / PARTIAL / FAILED)",
+        ],
+      },
+    ],
+    testStats: "clinic-finance-bridge · docs:verify · lint",
+  },
+  {
+    version: "2.4.0",
+    label: "Sistema Bibi - ServiceOS v2.4.0",
+    date: "25/07/2026",
+    status: "previous",
     summary:
       "Piloto CEDIG Cruzeiro: gestão clínica com lançamentos, despesas e indicadores automáticos — a secretária lança, o sistema calcula.",
     highlights: [
@@ -39,14 +66,6 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Nova aba /interno/gestao — lançamentos por paciente, despesas e KPIs",
           "Tabelas Particular, CentralMed, Bem Saúde e Dr Saúde com valor sugerido",
           "Produção por médico, frascos de biópsia, ticket médio e lucro operacional",
-        ],
-      },
-      {
-        title: "Operação multi-portal",
-        items: [
-          "Tenant seed cedig com equipe, catálogo de exames e massa dos 4 portais",
-          "Prestador vê pacientes da agenda e da gestão clínica",
-          "Labels Exame no contexto MEDICAL / CEDIG",
         ],
       },
     ],

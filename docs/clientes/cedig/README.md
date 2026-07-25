@@ -124,8 +124,11 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
 | **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
 | **C** | Homologação browser 4 portais + gestão | ✅ assistida 2026-07-25 · falta humano in loco |
-| **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
-| **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
+| **D** | Ponte lançamento → agenda + PPU + fatura/pagamento | ✅ v2.6 · [`FASE_2.md`](FASE_2.md) |
+| **E** | Export Excel mensal + agenda “Lançar na gestão” | ✅ v2.6 |
+| **F** | Beneficiário/PJ polimento + E2E Playwright CEDIG | Backlog |
+
+Mapa de gaps e validação: [`FASE_2.md`](FASE_2.md).
 
 Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
 
@@ -136,6 +139,7 @@ Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROT
 - Tabelas de preço: `src/lib/clinic-finance/cedig-pricing.ts`
 - Constantes: `src/lib/clinic-finance/constants.ts`
 - Serviço: `src/lib/clinic-finance/service.ts`
+- Ponte PPU: `src/lib/clinic-finance/bridge.ts`
 - UI: `src/components/ClinicFinanceView.tsx`
-- API: `/api/interno/clinic-finance/*`
+- API: `/api/interno/clinic-finance/*` (+ `export`)
 - Catálogo / equipe seed: `prisma/seed-data/cedig-catalog.ts`

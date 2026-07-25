@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import {
+  requireInternoModule,
+  requireInternoModuleWrite,
+  authErrorResponse,
+} from "@/lib/api-auth";
 import {
   createExamLaunch,
   listExamLaunches,
@@ -24,7 +28,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("gestao");
+    const user = await requireInternoModuleWrite("gestao");
     const body = (await request.json()) as Record<string, unknown>;
     const result = await createExamLaunch(user.tenantId, {
       performedAt: body.performedAt ? String(body.performedAt) : undefined,
@@ -43,6 +47,11 @@ export async function POST(request: Request) {
       clips: Number(body.clips ?? 0),
       notes: body.notes ? String(body.notes) : undefined,
       patientId: body.patientId ? String(body.patientId) : undefined,
+      appointmentId: body.appointmentId ? String(body.appointmentId) : undefined,
+      syncOperations:
+        body.syncOperations === false || body.syncOperations === "false"
+          ? false
+          : true,
       createdById: user.id,
     });
     if ("error" in result) {

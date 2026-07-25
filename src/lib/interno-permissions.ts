@@ -79,6 +79,16 @@ export function isInternoAdmin(
   return internoProfile === "ADMIN";
 }
 
+/** Escrita no portal interno — READONLY (e perfil inválido) só lê. */
+export function canInternoWrite(
+  role: string,
+  internoProfile: string | null | undefined,
+): boolean {
+  if (role !== "INTERNO") return false;
+  if (!internoProfile || !isInternoProfile(internoProfile)) return false;
+  return internoProfile !== "READONLY";
+}
+
 export function internoProfileLabel(profile: string | null | undefined): string {
   switch (profile) {
     case "FATURAMENTO":
