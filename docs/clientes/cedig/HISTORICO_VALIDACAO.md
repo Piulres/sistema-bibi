@@ -8,6 +8,13 @@ Complementa [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · [`README.md`](
 
 ## Massa CEDIG (seed atual)
 
+| Contexto | `portalMass` | `seedHistory` | Conteúdo |
+|----------|--------------|---------------|----------|
+| **Demo** (`demo.db`) | ✅ | ✅ | Equipe + catálogo + PJ/pacientes + histórico de homologação |
+| **Operação** (`operation.db` / Blobs) | ❌ | ❌ | Equipe + catálogo apenas (greenfield) |
+
+### Demo (`demo.db`)
+
 | Entidade | Quantidade / contas |
 |----------|---------------------|
 | Tenant | `cedig` · MEDICAL · branding CEDIG Cruzeiro |
@@ -123,7 +130,7 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 | **A — Piloto gestão (Alana + admin)** | ✅ Sim | Core do pedido; homologado no browser |
 | **B — Prestador (médicos)** | 🟡 Shell OK | Sem histórico clínico ainda; pacientes só após atendimentos |
 | **C — PJ / Beneficiário** | 🟡 Shell + massa mínima | Login e nav OK; sem jornada PPU/fatura real CEDIG |
-| **D — Produção white-label** | ⏳ | Merge PR #169 → `dev` → `main` + deploy + modo **operação** |
+| **D — Produção white-label** | ✅ | Deploy `6a6462dc` @ `527fe03` · modo **operação** · CEDIG provisionado |
 | **E — Export Excel / ligação PPU** | ❌ Backlog | Combinar como fase 2 |
 
 ### Veredito
@@ -134,11 +141,24 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 
 ### Checklist antes de mostrar ao cliente
 
-1. Merge + deploy do PR #169 (quando autorizar)
-2. Modo **operação** + branding final (logo real, se houver)
+1. ~~Merge + deploy do PR #169~~ ✅ v2.4.0 em produção (25/07/2026)
+2. Modo **operação** ativo + branding final (logo real, se houver)
 3. Treinar Alana com [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) (15 min)
 4. Deixar claro: piloto = gestão financeira/operacional da secretária; demais portais na fase seguinte
 5. Coletar feedback in loco e só então priorizar Excel / PPU automático
+
+---
+
+### 2026-07-25d — Produção (modo operação)
+
+| Item | Resultado |
+|------|-----------|
+| Ambiente | https://sistema-bibi.netlify.app · modo **operação** (Blobs) |
+| Deploy | `6a6462dc` @ `527fe03` (`bibi-poc-2026-07-25d`) |
+| PRs | [#169](https://github.com/Piulres/sistema-bibi/pull/169) · [#172](https://github.com/Piulres/sistema-bibi/pull/172) |
+| CEDIG | Tenant provisionado — `alana@cedig.demo` · `/interno/gestao` |
+| Bootstrap | Equipe + catálogo (sem PJ/pacientes na operação) |
+| Smoke | Title/footer v2.4.0 · CSS 200 · `#novidades` alinhado |
 
 ---
 

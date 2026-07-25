@@ -22,14 +22,21 @@
 | Téc. enfermagem | Márcia |
 | Médicos | Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Auto |
 
-Credenciais (`/?tenant=cedig`, senha `bibi123`) — massa demo e bootstrap de **operação**:
+Credenciais (`/?tenant=cedig`, senha `bibi123`):
+
+| Contexto | O que inclui |
+|----------|--------------|
+| **Demo** (`demo.db`) | Equipe + catálogo + pacientes/PJ/beneficiários + histórico de homologação |
+| **Operação** (`operation.db` / Blobs) | Equipe + catálogo apenas — dados reais entram pelo uso |
+
+Contas principais:
 
 - `alana@cedig.demo` / `recepcao@cedig.demo` — secretária
 - `joao.marcos@cedig.demo` · `marcia@cedig.demo`
 - `alexandre.marcal@cedig.demo` · `luiza.lage@cedig.demo` · `bruno.dias@cedig.demo` · `luiza.zeraik@cedig.demo` · `fernanda.auto@cedig.demo`
 - `operacao@cedig.demo` — ADMIN
 
-Em produção (modo operação): provisionar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }` se o tenant ainda não existir na base Blobs.
+**Produção (v2.4.0):** site em **modo operação** com CEDIG provisionado. Se a base em Blobs for anterior ao bootstrap v2.4.0, um ADMIN pode chamar `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }`.
 
 ---
 
@@ -120,8 +127,9 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
 | **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
 | **C** | Homologação browser 4 portais + gestão | ✅ assistida 2026-07-25 · falta humano in loco |
-| **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
-| **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
+| **D** | Produção white-label + modo operação | ✅ deploy `6a6462dc` @ `527fe03` (25/07/2026) |
+| **E** | Integração lançamento → fatura PPU / estoque kits | Backlog |
+| **F** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
 
 Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md).
 
