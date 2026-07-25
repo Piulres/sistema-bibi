@@ -98,7 +98,7 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 | **API** (maioria das rotas `/api/interno/*`) | Só exige `role === INTERNO` — **qualquer perfil** acessa billing, cadastros, PIX… |
 | **Teste** | `tests/security/rbac-gaps.test.ts` documenta e falha se a correção for aplicada |
 
-**Rotas com guard correto (`requireInternoModule`):** invoices POST, TISS, users, branding, webhooks, CRM status, export LGPD.
+**Rotas com guard correto:** invoices POST, TISS, branding, webhooks, CRM status, export LGPD (`requireInternoModule`); users GET (`requireInternoModule("cadastros")`); users POST/PATCH (`requireInternoAdmin`).
 
 **Rotas expostas sem guard de módulo (exemplos):** `/interno/billing`, `/interno/procedures`, `/interno/invoices/[id]/pix`, `/interno/dashboard`.
 
@@ -164,7 +164,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 |--------|------------|-----------------|
 | ADMIN | todos | parcial |
 | FATURAMENTO | billing, subscriptions… | invoices POST ✅, billing GET ❌ |
-| RECEPCAO | agenda, cadastros… | appointments ✅ (só role) |
+| RECEPCAO | agenda, cadastros… | appointments ✅ (só role); users POST 403 ✅ `user-admin-guard.test.ts` |
 | READONLY | dashboard, relatórios | **pode chamar billing via API** |
 
 ### Portais B2B / beneficiário
@@ -209,6 +209,7 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 
 ### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
 - Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
+- Gestão de usuários ADMIN-only: `tests/security/user-admin-guard.test.ts`
 
 ### PJ (2) — 🔑 PJ
 ### Beneficiário (5) — 🔑 BENEFICIARIO

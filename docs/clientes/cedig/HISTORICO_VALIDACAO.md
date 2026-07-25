@@ -64,6 +64,7 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 | Check | Status |
 |-------|--------|
 | Gestão / Agenda / Cadastros / Estoque / Comunicação | ✅ visíveis |
+| Cadastros → Usuários (Alana) | ✅ lista; criar/editar oculto — ADMIN `operacao@cedig.demo` |
 | Faturamento / Segurança | ✅ ocultos (RBAC) |
 
 #### Prestador (`bruno.dias@cedig.demo`)

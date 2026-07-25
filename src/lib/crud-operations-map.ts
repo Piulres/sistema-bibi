@@ -110,6 +110,8 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
   {
     entity: "Usuário",
     portal: "Interno",
+    description:
+      "Criar/editar exige ADMIN (`requireInternoAdmin`); listar exige módulo cadastros (RECEPCAO pode listar).",
     create: [
       ui("Criar usuário", "/interno/cadastros → Usuários", "POST /api/interno/users"),
       ui("Portal walk-in (opcional)", "/interno/agenda → walk-in", "POST /api/interno/users"),

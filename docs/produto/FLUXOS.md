@@ -314,7 +314,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
-| Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| Usuários | `POST /api/interno/users` (**ADMIN**) | `PATCH .../users/[id]` (**ADMIN**) | — | `GET` no módulo `cadastros`; criar/editar exige `requireInternoAdmin` + UI `canManageUsers` |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
@@ -623,7 +623,21 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs (parcial)** | `requireInternoModule()` em billing (invoices, TISS), CRM status, branding, integracoes, users (GET), export LGPD; `requireInternoAdmin()` em users POST/PATCH |
+| **Cadastros → Usuários (UI)** | `canManageUsers` em `cadastros/page.tsx` — RECEPCAO lista; formulário e Editar só para ADMIN |
+
+### Ações exclusivas de ADMIN
+
+Além dos módulos da matriz, algumas operações exigem `internoProfile === "ADMIN"` (`isInternoAdmin` / `requireInternoAdmin`):
+
+| Operação | API | UI |
+|----------|-----|-----|
+| Criar usuário | `POST /api/interno/users` | Formulário oculto; callout RBAC em `CadastrosView` |
+| Editar usuário | `PATCH /api/interno/users/[id]` | Botão Editar oculto |
+
+Listagem (`GET /api/interno/users`) permanece no módulo `cadastros` — RECEPCAO e ADMIN podem listar.
+
+Piloto CEDIG: `operacao@cedig.demo` (ADMIN) · `alana@cedig.demo` (RECEPCAO, só lista). Ver [`docs/clientes/cedig/README.md`](../clientes/cedig/README.md).
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.
