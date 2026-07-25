@@ -13,5 +13,6 @@ Fonte: homologação browser 2026-07-25 · [`HISTORICO_VALIDACAO.md`](HISTORICO_
 | P3-b | Baixa | Interno Agenda “Consulta” hardcoded | ✅ `labels.appointment` |
 | S2 | Baixa | Tabela Dr Saúde sem empresa no seed | ✅ empresa no catálogo |
 | P1-c | Alta | Walk-in “não funciona” / some da agenda | ✅ causa: modo **demo** na Netlify (Lambda `/tmp`); uso exige **modo operação** + aviso na agenda |
+| P1-d | Alta | Modo operação rebaixado ao abrir `/segmentos` | ✅ `ensureDataStoreForSegmentAccess` não faz operation→demo automático |
 
 Backlog (não nesta leva): export Excel · lançamento → fatura PPU · E2E Playwright · Beneficiário “Consulta” residual em `BeneficiarioView`.

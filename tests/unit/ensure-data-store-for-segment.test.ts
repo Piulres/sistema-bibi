@@ -5,6 +5,7 @@ import {
   ensureDataStoreForSegmentAccess,
   isDemoOnlySegmentEmail,
   isDemoSegmentTenantSlug,
+  isOperationTenantSlug,
 } from "@/lib/data-store/ensure-data-store-for-segment";
 
 const { getDataStoreMode, setDataStoreMode, isDualDataStoreEnabled } = vi.hoisted(() => ({
@@ -44,6 +45,8 @@ describe("ensure-data-store-for-segment", () => {
     expect(isDemoSegmentTenantSlug("petcare")).toBe(true);
     expect(isDemoSegmentTenantSlug("horizonte")).toBe(true);
     expect(isDemoSegmentTenantSlug("bibi-saude")).toBe(false);
+    expect(isDemoSegmentTenantSlug("cedig")).toBe(false);
+    expect(isOperationTenantSlug("cedig")).toBe(true);
   });
 
   it("identifica e-mails exclusivos do modo demo", () => {
@@ -53,24 +56,32 @@ describe("ensure-data-store-for-segment", () => {
     expect(DEMO_SEGMENT_TENANT_SLUGS.has("petcare")).toBe(true);
   });
 
-  it("alterna para demo ao acessar landing de segmento", async () => {
+  it("não rebaixa operação → demo ao acessar landing de segmento", async () => {
+    const mode = await ensureDataStoreForSegmentAccess({ segmentLanding: true });
+
+    expect(mode).toBe("operation");
+    expect(setDataStoreMode).not.toHaveBeenCalled();
+  });
+
+  it("em demo, landing de segmento mantém/grava demo", async () => {
+    getDataStoreMode.mockResolvedValue("demo");
+
     const mode = await ensureDataStoreForSegmentAccess({ segmentLanding: true });
 
     expect(mode).toBe("demo");
-    expect(setDataStoreMode).toHaveBeenCalledWith("demo");
-    expect(invalidatePrismaCache).toHaveBeenCalled();
+    expect(setDataStoreMode).not.toHaveBeenCalled();
   });
 
-  it("alterna para demo com tenant slug de segmento", async () => {
+  it("não rebaixa operação → demo com tenant slug de segmento", async () => {
     await ensureDataStoreForSegmentAccess({ tenantSlug: "petcare" });
 
-    expect(setDataStoreMode).toHaveBeenCalledWith("demo");
+    expect(setDataStoreMode).not.toHaveBeenCalled();
   });
 
-  it("alterna para demo com e-mail exclusivo de segmento", async () => {
+  it("não rebaixa operação → demo com e-mail exclusivo de segmento", async () => {
     await ensureDataStoreForSegmentAccess({ email: "operacao@petcare.demo" });
 
-    expect(setDataStoreMode).toHaveBeenCalledWith("demo");
+    expect(setDataStoreMode).not.toHaveBeenCalled();
   });
 
   it("mantém operação sem contexto de segmento", async () => {
@@ -80,7 +91,7 @@ describe("ensure-data-store-for-segment", () => {
     expect(setDataStoreMode).not.toHaveBeenCalled();
   });
 
-  it("não regrava modo quando já está em demo", async () => {
+  it("não regrava modo quando já está em demo e o alvo é demo", async () => {
     getDataStoreMode.mockResolvedValue("demo");
 
     const mode = await ensureDataStoreForSegmentAccess({ tenantSlug: "petcare" });
@@ -93,6 +104,14 @@ describe("ensure-data-store-for-segment", () => {
     getDataStoreMode.mockResolvedValue("demo");
 
     await ensureDataStoreForSegmentAccess({ tenantSlug: "bibi-saude" });
+
+    expect(setDataStoreMode).toHaveBeenCalledWith("operation");
+  });
+
+  it("alterna para operação com tenant cedig quando em demo", async () => {
+    getDataStoreMode.mockResolvedValue("demo");
+
+    await ensureDataStoreForSegmentAccess({ tenantSlug: "cedig" });
 
     expect(setDataStoreMode).toHaveBeenCalledWith("operation");
   });

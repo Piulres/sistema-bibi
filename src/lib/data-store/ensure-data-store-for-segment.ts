@@ -12,6 +12,12 @@ import { invalidatePrismaCache } from "@/lib/db";
 /** Tenant padrão do modo operação (bootstrap mínimo). */
 export const OPERATION_DEFAULT_TENANT_SLUG = "bibi-saude";
 
+/** Tenants de operação real (não forçam massa demo). */
+export const OPERATION_TENANT_SLUGS = new Set([
+  OPERATION_DEFAULT_TENANT_SLUG,
+  "cedig",
+]);
+
 /** Slugs dos tenants demo por segmento (horizonte, petcare, smile…). */
 export const DEMO_SEGMENT_TENANT_SLUGS = new Set(
   SEGMENT_TENANTS.map((tenant) => tenant.slug),
@@ -36,10 +42,15 @@ export const DEMO_ONLY_SEGMENT_EMAILS = new Set(
     .filter((email) => !SHARED_OPERATION_EMAILS.has(email)),
 );
 
+export function isOperationTenantSlug(slug: string | null | undefined): boolean {
+  if (!slug) return false;
+  return OPERATION_TENANT_SLUGS.has(slug.toLowerCase().trim());
+}
+
 export function isDemoSegmentTenantSlug(slug: string | null | undefined): boolean {
   if (!slug) return false;
   const normalized = slug.toLowerCase().trim();
-  if (normalized === OPERATION_DEFAULT_TENANT_SLUG) return false;
+  if (isOperationTenantSlug(normalized)) return false;
   return DEMO_SEGMENT_TENANT_SLUGS.has(normalized);
 }
 
@@ -57,7 +68,7 @@ export type EnsureDataStoreForSegmentOptions = {
 
 function targetStoreForSegment(options: EnsureDataStoreForSegmentOptions): DataStoreMode | null {
   const slug = options.tenantSlug?.toLowerCase().trim();
-  if (slug === OPERATION_DEFAULT_TENANT_SLUG) return "operation";
+  if (slug && isOperationTenantSlug(slug)) return "operation";
   if (slug && isDemoSegmentTenantSlug(slug)) return "demo";
 
   if (options.segmentLanding) return "demo";
@@ -71,7 +82,11 @@ function targetStoreForSegment(options: EnsureDataStoreForSegmentOptions): DataS
 
 /**
  * Garante o banco correto ao acessar tenants demo (?tenant=lex, horizonte, petcare…),
- * landing de segmento, e-mail demo exclusivo ou tenant de operação (?tenant=bibi-saude).
+ * landing de segmento, e-mail demo exclusivo ou tenant de operação (?tenant=bibi-saude|cedig).
+ *
+ * Regra de proteção: se o site já está em **operação**, não rebaixa automaticamente
+ * para demo (landing/segmento/e-mail). Só ADMIN via `/interno/seguranca` volta à demo.
+ * Assim walk-in e dados reais da CEDIG não somem ao abrir `/segmentos/*`.
  */
 export async function ensureDataStoreForSegmentAccess(
   options: EnsureDataStoreForSegmentOptions = {},
@@ -80,13 +95,19 @@ export async function ensureDataStoreForSegmentAccess(
     return getDataStoreMode();
   }
 
+  const current = await getDataStoreMode();
   const target = targetStoreForSegment(options);
+
   if (!target) {
-    return getDataStoreMode();
+    return current;
   }
 
-  const current = await getDataStoreMode();
   if (current === target) {
+    return current;
+  }
+
+  // Protege base real: nunca demo automática a partir de operação.
+  if (current === "operation" && target === "demo") {
     return current;
   }
 
