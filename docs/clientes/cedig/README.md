@@ -54,8 +54,8 @@ Credenciais iniciais: as do bootstrap de operação (ou usuários criados no ten
 
 | Fase | Entrega | Status |
 |------|---------|--------|
-| **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | Em implementação |
-| **B** | Tenant CEDIG (branding, labels “Exame”, catálogo) em operação | Em implementação |
+| **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
+| **B** | Tenant CEDIG (branding, labels “Exame”, catálogo, usuários demo) | ✅ seed `/?tenant=cedig` |
 | **C** | Homologação com secretária (UX + exemplos) | Pendente humano |
 | **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
 | **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
