@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **415+** casos Vitest · **128+** testes Playwright E2E · **123** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **524** casos Vitest · **140** testes Playwright E2E · **158** Route Handlers · **123** paths no OpenAPI (gap: `clinic-finance/*` — ver [`API_DOCS.md`](API_DOCS.md)).
 
 ### Onboarding tour (v3)
 
@@ -83,6 +83,18 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`
 
+### Gestão clínica (v2.4 — CEDIG)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Categorias de despesa | `tests/unit/clinic-finance.test.ts` | `LABORATORIO`, `ANESTESISTA`, `PESSOAL`, `TAXA_CARTAO` |
+| Formas de pagamento | idem | `CLINIC_PAYMENT_METHODS`, labels PIX/convênio |
+| Catálogo CEDIG | idem | Procedimentos `CEDIG-*`, equipe, overrides de label |
+| Motor de preços | idem | `suggestCedigAmount()` — base + biópsias + polipectomias |
+| RBAC módulo `gestao` | `tests/security/rbac-gaps.test.ts` | Contagem de módulos internos (14 abas) |
+
+Doc: [`versoes/V2_4.md`](../versoes/V2_4.md) · fluxo: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 · homologação: [`clientes/cedig/ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md).
+
 ---
 
 ## O que você **não vê** (lacunas e riscos)
@@ -98,7 +110,7 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 | **API** (maioria das rotas `/api/interno/*`) | Só exige `role === INTERNO` — **qualquer perfil** acessa billing, cadastros, PIX… |
 | **Teste** | `tests/security/rbac-gaps.test.ts` documenta e falha se a correção for aplicada |
 
-**Rotas com guard correto (`requireInternoModule`):** invoices POST, TISS, users, branding, webhooks, CRM status, export LGPD.
+**Rotas com guard correto (`requireInternoModule`):** invoices POST, TISS, users, branding, webhooks, CRM status, export LGPD, **clinic-finance/** (gestão clínica v2.4).
 
 **Rotas expostas sem guard de módulo (exemplos):** `/interno/billing`, `/interno/procedures`, `/interno/invoices/[id]/pix`, `/interno/dashboard`.
 
