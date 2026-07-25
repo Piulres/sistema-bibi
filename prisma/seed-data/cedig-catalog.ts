@@ -133,22 +133,10 @@ export const CEDIG_STAFF = [
     internoProfile: null,
     specialty: "Endoscopia digestiva",
   },
-  // aliases legados do primeiro seed
-  {
-    email: "bruno@cedig.demo",
-    name: "Dr. Bruno Dias",
-    role: "PRESTADOR",
-    internoProfile: null,
-    specialty: "Endoscopia digestiva",
-  },
-  {
-    email: "luiza@cedig.demo",
-    name: "Dra. Luiza Lage",
-    role: "PRESTADOR",
-    internoProfile: null,
-    specialty: "Endoscopia digestiva",
-  },
 ] as const;
+
+/** E-mails do primeiro seed — deixam de ser PRESTADOR para não duplicar o select. */
+const CEDIG_LEGACY_PROVIDER_ALIASES = ["bruno@cedig.demo", "luiza@cedig.demo"] as const;
 
 export async function upsertCedigProcedures(
   prisma: PrismaClient,
@@ -199,6 +187,20 @@ async function upsertCedigStaff(prisma: PrismaClient, tenantId: string) {
       },
     });
   }
+
+  for (const email of CEDIG_LEGACY_PROVIDER_ALIASES) {
+    const legacy = await prisma.user.findUnique({ where: { email } });
+    if (!legacy || legacy.tenantId !== tenantId) continue;
+    if (legacy.role !== "PRESTADOR") continue;
+    await prisma.user.update({
+      where: { id: legacy.id },
+      data: {
+        role: "INTERNO",
+        internoProfile: "READONLY",
+        specialty: "Alias legado (não usar)",
+      },
+    });
+  }
 }
 
 /** Empresas institucionais + pacientes + acessos PJ/Beneficiário (demo dos 4 portais). */
@@ -217,6 +219,13 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
       tradeName: "Bem Saúde",
       status: "ATIVO",
       email: "contato@bemsaude.demo",
+    },
+    {
+      name: "Dr Saúde",
+      cnpj: "34.567.890/0001-13",
+      tradeName: "Dr Saúde",
+      status: "ATIVO",
+      email: "contato@drsaude.demo",
     },
   ] as const;
 
@@ -372,6 +381,165 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
 }
 
 /**
+ * Histórico mínimo para demos dos 4 portais (idempotente por notes marker).
+ */
+async function seedCedigOperationalHistory(
+  prisma: PrismaClient,
+  tenantId: string,
+): Promise<void> {
+  const marker = "[seed-cedig-demo]";
+  const existingLaunch = await prisma.clinicExamLaunch.findFirst({
+    where: { tenantId, notes: { contains: marker } },
+  });
+  if (existingLaunch) return;
+
+  const bruno = await prisma.user.findUnique({
+    where: { email: "bruno.dias@cedig.demo" },
+  });
+  const luiza = await prisma.user.findUnique({
+    where: { email: "luiza.lage@cedig.demo" },
+  });
+  const alexandre = await prisma.user.findUnique({
+    where: { email: "alexandre.marcal@cedig.demo" },
+  });
+  const maria = await prisma.patient.findUnique({ where: { cpf: "901.111.222-33" } });
+  const jose = await prisma.patient.findUnique({ where: { cpf: "901.222.333-44" } });
+  const ana = await prisma.patient.findUnique({ where: { cpf: "901.333.444-55" } });
+  const endo = await prisma.procedure.findUnique({
+    where: { tenantId_code: { tenantId, code: "CEDIG-ENDO" } },
+  });
+  const colo = await prisma.procedure.findUnique({
+    where: { tenantId_code: { tenantId, code: "CEDIG-COLO" } },
+  });
+  const resp = await prisma.procedure.findUnique({
+    where: { tenantId_code: { tenantId, code: "CEDIG-RESP" } },
+  });
+
+  if (!bruno || !luiza || !alexandre || !maria || !jose || !ana || !endo || !colo || !resp) {
+    return;
+  }
+
+  const today = new Date();
+  const at = (hour: number, dayOffset = 0) => {
+    const d = new Date(today);
+    d.setDate(d.getDate() + dayOffset);
+    d.setHours(hour, 0, 0, 0);
+    return d;
+  };
+
+  await prisma.appointment.createMany({
+    data: [
+      {
+        tenantId,
+        patientId: maria.id,
+        providerId: bruno.id,
+        procedureId: endo.id,
+        scheduledAt: at(9),
+        status: "CONFIRMADO",
+        modality: "PRESENCIAL",
+        reason: "Exame — Endoscopia Digestiva Alta",
+      },
+      {
+        tenantId,
+        patientId: jose.id,
+        providerId: luiza.id,
+        procedureId: colo.id,
+        scheduledAt: at(10),
+        status: "CONFIRMADO",
+        modality: "PRESENCIAL",
+        reason: "Exame — Colonoscopia",
+      },
+      {
+        tenantId,
+        patientId: ana.id,
+        providerId: alexandre.id,
+        procedureId: colo.id,
+        scheduledAt: at(14, -1),
+        status: "REALIZADO",
+        modality: "PRESENCIAL",
+        reason: "Exame — Colonoscopia + polipectomia",
+      },
+    ],
+  });
+
+  await prisma.clinicExamLaunch.createMany({
+    data: [
+      {
+        tenantId,
+        patientId: maria.id,
+        patientName: maria.name,
+        providerId: bruno.id,
+        procedureId: endo.id,
+        performedAt: at(9, -2),
+        paymentMethod: "PIX",
+        priceTable: "PARTICULAR",
+        amountReceived: 900,
+        biopsies: 1,
+        notes: `${marker} C1 homolog`,
+      },
+      {
+        tenantId,
+        patientId: jose.id,
+        patientName: jose.name,
+        providerId: luiza.id,
+        procedureId: colo.id,
+        performedAt: at(10, -2),
+        paymentMethod: "CONVENIO",
+        priceTable: "CENTRALMED",
+        amountReceived: 1250,
+        notes: `${marker} C2 homolog`,
+      },
+      {
+        tenantId,
+        patientId: ana.id,
+        patientName: ana.name,
+        providerId: alexandre.id,
+        procedureId: colo.id,
+        performedAt: at(14, -1),
+        paymentMethod: "CARTAO",
+        priceTable: "PARTICULAR",
+        amountReceived: 3200,
+        polypectomies: 1,
+        polypectomyTier: "INTERMEDIARIA",
+        clips: 1,
+        notes: `${marker} C3 homolog`,
+      },
+      {
+        tenantId,
+        patientId: maria.id,
+        patientName: maria.name,
+        providerId: alexandre.id,
+        procedureId: resp.id,
+        performedAt: at(11, -1),
+        paymentMethod: "CONVENIO",
+        priceTable: "BEM_SAUDE",
+        amountReceived: 450,
+        notes: `${marker} C4 homolog`,
+      },
+    ],
+  });
+
+  await prisma.clinicExpense.createMany({
+    data: [
+      {
+        tenantId,
+        category: "LABORATORIO",
+        description: `${marker} Lab biópsias — demo`,
+        amount: 300,
+        expenseDate: at(8, -1),
+      },
+      {
+        tenantId,
+        category: "PESSOAL",
+        description: `${marker} Pagamento equipe — demo`,
+        amount: 500,
+        expenseDate: at(8, -1),
+      },
+    ],
+  });
+}
+
+/**
  * Garante tenant CEDIG (demo ou operação) com branding e catálogo.
  * Idempotente por slug `cedig`.
  */
@@ -391,6 +559,7 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
     });
     await upsertCedigStaff(prisma, existing.id);
     await upsertCedigPortalMass(prisma, existing.id);
+    await seedCedigOperationalHistory(prisma, existing.id);
     return { tenantId: existing.id, created: false, procedures };
   }
 
@@ -419,6 +588,7 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
   const procedures = await upsertCedigProcedures(prisma, tenant.id);
   await upsertCedigStaff(prisma, tenant.id);
   await upsertCedigPortalMass(prisma, tenant.id);
+  await seedCedigOperationalHistory(prisma, tenant.id);
 
   return { tenantId: tenant.id, created: true, procedures };
 }

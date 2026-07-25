@@ -14,9 +14,11 @@ import {
 import {
   _parseState,
   isTourDismissed,
+  isRouteTourDismissed,
   markRouteTourCompleted,
   markTourDismissed,
   shouldAutoStartRouteTour,
+  shouldSkipPortalAutoTours,
 } from "@/lib/onboarding/storage";
 import { getRouteScopeKey, routeStorageKey } from "@/lib/onboarding/route-scope";
 import { ONBOARDING_VERSION } from "@/lib/onboarding/types";
@@ -172,6 +174,26 @@ describe("onboarding storage", () => {
     });
     markTourDismissed("interno");
     expect(isTourDismissed("interno")).toBe(true);
+    expect(shouldSkipPortalAutoTours("interno")).toBe(true);
+    vi.unstubAllGlobals();
+  });
+
+  it("ao pular tour principal, marca micro-tours do portal como dismissed", () => {
+    const store = new Map<string, string>();
+    vi.stubGlobal("window", globalThis);
+    vi.stubGlobal("localStorage", {
+      getItem: (k: string) => store.get(k) ?? null,
+      setItem: (k: string, v: string) => {
+        store.set(k, v);
+      },
+      removeItem: (k: string) => {
+        store.delete(k);
+      },
+    });
+    markRouteTourCompleted("interno:agenda");
+    markTourDismissed("interno");
+    expect(isRouteTourDismissed("interno:agenda")).toBe(true);
+    expect(shouldAutoStartRouteTour("interno:agenda")).toBe(false);
     vi.unstubAllGlobals();
   });
 

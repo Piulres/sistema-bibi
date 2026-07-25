@@ -139,3 +139,19 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 3. Treinar Alana com [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) (15 min)
 4. Deixar claro: piloto = gestão financeira/operacional da secretária; demais portais na fase seguinte
 5. Coletar feedback in loco e só então priorizar Excel / PPU automático
+
+---
+
+### 2026-07-25c — Correção das falhas mapeadas
+
+Ver [`FALHAS.md`](FALHAS.md).
+
+| ID | Correção |
+|----|----------|
+| P1-a | Prestador lista pacientes de agenda **ou** `ClinicExamLaunch` + seed com histórico |
+| P1-b | Labels `useLabels()` na agenda/dashboard/pacientes do prestador (+ interno/atendimento) |
+| P2-a | Removidos aliases `bruno@`/`luiza@` do select; demote no seed |
+| P2-b | Select de pacientes cadastrados + `patientId` no lançamento |
+| P2-c | Seed: 3 exames na agenda, 4 launches, 2 despesas |
+| P3-a | Dismiss do tour principal bloqueia micro-tours |
+| S2 | Empresa Dr Saúde no seed |

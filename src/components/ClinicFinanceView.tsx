@@ -15,6 +15,7 @@ function brl(v: number) {
 
 type Provider = { id: string; name: string; specialty: string | null };
 type Procedure = { id: string; code: string; name: string; basePrice: number };
+type PatientOpt = { id: string; name: string; cpf: string };
 type Option = { id: string; label: string };
 
 type Launch = {
@@ -75,6 +76,7 @@ export default function ClinicFinanceView() {
 
   const [providers, setProviders] = useState<Provider[]>([]);
   const [procedures, setProcedures] = useState<Procedure[]>([]);
+  const [patients, setPatients] = useState<PatientOpt[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<Option[]>([]);
   const [expenseCategories, setExpenseCategories] = useState<Option[]>([]);
   const [priceTables, setPriceTables] = useState<Option[]>([]);
@@ -84,6 +86,7 @@ export default function ClinicFinanceView() {
   const [kpis, setKpis] = useState<Kpis | null>(null);
 
   const [form, setForm] = useState({
+    patientId: "",
     patientName: "",
     providerId: "",
     procedureId: "",
@@ -175,6 +178,7 @@ export default function ClinicFinanceView() {
     if (metaRes.ok) {
       setProviders(meta.providers ?? []);
       setProcedures(meta.procedures ?? []);
+      setPatients(meta.patients ?? []);
       setPaymentMethods(meta.paymentMethods ?? []);
       setExpenseCategories(meta.expenseCategories ?? []);
       setPriceTables(meta.priceTables ?? []);
@@ -226,6 +230,7 @@ export default function ClinicFinanceView() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...form,
+        patientId: form.patientId || undefined,
         amountReceived: Number(form.amountReceived),
         biopsies: Number(form.biopsies),
         polypectomies: Number(form.polypectomies),
@@ -247,6 +252,7 @@ export default function ClinicFinanceView() {
     showToast({ message: "Lançamento registrado.", tone: "success" });
     setForm((f) => ({
       ...f,
+      patientId: "",
       patientName: "",
       biopsies: "0",
       polypectomies: "0",
@@ -351,15 +357,43 @@ export default function ClinicFinanceView() {
               Novo lançamento (1 paciente = 1 linha)
             </p>
             <label className="text-sm sm:col-span-2">
-              Paciente *
+              Paciente cadastrado
+              <select
+                className="mt-1 w-full rounded-lg border px-3 py-2"
+                value={form.patientId}
+                onChange={(e) => {
+                  const id = e.target.value;
+                  const p = patients.find((x) => x.id === id);
+                  patchForm(
+                    {
+                      patientId: id,
+                      patientName: p?.name ?? form.patientName,
+                    },
+                    { keepAmount: true },
+                  );
+                }}
+              >
+                <option value="">— Digitar nome abaixo (ou escolher) —</option>
+                {patients.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} · {p.cpf}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="text-sm sm:col-span-2">
+              Nome do paciente *
               <input
                 required
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.patientName}
                 onChange={(e) =>
-                  patchForm({ patientName: e.target.value }, { keepAmount: true })
+                  patchForm(
+                    { patientName: e.target.value, patientId: "" },
+                    { keepAmount: true },
+                  )
                 }
-                placeholder="Nome completo"
+                placeholder="Nome completo (preenche ao escolher o cadastro)"
               />
             </label>
             <label className="text-sm">

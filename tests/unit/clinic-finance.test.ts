@@ -53,8 +53,9 @@ describe("cedig catalog", () => {
     expect(CEDIG_LABEL_OVERRIDES.procedures).toBe("Exames");
   });
 
-  it("cadastra equipe médica e operacional", () => {
+  it("cadastra equipe médica e operacional sem aliases duplicados", () => {
     const names = CEDIG_STAFF.map((u) => u.name);
+    const emails = CEDIG_STAFF.map((u) => u.email);
     expect(names.some((n) => n.includes("Alexandre Marçal"))).toBe(true);
     expect(names.some((n) => n.includes("Bruno Dias"))).toBe(true);
     expect(names.some((n) => n.includes("Luiza Lage"))).toBe(true);
@@ -63,6 +64,11 @@ describe("cedig catalog", () => {
     expect(names).toContain("Alana");
     expect(names).toContain("João Marcos");
     expect(names).toContain("Márcia");
+    expect(emails).not.toContain("bruno@cedig.demo");
+    expect(emails).not.toContain("luiza@cedig.demo");
+    expect(new Set(names.filter((n) => n.startsWith("Dr"))).size).toBe(
+      names.filter((n) => n.startsWith("Dr")).length,
+    );
   });
 });
 

@@ -86,7 +86,7 @@ export default function AppointmentsView() {
     procedureId: "",
     autoAssignProvider: false,
     time: "09:00",
-    reason: "Consulta",
+    reason: labels.appointment,
     status: "CONFIRMADO",
     modality: "PRESENCIAL",
   });
@@ -100,7 +100,7 @@ export default function AppointmentsView() {
     procedureId: "",
     autoAssignProvider: false,
     time: "",
-    reason: "Consulta walk-in",
+    reason: `${labels.appointment} walk-in`,
     createPortalUser: false,
     petName: "",
     petSpecies: "CANINO",
@@ -128,7 +128,7 @@ export default function AppointmentsView() {
           }),
         }),
       {
-        successMessage: "Consulta agendada com sucesso",
+        successMessage: `${labels.appointment} agendado com sucesso`,
         onSuccess: async (body) => {
           const appt = body.appointment as { patientName?: string } | undefined;
           if (appt?.patientName) {
@@ -212,7 +212,7 @@ export default function AppointmentsView() {
             procedureId: "",
             autoAssignProvider: false,
             time: "",
-            reason: "Consulta walk-in",
+            reason: `${labels.appointment} walk-in`,
             createPortalUser: false,
             petName: "",
             petSpecies: "CANINO",

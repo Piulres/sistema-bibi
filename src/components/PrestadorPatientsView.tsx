@@ -62,12 +62,12 @@ export default function PrestadorPatientsView() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-[var(--text-primary)]">
-          {isVet ? `Meus ${labels.patients.toLowerCase()}` : "Meus pacientes"}
+          Meus {labels.patients.toLowerCase()}
         </h1>
         <p className="text-sm text-[var(--text-muted)]">
           {isVet
             ? `Histórico clínico por ${labels.patient.toLowerCase()} — ficha, medicações e exames.`
-            : "Histórico clínico longitudinal — prontuário, medicação, exames e protocolos."}
+            : `Histórico clínico — prontuário, medicação, ${labels.appointments.toLowerCase()} e protocolos. Inclui ${labels.patients.toLowerCase()} da agenda e da gestão clínica.`}
         </p>
       </div>
 
@@ -115,7 +115,11 @@ export default function PrestadorPatientsView() {
           )
         ) : patients.length === 0 ? (
           <Card padding="lg">
-            <p className="text-sm text-[var(--text-muted)]">Nenhum paciente encontrado nos seus atendimentos.</p>
+            <p className="text-sm text-[var(--text-muted)]">
+              Nenhum(a) {labels.patient.toLowerCase()} nos seus {labels.appointments.toLowerCase()} ou
+              lançamentos de gestão clínica. Quando a recepção agendar ou lançar um exame com você como
+              médico, a lista aparece aqui.
+            </p>
           </Card>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

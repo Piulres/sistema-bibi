@@ -121,7 +121,7 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
 | **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
 
-Histórico detalhado: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro Alana: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md).
+Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md).
 
 ---
 

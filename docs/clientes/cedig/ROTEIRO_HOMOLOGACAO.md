@@ -2,7 +2,8 @@
 
 Complementa [`README.md`](README.md). Massa geral: [`docs/plataforma/MASSA_TESTES.md`](../../plataforma/MASSA_TESTES.md). Estratégia: [`docs/plataforma/TESTES.md`](../../plataforma/TESTES.md).
 
-> **Nota:** não há ainda E2E Playwright nem entrada CEDIG em `MASSA_TESTES.md`. Este roteiro é o checklist assistido (browser / secretária Alana).
+> **Nota:** checklist assistido (browser / secretária Alana). Falhas mapeadas: [`FALHAS.md`](FALHAS.md).  
+> Tours: ao pular o tour principal, os micro-tours do portal não abrem mais. Em demos: `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true`.
 
 ---
 

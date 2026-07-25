@@ -63,7 +63,24 @@ export function markTourDismissed(portal: PortalKey, version = ONBOARDING_VERSIO
     version,
     dismissed: true,
   };
+  // Pular micro-tours do mesmo portal (evita fadiga no piloto CEDIG / demos)
+  if (state.routes) {
+    const prefix = `${portal}:`;
+    for (const key of Object.keys(state.routes)) {
+      if (!key.startsWith(prefix)) continue;
+      state.routes[key] = {
+        completed: false,
+        version,
+        dismissed: true,
+      };
+    }
+  }
   writeState(state);
+}
+
+/** True quando o usuário pediu para não ver mais tours deste portal. */
+export function shouldSkipPortalAutoTours(portal: PortalKey): boolean {
+  return isTourDismissed(portal);
 }
 
 export function markRouteTourCompleted(routeKey: string, version = ONBOARDING_VERSION): void {

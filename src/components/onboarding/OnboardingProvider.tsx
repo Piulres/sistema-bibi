@@ -30,6 +30,7 @@ import {
   markTourDismissed,
   resetTour,
   shouldAutoStartRouteTour,
+  shouldSkipPortalAutoTours,
 } from "@/lib/onboarding/storage";
 import { getRouteScopeKey, routeStorageKey } from "@/lib/onboarding/route-scope";
 import type { OnboardingStep, OnboardingTourMode } from "@/lib/onboarding/types";
@@ -175,6 +176,9 @@ export function OnboardingProvider({ portal, labels, niche = "MEDICAL", permissi
         setActive(true);
         return;
       }
+
+      // Após "pular" o tour principal, não abrir micro-tours em cada aba
+      if (shouldSkipPortalAutoTours(portal)) return;
 
       if (routeKey && shouldAutoStartRouteTour(routeKey) && microSteps.length > 0) {
         setTourMode("micro");

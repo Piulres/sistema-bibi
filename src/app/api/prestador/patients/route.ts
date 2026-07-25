@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 
+/** Pacientes do prestador: agenda OU lançamentos de gestão clínica. */
 export async function GET(request: Request) {
   const prisma = await getPrisma();
   try {
@@ -20,14 +21,22 @@ export async function GET(request: Request) {
               ],
             }
           : {}),
-        appointments: { some: { providerId: user.id } },
+        OR: [
+          { appointments: { some: { providerId: user.id } } },
+          { clinicExamLaunches: { some: { providerId: user.id } } },
+        ],
       },
       select: {
         id: true,
         name: true,
         cpf: true,
         company: { select: { name: true } },
-        _count: { select: { appointments: true } },
+        _count: {
+          select: {
+            appointments: true,
+            clinicExamLaunches: true,
+          },
+        },
       },
       orderBy: { name: "asc" },
       take: 50,
@@ -39,7 +48,7 @@ export async function GET(request: Request) {
         name: p.name,
         cpf: p.cpf,
         company: p.company?.name ?? null,
-        appointmentsCount: p._count.appointments,
+        appointmentsCount: p._count.appointments + p._count.clinicExamLaunches,
       })),
     });
   } catch (error) {

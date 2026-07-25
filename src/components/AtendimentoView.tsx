@@ -24,6 +24,7 @@ import { useDraftUndo } from "@/hooks/useDraftUndo";
 import VoaAssistantPanel from "@/components/voa/VoaAssistantPanel";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Usage = {
@@ -91,6 +92,7 @@ const fieldClass =
   "w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
 
 export default function AtendimentoView({ appointmentId }: { appointmentId: string }) {
+  const { labels } = useLabels();
   const { isBusy, run, showToast } = useAsyncAction();
   const [selectedProc, setSelectedProc] = useState("");
   const pepDraft = useDraftUndo({
@@ -384,7 +386,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             )}
             <p className="mt-1 text-sm text-[var(--text-muted)]">
               {new Date(detail.appointment.scheduledAt).toLocaleString("pt-BR")} ·{" "}
-              {detail.appointment.reason ?? "Consulta"}
+              {detail.appointment.reason ?? labels.appointment}
             </p>
             <Link
               href={historyHref}

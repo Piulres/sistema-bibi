@@ -9,6 +9,7 @@ import CalloutCard from "@/components/ui/CalloutCard";
 import StatusBadge from "@/components/ui/StatusBadge";
 import Button from "@/components/ui/Button";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Dashboard = {
@@ -44,6 +45,7 @@ type DashboardPayload = {
 };
 
 export default function PrestadorDashboardView() {
+  const { labels } = useLabels();
   const loadDashboard = useCallback(
     () =>
       fetchJson<DashboardPayload>(
@@ -76,7 +78,7 @@ export default function PrestadorDashboardView() {
           label="Atendimentos hoje"
           value={kpis.appointmentsToday}
           hint={`${kpis.completedToday} realizados · ${kpis.confirmedToday} confirmados`}
-          info="Consultas agendadas para hoje, exceto canceladas."
+          info={`${labels.appointments} agendados para hoje, exceto cancelados.`}
         />
         <StatCard
           label="Pendentes hoje"
@@ -85,17 +87,17 @@ export default function PrestadorDashboardView() {
           info="Agendados ou confirmados que ainda não foram marcados como realizados."
         />
         <StatCard
-          label="Procedimentos (semana)"
+          label={`${labels.procedures} (semana)`}
           value={kpis.proceduresWeek}
           tone="accent"
           hint={kpis.revenueWeekLabel}
-          info="Procedimentos Pay Per Use registrados por você nesta semana."
+          info={`${labels.procedures} Pay Per Use registrados por você nesta semana.`}
         />
         <StatCard
-          label="Pacientes atendidos"
+          label={`${labels.patients} atendidos`}
           value={kpis.uniquePatients}
           hint={kpis.teleToday > 0 ? `${kpis.teleToday} tele hoje` : undefined}
-          info="Total de pacientes distintos com consultas na sua agenda."
+          info={`Total de ${labels.patients.toLowerCase()} distintos com ${labels.appointments.toLowerCase()} na sua agenda.`}
         />
       </div>
 

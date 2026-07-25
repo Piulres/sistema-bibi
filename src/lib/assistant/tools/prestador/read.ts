@@ -53,18 +53,30 @@ export const prestadorReadTools: AssistantToolDefinition[] = [
     handler: async (ctx, args) => {
       const prisma = await getPrisma();
       const search = ((args as { search?: string }).search ?? "").toLowerCase();
-      const rows = await prisma.appointment.findMany({
-        where: { tenantId: ctx.user.tenantId, providerId: ctx.user.id },
-        distinct: ["patientId"],
-        include: { patient: { select: { id: true, name: true, cpf: true, phone: true } } },
+      const patients = await prisma.patient.findMany({
+        where: {
+          tenantId: ctx.user.tenantId,
+          OR: [
+            { appointments: { some: { providerId: ctx.user.id } } },
+            { clinicExamLaunches: { some: { providerId: ctx.user.id } } },
+          ],
+          ...(search
+            ? {
+                AND: [
+                  {
+                    OR: [
+                      { name: { contains: search } },
+                      { cpf: { contains: search } },
+                    ],
+                  },
+                ],
+              }
+            : {}),
+        },
+        select: { id: true, name: true, cpf: true, phone: true },
         take: 30,
+        orderBy: { name: "asc" },
       });
-      let patients = rows.map((r) => r.patient);
-      if (search) {
-        patients = patients.filter(
-          (p) => p.name.toLowerCase().includes(search) || p.cpf.includes(search),
-        );
-      }
       return { count: patients.length, patients: patients.slice(0, 10) };
     },
   },

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
 import AppointmentCard from "@/components/ui/AppointmentCard";
 import SectionHeader from "@/components/ui/SectionHeader";
@@ -9,6 +9,7 @@ import Button from "@/components/ui/Button";
 import StatCard from "@/components/ui/StatCard";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { cn } from "@/lib/utils/cn";
 
@@ -31,12 +32,6 @@ type AgendaPayload = {
   summary?: Summary;
 };
 
-const TABS: { id: View; label: string; description: string }[] = [
-  { id: "day", label: "Dia", description: "Agenda por data" },
-  { id: "upcoming", label: "Próximos", description: "Consultas futuras" },
-  { id: "past", label: "Histórico", description: "Atendimentos anteriores" },
-];
-
 function formatDateLabel(iso: string): string {
   return new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -53,8 +48,29 @@ function shiftDate(iso: string, days: number): string {
 }
 
 export default function AgendaView() {
+  const { labels } = useLabels();
+  const appt = labels.appointment;
+  const apptsLabel = labels.appointments;
   const [view, setView] = useState<View>("day");
   const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+
+  const tabs = useMemo(
+    () =>
+      [
+        { id: "day" as const, label: "Dia", description: "Agenda por data" },
+        {
+          id: "upcoming" as const,
+          label: "Próximos",
+          description: `${apptsLabel} futuros`,
+        },
+        {
+          id: "past" as const,
+          label: "Histórico",
+          description: "Atendimentos anteriores",
+        },
+      ] as const,
+    [apptsLabel],
+  );
 
   const loadAgenda = useCallback(() => {
     const params = new URLSearchParams({ view });
@@ -79,14 +95,14 @@ export default function AgendaView() {
         ? "Agenda de hoje"
         : `Agenda — ${formatDateLabel(date)}`
       : view === "upcoming"
-        ? "Próximas consultas"
+        ? `${apptsLabel} futuros`
         : "Histórico de atendimentos";
 
   const headerDescription =
     view === "day"
       ? `${appts.length} atendimento(s) neste dia`
       : view === "upcoming"
-        ? `${summary?.upcoming ?? 0} consulta(s) agendada(s) a partir de hoje`
+        ? `${summary?.upcoming ?? 0} ${appt.toLowerCase()}(s) agendado(s) a partir de hoje`
         : `${summary?.past ?? 0} atendimento(s) anteriores`;
 
   return (
@@ -108,7 +124,7 @@ export default function AgendaView() {
               label="Próximos"
               value={summary.upcoming}
               tone="accent"
-              info="Consultas futuras a partir de hoje."
+              info={`${apptsLabel} futuros a partir de hoje.`}
             />
             <StatCard
               label="Histórico"
@@ -119,7 +135,7 @@ export default function AgendaView() {
         )}
 
         <div className="flex flex-wrap gap-2">
-          {TABS.map((tab) => (
+          {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
@@ -173,10 +189,10 @@ export default function AgendaView() {
           <EmptyState
             title={
               view === "upcoming"
-                ? "Nenhuma consulta futura"
+                ? `Nenhum(a) ${appt.toLowerCase()} futuro(a)`
                 : view === "past"
                   ? "Nenhum atendimento anterior"
-                  : "Sem consultas neste dia"
+                  : `Sem ${apptsLabel.toLowerCase()} neste dia`
             }
             message={
               view === "upcoming"
@@ -202,8 +218,8 @@ export default function AgendaView() {
                     title={a.patient.name}
                     subtitle={
                       showDate
-                        ? `${scheduled.toLocaleDateString("pt-BR")} · ${a.reason ?? "Consulta"}`
-                        : (a.reason ?? "Consulta")
+                        ? `${scheduled.toLocaleDateString("pt-BR")} · ${a.reason ?? appt}`
+                        : (a.reason ?? appt)
                     }
                     status={a.status}
                     particular={!a.patient.company}

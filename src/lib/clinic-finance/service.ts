@@ -33,10 +33,33 @@ function parseMonth(year?: number, month?: number) {
 
 export async function listClinicProviders(tenantId: string) {
   const prisma = await getPrisma();
-  return prisma.user.findMany({
-    where: { tenantId, role: "PRESTADOR" },
-    select: { id: true, name: true, specialty: true },
+  const rows = await prisma.user.findMany({
+    where: {
+      tenantId,
+      role: "PRESTADOR",
+      // aliases legados do primeiro seed CEDIG
+      NOT: { email: { in: ["bruno@cedig.demo", "luiza@cedig.demo"] } },
+    },
+    select: { id: true, name: true, specialty: true, email: true },
     orderBy: { name: "asc" },
+  });
+  // dedupe por nome normalizado (evita Bruno/Luiza duplicados)
+  const seen = new Set<string>();
+  return rows.filter((r) => {
+    const key = r.name.trim().toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).map(({ id, name, specialty }) => ({ id, name, specialty }));
+}
+
+export async function listClinicPatients(tenantId: string) {
+  const prisma = await getPrisma();
+  return prisma.patient.findMany({
+    where: { tenantId },
+    select: { id: true, name: true, cpf: true },
+    orderBy: { name: "asc" },
+    take: 200,
   });
 }
 
@@ -114,6 +137,20 @@ export async function createExamLaunch(
   if (!provider) return { error: "Médico não encontrado neste tenant." } as const;
   if (!procedure) return { error: "Tipo de exame não encontrado." } as const;
 
+  let patientId = input.patientId?.trim() || null;
+  if (patientId) {
+    const linked = await prisma.patient.findFirst({
+      where: { id: patientId, tenantId },
+    });
+    if (!linked) return { error: "Paciente não encontrado neste tenant." } as const;
+  } else {
+    // Resolve por nome exato (case-insensitive via equals SQLite) entre cadastrados
+    const match = await prisma.patient.findFirst({
+      where: { tenantId, name: patientName },
+    });
+    if (match) patientId = match.id;
+  }
+
   const nonNeg = (n: unknown) => {
     const v = Math.floor(Number(n ?? 0));
     return Number.isFinite(v) && v >= 0 ? v : 0;
@@ -135,7 +172,7 @@ export async function createExamLaunch(
       mucosectomies: nonNeg(input.mucosectomies),
       clips: nonNeg(input.clips),
       notes: input.notes?.trim() || null,
-      patientId: input.patientId || null,
+      patientId,
       createdById: input.createdById || null,
     },
     include: {
@@ -367,13 +404,15 @@ export async function getClinicFinanceKpis(
 }
 
 export async function getClinicFinanceMeta(tenantId: string) {
-  const [providers, procedures] = await Promise.all([
+  const [providers, procedures, patients] = await Promise.all([
     listClinicProviders(tenantId),
     listClinicExamProcedures(tenantId),
+    listClinicPatients(tenantId),
   ]);
   return {
     providers,
     procedures,
+    patients,
     paymentMethods: CLINIC_PAYMENT_METHODS,
     expenseCategories: CLINIC_EXPENSE_CATEGORIES,
     priceTables: CEDIG_PRICE_TABLES,
