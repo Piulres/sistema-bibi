@@ -11,39 +11,40 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v2.6.0** — CEDIG fase 2+F + login v2.5.0 **publicado em produção**.
+> Pacote **v2.6.0** — CEDIG fase 2+F + fundação PWA v3.0 (sem bump de major) **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.6.0** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.6.0** — deploy `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v2.6.0** · tag `v2.6.0` |
-| **Pacote anterior em produção** | **2.4.0** — CEDIG gestão clínica |
-| **Próxima linha (WIP)** | **v3.0** — mobile PWA/app shell · [`V3_0.md`](V3_0.md) · **não** altera produção |
+| **Release `main` / `dev`** | **v2.6.0** · tag `v2.6.0` · tip `e738f12` |
+| **Pacote anterior em produção** | **2.6.0** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
+| **Próxima linha (WIP)** | **v3.0** — Capacitor / SW offline · [`V3_0.md`](V3_0.md) · `PLATFORM.release` permanece 2.6.0 |
 
 ### Em desenvolvimento — `v3.0` (isolado)
 
-Trilha **ServiceOS v3.0** (experiência app no celular). Branches `cursor/serviceos-v3-*`.
-**Não** bumpa `PLATFORM.release` até fechar o pacote. Features paralelas em outras
-branches não devem misturar escopo nesta linha — ver [`V3_0.md`](V3_0.md).
+Trilha **ServiceOS v3.0** (experiência app no celular). Fundação PWA (`/instalar`, manifest,
+ícones) já está em produção sob **v2.6.0**. Fechamento `3.0.0` só ao bump intencional —
+ver [`V3_0.md`](V3_0.md).
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v2.6.0** |
-| **Release** | `main` | **v2.6.0** · tag `v2.6.0` |
-| **Netlify** | **sistema-bibi.netlify.app** | **v2.6.0** · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v2.6.0** + PWA (`e738f12`) |
+| **Release** | `main` | **v2.6.0** + PWA (`e738f12`) |
+| **Netlify** | **sistema-bibi.netlify.app** | **v2.6.0** · deploy `6a654678` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
-### Smoke (25/07/2026) — produção v2.6.0
+### Smoke (25/07/2026) — produção v2.6.0j
 
 | Check | Resultado |
 |-------|-----------|
 | Title | `Sistema Bibi - ServiceOS v2.6.0 — …` |
 | CSS `/_next/static` | 200 |
+| `/instalar` · `/manifest.webmanifest` · `/icons/*` | 200 · `display: standalone` |
 | `#novidades` | current **2.6.0** |
-| Logins `/login`, `/interno/login`, `/pj/login`, `/beneficiario/login` | 200 |
+| Logins `/login`, `/interno/login` | 200 |
 
 ### Tags git (histórico)
 
@@ -74,8 +75,8 @@ branches não devem misturar escopo nesta linha — ver [`V3_0.md`](V3_0.md).
 | **Commit publicado** | `579f686` |
 | **PRs** | [#186](https://github.com/Piulres/sistema-bibi/pull/186) · [#187](https://github.com/Piulres/sistema-bibi/pull/187) · [#188](https://github.com/Piulres/sistema-bibi/pull/188) · [#189](https://github.com/Piulres/sistema-bibi/pull/189) · [#193](https://github.com/Piulres/sistema-bibi/pull/193) |
 | **Doc** | [`V2_6.md`](V2_6.md) · [`V2_5.md`](V2_5.md) · [`clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) |
-| **Inclui** | Ponte gestão→Patient/Appointment/PPU/Invoice · export · labels CLINIC_* · PJ×3 · E2E · login tenant/portal (v2.5) · skill agentes · matriz CRUD testes |
-| **Publicado em** | 25/07/2026 — deploy Netlify `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
+| **Inclui** | Ponte gestão→Patient/Appointment/PPU/Invoice · export · labels CLINIC_* · PJ×3 · E2E · login tenant/portal (v2.5) · skill agentes · matriz CRUD testes · fundação PWA v3.0 (`/instalar`, manifest) |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`; anterior `6a6534e9` @ `579f686`) |
 
 ---
 

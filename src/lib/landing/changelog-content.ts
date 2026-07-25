@@ -49,8 +49,15 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Coluna Ponte na lista de lançamentos (SYNCED / PARTIAL / FAILED)",
         ],
       },
+      {
+        title: "Mobile (fundação v3.0)",
+        items: [
+          "Instalar como app no iPhone/Android — /instalar (PWA standalone)",
+          "Manifest + ícones na tela de início sem App Store",
+        ],
+      },
     ],
-    testStats: "clinic-finance-bridge · system-crud-matrix · e2e · docs:verify · pre-release · deploy 2.6.0",
+    testStats: "clinic-finance-bridge · system-crud-matrix · e2e · smoke-netlify-pwa · pre-release · deploy 2.6.0j",
   },
   {
     version: "2.5.0",
