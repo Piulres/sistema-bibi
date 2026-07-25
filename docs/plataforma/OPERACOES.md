@@ -81,7 +81,8 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint + docs + test + `netlify:build` + smoke PWA | **Validar pacote sem publicar** |
+| `npm run smoke:netlify-pwa` | `next start` + rotas `/instalar`, manifest, ícones | Isolado (já incluso no pre-release) |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
@@ -156,6 +157,30 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
+### 4.4 PWA mobile (v3.0)
+
+Experiência de aplicativo no celular — **sem App Store**. Escopo completo: [`V3_0.md`](../versoes/V3_0.md).
+
+| Recurso | Rota / arquivo | Notas |
+|---------|----------------|-------|
+| Guia de instalação | `/instalar` | `src/app/instalar/page.tsx` + `PwaInstallGuide` |
+| Web App Manifest | `/manifest.webmanifest` | `src/app/manifest.ts` — `display: standalone` |
+| Ícones | `/icons/*` | `public/icons/` (192, 512, apple-touch) |
+| Metas Apple | `<head>` da home | Add to Home Screen no Safari |
+| Smoke pós-build | `scripts/smoke-netlify-pwa.mjs` | Incluso em `npm run pre-release` |
+
+**Testar localmente:**
+
+```bash
+npm run build && npm run smoke:netlify-pwa
+# ou validação completa:
+npm run pre-release
+```
+
+**Aceite manual (iPhone):** Safari → https://sistema-bibi.netlify.app/instalar → Compartilhar → Adicionar à Tela de Início → abrir ícone (modo standalone, sem barra do Safari).
+
+**Limitações v3.0.0:** sem service worker / offline; Capacitor (app nativo) é Fase B — ver [`mobile/README.md`](../../mobile/README.md).
+
 ---
 
 ## 5. Operações de release (pacote fechado)
@@ -197,7 +222,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.6.0`** — **Sistema Bibi - ServiceOS** (CEDIG pontes + login tenant/portal). Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v3.0.0`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + empilha v2.6 CEDIG/login). Ver [`RELEASES.md`](../versoes/RELEASES.md) · escopo: [`V3_0.md`](../versoes/V3_0.md).
 
 ---
 
@@ -212,8 +237,8 @@ Exemplo atual em produção: **`v2.6.0`** — **Sistema Bibi - ServiceOS** (CEDI
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v2.6.0** · modo **operação** (CEDIG) · Stop builds **ON**  
-Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
+**Produção:** https://sistema-bibi.netlify.app · **v3.0.0** · PWA `/instalar` · modo **operação** (CEDIG) · Stop builds **ON**  
+Fonte: [`RELEASES.md`](../versoes/RELEASES.md) · [`V3_0.md`](../versoes/V3_0.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
 

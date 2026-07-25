@@ -18,6 +18,17 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
+### PWA v3.0 (smoke pós-build)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Rotas PWA | `scripts/smoke-netlify-pwa.mjs` | `/instalar`, `/manifest.webmanifest`, `/icons/*`, logins |
+| Manifest | idem | `display: standalone`, ícones 192/512 |
+| Metas Apple na home | idem | `apple-touch-icon`, `mobile-web-app-capable` |
+| Assets Netlify | idem | chunk CSS em `/_next/static/` retorna 200 |
+
+Incluso no `npm run pre-release` (após `netlify:build`). Isolado: `npm run smoke:netlify-pwa`. Doc: [`versoes/V3_0.md`](../versoes/V3_0.md) · operações: [`OPERACOES.md`](OPERACOES.md) §4.4.
+
 ---
 
 ## Matriz CRUD (obrigatório)
@@ -339,7 +350,7 @@ npm run test && npm run build
 CI=true npm run test:e2e
 ```
 
-`npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
+`npm run pre-release` executa o mesmo bootstrap antes de `db:verify`, roda `netlify:build` e o smoke PWA (`smoke-netlify-pwa.mjs`).
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
 

@@ -1,7 +1,7 @@
 # Checklist go-live — CEDIG Cruzeiro
 
 Validação pré-apresentação / uso em produção.  
-**Produção:** https://sistema-bibi.netlify.app · pacote **v2.6.0** · modo **operação**
+**Produção:** https://sistema-bibi.netlify.app · pacote **v3.0.0** · modo **operação**
 
 ---
 

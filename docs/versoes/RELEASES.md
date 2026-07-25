@@ -11,7 +11,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v3.0.0** — PWA mobile (`/instalar`) **em fechamento / publicação**.
+> Pacote **v3.0.0** — PWA mobile (`/instalar`) **em produção**.
 
 | Item | Valor |
 |------|-------|

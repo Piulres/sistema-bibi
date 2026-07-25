@@ -32,6 +32,7 @@ npm run pre-release                              # lint + build local (obrigató
 curl -s -o /dev/null -w "%{http_code}" https://sistema-bibi.netlify.app/  # 503=cota
 npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"
 # smoke test: chunk CSS em /_next/static/ deve retornar 200
+# smoke PWA: npm run smoke:netlify-pwa (já incluso no pre-release)
 # smoke test → atualizar docs/versoes/RELEASES.md + changelog landing (LANDING_CHANGELOG.md) → commit na main
 ```
 
