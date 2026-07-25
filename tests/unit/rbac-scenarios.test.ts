@@ -5,12 +5,13 @@ import {
 } from "@/lib/interno-permissions";
 
 describe("Cenários RBAC — matriz perfil × módulo", () => {
-  it("ADMIN acessa todos os 14 módulos", () => {
+  it("ADMIN acessa todos os 15 módulos", () => {
     const perms = resolveInternoPermissions("INTERNO", "ADMIN");
-    expect(perms).toHaveLength(14);
+    expect(perms).toHaveLength(15);
     expect(hasInternoPermission("INTERNO", "ADMIN", "billing")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "projetos")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "auditoria")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "ADMIN", "gestao")).toBe(true);
   });
 
   it("FATURAMENTO: billing sim, cadastros não", () => {
@@ -20,26 +21,29 @@ describe("Cenários RBAC — matriz perfil × módulo", () => {
     expect(hasInternoPermission("INTERNO", "FATURAMENTO", "seguranca")).toBe(false);
   });
 
-  it("RECEPCAO: agenda e comunicação sim, billing não", () => {
+  it("RECEPCAO: agenda, comunicação e gestão sim, billing não", () => {
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "agenda")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "comunicacao")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "cadastros")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "estoque")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "RECEPCAO", "gestao")).toBe(true);
     expect(hasInternoPermission("INTERNO", "RECEPCAO", "billing")).toBe(false);
   });
 
-  it("READONLY: dashboard, relatórios e auditoria", () => {
+  it("READONLY: dashboard, relatórios, auditoria e gestão (leitura)", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "dashboard")).toBe(true);
     expect(hasInternoPermission("INTERNO", "READONLY", "relatorios")).toBe(true);
     expect(hasInternoPermission("INTERNO", "READONLY", "auditoria")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "READONLY", "gestao")).toBe(true);
     expect(hasInternoPermission("INTERNO", "READONLY", "billing")).toBe(false);
     expect(hasInternoPermission("INTERNO", "READONLY", "agenda")).toBe(false);
   });
 
   it("perfil null em INTERNO recebe READONLY (menor privilégio)", () => {
     const perms = resolveInternoPermissions("INTERNO", null);
-    expect(perms).toHaveLength(3);
+    expect(perms).toHaveLength(4);
     expect(hasInternoPermission("INTERNO", null, "billing")).toBe(false);
+    expect(hasInternoPermission("INTERNO", null, "gestao")).toBe(true);
   });
 
   it("roles não-interno não recebem módulos", () => {
