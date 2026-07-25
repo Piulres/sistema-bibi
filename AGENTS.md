@@ -22,6 +22,8 @@ segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`
 
 **Regra para IAs:** consulte `docs/prompts/README.md` e `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` antes de features novas. Não usar *HealthOS* nem posicionamento só-saúde em código/docs v2.0.
 
+**Skill obrigatório (todo agente novo):** `.cursor/skills/serviceos-dev-quality/SKILL.md` — fluxo de qualidade (diagnóstico, padrões do repo, testes Vitest, docs, PR → `dev`). Invocar `/serviceos-dev-quality` ou seguir a rule `.cursor/rules/serviceos-agent-skill.mdc`.
+
 **Roteamento por segmento:** `?tenant=petcare` · cookie `bibi_segment` · `docs/segmentos/README.md`
 
 **Regra labels:** ao criar qualquer tela nos portais autenticados, **consulte `NICHE_MASTER_LABELS` e use `useLabels()`** — a nomenclatura vem do tenant ativo.
@@ -52,7 +54,7 @@ Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Title e footer exibem `PLAT
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
 Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
-**Preferências IA:** `AGENTS.md` · `docs/prompts/README.md` · `.cursor/rules/serviceos-dev.mdc` · `.cursor/rules/operacoes-bibi.mdc`.
+**Preferências IA:** `AGENTS.md` · `docs/prompts/README.md` · `.cursor/skills/serviceos-dev-quality/SKILL.md` · `.cursor/rules/serviceos-dev.mdc` · `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/plataforma/HISTORICO_2026-06-21.md`
 

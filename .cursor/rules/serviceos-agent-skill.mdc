@@ -1,0 +1,18 @@
+---
+description: Obriga agentes a seguir o skill de qualidade ServiceOS em features e bugfixes.
+alwaysApply: true
+---
+
+# Skill de qualidade — todo agente
+
+Antes de implementar feature, corrigir bug, refatorar ou adicionar testes neste repositório, **leia e siga**:
+
+`.cursor/skills/serviceos-dev-quality/SKILL.md`
+
+(atalho: `/serviceos-dev-quality`)
+
+## Em uma frase
+
+Diagnosticar → implementar no padrão do repo → testes Vitest → lint/docs → PR para `dev`.
+
+Não substituir este skill por prompts genéricos de “reescreva o código” sem alinhar a `AGENTS.md`, labels multi-nicho e regras de operação (sem deploy autônomo).
