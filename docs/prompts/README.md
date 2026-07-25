@@ -14,6 +14,15 @@
 | [`SERVICEOS_CURSOR_SESSION.md`](SERVICEOS_CURSOR_SESSION.md) | Abrir sessão no Cursor / handoff entre agentes |
 | [`../pesquisa/15-prompt-deep-research-nicho.md`](../pesquisa/15-prompt-deep-research-nicho.md) | Pesquisa de mercado por vertical |
 
+### Skill Cursor (todo agente)
+
+| Skill | Quando usar |
+|-------|-------------|
+| [`.cursor/skills/serviceos-dev-quality/SKILL.md`](../../.cursor/skills/serviceos-dev-quality/SKILL.md) | **Obrigatório** — feature, bugfix, testes, refatoração, análise de desempenho; `/serviceos-dev-quality` |
+| Checklist | [`.cursor/skills/serviceos-dev-quality/references/CHECKLIST.md`](../../.cursor/skills/serviceos-dev-quality/references/CHECKLIST.md) |
+
+A rule always-on `.cursor/rules/serviceos-agent-skill.mdc` aponta para esse skill em toda sessão.
+
 ---
 
 ## Prompts de pesquisa e estratégia

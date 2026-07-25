@@ -13,8 +13,9 @@ Não é mais uma POC HealthTech única: saúde é o segmento `MEDICAL`; há tamb
 ## Antes de codificar
 
 1. Ler `AGENTS.md` e `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md`
-2. Confirmar segmento/tenant: `docs/segmentos/README.md` e `?tenant=` (ex. `petcare`, `horizonte`)
-3. Branch `cursor/*` → PR para **`dev`** (nunca `main` direto)
+2. Seguir o skill **`/serviceos-dev-quality`** (`.cursor/skills/serviceos-dev-quality/SKILL.md`) — diagnóstico, padrões, testes Vitest, PR → `dev`
+3. Confirmar segmento/tenant: `docs/segmentos/README.md` e `?tenant=` (ex. `petcare`, `horizonte`)
+4. Branch `cursor/*` → PR para **`dev`** (nunca `main` direto)
 
 ## Invariantes de produto (v2.0)
 
