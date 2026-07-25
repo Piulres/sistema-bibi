@@ -22,7 +22,7 @@ export async function runOperationBootstrap(
 ): Promise<OperationBootstrapResult> {
   const existingTenant = await prisma.tenant.findFirst();
   if (existingTenant) {
-    await ensureCedigTenant(prisma, { seedHistory: false });
+    await ensureCedigTenant(prisma, { seedHistory: false, portalMass: false });
     const users = await prisma.user.count();
     const procedures = await prisma.procedure.count();
     return {
@@ -118,7 +118,7 @@ export async function runOperationBootstrap(
     });
   }
 
-  const cedig = await ensureCedigTenant(prisma, { seedHistory: false });
+  const cedig = await ensureCedigTenant(prisma, { seedHistory: false, portalMass: false });
 
   console.log("  Operação — bootstrap mínimo:");
   console.log("  Prestador  -> dra.helena@bibi.health / bibi123");

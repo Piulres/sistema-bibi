@@ -542,6 +542,8 @@ async function seedCedigOperationalHistory(
 export type EnsureCedigTenantOptions = {
   /** Inclui lançamentos/agenda de homologação (padrão: true na massa demo). */
   seedHistory?: boolean;
+  /** Inclui pacientes/PJ de portal (padrão: true na massa demo; false na operação). */
+  portalMass?: boolean;
 };
 
 /**
@@ -557,6 +559,7 @@ export async function ensureCedigTenant(
   procedures: number;
 }> {
   const seedHistory = options.seedHistory !== false;
+  const portalMass = options.portalMass !== false;
   const existing = await prisma.tenant.findUnique({ where: { slug: "cedig" } });
   if (existing) {
     const procedures = await upsertCedigProcedures(prisma, existing.id);
@@ -567,7 +570,9 @@ export async function ensureCedigTenant(
       },
     });
     await upsertCedigStaff(prisma, existing.id);
-    await upsertCedigPortalMass(prisma, existing.id);
+    if (portalMass) {
+      await upsertCedigPortalMass(prisma, existing.id);
+    }
     if (seedHistory) {
       await seedCedigOperationalHistory(prisma, existing.id);
     }
@@ -598,7 +603,9 @@ export async function ensureCedigTenant(
 
   const procedures = await upsertCedigProcedures(prisma, tenant.id);
   await upsertCedigStaff(prisma, tenant.id);
-  await upsertCedigPortalMass(prisma, tenant.id);
+  if (portalMass) {
+    await upsertCedigPortalMass(prisma, tenant.id);
+  }
   if (seedHistory) {
     await seedCedigOperationalHistory(prisma, tenant.id);
   }

@@ -21,13 +21,15 @@ const DEMO_EMAILS = [
   "joao.pereira@email.com",
   "rh@techcorp.com",
 ];
-const OPERATION_SLUG = "bibi-saude";
+const OPERATION_SLUGS = ["bibi-saude", "cedig"];
 const OPERATION_EMAILS = [
   "dra.helena@bibi.health",
   "faturamento@bibi.health",
   "recepcao@bibi.health",
   "financeiro@bibi.health",
   "seguranca@bibi.health",
+  "alana@cedig.demo",
+  "operacao@cedig.demo",
 ];
 const MIN_PROCEDURES_OPERATION = 14;
 
@@ -96,15 +98,21 @@ async function verifyOperation() {
   const prisma = clientFor(operationDb);
   try {
     const tenants = await prisma.tenant.findMany({ select: { slug: true, niche: true, name: true } });
-    if (tenants.length !== 1) {
-      errors.push(`operation.db: esperado 1 tenant (bootstrap), encontrado ${tenants.length}`);
+    const slugs = new Set(tenants.map((t) => t.slug).filter(Boolean));
+    if (tenants.length !== OPERATION_SLUGS.length) {
+      errors.push(
+        `operation.db: esperado ${OPERATION_SLUGS.length} tenants (bootstrap), encontrado ${tenants.length}`,
+      );
     }
-    const tenant = tenants[0];
-    if (tenant?.slug !== OPERATION_SLUG) {
-      errors.push(`operation.db: slug esperado "${OPERATION_SLUG}", encontrado "${tenant?.slug ?? "null"}"`);
+    for (const slug of OPERATION_SLUGS) {
+      if (!slugs.has(slug)) {
+        errors.push(`operation.db: falta tenant slug "${slug}"`);
+      }
     }
-    if (tenant?.niche !== "MEDICAL") {
-      errors.push(`operation.db: tenant operação deve ser MEDICAL`);
+    for (const tenant of tenants) {
+      if (tenant.niche !== "MEDICAL") {
+        errors.push(`operation.db: tenant ${tenant.slug} deve ser MEDICAL`);
+      }
     }
 
     for (const email of OPERATION_EMAILS) {
