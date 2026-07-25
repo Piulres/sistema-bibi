@@ -212,9 +212,10 @@ Exemplo atual em produção: **`v2.3.0`** — **Sistema Bibi - ServiceOS**. Ver 
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app
+**Produção:** https://sistema-bibi.netlify.app · **v2.3.0** · Stop builds **ON**  
+Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
-**Status conhecido (22/06/2026):** `503 usage_exceeded` — cota esgotada, não é bug de código.
+**Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
 
 **Dados em produção:** modo demo (padrão) ou operação via `/interno/seguranca` — ver §4.3 e [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
