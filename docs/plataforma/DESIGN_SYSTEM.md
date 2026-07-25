@@ -204,6 +204,9 @@ Complementa o white label visual com **vocabulário do setor**:
 
 - Defaults: `src/lib/niche/defaults.ts` + `src/constants/niches.ts`
 - Hook: `useLabels()` em componentes client — **nunca** hardcodar "Paciente" em novas telas
+- **E2E:** textos compostos com `labels.appointment` (ex.: `Próximo ${labels.appointment.toLowerCase()}`
+  em `BeneficiarioView`) mudam por tenant — asserts Playwright com regex, não string fixa
+  ([`TESTES.md`](TESTES.md) § *E2E e labels multi-nicho*)
 - Paleta automática: `applyNicheBrandingDefaults()` quando tenant usa cores padrão teal
 - Landing: `nicheLandingBranding()` em `src/lib/niche/branding.ts`
 

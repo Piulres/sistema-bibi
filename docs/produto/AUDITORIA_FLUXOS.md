@@ -221,8 +221,14 @@ documentados em [`FLUXOS.md`](FLUXOS.md) §4.4.
 | Fluxo | Evidência |
 |-------|-----------|
 | Overview, agendamento (formulário), seções de consumo | e2e `flows.spec.ts` |
+| KPI resumo (`Próximo {appointment}` via `useLabels()`) | `BeneficiarioView` + e2e regex em `flows.spec.ts` |
 | `GET /api/beneficiario/overview` | `tests/api/portal-flows.test.ts` |
 | PIX com anti-IDOR (`patientId`) | `src/app/api/beneficiario/invoices/[id]/pay/route.ts` |
+
+> **v2.6 fase F:** o StatCard de próximo agendamento usa
+> `` `Próximo ${labels.appointment.toLowerCase()}` `` — no tenant MEDICAL demo vira
+> **"Próximo consulta"** (não "Próximo atendimento"). Overrides CEDIG usam **"Exame"**.
+> Padrão de assert E2E: [`TESTES.md`](../plataforma/TESTES.md) § *E2E e labels multi-nicho*.
 
 ### Falhas
 

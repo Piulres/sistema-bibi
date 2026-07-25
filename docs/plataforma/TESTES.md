@@ -286,6 +286,47 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, KPIs, ponte agenda |
+
+### E2E e labels multi-nicho (`useLabels()`)
+
+Após a **fase F (v2.6 / CEDIG)**, KPIs e títulos dos portais Beneficiário e Prestador
+usam vocabulário do tenant ativo — **não** strings fixas de saúde genérica.
+
+| Onde na UI | Código | Exemplo MEDICAL (João Pereira) | Exemplo CEDIG (`?tenant=cedig`) |
+|------------|--------|--------------------------------|----------------------------------|
+| KPI resumo beneficiário | `BeneficiarioView` → `StatCard` | `Próximo consulta` | `Próximo exame` |
+| Form agendar | heading dinâmico | `Agendar consulta` | `Agendar exame` |
+| Prestador dashboard | tour / KPIs | `Próximo atendimento` (VET) | — |
+
+**Regra para asserts Playwright:** quando o texto vem de `useLabels()` ou
+`labels.appointment`, use **regex com alternativas** por nicho/override — nunca
+uma string literal única como `"Próximo atendimento"`.
+
+```ts
+// e2e/flows.spec.ts — tenant demo MEDICAL (joao.pereira@email.com)
+await expect(page.getByText(/^Próximo (consulta|atendimento|exame)$/i)).toBeVisible();
+await expect(page.getByRole("heading", { name: /Agendar (consulta|exame|atendimento)/i })).toBeVisible();
+```
+
+**Por que três alternativas no regex:**
+
+| Origem do label | `labels.appointment` | KPI no resumo |
+|-----------------|----------------------|---------------|
+| `NICHE_MASTER_LABELS.MEDICAL` | Consulta | Próximo consulta |
+| `NICHE_MASTER_LABELS.VET` | Atendimento | Próximo atendimento |
+| `CEDIG_LABEL_OVERRIDES` (`prisma/seed-data/cedig-catalog.ts`) | Exame | Próximo exame |
+
+**Tenant do E2E padrão:** `flows.spec.ts` loga como `joao.pereira@email.com` (TechCorp /
+Clínica Horizonte, nicho `MEDICAL`). Após migração para `useLabels()`, o assert correto
+é `consulta`, não `atendimento`.
+
+**Quando criar spec por tenant:** piloto white-label (ex.: `cedig-gestao.spec.ts`) pode
+fixar o vocabulário do tenant (`Exame`) — specs transversais (`flows`, `smoke`) devem
+tolerar o glossário do seed demo ou parametrizar `?tenant=`.
+
+**Fontes:** `src/hooks/useLabels.tsx` · `src/constants/niches.ts` ·
+`mergeNicheLabels()` · [`FLUXOS.md`](../produto/FLUXOS.md) §0.2
 
 ---
 

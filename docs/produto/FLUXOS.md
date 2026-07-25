@@ -68,6 +68,9 @@ flowchart LR
 2. `PortalShell` injeta `NicheProvider` com `niche` + `labels`.
 3. Componentes client usam `useLabels()` → `labels.patient`, `t("appointment")`, etc.
 4. Navegação dinâmica: `buildPrestadorNavTabs(labels)`, `buildCadastrosTabs(labels, niche)`.
+5. **Testes E2E:** asserts em textos derivados de `labels.*` devem usar regex com
+   alternativas por nicho (ex.: `Próximo consulta` no MEDICAL, `Próximo exame` no CEDIG) —
+   ver [`TESTES.md`](../plataforma/TESTES.md) § *E2E e labels multi-nicho*.
 
 **Regra:** não hardcodar "Paciente" / "Beneficiário" em novos componentes dos portais.
 
