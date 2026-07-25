@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "2.6.0",
+    version: "3.0.0",
     label: PLATFORM.versionLabel,
     date: "25/07/2026",
     status: "current",
+    summary:
+      "ServiceOS v3.0: instale como app no celular (PWA) — tela cheia no iPhone/Android, sem App Store. Empilha o pacote v2.6 (CEDIG + login).",
+    highlights: [
+      {
+        title: "App no celular",
+        items: [
+          "Página /instalar com guia Safari (iPhone) e Chrome (Android)",
+          "Web App Manifest standalone + ícones na tela de início",
+          "Metas Apple (Add to Home Screen) e smoke Netlify no pre-release",
+        ],
+      },
+      {
+        title: "Operação (v2.6)",
+        items: [
+          "CEDIG: lançamento na gestão alimenta agenda, PPU e fatura",
+          "Exportar mês (Excel) em /interno/gestao",
+          "Login com tenant digitável e seletor de portal",
+        ],
+      },
+    ],
+    testStats: "smoke-netlify-pwa · clinic-finance-bridge · e2e · docs:verify · pre-release · deploy 3.0.0",
+  },
+  {
+    version: "2.6.0",
+    label: "Sistema Bibi - ServiceOS v2.6.0",
+    date: "25/07/2026",
+    status: "previous",
     summary:
       "CEDIG fase 2+F: o lançamento na gestão alimenta agenda, extrato PPU e fatura; export do mês; empilha login tenant/portal (v2.5).",
     highlights: [
@@ -49,15 +76,8 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Coluna Ponte na lista de lançamentos (SYNCED / PARTIAL / FAILED)",
         ],
       },
-      {
-        title: "Mobile (fundação v3.0)",
-        items: [
-          "Instalar como app no iPhone/Android — /instalar (PWA standalone)",
-          "Manifest + ícones na tela de início sem App Store",
-        ],
-      },
     ],
-    testStats: "clinic-finance-bridge · system-crud-matrix · e2e · smoke-netlify-pwa · pre-release · deploy 2.6.0j",
+    testStats: "clinic-finance-bridge · system-crud-matrix · e2e · docs:verify · pre-release · deploy 2.6.0",
   },
   {
     version: "2.5.0",

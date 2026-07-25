@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Cursor Cloud specific instructions
 
-### O que é o Sistema Bibi - ServiceOS (v2.6.0)
+### O que é o Sistema Bibi - ServiceOS (v3.0.0)
 Infraestrutura horizontal **ServiceOS** — plataforma **multi-segmento** Pay Per Use com **quatro portais**
 segregados por `role`: **Prestador** (`/login` → `/prestador`), **Interno** (`/interno/login` →
 `/interno/dashboard`), **Empresa/PJ** (`/pj/login` → `/pj`) e **Beneficiário**
@@ -49,7 +49,7 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 (MFA TOTP, telemedicina, TISS XML, webhook retry), docs completas e UI PIX no faturamento interno.
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
-**Produção:** **`v2.6.0`** @ https://sistema-bibi.netlify.app · CEDIG pontes + login tenant/portal · ver `docs/versoes/RELEASES.md`.
+**Produção:** **`v3.0.0`** @ https://sistema-bibi.netlify.app · PWA `/instalar` · CEDIG + login tenant/portal · ver `docs/versoes/RELEASES.md` · `V3_0.md`.
 Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
@@ -110,7 +110,7 @@ Volume do seed: `SEED_SCALE=small|medium|large` no `.env` (padrão `medium`).
 
 **Modelo:** pacotes fechados — `dev` integra features; `main` é release; produção muda só com deploy manual humano.
 
-**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v2.6.0`** — `docs/versoes/V2_6.md` · `V2_5.md` · `docs/versoes/RELEASES.md`.
+**Versões:** `1.0.x` histórico — `docs/versoes/V1_0.md`. Produção: **`v3.0.0`** — `docs/versoes/V3_0.md` · `V2_6.md` · `docs/versoes/RELEASES.md`.
 
 **Branches:** `cursor/*` → PR → **`dev`** → (fechar pacote) → `main`. Agentes **nunca** abrem PR contra `main`.
 

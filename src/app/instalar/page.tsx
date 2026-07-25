@@ -31,8 +31,8 @@ export default function InstalarPage() {
         <PwaInstallGuide />
 
         <p className="mt-10 text-sm text-slate-400">
-          Produção continua em v{PLATFORM.release}. Esta trilha é a fundação mobile da
-          v3.0.
+          {PLATFORM.shortName} v{PLATFORM.release} — experiência de aplicativo no
+          celular (PWA).
         </p>
         <Link
           href="/"

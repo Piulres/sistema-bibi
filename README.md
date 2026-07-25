@@ -1,18 +1,20 @@
-# Sistema Bibi - ServiceOS v2.6.0 — Infraestrutura Pay Per Use Multi-Nicho
+# Sistema Bibi - ServiceOS v3.0.0 — Infraestrutura Pay Per Use Multi-Nicho
 
 > Plataforma **ServiceOS** multi-nicho para faturamento Pay Per Use em saúde, veterinária,
 > odontologia, jurídico, bem-estar, educação e engenharia. White label por tenant, quatro portais
 > segregados e transparência total de consumo — sem a "caixa preta" da sinistralidade.
+>
+> **v3.0** — instale como app no celular (PWA): [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
 | | |
 |--|--|
-| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v2.6.0** · deploy `bibi-poc-2026-07-25i` |
-| **Código** | `main` = `dev` · tag `v2.6.0` |
+| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v3.0.0** · PWA `/instalar` |
+| **Código** | `main` = `dev` · tag `v3.0.0` |
 | **Publicação** | Manual (`pre-release` → `netlify deploy --prod`) · **Stop builds ON** |
-| **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V2_6.md`](docs/versoes/V2_6.md) |
+| **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V3_0.md`](docs/versoes/V3_0.md) |
 
 > **GitHub About** (painel do repositório — a API do agente não altera Description/Website):  
-> Description: `Sistema Bibi - ServiceOS v2.6.0 — Infraestrutura Pay Per Use multi-nicho`  
+> Description: `Sistema Bibi - ServiceOS v3.0.0 — PWA mobile + Pay Per Use multi-nicho`  
 > Website: `https://sistema-bibi.netlify.app`
 
 ---
@@ -220,7 +222,7 @@ Criadas automaticamente pelo seed (`prisma/seed.ts`). Senha única: **`bibi123`*
 | Interno CEDIG (ADMIN) | `/interno/login?tenant=cedig` | `operacao@cedig.demo` | `bibi123` |
 | Interno CEDIG (recepção) | `/interno/login?tenant=cedig` | `alana@cedig.demo` | `bibi123` |
 
-### Tenants ServiceOS multi-nicho (v2.6)
+### Tenants ServiceOS multi-nicho (v3.0)
 
 Senha única: **`bibi123`**. Cada tenant tem procedimentos e nomenclatura do nicho.
 
@@ -507,18 +509,18 @@ sistema-bibi/
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/plataforma/TESTES.md`](docs/plataforma/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v2.6.0** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
+- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v3.0.0** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
   Se retornar **503 `usage_exceeded`**, é cota do plano (não regressão de código). Workflow:
   [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
   Deploy manual — [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md) · Stop builds ON.
-- **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres para alta escala, validação XSD TISS completa.
+- **Roadmap (Tier 5+):** SSO OAuth/SAML, Postgres para alta escala, validação XSD TISS completa · Capacitor (app nativo).
 
 ## 14. Documentação adicional
 
 - **Índice por segmento (ServiceOS):**
   [`docs/README.md`](docs/README.md) · [`docs/segmentos/README.md`](docs/segmentos/README.md)
-- **Changelog v2.6.0 (produção atual):**
-  [`docs/versoes/V2_6.md`](docs/versoes/V2_6.md) · [`docs/versoes/V2_5.md`](docs/versoes/V2_5.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
+- **Changelog v3.0.0 (produção atual):**
+  [`docs/versoes/V3_0.md`](docs/versoes/V3_0.md) · [`docs/versoes/V2_6.md`](docs/versoes/V2_6.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md)
 - **Jornada do cliente nos 4 portais (UX, gaps e melhorias):**
@@ -565,4 +567,4 @@ sistema-bibi/
 
 ---
 
-Construído como POC evoluindo para **Sistema Bibi - ServiceOS v2.6.0** — infraestrutura horizontal Pay Per Use multi-nicho (piloto CEDIG).
+Construído como POC evoluindo para **Sistema Bibi - ServiceOS v3.0.0** — infraestrutura horizontal Pay Per Use multi-nicho com PWA mobile (piloto CEDIG).
