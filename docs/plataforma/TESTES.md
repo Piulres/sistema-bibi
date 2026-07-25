@@ -18,6 +18,17 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
+### PWA v3.0 (smoke pós-build)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Rotas e manifest | `scripts/smoke-netlify-pwa.mjs` | `/instalar`, `/manifest.webmanifest`, `display: standalone`, ícones |
+| Metas na home | idem | `rel="manifest"`, `apple-touch-icon`, `mobile-web-app-capable` |
+| Estáticos Netlify | idem | `/_next/static/*.css` 200 após `next start` |
+| Integração pacote | `scripts/pre-release.mjs` | Última etapa antes de “Pre-release OK” |
+
+Comando isolado: `npm run smoke:netlify-pwa` · Doc: [`PWA.md`](PWA.md)
+
 ---
 
 ## Matriz CRUD (obrigatório)

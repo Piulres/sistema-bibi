@@ -81,7 +81,8 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint + `netlify:build` + smoke PWA | **Validar pacote sem publicar** |
+| `npm run smoke:netlify-pwa` | Smoke PWA/estáticos no `next start` | Isolado ou via `pre-release` |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
@@ -183,6 +184,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 - [ ] Cota Netlify: `curl` não retorna `503 usage_exceeded`
 - [ ] `npx netlify deploy --prod --message "bibi-poc-YYYY-MM-DDx: resumo"`
 - [ ] Smoke test: `/_next/static/chunks/*.css` retorna **200**
+- [ ] Smoke test: `/instalar`, `/manifest.webmanifest`, `/icons/*` retornam **200** (ou `npm run smoke:netlify-pwa` no `pre-release`)
 - [ ] Smoke test: landing + um login por portal
 - [ ] Atualizar [`RELEASES.md`](../versoes/RELEASES.md) (mover rascunho → produção)
 - [ ] Atualizar changelog da landing: `src/lib/landing/changelog-content.ts` + `src/lib/platform.ts` + `package.json` — ver [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md)
@@ -197,7 +199,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.6.0`** — **Sistema Bibi - ServiceOS** (CEDIG pontes + login tenant/portal). Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v3.0.0`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + pacote v2.6 CEDIG/login). Ver [`RELEASES.md`](../versoes/RELEASES.md) · doc PWA: [`PWA.md`](PWA.md).
 
 ---
 
@@ -212,8 +214,8 @@ Exemplo atual em produção: **`v2.6.0`** — **Sistema Bibi - ServiceOS** (CEDI
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v2.6.0** · modo **operação** (CEDIG) · Stop builds **ON**  
-Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
+**Produção:** https://sistema-bibi.netlify.app · **v3.0.0** · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar) · modo **operação** (CEDIG) · Stop builds **ON**  
+Fonte: [`RELEASES.md`](../versoes/RELEASES.md) · PWA: [`PWA.md`](PWA.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
 

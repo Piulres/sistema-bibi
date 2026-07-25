@@ -16,6 +16,7 @@
 |--------|-----------|
 | Desenvolvedor / agente IA | [`AGENTS.md`](../AGENTS.md) · [`prompts/README.md`](prompts/README.md) |
 | Operações e deploy | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) |
+| PWA / app mobile (v3.0) | [`plataforma/PWA.md`](plataforma/PWA.md) |
 | API (Swagger / OpenAPI) | [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) |
 | Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
@@ -71,6 +72,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) | Mapa de operações e regras para agentes |
 | [`plataforma/ARQUITETURA.md`](plataforma/ARQUITETURA.md) | Diagramas, épicos, stack |
 | [`plataforma/DEPLOY_NETLIFY.md`](plataforma/DEPLOY_NETLIFY.md) | Deploy e troubleshooting |
+| [`plataforma/PWA.md`](plataforma/PWA.md) | PWA v3.0 — manifest, `/instalar`, smoke |
 | [`plataforma/OPERACAO_DADOS.md`](plataforma/OPERACAO_DADOS.md) | Dual-store demo/operação |
 | [`plataforma/VARIAVEIS_AMBIENTE.md`](plataforma/VARIAVEIS_AMBIENTE.md) | Env vars (local, CI, Netlify) |
 | [`plataforma/TESTES.md`](plataforma/TESTES.md) | Estratégia e mapa de testes |

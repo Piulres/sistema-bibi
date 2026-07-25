@@ -15,11 +15,11 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.6.0`** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
-| Pacote anterior | **`v2.4.0`** — CEDIG gestão clínica |
-| `main` / `dev` | Sincronizadas · tag `v2.6.0` |
-| Tags git | ✅ `v2.4.0` · `v2.5.0` (empilhado) · `v2.6.0` |
-| Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
+| Pacote em produção | **`v3.0.0`** — PWA `/instalar` · tip `d2e0548` *(atualizar deploy id após próximo `netlify deploy --prod`)* |
+| Pacote anterior | **`v2.6.0`** — CEDIG pontes + login tenant/portal |
+| `main` / `dev` | Sincronizadas · tag `v3.0.0` |
+| Tags git | ✅ `v2.4.0` · `v2.5.0` · `v2.6.0` · `v3.0.0` |
+| Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build + **smoke PWA**) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
@@ -107,7 +107,15 @@ npx netlify deploy --prod --message "vX.Y.Z: descrição"
 curl -s https://sistema-bibi.netlify.app/ | rg -o '/_next/static/chunks/[^"]+\.css' | head -1 \
   | xargs -I{} curl -s -o /dev/null -w "%{http_code}\n" "https://sistema-bibi.netlify.app{}"
 # Deve retornar 200
+
+# 4. Smoke test — PWA v3.0
+curl -s https://sistema-bibi.netlify.app/manifest.webmanifest | jq .display
+# Deve retornar "standalone"
+curl -s -o /dev/null -w "%{http_code}\n" https://sistema-bibi.netlify.app/instalar
+# Deve retornar 200
 ```
+
+Detalhes: [`PWA.md`](PWA.md).
 
 > **Não use `--no-build`** com `@netlify/plugin-nextjs`. O HTML é publicado, mas
 > `/_next/static/chunks/*` fica em **404** e o front não hidrata.

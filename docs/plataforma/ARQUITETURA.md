@@ -4,6 +4,8 @@ Documento técnico com os diagramas de arquitetura, modelo de dados (ER) e os
 principais fluxos do sistema. Os diagramas usam [Mermaid](https://mermaid.js.org/)
 e são renderizados automaticamente no GitHub.
 
+> **ServiceOS v3.0 (PWA):** [`PWA.md`](PWA.md) — manifest standalone, `/instalar`, smoke `smoke-netlify-pwa`
+>
 > **Fluxos de usuário detalhados** (todos os portais, RBAC, máquinas de estado):
 > [`FLUXOS.md`](../produto/FLUXOS.md)
 >
