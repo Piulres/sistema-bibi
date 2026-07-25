@@ -283,10 +283,10 @@ Serviço: `src/lib/invoice-service.ts`
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Listar | `GET /api/interno/appointments?date=` | Por data |
+| Listar | `GET /api/interno/appointments?date=` | Por data; inclui `dataStoreMode` e `walkInEphemeral` quando dual-store ativo |
 | Criar | `POST /api/interno/appointments` | `createAppointment()`; TELE → `telemedicineUrl`; webhook `APPOINTMENT_CREATED` |
 | Alterar | `PATCH /api/interno/appointments/[id]` | Status/modalidade |
-| **Walk-in particular** | `POST /api/interno/patients` + `POST /api/interno/appointments` | Cadastro sem `companyId` + agendamento `AGENDADO` na mesma tela |
+| **Walk-in particular** | `POST /api/interno/appointments/walk-in` | Paciente sem `companyId` + agendamento `AGENDADO` em transação única (`walkInAndSchedule`) |
 | **Check-in** | `PATCH .../appointments/[id]` `{ status: "CONFIRMADO" }` | Paciente chegou à clínica (AGENDADO → CONFIRMADO) |
 
 **Fluxo walk-in (paciente não PJ):**
@@ -297,13 +297,14 @@ sequenceDiagram
   participant API as APIs interno
   participant P as Prestador
 
-  R->>API: POST /patients (companyId null)
-  R->>API: POST /appointments (status AGENDADO)
+  R->>API: POST /appointments/walk-in
   Note over R: Opcional: POST /users (portal beneficiário)
   R->>API: PATCH appointment CONFIRMADO
   P->>P: Atendimento + ProcedureUsage
   Note over P: Faturamento PPU (particular, preço base)
 ```
+
+> **Modo demo na Netlify:** cadastros walk-in podem sumir entre reloads (SQLite efêmero por Lambda). A agenda exibe aviso quando `walkInEphemeral=true`. Para uso real, alternar para **modo operação** — ver [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) § walk-in.
 
 Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicine.ts`
 
@@ -551,11 +552,13 @@ Paciente **sem empresa PJ** (`Patient.companyId = null`). UI em `AppointmentsVie
 
 | Passo | Ação na UI | API |
 |-------|------------|-----|
-| 1 | Preencher walk-in (nome, CPF, nascimento, prestador) | `POST /api/interno/patients` |
-| 2 | **Cadastrar e agendar agora** | `POST /api/interno/appointments` (`AGENDADO`) |
+| 1 | Preencher walk-in (nome, CPF, nascimento, prestador) | — |
+| 2 | **Cadastrar e agendar agora** | `POST /api/interno/appointments/walk-in` (paciente + `AGENDADO`) |
 | 3 | Opcional: criar portal beneficiário | `POST /api/interno/users` |
 | 4 | **Confirmar chegada** na lista do dia | `PATCH …/appointments/[id]` → `CONFIRMADO` |
 | 5 | Prestador atende → PPU preço base | fluxo §7 |
+
+**Restrição em produção (modo demo):** se `walkInEphemeral=true` no payload da agenda, exibir aviso e orientar ADMIN a ativar modo **operação** antes de homologar walk-in real. Detalhes: [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 
 Credencial demo: `pedro.almeida@email.com` (particular, histórico de fatura PAGA no seed).
 

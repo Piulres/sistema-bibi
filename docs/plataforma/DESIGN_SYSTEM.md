@@ -85,7 +85,7 @@ Localizados em `src/components/ui/`:
 | `SectionNav` | Âncoras PJ/beneficiário — drawer abaixo de lg + faixa rolável |
 | `ScrollableNavRail` | Scroll horizontal com gradientes e setas quando transborda |
 | `StatCard` | KPI com label, valor, hint e tom semântico (`warning`, `success`, `accent`…) |
-| `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
+| `CalloutCard` | Destaque com borda lateral — `walk-in`, `info`, `success`, `warning` |
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
 | `AppointmentCard` | Card de consulta com horário, status e faixa lateral por estado |
 | `TabBar` | Abas client-side com sublinhado (ex.: Cadastros) |

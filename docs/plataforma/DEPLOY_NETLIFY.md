@@ -165,7 +165,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | Login falha | `SESSION_SECRET` diferente entre builds | Fixar secret no painel |
 | Logo 404 | Blobs indisponível em dev puro | Use `netlify dev` ou URL externa |
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
-| Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
+| Walk-in some na agenda (modo demo) | SQLite efêmero em `/tmp` por instância Lambda | Alternar para **modo operação** em `/interno/seguranca`; a agenda exibe aviso `walkInEphemeral` |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
 | Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
 

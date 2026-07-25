@@ -119,6 +119,37 @@ Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
 | Concorrência alta | OK para apresentação | SQLite serializa escritas — adequado a clínica pequena/média POC |
 | Postgres | Não necessário | Migração futura quando escalar |
 
+### Walk-in e persistência no modo demo (Netlify)
+
+No modo **demo**, o SQLite é copiado para `/tmp` em cada instância Lambda. Escritas (paciente, agendamento, walk-in) **não são compartilhadas** entre cold starts nem entre requisições que caem em instâncias diferentes.
+
+**Sintoma:** recepção cadastra walk-in em `/interno/agenda`, vê toast de sucesso, mas o paciente **some** ao recarregar ou em outra aba — parece que “walk-in não funciona”.
+
+**Causa:** não é bug de API; é limitação da POC demo na Netlify.
+
+**Mitigação na UI:** quando `DUAL_DATA_STORE=true` e o modo ativo é `demo`, a agenda exibe um `CalloutCard` de aviso (*“Modo demo — walk-in pode sumir”*) acima do formulário walk-in.
+
+**Solução operacional:** ADMIN em `/interno/seguranca` → **Ir para operação** → confirmar `OPERAR` → novo login. No modo **operação**, escritas persistem em Netlify Blobs.
+
+**API (detecção):** `GET /api/interno/appointments` retorna, além da agenda:
+
+| Campo | Tipo | Quando |
+|-------|------|--------|
+| `dataStoreMode` | `"demo"` \| `"operation"` | `DUAL_DATA_STORE=true` |
+| `walkInEphemeral` | `boolean` | `true` se dual-store ativo **e** modo demo |
+
+Fonte: `src/app/api/interno/appointments/route.ts` · UI: `src/components/AppointmentsView.tsx`.
+
+### Troca demo ↔ operação e sessão antiga
+
+Ao alternar o modo em `POST /api/interno/data-store`, a sessão do usuário ainda referencia o `tenantId` do banco anterior. O novo banco (demo ou operação) pode não conter esse tenant.
+
+A API resolve o tenant para a timeline de auditoria com fallback: tenta `user.tenantId` no DB ativo; se ausente, usa o primeiro tenant do banco novo. Isso evita falha silenciosa ao registrar `DATA_STORE_CHANGED` após a troca.
+
+Recomendação mantida: **fazer login novamente** após alternar (`logoutRecommended: true` na resposta).
+
+Fonte: `src/app/api/interno/data-store/route.ts`.
+
 ---
 
 ## Migrar para Postgres (futuro)

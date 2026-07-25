@@ -154,6 +154,8 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 | **Demo** | Massa seed (50 PJ, beneficiários) | Snapshot do build (efêmero por Lambda) |
 | **Operação** | Bootstrap mínimo; dados reais pelo uso | Netlify Blobs |
 
+**Walk-in na agenda:** no modo demo em produção, cadastros podem sumir entre reloads (SQLite em `/tmp` por instância). A UI exibe aviso quando `walkInEphemeral=true`; homologação real exige modo **operação**. Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § walk-in.
+
 Detalhes: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md).
 
 ---
@@ -299,7 +301,7 @@ Pedido de validação
 | Operação | Local (`dev`) | `netlify:dev` | Produção Netlify |
 |----------|---------------|---------------|------------------|
 | Codar / debug | ✅ | ✅ | ❌ agente |
-| SQLite demo | ✅ `demo.db` / `dev.db` | ✅ | ⚠️ efêmero `/tmp` por instância |
+| SQLite demo | ✅ `demo.db` / `dev.db` | ✅ | ⚠️ efêmero `/tmp` por instância — walk-in pode sumir |
 | SQLite operação | ✅ `operation.db` | ✅ Blobs | ✅ Blobs (`operation.db`) |
 | Alternar demo ↔ operação | ✅ `/interno/seguranca` | ✅ | ✅ `/interno/seguranca` (ADMIN) |
 | Logos white-label | filesystem | Blobs | Blobs |
