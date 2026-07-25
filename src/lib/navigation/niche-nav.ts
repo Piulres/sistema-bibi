@@ -37,6 +37,10 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
     tabs.push({ href: "/interno/projetos", label: labels.patients, key: "projetos" });
   }
 
+  if (niche === "MEDICAL" || niche === "DENTAL") {
+    tabs.push({ href: "/interno/gestao", label: "Gestão clínica", key: "gestao" });
+  }
+
   tabs.push(
     { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
     { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },

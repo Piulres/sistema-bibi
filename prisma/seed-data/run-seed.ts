@@ -34,6 +34,7 @@ import { resolveSeedProfile } from "./profile";
 import { seedVitacareTenant } from "./vitacare";
 import { seedNicheTenants } from "./niche-tenants";
 import { seedAllNicheOperational, nicheDemoCredentials } from "./niche-operational";
+import { ensureCedigTenant } from "./cedig-catalog";
 import { seedConstructionProjects } from "./construction-projects";
 import { seedConstructionRoadmap } from "./construction-roadmap";
 import { serializeTenantLabels } from "../../src/constants/niches";
@@ -822,6 +823,12 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log("\nPopulando tenants ServiceOS multi-nicho (v2.0)...");
   const nicheStats = await seedNicheTenants(prisma, DEMO_PASSWORD);
 
+  console.log("\nTenant piloto CEDIG Cruzeiro (endoscopia)...");
+  const cedig = await ensureCedigTenant(prisma);
+  console.log(
+    `  CEDIG slug=cedig · ${cedig.created ? "criado" : "atualizado"} · ${cedig.procedures} exames`,
+  );
+
   console.log("\nMassa operacional multi-nicho (histórico + futuro)...");
   const nicheOperational = await seedAllNicheOperational(prisma, DEMO_PASSWORD, scale);
 
@@ -876,6 +883,11 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     console.log(`  ${cred.niche.padEnd(10)} interno: ${cred.interno} · prestador: ${cred.prestador}`);
     console.log(`  ${"".padEnd(10)} beneficiário: ${cred.beneficiario} · PJ: ${cred.pj}`);
   }
+  console.log("\nCEDIG Cruzeiro — senha bibi123 · /?tenant=cedig");
+  console.log("  Interno ADMIN  -> operacao@cedig.demo");
+  console.log("  Secretária     -> recepcao@cedig.demo");
+  console.log("  Prestador      -> bruno@cedig.demo · luiza@cedig.demo");
+  console.log("  Gestão clínica -> /interno/gestao");
   console.log("\nSEED_PROFILE=market|operation-1y · SEED_SCALE=small|medium|large|operation-1y no .env");
   console.log("\nTier 4: MFA em /interno/seguranca · TISS XML no faturamento · telemedicina na agenda");
 

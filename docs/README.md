@@ -40,6 +40,14 @@ docs/
 
 ---
 
+## Clientes (piloto)
+
+| Cliente | Doc |
+|---------|-----|
+| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) |
+
+---
+
 ## Segmentos (ServiceOS v2.0)
 
 | Segmento | Pasta | Tenant demo | Login interno |

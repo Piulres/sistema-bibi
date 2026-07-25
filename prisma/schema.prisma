@@ -55,6 +55,8 @@ model Tenant {
   projectCashEntries    ProjectCashEntry[]
   projectAllocations    ProjectAllocation[]
   projectContracts      ProjectContract[]
+  clinicExamLaunches    ClinicExamLaunch[]
+  clinicExpenses        ClinicExpense[]
 }
 
 /// Identidade visual white-label por tenant (logo, cores, nome de exibicao).
@@ -127,6 +129,9 @@ model User {
   uploadedAttachments Attachment[]     @relation("AttachmentUploader")
   fieldReports      DailyFieldReport[] @relation("FieldReportAuthor")
   projectAllocations ProjectAllocation[] @relation("AllocationProvider")
+  clinicExamLaunchesAsProvider ClinicExamLaunch[] @relation("ClinicExamLaunchProvider")
+  clinicExamLaunchesCreated    ClinicExamLaunch[] @relation("ClinicExamLaunchCreatedBy")
+  clinicExpensesCreated        ClinicExpense[]    @relation("ClinicExpenseCreatedBy")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -198,6 +203,7 @@ model Patient {
   invoices       Invoice[]
   subscriptions  Subscription[]
   messages       Message[]
+  clinicExamLaunches ClinicExamLaunch[]
 }
 
 /// Animal de estimação (nicho VET) — vinculado ao tutor (`Patient`).
@@ -292,6 +298,7 @@ model Procedure {
   materialKits ProcedureMaterialKit[]
   appointments Appointment[]
   budgetLineItems BudgetLineItem[]
+  clinicExamLaunches ClinicExamLaunch[]
 
   @@unique([tenantId, code])
 }
@@ -1184,4 +1191,62 @@ model CompanyIndirectExpense {
   tenant   Tenant @relation(fields: [tenantId], references: [id])
 
   @@index([tenantId, expenseDate])
+}
+
+/// Lançamento operacional de exame (piloto clínicas como CEDIG).
+/// Um registro por paciente/exame — preenchimento pela secretária.
+/// paymentMethod: DINHEIRO | PIX | CARTAO | CONVENIO | TRANSFERENCIA | OUTRO
+model ClinicExamLaunch {
+  id              String   @id @default(cuid())
+  performedAt     DateTime @default(now())
+  patientName     String
+  paymentMethod   String
+  amountReceived  Float
+  biopsies        Int      @default(0)
+  polypectomies   Int      @default(0)
+  mucosectomies   Int      @default(0)
+  clips           Int      @default(0)
+  notes           String?
+  createdAt       DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  /// Médico responsável (User role PRESTADOR)
+  providerId String
+  provider   User   @relation("ClinicExamLaunchProvider", fields: [providerId], references: [id])
+
+  /// Tipo de exame (Procedure do catálogo do tenant)
+  procedureId String
+  procedure   Procedure @relation(fields: [procedureId], references: [id])
+
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+
+  createdById String?
+  createdBy   User?   @relation("ClinicExamLaunchCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId, performedAt])
+  @@index([tenantId, providerId])
+  @@index([tenantId, procedureId])
+}
+
+/// Despesa operacional da clínica (opex mensal — não confundir com estoque).
+/// category: LABORATORIO | ANESTESISTA | PESSOAL | INSUMOS | MEDICAMENTOS | TAXA_CARTAO | OUTRAS
+model ClinicExpense {
+  id          String   @id @default(cuid())
+  category    String
+  description String
+  amount      Float
+  expenseDate DateTime
+  createdAt   DateTime @default(now())
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdById String?
+  createdBy   User? @relation("ClinicExpenseCreatedBy", fields: [createdById], references: [id])
+
+  @@index([tenantId, expenseDate])
+  @@index([tenantId, category])
 }

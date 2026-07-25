@@ -33,7 +33,12 @@ Senha: **`bibi123`**
 
 - [Playbook de captação e vendas MEDICAL](./COMERCIAL.md)
 
+## Cliente piloto
+
+- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`)
+
 ## Código
 
 - Labels: `NICHE_MASTER_LABELS.MEDICAL` em `src/constants/niches.ts`
 - Landing: `/?niche=MEDICAL` ou `/` (padrão)
+- Gestão clínica: `src/lib/clinic-finance/` · `/interno/gestao`
