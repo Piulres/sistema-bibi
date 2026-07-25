@@ -164,7 +164,8 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
     await form.locator("label").filter({ hasText: /^E-mail$/ }).locator("input").fill(`dr.e2e.${id}@bibi.health`);
     await form.locator("label").filter({ hasText: /^Senha$/ }).locator("input").fill("bibi123");
     await form.getByRole("button", { name: "Criar usuário" }).click();
-    await expectFeedbackMessage(page, new RegExp(`Usuário Dr E2E ${id} criado`));
+    // Toast de PRESTADOR: "{nome} criado. Entrar em /login?tenant=…"
+    await expectFeedbackMessage(page, new RegExp(`Dr E2E ${id} criado`));
     await expect(page.getByText(`dr.e2e.${id}@bibi.health`)).toBeVisible();
   });
 });
