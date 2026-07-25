@@ -14,7 +14,7 @@ ver [`../evidencias/README.md`](../evidencias/README.md). Para operações (dev,
 ver [`OPERACOES.md`](../plataforma/OPERACOES.md). Para histórico de PRs/deploys,
 ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21.md).
 
-**Última revisão factual:** junho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed e testes Vitest (384).
+**Última revisão factual:** julho/2026 — alinhado a `src/lib/navigation/routes.ts`, seed v2.3 e testes Vitest (495+).
 
 ---
 
@@ -25,10 +25,13 @@ ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21
 2. [Autenticação e MFA](#2-autenticação-e-mfa)
 3. [Portal Prestador](#3-portal-prestador)
 4. [Portal Interno](#4-portal-interno)
+   - 4.11 [Obras (CONSTRUCTION)](#411-obras-construction)
 5. [Portal PJ (Empresa)](#5-portal-pj-empresa)
 6. [Portal Beneficiário](#6-portal-beneficiário)
 7. [Fluxo master Pay Per Use (E2E)](#7-fluxo-master-pay-per-use-e2e)
 8. [Fluxos auxiliares](#8-fluxos-auxiliares)
+   - 8.10 [Assistente operacional](#810-assistente-operacional-v23)
+   - 8.11 [Onboarding v3](#811-onboarding-v3)
 9. [RBAC — matriz perfil × módulo](#9-rbac--matriz-perfil--módulo)
 10. [Máquinas de estado](#10-máquinas-de-estado)
 11. [Mapa de APIs por portal](#11-mapa-de-apis-por-portal)
@@ -80,8 +83,9 @@ flowchart LR
 | LEGAL | Lex & Partners (`lex`) | `operacao@lex.demo` | `/?tenant=lex` ou `/?niche=LEGAL` |
 | SPA | Zen Studio (`zen`) | `operacao@zen.demo` | `/?tenant=zen` ou `/?niche=SPA` |
 | EDUCATION | EduPrime (`eduprime`) | `operacao@eduprime.demo` | `/?tenant=eduprime` ou `/?niche=EDUCATION` |
+| CONSTRUCTION | Build Corp (`build`) | `operacao@build.demo` | `/?tenant=build` ou `/?niche=CONSTRUCTION` |
 
-Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`. **FATO:** tenants de nicho têm apenas interno + prestador no seed (sem PJ/beneficiário dedicados).
+Senha: `bibi123`. Seed: `prisma/seed-data/niche-tenants.ts`. **FATO:** tenants de nicho têm apenas interno + prestador no seed (sem PJ/beneficiário dedicados), exceto Build Corp (PJ `rh@incorp.demo` + beneficiário com obras).
 
 ### 0.4 Landing por nicho
 
@@ -259,9 +263,10 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
+| `projetos` *(CONSTRUCTION)* | `/interno/projetos` | `ProjectsView` | ERP obras — pipeline, orçamentos, caixa, RDO |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav: **13 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
+Nav: **13 módulos** base em `INTERNO_NAV_TABS` (`routes.ts`), mais **`projetos`** injetado por `niche-nav.ts` quando `niche=CONSTRUCTION`. Filtrada em `InternoNav` por `internoPermissions`. Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.1 Faturamento (`BillingView`)
 
@@ -395,6 +400,23 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 | Restaurar seed demo | `POST /api/interno/demo/reset` | Somente ADMIN + modo demo + `ALLOW_DEMO_RESET` |
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
+
+### 4.11 Obras (CONSTRUCTION)
+
+Módulo visível apenas para tenants `niche=CONSTRUCTION`. Demo: `/?tenant=build` · `operacao@build.demo`.
+
+| Área | Rota UI | API principal |
+|------|---------|---------------|
+| Lista de obras | `/interno/projetos` | `GET/POST /api/interno/projects` |
+| Detalhe da obra | `/interno/projetos/[id]` | `GET/PATCH /api/interno/projects/[id]` |
+| Pipeline comercial | `/interno/projetos/pipeline` | `GET/POST /api/interno/construction/pipeline` |
+| Financeiro obras | `/interno/projetos/financeiro` | `GET /api/interno/construction/finance` |
+| Orçamentos / BDI / caixa | abas no detalhe | `…/projects/[id]/{budgets,bdi,cash,allocations}` |
+| RDO (campo) | `/prestador/campo` | `POST /api/prestador/field-reports` |
+| Portal PJ | `/pj/projetos` | `GET /api/pj/projects` |
+| Portal beneficiário | `/beneficiario/obras` | `GET /api/beneficiario/projects` |
+
+Doc segmento: [`../segmentos/construction/README.md`](../segmentos/construction/README.md) · Testes: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`.
 
 ---
 
@@ -595,6 +617,33 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
 
+### 8.10 Assistente operacional (v2.3)
+
+Chat nos 4 portais via `AssistantProvider` — rotas `POST /api/assistant/chat` e `POST /api/assistant/confirm`.
+
+| Etapa | Comportamento |
+|-------|---------------|
+| Turno | Cliente envia `sessionState` HMAC; servidor restaura draft e executa tools |
+| Ação destrutiva | Retorna `pendingActionId` assinado; usuário confirma em modal |
+| Confirmação | Revalida HMAC + JTI one-time + RBAC (`confirm-guard.ts`) |
+| Analytics | Eventos `ASSISTANT_TOOL_*` em `/interno/auditoria` |
+
+Doc: [`ASSISTENTE_SERVERLESS.md`](ASSISTENTE_SERVERLESS.md) · Testes: `tests/integration/assistant-flow.test.ts`, `e2e/assistant.spec.ts`.
+
+### 8.11 Onboarding v3
+
+Tour guiado em duas fases (`ONBOARDING_VERSION = 3`):
+
+| Fase | Onde | Comportamento |
+|------|------|---------------|
+| Tour principal | Dashboard de cada portal | ~5 passos condensados |
+| Micro-tours | 1ª visita a cada módulo | Passos contextuais por rota |
+| Hotspots | Cliente 360°, PIX, PEP, demo reset | Destaques pontuais |
+
+Persistência: `localStorage` (`bibi_onboarding`). E2E: `skipOnboardingTours()` e `dismissOnboardingIfVisible()` em `e2e/helpers/auth.ts`.
+
+Doc: [`ONBOARDING_TOUR.md`](ONBOARDING_TOUR.md) · Testes: `tests/unit/onboarding.test.ts`.
+
 ---
 
 ## 9. RBAC — matriz perfil × módulo
@@ -609,6 +658,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | cadastros | ✓ | ✗ | ✓ | ✗ |
 | estoque | ✓ | ✗ | ✓ | ✗ |
 | crm | ✓ | ✗ | ✗ | ✗ |
+| projetos | ✓ | ✓ | ✓ | ✗ |
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
@@ -699,28 +749,37 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` ·
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
+### Assistente (sessão)
+`POST /api/assistant/chat` · `POST /api/assistant/confirm`
+
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
+`GET /api/prestador/campo/projects` · `POST /api/prestador/field-reports`
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
 `POST /api/beneficiario/appointments` ·
 `PATCH /api/beneficiario/appointments/[id]` ·
-`POST|PATCH /api/beneficiario/invoices/[id]/pay`
+`POST|PATCH /api/beneficiario/invoices/[id]/pay` ·
+`GET /api/beneficiario/projects`
 
 ### PJ
-`GET /api/pj/overview` · `GET /api/pj/reports`
+`GET /api/pj/overview` · `GET /api/pj/reports` · `GET /api/pj/projects`
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
 `companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*` ·
+`projects/*` · `construction/{pipeline,finance,goals}`
+
+### Documentação API
+`GET /api/docs` (Swagger UI) · `GET /openapi.yaml`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`
 
-Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml)
+Especificação completa: [`public/openapi.yaml`](../public/openapi.yaml) · guia: [`../plataforma/API_DOCS.md`](../plataforma/API_DOCS.md)
 
 ---
 

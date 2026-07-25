@@ -45,6 +45,21 @@ Cliente                          API (serverless)
 - `timingSafeEqual` na verificação da assinatura
 - **JTI one-time** na confirmação — replay do mesmo `pendingActionId` retorna 410
 
+### Segurança na confirmação (#158)
+
+Além do HMAC e JTI, a rota `POST /api/assistant/confirm` revalida **RBAC** antes de executar a ação (`assertPendingActionPermission` em `confirm-guard.ts`):
+
+| `PendingActionPayload.type` | Quem pode confirmar |
+|-----------------------------|---------------------|
+| `create_user` | ADMIN interno (`isInternoAdmin`) |
+| `create_patient` | INTERNO com módulo `cadastros` |
+| `create_appointment` | INTERNO com módulo `agenda` |
+| `book_appointment` | BENEFICIARIO com `patientId` na sessão |
+
+**Senha fora do token:** em `create_user`, o payload assinado **não** inclui `password` (`types.ts`). A senha é enviada apenas no corpo do `POST /confirm` e usada em `confirm-executor.ts` — não trafega no `pendingActionId` HMAC.
+
+Fluxo JTI: consumo atômico via Blobs (`pending-consumed.ts`); replay retorna 410; falha de RBAC retorna 403.
+
 ## Provider de IA
 
 | Modo | Env | Comportamento |
@@ -63,7 +78,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 | Item | Prioridade | Notas |
 |------|------------|-------|
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
-| **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
+| **E2E multi-nicho** | Baixa | VET em `e2e/assistant.spec.ts`; LEGAL/CONSTRUCTION pendentes |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
 | **OpenAPI assistente** | Baixa | Documentar `sessionState` no spec |

@@ -87,12 +87,19 @@ Evidências gravadas: [`../evidencias/`](../evidencias/).
 npm run pre-release
 ```
 
-Executa, em sequência:
+Executa, em sequência (`scripts/pre-release.mjs`):
 
 1. `npm run lint`
-2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+2. `npm run docs:verify`
+3. `npm run openapi:verify`
+4. `npm run db:bootstrap:demo` (`SEED_SCALE=small` por padrão)
+5. `npm run db:verify`
+6. `npm test`
+7. `npm run netlify:build` (mesmo pipeline do CI Netlify)
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
+
+> O CI (`.github/workflows/ci.yml`) não inclui `openapi:verify` — só o `pre-release` local.
 
 ---
 

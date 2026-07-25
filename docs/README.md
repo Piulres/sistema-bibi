@@ -20,6 +20,7 @@
 | Escopo v2.0 | [`versoes/V2_0.md`](versoes/V2_0.md) |
 | Fluxos de produto | [`produto/FLUXOS.md`](produto/FLUXOS.md) |
 | Tour guiado (onboarding) | [`produto/ONBOARDING_TOUR.md`](produto/ONBOARDING_TOUR.md) |
+| Assistente operacional | [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) |
 | Demo multi-nicho | [`segmentos/README.md`](segmentos/README.md) |
 
 ---
@@ -83,6 +84,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 |-----------|----------|
 | [`produto/FLUXOS.md`](produto/FLUXOS.md) | Fluxos E2E nos quatro portais |
 | [`produto/ONBOARDING_TOUR.md`](produto/ONBOARDING_TOUR.md) | Tour guiado v3 (duas fases, micro-tours) |
+| [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) | Assistente stateless (HMAC, JTI, RBAC na confirmação) |
 | [`produto/JORNADA_CLIENTE.md`](produto/JORNADA_CLIENTE.md) | Jornada UX por portal |
 | [`produto/AUDITORIA_FLUXOS.md`](produto/AUDITORIA_FLUXOS.md) | Gaps mapeados |
 

@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jun/2026):** **415+** casos Vitest · **128+** testes Playwright E2E · **123** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026, v2.3.0):** **495+** casos Vitest · **138** testes Playwright E2E · **154** Route Handlers · **123** paths no OpenAPI (paridade total via `openapi:sync`).
 
 ### Onboarding tour (v3)
 
@@ -14,7 +14,7 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 | Micro-tour faturamento | idem | `page-billing`, `billing-cliente-360` |
 | Micro-tour atendimento | idem | hotspot `atendimento-pep` |
 | Persistência dismissed / routes | idem | `storage.ts` v3 |
-| E2E isolamento | `e2e/helpers/auth.ts` | `skipOnboardingTours()` |
+| E2E isolamento | `e2e/helpers/auth.ts` | `skipOnboardingTours()`, `dismissOnboardingIfVisible()` |
 
 Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
@@ -24,7 +24,7 @@ Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
 ```
                     ┌─────────────┐
-                    │  E2E        │  Playwright — 10 specs (desktop + mobile)
+                    │  E2E        │  Playwright — 11 specs (desktop + mobile)
                     ├─────────────┤
                     │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
@@ -189,7 +189,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa das rotas API
 
-**FATO:** existem **~100** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **58** paths — subconjunto intencional para integradores.
+**FATO:** existem **154** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths — cobertura total dos handlers (sincronizado via `npm run openapi:sync`).
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -286,6 +286,21 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `assistant.spec.ts` | Chat assistente — MEDICAL + VET PetCare |
+| `api-docs.spec.ts` | Swagger UI `/api/docs`, YAML, redirect legado |
+| `cadastros-crud.spec.ts` | CRUD cadastros interno (toast + confirmação) |
+| `flow-improvements.spec.ts` | Cancelamento, stepper PPU, QR PIX |
+| `mobile-nav.spec.ts` | Drawer mobile nos 4 portais |
+| `interno-reports.spec.ts` | Relatórios interno — export CSV |
+
+### Helpers E2E (UX #151 / #160)
+
+| Helper | Arquivo | Uso |
+|--------|---------|-----|
+| `expectFeedbackMessage` | `e2e/helpers/feedback.ts` | Asserta toast (`aria-live`) ou mensagem inline |
+| `confirmDialog` | `e2e/helpers/feedback.ts` | Confirma modal destrutivo (`useConfirm`) |
+| `dismissOnboardingIfVisible` | `e2e/helpers/auth.ts` | Fecha tour se visível após navegação |
+| `skipOnboardingTours` | `e2e/helpers/auth.ts` | Desabilita tour via `localStorage` antes do login |
 
 ---
 

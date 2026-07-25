@@ -19,7 +19,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Pacote anterior | **`v2.2.0`** — deploy `6a3ea6c5` @ `2c38248` |
 | `main` / `dev` | Sincronizadas · tip com docs de release (`544baa1+`) |
 | Tags git | ✅ `v2.2.0` · `v2.3.0` |
-| Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
+| Validação pré-deploy | `npm run pre-release` (lint + docs + openapi + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |

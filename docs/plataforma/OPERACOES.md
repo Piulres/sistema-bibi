@@ -81,13 +81,29 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run lint` | ESLint | Antes de PR |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | 7 passos — ver abaixo | **Validar pacote sem publicar** |
+| `npm run docs:verify` | Estrutura docs + changelog landing | Incluído no pre-release |
+| `npm run openapi:verify` | YAML + paridade paths vs handlers | Incluído no pre-release (v2.3+) |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |
 | `npm run db:bootstrap:operation` | Só `operation.db` (bootstrap mínimo) | Piloto operação local |
 | `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
+
+### Sequência `pre-release` (fonte: `scripts/pre-release.mjs`)
+
+Executa **em ordem** — qualquer falha aborta o script:
+
+1. `npm run lint`
+2. `npm run docs:verify`
+3. `npm run openapi:verify`
+4. `npm run db:bootstrap:demo` (`SEED_SCALE=small` por padrão)
+5. `npm run db:verify`
+6. `npm test`
+7. `npm run netlify:build`
+
+> O job **unit-integration-api** do CI espelha os passos 1–6 + `build` (Next puro). O passo `openapi:verify` roda **só** no `pre-release` local — não pule ao validar pacote.
 
 ---
 

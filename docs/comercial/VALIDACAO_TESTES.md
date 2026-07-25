@@ -68,10 +68,11 @@ Sequência em `scripts/pre-release.mjs`:
 
 1. `npm run lint` — OK  
 2. `npm run docs:verify` — OK  
-3. `npm run db:bootstrap:demo` — demo.db + operation.db  
-4. `npm run db:verify` — OK  
-5. `npm run test` — 410/410  
-6. `npm run netlify:build` — `next build` OK  
+3. `npm run openapi:verify` — OK (v2.3+)  
+4. `npm run db:bootstrap:demo` — demo.db + operation.db  
+5. `npm run db:verify` — OK  
+6. `npm run test` — 495+/495+  
+7. `npm run netlify:build` — `next build` OK  
 
 > **Correção aplicada:** `LandingLeadForm.tsx` — guard `if (!config) return` em `handleSubmit` (TypeScript strict no build).
 
