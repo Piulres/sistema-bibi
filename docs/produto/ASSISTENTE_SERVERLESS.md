@@ -44,6 +44,16 @@ Cliente                          API (serverless)
 - `userId` + `tenantId` embutidos — token de outro usuário/tenant é rejeitado
 - `timingSafeEqual` na verificação da assinatura
 - **JTI one-time** na confirmação — replay do mesmo `pendingActionId` retorna 410
+- **Senha fora do token** — `password` vai no body de `POST /confirm`, nunca no envelope HMAC (evita vazamento em logs/cliente)
+- **JTI atômico** — `tryMarkPendingJtiConsumed` usa `onlyIfNew` no Netlify Blobs; em falha de execução, `releasePendingJti` libera nova tentativa
+- **RBAC na confirmação** — `confirm-guard.ts` revalida permissão no momento do `POST /confirm`, alinhado às APIs REST (ex.: `create_user` exige ADMIN, `create_appointment` exige módulo `agenda`)
+
+| Ação pendente | Guard |
+|---------------|-------|
+| `create_user` | `isInternoAdmin` |
+| `create_patient` | módulo `cadastros` |
+| `create_appointment` | módulo `agenda` |
+| `book_appointment` | role `BENEFICIARIO` + `patientId` |
 
 ## Provider de IA
 
@@ -74,7 +84,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 
 - `tests/unit/assistant.test.ts` — multi-turno stateless
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
-- `tests/api/assistant.test.ts` — replay JTI, cancelamento
+- `tests/api/assistant.test.ts` — replay JTI (410), RBAC na confirmação (403), senha no body
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare
 
 ## Referências

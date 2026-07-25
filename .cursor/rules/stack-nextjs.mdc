@@ -26,6 +26,7 @@ Referências: `@AGENTS.md` · `@docs/plataforma/ARQUITETURA.md` · `@docs/plataf
 - Primitivos: `src/components/ui/` (`Breadcrumbs`, `SectionNav`, `NavTabs`)
 - Tokens: `src/app/globals.css` (`--brand-*`, `--surface-*`)
 - White label: `TenantBranding` + `TenantTheme`
+- Feedback UX: `useAsyncData` / `useAsyncAction` / `confirmPresets` — ver `@docs/plataforma/FEEDBACK_UX.md`
 - E2E interno: escopar nav com `getByRole('navigation', { name: 'Navegação por abas' })`
 
 ## Padrões de API

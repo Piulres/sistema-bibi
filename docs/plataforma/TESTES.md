@@ -18,6 +18,18 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
+### Feedback UX (v2.3)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Mensagens HTTP | `tests/unit/api-feedback.test.ts` | 401/403/404/5xx → copy amigável |
+| Helper E2E toast | `e2e/helpers/feedback.ts` | `expectFeedbackMessage` |
+| Helper E2E confirm | idem | `confirmDialog` (`alertdialog`) |
+| CRUD com confirmação | `e2e/cadastros-crud.spec.ts` | Exclusão + toast de sucesso |
+| Walk-in | `e2e/walkin-particular.spec.ts` | Feedback pós-mutação |
+
+Doc: [`plataforma/FEEDBACK_UX.md`](FEEDBACK_UX.md)
+
 ---
 
 ## Pirâmide de testes
@@ -286,8 +298,10 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `cadastros-crud.spec.ts` | CRUD cadastros com `confirmDialog` + toasts |
+| `assistant.spec.ts` | Assistente MEDICAL + VET (confirmação serverless) |
 
----
+Helpers E2E: `e2e/helpers/auth.ts` (`skipOnboardingTours`), `e2e/helpers/feedback.ts` (`confirmDialog`, `expectFeedbackMessage`).
 
 ## CI (GitHub Actions)
 

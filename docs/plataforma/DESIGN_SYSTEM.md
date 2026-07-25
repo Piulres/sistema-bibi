@@ -215,6 +215,24 @@ Complementa o white label visual com **vocabulário do setor**:
 | `SectionHeader` | Título + descrição de seção |
 | `LoadingState` / `EmptyState` | Estados de carregamento e vazio |
 
+### Feedback UX (v2.3)
+
+Padrão unificado nos portais autenticados — guia completo: [`FEEDBACK_UX.md`](FEEDBACK_UX.md).
+
+| Componente / hook | Uso |
+|-------------------|-----|
+| `FeedbackProvider` | Toast + Confirm nos shells (`InternoPortalShell`, …) |
+| `ViewStateBoundary` | Guard loading → erro com retry → conteúdo |
+| `ConfirmDialog` | `role="alertdialog"` — confirmações destrutivas |
+| `Toast` | Sucesso/erro/info com `aria-live` |
+| `useAsyncData` | Carga inicial padronizada (`fetchJson`) |
+| `useAsyncAction` | Mutações com `busy`, toast e `confirm` opcional |
+| `useConfirm` | Promise-based — substitui `window.confirm` |
+| `confirmPresets` | Textos reutilizáveis (excluir, PIX, demo reset) |
+| `api-feedback` | `parseApiResponse` — HTTP → mensagem amigável |
+
+Catálogo por view: `src/lib/ui/feedback-map.ts`.
+
 ## Próximos passos sugeridos
 
 - Purge de cache CDN via `Cache-Tag: tenant-logo-{tenantId}` após troca de logo (Netlify)

@@ -182,7 +182,7 @@ documentados em [`FLUXOS.md`](FLUXOS.md) §4.4.
 | **Média** | Cliente 360° | `/interno/beneficiarios/[id]` sem módulo RBAC | `src/app/interno/beneficiarios/[id]/page.tsx` |
 | **Média** | Faturamento UI | `BillingView` em 403 mostra listas vazias, não erro de permissão | `src/components/BillingView.tsx` |
 | **Média** | Agenda | `updateStatus()` ignora falha de PATCH | `src/components/AppointmentsView.tsx` |
-| **Média** | Comunicação / recorrência / cadastros | Loads iniciais sem feedback em erro de auth | várias `*View.tsx` |
+| **Média** | Comunicação / recorrência / cadastros | Loads iniciais sem feedback em erro de auth — **parcialmente corrigido** v2.3 (`ViewStateBoundary` + `useAsyncData`); revisar views legadas | várias `*View.tsx` |
 | **Baixa** | Logo white label | Upload sem `requireInternoModule("branding")` | `src/app/api/interno/branding/logo/route.ts` |
 | **Baixa** | Demo reset | API exige ADMIN mas não módulo `seguranca` | `src/app/api/interno/demo/reset/route.ts` |
 

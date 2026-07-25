@@ -65,6 +65,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`plataforma/VARIAVEIS_AMBIENTE.md`](plataforma/VARIAVEIS_AMBIENTE.md) | Env vars (local, CI, Netlify) |
 | [`plataforma/TESTES.md`](plataforma/TESTES.md) | Estratégia e mapa de testes |
 | [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) | Tokens, white label |
+| [`plataforma/FEEDBACK_UX.md`](plataforma/FEEDBACK_UX.md) | Loading, toasts, confirmações nos portais |
 | [`plataforma/PAYMENTS.md`](plataforma/PAYMENTS.md) | Motor PIX / Strategy |
 | [`plataforma/COMMUNICATIONS.md`](plataforma/COMMUNICATIONS.md) | Motor de comunicação |
 | [`plataforma/BENCHMARK.md`](plataforma/BENCHMARK.md) | Matriz POC × mercado |
