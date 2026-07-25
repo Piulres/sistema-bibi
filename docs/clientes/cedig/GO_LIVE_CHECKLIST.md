@@ -36,8 +36,8 @@ Fluxos críticos cobertos no smoke: modo operação estável, criar prestador + 
 
 1. Confirmar modo **operação** em `/interno/seguranca` (ADMIN plataforma `faturamento@bibi.health` se precisar).
 2. Login Alana → `/interno/gestao` → lançar 1 exame + 1 despesa → ver KPIs.
-3. Login ADMIN CEDIG → Cadastros → Usuários → criar prestador de teste.
-4. Logout → `/login?tenant=cedig` → entrar com o prestador criado.
+3. Login ADMIN CEDIG → Cadastros → Usuários → criar prestador de teste → confirmar toast `{nome} criado. Entrar em /login?tenant=…`.
+4. Logout → `/login?tenant=cedig` → entrar com o prestador criado (seguir o hint do toast, não `/interno/login`).
 5. Login Alana → `/interno/agenda` → walk-in → confirmar chegada na lista (não some após F5).
 
 ---

@@ -35,6 +35,8 @@ Em produção (modo operação): provisionar com `POST /api/interno/operation/pr
 
 **Login do prestador criado:** `/login?tenant=cedig` (Portal Prestador) · e-mail/senha do cadastro — senha padrão sugerida `bibi123`. Não usar `/interno/login`.
 
+Após criar o prestador, a UI exibe toast de sucesso com esse caminho (`{nome} criado. Entrar em /login?tenant=… (Portal Prestador)…`) — ver [`FLUXOS.md`](../../produto/FLUXOS.md) §4.3.
+
 ---
 
 ## Tabelas de preço

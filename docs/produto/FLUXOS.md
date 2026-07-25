@@ -317,6 +317,24 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
+**RBAC — usuários:** criar e editar exige perfil interno **ADMIN** (`canManageUsers` na UI · `requireInternoAdmin` na API). Perfis como RECEPCAO listam usuários, mas o formulário "Novo usuário" fica oculto com aviso (ex.: CEDIG → `operacao@cedig.demo`).
+
+**Feedback (toast) após salvar** — `CadastrosView` via `useAsyncAction().showToast`:
+
+| Entidade | Mensagem de sucesso (padrão) |
+|----------|------------------------------|
+| Beneficiário | `Beneficiário {nome} cadastrado` |
+| Empresa (criar) | `Empresa {nome} cadastrada` |
+| Empresa (editar) | `Empresa {nome} atualizada` |
+| Procedimento (criar) | `Procedimento {código} cadastrado` |
+| Procedimento (editar) | `Procedimento {código} atualizado` |
+| Procedimento (excluir) | `Procedimento excluído` |
+| Usuário (criar, `role !== PRESTADOR`) | `Usuário {nome} criado` |
+| Usuário (criar, `role === PRESTADOR`) | `{nome} criado. Entrar em /login?tenant=… (Portal Prestador) com o e-mail e a senha definidos` |
+| Usuário (editar) | `Usuário {nome} atualizado` |
+
+O toast de **PRESTADOR** orienta o operador ao portal correto (`/login?tenant={slug}`), não `/interno/login` — ver [`clientes/cedig/FALHAS.md`](../clientes/cedig/FALHAS.md) (P1-e). A auditoria interna (`user-service`) continua com `Usuário {nome} ({role}) criado`, independente do toast.
+
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
 ### 4.4 CRM (`CrmPipelineView`)

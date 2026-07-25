@@ -24,7 +24,7 @@ Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
 ```
                     ┌─────────────┐
-                    │  E2E        │  Playwright — 10 specs (desktop + mobile)
+                    │  E2E        │  Playwright — 12 specs (desktop + mobile)
                     ├─────────────┤
                     │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
@@ -284,8 +284,35 @@ Senha única: `bibi123`
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
+| `interno-reports.spec.ts` | Relatórios internos — carregamento e export |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
+| `cadastros-crud.spec.ts` | CRUD beneficiário, empresa, procedimento, usuário prestador; abas e RBAC recepção |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `flow-improvements.spec.ts` | Melhorias de jornada (links atendimento, mapa de fluxos) |
+| `mobile-nav.spec.ts` | Drawer mobile — landing e navegação |
+| `assistant.spec.ts` | Assistente IA — MEDICAL + VET (PetCare) |
+| `api-docs.spec.ts` | Página `/api/docs`, YAML OpenAPI, redirect legado |
+| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão, lançamentos, KPIs |
+
+**Helpers E2E** (`e2e/helpers/`):
+
+| Helper | Uso |
+|--------|-----|
+| `loginAs` / `skipOnboardingTours` | Login demo + dispensar tour que intercepta cliques no CI |
+| `dismissOnboardingIfVisible` | Fecha overlay residual após navegação |
+| `expectFeedbackMessage` | Assert de toast/feedback inline — `page.getByText(pattern)` |
+| `confirmDialog` | Confirma exclusões no `alertdialog` |
+
+**Assert de toast em cadastros** — `cadastros-crud.spec.ts` valida mensagens alinhadas à UI (`CadastrosView`):
+
+| Fluxo | Padrão esperado no E2E |
+|-------|------------------------|
+| Criar beneficiário | `/Beneficiário {nome} cadastrado/` |
+| Criar empresa | `/Empresa {nome} cadastrada/` |
+| Criar procedimento | `/Procedimento {código} cadastrado/` |
+| **Criar usuário prestador** | `/{nome} criado/` — **não** `Usuário …` (toast específico de PRESTADOR com hint `/login?tenant=…`) |
+
+Fonte canônica das strings: `src/components/CadastrosView.tsx` (`submitUser` e demais `showToast`).
 
 ---
 
