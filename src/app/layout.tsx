@@ -23,11 +23,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${PLATFORM.name} ${PLATFORM.version} — ${PLATFORM.tagline}`,
-    template: `%s | ${PLATFORM.shortName} ${PLATFORM.version}`,
+    default: `${PLATFORM.name} v${PLATFORM.release} — ${PLATFORM.tagline}`,
+    template: `%s | ${PLATFORM.shortName} v${PLATFORM.release}`,
   },
   description: PLATFORM.description,
-  applicationName: PLATFORM.name,
+  applicationName: `${PLATFORM.name} v${PLATFORM.release}`,
   authors: [{ name: PLATFORM.name }],
   creator: PLATFORM.name,
   formatDetection: {

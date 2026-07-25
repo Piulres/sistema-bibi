@@ -161,13 +161,17 @@ try {
   const platformTs = readFileSync(join(ROOT, "src/lib/platform.ts"), "utf8");
   const changelogTs = readFileSync(join(ROOT, "src/lib/landing/changelog-content.ts"), "utf8");
 
-  const platformVersion = platformTs.match(/version:\s*"([^"]+)"/)?.[1];
+  const platformVersion = platformTs.match(/^\s*version:\s*"([^"]+)"/m)?.[1];
+  const platformRelease = platformTs.match(/^\s*release:\s*"([^"]+)"/m)?.[1];
   const currentChangelogVersion = changelogTs.match(
     /version:\s*"([\d.]+)"[\s\S]*?status:\s*"current"/,
   )?.[1];
 
   if (!platformVersion) {
     errors.push("src/lib/platform.ts: não encontrou PLATFORM.version");
+  }
+  if (!platformRelease) {
+    errors.push("src/lib/platform.ts: não encontrou PLATFORM.release");
   }
   if (!currentChangelogVersion) {
     errors.push(
@@ -177,6 +181,11 @@ try {
   if (pkgVersion && currentChangelogVersion && pkgVersion !== currentChangelogVersion) {
     errors.push(
       `Versão desalinhada: package.json (${pkgVersion}) ≠ changelog current (${currentChangelogVersion}) — ver docs/plataforma/LANDING_CHANGELOG.md`,
+    );
+  }
+  if (pkgVersion && platformRelease && pkgVersion !== platformRelease) {
+    errors.push(
+      `Versão desalinhada: package.json (${pkgVersion}) ≠ PLATFORM.release (${platformRelease})`,
     );
   }
   if (
