@@ -15,7 +15,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a645cdc` @ `c64fc14` (`bibi-poc-2026-07-25c`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **2.4.0** — deploy `6a6462dc` @ `527fe03` (`bibi-poc-2026-07-25d`) |
+| **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
 | **Release `main` / `dev`** | **v2.4.0** · tag `v2.4.0` |
 | **Pacote anterior em produção** | **2.3.1** — deploy `6a643a0d` @ `12148ce` |
 
@@ -62,11 +63,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Campo | Valor |
 |-------|-------|
 | **Tag git** | `v2.4.0` |
-| **Commit publicado** | `c64fc14` |
-| **PRs** | [#169](https://github.com/Piulres/sistema-bibi/pull/169) |
+| **Commit publicado** | `527fe03` (hotfix CEDIG operação; tag `v2.4.0` @ `c64fc14`) |
+| **PRs** | [#169](https://github.com/Piulres/sistema-bibi/pull/169) · [#172](https://github.com/Piulres/sistema-bibi/pull/172) |
 | **Doc** | [`V2_4.md`](V2_4.md) · [`clientes/cedig/`](../clientes/cedig/) |
-| **Inclui** | `/interno/gestao` · tabelas de preço CEDIG · seed 4 portais · correções homologação |
-| **Publicado em** | 25/07/2026 — deploy Netlify `6a645cdc` @ `c64fc14` (`bibi-poc-2026-07-25c`) |
+| **Inclui** | `/interno/gestao` · tabelas de preço CEDIG · seed 4 portais · CEDIG no bootstrap/provision operação |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a6462dc` @ `527fe03` (`bibi-poc-2026-07-25d`; anterior `6a645cdc` @ `c64fc14`) |
 
 ---
 
