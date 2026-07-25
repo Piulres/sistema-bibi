@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (25/07/2026)
 
-> Pacote **v3.0.0** — PWA mobile (`/instalar`) **em fechamento / publicação**.
+> Pacote **v3.0.0** — PWA mobile (`/instalar`) **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.0** — *(atualizar deploy id após `netlify deploy --prod`)* |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.0** — deploy `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.0** · tag `v3.0.0` |
+| **Release `main` / `dev`** | **v3.0.0** · tag `v3.0.0` · tip `e30fc70` |
 | **Pacote anterior em produção** | **2.6.0** — deploy `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.0** |
 | **Release** | `main` | **v3.0.0** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.0** · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.0** · deploy `6a654c88` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Smoke (25/07/2026) — produção v3.0.0
@@ -44,7 +44,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.0`** | *(tip após bump)* | PWA `/instalar` · manifest standalone · smoke Netlify |
+| **`v3.0.0`** | `d2e0548` | PWA `/instalar` · manifest standalone · smoke Netlify |
 | **`v2.6.0`** | `579f686` | CEDIG fase 2+F — ponte PPU + export + v2.5 login · #186–#189 · #193 |
 | **`v2.5.0`** | _(empilhado)_ | Login tenant digitável + seletor de portal · PR #186 |
 | **`v2.4.0`** | `c64fc14` | CEDIG gestão clínica · PR #169 |
@@ -66,11 +66,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Campo | Valor |
 |-------|-------|
-| **Tag git** | `v3.0.0` |
-| **Commit publicado** | *(após deploy — ver Status agora)* |
+| **Tag git** | `v3.0.0` @ `d2e0548` |
+| **Commit publicado** | `e30fc70` (docs rules) · bump `d2e0548` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 | **Inclui** | `/instalar` · manifest standalone · ícones iOS/Android · metas Apple · smoke `smoke-netlify-pwa` no pre-release · empilha v2.6 (CEDIG + login) |
-| **Publicado em** | 25/07/2026 — *(preencher deploy id após publish)* |
+| **Publicado em** | 25/07/2026 — deploy Netlify `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
 
 ---
 

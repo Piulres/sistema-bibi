@@ -8,7 +8,7 @@
 
 | | |
 |--|--|
-| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v3.0.0** · PWA `/instalar` |
+| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v3.0.0** · deploy `bibi-poc-2026-07-25k` · PWA `/instalar` |
 | **Código** | `main` = `dev` · tag `v3.0.0` |
 | **Publicação** | Manual (`pre-release` → `netlify deploy --prod`) · **Stop builds ON** |
 | **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V3_0.md`](docs/versoes/V3_0.md) |
