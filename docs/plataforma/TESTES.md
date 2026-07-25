@@ -162,9 +162,9 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Perfil | Módulos UI | APIs protegidas |
 |--------|------------|-----------------|
-| ADMIN | todos | parcial |
+| ADMIN | todos | gestão de usuários POST/PATCH ✅ (`user-admin-guard.test.ts`) |
 | FATURAMENTO | billing, subscriptions… | invoices POST ✅, billing GET ❌ |
-| RECEPCAO | agenda, cadastros… | appointments ✅ (só role) |
+| RECEPCAO | agenda, cadastros… | appointments ✅ (só role); users GET ✅ · POST/PATCH 403 ✅ |
 | READONLY | dashboard, relatórios | **pode chamar billing via API** |
 
 ### Portais B2B / beneficiário

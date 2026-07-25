@@ -771,7 +771,7 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 
 | Feature | Arquivos |
 |---------|----------|
-| RBAC | `interno-permissions.ts`, `interno-guard.ts` |
+| RBAC | `interno-permissions.ts`, `interno-guard.ts` — módulos por perfil; **gestão de usuários** (POST/PATCH + UI criar/editar) exige `internoProfile: "ADMIN"` (`isInternoAdmin` / `requireInternoAdmin`) |
 | Webhooks | `webhook-service.ts`, `IntegracoesView.tsx` |
 | Portal PJ | `pj-portal-service.ts`, `PjView.tsx` |
 | LGPD | `patient-export.ts`, export JSON |

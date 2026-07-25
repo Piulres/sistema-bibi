@@ -142,7 +142,7 @@ Exemplo seed: Consulta Clínica base R$ 320 → TechCorp paga R$ 272 (15% descon
 | `/interno/dashboard` | Dashboard Executivo (KPIs) | 8 |
 | `/interno` | Faturamento Pay Per Use (+ PIX/pagar — Tier 1) | core / T1 |
 | `/interno/agenda` | Agendamentos (criar, status) | T2 |
-| `/interno/cadastros` | CRUD: beneficiários, empresas, procedimentos, usuários | T2 |
+| `/interno/cadastros` | CRUD: beneficiários, empresas, procedimentos; usuários (criar/editar **ADMIN**) | T2 |
 | `/interno/estoque` | Estoque médico (produtos, lotes, movimentações, kits) | v1.3 |
 | `/interno/crm` | Pipeline CRM corporativo | 3 |
 | `/interno/assinaturas` | Recorrência (+ faturar cobrança — Tier 1) | 5 / T1 |
@@ -236,7 +236,7 @@ Alinha com iClinic/Feegow no dia a dia:
 
 | Feature | Descrição |
 |---------|-----------|
-| CRUD Admin | Beneficiários, empresas, procedimentos, usuários (`/interno/cadastros`) |
+| CRUD Admin | Beneficiários, empresas, procedimentos; usuários criar/editar só **ADMIN** (`/interno/cadastros`) |
 | Agenda interna | Criar/reagendar, alterar status (`/interno/agenda`) |
 | Agendamento self-service | Beneficiário escolhe prestador + slot 30min (8h–18h) |
 | Relatórios CSV | Faturamento + CRM (`/interno/relatorios`) |

@@ -314,7 +314,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Beneficiários | `/api/interno/patients` | `PATCH .../patients/[id]` | — | Webhook `PATIENT_CREATED`; link Cliente 360° |
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
-| Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| Usuários | `POST /api/interno/users` (**ADMIN**) | `PATCH .../users/[id]` (**ADMIN**) | — | `GET` com módulo `cadastros` (RECEPCAO lista); criar/editar só ADMIN — UI `canManageUsers` em `CadastrosView` |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
@@ -599,7 +599,7 @@ Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; liber
 
 ## 9. RBAC — matriz perfil × módulo
 
-Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed faturamento).
+Definido em `src/lib/interno-permissions.ts`. Perfil `null` ou inválido = **READONLY** (menor privilégio). `internoProfile: "ADMIN"` explícito para administrador (ex.: `faturamento@bibi.health` no seed demo).
 
 | Módulo | ADMIN | FATURAMENTO | RECEPCAO | READONLY |
 |--------|:-----:|:-----------:|:--------:|:--------:|
@@ -623,7 +623,8 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, `users` (GET), export LGPD · `requireInternoAdmin()` em `users` POST/PATCH |
+| **Cadastros → Usuários** | `canManageUsers` (`isInternoAdmin`) — RECEPCAO vê lista; formulário criar/editar e botão Editar só para ADMIN (`interno/cadastros/page.tsx`) |
 
 > **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
 > RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.

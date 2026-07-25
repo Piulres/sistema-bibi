@@ -241,7 +241,7 @@ flowchart LR
 | Dashboard | `/interno/dashboard` | KPIs → links rápidos (faturamento, CRM, recorrência) |
 | Faturamento | `/interno` | Pendências PPU → gerar fatura → PIX / marcar paga → TISS XML |
 | Agenda | `/interno/agenda` | CRUD agendamentos, **walk-in particular**, check-in, modalidade TELE |
-| Cadastros | `/interno/cadastros` | Beneficiários, empresas, procedimentos, usuários (criar + **editar**) |
+| Cadastros | `/interno/cadastros` | Beneficiários, empresas, procedimentos; **usuários**: listar (RECEPCAO+) · criar/editar (**ADMIN** apenas) |
 | Mapa CRUD | `/interno/cadastros?tab=operations` | 27 entidades — telas, rotas API, filtro por portal |
 | CRM | `/interno/crm` | Pipeline lead → ativo (kanban) |
 | Recorrência | `/interno/assinaturas` | Assinaturas → gerar cobranças → faturar |

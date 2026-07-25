@@ -132,7 +132,8 @@ A matriz de permissões em `interno-permissions.ts` filtra **páginas e nav**, m
 - `/api/interno/invoices` (POST)
 - `/api/interno/invoices/[id]/tiss`
 - `/api/interno/companies/[id]/status`
-- `/api/interno/users` (GET/POST)
+- `/api/interno/users` — GET: `requireInternoModule("cadastros")` · POST: `requireInternoAdmin()`
+- `/api/interno/users/[id]` — PATCH: `requireInternoAdmin()`
 - `/api/interno/branding` (GET/PATCH)
 - `/api/interno/branding` — logo upload **não** usa módulo
 - `/api/interno/webhooks/*`
@@ -178,7 +179,7 @@ documentados em [`FLUXOS.md`](FLUXOS.md) §4.4.
 | Sev. | Fluxo | Problema | Arquivo |
 |------|-------|----------|---------|
 | **Alta** | MFA TOTP | `GET\|POST /api/auth/mfa/setup` aceita **qualquer role** autenticada | `src/app/api/auth/mfa/setup/route.ts` |
-| **Alta** | Editar usuários | `PATCH /api/interno/users/[id]` sem guard de módulo `cadastros` | `src/app/api/interno/users/[id]/route.ts` |
+| ~~**Alta**~~ | ~~Editar usuários~~ | ~~`PATCH` sem guard de módulo `cadastros`~~ | ✅ **Resolvido (2.4.0g):** `requireInternoAdmin` por design; UI esconde criar/editar para não-ADMIN (`CadastrosView` + `user-admin-guard.test.ts`) |
 | **Média** | Cliente 360° | `/interno/beneficiarios/[id]` sem módulo RBAC | `src/app/interno/beneficiarios/[id]/page.tsx` |
 | **Média** | Faturamento UI | `BillingView` em 403 mostra listas vazias, não erro de permissão | `src/components/BillingView.tsx` |
 | **Média** | Agenda | `updateStatus()` ignora falha de PATCH | `src/components/AppointmentsView.tsx` |
