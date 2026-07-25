@@ -109,9 +109,11 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 |------|---------|--------|
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
 | **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
-| **C** | Homologação com Alana (UX + exemplos) | Pendente humano |
+| **C** | Homologação browser 4 portais + gestão | ✅ assistida 2026-07-25 · falta humano in loco |
 | **D** | Integração opcional lançamento → fatura PPU / estoque kits | Backlog |
 | **E** | Export Excel mensal (compatível com hábito da planilha) | Backlog |
+
+Histórico detalhado: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro Alana: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md).
 
 ---
 
