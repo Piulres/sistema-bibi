@@ -12,5 +12,6 @@ Fonte: homologação browser 2026-07-25 · [`HISTORICO_VALIDACAO.md`](HISTORICO_
 | P3-a | Baixa | Tours micro após dismiss do tour principal | ✅ skip auto micros |
 | P3-b | Baixa | Interno Agenda “Consulta” hardcoded | ✅ `labels.appointment` |
 | S2 | Baixa | Tabela Dr Saúde sem empresa no seed | ✅ empresa no catálogo |
+| P1-c | Alta | Walk-in “não funciona” / some da agenda | ✅ causa: modo **demo** na Netlify (Lambda `/tmp`); uso exige **modo operação** + aviso na agenda |
 
 Backlog (não nesta leva): export Excel · lançamento → fatura PPU · E2E Playwright · Beneficiário “Consulta” residual em `BeneficiarioView`.

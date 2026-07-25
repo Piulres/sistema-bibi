@@ -11,6 +11,7 @@ import { listPatients } from "@/lib/patient-service";
 import { listProcedures } from "@/lib/procedure-service";
 import { listPets } from "@/lib/pet-service";
 import { getPrisma } from "@/lib/db";
+import { getDataStoreMode, isDualDataStoreEnabled } from "@/lib/data-store-mode";
 import { requiresPet } from "@/lib/vet-niche";
 
 export async function GET(request: Request) {
@@ -33,13 +34,15 @@ export async function GET(request: Request) {
       select: { niche: true },
     });
 
-    const [appointments, providers, patients, procedures, pets] = await Promise.all([
-      listAppointments({ tenantId: user.tenantId, from, to, providerId }),
-      listProviders(user.tenantId),
-      listPatients(user.tenantId),
-      listProcedures(user.tenantId),
-      requiresPet(tenant?.niche) ? listPets(user.tenantId) : Promise.resolve([]),
-    ]);
+    const [appointments, providers, patients, procedures, pets, dataStoreMode] =
+      await Promise.all([
+        listAppointments({ tenantId: user.tenantId, from, to, providerId }),
+        listProviders(user.tenantId),
+        listPatients(user.tenantId),
+        listProcedures(user.tenantId),
+        requiresPet(tenant?.niche) ? listPets(user.tenantId) : Promise.resolve([]),
+        isDualDataStoreEnabled() ? getDataStoreMode() : Promise.resolve("demo" as const),
+      ]);
 
     return NextResponse.json({
       appointments,
@@ -48,6 +51,9 @@ export async function GET(request: Request) {
       procedures,
       pets,
       niche: tenant?.niche,
+      dataStoreMode,
+      /** Em demo na Netlify, escritas no /tmp somem entre Lambdas — walk-in parece falhar. */
+      walkInEphemeral: isDualDataStoreEnabled() && dataStoreMode === "demo",
     });
   } catch (error) {
     return authErrorResponse(error);

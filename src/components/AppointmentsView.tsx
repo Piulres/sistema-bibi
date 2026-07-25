@@ -45,6 +45,9 @@ type AppointmentsPayload = {
   patients?: Option[];
   procedures?: ProcedureOption[];
   pets?: PetOption[];
+  dataStoreMode?: "demo" | "operation";
+  /** true = modo demo em dual-store: cadastros podem sumir após o reload. */
+  walkInEphemeral?: boolean;
 };
 
 const fieldClass =
@@ -78,6 +81,7 @@ export default function AppointmentsView() {
   const patients = data?.patients ?? [];
   const procedures = data?.procedures ?? [];
   const pets = data?.pets ?? [];
+  const walkInEphemeral = Boolean(data?.walkInEphemeral);
 
   const [form, setForm] = useState({
     patientId: "",
@@ -263,6 +267,15 @@ export default function AppointmentsView() {
       onRetry={() => void reload()}
     >
       <div className="space-y-8">
+        {walkInEphemeral ? (
+          <CalloutCard
+            data-tour-id="walk-in-ephemeral-warning"
+            variant="warning"
+            title="Modo demo — walk-in pode sumir"
+            description="O site está em massa de teste. Cadastros na agenda não ficam gravados de forma confiável entre telas. Peça a um ADMIN para ir em Segurança → Base de dados → Operação (confirmar OPERAR) e tente de novo."
+            badge="Atenção"
+          />
+        ) : null}
         <CalloutCard
           id="walk-in"
           data-tour-id="walk-in-callout"

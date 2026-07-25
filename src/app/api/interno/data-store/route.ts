@@ -87,16 +87,26 @@ export async function POST(request: Request) {
     await setDataStoreMode(mode);
     await invalidatePrismaCache();
 
-    await recordTimelineEvent({
-      tenantId: user.tenantId,
-      entityType: TIMELINE_ENTITY_TYPES.SECURITY,
-      entityId: user.tenantId,
-      action: TIMELINE_ACTIONS.DATA_STORE_CHANGED,
-      description: `Base de dados alterada: ${status.mode} → ${mode}`,
-      createdBy: user.id,
-    });
-
     const prisma = await getPrisma();
+    // Sessão ainda aponta ao tenant do modo anterior — no DB novo o id pode não existir.
+    const timelineTenant =
+      (await prisma.tenant.findFirst({
+        where: { id: user.tenantId },
+        select: { id: true },
+      })) ??
+      (await prisma.tenant.findFirst({ select: { id: true } }));
+
+    if (timelineTenant) {
+      await recordTimelineEvent({
+        tenantId: timelineTenant.id,
+        entityType: TIMELINE_ENTITY_TYPES.SECURITY,
+        entityId: timelineTenant.id,
+        action: TIMELINE_ACTIONS.DATA_STORE_CHANGED,
+        description: `Base de dados alterada: ${status.mode} → ${mode}`,
+        createdBy: user.id,
+      });
+    }
+
     const [users, patients, companies] = await Promise.all([
       prisma.user.count(),
       prisma.patient.count(),

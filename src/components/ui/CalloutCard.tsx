@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils/cn";
 import Card from "@/components/ui/Card";
 
-type Variant = "walk-in" | "info" | "success";
+type Variant = "walk-in" | "info" | "success" | "warning";
 
 const variantClass: Record<Variant, string> = {
   "walk-in":
@@ -9,6 +9,8 @@ const variantClass: Record<Variant, string> = {
   info: "border-l-4 border-l-[var(--status-info-text)] bg-[var(--status-info-bg)]/30",
   success:
     "border-l-4 border-l-[var(--status-success-text)] bg-[var(--status-success-bg)]/30",
+  warning:
+    "border-l-4 border-l-[var(--status-warning-text)] bg-[var(--status-warning-bg)]/40",
 };
 
 type Props = React.HTMLAttributes<HTMLDivElement> & {
