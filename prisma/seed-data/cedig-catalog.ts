@@ -253,11 +253,13 @@ async function upsertCedigPricingRules(
   }
 }
 
-/** Empresas + PricingRules + usuários PJ demo — seguro também em modo operação. */
+/** Empresas + PricingRules (+ PJ demo opcional). Em operação: empresas/regras sem logins PJ fictícios. */
 async function upsertCedigCommercialLayer(
   prisma: PrismaClient,
   tenantId: string,
+  options: { includePjUsers?: boolean } = {},
 ): Promise<Record<string, string>> {
+  const includePjUsers = options.includePjUsers !== false;
   const companies = [
     {
       name: "CentralMed",
@@ -332,29 +334,31 @@ async function upsertCedigCommercialLayer(
     },
   ] as const;
 
-  for (const pj of pjUsers) {
-    const pjExisting = await prisma.user.findUnique({ where: { email: pj.email } });
-    if (pjExisting) {
-      await prisma.user.update({
-        where: { id: pjExisting.id },
-        data: {
-          name: pj.name,
-          role: "PJ",
-          tenantId,
-          companyId: pj.companyId,
-        },
-      });
-    } else {
-      await prisma.user.create({
-        data: {
-          email: pj.email,
-          name: pj.name,
-          password: DEMO_PASSWORD,
-          role: "PJ",
-          tenantId,
-          companyId: pj.companyId,
-        },
-      });
+  if (includePjUsers) {
+    for (const pj of pjUsers) {
+      const pjExisting = await prisma.user.findUnique({ where: { email: pj.email } });
+      if (pjExisting) {
+        await prisma.user.update({
+          where: { id: pjExisting.id },
+          data: {
+            name: pj.name,
+            role: "PJ",
+            tenantId,
+            companyId: pj.companyId,
+          },
+        });
+      } else {
+        await prisma.user.create({
+          data: {
+            email: pj.email,
+            name: pj.name,
+            password: DEMO_PASSWORD,
+            role: "PJ",
+            tenantId,
+            companyId: pj.companyId,
+          },
+        });
+      }
     }
   }
 
@@ -364,7 +368,9 @@ async function upsertCedigCommercialLayer(
 
 /** Pacientes + acessos Beneficiário (demo dos 4 portais). */
 async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
-  const companyIds = await upsertCedigCommercialLayer(prisma, tenantId);
+  const companyIds = await upsertCedigCommercialLayer(prisma, tenantId, {
+    includePjUsers: true,
+  });
 
   const patients = [
     {
@@ -475,11 +481,29 @@ async function bridgeUnsyncedCedigLaunches(
     select: { id: true },
     take: 20,
   });
-  for (const row of pending) {
-    await bridgeExamLaunchToOperations({
-      tenantId,
-      launchId: row.id,
-    });
+  if (pending.length === 0) return;
+
+  // Seed escreve em DATABASE_URL; getPrisma() no dual-store pode apontar outro .db.
+  const prevDual = process.env.DUAL_DATA_STORE;
+  process.env.DUAL_DATA_STORE = "false";
+  try {
+    const { invalidatePrismaCache } = await import("../../src/lib/db");
+    await invalidatePrismaCache();
+    for (const row of pending) {
+      await bridgeExamLaunchToOperations({
+        tenantId,
+        launchId: row.id,
+      });
+    }
+  } finally {
+    if (prevDual === undefined) delete process.env.DUAL_DATA_STORE;
+    else process.env.DUAL_DATA_STORE = prevDual;
+    try {
+      const { invalidatePrismaCache } = await import("../../src/lib/db");
+      await invalidatePrismaCache();
+    } catch {
+      /* ignore */
+    }
   }
 }
 
@@ -684,7 +708,7 @@ export async function ensureCedigTenant(
     if (portalMass) {
       await upsertCedigPortalMass(prisma, existing.id);
     } else if (commercialLayer) {
-      await upsertCedigCommercialLayer(prisma, existing.id);
+      await upsertCedigCommercialLayer(prisma, existing.id, { includePjUsers: false });
     }
     if (seedHistory) {
       await seedCedigOperationalHistory(prisma, existing.id);
@@ -719,7 +743,7 @@ export async function ensureCedigTenant(
   if (portalMass) {
     await upsertCedigPortalMass(prisma, tenant.id);
   } else if (commercialLayer) {
-    await upsertCedigCommercialLayer(prisma, tenant.id);
+    await upsertCedigCommercialLayer(prisma, tenant.id, { includePjUsers: false });
   }
   if (seedHistory) {
     await seedCedigOperationalHistory(prisma, tenant.id);
