@@ -393,7 +393,7 @@ src/
 - SQLite local — migrar para Postgres em produção (Netlify Database)
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v2.6.0**:
+- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.0** (PWA `/instalar`):
   https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
   Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual; Stop builds ON).
   Se retornar **503 `usage_exceeded`**, é cota Netlify — não é bug de código.
@@ -417,6 +417,7 @@ src/
 | `docs/plataforma/COMMUNICATIONS.md` | Motor de comunicação Strategy |
 | `docs/plataforma/DESIGN_SYSTEM.md` | Design system, tokens CSS e white label |
 | `docs/plataforma/DEPLOY_NETLIFY.md` | Deploy Netlify (produção + troubleshooting) |
+| `docs/plataforma/PWA.md` | PWA v3.0 — instalação, smoke e arquitetura |
 | `docs/versoes/RELEASES.md` | Pacotes fechados — o que está em produção vs pendente |
 | `docs/plataforma/WORKFLOW_CURSOR.md` | Workflow Cursor sem deploy automático |
 | `docs/plataforma/OPERACOES.md` | Mapa completo de operações + regras para agentes IA |

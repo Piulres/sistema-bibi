@@ -129,7 +129,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
 | Média | Notificações mock (`COMMUNICATION_PROVIDER=console`) | Adapter real (e-mail/SMS/WhatsApp) |
 | Baixa | Sem carteirinha digital | Card com QR + dados do plano corporativo |
-| Baixa | Sem PWA / app nativo | PWA instalável com push de lembrete |
+| Baixa | Push de lembrete (PWA sem service worker) | Service worker + push notifications (fase B v3.0) |
 
 **Código:** `src/components/BeneficiarioView.tsx` · APIs em `src/app/api/beneficiario/`
 
@@ -334,7 +334,7 @@ Escala por dimensão de jornada (não cobertura de código).
 | Self-service | ✅ agendar + pagar | ❌ só leitura | 🟡 só atendimento | ✅ CRUD completo |
 | Transparência financeira | ⭐ ✅ | ⭐ ✅ | 🟡 vê preço no ato | ✅ |
 | Comunicação proativa | 🟡 mock | 🟡 alertas passivos | ❌ | 🟡 fila mock |
-| Mobile / PWA | 🟡 drawer + nav rolável | 🟡 drawer seções | ✅ 1 aba | 🟡 drawer &lt; lg |
+| Mobile / PWA | ✅ instalável (`/instalar`) · 🟡 drawer | 🟡 drawer seções | ✅ 1 aba | 🟡 drawer &lt; lg |
 | Integrações reais | 🟡 PIX mock | 🟡 CSV only | ❌ | 🟡 webhooks OK, TISS parcial |
 
 Legenda: ✅ implementado · 🟡 parcial/mock · ❌ ausente · ⭐ diferencial vs mercado clínico.

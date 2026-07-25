@@ -71,6 +71,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) | Mapa de operações e regras para agentes |
 | [`plataforma/ARQUITETURA.md`](plataforma/ARQUITETURA.md) | Diagramas, épicos, stack |
 | [`plataforma/DEPLOY_NETLIFY.md`](plataforma/DEPLOY_NETLIFY.md) | Deploy e troubleshooting |
+| [`plataforma/PWA.md`](plataforma/PWA.md) | PWA v3.0 — instalação, smoke e arquitetura |
 | [`plataforma/OPERACAO_DADOS.md`](plataforma/OPERACAO_DADOS.md) | Dual-store demo/operação |
 | [`plataforma/VARIAVEIS_AMBIENTE.md`](plataforma/VARIAVEIS_AMBIENTE.md) | Env vars (local, CI, Netlify) |
 | [`plataforma/TESTES.md`](plataforma/TESTES.md) | Estratégia e mapa de testes |

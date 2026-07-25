@@ -15,10 +15,11 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.6.0`** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
-| Pacote anterior | **`v2.4.0`** — CEDIG gestão clínica |
-| `main` / `dev` | Sincronizadas · tag `v2.6.0` |
-| Tags git | ✅ `v2.4.0` · `v2.5.0` (empilhado) · `v2.6.0` |
+| Pacote em produção | **`v3.0.0`** — deploy `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
+| Pacote anterior | **`v2.6.0`** — CEDIG pontes + login tenant/portal |
+| `main` / `dev` | Sincronizadas · tag `v3.0.0` |
+| Tags git | ✅ `v2.4.0` · `v2.6.0` · **`v3.0.0`** |
+| PWA | `/instalar` · `/manifest.webmanifest` · smoke `smoke-netlify-pwa` no `pre-release` |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
@@ -103,10 +104,12 @@ npm run pre-release
 # 2. Publicar (build integrado — obrigatório para Next.js)
 npx netlify deploy --prod --message "vX.Y.Z: descrição"
 
-# 3. Smoke test — assets estáticos
+# 3. Smoke test — assets estáticos e PWA
+curl -s https://sistema-bibi.netlify.app/manifest.webmanifest | jq '.display'
+curl -s -o /dev/null -w "%{http_code}\n" https://sistema-bibi.netlify.app/instalar
 curl -s https://sistema-bibi.netlify.app/ | rg -o '/_next/static/chunks/[^"]+\.css' | head -1 \
   | xargs -I{} curl -s -o /dev/null -w "%{http_code}\n" "https://sistema-bibi.netlify.app{}"
-# Deve retornar 200
+# Deve retornar standalone + 200 + 200
 ```
 
 > **Não use `--no-build`** com `@netlify/plugin-nextjs`. O HTML é publicado, mas
