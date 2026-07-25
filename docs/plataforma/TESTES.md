@@ -32,6 +32,12 @@ as operações suportadas (C/R/U/D).
 | Gate | `tests/lib/crud-coverage.test.ts` | Falha se faltar entidade ou arquivo |
 | API (preferido) | `tests/api/cadastros-crud.test.ts` · `tests/api/system-crud-matrix.test.ts` · demais `tests/api/*` | Happy path + RBAC leve |
 | E2E (smoke UI) | `e2e/cadastros-crud.spec.ts` · `e2e/cedig-gestao.spec.ts` · `e2e/walkin-particular.spec.ts` | Confirma formulários e toasts |
+| Gate de cobertura | `tests/lib/crud-coverage.test.ts` | Falha se alguma das **34** entidades do mapa não tiver teste declarado |
+
+**`system-crud-matrix.test.ts`** cobre entidades sem UI dedicada em cadastros: pets (VET),
+regras de precificação, protocolos, webhooks, mensagens, CEDIG (lançamentos/despesas),
+branding, assinaturas, estoque e change management. Complementa `cadastros-crud.test.ts`
+(beneficiário, empresa, procedimento, usuário).
 
 **Regra para PRs:** nova entidade CRUD = entrada no mapa + entrada no registry +
 teste API (E2E só se houver UI crítica). Validar com `npm run test`.
@@ -300,10 +306,75 @@ Senha única: `bibi123`
 | Arquivo | Cobertura |
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
-| `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
+| `flows.spec.ts` | Proxy, PJ, beneficiário (resumo com `useLabels()`), prestador, logout |
+| `cadastros-crud.spec.ts` | Abas interno — CREATE+UPDATE beneficiário/empresa/usuário; CREATE+UPDATE+DELETE procedimento; RBAC recepção |
 | `interno-modules.spec.ts` | **13** módulos interno (nav `INTERNO_NAV_TABS`) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, export, lançamentos |
+| `assistant.spec.ts` | Assistente interno — MEDICAL + VET PetCare |
+
+---
+
+## E2E Playwright — padrões e armadilhas
+
+Helpers compartilhados em `e2e/helpers/`:
+
+| Arquivo | Exporta | Uso |
+|---------|---------|-----|
+| `auth.ts` | `loginAs`, `skipOnboardingTours`, `dismissOnboardingIfVisible` | Login demo + isolar tour guiado |
+| `feedback.ts` | `expectFeedbackMessage`, `confirmDialog` | Toasts de sucesso/erro e diálogos destrutivos |
+
+### Onboarding (backdrop intercepta cliques)
+
+O webServer do Playwright define `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true`
+(`playwright.config.ts`). Mesmo assim, specs que navegam para cadastros devem:
+
+1. Chamar `skipOnboardingTours()` antes do login (`loginAs` já faz isso via `addInitScript`).
+2. Após `page.goto("/interno/cadastros")`, chamar `dismissOnboardingIfVisible()` se o overlay
+   ainda estiver visível.
+
+Doc do tour: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md).
+
+### Strict mode — toast vs. listagem
+
+Após UPDATE, o toast de sucesso repete o nome editado (ex.: `Usuário Dr E2E … Edit atualizado`).
+Um `page.getByText("Dr E2E … Edit")` **sem escopo** encontra toast **e** linha da listagem →
+Playwright falha em **strict mode violation**.
+
+**Padrão correto** (ver `e2e/cadastros-crud.spec.ts`):
+
+```ts
+await expectFeedbackMessage(page, new RegExp(`Usuário ${name} Edit atualizado`));
+await expect(
+  listItemByText(page, email).getByText(`${name} Edit`, { exact: true }),
+).toBeVisible();
+```
+
+- Toast → `expectFeedbackMessage` com regex específica.
+- Estado na UI → escopar em `listitem` (`listItemByText` / `listItemByCode`) ou `getByRole("link")`.
+
+### Labels multi-nicho (`useLabels()`)
+
+Textos de KPI e nav variam por `Tenant.niche` / `Tenant.labels`. No tenant MEDICAL demo,
+o resumo do beneficiário exibe **"Próximo consulta"**, não "Próximo atendimento".
+
+**Evitar:** string fixa de outro nicho no assert.
+
+**Preferir:** regex com alternativas do vocabulário esperado:
+
+```ts
+await expect(page.getByText(/^Próximo (consulta|atendimento|exame)$/i)).toBeVisible();
+```
+
+Para navegação interna, usar `href` estável (`internoNavLink(page, "/interno/cadastros")`) em vez
+do rótulo visível da aba.
+
+### Rodar um spec isolado
+
+```bash
+CI=true npx playwright test e2e/cadastros-crud.spec.ts --project=chromium
+```
 
 ---
 

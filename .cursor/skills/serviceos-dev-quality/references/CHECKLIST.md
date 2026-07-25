@@ -20,6 +20,7 @@ Use antes do commit / PR.
 
 - [ ] Causa raiz explicada (bugs)
 - [ ] Teste Vitest para lógica pura / serviço crítico
+- [ ] E2E novo: escopar asserts pós-toast (`listitem`); labels via regex, não string fixa de outro nicho
 - [ ] `npm run lint` OK nos arquivos tocados
 - [ ] `npm run docs:verify` se mexeu em versão/changelog/docs estruturados
 

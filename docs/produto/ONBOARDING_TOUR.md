@@ -100,7 +100,12 @@ Chave: `bibi_onboarding`
 
 Auto-start desligado em testes: `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true` em `playwright.config.ts`.
 
-Helper `skipOnboardingTours()` em `e2e/helpers/auth.ts` marca portais e rotas como concluídos.
+| Helper | Arquivo | Quando |
+|--------|---------|--------|
+| `skipOnboardingTours()` | `e2e/helpers/auth.ts` | Antes do login — `addInitScript` marca portais e rotas como concluídos |
+| `dismissOnboardingIfVisible()` | idem | Após navegar — fecha overlay se ainda interceptar cliques (ex.: cadastros CRUD) |
+
+Armadilhas adicionais (strict mode com toast, labels `useLabels()`): [`plataforma/TESTES.md`](../plataforma/TESTES.md) — seção *E2E Playwright*.
 
 ---
 

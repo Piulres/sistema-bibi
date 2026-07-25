@@ -4,6 +4,10 @@ Registro da execução completa de testes após a iteração **v4** (captação,
 
 > **Branch:** `dev` / `cursor/analise-diaria-docs-87f9` · **Análise diária:** [`ANALISE_DIARIA.md`](ANALISE_DIARIA.md)
 
+> **Atualização jul/2026:** falhas E2E de `cadastros-crud.spec.ts` citadas abaixo foram corrigidas
+> (`skipOnboardingTours` + `dismissOnboardingIfVisible`, asserts com escopo pós-toast, labels
+> `useLabels()`). Ver [`plataforma/TESTES.md`](../plataforma/TESTES.md) — *E2E Playwright*.
+
 ---
 
 ## Última execução (2026-06-27 — pós-merge comercial na dev)
