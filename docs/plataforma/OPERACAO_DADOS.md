@@ -97,6 +97,18 @@ npm run dev
 
 Para voltar à demo: confirmar com `DEMO`.
 
+### Provisionar CEDIG na operação
+
+O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo, sem histórico de homologação).
+Se a base em Blobs for anterior a esse bootstrap, um ADMIN pode chamar:
+
+```bash
+POST /api/interno/operation/provision-cedig
+{ "confirm": "CEDIG" }
+```
+
+Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
+
 ---
 
 ## Limitações conhecidas

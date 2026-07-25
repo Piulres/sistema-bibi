@@ -22,12 +22,14 @@
 | Téc. enfermagem | Márcia |
 | Médicos | Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Auto |
 
-Seed demo (`/?tenant=cedig`, senha `bibi123`):
+Credenciais (`/?tenant=cedig`, senha `bibi123`) — massa demo e bootstrap de **operação**:
 
 - `alana@cedig.demo` / `recepcao@cedig.demo` — secretária
 - `joao.marcos@cedig.demo` · `marcia@cedig.demo`
 - `alexandre.marcal@cedig.demo` · `luiza.lage@cedig.demo` · `bruno.dias@cedig.demo` · `luiza.zeraik@cedig.demo` · `fernanda.auto@cedig.demo`
 - `operacao@cedig.demo` — ADMIN
+
+Em produção (modo operação): provisionar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }` se o tenant ainda não existir na base Blobs.
 
 ---
 

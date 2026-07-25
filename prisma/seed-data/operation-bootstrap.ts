@@ -5,6 +5,7 @@
 import { PrismaClient } from "@prisma/client";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { hashPassword } from "../../src/lib/password";
+import { ensureCedigTenant } from "./cedig-catalog";
 import { ALL_SEED_PROCEDURES } from "./pricing-market";
 import { currentTotpCode, DEMO_MFA_SECRET } from "./totp-demo";
 
@@ -21,6 +22,7 @@ export async function runOperationBootstrap(
 ): Promise<OperationBootstrapResult> {
   const existingTenant = await prisma.tenant.findFirst();
   if (existingTenant) {
+    await ensureCedigTenant(prisma, { seedHistory: false });
     const users = await prisma.user.count();
     const procedures = await prisma.procedure.count();
     return {
@@ -116,11 +118,16 @@ export async function runOperationBootstrap(
     });
   }
 
+  const cedig = await ensureCedigTenant(prisma, { seedHistory: false });
+
   console.log("  Operação — bootstrap mínimo:");
   console.log("  Prestador  -> dra.helena@bibi.health / bibi123");
   console.log("  Interno    -> faturamento@bibi.health / bibi123 (ADMIN)");
   console.log("  Recepção   -> recepcao@bibi.health / bibi123");
   console.log(`  MFA demo   -> seguranca@bibi.health / bibi123 + TOTP ${currentTotpCode(DEMO_MFA_SECRET)}`);
+  console.log(
+    `  CEDIG      -> /?tenant=cedig · alana@cedig.demo / bibi123 (${cedig.created ? "criado" : "atualizado"})`,
+  );
 
   return {
     tenantId: tenant.id,

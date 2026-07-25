@@ -539,15 +539,24 @@ async function seedCedigOperationalHistory(
   });
 }
 
+export type EnsureCedigTenantOptions = {
+  /** Inclui lançamentos/agenda de homologação (padrão: true na massa demo). */
+  seedHistory?: boolean;
+};
+
 /**
  * Garante tenant CEDIG (demo ou operação) com branding e catálogo.
  * Idempotente por slug `cedig`.
  */
-export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
+export async function ensureCedigTenant(
+  prisma: PrismaClient,
+  options: EnsureCedigTenantOptions = {},
+): Promise<{
   tenantId: string;
   created: boolean;
   procedures: number;
 }> {
+  const seedHistory = options.seedHistory !== false;
   const existing = await prisma.tenant.findUnique({ where: { slug: "cedig" } });
   if (existing) {
     const procedures = await upsertCedigProcedures(prisma, existing.id);
@@ -559,7 +568,9 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
     });
     await upsertCedigStaff(prisma, existing.id);
     await upsertCedigPortalMass(prisma, existing.id);
-    await seedCedigOperationalHistory(prisma, existing.id);
+    if (seedHistory) {
+      await seedCedigOperationalHistory(prisma, existing.id);
+    }
     return { tenantId: existing.id, created: false, procedures };
   }
 
@@ -588,7 +599,9 @@ export async function ensureCedigTenant(prisma: PrismaClient): Promise<{
   const procedures = await upsertCedigProcedures(prisma, tenant.id);
   await upsertCedigStaff(prisma, tenant.id);
   await upsertCedigPortalMass(prisma, tenant.id);
-  await seedCedigOperationalHistory(prisma, tenant.id);
+  if (seedHistory) {
+    await seedCedigOperationalHistory(prisma, tenant.id);
+  }
 
   return { tenantId: tenant.id, created: true, procedures };
 }
