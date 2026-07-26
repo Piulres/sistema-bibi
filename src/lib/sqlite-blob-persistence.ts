@@ -2,6 +2,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from
 import { join } from "node:path";
 import type { DataStoreMode } from "@/lib/data-store-mode";
 import { isLambdaSqliteRuntime } from "@/lib/database-env";
+import { syncSqliteSchema } from "@/lib/operation/schema-sync";
 
 const BLOB_STORE = "bibi-databases";
 const OPERATION_BLOB_KEY = "operation.db";
@@ -12,6 +13,8 @@ const LEGACY_BUILD_DB = join(process.cwd(), "prisma", "dev.db");
 
 const TMP_DEMO_DB = "/tmp/bibi-demo.db";
 const TMP_OPERATION_DB = "/tmp/bibi-operation.db";
+/** Cópia gravável da referência de schema (o artefato de build fica em FS read-only na Lambda). */
+const TMP_SCHEMA_REF_DB = "/tmp/bibi-operation-schema-ref.db";
 
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 let persistInFlight: Promise<void> | null = null;
@@ -97,15 +100,57 @@ async function ensureLambdaDemoDb(): Promise<string> {
   return TMP_DEMO_DB;
 }
 
+/** Última versão do banco em que o schema-sync rodou (evita reprocesso). */
+let schemaSyncedVersion: string | null = null;
+
+/**
+ * O Blob de operação congela o schema da época do primeiro persist — `db push`
+ * não roda na Lambda, então tabelas/colunas novas nunca chegariam à produção
+ * (incidente: ClinicExamLaunch sem colunas da ponte v2.6 → 500 na gestão).
+ * Aplica adições de schema usando o artefato de build como referência.
+ */
+async function ensureOperationSchemaCurrent(activePath: string): Promise<void> {
+  const buildArtifact = resolveBuildArtifact("operation");
+  if (!existsSync(buildArtifact) || buildArtifact === activePath) return;
+
+  const versionKey = `${activePath}:${localBlobUpdatedAt ?? "bootstrap"}`;
+  if (schemaSyncedVersion === versionKey) return;
+
+  try {
+    // O artefato de build vive em FS read-only na Lambda; SQLite/Prisma pode
+    // precisar de journal ao conectar, então lê a partir de uma cópia em /tmp.
+    let referencePath = buildArtifact;
+    if (isLambdaSqliteRuntime()) {
+      copyFileSync(buildArtifact, TMP_SCHEMA_REF_DB);
+      referencePath = TMP_SCHEMA_REF_DB;
+    }
+    const result = await syncSqliteSchema(activePath, referencePath);
+    if (
+      result.createdTables.length ||
+      result.addedColumns.length ||
+      result.createdIndexes.length ||
+      result.skipped.length
+    ) {
+      console.log("[operation-schema-sync]", JSON.stringify(result));
+    }
+    schemaSyncedVersion = versionKey;
+  } catch (error) {
+    // Não bloquear o boot — sem o sync, o comportamento volta ao anterior.
+    console.error("[operation-schema-sync] falha ao migrar schema:", error);
+  }
+}
+
 async function ensureLambdaOperationDb(): Promise<string> {
   const synced = await syncOperationDatabaseFromBlob();
   if (existsSync(TMP_OPERATION_DB)) {
     void synced;
+    await ensureOperationSchemaCurrent(TMP_OPERATION_DB);
     return TMP_OPERATION_DB;
   }
 
   const bootstrap = resolveBuildArtifact("operation");
   copyIfNewer(bootstrap, TMP_OPERATION_DB);
+  await ensureOperationSchemaCurrent(TMP_OPERATION_DB);
   return TMP_OPERATION_DB;
 }
 
