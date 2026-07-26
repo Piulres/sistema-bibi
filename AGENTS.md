@@ -63,8 +63,13 @@ Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (m
 - Comandos padrão estão em `package.json`: `npm run dev`, `npm run build`, `npm run lint`.
 - Banco local (Prisma + SQLite): primeiro setup em uma VM nova exige criar o `.env`
   e popular o banco (o `dev.db` e o `.env` são gitignored, então **não** vêm no checkout):
- - `cp .env.example .env` (se `.env` não existir)
- - `npm run db:reset` (faz `prisma db push --force-reset` + seed) ou `npm run db:push && npm run db:seed`
+ - **Atalho (recomendado): `npm run setup`** — idempotente e não destrutivo: cria `.env`,
+   roda `prisma db push` + `prisma db seed` (só se o banco estiver vazio) e remove resíduo
+   do dual-store (`prisma/.data-store-mode`). Não instala deps nem browser do Playwright.
+ - Manual: `cp .env.example .env` (se ausente) e `npm run db:push && npm run db:seed`.
+ - E2E: `npx playwright install chromium` (uma vez por VM) e **pare o `npm run dev`** antes
+   de `npm run test:e2e` (Next 16 só permite um dev server por projeto; o Playwright sobe o
+   próprio na porta 3100). Gotchas completos: `docs/plataforma/TESTES.md` §Setup e gotchas.
 - O `postinstall` roda `prisma generate` automaticamente no `npm install`.
 - **Agentes (Cursor): `npm run db:reset` é BLOQUEADO** — qualquer comando Prisma
  destrutivo (`--force-reset`/`migrate`) dispara um prompt de consentimento e aborta.
