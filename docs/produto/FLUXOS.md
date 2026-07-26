@@ -239,7 +239,7 @@ Quando `User.mfaEnabled = true`:
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
-| Calendário externo | `GET/POST/DELETE /api/prestador/calendar` + `.../appointments/[id]/calendar` | Feed ICS + links Google/Outlook — [`CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md) |
+| Calendário externo | OAuth Google/Microsoft + feed ICS + `.../appointments/[id]/calendar` | Push automático + fallback ICS — [`CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md) |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
