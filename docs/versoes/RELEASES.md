@@ -150,6 +150,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.9`** | `0bd89b2` | Hotfix timezone America/Sao_Paulo (#263) · deploy `6a669510` |
 | **`v3.0.8`** | `5c94251` | Jornada consultório + reset operacional CEDIG + docs sync |
 | **`v3.0.7`** | `25385b2` | Drawer mobile direita + dashboard + gestão mobile + exports + E2E/docs sync |
 | **`v3.0.6`** | `ed14233` | Home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) |
