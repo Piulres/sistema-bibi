@@ -763,6 +763,7 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 | `/interno/cadastros` | `patient-service`, `company-service`, `procedure-service`, `user-service` |
 | `/interno/agenda` | `appointment-service` |
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
+| Exports portais | `ExportButtons` + `format.ts` | CSV/JSON/TXT/PDF/XLSX canônicos (v3.0.7) |
 | `/beneficiario` (agendar) | `scheduling-service` |
 
 ---
@@ -813,6 +814,9 @@ flowchart LR
 | MRR estimado | `Subscription` ATIVA (normalizado mensal) |
 | Pipeline CRM | `Company` por status |
 | Atividade recente | `TimelineEvent` (últimos 10) |
+| Gestão clínica (mês) | `clinicFinance` — exames, receita, despesas, lucro |
+
+**Hierarquia UI (v3.0.7):** alerta de fonte dos números → 4 KPIs principais (`StatCard`) → faixa secundária → cards Receita/CRM/atividade. Ver `ExecutiveDashboardView.tsx`.
 
 ### Checklist de homologação (Épico 8)
 
@@ -828,7 +832,7 @@ flowchart LR
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/openapi.yaml).
 
-| Métrica | Valor (v3.0.6) |
+| Métrica | Valor (v3.0.7) |
 |---------|----------------|
 | Route Handlers | **160** em `src/app/api/**/route.ts` |
 | Paths OpenAPI | **123** (sync automático) |

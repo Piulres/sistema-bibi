@@ -105,15 +105,16 @@ Fonte: `src/lib/landing/navigation.ts`.
 
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
 
-### Portal nav — abas de rota (v3.0.6)
+### Portal nav — abas de rota (v3.0.7)
 
-Fonte: `src/components/ui/NavTabs.tsx` + `src/lib/navigation/portal-nav.ts`.
+Fonte: `src/components/ui/NavTabs.tsx` + `src/lib/navigation/portal-nav.ts` + `MobileNavDrawer.tsx`.
 
 | Breakpoint | Comportamento |
 |------------|---------------|
 | Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com abas primárias; módulos `priority: "secondary"` no menu **Mais** |
 | Aba secundária ativa | Pinada na faixa principal (não some no dropdown) |
-| Mobile (`< lg`) | `MobileNavDrawer` portaled — gatilho com módulo ativo + contagem |
+| Mobile (`< lg`) | `MobileNavDrawer` portaled — **abre pela direita** (`right-0`, animação `ds-nav-drawer-enter`); gatilho mostra só o módulo ativo (sem contagem) |
+| Grupos no drawer | Tabs com `group` → cabeçalho com contraste + separador `border-t` entre categorias |
 | Sticky | `PORTAL_NAV_STICKY_CLASS` em `data-tour-id="portal-nav"` nos 4 portais |
 
 Definição das abas: `buildInternoNavTabs()`, `buildPrestadorNavTabs()`, etc. em `src/lib/navigation/`. E2E: `e2e/mobile-nav.spec.ts`.
@@ -135,7 +136,7 @@ Padrão para abas com muitos itens (portal-nav + atendimento/cadastros):
 3. Em portais com muitos módulos (interno, beneficiário), marcar `priority: "secondary"` — vão para o menu **Mais** no desktop; a aba ativa secundária fica pinada na faixa.
 4. `ScrollableNavRail` adiciona scroll + setas e centraliza a aba `[aria-current]` / `data-nav-key`.
 5. `portal-nav` é **sticky** (`PORTAL_NAV_STICKY_CLASS`) nos quatro portais.
-6. Mobile (`< lg`): drawer portaled com grupos (`group`) e gatilho “Navegação · N módulos”.
+6. Mobile (`< lg`): drawer portaled pela **direita** com grupos (`group`); gatilho “Navegação” + label do módulo ativo (sem contagem).
 
 ## Layout
 

@@ -15,10 +15,10 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v3.0.6`** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) |
-| Pacote anterior | **`v3.0.5`** — deploy `6a65c17d` @ `cf0eb26` (`bibi-poc-2026-07-26e`) |
-| `main` / `dev` | **v3.0.6** · sincronizadas @ `ed14233` |
-| Tags git | ✅ `v2.4.0` … `v3.0.6` |
+| Pacote em produção | **`v3.0.7`** — deploy `6a65e256` @ `bce3203` (`bibi-poc-2026-07-26g`) |
+| Pacote anterior | **`v3.0.6`** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) |
+| `main` / `dev` | **v3.0.7** · sincronizadas @ `bce3203` |
+| Tags git | ✅ `v2.4.0` … `v3.0.7` |
 | Doc | [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V3_0.md`](../versoes/V3_0.md) |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + openapi + db + test + build + smoke PWA) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
