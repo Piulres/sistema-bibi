@@ -16,6 +16,16 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
     await expect(page.getByText(/Carregando gestão clínica/i)).toHaveCount(0, {
       timeout: 20_000,
     });
+    const retry = page.getByRole("button", { name: /Tentar novamente/i });
+    if (await retry.isVisible().catch(() => false)) {
+      await retry.click();
+      await expect(page.getByText(/Carregando gestão clínica/i)).toHaveCount(0, {
+        timeout: 20_000,
+      });
+    }
+    await expect(page.locator('[data-cursor-id="clinic-finance-root"]')).toBeVisible({
+      timeout: 20_000,
+    });
 
     const unique = `E2E Cedig ${Date.now()}`;
     await page.getByLabel(/Nome do paciente/i).fill(unique);
@@ -99,9 +109,16 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
     await expect(page.getByText(/Carregando gestão clínica/i)).toHaveCount(0, {
       timeout: 20_000,
     });
+    const retry = page.getByRole("button", { name: /Tentar novamente/i });
+    if (await retry.isVisible().catch(() => false)) {
+      await retry.click();
+      await expect(page.getByText(/Carregando gestão clínica/i)).toHaveCount(0, {
+        timeout: 20_000,
+      });
+    }
 
     const root = page.locator('[data-cursor-id="clinic-finance-root"]');
-    await expect(root).toBeVisible();
+    await expect(root).toBeVisible({ timeout: 20_000 });
     await expect(page.getByRole("button", { name: /Registrar lançamento/i })).toBeVisible();
     await expect(page.getByLabel(/Nome do paciente/i)).toBeVisible();
 

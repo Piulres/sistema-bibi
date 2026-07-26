@@ -642,8 +642,8 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
 
             <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] pt-4">
               <h3 className={sectionTitleClass}>Extras clínicos</h3>
-              <div className="grid min-w-0 grid-cols-2 gap-3 xl:grid-cols-3">
-                <label className={`${labelClass} col-span-2 sm:col-span-1`}>
+              <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <label className={labelClass}>
                   Biópsias (frascos)
                   <span className="ml-1 font-normal text-[var(--text-muted)]">
                     · R$ 150/un
@@ -657,7 +657,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                     onChange={(e) => patchForm({ biopsies: e.target.value })}
                   />
                 </label>
-                <label className={`${labelClass} col-span-2 sm:col-span-1`}>
+                <label className={labelClass}>
                   Tipo de polipectomia
                   <select
                     className={fieldClass}
