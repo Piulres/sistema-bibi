@@ -508,7 +508,7 @@ async function seedCedigOperationMonth(
     const procedureId = procByCode.get(launch.procedureCode);
     if (!procedureId) continue;
     const patient = patients[launch.patientSalt % patients.length]!;
-    const providerId = providers[launch.launchIndex % providers.length]!;
+    const providerId = providers[launch.launchIndex % providers.length]!.id;
     const performedAt = atOffset(launch.dayOffset, launch.hour, 0);
 
     await prisma.clinicExamLaunch.create({
