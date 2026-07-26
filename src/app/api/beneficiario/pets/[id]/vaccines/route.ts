@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import { listPetVaccines } from "@/lib/pet-vaccine-service";
 import { getPrisma } from "@/lib/db";
 
@@ -7,10 +7,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
-    if (!user.patientId) {
-      return NextResponse.json({ error: "Beneficiário sem vínculo" }, { status: 403 });
-    }
+    const user = await requireBeneficiary();
 
     const { id: petId } = await params;
     const prisma = await getPrisma();

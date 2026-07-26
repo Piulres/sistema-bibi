@@ -145,8 +145,8 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
   return (
     <ViewStateBoundary
       loading={loading}
-      error={error ?? (!overview && !loading ? "Paciente não encontrado" : null)}
-      loadingMessage="Carregando histórico do paciente..."
+      error={error ?? (!overview && !loading ? `${labels.patient} não encontrado(a)` : null)}
+      loadingMessage="Carregando histórico..."
       onRetry={() => void reload()}
     >
       {overview && (() => {
@@ -164,7 +164,7 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
 
   return (
     <div className="space-y-8">
-      <Breadcrumbs items={buildPatientHistoryBreadcrumbs(patient.name)} />
+      <Breadcrumbs items={buildPatientHistoryBreadcrumbs(patient.name, labels)} />
 
       <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">
@@ -250,43 +250,75 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
             Nenhum atendimento registrado.
           </p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Data</th>
-                  <th className="px-4 py-2 font-medium">Status</th>
-                  <th className="px-4 py-2 font-medium">Motivo</th>
-                  <th className="px-4 py-2 text-right font-medium">Ações</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.appointments.map((appointment) => (
-                  <tr key={appointment.id}>
-                    <td className="px-4 py-2 text-[var(--text-secondary)]">
-                      {appointment.scheduledAtLabel}
-                      {appointment.modality === "TELE" && (
-                        <span className="ml-2 text-xs text-[var(--status-info-text)]">Tele</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-2">
-                      <StatusBadge value={appointment.status} map="appointment" />
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
-                    <td className="px-4 py-2 text-right">
-                      <Link
-                        href={`/prestador/atendimento/${appointment.id}`}
-                        className="text-[var(--portal-accent)] hover:underline"
-                      >
-                        Abrir
-                        {appointment.usagesCount > 0 ? ` (${appointment.usagesCount} proc.)` : ""}
-                      </Link>
-                    </td>
+          <>
+            <ul className="mt-3 space-y-2 md:hidden">
+              {overview.appointments.map((appointment) => (
+                <li
+                  key={appointment.id}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[var(--text-secondary)]">
+                        {appointment.scheduledAtLabel}
+                        {appointment.modality === "TELE" && (
+                          <span className="ml-2 text-xs text-[var(--status-info-text)]">Tele</span>
+                        )}
+                      </p>
+                      <p className="mt-1 break-words text-sm text-[var(--text-muted)]">
+                        {appointment.reason ?? "—"}
+                      </p>
+                    </div>
+                    <StatusBadge value={appointment.status} map="appointment" />
+                  </div>
+                  <Link
+                    href={`/prestador/atendimento/${appointment.id}`}
+                    className="ds-touch-link ds-touch-link-solid mt-3 w-full"
+                  >
+                    Abrir atendimento
+                    {appointment.usagesCount > 0 ? ` (${appointment.usagesCount})` : ""}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-3 hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm md:block">
+              <table className="w-full min-w-[32rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Data</th>
+                    <th className="px-4 py-2 font-medium">Status</th>
+                    <th className="px-4 py-2 font-medium">Motivo</th>
+                    <th className="px-4 py-2 text-right font-medium">Ações</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {overview.appointments.map((appointment) => (
+                    <tr key={appointment.id}>
+                      <td className="px-4 py-2 text-[var(--text-secondary)]">
+                        {appointment.scheduledAtLabel}
+                        {appointment.modality === "TELE" && (
+                          <span className="ml-2 text-xs text-[var(--status-info-text)]">Tele</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-2">
+                        <StatusBadge value={appointment.status} map="appointment" />
+                      </td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
+                      <td className="px-4 py-2 text-right">
+                        <Link
+                          href={`/prestador/atendimento/${appointment.id}`}
+                          className="ds-touch-link"
+                        >
+                          Abrir
+                          {appointment.usagesCount > 0 ? ` (${appointment.usagesCount} proc.)` : ""}
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 
@@ -303,36 +335,60 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
             Nenhum procedimento registrado.
           </p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Procedimento</th>
-                  <th className="px-4 py-2 font-medium">Atendimento</th>
-                  <th className="px-4 py-2 font-medium">Realizado em</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.usages.map((usage) => (
-                  <tr key={usage.id}>
-                    <td className="px-4 py-2">
-                      <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
-                    </td>
-                    <td className="px-4 py-2">
-                      <Link
-                        href={`/prestador/atendimento/${usage.appointmentId}`}
-                        className="text-[var(--portal-accent)] hover:underline"
-                      >
-                        {usage.appointmentDateLabel}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
+          <>
+            <ul className="mt-3 space-y-2 md:hidden">
+              {overview.usages.map((usage) => (
+                <li
+                  key={usage.id}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-sm"
+                >
+                  <p className="break-words font-medium text-[var(--text-secondary)]">
+                    {usage.procedure}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                    {usage.performedAtLabel}
+                    {usage.category ? ` · ${usage.category}` : ""}
+                  </p>
+                  <Link
+                    href={`/prestador/atendimento/${usage.appointmentId}`}
+                    className="ds-touch-link mt-2 px-0"
+                  >
+                    {usage.appointmentDateLabel}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-3 hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm md:block">
+              <table className="w-full min-w-[28rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Procedimento</th>
+                    <th className="px-4 py-2 font-medium">Atendimento</th>
+                    <th className="px-4 py-2 font-medium">Realizado em</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {overview.usages.map((usage) => (
+                    <tr key={usage.id}>
+                      <td className="px-4 py-2">
+                        <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
+                      </td>
+                      <td className="px-4 py-2">
+                        <Link
+                          href={`/prestador/atendimento/${usage.appointmentId}`}
+                          className="ds-touch-link px-0"
+                        >
+                          {usage.appointmentDateLabel}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 
@@ -381,7 +437,7 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
                     Atendimento:{" "}
                     <Link
                       href={`/prestador/atendimento/${record.appointmentId}`}
-                      className="text-[var(--portal-accent)] hover:underline"
+                      className="ds-touch-link px-0"
                     >
                       {record.appointmentDateLabel}
                     </Link>

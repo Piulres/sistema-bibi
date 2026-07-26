@@ -231,7 +231,7 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
         silentSuccess: true,
         onSuccess: async (body) => {
           const patient = body.patient as { name: string };
-          showToast({ message: `Beneficiário ${patient.name} cadastrado`, tone: "success" });
+          showToast({ message: `${labels.beneficiary} ${patient.name} cadastrado(a)`, tone: "success" });
           setPatientForm({
             name: "",
             cpf: "",
@@ -619,9 +619,9 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
             </form>
           </Card>
           <Card>
-            <SectionHeader title="Beneficiários" />
+            <SectionHeader title={labels.beneficiaries} />
             {patients.length === 0 ? (
-              <EmptyState message="Nenhum beneficiário." />
+              <EmptyState message={`Nenhum registro de ${labels.beneficiary.toLowerCase()}.`} />
             ) : (
               <ul className="mt-4 divide-y divide-[var(--border-default)]">
                 {patients.map((p) => (
@@ -726,20 +726,23 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
                         </div>
                       </form>
                     ) : (
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
+                      <div className="flex min-w-0 items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
                           <Link
                             href={`/interno/beneficiarios/${p.id}?from=/interno/cadastros`}
-                            className="font-medium text-[var(--portal-accent)] hover:underline"
+                            className="ds-touch-link break-words px-0 font-medium"
                           >
                             {p.name}
                           </Link>
-                          <p className="text-[var(--text-muted)]">
-                            {p.cpf} · {p.companyName ?? "Particular"}
+                          <p className="break-words text-sm text-[var(--text-muted)]">
+                            {p.cpf}
+                          </p>
+                          <p className="break-words text-sm text-[var(--text-muted)]">
+                            {p.companyName ?? "Particular"}
                             {p.phone ? ` · ${p.phone}` : ""}
                           </p>
                         </div>
-                        <Button type="button" size="sm" variant="ghost" onClick={() => {
+                        <Button type="button" size="sm" variant="ghost" className="shrink-0" onClick={() => {
                           patientEditUndo.reset({ ...p });
                           setEditingPatient({ ...p });
                         }}>

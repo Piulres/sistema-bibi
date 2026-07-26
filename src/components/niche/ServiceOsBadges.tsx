@@ -27,8 +27,11 @@ export default function ServiceOsBadges({ niche, variant = "header" }: Props) {
   }
 
   return (
-    <div className="mt-1 flex flex-wrap items-center gap-1.5">
-      <span className="rounded-full bg-[var(--brand-primary)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--brand-primary)]">
+    <div className="mt-1 flex min-w-0 flex-wrap items-center gap-1.5">
+      <span className="rounded-full bg-[var(--brand-primary)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--brand-primary)] sm:hidden">
+        v{PLATFORM.release}
+      </span>
+      <span className="hidden rounded-full bg-[var(--brand-primary)]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--brand-primary)] sm:inline">
         {PLATFORM.versionLabel}
       </span>
       <span className="rounded-full border border-[var(--border-default)] px-2 py-0.5 text-[10px] font-medium text-[var(--text-secondary)]">

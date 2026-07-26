@@ -58,7 +58,7 @@ function CardInner({
           {meta ? <div className="mt-1">{meta}</div> : null}
         </div>
       </div>
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
         <StatusBadge value={status} map="appointment" />
         {actions}
       </div>

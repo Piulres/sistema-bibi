@@ -29,7 +29,7 @@ export default function PjPortalShell({ user, assistantEnabled = true, children 
       <FeedbackProvider>
       <PortalShell
         portal="pj"
-        portalLabel={`Portal ${user.labels.company}`}
+        portalLabel="Portal PJ"
         loginPath={portal.loginPath}
         userName={user.name}
         branding={user.branding}

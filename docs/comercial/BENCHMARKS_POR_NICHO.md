@@ -1,4 +1,4 @@
-# Benchmarks por nicho — ServiceOS v2.0
+# Benchmarks por nicho — Sistema Bibi - ServiceOS
 
 Catálogo consolidado de **concorrentes, features, prós/contras e âncoras de preço** por vertical. Complementa [`../pesquisa/01-matriz-competitiva.md`](../pesquisa/01-matriz-competitiva.md) e as pesquisas em `docs/segmentos/*/pesquisa.md`.
 

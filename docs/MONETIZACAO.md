@@ -4,7 +4,7 @@ Documento que descreve **onde o ServiceOS gera receita**, alinhado ao posicionam
 de infraestrutura financeira e clínica para saúde corporativa Pay Per Use.
 
 > **Contexto de mercado:** [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) ·
-> **Motor de cobrança (implementação):** [`PAYMENTS.md`](PAYMENTS.md) ·
+> **Motor de cobrança (implementação):** [`PAYMENTS.md`](plataforma/PAYMENTS.md) ·
 > **Roadmap:** [`pesquisa/03-estrategia-produto-posicionamento.md`](pesquisa/03-estrategia-produto-posicionamento.md)
 
 ---
@@ -144,5 +144,5 @@ A combinação das três fontes sustenta o argumento comercial principal:
 2. Formalizar tiers de SaaS enterprise no Portal PJ (billing de assinatura).
 3. Empacotar Analytics Premium como add-on pós-validação comercial (regra 80/20).
 
-Ver também: [`ARQUITETURA.md`](ARQUITETURA.md) (Price Snapshot) ·
-[`pesquisa/07-healthos-expansao-2026.md`](pesquisa/07-healthos-expansao-2026.md)
+Ver também: [`ARQUITETURA.md`](plataforma/ARQUITETURA.md) (Price Snapshot) ·
+[`pesquisa/07-healthos-expansao-2026.md`](segmentos/medical/pesquisa-expansao-2026.md)

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import { cancelBeneficiaryAppointment } from "@/lib/scheduling-service";
 
 /** Cancela consulta self-service (somente status AGENDADO). */
@@ -8,11 +8,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/beneficiario/appointments/[id]">,
 ) {
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
-
-    if (!user.patientId) {
-      return NextResponse.json({ error: "Conta sem beneficiário vinculado" }, { status: 403 });
-    }
+    const user = await requireBeneficiary();
 
     const { id } = await ctx.params;
     const body = (await request.json()) as { action?: string };

@@ -10,6 +10,7 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
 
@@ -30,6 +31,7 @@ type Message = {
 type Patient = { id: string; name: string; phone: string | null };
 
 export default function ComunicacaoView() {
+  const { labels } = useLabels();
   const { isBusy, run, showToast } = useAsyncAction();
   const [form, setForm] = useState({
     patientId: "",
@@ -199,7 +201,7 @@ export default function ComunicacaoView() {
           <SectionHeader title="Nova comunicação" />
           <form onSubmit={queueMessage} className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm">
-              <span className="text-[var(--text-secondary)]">Beneficiário</span>
+              <span className="text-[var(--text-secondary)]">{labels.beneficiary}</span>
               <select
                 required
                 className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
@@ -288,7 +290,7 @@ export default function ComunicacaoView() {
                     <div>
                       <Link
                         href={`/interno/beneficiarios/${message.patientId}?from=/interno/comunicacao`}
-                        className="font-semibold text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link px-0 font-semibold"
                       >
                         {message.patientName}
                       </Link>

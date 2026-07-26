@@ -17,6 +17,10 @@ import {
 } from "@/lib/pep-templates";
 import FlowStepper from "@/components/ui/FlowStepper";
 import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
+import {
+  canRegisterProcedureForStatus,
+  isTerminalAppointmentStatus,
+} from "@/lib/appointment-status";
 import TabBar from "@/components/ui/TabBar";
 import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
@@ -390,7 +394,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             </p>
             <Link
               href={historyHref}
-              className="mt-2 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
+              className="ds-touch-link mt-2"
             >
               {hasPet ? "Ver histórico completo do pet →" : "Ver histórico completo do paciente →"}
             </Link>
@@ -399,10 +403,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             <StatusBadge value={detail.appointment.status} map="appointment" />
             {detail.appointment.status === "AGENDADO" && (
               <Button variant="secondary" size="sm" onClick={confirmArrival} disabled={isBusy("confirm-arrival")}>
-                Paciente presente
+                {labels.patient} presente
               </Button>
             )}
-            {detail.appointment.status !== "REALIZADO" && detail.appointment.status !== "CANCELADO" && (
+            {!isTerminalAppointmentStatus(detail.appointment.status) && (
               <Button variant="primary" size="sm" onClick={markRealizado} disabled={isBusy("mark-realizado")}>
                 Marcar como realizado
               </Button>
@@ -424,23 +428,30 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             description="Cada procedimento utilizado é cobrado com transparência prévia."
           />
 
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
-            <select
-              value={selectedProc}
-              onChange={(e) => setSelectedProc(e.target.value)}
-              className={`flex-1 ${fieldClass}`}
-            >
-              <option value="">Selecione um procedimento...</option>
-              {procedures.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name} ({p.category}) — base {p.basePriceLabel}
-                </option>
-              ))}
-            </select>
-            <Button onClick={addProcedure} disabled={isBusy("add-procedure") || !selectedProc}>
-              Registrar
-            </Button>
-          </div>
+          {canRegisterProcedureForStatus(detail.appointment.status) ? (
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+              <select
+                value={selectedProc}
+                onChange={(e) => setSelectedProc(e.target.value)}
+                className={`flex-1 ${fieldClass}`}
+              >
+                <option value="">Selecione um procedimento...</option>
+                {procedures.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.category}) — base {p.basePriceLabel}
+                  </option>
+                ))}
+              </select>
+              <Button onClick={addProcedure} disabled={isBusy("add-procedure") || !selectedProc}>
+                Registrar
+              </Button>
+            </div>
+          ) : (
+            <p className="mt-4 rounded-md bg-[var(--surface-muted)] p-3 text-sm text-[var(--text-muted)]">
+              Este agendamento está <strong>{detail.appointment.status.toLowerCase()}</strong> e
+              não aceita novos procedimentos.
+            </p>
+          )}
 
           <ul className="mt-4 divide-y divide-[var(--border-default)]">
             {detail.usages.length === 0 && (

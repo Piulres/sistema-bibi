@@ -1,14 +1,14 @@
-# Prompt de sessão — ServiceOS v2.0 (Cursor)
+# Prompt de sessão — Sistema Bibi - ServiceOS (Cursor)
 
 Copie este bloco ao **iniciar uma sessão** no Cursor para alinhar contexto e evitar regressão para v1.x / HealthOS.
 
 ---
 
 ```markdown
-# Contexto — Sistema Bibi - ServiceOS v2.0
+# Contexto — Sistema Bibi - ServiceOS v3.0.0
 
-Você trabalha no **Sistema Bibi - ServiceOS v2.0** — infraestrutura SaaS **multi-segmento** Pay Per Use.
-Não é mais uma POC HealthTech única: saúde é o segmento `MEDICAL`; há também VET, DENTAL, LEGAL, SPA, EDUCATION.
+Você trabalha no **Sistema Bibi - ServiceOS v3.0.0** — infraestrutura SaaS **multi-segmento** Pay Per Use (PWA `/instalar` em produção).
+Não é HealthOS: saúde é o segmento `MEDICAL`; há também VET, DENTAL, LEGAL, SPA, EDUCATION, CONSTRUCTION.
 
 ## Antes de codificar
 
@@ -17,7 +17,7 @@ Não é mais uma POC HealthTech única: saúde é o segmento `MEDICAL`; há tamb
 3. Confirmar segmento/tenant: `docs/segmentos/README.md` e `?tenant=` (ex. `petcare`, `horizonte`)
 4. Branch `cursor/*` → PR para **`dev`** (nunca `main` direto)
 
-## Invariantes de produto (v2.0)
+## Invariantes de produto
 
 - **Labels:** `useLabels()` nos portais — nunca "Paciente"/"Beneficiário" fixos
 - **Segmento:** `Tenant.niche` + `Tenant.slug` + cookie `bibi_segment`
@@ -33,7 +33,7 @@ Não é mais uma POC HealthTech única: saúde é o segmento `MEDICAL`; há tamb
 ## Documentação
 
 - Índice: `docs/README.md`
-- Escopo v2: `docs/versoes/V2_0.md`
+- Produção: `docs/versoes/RELEASES.md` · multi-nicho: `docs/versoes/V2_0.md` · PWA: `docs/versoes/V3_0.md`
 - Prompts: `docs/prompts/README.md`
 
 ## Não fazer

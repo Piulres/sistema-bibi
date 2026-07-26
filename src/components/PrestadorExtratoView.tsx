@@ -7,6 +7,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Extrato = {
@@ -35,6 +36,7 @@ type ExtratoPayload = {
 };
 
 export default function PrestadorExtratoView() {
+  const { labels } = useLabels();
   const loadExtrato = useCallback(
     () =>
       fetchJson<ExtratoPayload>("/api/prestador/extrato", undefined, "Erro ao carregar extrato"),
@@ -93,37 +95,65 @@ export default function PrestadorExtratoView() {
         {extrato.lines.length === 0 ? (
           <p className="mt-3 text-sm text-[var(--text-muted)]">Nenhum procedimento no período.</p>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
-            <table className="w-full min-w-[40rem] text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Data</th>
-                  <th className="px-4 py-2 font-medium">Paciente</th>
-                  <th className="px-4 py-2 font-medium">Procedimento</th>
-                  <th className="px-4 py-2 font-medium">Faturado</th>
-                  <th className="px-4 py-2 text-right font-medium">Valor</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {extrato.lines.map((line) => (
-                  <tr key={line.id}>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{line.performedAtLabel}</td>
-                    <td className="px-4 py-2 text-[var(--text-secondary)]">{line.patientName}</td>
-                    <td className="px-4 py-2">
-                      <p className="font-medium text-[var(--text-primary)]">{line.procedure}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{line.category}</p>
-                    </td>
-                    <td className="px-4 py-2">
-                      <StatusBadge value={line.billed ? "PAGA" : "ABERTA"} map="invoice" />
-                    </td>
-                    <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
+          <>
+            <ul className="mt-4 space-y-2 md:hidden">
+              {extrato.lines.map((line) => (
+                <li
+                  key={line.id}
+                  className="rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-[var(--shadow-card)]"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="break-words font-medium text-[var(--text-primary)]">
+                        {line.procedure}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                        {line.performedAtLabel} · {line.patientName}
+                      </p>
+                    </div>
+                    <p className="shrink-0 font-semibold text-[var(--text-primary)]">
                       {line.priceLabel}
-                    </td>
+                    </p>
+                  </div>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <StatusBadge value={line.billed ? "PAGA" : "ABERTA"} map="invoice" />
+                    <span className="text-xs text-[var(--text-muted)]">{line.category}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-4 hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] md:block">
+              <table className="w-full min-w-[40rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Data</th>
+                    <th className="px-4 py-2 font-medium">{labels.patient}</th>
+                    <th className="px-4 py-2 font-medium">Procedimento</th>
+                    <th className="px-4 py-2 font-medium">Faturado</th>
+                    <th className="px-4 py-2 text-right font-medium">Valor</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {extrato.lines.map((line) => (
+                    <tr key={line.id}>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{line.performedAtLabel}</td>
+                      <td className="px-4 py-2 text-[var(--text-secondary)]">{line.patientName}</td>
+                      <td className="px-4 py-2">
+                        <p className="font-medium text-[var(--text-primary)]">{line.procedure}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{line.category}</p>
+                      </td>
+                      <td className="px-4 py-2">
+                        <StatusBadge value={line.billed ? "PAGA" : "ABERTA"} map="invoice" />
+                      </td>
+                      <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
+                        {line.priceLabel}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
     </div>

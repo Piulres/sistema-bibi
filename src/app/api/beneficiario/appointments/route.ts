@@ -1,15 +1,11 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import { bookBeneficiaryAppointment } from "@/lib/scheduling-service";
 import { isAppointmentModality } from "@/lib/telemedicine";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
-
-    if (!user.patientId) {
-      return NextResponse.json({ error: "Conta sem beneficiário vinculado" }, { status: 403 });
-    }
+    const user = await requireBeneficiary();
 
     const body = (await request.json()) as {
       providerId?: string;

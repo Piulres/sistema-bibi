@@ -1,7 +1,11 @@
 import type { InternoModule } from "@/lib/interno-permissions";
 import type { NavTab } from "@/components/ui/NavTabs";
 
-/** Abas do portal interno — fonte única para nav desktop e mobile. */
+/**
+ * @deprecated Referência estática (labels MEDICAL) usada só em testes/docs.
+ * A UI monta a nav com `buildInternoNavTabs(labels, niche)` em
+ * `src/lib/navigation/niche-nav.ts` — labels vêm do tenant ativo.
+ */
 export const INTERNO_NAV_TABS: NavTab[] = [
   { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" },
   { href: "/interno", label: "Faturamento", key: "billing" },
@@ -26,7 +30,7 @@ export const INTERNO_ROUTE_LABELS: Record<string, string> = {
   "/interno/faturamento": "Faturamento",
   "/interno/agenda": "Agenda",
   "/interno/cadastros": "Cadastros",
-  "/interno/estoque": "Estoque Médico",
+  "/interno/estoque": "Estoque",
   "/interno/crm": "CRM Corporativo",
   "/interno/projetos": "Obras",
   "/interno/gestao": "Gestão clínica",
@@ -59,7 +63,10 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
   return undefined;
 }
 
-/** Abas do portal prestador. */
+/**
+ * @deprecated Referência estática (labels MEDICAL) usada só em testes/docs.
+ * A UI usa `buildPrestadorNavTabs(labels, niche)` de `niche-nav.ts`.
+ */
 export const PRESTADOR_NAV_TABS: NavTab[] = [
   { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
   { href: "/prestador", label: "Agenda", key: "agenda" },
@@ -80,7 +87,10 @@ export function resolvePrestadorActive(pathname: string): string | undefined {
   return undefined;
 }
 
-/** Seções de página única — portal PJ. */
+/**
+ * @deprecated Referência estática (labels MEDICAL) usada só em testes/docs.
+ * A UI usa `buildPjSectionNav(labels, niche)` de `niche-nav.ts`.
+ */
 export const PJ_SECTION_NAV = [
   { id: "resumo", label: "Resumo" },
   { id: "beneficiarios", label: "Beneficiários" },
@@ -88,7 +98,10 @@ export const PJ_SECTION_NAV = [
   { id: "faturas", label: "Faturas" },
 ] as const;
 
-/** Abas do portal beneficiário — rotas dedicadas. */
+/**
+ * @deprecated Referência estática (labels MEDICAL) usada só em testes/docs.
+ * A UI usa `buildBeneficiarioNavTabs(labels, niche)` de `niche-nav.ts`.
+ */
 export const BENEFICIARIO_NAV_TABS: NavTab[] = [
   { href: "/beneficiario/agendar", label: "Agendar", key: "agendar" },
   { href: "/beneficiario/resumo", label: "Resumo", key: "resumo" },

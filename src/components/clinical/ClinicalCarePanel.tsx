@@ -214,14 +214,24 @@ export default function ClinicalCarePanel({
     }
   }
 
+  /** Reporta erro da resposta no Alert do painel. Retorna true se falhou. */
+  async function reportIfError(res: Response, fallback: string): Promise<boolean> {
+    if (res.ok) return false;
+    const data = await res.json().catch(() => null);
+    setError((data as { error?: string } | null)?.error ?? fallback);
+    return true;
+  }
+
   async function updateMedStatus(id: string, status: string) {
     setBusy(true);
+    setError(null);
     try {
-      await fetch(`/api/prestador/medications/${id}`, {
+      const res = await fetch(`/api/prestador/medications/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
+      if (await reportIfError(res, "Erro ao atualizar a medicação")) return;
       await loadMedications();
       onChanged?.();
     } finally {
@@ -255,12 +265,14 @@ export default function ClinicalCarePanel({
 
   async function updateExam(id: string, patch: Record<string, unknown>) {
     setBusy(true);
+    setError(null);
     try {
-      await fetch(`/api/prestador/exam-orders/${id}`, {
+      const res = await fetch(`/api/prestador/exam-orders/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
       });
+      if (await reportIfError(res, "Erro ao atualizar o exame")) return;
       await loadExams();
       onChanged?.();
     } finally {
@@ -298,12 +310,14 @@ export default function ClinicalCarePanel({
       [itemId]: !enrollment.checklistState[itemId],
     };
     setBusy(true);
+    setError(null);
     try {
-      await fetch(`/api/prestador/protocols/${enrollment.id}`, {
+      const res = await fetch(`/api/prestador/protocols/${enrollment.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ checklistState: next }),
       });
+      if (await reportIfError(res, "Erro ao atualizar o checklist")) return;
       await loadProtocols();
       onChanged?.();
     } finally {
@@ -502,11 +516,13 @@ export default function ClinicalCarePanel({
               </ul>
               {en.status === "ATIVO" && en.progressPercent === 100 && (
                 <Button className="mt-3" size="sm" variant="secondary" disabled={busy} onClick={async () => {
-                  await fetch(`/api/prestador/protocols/${en.id}`, {
+                  setError(null);
+                  const res = await fetch(`/api/prestador/protocols/${en.id}`, {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ status: "CONCLUIDO" }),
                   });
+                  if (await reportIfError(res, "Erro ao concluir o protocolo")) return;
                   await loadProtocols();
                   onChanged?.();
                 }}>Concluir protocolo</Button>

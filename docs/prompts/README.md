@@ -1,4 +1,6 @@
-# Prompts ServiceOS v2.0 — desenvolvimento futuro
+# Prompts — Sistema Bibi - ServiceOS
+
+> Base multi-nicho desde **v2.0** · produção atual **v3.0.0**. Prompts históricos de implementação permanecem com prefixo `SERVICEOS_V2_*`.
 
 Índice canônico de prompts para **Cursor**, Copilot e pesquisa externa.
 

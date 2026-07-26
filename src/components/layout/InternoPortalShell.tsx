@@ -35,7 +35,7 @@ export default function InternoPortalShell({ user, assistantEnabled = true, chil
       <FeedbackProvider>
         <PortalShell
           portal="interno"
-          portalLabel={`Operação · ${user.labels.beneficiaries}`}
+          portalLabel="Operação"
           loginPath={portal.loginPath}
           userName={user.name}
           branding={user.branding}

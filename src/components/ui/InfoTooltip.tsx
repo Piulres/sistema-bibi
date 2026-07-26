@@ -18,14 +18,19 @@ export default function InfoTooltip({ content, label = "Mais informações", cla
     <span className={cn("relative inline-flex", className)}>
       <button
         type="button"
-        className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[var(--border-muted)] bg-[var(--surface-muted)] text-[10px] font-bold text-[var(--text-muted)] transition hover:border-[var(--border-default)] hover:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+        className="inline-flex min-h-9 min-w-9 shrink-0 items-center justify-center rounded-full text-[var(--text-muted)] transition hover:text-[var(--text-secondary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
         aria-label={label}
         aria-describedby={open ? tooltipId : undefined}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         onBlur={() => setOpen(false)}
       >
-        ?
+        <span
+          aria-hidden
+          className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[var(--border-muted)] bg-[var(--surface-muted)] text-[10px] font-bold"
+        >
+          ?
+        </span>
       </button>
       {open ? (
         <span

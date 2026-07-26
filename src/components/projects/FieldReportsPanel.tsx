@@ -112,7 +112,7 @@ export default function FieldReportsPanel({ projectId }: { projectId: string }) 
                     href={a.downloadUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-xs text-[var(--brand-primary)] hover:underline"
+                    className="ds-touch-link ds-touch-link-solid text-xs"
                   >
                     {a.fileName}
                   </a>
@@ -124,7 +124,7 @@ export default function FieldReportsPanel({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => approve(r.id)}
-                className="mt-3 rounded-md bg-emerald-600 px-3 py-1.5 text-xs text-white disabled:opacity-50"
+                className="mt-3 min-h-10 rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
               >
                 Aprovar{r.diariaAmount ? " e faturar diária" : ""}
               </button>

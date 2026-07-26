@@ -3,6 +3,10 @@ import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
 import {
+  canTransitionAppointmentStatus,
+  isAppointmentStatus,
+} from "@/lib/appointment-status";
+import {
   recordTimelineEvent,
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
@@ -19,7 +23,7 @@ export async function GET(
     const { id } = await ctx.params;
 
     const appointment = await prisma.appointment.findFirst({
-      where: { id, providerId: user.id },
+      where: { id, providerId: user.id, tenantId: user.tenantId },
       include: {
         patient: { include: { company: true } },
         pet: { select: { id: true, name: true, species: true, breed: true } },
@@ -86,17 +90,23 @@ export async function PATCH(
     const { id } = await ctx.params;
     const body = (await request.json()) as { status?: string };
 
-    const allowed = ["AGENDADO", "CONFIRMADO", "REALIZADO", "FALTOU", "CANCELADO"];
-    if (!body.status || !allowed.includes(body.status)) {
+    if (!body.status || !isAppointmentStatus(body.status)) {
       return NextResponse.json({ error: "Status inválido" }, { status: 400 });
     }
 
     const existing = await prisma.appointment.findFirst({
-      where: { id, providerId: user.id },
+      where: { id, providerId: user.id, tenantId: user.tenantId },
       include: { patient: { select: { name: true } } },
     });
     if (!existing) {
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
+    }
+
+    if (!canTransitionAppointmentStatus(existing.status, body.status)) {
+      return NextResponse.json(
+        { error: `Transição de status inválida: ${existing.status} → ${body.status}` },
+        { status: 409 },
+      );
     }
 
     await prisma.appointment.update({

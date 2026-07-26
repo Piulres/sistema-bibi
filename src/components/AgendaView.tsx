@@ -167,18 +167,32 @@ export default function AgendaView() {
 
         {view === "day" && (
           <div className="flex flex-wrap items-center gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setDate(shiftDate(date, -1))}>
-              ← Anterior
-            </Button>
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-1.5 text-sm"
-            />
-            <Button variant="secondary" size="sm" onClick={() => setDate(shiftDate(date, 1))}>
-              Próximo →
-            </Button>
+            <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:w-auto sm:flex">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setDate(shiftDate(date, -1))}
+                aria-label="Dia anterior"
+              >
+                <span className="sm:hidden">←</span>
+                <span className="hidden sm:inline">← Anterior</span>
+              </Button>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="ds-touch-select min-w-0 w-full"
+              />
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setDate(shiftDate(date, 1))}
+                aria-label="Próximo dia"
+              >
+                <span className="sm:hidden">→</span>
+                <span className="hidden sm:inline">Próximo →</span>
+              </Button>
+            </div>
             {!isToday && (
               <Button
                 variant="secondary"
@@ -232,16 +246,16 @@ export default function AgendaView() {
                     status={a.status}
                     particular={!a.patient.company}
                     actions={
-                      <div className="flex flex-col items-end gap-1">
+                      <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
                         <Link
                           href={`/prestador/atendimento/${a.id}`}
-                          className="text-xs font-medium text-[var(--portal-accent)] hover:underline"
+                          className="ds-touch-link ds-touch-link-solid"
                         >
                           Abrir atendimento
                         </Link>
                         <Link
                           href={`/prestador/paciente/${a.patient.id}`}
-                          className="text-xs text-[var(--text-muted)] hover:underline"
+                          className="ds-touch-link"
                         >
                           Histórico
                         </Link>

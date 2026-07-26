@@ -15,10 +15,11 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v2.6.0`** — deploy `6a6534e9` @ `579f686` (`bibi-poc-2026-07-25i`) |
-| Pacote anterior | **`v2.4.0`** — CEDIG gestão clínica |
-| `main` / `dev` | Sincronizadas · tag `v2.6.0` |
-| Tags git | ✅ `v2.4.0` · `v2.5.0` (empilhado) · `v2.6.0` |
+| Pacote em produção | **`v3.0.0`** — deploy `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
+| Pacote anterior | **`v2.6.0`** — deploy `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`) |
+| `main` / `dev` | Sincronizadas · tag `v3.0.0` |
+| Tags git | ✅ `v2.4.0` · `v2.5.0` · `v2.6.0` · `v3.0.0` |
+| Doc | [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V3_0.md`](../versoes/V3_0.md) |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
@@ -52,7 +53,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 1. **Créditos / plano Netlify** — se o site retornar `503 usage_exceeded`, aguarde reset ou upgrade.
 2. **`SESSION_SECRET`** — defina no painel (Site settings → Environment variables), **não** use o fallback do `netlify.toml`.
 3. **`CRON_SECRET`** — obrigatório se usar scheduled functions para lembretes/webhooks.
-4. **Banco** — SQLite + `/tmp` é **apenas POC** (dados efêmeros por instância). Produção real → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
+4. **Banco** — dual-store SQLite: **demo** (efêmero no Lambda) + **operação** (persistida em Netlify Blobs). Ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md). Escala futura → [Netlify Database](https://docs.netlify.com/database/) (Postgres).
 5. **Publish directory** — deve ficar **vazio** no painel (Next.js runtime gerencia o output). Valor `.next` causa falhas.
 6. **Git** — deploy contínuo **desligado** (Stop builds). Publicação só via pacote fechado — ver [`OPERACOES.md`](OPERACOES.md).
 

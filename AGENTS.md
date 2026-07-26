@@ -50,10 +50,10 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** **`v3.0.0`** @ https://sistema-bibi.netlify.app · PWA `/instalar` · CEDIG + login tenant/portal · ver `docs/versoes/RELEASES.md` · `V3_0.md`.
-Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
+Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao` · status vivo `docs/clientes/cedig/STATUS.md`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
-Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
+Ver `docs/plataforma/WORKFLOW_CURSOR.md` · **`docs/plataforma/OPERACOES.md`** · docs vivas `docs/plataforma/DOCUMENTACAO.md`.
 **Preferências IA:** `AGENTS.md` · `docs/prompts/README.md` · `.cursor/skills/serviceos-dev-quality/SKILL.md` · `.cursor/rules/serviceos-dev.mdc` · `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/plataforma/HISTORICO_2026-06-21.md`
@@ -63,8 +63,13 @@ Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (m
 - Comandos padrão estão em `package.json`: `npm run dev`, `npm run build`, `npm run lint`.
 - Banco local (Prisma + SQLite): primeiro setup em uma VM nova exige criar o `.env`
   e popular o banco (o `dev.db` e o `.env` são gitignored, então **não** vêm no checkout):
- - `cp .env.example .env` (se `.env` não existir)
- - `npm run db:reset` (faz `prisma db push --force-reset` + seed) ou `npm run db:push && npm run db:seed`
+ - **Atalho (recomendado): `npm run setup`** — idempotente e não destrutivo: cria `.env`,
+   roda `prisma db push` + `prisma db seed` (só se o banco estiver vazio) e remove resíduo
+   do dual-store (`prisma/.data-store-mode`). Não instala deps nem browser do Playwright.
+ - Manual: `cp .env.example .env` (se ausente) e `npm run db:push && npm run db:seed`.
+ - E2E: `npx playwright install chromium` (uma vez por VM) e **pare o `npm run dev`** antes
+   de `npm run test:e2e` (Next 16 só permite um dev server por projeto; o Playwright sobe o
+   próprio na porta 3100). Gotchas completos: `docs/plataforma/TESTES.md` §Setup e gotchas.
 - O `postinstall` roda `prisma generate` automaticamente no `npm install`.
 - **Agentes (Cursor): `npm run db:reset` é BLOQUEADO** — qualquer comando Prisma
  destrutivo (`--force-reset`/`migrate`) dispara um prompt de consentimento e aborta.
@@ -176,6 +181,13 @@ Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particula
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
+- **Gotcha pós-`npm test` (causa raiz corrigida):** a suíte Vitest
+ (`tests/lib/data-store-mode.test.ts`) chamava `setDataStoreMode("operation")` e deixava
+ `prisma/.data-store-mode=operation` no diretório real — o `npm run dev` subia em **modo
+ operação** apontando para `prisma/operation.db` (vazio) e o login quebrava com
+ `The table main.User does not exist`. O teste agora restaura o arquivo no `afterEach`.
+ Se o sintoma reaparecer (ex.: suíte interrompida no meio): `npm run setup` ou
+ `rm -f prisma/.data-store-mode prisma/operation.db` antes do `npm run dev`.
 - **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
   build CI em `npm run netlify:build`; ver `docs/plataforma/DEPLOY_NETLIFY.md` e `docs/plataforma/WORKFLOW_CURSOR.md`.
   Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.

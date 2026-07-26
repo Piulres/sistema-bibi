@@ -27,7 +27,7 @@ Senha: **`bibi123`**
 ## Pesquisa
 
 - [Expansão segmento saúde 2026](./pesquisa-expansao-2026.md)
-- [Síntese consultor](../pesquisa/09-sintese-consultor-senior.md) (ROI corporativo)
+- [Síntese consultor](../../pesquisa/09-sintese-consultor-senior.md) (ROI corporativo)
 
 ## Comercial
 
@@ -35,7 +35,8 @@ Senha: **`bibi123`**
 
 ## Cliente piloto
 
-- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`)
+- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`) · labels **Exame** · produção **v3.0.0** (modo operação)
+- [Playbook de ações CEDIG](../../clientes/cedig/OPERACAO.md)
 
 ## Código
 

@@ -58,7 +58,7 @@ function AuditEventDiff({ metadata }: { metadata: TimelineEventMetadata }) {
   if (fields.length === 0) return null;
 
   return (
-    <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border-muted)] bg-[var(--surface-muted)]">
+    <div className="ds-scroll-x mt-3 rounded-lg border border-[var(--border-muted)] bg-[var(--surface-muted)]">
       <table className="w-full min-w-[20rem] text-left text-xs">
         <thead>
           <tr className="border-b border-[var(--border-muted)] text-[var(--text-muted)]">
@@ -180,7 +180,7 @@ export default function AuditoriaView() {
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Tipo de entidade</span>
             <select
-              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
+              className="ds-touch-select mt-1 w-full bg-[var(--surface-card)] px-3"
               value={entityType}
               onChange={(e) => setEntityType(e.target.value)}
             >
@@ -195,7 +195,7 @@ export default function AuditoriaView() {
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Ação</span>
             <select
-              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"
+              className="ds-touch-select mt-1 w-full bg-[var(--surface-card)] px-3"
               value={action}
               onChange={(e) => setAction(e.target.value)}
             >
@@ -314,7 +314,7 @@ export default function AuditoriaView() {
                       {href && (
                         <>
                           {" · "}
-                          <Link href={href} className="text-[var(--portal-accent)] hover:underline">
+                          <Link href={href} className="ds-touch-link px-0">
                             Ver beneficiário
                           </Link>
                         </>

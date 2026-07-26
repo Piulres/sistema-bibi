@@ -106,7 +106,7 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 ## O que você **não vê** (lacunas e riscos)
 
 > **Auditoria completa (2026-06-22):** falhas mapeadas nos quatro portais com
-> evidências de código, testes e `curl` — [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md).
+> evidências de código, testes e `curl` — [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md).
 
 ### 1. RBAC inconsistente entre UI e API
 
@@ -252,6 +252,23 @@ npm run test:e2e
 npm run lint && npm run test && npm run build
 ```
 
+### Setup e gotchas de execução (VM/dev nova)
+
+Atalho de onboarding — em VM nova, após `npm install`:
+
+```bash
+npm run setup   # cria .env, prisma db push + seed condicional (idempotente, não destrutivo)
+```
+
+Gotchas confirmados em runtime (jul/2026):
+
+| Sintoma | Causa | Resolução |
+|---------|-------|-----------|
+| `npm run test:e2e` falha com **"Another next dev server is already running"** | Next 16 permite **um** `next dev` por diretório de projeto; Playwright sobe o próprio dev server (porta 3100) | **Pare o `npm run dev`** antes de rodar e2e (o Playwright inicia e derruba o dele) |
+| E2E aborta com `browserType.launch: Executable doesn't exist` | Browser do Playwright não baixado na VM | `npx playwright install chromium` (uma vez por VM) |
+| Login retorna **500 `The table main.User does not exist`** após `npm run test` | O teste de dual-store gravava `prisma/.data-store-mode=operation`, apontando o dev para `operation.db` (vazio) | Corrigido no `afterEach` do teste; se ainda ocorrer: `rm -f prisma/.data-store-mode prisma/operation.db` (ou `npm run setup`) |
+| RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
+
 ### Variáveis em testes
 
 Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vitest e Playwright).
@@ -348,7 +365,7 @@ CI=true npm run test:e2e
 ## Referências
 
 - Fluxos de negócio: [`FLUXOS.md`](../produto/FLUXOS.md)
-- Auditoria de falhas por portal: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md)
+- Auditoria de falhas por portal: [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md)
 - Arquitetura: [`ARQUITETURA.md`](ARQUITETURA.md)
 - Evidências manuais: [`../evidencias/`](../evidencias/)
-- CI: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)
+- CI: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)

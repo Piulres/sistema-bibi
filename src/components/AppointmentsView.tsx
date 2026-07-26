@@ -284,7 +284,7 @@ export default function AppointmentsView() {
           id="walk-in"
           data-tour-id="walk-in-callout"
           variant="walk-in"
-          title="Paciente particular (walk-in)"
+          title={`${labels.patient} particular (walk-in)`}
           description="Chegou na clínica sem cadastro prévio e sem empresa PJ — cadastre e agende em um passo."
           badge="Recepção"
         >
@@ -472,7 +472,7 @@ export default function AppointmentsView() {
               />
             </label>
             <label className="block text-sm">
-              <span className="text-[var(--text-secondary)]">{isVet ? labels.beneficiary : "Beneficiário"}</span>
+              <span className="text-[var(--text-secondary)]">{labels.beneficiary}</span>
               <select
                 required
                 className="mt-1 w-full rounded border px-3 py-2"
@@ -606,7 +606,7 @@ export default function AppointmentsView() {
                           href={a.telemedicineUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-sm text-[var(--portal-accent)] hover:underline"
+                          className="ds-touch-link"
                         >
                           Entrar na sala virtual
                         </a>
@@ -632,14 +632,14 @@ export default function AppointmentsView() {
                       {a.status !== "CANCELADO" && a.status !== "FALTOU" && (
                         <Link
                           href={`/interno/gestao?appointmentId=${encodeURIComponent(a.id)}&patientId=${encodeURIComponent(a.patientId)}&patientName=${encodeURIComponent(a.patientName)}&providerId=${encodeURIComponent(a.providerId)}${a.procedureId ? `&procedureId=${encodeURIComponent(a.procedureId)}` : ""}`}
-                          className="inline-flex items-center rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-2.5 py-1 text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
+                          className="ds-touch-link ds-touch-link-solid"
                           data-cursor-id="agenda-launch-gestao"
                         >
                           Lançar na gestão
                         </Link>
                       )}
                       <select
-                        className="rounded border border-[var(--border-muted)] bg-[var(--surface-card)] px-2 py-1 text-sm"
+                        className="ds-touch-select"
                         value={a.status}
                         disabled={isBusy(a.id)}
                         onChange={(e) => updateStatus(a.id, e.target.value, a.scheduledAtLabel)}

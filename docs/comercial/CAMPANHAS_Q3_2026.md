@@ -1,6 +1,6 @@
 # Campanhas Q3 2026 — índice por nicho
 
-Pacote de planos operacionais B2B do **Sistema Bibi - ServiceOS v2.0** — um documento por vertical.
+Pacote de planos operacionais B2B do **Sistema Bibi - ServiceOS** — um documento por vertical.
 
 > **Prompt base:** [`PROMPT_CAMPANHAS_MARKETING.md`](PROMPT_CAMPANHAS_MARKETING.md) · **Estratégia:** [`ESTRATEGIA_SEGMENTOS.md`](ESTRATEGIA_SEGMENTOS.md) · **Calculadora:** [`CALCULADORA_ROI.md`](CALCULADORA_ROI.md)
 
