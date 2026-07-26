@@ -77,6 +77,12 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 **Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts`
 
+**Schema-sync do `operation.db` (v3.0.2):** `tests/unit/operation-schema-sync.test.ts` —
+valida migrações aditivas idempotentes (`CREATE TABLE`, `ADD COLUMN`, `CREATE INDEX`)
+comparando banco ativo vs artefato de referência. Cobre o incidente `ClinicExamLaunch`
+sem colunas da ponte v2.6. O sync em produção só roda na Lambda — ver
+[`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Evolução de schema.
+
 | Fixture | E-mail / CPF | Uso típico |
 |---------|----------------|------------|
 | João Pereira | `joao.pereira@email.com` / `111.222.333-44` | PEP, timeline, consumo pendente PPU |
@@ -267,6 +273,7 @@ Gotchas confirmados em runtime (jul/2026):
 | `npm run test:e2e` falha com **"Another next dev server is already running"** | Next 16 permite **um** `next dev` por diretório de projeto; Playwright sobe o próprio dev server (porta 3100) | **Pare o `npm run dev`** antes de rodar e2e (o Playwright inicia e derruba o dele) |
 | E2E aborta com `browserType.launch: Executable doesn't exist` | Browser do Playwright não baixado na VM | `npx playwright install chromium` (uma vez por VM) |
 | Login retorna **500 `The table main.User does not exist`** após `npm run test` | O teste de dual-store gravava `prisma/.data-store-mode=operation`, apontando o dev para `operation.db` (vazio) | Corrigido no `afterEach` do teste; se ainda ocorrer: `rm -f prisma/.data-store-mode prisma/operation.db` (ou `npm run setup`) |
+| **`no such column: …`** em produção (modo operação) | Blob `operation.db` com schema congelado — `db push` não roda na Lambda | **v3.0.2+:** schema-sync no boot; local: `npm run db:push` após mudar `schema.prisma` |
 | RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
 
 ### Variáveis em testes

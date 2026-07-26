@@ -287,7 +287,7 @@ Pedido de validação
 |--------|-----------|
 | Fechar pacote em produção | `docs/versoes/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
-| Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
+| Demo vs operação / dual SQLite | `OPERACAO_DADOS.md` (§Evolução de schema), `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |

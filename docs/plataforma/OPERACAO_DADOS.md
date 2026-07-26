@@ -88,6 +88,56 @@ npm run dev
 
 ---
 
+## Evolução de schema (modo operação)
+
+O banco de **operação** em Netlify Blobs **persiste entre deploys** e sempre vence o
+artefato de build (`prisma/operation.db` gerado no `netlify-build`). O `prisma db push`
+**não roda na Lambda** — sem intervenção, o schema do Blob ficava congelado na época do
+primeiro persist.
+
+### Sintoma (incidente v3.0.2)
+
+Em produção (CEDIG, modo operação), `/interno/gestao` retornava **500**
+(`no such column: bridgeStatus`) — a tabela `ClinicExamLaunch` no Blob não tinha as
+colunas da ponte v2.6 (`bridgeStatus`, `bridgeNote`, `appointmentId`, `usageId`,
+`invoiceId`).
+
+### Correção automática (v3.0.2+)
+
+No boot da Lambda, `ensureLambdaOperationDb` (`src/lib/sqlite-blob-persistence.ts`)
+chama `syncSqliteSchema` (`src/lib/operation/schema-sync.ts`), comparando o banco
+ativo (`/tmp/bibi-operation.db`) com o artefato de build e aplicando migrações
+**aditivas** idempotentes:
+
+| Operação | Quando |
+|----------|--------|
+| `CREATE TABLE IF NOT EXISTS` | Tabela ausente no Blob |
+| `ALTER TABLE … ADD COLUMN` | Coluna ausente (nullable ou com `DEFAULT`) |
+| `CREATE INDEX IF NOT EXISTS` | Índice ausente |
+
+**Memoização:** o sync roda uma vez por versão do Blob na instância Lambda
+(`schemaSyncedVersion`), evitando reprocesso a cada request.
+
+**Logs:** alterações aparecem como `[operation-schema-sync]` no log da função
+(JSON com `createdTables`, `addedColumns`, `createdIndexes`, `skipped`). Falha no
+sync **não bloqueia o boot** — o comportamento volta ao anterior (erro registrado).
+
+### Limitações
+
+| Tipo de mudança | Comportamento |
+|-----------------|---------------|
+| Aditiva (tabela/coluna/índice novo) | Aplicada automaticamente no boot |
+| Destrutiva (DROP, RENAME, `NOT NULL` sem default) | **Não** aplicada — entra em `skipped`; exige migração assistida |
+| Índice UNIQUE com dados legados incompatíveis | Ignorado (não bloqueia boot) |
+
+**Dev local:** o schema-sync **só roda em runtime Lambda** (`isLambdaSqliteRuntime()`).
+Após mudar `schema.prisma`, use `npm run db:push` ou `npm run db:bootstrap:operation`.
+
+**Testes:** `tests/unit/operation-schema-sync.test.ts` — colunas/tabelas/índices,
+idempotência, `extractColumnDefinition`.
+
+---
+
 ## Alternar em produção
 
 1. Login como ADMIN (`faturamento@bibi.health` / `bibi123`)
@@ -144,6 +194,7 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 - Modo ativo: `src/lib/data-store-mode.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
+- Schema-sync operação: `src/lib/operation/schema-sync.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
 - UI seletor: `src/components/DataStoreCard.tsx`
 - API: `GET|POST /api/interno/data-store`

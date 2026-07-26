@@ -11,13 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.1** — qualidade multi-nicho + regras da agenda **publicado em produção**.
+> Pacote **v3.0.2** — hotfix schema-sync do `operation.db` **fechado na `main`**; produção ainda em **v3.0.1** até deploy manual.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.1** — deploy `6a6594ac` @ `daf690e` (`bibi-poc-2026-07-26a`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.1** · tip `daf690e` |
+| **Release `main`** | **v3.0.2** · tip `9ceeb49` |
+| **Release `dev`** | **v3.0.1** · tip `daf690e` (integrar hotfix antes do próximo pacote) |
 | **Pacote anterior em produção** | **3.0.0** — deploy `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -26,9 +27,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.1** |
-| **Release** | `main` | **v3.0.1** |
+| **Release** | `main` | **v3.0.2** (hotfix schema-sync) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.1** · deploy `6a6594ac` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.2 (pendente deploy)
+
+- Hotfix schema-sync do `operation.db` em produção (#213): migrações aditivas idempotentes no boot da Lambda (`src/lib/operation/schema-sync.ts`).
+- Incidente corrigido: `ClinicExamLaunch` sem colunas da ponte v2.6 → 500 em `/interno/gestao`.
+- Testes: `tests/unit/operation-schema-sync.test.ts`.
 
 ### Smoke (26/07/2026) — produção v3.0.1
 
@@ -50,6 +57,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.2`** | `9ceeb49` | Hotfix schema-sync `operation.db` (migrações aditivas no boot Lambda) |
 | **`v3.0.1`** | `daf690e` | Qualidade multi-nicho + regras da agenda (auditoria P1–P3 + labels + CI) |
 | **`v3.0.0`** | `d2e0548` | PWA `/instalar` · manifest standalone · smoke Netlify |
 | **`v2.6.0`** | `579f686` | CEDIG fase 2+F — ponte PPU + export + v2.5 login · #186–#189 · #193 |

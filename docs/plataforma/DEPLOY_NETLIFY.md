@@ -168,6 +168,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | Cron 401 | `CRON_SECRET` ausente ou incorreto | Definir no painel e no caller |
 | Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
+| `500 no such column: …` em modo operação | Blob `operation.db` com schema anterior ao deploy (`prisma db push` não roda na Lambda) | **v3.0.2+:** schema-sync aditivo no boot (`src/lib/operation/schema-sync.ts`); após deploy, aguardar cold start; verificar logs `[operation-schema-sync]` · detalhes em [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Evolução de schema |
 | Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
 
 ---
