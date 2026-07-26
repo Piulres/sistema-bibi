@@ -160,10 +160,22 @@ Quando houver sujeira de testes no banco de **operação** (duplicata clínica, 
 
 1. Baixar: `npx netlify blobs:get bibi-databases operation.db --output /tmp/operation.db`
 2. Rodar (sobre cópia): `node scripts/cleanup-operation-test-data.mjs /tmp/operation.db`
-3. Republicar com metadata: usar `@netlify/blobs` `store.set(..., { metadata: { updatedAt } })` para as Lambdas rehidratatem
+3. Republicar com metadata: `node scripts/publish-operation-blob.mjs /tmp/operation.db` (grava `updatedAt` para as Lambdas reidratarem)
 4. Registrar na timeline do cliente (ex.: [`docs/clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md))
 
 O script de 2026-07-26 unificou as anamneses da consulta **Renan Emigdio** / **Dra. Gabriela Lage** e removeu a massa efêmera de golive/smoke — mantendo a consulta, a ficha unificada e a prescrição Dexilant.
+
+### Reset de fluxos CEDIG (voltar ao zero operacional)
+
+Para zerar **atendimentos e fluxos** do tenant `cedig` sem apagar equipe/catálogo/preços:
+
+1. Baixar + backup (como acima)
+2. `node scripts/reset-cedig-transactional.mjs /tmp/operation.db --confirm=LIMPAR-FLUXOS`
+3. `DATABASE_URL="file:/tmp/operation.db" npx tsx scripts/cedig-ensure-commercial.ts` (empresas + PricingRules)
+4. `node scripts/publish-operation-blob.mjs /tmp/operation.db`
+5. Timeline: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · playbook: [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md)
+
+**Não** usar `db:reset` nem o botão “Restaurar demo” (só vale no modo demo).
 
 ---
 
