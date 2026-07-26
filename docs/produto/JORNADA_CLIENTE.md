@@ -199,7 +199,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
 | Alta | Só exibe agenda do dia | Calendário semanal/mensal + filtros |
-| Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
+| ~~Alta~~ | ~~Sem confirmação de chegada do paciente~~ | **✅ v3.0.5** — ação “Paciente presente” → `PATCH .../appointments/[id]` `{ status: CONFIRMADO }` (`flow-improvements-map` id `prestador-confirm-arrival`) |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
 | Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
 | Média | Sem assinatura digital / Atesta CFM / SNCR | **Parcial (v3.0.5):** atestado CFM e receita comum/controle especial estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |

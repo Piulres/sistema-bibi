@@ -91,6 +91,10 @@ Fluxo em `src/app/page.tsx`:
 2. `nicheLandingBranding()` aplica paleta do nicho.
 3. `getNicheLandingContent(niche)` — features, FAQ, descrição dos portais com vocabulário correto.
 
+**Nav da home (v3.0.5):** 6 âncoras em `src/lib/landing/navigation.ts` (`HOME_NAV_ANCHORS`) — Solução, Demo, Segmentos, Portais, Contato, FAQ. Renderizado em `LandingHeader`, `LandingMobileMenu` e `LandingFooter`.
+
+**Marca no header:** `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` em `src/lib/platform.ts` — sem sufixo ServiceOS no título visível.
+
 O motor Pay Per Use (§7) **não muda** entre nichos — apenas rótulos e copy.
 
 ---
@@ -240,6 +244,7 @@ Quando `User.mfaEnabled = true`:
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline (receita/atestado estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md)) |
 | Aplicar protocolo de exames | `POST .../patients/[id]/exam-protocols` | N× `ExamOrder` a partir do template |
 | Prescrever (comum / controle especial) | `POST .../medications` | `MedicationPrescription.prescriptionKind` + status ATIVA/SUSPENSA/ENCERRADA |
+| Reativar / suspender prescrição | `PATCH /api/prestador/medications/[id]` `{ status }` | Transições ATIVA ↔ SUSPENSA ↔ ENCERRADA |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
 ```mermaid
@@ -367,6 +372,7 @@ Doc completa: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · [`
 | Empresas | `/api/interno/companies` | `PATCH .../companies/[id]` | — | Status também via CRM |
 | Procedimentos | `/api/interno/procedures` | `PUT .../procedures/[id]` | `DELETE` | Catálogo do tenant |
 | Usuários | `/api/interno/users` | `PATCH .../users/[id]` | — | `role`, `internoProfile`, vínculos |
+| **Protocolos** (`?tab=protocols`) | `/api/interno/exam-protocol-templates` | `PATCH .../exam-protocol-templates/[id]` | — | `ProtocolTemplatesPanel` (cuidados) + `ExamProtocolTemplatesPanel` (exames); aplicar em lote no prestador via `POST .../patients/[id]/exam-protocols` |
 | **Mapa CRUD** | — | — | — | `CRUD_OPERATIONS_MAP` — 27 entidades, rotas API, filtro por portal (`?tab=operations`) |
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
@@ -769,7 +775,9 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Prestador
 `GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
-`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures`
+`POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
+`POST .../patients/[id]/exam-protocols` · `POST .../patients/[id]/medications` ·
+`PATCH /api/prestador/medications/[id]`
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
@@ -782,8 +790,9 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
-`companies/*` · `procedures/*` · `users/*` · `subscriptions/*` · `messages/*` ·
-`reminders` · `crm/pipeline` · `reports` · `branding/*` · `webhooks/*`
+`companies/*` · `procedures/*` · `users/*` · `exam-protocol-templates/*` ·
+`subscriptions/*` · `messages/*` · `reminders` · `crm/pipeline` · `reports` ·
+`branding/*` · `webhooks/*`
 
 ### Cron (sistema)
 `POST /api/cron/reminders` · `POST /api/cron/webhooks` — header `x-cron-secret`
