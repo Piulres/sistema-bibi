@@ -126,6 +126,17 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     docRef: "FLUXOS.md §8.6",
   },
   {
+    id: "cross-portal-nav-v3",
+    portal: "Cross-portal",
+    flow: "Navegação",
+    title: "Nav portais — menu Mais + drawer mobile",
+    description:
+      "NavTabs com split primary/secondary, ScrollableNavRail, drawer < lg e sticky wrapper nos 4 portais.",
+    status: "implemented",
+    ui: "Interno · Prestador · PJ · Beneficiário",
+    docRef: "ARQUITETURA_PORTAIS.md §Navegação",
+  },
+  {
     id: "cross-status-tracker",
     portal: "Cross-portal",
     flow: "Jornada PPU",

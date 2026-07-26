@@ -121,6 +121,7 @@ Seções **ROI**, **Comparativo** e **Para quem** permanecem na página (scroll)
 
 | Arquivo | Papel |
 |---------|-------|
+| `src/lib/landing/navigation.ts` | Âncoras home (`HOME_NAV_ANCHORS`) e segmento (`SEGMENT_NAV_ANCHORS`) |
 | `src/lib/landing/home-content.ts` | Copy base |
 | `src/lib/landing/hero-variants.ts` | Hero por segmento/UTM |
 | `src/lib/landing/roi-calculator.ts` | Fórmulas e presets |
