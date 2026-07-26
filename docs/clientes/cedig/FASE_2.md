@@ -62,4 +62,5 @@ Código: `src/lib/clinic-finance/bridge.ts` · `bridge-helpers.ts`.
 5. `npx playwright test e2e/cedig-gestao.spec.ts --project=chromium` (6/6)  
 6. Exportar mês (Excel) · Dashboard mostra KPIs da gestão no mês corrente
 
-Credenciais: [`README.md`](README.md).
+Credenciais: [`README.md`](README.md).  
+Playbook de ações (dia a dia + massa mapeada): [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md).
