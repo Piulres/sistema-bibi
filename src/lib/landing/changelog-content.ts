@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.0",
+    version: "3.0.1",
     label: PLATFORM.versionLabel,
-    date: "25/07/2026",
+    date: "26/07/2026",
     status: "current",
+    summary:
+      "Pacote de qualidade: vocabulário do tenant em todas as telas (Pet/Tutor/Cliente…), regras de negócio da agenda mais seguras e experiência multi-nicho mais consistente.",
+    highlights: [
+      {
+        title: "Vocabulário por segmento",
+        items: [
+          "Faturamento, agenda, cadastros e comunicação usam os termos do tenant",
+          "Estoque, breadcrumbs e mensagens seguem o nicho (pet, cliente, aluno…)",
+          "Consumo do beneficiário distingue 'Faturado' de 'A faturar'",
+        ],
+      },
+      {
+        title: "Regras da agenda",
+        items: [
+          "Agendamento cancelado ou faltou não aceita novos procedimentos",
+          "Transições de status seguem a máquina de estados (sem reabrir concluído)",
+          "Mensagens de erro claras em prestador, gestão clínica e portal PJ",
+        ],
+      },
+    ],
+    testStats: "563 testes Vitest · 152 E2E · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.0",
+    label: "Sistema Bibi - ServiceOS v3.0.0",
+    date: "25/07/2026",
+    status: "previous",
     summary:
       "ServiceOS v3.0: instale como app no celular (PWA) — tela cheia no iPhone/Android, sem App Store. Empilha o pacote v2.6 (CEDIG + login).",
     highlights: [
