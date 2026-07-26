@@ -10,7 +10,7 @@ import { PrismaClient } from "@prisma/client";
  * produção fica congelado no schema da época do primeiro persist — tabelas
  * e colunas adicionadas depois nunca chegam lá (`prisma db push` não roda na
  * Lambda). Incidente real: `ClinicExamLaunch` sem as colunas da ponte v2.6
- * (`bridgeStatus`, `appointmentId`…) → 500 em /interno/gestao.
+ * (`bridgeStatus`, `appointmentId`…) → 500 em /interno/gestao (não salva).
  *
  * Este módulo compara o banco ativo com o artefato de build (schema atual,
  * gerado no `db:setup`) e aplica migrações aditivas idempotentes:

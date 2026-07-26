@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-26 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.0** |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.1** · hotfix schema operação pendente deploy |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -20,7 +20,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 
 | Capacidade | Estado | Nota |
 |------------|--------|------|
-| Gestão clínica (lançamentos, despesas, KPIs) | ✅ | `/interno/gestao` |
+| Gestão clínica (lançamentos, despesas, KPIs) | 🔧 | Prod: 500 até deploy do schema-sync (Blob sem colunas ponte) |
 | Agenda + walk-in (modo operação) | ✅ | Persiste com Blobs |
 | Ponte PPU (lançamento → Appointment + Usage + Invoice) | ✅ | `bridge.ts` · coluna **SYNCED** |
 | Prestador (fila / extrato) | ✅ | Ex.: `bruno.dias@cedig.demo` |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.0** |
+| Pacote em produção | ✅ | **v3.0.1** · gestão bloqueada até hotfix |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 
@@ -69,6 +69,7 @@ Código: `src/lib/clinic-finance/bridge.ts`.
 | Login prestador falha | Portal errado | `/login?tenant=cedig` |
 | Criar usuário 403 | Conta RECEPÇÃO | Usar `operacao@cedig.demo` |
 | Massa vazia no local | Operation sem enrich | `./scripts/cedig-mapear.sh` |
+| Gestão 500 / não salva | `operation.db` Blob sem colunas ponte | Deploy hotfix schema-sync |
 
 Smoke produção: `bash scripts/cedig-golive-smoke.sh`
 
@@ -92,6 +93,11 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
+<<<<<<< HEAD
+| 2026-07-26 | Limpeza operation.db (Blobs): unificou 2 anamneses da consulta Renan Emigdio + Dra. Gabriela Lage; removeu 8 usuários e massa efêmera de testes (golive/smoke/persist). Script `scripts/cleanup-operation-test-data.mjs` + eventos de timeline `MEDICAL_RECORD_MERGED` / `OPERATION_TEST_DATA_CLEANUP` | ✅ |
+=======
+| 2026-07-26 | Incidente prod: `/interno/gestao` 500 ao listar/salvar (operation.db Blob sem colunas ponte v2.6) → schema-sync aditivo no boot Lambda | 🔧 fix em PR (requer deploy) |
+>>>>>>> origin/dev
 | 2026-07-26 | Docs vivas: status único; removidos FASE_2 / GO_LIVE / HISTORICO / FALHAS fragmentados | ✅ |
 | 2026-07-26 | Mapeamento 4 portais + agenda semana (21 exames, 4 walk-ins, 4 SYNCED) | ✅ KPIs 11.750 / 1.600 / 10.150 |
 | 2026-07-25 | Produção **v3.0.0** · modo operação · CEDIG provisionado · PWA `/instalar` | ✅ |
