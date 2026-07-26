@@ -164,7 +164,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | Uso de procedimento | `prestador/.../procedures` | ❌ | API + E2E |
 | Faturamento | `invoice-service.ts` | ❌ | Integração transacional |
 | PIX mock | `mock-pix-adapter.ts` | ✅ integração | confirm-pix round-trip |
-| TISS XML | `tiss-service.ts` | ❌ | Snapshot XML |
+| TISS XML | `tiss-service.ts` | ✅ `tests/api/tiss-guide.test.ts` (5 casos: 200, 422 NO_ITEMS, 403, 404, escapeXml) | Snapshot XSD (Tier 5) |
 
 ### Autenticação e sessão
 

@@ -11,14 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.4** — TISS endurecido, config Cursor enxuta e docs schema-sync **integrado na `dev`** · aguardando merge `dev` → `main` e deploy manual.
+> Pacote **v3.0.4** — TISS endurecido, config Cursor enxuta e docs schema-sync **na `main`** (merge #220) · **aguardando deploy manual** para produção.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
 | **Release `dev`** | **v3.0.4** · tip `dev` (pós-merge #212/#218/#219) |
-| **Release `main`** | **v3.0.3** · tip `d40f4ae` |
+| **Release `main`** | **v3.0.4** · tip `fd22ebc` (merge #220) |
 | **Pacote anterior em produção** | **3.0.2** — deploy `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.4** |
-| **Release** | `main` | **v3.0.3** (até merge + deploy) |
+| **Release** | `main` | **v3.0.4** (aguardando deploy) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.3** · deploy `6a65b0e3` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
@@ -70,7 +70,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.4`** | _(após merge dev→main)_ | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219) |
+| **`v3.0.4`** | `fd22ebc` | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219/#220) |
 | **`v3.0.3`** | `fc9afa7` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
 | **`v3.0.2`** | `9ceeb49` | Hotfix: schema-sync do operation.db (incidente 500 em /interno/gestao) |
 | **`v3.0.1`** | `daf690e` | Qualidade multi-nicho + regras da agenda (auditoria P1–P3 + labels + CI) |
@@ -307,7 +307,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.4` na `dev`** · produção **v3.0.3** até deploy |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.4` na `main`** · produção **v3.0.3** até deploy |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
