@@ -827,10 +827,18 @@ flowchart LR
 ## 20. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/openapi.yaml).
+
+| Métrica | Valor (v3.0.4) |
+|---------|----------------|
+| Route Handlers | **160** em `src/app/api/**/route.ts` |
+| Paths OpenAPI | **123** (sync automático) |
+| Handlers sem YAML | **37** (aviso em `openapi:verify`) |
+| Swagger UI | `/api/docs` |
+
 Fluxos de usuário detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
 
 - **Swagger UI:** http://localhost:3000/api/docs
 - **Spec (YAML):** http://localhost:3000/openapi.yaml
 
-Guia completo: [`API_DOCS.md`](API_DOCS.md)
+Guia completo: [`API_DOCS.md`](API_DOCS.md) · manutenção do contrato: §5 · export TISS: §6.
