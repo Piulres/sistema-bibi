@@ -10,6 +10,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
 
@@ -40,6 +41,7 @@ type Charge = {
 };
 
 export default function SubscriptionsView() {
+  const { labels } = useLabels();
   const { isBusy, run, showToast } = useAsyncAction();
   const [expanded, setExpanded] = useState<string | null>(null);
   const [charges, setCharges] = useState<Charge[]>([]);
@@ -213,7 +215,7 @@ export default function SubscriptionsView() {
           <SectionHeader title="Nova assinatura" />
           <form onSubmit={createSubscription} className="mt-4 grid gap-4 sm:grid-cols-2">
             <label className="block text-sm">
-              <span className="text-[var(--text-secondary)]">Beneficiário</span>
+              <span className="text-[var(--text-secondary)]">{labels.beneficiary}</span>
               <select
                 required
                 className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2"

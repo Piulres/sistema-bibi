@@ -7,6 +7,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Extrato = {
@@ -35,6 +36,7 @@ type ExtratoPayload = {
 };
 
 export default function PrestadorExtratoView() {
+  const { labels } = useLabels();
   const loadExtrato = useCallback(
     () =>
       fetchJson<ExtratoPayload>("/api/prestador/extrato", undefined, "Erro ao carregar extrato"),
@@ -125,7 +127,7 @@ export default function PrestadorExtratoView() {
                 <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                   <tr>
                     <th className="px-4 py-2 font-medium">Data</th>
-                    <th className="px-4 py-2 font-medium">Paciente</th>
+                    <th className="px-4 py-2 font-medium">{labels.patient}</th>
                     <th className="px-4 py-2 font-medium">Procedimento</th>
                     <th className="px-4 py-2 font-medium">Faturado</th>
                     <th className="px-4 py-2 text-right font-medium">Valor</th>

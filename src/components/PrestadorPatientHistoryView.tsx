@@ -145,8 +145,8 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
   return (
     <ViewStateBoundary
       loading={loading}
-      error={error ?? (!overview && !loading ? "Paciente não encontrado" : null)}
-      loadingMessage="Carregando histórico do paciente..."
+      error={error ?? (!overview && !loading ? `${labels.patient} não encontrado(a)` : null)}
+      loadingMessage="Carregando histórico..."
       onRetry={() => void reload()}
     >
       {overview && (() => {
@@ -164,7 +164,7 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
 
   return (
     <div className="space-y-8">
-      <Breadcrumbs items={buildPatientHistoryBreadcrumbs(patient.name)} />
+      <Breadcrumbs items={buildPatientHistoryBreadcrumbs(patient.name, labels)} />
 
       <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
         <div className="flex flex-wrap items-start justify-between gap-4">

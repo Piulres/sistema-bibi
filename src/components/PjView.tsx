@@ -10,6 +10,7 @@ import Alert from "@/components/ui/Alert";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type AlertItem = {
@@ -69,6 +70,7 @@ const alertTone = {
 };
 
 export default function PjView() {
+  const { labels } = useLabels();
   const loadOverview = useCallback(
     () => fetchJson<Overview>("/api/pj/overview", undefined, "Falha ao carregar dados da empresa"),
     [],
@@ -125,7 +127,7 @@ export default function PjView() {
           info="Status do contrato B2B com a clínica operadora."
         />
         <StatCard
-          label="Beneficiários"
+          label={labels.beneficiaries}
           value={company.beneficiariesCount}
           info="Colaboradores vinculados ao plano corporativo da empresa."
         />
@@ -146,7 +148,7 @@ export default function PjView() {
       </section>
 
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
-        <SectionHeader title="Beneficiários" />
+        <SectionHeader title={labels.beneficiaries} />
         <ul className="mt-4 space-y-2 md:hidden">
           {beneficiaries.map((b) => (
             <li key={b.id}>

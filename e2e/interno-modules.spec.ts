@@ -6,7 +6,7 @@ const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno", heading: /Faturamento/i },
   { path: "/interno/agenda", heading: /^Agenda$/ },
   { path: "/interno/cadastros", heading: /Cadastros/i },
-  { path: "/interno/estoque", heading: /Estoque Médico/i },
+  { path: "/interno/estoque", heading: /Estoque clínico/i },
   { path: "/interno/crm", heading: /CRM Corporativo/i },
   { path: "/interno/assinaturas", heading: /Recorrência/i },
   { path: "/interno/comunicacao", heading: /Comunicação/i },

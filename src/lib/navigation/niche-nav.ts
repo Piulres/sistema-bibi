@@ -2,7 +2,8 @@ import type { NavTab } from "@/components/ui/NavTabs";
 import type { InternoModule } from "@/lib/interno-permissions";
 import type { NicheId, NicheLabels } from "@/lib/niche/types";
 
-function estoqueTabLabel(niche: NicheId): string {
+/** Rótulo do módulo de estoque por nicho (nav e título de página). */
+export function estoqueTabLabel(niche: NicheId): string {
   switch (niche) {
     case "MEDICAL":
     case "DENTAL":

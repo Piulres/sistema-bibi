@@ -231,7 +231,7 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
         silentSuccess: true,
         onSuccess: async (body) => {
           const patient = body.patient as { name: string };
-          showToast({ message: `Beneficiário ${patient.name} cadastrado`, tone: "success" });
+          showToast({ message: `${labels.beneficiary} ${patient.name} cadastrado(a)`, tone: "success" });
           setPatientForm({
             name: "",
             cpf: "",
@@ -619,9 +619,9 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
             </form>
           </Card>
           <Card>
-            <SectionHeader title="Beneficiários" />
+            <SectionHeader title={labels.beneficiaries} />
             {patients.length === 0 ? (
-              <EmptyState message="Nenhum beneficiário." />
+              <EmptyState message={`Nenhum registro de ${labels.beneficiary.toLowerCase()}.`} />
             ) : (
               <ul className="mt-4 divide-y divide-[var(--border-default)]">
                 {patients.map((p) => (

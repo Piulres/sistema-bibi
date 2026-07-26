@@ -13,6 +13,7 @@ import StatCard from "@/components/ui/StatCard";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
 
@@ -50,6 +51,7 @@ type PixState = {
 };
 
 export default function BillingView() {
+  const { labels } = useLabels();
   const { isBusy, run, showToast } = useAsyncAction();
   const [pixState, setPixState] = useState<PixState | null>(null);
 
@@ -196,7 +198,7 @@ export default function BillingView() {
 
         <div className="grid gap-4 sm:grid-cols-3">
           <StatCard
-            label="Beneficiários com pendência"
+            label={`${labels.beneficiaries} com pendência`}
             value={pending.length}
             tone="warning"
             hint="Aguardando geração de fatura"
@@ -345,7 +347,7 @@ export default function BillingView() {
             <table className="w-full min-w-[44rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
-                  <th className="px-4 py-2 font-medium">Beneficiário</th>
+                  <th className="px-4 py-2 font-medium">{labels.beneficiary}</th>
                   <th className="px-4 py-2 font-medium">Empresa</th>
                   <th className="px-4 py-2 font-medium">Itens</th>
                   <th className="px-4 py-2 font-medium">Status</th>

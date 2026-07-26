@@ -5,6 +5,7 @@ import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
+import { useLabels } from "@/hooks/useLabels";
 import { suggestCedigAmount } from "@/lib/clinic-finance/cedig-pricing";
 import type {
   CedigPolypectomyTierId,
@@ -78,6 +79,7 @@ type Kpis = {
 type Tab = "lancamentos" | "despesas" | "indicadores";
 
 export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
+  const { labels } = useLabels();
   const { showToast } = useToast();
   const now = new Date();
   const [tab, setTab] = useState<Tab>("lancamentos");
@@ -438,10 +440,10 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
             className="grid gap-3 rounded-xl border border-[var(--border-default)] p-4 sm:grid-cols-2 lg:grid-cols-3"
           >
             <p className="sm:col-span-2 lg:col-span-3 text-sm font-medium text-[var(--text-primary)]">
-              Novo lançamento (1 paciente = 1 linha) — sincroniza Prestador e Faturamento
+              Novo lançamento (1 {labels.patient.toLowerCase()} = 1 linha) — sincroniza Prestador e Faturamento
             </p>
             <label className="text-sm sm:col-span-2">
-              Paciente cadastrado
+              {labels.patient} cadastrado(a)
               <select
                 className="mt-1 w-full rounded-lg border px-3 py-2"
                 value={form.patientId}
@@ -466,7 +468,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
               </select>
             </label>
             <label className="text-sm sm:col-span-2">
-              Nome do paciente *
+              Nome do {labels.patient.toLowerCase()} *
               <input
                 required
                 className="mt-1 w-full rounded-lg border px-3 py-2"
@@ -752,7 +754,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
               <thead className="bg-[var(--surface-muted)] text-xs uppercase text-[var(--text-muted)]">
                 <tr>
                   <th className="px-3 py-2">Data</th>
-                  <th className="px-3 py-2">Paciente</th>
+                  <th className="px-3 py-2">{labels.patient}</th>
                   <th className="px-3 py-2">Médico</th>
                   <th className="px-3 py-2">Tabela</th>
                   <th className="px-3 py-2">Exame</th>

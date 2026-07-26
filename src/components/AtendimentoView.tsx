@@ -403,7 +403,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             <StatusBadge value={detail.appointment.status} map="appointment" />
             {detail.appointment.status === "AGENDADO" && (
               <Button variant="secondary" size="sm" onClick={confirmArrival} disabled={isBusy("confirm-arrival")}>
-                Paciente presente
+                {labels.patient} presente
               </Button>
             )}
             {!isTerminalAppointmentStatus(detail.appointment.status) && (
