@@ -56,7 +56,7 @@ if (existsSync(OPERATION_DB) && statSync(OPERATION_DB).size === 0) {
 
 // 2. schema
 step("Sincronizando schema (prisma db push)");
-run("npx prisma db push --skip-generate");
+run("npx prisma db push");
 
 // 3. seed condicional
 const needsSeed = !existsSync(DEV_DB) || statSync(DEV_DB).size < 50_000;
