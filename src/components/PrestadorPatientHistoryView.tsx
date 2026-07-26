@@ -250,8 +250,8 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
             Nenhum atendimento registrado.
           </p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full text-left text-sm">
+          <div className="ds-scroll-x mt-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
+            <table className="w-full min-w-[32rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Data</th>
@@ -303,8 +303,8 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
             Nenhum procedimento registrado.
           </p>
         ) : (
-          <div className="mt-3 overflow-hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full text-left text-sm">
+          <div className="ds-scroll-x mt-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
+            <table className="w-full min-w-[28rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Procedimento</th>

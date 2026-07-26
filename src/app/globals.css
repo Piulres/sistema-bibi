@@ -144,13 +144,35 @@ body {
   border: 1px solid var(--border-default);
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ds-page-shell {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   margin-inline: auto;
   max-width: 64rem;
-  padding-inline: 1.5rem;
-  padding-block: 2rem;
+  padding-inline: 1rem;
+  padding-block: 1.5rem;
+  /* Contém tabelas/kanban largos — scroll fica nos wrappers .ds-scroll-x */
+  overflow-x: clip;
+}
+
+@media (min-width: 640px) {
+  .ds-page-shell {
+    padding-inline: 1.5rem;
+    padding-block: 2rem;
+  }
+}
+
+/* Faixa/tabela horizontal sem estourar a largura do viewport */
+.ds-scroll-x {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .ds-gradient-brand {

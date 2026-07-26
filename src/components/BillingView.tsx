@@ -276,8 +276,8 @@ export default function BillingView() {
             <ExportButtons baseUrl="/api/interno/billing/export" />
           </div>
           {invoices.length === 0 && <EmptyState message="Nenhuma fatura emitida ainda." />}
-          <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
-            <table className="w-full text-left text-sm">
+          <div className="ds-scroll-x mt-4 rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
+            <table className="w-full min-w-[44rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Beneficiário</th>

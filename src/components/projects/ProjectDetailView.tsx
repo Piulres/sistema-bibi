@@ -553,7 +553,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
 
           {activeBudget.status === "RASCUNHO" && (
             <>
-              <div className="overflow-x-auto rounded-xl border border-[var(--border-default)]">
+              <div className="ds-scroll-x rounded-xl border border-[var(--border-default)]">
                 <table className="min-w-full text-sm">
                   <thead className="bg-[var(--surface-muted)] text-left text-xs uppercase text-[var(--text-muted)]">
                     <tr>

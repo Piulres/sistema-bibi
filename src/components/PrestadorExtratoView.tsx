@@ -93,7 +93,7 @@ export default function PrestadorExtratoView() {
         {extrato.lines.length === 0 ? (
           <p className="mt-3 text-sm text-[var(--text-muted)]">Nenhum procedimento no período.</p>
         ) : (
-          <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
+          <div className="ds-scroll-x mt-4 rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
             <table className="w-full min-w-[40rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>

@@ -147,7 +147,7 @@ export default function ConstructionPipelineView() {
           Adicionar
         </button>
       </form>
-      <div className="flex gap-3 overflow-x-auto pb-2">
+      <div className="ds-scroll-x flex gap-3 pb-2">
         {data?.columns.map((col) => (
           <div
             key={col.status}

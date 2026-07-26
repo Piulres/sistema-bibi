@@ -19,7 +19,7 @@ export default function TenantTheme({ branding, portal, className, children }: P
 
   return (
     <div
-      className={className}
+      className={className ? `${className} min-w-0` : "min-w-0"}
       data-theme={brandingThemeAttribute(branding)}
       style={style}
     >

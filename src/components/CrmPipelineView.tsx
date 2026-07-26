@@ -69,7 +69,7 @@ export default function CrmPipelineView() {
     >
       {data && (
         <div className="space-y-4">
-          <div className="flex gap-4 overflow-x-auto pb-2">
+          <div className="ds-scroll-x flex gap-4 pb-2">
             {data.statuses.map((status) => {
               const cards = data.pipeline[status.value] ?? [];
               return (

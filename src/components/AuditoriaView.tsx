@@ -58,7 +58,7 @@ function AuditEventDiff({ metadata }: { metadata: TimelineEventMetadata }) {
   if (fields.length === 0) return null;
 
   return (
-    <div className="mt-3 overflow-x-auto rounded-lg border border-[var(--border-muted)] bg-[var(--surface-muted)]">
+    <div className="ds-scroll-x mt-3 rounded-lg border border-[var(--border-muted)] bg-[var(--surface-muted)]">
       <table className="w-full min-w-[20rem] text-left text-xs">
         <thead>
           <tr className="border-b border-[var(--border-muted)] text-[var(--text-muted)]">

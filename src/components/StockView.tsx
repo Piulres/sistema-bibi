@@ -422,8 +422,8 @@ export default function StockView() {
               {products.length === 0 ? (
                 <EmptyState title="Sem produtos" message="Cadastre o primeiro item médico." />
               ) : (
-                <div className="mt-4 overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="ds-scroll-x mt-4">
+                  <table className="w-full min-w-[28rem] text-sm">
                     <thead>
                       <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
                         <th className="py-2 pr-3">SKU</th>
@@ -479,8 +479,8 @@ export default function StockView() {
               {lots.length === 0 ? (
                 <EmptyState title="Sem lotes" message="Registre uma entrada de estoque." />
               ) : (
-                <div className="mt-4 overflow-x-auto">
-                  <table className="w-full text-sm">
+                <div className="ds-scroll-x mt-4">
+                  <table className="w-full min-w-[28rem] text-sm">
                     <thead>
                       <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
                         <th className="py-2 pr-3">Produto</th>

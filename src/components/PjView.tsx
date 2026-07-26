@@ -86,13 +86,13 @@ export default function PjView() {
       {data && (() => {
         const { company, alerts, beneficiaries, invoices, subscriptions, summary } = data;
         return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-8">
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((a, i) => (
-            <Alert key={i} tone={alertTone[a.tone]}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span>{a.message}</span>
+            <Alert key={i} tone={alertTone[a.tone]} className="min-w-0 break-words">
+              <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+                <span className="min-w-0 break-words">{a.message}</span>
                 {a.href && a.actionLabel && (
                   <a
                     href={a.href}
@@ -150,7 +150,7 @@ export default function PjView() {
 
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title="Beneficiários" />
-        <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
+        <div className="ds-scroll-x mt-4 rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
               <tr>

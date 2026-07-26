@@ -660,8 +660,8 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
             </div>
           </form>
 
-          <div className="overflow-x-auto rounded-xl border">
-            <table className="min-w-full text-left text-sm">
+          <div className="ds-scroll-x rounded-xl border">
+            <table className="min-w-[52rem] w-full text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-xs uppercase text-[var(--text-muted)]">
                 <tr>
                   <th className="px-3 py-2">Data</th>

@@ -646,7 +646,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
             Nenhum {labels.procedure.toLowerCase()} registrado.
           </p>
         ) : (
-          <div className="mt-3 overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
+          <div className="ds-scroll-x mt-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
             <table className="w-full min-w-[32rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
