@@ -335,36 +335,60 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
             Nenhum procedimento registrado.
           </p>
         ) : (
-          <div className="ds-scroll-x mt-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full min-w-[28rem] text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Procedimento</th>
-                  <th className="px-4 py-2 font-medium">Atendimento</th>
-                  <th className="px-4 py-2 font-medium">Realizado em</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.usages.map((usage) => (
-                  <tr key={usage.id}>
-                    <td className="px-4 py-2">
-                      <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
-                    </td>
-                    <td className="px-4 py-2">
-                      <Link
-                        href={`/prestador/atendimento/${usage.appointmentId}`}
-                        className="text-[var(--portal-accent)] hover:underline"
-                      >
-                        {usage.appointmentDateLabel}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
+          <>
+            <ul className="mt-3 space-y-2 md:hidden">
+              {overview.usages.map((usage) => (
+                <li
+                  key={usage.id}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-sm"
+                >
+                  <p className="break-words font-medium text-[var(--text-secondary)]">
+                    {usage.procedure}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                    {usage.performedAtLabel}
+                    {usage.category ? ` · ${usage.category}` : ""}
+                  </p>
+                  <Link
+                    href={`/prestador/atendimento/${usage.appointmentId}`}
+                    className="ds-touch-link mt-2 px-0"
+                  >
+                    {usage.appointmentDateLabel}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-3 hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm md:block">
+              <table className="w-full min-w-[28rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Procedimento</th>
+                    <th className="px-4 py-2 font-medium">Atendimento</th>
+                    <th className="px-4 py-2 font-medium">Realizado em</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {overview.usages.map((usage) => (
+                    <tr key={usage.id}>
+                      <td className="px-4 py-2">
+                        <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
+                      </td>
+                      <td className="px-4 py-2">
+                        <Link
+                          href={`/prestador/atendimento/${usage.appointmentId}`}
+                          className="ds-touch-link px-0"
+                        >
+                          {usage.appointmentDateLabel}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 
@@ -413,7 +437,7 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
                     Atendimento:{" "}
                     <Link
                       href={`/prestador/atendimento/${record.appointmentId}`}
-                      className="text-[var(--portal-accent)] hover:underline"
+                      className="ds-touch-link px-0"
                     >
                       {record.appointmentDateLabel}
                     </Link>

@@ -130,7 +130,7 @@ export default function PatientOverviewView({
         <a
           href={`/api/interno/patients/${patientId}/export?format=json`}
           download
-          className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+          className="ds-touch-link"
         >
           LGPD (JSON)
         </a>
@@ -224,32 +224,61 @@ export default function PatientOverviewView({
         {overview.appointments.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum atendimento registrado.</p>
         ) : (
-          <div className="ds-scroll-x mt-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Data</th>
-                  <th className="px-4 py-2 font-medium">Prestador</th>
-                  <th className="px-4 py-2 font-medium">Status</th>
-                  <th className="px-4 py-2 font-medium">Motivo</th>
-                  <th className="px-4 py-2 text-right font-medium">Procedimentos</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.appointments.map((appointment) => (
-                  <tr key={appointment.id}>
-                    <td className="px-4 py-2 text-[var(--text-secondary)]">{appointment.scheduledAtLabel}</td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.providerName}</td>
-                    <td className="px-4 py-2">
-                      <StatusBadge value={appointment.status} map="appointment" />
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
-                    <td className="px-4 py-2 text-right text-[var(--text-secondary)]">{appointment.usagesCount}</td>
+          <>
+            <ul className="mt-3 space-y-2 md:hidden">
+              {overview.appointments.map((appointment) => (
+                <li
+                  key={appointment.id}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-[var(--text-secondary)]">
+                        {appointment.scheduledAtLabel}
+                      </p>
+                      <p className="mt-0.5 break-words text-sm text-[var(--text-muted)]">
+                        {appointment.providerName}
+                      </p>
+                      <p className="mt-1 break-words text-xs text-[var(--text-muted)]">
+                        {appointment.reason ?? "—"}
+                      </p>
+                    </div>
+                    <StatusBadge value={appointment.status} map="appointment" />
+                  </div>
+                  <p className="mt-2 text-xs text-[var(--text-muted)]">
+                    {appointment.usagesCount} procedimento
+                    {appointment.usagesCount === 1 ? "" : "s"}
+                  </p>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-3 hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm md:block">
+              <table className="w-full min-w-[36rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Data</th>
+                    <th className="px-4 py-2 font-medium">Prestador</th>
+                    <th className="px-4 py-2 font-medium">Status</th>
+                    <th className="px-4 py-2 font-medium">Motivo</th>
+                    <th className="px-4 py-2 text-right font-medium">Procedimentos</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {overview.appointments.map((appointment) => (
+                    <tr key={appointment.id}>
+                      <td className="px-4 py-2 text-[var(--text-secondary)]">{appointment.scheduledAtLabel}</td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.providerName}</td>
+                      <td className="px-4 py-2">
+                        <StatusBadge value={appointment.status} map="appointment" />
+                      </td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{appointment.reason ?? "—"}</td>
+                      <td className="px-4 py-2 text-right text-[var(--text-secondary)]">{appointment.usagesCount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 
@@ -264,35 +293,66 @@ export default function PatientOverviewView({
         {overview.usages.length === 0 ? (
           <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">Nenhum procedimento registrado.</p>
         ) : (
-          <div className="ds-scroll-x mt-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full min-w-[36rem] text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">Procedimento</th>
-                  <th className="px-4 py-2 font-medium">Atendimento</th>
-                  <th className="px-4 py-2 font-medium">Realizado em</th>
-                  <th className="px-4 py-2 font-medium">Faturado</th>
-                  <th className="px-4 py-2 text-right font-medium">Valor</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.usages.map((usage) => (
-                  <tr key={usage.id}>
-                    <td className="px-4 py-2">
-                      <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.appointmentDateLabel}</td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
-                    <td className="px-4 py-2">
-                      <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
-                    </td>
-                    <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">{usage.priceLabel}</td>
+          <>
+            <ul className="mt-3 space-y-2 md:hidden">
+              {overview.usages.map((usage) => (
+                <li
+                  key={usage.id}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="break-words font-medium text-[var(--text-secondary)]">
+                        {usage.procedure}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                        {usage.appointmentDateLabel}
+                        {usage.category ? ` · ${usage.category}` : ""}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                        {usage.performedAtLabel}
+                      </p>
+                    </div>
+                    <p className="shrink-0 font-semibold text-[var(--text-primary)]">
+                      {usage.priceLabel}
+                    </p>
+                  </div>
+                  <div className="mt-2">
+                    <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-3 hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm md:block">
+              <table className="w-full min-w-[36rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">Procedimento</th>
+                    <th className="px-4 py-2 font-medium">Atendimento</th>
+                    <th className="px-4 py-2 font-medium">Realizado em</th>
+                    <th className="px-4 py-2 font-medium">Faturado</th>
+                    <th className="px-4 py-2 text-right font-medium">Valor</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {overview.usages.map((usage) => (
+                    <tr key={usage.id}>
+                      <td className="px-4 py-2">
+                        <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
+                      </td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{usage.appointmentDateLabel}</td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{usage.performedAtLabel}</td>
+                      <td className="px-4 py-2">
+                        <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
+                      </td>
+                      <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">{usage.priceLabel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
 

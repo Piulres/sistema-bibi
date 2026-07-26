@@ -229,7 +229,7 @@ export default function BillingView() {
                   <div>
                     <Link
                       href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
-                      className="font-semibold text-[var(--portal-accent)] hover:underline"
+                      className="ds-touch-link px-0 font-semibold"
                     >
                       {g.patientName}
                     </Link>
@@ -286,7 +286,7 @@ export default function BillingView() {
                     <div className="min-w-0">
                       <Link
                         href={`/interno/beneficiarios/${inv.patientId}?from=/interno`}
-                        className="break-words font-medium text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link break-words px-0 font-medium"
                       >
                         {inv.patientName}
                       </Link>
@@ -310,7 +310,7 @@ export default function BillingView() {
                     <a
                       href={`/api/interno/invoices/${inv.id}/tiss`}
                       download
-                      className="inline-flex min-h-10 items-center px-2 text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                      className="ds-touch-link"
                     >
                       XML
                     </a>
@@ -360,7 +360,7 @@ export default function BillingView() {
                     <td className="px-4 py-2">
                       <Link
                         href={`/interno/beneficiarios/${inv.patientId}?from=/interno`}
-                        className="font-medium text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link px-0 font-medium"
                       >
                         {inv.patientName}
                       </Link>
@@ -384,7 +384,7 @@ export default function BillingView() {
                         <a
                           href={`/api/interno/invoices/${inv.id}/tiss`}
                           download
-                          className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                          className="ds-touch-link"
                         >
                           XML
                         </a>

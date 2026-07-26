@@ -284,7 +284,7 @@ export default function SubscriptionsView() {
                     <div>
                       <Link
                         href={`/interno/beneficiarios/${sub.patientId}?from=/interno/assinaturas`}
-                        className="font-semibold text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link px-0 font-semibold"
                       >
                         {sub.patientName}
                       </Link>

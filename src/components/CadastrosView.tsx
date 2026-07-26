@@ -730,7 +730,7 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
                         <div className="min-w-0 flex-1">
                           <Link
                             href={`/interno/beneficiarios/${p.id}?from=/interno/cadastros`}
-                            className="break-words font-medium text-[var(--portal-accent)] hover:underline"
+                            className="ds-touch-link break-words px-0 font-medium"
                           >
                             {p.name}
                           </Link>

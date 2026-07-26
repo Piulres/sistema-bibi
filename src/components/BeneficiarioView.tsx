@@ -602,7 +602,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                         href={appointment.telemedicineUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link text-xs"
                       >
                         Entrar na videochamada
                       </a>
