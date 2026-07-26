@@ -1,29 +1,21 @@
 import "server-only";
+import {
+  endOfDayInAppTz,
+  formatDateTimeBR as dateTime,
+  startOfDayInAppTz,
+} from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { companyStatusLabel } from "@/lib/company-crm";
 import { getClinicFinanceKpis } from "@/lib/clinic-finance/service";
 import { formatBRL } from "@/lib/pricing";
 import { monthsForBillingCycle } from "@/lib/subscription";
 
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
 function startOfToday(): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return startOfDayInAppTz();
 }
 
 function endOfToday(): Date {
-  const d = new Date();
-  d.setHours(23, 59, 59, 999);
-  return d;
+  return endOfDayInAppTz();
 }
 
 /** Converte valor de assinatura para equivalente mensal (MRR). */

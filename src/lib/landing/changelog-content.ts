@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.8",
+    version: "3.0.9",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Hotfix de fuso horário: agendas, slots e labels passam a usar America/Sao_Paulo de forma consistente em produção (UTC).",
+    highlights: [
+      {
+        title: "Correção operacional",
+        items: [
+          "Utilitário central `timezone.ts` com fuso America/Sao_Paulo",
+          "Agendamentos, slots, dashboards e seed deixam de adiantar ~3h em Netlify/UTC",
+          "Dia civil BRT correto para filtros de agenda e “hoje” após 21h",
+        ],
+      },
+    ],
+    testStats: "timezone unit · CI unit+E2E · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.8",
+    label: "Sistema Bibi - ServiceOS v3.0.8",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Documentação operacional do consultório ponta a ponta e ferramentas para zerar fluxos de teste da CEDIG sem perder catálogo e equipe.",
     highlights: [

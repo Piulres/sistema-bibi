@@ -1,4 +1,12 @@
 import "server-only";
+import {
+  civilDateISO,
+  endOfDayInAppTz,
+  formatDateBR,
+  formatDateTimeBR as dateTime,
+  startOfDayInAppTz,
+  zonedDateTimeToUtc,
+} from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 import { getBeneficiaryOverview } from "@/lib/beneficiary-overview";
@@ -14,14 +22,6 @@ import {
 } from "@/lib/timeline";
 import type { TabularExport } from "@/lib/exports/tabular";
 
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 export type PatientExportSection =
   | "timeline"
@@ -52,7 +52,7 @@ export async function buildAuditTabularExport(
 
   return {
     title: "Auditoria do tenant",
-    subtitle: `${result.total} evento(s) — exportação em ${new Date().toLocaleString("pt-BR")}`,
+    subtitle: `${result.total} evento(s) — exportação em ${dateTime(new Date())}`,
     sheetName: "Auditoria",
     columns: [
       { header: "Data", key: "createdAt", width: 18 },
@@ -484,10 +484,15 @@ export async function buildPrestadorAppointmentsTabularExport(
   to?: string,
 ): Promise<TabularExport> {
   const prisma = await getPrisma();
-  const fromDate = from ? new Date(`${from}T00:00:00`) : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-  const toDate = to
-    ? new Date(`${to}T23:59:59`)
-    : new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0, 23, 59, 59);
+  const todayISO = civilDateISO();
+  const [year, month] = todayISO.split("-").map(Number);
+  const fromDate = from
+    ? startOfDayInAppTz(from)
+    : zonedDateTimeToUtc({ year, month, day: 1, hour: 0, minute: 0, second: 0 });
+  // `month` é 1–12; Date.UTC(year, month, 0) devolve o último dia civil desse mês.
+  const lastDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const monthEndISO = `${year}-${String(month).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
+  const toDate = to ? endOfDayInAppTz(to) : endOfDayInAppTz(monthEndISO);
 
   const appointments = await prisma.appointment.findMany({
     where: {
@@ -504,7 +509,7 @@ export async function buildPrestadorAppointmentsTabularExport(
 
   return {
     title: "Atendimentos do prestador",
-    subtitle: `${fromDate.toLocaleDateString("pt-BR")} — ${toDate.toLocaleDateString("pt-BR")}`,
+    subtitle: `${formatDateBR(fromDate)} — ${formatDateBR(toDate)}`,
     sheetName: "Atendimentos",
     columns: [
       { header: "Data", key: "scheduledAt", width: 18 },

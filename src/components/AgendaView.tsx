@@ -14,6 +14,13 @@ import { useAsyncData } from "@/hooks/useAsyncData";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { cn } from "@/lib/utils/cn";
+import {
+  civilDateISO,
+  formatDateBR,
+  formatTimeBR,
+  parseAppDateTime,
+  shiftCivilDate,
+} from "@/lib/timezone";
 
 type Appt = {
   id: string;
@@ -34,16 +41,8 @@ type AgendaPayload = {
   summary?: Summary;
 };
 
-/** Data civil no fuso local (evita UTC ISO que muda o “hoje” perto da meia-noite). */
-function localDateISO(d = new Date()): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
 function formatDateLabel(iso: string): string {
-  return new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", {
+  return formatDateBR(parseAppDateTime(iso, "12:00"), {
     weekday: "long",
     day: "2-digit",
     month: "long",
@@ -51,18 +50,12 @@ function formatDateLabel(iso: string): string {
   });
 }
 
-function shiftDate(iso: string, days: number): string {
-  const d = new Date(`${iso}T12:00:00`);
-  d.setDate(d.getDate() + days);
-  return localDateISO(d);
-}
-
 export default function AgendaView() {
   const { labels } = useLabels();
   const appt = labels.appointment;
   const apptsLabel = labels.appointments;
   const [view, setView] = useState<View>("day");
-  const [date, setDate] = useState(() => localDateISO());
+  const [date, setDate] = useState(() => civilDateISO());
 
   const tabs = useMemo(
     () =>
@@ -97,7 +90,7 @@ export default function AgendaView() {
   const appts = data?.appointments ?? [];
   const summary = data?.summary ?? null;
 
-  const isToday = date === localDateISO();
+  const isToday = date === civilDateISO();
 
   const headerTitle =
     view === "day"
@@ -180,7 +173,7 @@ export default function AgendaView() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setDate(shiftDate(date, -1))}
+                onClick={() => setDate(shiftCivilDate(date, -1))}
                 aria-label="Dia anterior"
               >
                 <span className="sm:hidden">←</span>
@@ -195,7 +188,7 @@ export default function AgendaView() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setDate(shiftDate(date, 1))}
+                onClick={() => setDate(shiftCivilDate(date, 1))}
                 aria-label="Próximo dia"
               >
                 <span className="sm:hidden">→</span>
@@ -206,7 +199,7 @@ export default function AgendaView() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setDate(localDateISO())}
+                onClick={() => setDate(civilDateISO())}
               >
                 Hoje
               </Button>
@@ -242,14 +235,11 @@ export default function AgendaView() {
               return (
                 <li key={a.id}>
                   <AppointmentCard
-                    time={scheduled.toLocaleTimeString("pt-BR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+                    time={formatTimeBR(scheduled)}
                     title={a.patient.name}
                     subtitle={
                       showDate
-                        ? `${scheduled.toLocaleDateString("pt-BR")} · ${a.reason ?? appt}`
+                        ? `${formatDateBR(scheduled)} · ${a.reason ?? appt}`
                         : (a.reason ?? appt)
                     }
                     status={a.status}

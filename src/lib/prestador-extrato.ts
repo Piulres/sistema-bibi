@@ -1,28 +1,21 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
+import {
+  civilDateISO,
+  endOfDayInAppTz,
+  formatDateTimeBR,
+  startOfDayInAppTz,
+  zonedDateTimeToUtc,
+} from "@/lib/timezone";
 
 function startOfMonth(date = new Date()): Date {
-  const d = new Date(date);
-  d.setDate(1);
-  d.setHours(0, 0, 0, 0);
-  return d;
+  const iso = civilDateISO(date);
+  const [year, month] = iso.split("-").map(Number);
+  return zonedDateTimeToUtc({ year, month, day: 1, hour: 0, minute: 0, second: 0 });
 }
 
-function endOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(23, 59, 59, 999);
-  return d;
-}
-
-const dateLabel = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const dateLabel = (value: Date) => formatDateTimeBR(value);
 
 export type PrestadorExtratoData = {
   periodLabel: string;
@@ -52,8 +45,8 @@ export async function getPrestadorExtrato(
   toParam?: string,
 ): Promise<PrestadorExtratoData> {
   const prisma = await getPrisma();
-  const from = fromParam ? new Date(`${fromParam}T00:00:00`) : startOfMonth();
-  const to = toParam ? endOfDay(new Date(`${toParam}T12:00:00`)) : endOfDay(new Date());
+  const from = fromParam ? startOfDayInAppTz(fromParam) : startOfMonth();
+  const to = toParam ? endOfDayInAppTz(toParam) : endOfDayInAppTz();
 
   const usages = await prisma.procedureUsage.findMany({
     where: {

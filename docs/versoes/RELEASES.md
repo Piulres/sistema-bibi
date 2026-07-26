@@ -11,24 +11,30 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.8** — jornada consultório + reset operacional CEDIG **publicado em produção**.
+> Pacote **v3.0.9** — hotfix timezone America/Sao_Paulo **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.8** — deploy `6a668d13` @ `5c94251` (`bibi-poc-2026-07-26i`) |
-| **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG (fluxos zerados; masters intactos) |
-| **Release `main` / `dev`** | **v3.0.8** · `main`/`dev` sincronizadas · artefato prod `@ 5c94251` |
-| **Pacote anterior em produção** | **3.0.7** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.9** — deploy `6a669510` @ `0bd89b2` (`bibi-poc-2026-07-26j`) |
+| **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
+| **Release `main` / `dev`** | **v3.0.9** · `main`/`dev` sincronizadas · artefato prod `@ 0bd89b2` |
+| **Pacote anterior em produção** | **3.0.8** — deploy `6a668d13` @ `5c94251` (`bibi-poc-2026-07-26i`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.8** |
-| **Release** | `main` | **v3.0.8** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.8** · deploy `6a668d13` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.9** |
+| **Release** | `main` | **v3.0.9** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.9** · deploy `6a669510` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.9
+
+- **Hotfix timezone:** fuso operacional `America/Sao_Paulo` em labels, limites de dia, slots e seed (`src/lib/timezone.ts`).
+- Corrige agendas ~3h adiantadas e “hoje” errado após 21h BRT em Netlify/UTC.
+- CI unit+E2E verdes · validação prod: walk-in 15:30 → label `15:30` (não `18:30`).
 
 ### Conteúdo do pacote v3.0.8
 
@@ -42,6 +48,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Dashboard executivo:** hierarquia de KPIs e menos ruído visual.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
+
+### Smoke (26/07/2026) — produção v3.0.9
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.9` · deploy `6a669510` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Agenda timezone | walk-in 15:30 BRT → label `26/07/2026, 15:30` |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (26/07/2026) — produção v3.0.8
 
@@ -133,6 +150,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.9`** | `0bd89b2` | Hotfix timezone America/Sao_Paulo (#263) · deploy `6a669510` |
 | **`v3.0.8`** | `5c94251` | Jornada consultório + reset operacional CEDIG + docs sync |
 | **`v3.0.7`** | `25385b2` | Drawer mobile direita + dashboard + gestão mobile + exports + E2E/docs sync |
 | **`v3.0.6`** | `ed14233` | Home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) |
@@ -374,7 +392,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.8` em produção** — jornada consultório + reset CEDIG ops |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.9` em produção** — hotfix timezone America/Sao_Paulo |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

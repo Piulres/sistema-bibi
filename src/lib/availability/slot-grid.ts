@@ -1,6 +1,8 @@
 /**
  * Geração pura de slots a partir de janelas (minutos do dia) e bloqueios.
  * weekday/JS: 0=Dom … 6=Sáb.
+ *
+ * Os instantes são calculados no fuso da clínica via `toUtc(year,month,day,hour,minute)`.
  */
 
 export const DEFAULT_SLOT_MINUTES = 30;
@@ -21,6 +23,12 @@ export type TimeRangeMs = {
 export type GeneratedSlot = {
   start: Date;
   startMs: number;
+};
+
+export type CivilDateParts = {
+  year: number;
+  month: number;
+  day: number;
 };
 
 /** Fallback POC: todos os dias, 08:00–18:00 / 30 min. */
@@ -67,12 +75,13 @@ function overlapsBlock(slotStartMs: number, slotEndMs: number, blocks: TimeRange
 }
 
 /**
- * Gera inícios de slot no dia civil de `dayStart` (00:00 local).
- * Exclui passado, horários em `bookedStartMs` e sobreposição com `blocks`.
+ * Gera inícios de slot no dia civil informado.
+ * `toUtc` converte componentes civis → instante UTC (ex.: America/Sao_Paulo).
  */
 export function generateDaySlots(input: {
-  dayStart: Date;
+  date: CivilDateParts;
   windows: AvailabilityWindow[];
+  toUtc: (parts: CivilDateParts & { hour: number; minute: number }) => Date;
   blocks?: TimeRangeMs[];
   bookedStartMs?: Iterable<number>;
   nowMs?: number;
@@ -90,9 +99,15 @@ export function generateDaySlots(input: {
       minute + step <= window.endMinute;
       minute += step
     ) {
-      const slot = new Date(input.dayStart);
-      slot.setHours(0, 0, 0, 0);
-      slot.setMinutes(minute, 0, 0);
+      const hour = Math.floor(minute / 60);
+      const min = minute % 60;
+      const slot = input.toUtc({
+        year: input.date.year,
+        month: input.date.month,
+        day: input.date.day,
+        hour,
+        minute: min,
+      });
       const startMs = slot.getTime();
       const endMs = startMs + step * 60_000;
       if (startMs < nowMs) continue;

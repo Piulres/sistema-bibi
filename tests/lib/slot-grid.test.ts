@@ -5,6 +5,21 @@ import {
   isValidWindow,
   parseTimeToMinutes,
 } from "@/lib/availability/slot-grid";
+import { zonedDateTimeToUtc } from "@/lib/timezone";
+
+const toUtc = ({
+  year,
+  month,
+  day,
+  hour,
+  minute,
+}: {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+}) => zonedDateTimeToUtc({ year, month, day, hour, minute });
 
 describe("slot-grid", () => {
   it("parseia horários HH:mm", () => {
@@ -18,42 +33,44 @@ describe("slot-grid", () => {
     expect(isValidWindow({ startMinute: 1080, endMinute: 480, slotMinutes: 30 })).toBe(false);
   });
 
-  it("gera slots 30min 08–18 e exclui bloqueio/ocupado", () => {
-    const dayStart = new Date("2026-08-03T00:00:00"); // segunda
-    const noon = new Date(dayStart);
-    noon.setHours(12, 0, 0, 0);
+  it("gera slots 30min 08–18 (BRT) e exclui bloqueio/ocupado", () => {
+    const date = { year: 2026, month: 8, day: 3 }; // segunda
+    const noon = zonedDateTimeToUtc({ ...date, hour: 12, minute: 0 });
+    const blockStart = zonedDateTimeToUtc({ ...date, hour: 12, minute: 0 });
+    const blockEnd = zonedDateTimeToUtc({ ...date, hour: 13, minute: 0 });
 
     const slots = generateDaySlots({
-      dayStart,
+      date,
       windows: defaultAvailabilityWindows(),
-      nowMs: dayStart.getTime() - 1,
+      toUtc,
+      nowMs: zonedDateTimeToUtc({ ...date, hour: 0, minute: 0 }).getTime() - 1,
       bookedStartMs: [noon.getTime()],
-      blocks: [
-        {
-          startsAtMs: new Date(dayStart).setHours(12, 0, 0, 0),
-          endsAtMs: new Date(dayStart).setHours(13, 0, 0, 0),
-        },
-      ],
+      blocks: [{ startsAtMs: blockStart.getTime(), endsAtMs: blockEnd.getTime() }],
     });
 
     expect(slots.length).toBeGreaterThan(0);
-    expect(slots[0]!.start.getHours()).toBe(8);
-    expect(slots.some((s) => s.start.getHours() === 12)).toBe(false);
-    // 12:30 also overlaps 12–13 block
-    expect(slots.some((s) => s.start.getHours() === 12 && s.start.getMinutes() === 30)).toBe(
-      false,
+    expect(slots[0]!.start.toISOString()).toBe(
+      zonedDateTimeToUtc({ ...date, hour: 8, minute: 0 }).toISOString(),
     );
+    expect(slots.some((s) => s.startMs === noon.getTime())).toBe(false);
+    const twelveThirty = zonedDateTimeToUtc({ ...date, hour: 12, minute: 30 }).getTime();
+    expect(slots.some((s) => s.startMs === twelveThirty)).toBe(false);
   });
 
   it("respeita duração de slot customizada", () => {
-    const dayStart = new Date("2026-08-03T00:00:00");
+    const date = { year: 2026, month: 8, day: 3 };
     const slots = generateDaySlots({
-      dayStart,
+      date,
       windows: [{ startMinute: 9 * 60, endMinute: 11 * 60, slotMinutes: 60 }],
-      nowMs: dayStart.getTime() - 1,
+      toUtc,
+      nowMs: zonedDateTimeToUtc({ ...date, hour: 0, minute: 0 }).getTime() - 1,
     });
     expect(slots).toHaveLength(2);
-    expect(slots[0]!.start.getHours()).toBe(9);
-    expect(slots[1]!.start.getHours()).toBe(10);
+    expect(slots[0]!.start.toISOString()).toBe(
+      zonedDateTimeToUtc({ ...date, hour: 9, minute: 0 }).toISOString(),
+    );
+    expect(slots[1]!.start.toISOString()).toBe(
+      zonedDateTimeToUtc({ ...date, hour: 10, minute: 0 }).toISOString(),
+    );
   });
 });

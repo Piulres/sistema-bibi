@@ -13,6 +13,12 @@ import {
   loadBlocksForDay,
   resolveWindowsForProviderDay,
 } from "@/lib/availability/provider-availability-service";
+import {
+  civilDateISO,
+  dayRangeInAppTz,
+  formatDateTimeBR,
+  zonedDateTimeToUtc,
+} from "@/lib/timezone";
 
 export type AppointmentSlot = {
   start: string;
@@ -24,20 +30,15 @@ export type AppointmentSlotWithProvider = AppointmentSlot & {
   providerName: string;
 };
 
-function startOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function endOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(23, 59, 59, 999);
-  return d;
+/** Weekday JS (0=Dom…6=Sáb) a partir de YYYY-MM-DD civil — independente do fuso do host. */
+function weekdayFromCivilISO(dateISO: string): number {
+  const [year, month, day] = dateISO.split("-").map(Number);
+  // Meio-dia UTC evita bordas; weekday civil BRT = mesmo dia na prática para datas ISO.
+  return new Date(Date.UTC(year!, month! - 1, day!, 12, 0, 0)).getUTCDay();
 }
 
 /**
- * Slots livres do prestador no dia.
+ * Slots livres do prestador no dia (fuso America/Sao_Paulo).
  * Usa a grade semanal publicada; se ainda não configurou, fallback 08:00–18:00 / 30 min.
  * Exclui agendamentos ativos e bloqueios pontuais.
  */
@@ -47,9 +48,10 @@ export async function getAvailableSlots(input: {
   date: Date;
 }): Promise<{ slots: AppointmentSlot[]; usingDefault: boolean }> {
   const prisma = await getPrisma();
-  const dayStart = startOfDay(input.date);
-  const dayEnd = endOfDay(input.date);
-  const weekday = dayStart.getDay();
+  const dateISO = civilDateISO(input.date);
+  const { from: dayStart, to: dayEnd } = dayRangeInAppTz(dateISO);
+  const weekday = weekdayFromCivilISO(dateISO);
+  const [year, month, day] = dateISO.split("-").map(Number) as [number, number, number];
 
   const { windows, usingDefault } = await resolveWindowsForProviderDay({
     tenantId: input.tenantId,
@@ -81,22 +83,19 @@ export async function getAvailableSlots(input: {
 
   const bookedSet = new Set(booked.map((b) => b.scheduledAt.getTime()));
   const generated = generateDaySlots({
-    dayStart,
+    date: { year, month, day },
     windows,
     blocks,
     bookedStartMs: bookedSet,
+    toUtc: ({ year: y, month: m, day: d, hour, minute }) =>
+      zonedDateTimeToUtc({ year: y, month: m, day: d, hour, minute }),
   });
 
   return {
     usingDefault,
     slots: generated.map((s) => ({
       start: s.start.toISOString(),
-      label: s.start.toLocaleString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      label: formatDateTimeBR(s.start, { year: undefined }),
     })),
   };
 }
@@ -158,7 +157,7 @@ export async function findAvailableProviderAt(input: {
     const { slots } = await getAvailableSlots({
       tenantId: input.tenantId,
       providerId: provider.id,
-      date: startOfDay(input.scheduledAt),
+      date: input.scheduledAt,
     });
     if (slots.some((s) => s.start === input.scheduledAt.toISOString())) {
       return provider;
@@ -196,11 +195,10 @@ export async function bookBeneficiaryAppointment(input: {
     providerId = assigned.id;
   }
 
-  const slotDate = startOfDay(input.scheduledAt);
   const { slots } = await getAvailableSlots({
     tenantId: input.tenantId,
     providerId,
-    date: slotDate,
+    date: input.scheduledAt,
   });
 
   const available = slots.some((s) => s.start === input.scheduledAt.toISOString());

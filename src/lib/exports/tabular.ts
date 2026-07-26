@@ -1,4 +1,5 @@
 import "server-only";
+import { formatDateTimeBR } from "@/lib/timezone";
 import ExcelJS from "exceljs";
 import PDFDocument from "pdfkit";
 import { PLATFORM } from "@/lib/platform";
@@ -115,7 +116,7 @@ export async function buildTablePdfBufferFromTabular(
 
   doc.moveDown(2);
   doc.fontSize(8).fillColor("#94a3b8").text(
-    `Gerado em ${new Date().toLocaleString("pt-BR")} · ${platform}`,
+    `Gerado em ${formatDateTimeBR(new Date())} · ${platform}`,
     startX,
     doc.page.height - doc.page.margins.bottom - 20,
     { width: tableWidth, align: "center" },

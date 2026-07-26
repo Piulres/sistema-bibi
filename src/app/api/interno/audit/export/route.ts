@@ -3,6 +3,7 @@ import { parseExportFormat } from "@/lib/exports/format";
 import { buildAuditTabularExport } from "@/lib/exports/builders";
 import { serveTabularExport } from "@/lib/exports/serve";
 import { getTenantBranding } from "@/lib/theme/branding";
+import { endOfDayInAppTz, startOfDayInAppTz } from "@/lib/timezone";
 
 export async function GET(request: Request) {
   try {
@@ -17,8 +18,8 @@ export async function GET(request: Request) {
       entityType: url.searchParams.get("entityType") ?? undefined,
       action: url.searchParams.get("action") ?? undefined,
       search: url.searchParams.get("search") ?? undefined,
-      from: fromParam ? new Date(`${fromParam}T00:00:00`) : undefined,
-      to: toParam ? new Date(`${toParam}T23:59:59`) : undefined,
+      from: fromParam ? startOfDayInAppTz(fromParam) : undefined,
+      to: toParam ? endOfDayInAppTz(toParam) : undefined,
     });
 
     const branding = await getTenantBranding(user.tenantId);

@@ -6,6 +6,7 @@ import {
 import { createAppointment } from "@/lib/appointment-service";
 import { getTestPrisma } from "../helpers/db";
 import { DEMO_EMAILS } from "../helpers/seed-fixtures";
+import { civilDateISO, parseAppDateTime, shiftCivilDate } from "@/lib/timezone";
 
 describe("scheduling without provider preference", () => {
   it("atribui prestador automaticamente quando autoAssignProvider", async () => {
@@ -20,9 +21,8 @@ describe("scheduling without provider preference", () => {
     expect(patient).toBeTruthy();
     expect(provider).toBeTruthy();
 
-    const slot = new Date();
-    slot.setDate(slot.getDate() + 14);
-    slot.setHours(10, 0, 0, 0);
+    const dateISO = shiftCivilDate(civilDateISO(), 14);
+    const slot = parseAppDateTime(dateISO, "10:00");
 
     const assigned = await findAvailableProviderAt({
       tenantId: tenant!.id,
@@ -54,8 +54,8 @@ describe("scheduling without provider preference", () => {
   it("lista slots de todos os prestadores em uma data", async () => {
     const prisma = getTestPrisma();
     const tenant = await prisma.tenant.findFirst({ where: { slug: "horizonte" } });
-    const date = new Date();
-    date.setDate(date.getDate() + 3);
+    const dateISO = shiftCivilDate(civilDateISO(), 3);
+    const date = parseAppDateTime(dateISO, "12:00");
 
     const { slots } = await getAvailableSlotsAcrossProviders({
       tenantId: tenant!.id,
