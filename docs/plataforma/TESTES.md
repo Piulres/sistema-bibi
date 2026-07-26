@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers ainda sem path — ver `npm run openapi:verify`). Revalidar com `npx vitest run` após adicionar testes.
+**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers sem YAML — ver `npm run openapi:verify`). Revalidar com `npx vitest run` e `npm run openapi:verify` após adicionar testes.
 
 ### Onboarding tour (v3)
 

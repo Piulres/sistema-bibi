@@ -85,7 +85,7 @@ flowchart LR
 | Camada | Comando / artefato | Resultado rodada 3 |
 |--------|-------------------|--------------------|
 | Unitário + API + segurança | `npm run test` | **550 passed** (76 arquivos) |
-| E2E browser | `npm run test:e2e` | **152 passed** (chromium + mobile) |
+| E2E browser | `npm run test:e2e` | **156 passed** (chromium + mobile) |
 | Lint | `npm run lint` | **limpo** |
 | RBAC manual | `curl` com cookie `bibi_session` por perfil | ver §5 |
 | Regras de negócio | `curl` PATCH/POST em agendamento demo (revertido depois) | ver §4 |

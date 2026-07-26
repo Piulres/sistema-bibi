@@ -850,9 +850,9 @@ A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/
 
 | Métrica | Valor (v3.0.7) |
 |---------|----------------|
-| Route Handlers | **160** em `src/app/api/**/route.ts` |
+| Route Handlers | **163** em `src/app/api/**/route.ts` |
 | Paths OpenAPI | **123** (sync automático) |
-| Handlers sem YAML | **37** (aviso em `openapi:verify`) |
+| Handlers sem YAML | **40** (aviso em `openapi:verify`) |
 | Swagger UI | `/api/docs` |
 
 Fluxos de usuário detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
