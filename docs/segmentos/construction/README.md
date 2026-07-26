@@ -94,6 +94,8 @@ Aba **Campo** no detalhe da obra.
 
 Nav: aba **Obras** (`labels.patients`) — **somente** quando `tenant.niche === CONSTRUCTION`.
 
+> **OpenAPI:** as rotas de obras/anexos/RDO ainda não constam no YAML — inventário em [`plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §5.1; contrato HTTP detalhado neste README.
+
 ### Portal PJ
 
 | Rota | Descrição |

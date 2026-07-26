@@ -215,7 +215,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa das rotas API
 
-**FATO:** existem **163** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **40** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); ver [`API_DOCS.md`](API_DOCS.md) §5 e §8 (gestão clínica).
+**FATO:** existem **163** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **40** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); inventário por domínio em [`API_DOCS.md`](API_DOCS.md) §5.1 (gestão clínica §8, obras construction README).
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -275,6 +275,7 @@ Gotchas confirmados em runtime (jul/2026):
 | `npm run test:e2e` falha com **"Another next dev server is already running"** | Next 16 permite **um** `next dev` por diretório de projeto; Playwright sobe o próprio dev server (porta 3100) | **Pare o `npm run dev`** antes de rodar e2e (o Playwright inicia e derruba o dele) |
 | E2E aborta com `browserType.launch: Executable doesn't exist` | Browser do Playwright não baixado na VM | `npx playwright install chromium` (uma vez por VM) |
 | Login retorna **500 `The table main.User does not exist`** após `npm run test` | O teste de dual-store gravava `prisma/.data-store-mode=operation`, apontando o dev para `operation.db` (vazio) | Corrigido no `afterEach` do teste; se ainda ocorrer: `rm -f prisma/.data-store-mode prisma/operation.db` (ou `npm run setup`) |
+| `npm run setup` falha com `unknown option: --skip-generate` | Versões recentes do Prisma CLI não aceitam `--skip-generate` em `db push` | Atualize o repo (`scripts/dev-setup.mjs` usa `npx prisma db push` sem flags extras) |
 | `/interno/gestao` 500 em produção (`no such column`) | Blob de operação com schema defasado vs artefato de build | Pacote ≥ v3.0.2 aplica `schema-sync` no boot; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Schema-sync |
 | RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
 
@@ -330,7 +331,7 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao` |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
-| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão; **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
+| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão, hint dashboard (`dashboard-gestao-hint`); **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
 | `assistant.spec.ts` | Assistente operacional serverless |
 | `api-docs.spec.ts` | Swagger UI `/api-docs` |
