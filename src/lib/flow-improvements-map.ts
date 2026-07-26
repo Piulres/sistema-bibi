@@ -84,10 +84,12 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     portal: "Prestador",
     flow: "Atendimento",
     title: "Stepper PPU no atendimento",
-    description: "Progresso visual da jornada clínica durante o atendimento.",
+    description:
+      "Progresso visual da jornada clínica; avança para Faturado/Pago via deriveCareJourneyBilling (hasOpenInvoice/hasPaidInvoice).",
     status: "implemented",
     ui: "/prestador/atendimento/[id]",
     api: "GET /api/prestador/appointments/[id]",
+    docRef: "FLUXOS.md §8.9",
   },
   {
     id: "interno-walkin",

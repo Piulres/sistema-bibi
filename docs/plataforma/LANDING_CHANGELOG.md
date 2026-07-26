@@ -12,7 +12,8 @@ A home (`/`) exibe a seção **Novidades** (`#novidades`) com o changelog curado
 |---------|-------|
 | `src/lib/landing/changelog-content.ts` | **Fonte da UI** — releases, highlights, datas, testes |
 | `src/components/landing/LandingChangelog.tsx` | Componente visual (acordeão + destaque) |
-| `src/lib/platform.ts` | `PLATFORM.version` e `PLATFORM.versionLabel` (badge do hero e changelog) |
+| `src/lib/landing/navigation.ts` | Âncoras do menu da home (`HOME_NAV_ANCHORS`) |
+| `src/lib/platform.ts` | `PLATFORM.version`, `PLATFORM.versionLabel` e `PLATFORM.brandName` |
 | `package.json` | Campo `version` (semver do pacote) |
 | `docs/versoes/RELEASES.md` | Registro oficial do que está em produção |
 | `docs/versoes/VX_Y.md` | Changelog detalhado da versão (ex.: `V2_1.md`) |

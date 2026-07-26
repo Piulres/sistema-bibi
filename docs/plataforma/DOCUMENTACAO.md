@@ -14,7 +14,19 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Piloto CEDIG (status + timeline) | [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) |
 | Escopo da versão atual | [`../versoes/V3_0.md`](../versoes/V3_0.md) (+ histórico `V2_*` / `V1_*`) |
 | Fluxos de produto | [`../produto/FLUXOS.md`](../produto/FLUXOS.md) |
+| Documentos clínicos (atestado, receita, protocolos) | [`../produto/DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
+| Changelog da landing | [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md) |
 | Índice | [`../README.md`](../README.md) |
+
+### Subsistema → doc (roteamento rápido)
+
+| Subsistema alterado | Atualizar |
+|---------------------|-----------|
+| Prontuário / Care Chart / protocolos | `DOCUMENTOS_CLINICOS.md` · `FLUXOS.md` §3/§4.3 |
+| Jornada PPU / stepper / abas | `FLUXOS.md` §8.9 · `JORNADA_CLIENTE.md` · `src/lib/flow-improvements-map.ts` |
+| Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
+| Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
+| Piloto CEDIG | `clientes/cedig/STATUS.md` |
 
 ---
 
@@ -48,8 +60,10 @@ Ao fechar trabalho no domínio: **atualize `STATUS.md`** (tabela Status + linha 
 
 1. `RELEASES.md` / `STATUS.md` do domínio refletem a realidade?
 2. Links apontam para docs vivos (não arquivos removidos)?
-3. `npm run docs:verify`
-4. `npm run cursor:verify` (se tocou `.cursor/` ou `AGENTS.md`)
-5. PR base **`dev`** (nunca `main` direto)
+3. Subsistema alterado tem doc correspondente? (ver tabela acima)
+4. UX flow implementado? Atualizar `src/lib/flow-improvements-map.ts` (`status: "implemented"` + `docRef`)
+5. `npm run docs:verify`
+6. `npm run cursor:verify` (se tocou `.cursor/` ou `AGENTS.md`)
+7. PR base **`dev`** (nunca `main` direto)
 
 Ver também: skill `.cursor/skills/serviceos-dev-quality/SKILL.md`.

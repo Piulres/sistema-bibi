@@ -11,6 +11,8 @@
 
 - `src/lib/clinic-finance/bridge.ts` — ponte clínica ↔ faturamento
 - `src/lib/care-journey.ts` — stepper Agendado → Pago no prestador/beneficiário
+- `src/lib/exam-protocol-service.ts` — templates e aplicação em lote de protocolos de exames
+- `src/lib/clinical/atestado.ts` · `src/lib/clinical/receita.ts` — documentos estruturados CFM
 - `/interno/gestao` — gestão clínica (MEDICAL/DENTAL)
 - Tenant demo: `/?tenant=cedig`
 
