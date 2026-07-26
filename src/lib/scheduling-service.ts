@@ -6,16 +6,19 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
+import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
+import { generateDaySlots } from "@/lib/availability/slot-grid";
+import {
+  loadBlocksForDay,
+  resolveWindowsForProviderDay,
+} from "@/lib/availability/provider-availability-service";
 import {
   civilDateISO,
   dayRangeInAppTz,
   formatDateTimeBR,
   zonedDateTimeToUtc,
 } from "@/lib/timezone";
-
-/** Horário comercial simplificado para slots (POC) — fuso America/Sao_Paulo. */
-const SLOT_START_HOUR = 8;
-const SLOT_END_HOUR = 18;
 
 export type AppointmentSlot = {
   start: string;
@@ -27,49 +30,74 @@ export type AppointmentSlotWithProvider = AppointmentSlot & {
   providerName: string;
 };
 
-function buildDaySlots(dateISO: string, bookedSet: Set<number>): AppointmentSlot[] {
-  const slots: AppointmentSlot[] = [];
-  const now = Date.now();
+/** Weekday JS (0=Dom…6=Sáb) a partir de YYYY-MM-DD civil — independente do fuso do host. */
+function weekdayFromCivilISO(dateISO: string): number {
   const [year, month, day] = dateISO.split("-").map(Number);
-
-  for (let hour = SLOT_START_HOUR; hour < SLOT_END_HOUR; hour++) {
-    for (const minute of [0, 30]) {
-      const slot = zonedDateTimeToUtc({ year, month, day, hour, minute });
-      if (slot.getTime() < now) continue;
-      if (bookedSet.has(slot.getTime())) continue;
-
-      slots.push({
-        start: slot.toISOString(),
-        label: formatDateTimeBR(slot, { year: undefined }),
-      });
-    }
-  }
-
-  return slots;
+  // Meio-dia UTC evita bordas; weekday civil BRT = mesmo dia na prática para datas ISO.
+  return new Date(Date.UTC(year!, month! - 1, day!, 12, 0, 0)).getUTCDay();
 }
 
-/** Gera slots de 30min entre 8h e 18h (BRT) excluindo horários já ocupados. */
+/**
+ * Slots livres do prestador no dia (fuso America/Sao_Paulo).
+ * Usa a grade semanal publicada; se ainda não configurou, fallback 08:00–18:00 / 30 min.
+ * Exclui agendamentos ativos e bloqueios pontuais.
+ */
 export async function getAvailableSlots(input: {
   tenantId: string;
   providerId: string;
   date: Date;
-}): Promise<{ slots: AppointmentSlot[] }> {
+}): Promise<{ slots: AppointmentSlot[]; usingDefault: boolean }> {
   const prisma = await getPrisma();
   const dateISO = civilDateISO(input.date);
   const { from: dayStart, to: dayEnd } = dayRangeInAppTz(dateISO);
+  const weekday = weekdayFromCivilISO(dateISO);
+  const [year, month, day] = dateISO.split("-").map(Number) as [number, number, number];
 
-  const booked = await prisma.appointment.findMany({
-    where: {
-      tenantId: input.tenantId,
-      providerId: input.providerId,
-      scheduledAt: { gte: dayStart, lte: dayEnd },
-      status: { notIn: ["CANCELADO", "FALTOU"] },
-    },
-    select: { scheduledAt: true },
+  const { windows, usingDefault } = await resolveWindowsForProviderDay({
+    tenantId: input.tenantId,
+    providerId: input.providerId,
+    weekday,
   });
 
+  if (windows.length === 0) {
+    return { slots: [], usingDefault };
+  }
+
+  const [booked, blocks] = await Promise.all([
+    prisma.appointment.findMany({
+      where: {
+        tenantId: input.tenantId,
+        providerId: input.providerId,
+        scheduledAt: { gte: dayStart, lte: dayEnd },
+        status: { notIn: ["CANCELADO", "FALTOU"] },
+      },
+      select: { scheduledAt: true },
+    }),
+    loadBlocksForDay({
+      tenantId: input.tenantId,
+      providerId: input.providerId,
+      dayStart,
+      dayEnd,
+    }),
+  ]);
+
   const bookedSet = new Set(booked.map((b) => b.scheduledAt.getTime()));
-  return { slots: buildDaySlots(dateISO, bookedSet) };
+  const generated = generateDaySlots({
+    date: { year, month, day },
+    windows,
+    blocks,
+    bookedStartMs: bookedSet,
+    toUtc: ({ year: y, month: m, day: d, hour, minute }) =>
+      zonedDateTimeToUtc({ year: y, month: m, day: d, hour, minute }),
+  });
+
+  return {
+    usingDefault,
+    slots: generated.map((s) => ({
+      start: s.start.toISOString(),
+      label: formatDateTimeBR(s.start, { year: undefined }),
+    })),
+  };
 }
 
 /** Slots livres de todos os prestadores em uma data (para quem não tem preferência). */
@@ -126,16 +154,14 @@ export async function findAvailableProviderAt(input: {
     : providers;
 
   for (const provider of ordered) {
-    const conflict = await prisma.appointment.findFirst({
-      where: {
-        tenantId: input.tenantId,
-        providerId: provider.id,
-        scheduledAt: input.scheduledAt,
-        status: { notIn: ["CANCELADO", "FALTOU"] },
-      },
-      select: { id: true },
+    const { slots } = await getAvailableSlots({
+      tenantId: input.tenantId,
+      providerId: provider.id,
+      date: input.scheduledAt,
     });
-    if (!conflict) return provider;
+    if (slots.some((s) => s.start === input.scheduledAt.toISOString())) {
+      return provider;
+    }
   }
 
   return null;
@@ -237,6 +263,23 @@ export async function cancelBeneficiaryAppointment(input: {
     createdBy: input.createdBy,
     reversible: false,
   });
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: "APPOINTMENT_CANCELLED",
+    data: {
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      providerId: appointment.providerId,
+      status: "CANCELADO",
+      previousStatus: appointment.status,
+      modality: appointment.modality,
+      telemedicineUrl: appointment.telemedicineUrl,
+      scheduledAt: appointment.scheduledAt.toISOString(),
+    },
+  });
+
+  queueAppointmentCalendarSync(appointment.id);
 
   return { ok: true as const, status: "CANCELADO" as const };
 }

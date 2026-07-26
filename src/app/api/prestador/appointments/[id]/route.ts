@@ -11,6 +11,8 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
+import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
 
 /** Detalhe de um agendamento: paciente, procedimentos usados e prontuario. */
 export async function GET(
@@ -117,7 +119,7 @@ export async function PATCH(
       );
     }
 
-    await prisma.appointment.update({
+    const updated = await prisma.appointment.update({
       where: { id },
       data: { status: body.status },
     });
@@ -126,7 +128,10 @@ export async function PATCH(
       tenantId: existing.tenantId,
       entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
       entityId: existing.id,
-      action: TIMELINE_ACTIONS.UPDATED,
+      action:
+        body.status === "CANCELADO"
+          ? TIMELINE_ACTIONS.CANCELLED
+          : TIMELINE_ACTIONS.UPDATED,
       description: `Status do atendimento de ${existing.patient.name} alterado para ${body.status}`,
       createdBy: user.id,
     });
@@ -141,6 +146,24 @@ export async function PATCH(
         createdBy: user.id,
       });
     }
+
+    void dispatchWebhooks({
+      tenantId: existing.tenantId,
+      event:
+        body.status === "CANCELADO" ? "APPOINTMENT_CANCELLED" : "APPOINTMENT_UPDATED",
+      data: {
+        appointmentId: updated.id,
+        patientId: updated.patientId,
+        providerId: updated.providerId,
+        status: updated.status,
+        previousStatus: existing.status,
+        modality: updated.modality,
+        telemedicineUrl: updated.telemedicineUrl,
+        scheduledAt: updated.scheduledAt.toISOString(),
+      },
+    });
+
+    queueAppointmentCalendarSync(updated.id);
 
     return NextResponse.json({ ok: true, status: body.status });
   } catch (error) {

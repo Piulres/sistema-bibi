@@ -12,6 +12,7 @@ import {
 import { validatePetForAppointment } from "@/lib/pet-service";
 import { requiresPet } from "@/lib/vet-niche";
 import { canTransitionAppointmentStatus } from "@/lib/appointment-status";
+import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
 
 export {
   APPOINTMENT_STATUSES,
@@ -296,6 +297,8 @@ export async function createAppointment(input: {
     },
   });
 
+  queueAppointmentCalendarSync(finalAppointment.id);
+
   return { appointment: mapAppointment(finalAppointment) };
 }
 
@@ -367,6 +370,29 @@ export async function updateAppointment(input: {
         : undefined,
     reversible: appointment.status === "CANCELADO",
   });
+
+  const webhookEvent =
+    appointment.status === "CANCELADO"
+      ? ("APPOINTMENT_CANCELLED" as const)
+      : ("APPOINTMENT_UPDATED" as const);
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: webhookEvent,
+    data: {
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      providerId: appointment.providerId,
+      status: appointment.status,
+      previousStatus: existing.status,
+      modality: appointment.modality,
+      telemedicineUrl: appointment.telemedicineUrl,
+      scheduledAt: appointment.scheduledAt.toISOString(),
+      previousScheduledAt: existing.scheduledAt.toISOString(),
+    },
+  });
+
+  queueAppointmentCalendarSync(appointment.id);
 
   return { appointment: mapAppointment(appointment) };
 }

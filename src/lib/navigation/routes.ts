@@ -70,6 +70,7 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
 export const PRESTADOR_NAV_TABS: NavTab[] = [
   { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
   { href: "/prestador", label: "Agenda", key: "agenda" },
+  { href: "/prestador/disponibilidade", label: "Disponibilidade", key: "disponibilidade" },
   { href: "/prestador/pacientes", label: "Pacientes", key: "pacientes" },
   { href: "/prestador/extrato", label: "Extrato", key: "extrato" },
   { href: "/prestador/relatorios", label: "Relatórios", key: "relatorios" },
@@ -78,6 +79,7 @@ export const PRESTADOR_NAV_TABS: NavTab[] = [
 export function resolvePrestadorActive(pathname: string): string | undefined {
   if (pathname === "/prestador/dashboard") return "dashboard";
   if (pathname.startsWith("/prestador/campo")) return "campo";
+  if (pathname.startsWith("/prestador/disponibilidade")) return "disponibilidade";
   if (pathname === "/prestador") return "agenda";
   if (pathname.startsWith("/prestador/pacientes")) return "pacientes";
   if (pathname.startsWith("/prestador/extrato")) return "extrato";

@@ -3,7 +3,14 @@ import { describe, expect, it, vi } from "vitest";
 const mockPrisma = {
   appointment: {
     findFirst: vi.fn(),
+    findUnique: vi.fn(),
     update: vi.fn(),
+  },
+  webhookEndpoint: {
+    findMany: vi.fn(async () => []),
+  },
+  calendarConnection: {
+    findMany: vi.fn(async () => []),
   },
 };
 
@@ -13,7 +20,7 @@ vi.mock("@/lib/db", () => ({
 
 vi.mock("@/lib/timeline", () => ({
   recordTimelineEvent: vi.fn(),
-  TIMELINE_ACTIONS: { UPDATED: "UPDATED" },
+  TIMELINE_ACTIONS: { UPDATED: "UPDATED", CANCELLED: "CANCELLED" },
   TIMELINE_ENTITY_TYPES: { APPOINTMENT: "Appointment" },
 }));
 

@@ -214,6 +214,14 @@ export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): Nav
       priority: "primary",
     },
     {
+      href: "/prestador/disponibilidade",
+      label: "Disponibilidade",
+      shortLabel: "Horários",
+      key: "disponibilidade",
+      group: "Agenda",
+      priority: "primary",
+    },
+    {
       href: "/prestador/pacientes",
       label: labels.beneficiaries,
       shortLabel: compactLabel(labels.beneficiary),

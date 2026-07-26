@@ -10,6 +10,8 @@ import EmptyState from "@/components/ui/EmptyState";
 import CalloutCard from "@/components/ui/CalloutCard";
 import AppointmentCard from "@/components/ui/AppointmentCard";
 import FlowStepper from "@/components/ui/FlowStepper";
+import AddToCalendarMenu from "@/components/calendar/AddToCalendarMenu";
+import CalendarFeedPanel from "@/components/calendar/CalendarFeedPanel";
 import { CARE_JOURNEY_STEPS } from "@/lib/care-journey";
 import { useLabels } from "@/hooks/useLabels";
 import { useAsyncData } from "@/hooks/useAsyncData";
@@ -270,6 +272,13 @@ export default function AppointmentsView() {
       onRetry={() => void reload()}
     >
       <div className="space-y-8">
+        <CalendarFeedPanel
+          apiPath="/api/interno/calendar"
+          connectionsApiPath="/api/interno/calendar/connections"
+          title="Calendário da operação (Google / Outlook / Apple)"
+          description="Conecte Google ou Microsoft na recepção para push automático da agenda do tenant. Feed ICS fica como fallback (Apple)."
+        />
+
         {walkInEphemeral ? (
           <CalloutCard
             data-tour-id="walk-in-ephemeral-warning"
@@ -628,6 +637,12 @@ export default function AppointmentsView() {
                           Confirmar chegada
                         </Button>
                       )}
+                      {a.status !== "CANCELADO" && a.status !== "FALTOU" ? (
+                        <AddToCalendarMenu
+                          apiPath={`/api/interno/appointments/${a.id}/calendar`}
+                          icsPath={`/api/interno/appointments/${a.id}/calendar?format=ics`}
+                        />
+                      ) : null}
                       {a.status !== "CANCELADO" && a.status !== "FALTOU" && (
                         <Link
                           href={`/interno/gestao?appointmentId=${encodeURIComponent(a.id)}&patientId=${encodeURIComponent(a.patientId)}&patientName=${encodeURIComponent(a.patientName)}&providerId=${encodeURIComponent(a.providerId)}${a.procedureId ? `&procedureId=${encodeURIComponent(a.procedureId)}` : ""}`}

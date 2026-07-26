@@ -8,6 +8,8 @@ import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import StatCard from "@/components/ui/StatCard";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
+import AddToCalendarMenu from "@/components/calendar/AddToCalendarMenu";
+import CalendarFeedPanel from "@/components/calendar/CalendarFeedPanel";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
@@ -114,6 +116,13 @@ export default function AgendaView() {
       onRetry={() => void reload()}
     >
       <div className="space-y-4">
+        <CalendarFeedPanel
+          apiPath="/api/prestador/calendar"
+          connectionsApiPath="/api/prestador/calendar/connections"
+          title="Levar agenda para Google, Outlook ou Apple"
+          description="Conecte Google ou Microsoft para push automático. Use o feed ICS para Apple. Em cada card, o botão Calendário adiciona um atendimento avulso."
+        />
+
         {summary && (
           <div className="grid gap-4 sm:grid-cols-3">
             <StatCard
@@ -237,6 +246,12 @@ export default function AgendaView() {
                     particular={!a.patient.company}
                     actions={
                       <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
+                        {a.status !== "CANCELADO" && a.status !== "FALTOU" ? (
+                          <AddToCalendarMenu
+                            apiPath={`/api/prestador/appointments/${a.id}/calendar`}
+                            icsPath={`/api/prestador/appointments/${a.id}/calendar?format=ics`}
+                          />
+                        ) : null}
                         <Link
                           href={`/prestador/atendimento/${a.id}`}
                           className="ds-touch-link ds-touch-link-solid"

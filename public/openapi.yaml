@@ -524,6 +524,157 @@ paths:
         '401': { description: Não autenticado }
         '403': { description: Acesso negado (role != PRESTADOR) }
 
+  /api/prestador/availability:
+    get:
+      tags: [Prestador]
+      summary: Grade semanal de disponibilidade do prestador
+      responses:
+        '200': { description: Janelas + flag usingDefault }
+    put:
+      tags: [Prestador]
+      summary: Substitui a grade semanal publicada
+      responses:
+        '200': { description: Grade salva }
+
+  /api/prestador/availability/blocks:
+    get:
+      tags: [Prestador]
+      summary: Lista bloqueios pontuais
+      responses:
+        '200': { description: Bloqueios }
+    post:
+      tags: [Prestador]
+      summary: Cria bloqueio (almoço/folga/férias)
+      responses:
+        '200': { description: Bloqueio criado }
+
+  /api/prestador/availability/blocks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [Prestador]
+      summary: Remove bloqueio
+      responses:
+        '200': { description: Removido }
+
+  /api/prestador/availability/preview:
+    get:
+      tags: [Prestador]
+      summary: Prévia de slots livres em uma data
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Lista de slots }
+
+  /api/prestador/calendar:
+    get:
+      tags: [Prestador]
+      summary: Status do feed ICS pessoal do prestador
+      responses:
+        '200': { description: feed ativo ou null }
+    post:
+      tags: [Prestador]
+      summary: Cria ou rotaciona o feed ICS pessoal
+      responses:
+        '200': { description: Feed gerado }
+    delete:
+      tags: [Prestador]
+      summary: Revoga o feed ICS pessoal
+      responses:
+        '200': { description: Feed revogado }
+
+  /api/prestador/appointments/{id}/calendar:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: format
+        in: query
+        required: false
+        schema: { type: string, enum: [ics] }
+    get:
+      tags: [Prestador]
+      summary: Links Google/Outlook e ICS de um agendamento
+      responses:
+        '200': { description: JSON com links ou arquivo text/calendar }
+        '404': { description: Agendamento não encontrado }
+
+  /api/calendar/feed/{token}:
+    parameters:
+      - name: token
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Público]
+      summary: Feed ICS assinável (Google / Outlook / Apple)
+      responses:
+        '200':
+          description: text/calendar
+        '404': { description: Token inválido ou revogado }
+
+  /api/calendar/oauth/{provider}/start:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+      - name: scope
+        in: query
+        schema: { type: string, enum: [PROVIDER, TENANT] }
+      - name: returnTo
+        in: query
+        schema: { type: string }
+    get:
+      tags: [Público]
+      summary: Inicia OAuth Google/Microsoft Calendar
+      responses:
+        '302': { description: Redirect ao provedor }
+        '503': { description: Credenciais OAuth não configuradas }
+
+  /api/calendar/oauth/{provider}/callback:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    get:
+      tags: [Público]
+      summary: Callback OAuth — grava CalendarConnection
+      responses:
+        '302': { description: Redirect de volta ao portal }
+
+  /api/prestador/calendar/connections/{provider}:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    delete:
+      tags: [Prestador]
+      summary: Desconecta calendário OAuth do prestador
+      responses:
+        '200': { description: Desconectado }
+
+  /api/interno/calendar/connections/{provider}:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    delete:
+      tags: [Interno]
+      summary: Desconecta calendário OAuth da operação
+      responses:
+        '200': { description: Desconectado }
+
   /api/prestador/appointments/{id}:
     parameters:
       - name: id
@@ -1419,6 +1570,40 @@ paths:
       summary: Cria agendamento
       responses:
         '200': { description: Agendamento criado }
+
+  /api/interno/calendar:
+    get:
+      tags: [Interno]
+      summary: Status do feed ICS operacional do tenant
+      responses:
+        '200': { description: feed ativo ou null }
+    post:
+      tags: [Interno]
+      summary: Cria ou rotaciona o feed ICS da operação
+      responses:
+        '200': { description: Feed gerado }
+    delete:
+      tags: [Interno]
+      summary: Revoga o feed ICS da operação
+      responses:
+        '200': { description: Feed revogado }
+
+  /api/interno/appointments/{id}/calendar:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: format
+        in: query
+        required: false
+        schema: { type: string, enum: [ics] }
+    get:
+      tags: [Interno]
+      summary: Links Google/Outlook e ICS de um agendamento
+      responses:
+        '200': { description: JSON com links ou arquivo text/calendar }
+        '404': { description: Agendamento não encontrado }
 
   /api/interno/appointments/{id}:
     parameters:

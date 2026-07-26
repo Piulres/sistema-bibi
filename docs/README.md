@@ -89,6 +89,8 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) | Tokens, white label |
 | [`plataforma/PAYMENTS.md`](plataforma/PAYMENTS.md) | Motor PIX / Strategy |
 | [`plataforma/COMMUNICATIONS.md`](plataforma/COMMUNICATIONS.md) | Motor de comunicação |
+| [`plataforma/CALENDAR_INTEGRATION.md`](plataforma/CALENDAR_INTEGRATION.md) | Agenda → Google / Outlook / Apple (ICS + webhooks) |
+| [`plataforma/PROVIDER_AVAILABILITY.md`](plataforma/PROVIDER_AVAILABILITY.md) | Prestador publica grade → slots do beneficiário |
 | [`plataforma/BENCHMARK.md`](plataforma/BENCHMARK.md) | Matriz POC × mercado |
 | [`plataforma/ROI_REFERENCIA.md`](plataforma/ROI_REFERENCIA.md) | ROI Pay Per Use — fórmulas e sensibilidade (saúde) |
 | [`plataforma/NOTEBOOKLM.md`](plataforma/NOTEBOOKLM.md) | Corpus RAG |

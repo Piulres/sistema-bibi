@@ -126,6 +126,10 @@ export const CRUD_COVERAGE_REGISTRY: CrudCoverageEntry[] = [
     tests: ["tests/api/portal-flows.test.ts", "e2e/flow-improvements.spec.ts"],
   },
   {
+    entity: "Disponibilidade (prestador)",
+    tests: ["tests/lib/slot-grid.test.ts", "tests/unit/scheduling-flex.test.ts"],
+  },
+  {
     entity: "Uso de procedimento (PPU)",
     tests: ["tests/api/pay-per-use-flow.test.ts", "tests/api/stock.test.ts"],
   },
