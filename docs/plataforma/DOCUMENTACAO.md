@@ -49,6 +49,7 @@ Ao fechar trabalho no domínio: **atualize `STATUS.md`** (tabela Status + linha 
 1. `RELEASES.md` / `STATUS.md` do domínio refletem a realidade?
 2. Links apontam para docs vivos (não arquivos removidos)?
 3. `npm run docs:verify`
-4. PR base **`dev`** (nunca `main` direto)
+4. `npm run cursor:verify` (se tocou `.cursor/` ou `AGENTS.md`)
+5. PR base **`dev`** (nunca `main` direto)
 
 Ver também: skill `.cursor/skills/serviceos-dev-quality/SKILL.md`.

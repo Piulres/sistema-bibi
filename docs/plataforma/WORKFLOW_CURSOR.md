@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (26/07/2026):** **v3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+**Produção (26/07/2026):** **v3.0.4** em Netlify (`bibi-poc-2026-07-26d` @ `fd22ebc`) · `main` = `dev` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ---
 
@@ -98,6 +98,24 @@ Executa, em sequência:
 2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
+
+### Validar configuração Cursor (v3.0.4+)
+
+```bash
+npm run cursor:verify
+```
+
+Verifica drift da configuração de agentes:
+
+| Check | O que valida |
+|-------|--------------|
+| Router único | Só `router.mdc` com `alwaysApply: true` |
+| Rules esperadas | Arquivos listados em `OPERACOES.md` §7 existem |
+| Skill references | `crud-entity`, `cedig-clinic`, `billing-pix`, `auth-tenant`, `release-package`, `CHECKLIST` |
+| `AGENTS.md` enxuto | Índice com menos de 120 linhas |
+| Sem artefatos obsoletos | `serviceos-agent-skill.mdc` removido; sem sufixo `-5f67` |
+
+Script: `scripts/verify-cursor-config.mjs`. Incluir após mudanças em `.cursor/rules/`, `.cursor/skills/` ou `AGENTS.md`.
 
 ---
 

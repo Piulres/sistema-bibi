@@ -12,5 +12,6 @@
 - Não integrar gateway real sem pedido explícito
 - Rotas internas: RBAC `FATURAMENTO` ou `ADMIN`
 - Export: `TabularExport` + `serveTabularExport`
+- TISS: `src/lib/tiss-service.ts` — 422 se fatura sem itens ou beneficiário sem documento
 
 Skill reference: `.cursor/skills/serviceos-dev-quality/references/billing-pix.md`

@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.3** em produção (jul/2026): PWA `/instalar` + vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v3.0.4** em produção (jul/2026): PWA `/instalar` + vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -294,9 +294,24 @@ Nav: **14 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNa
 | Marcar paga | `POST /api/interno/invoices/[id]/pay` | Invoice `PAGA`; Payment `CONFIRMED` |
 | Gerar PIX | `POST /api/interno/invoices/[id]/pix` | Payment `PENDING` |
 | Confirmar PIX | `POST /api/interno/invoices/[id]/confirm-pix` | Payment `CONFIRMED`; Invoice `PAGA` |
-| Export TISS | `GET /api/interno/invoices/[id]/tiss` | XML via `tiss-service.ts` |
+| Export TISS | `GET /api/interno/invoices/[id]/tiss` | XML via `tiss-service.ts` · RBAC `billing` |
 
-Serviço: `src/lib/invoice-service.ts`
+Serviço: `src/lib/invoice-service.ts` · guia TISS: `src/lib/tiss-service.ts`
+
+**Validação TISS (v3.0.4):** a rota retorna **422** com `code` quando a fatura existe mas
+não gera guia válida — evita XML semanticamente inválido para a operadora.
+
+| HTTP | `code` | Causa |
+|------|--------|-------|
+| 200 | — | XML `application/xml` (download `tiss-guia-{id}.xml`) |
+| 404 | — | Fatura inexistente ou de outro tenant |
+| 422 | `NO_ITEMS` | Fatura sem procedimentos (`invoice.items.length === 0`) |
+| 422 | `NO_PATIENT_DOCUMENT` | Beneficiário sem CPF/documento (carteira ficaria vazia) |
+| 403 | — | Perfil sem módulo `billing` (ex.: RECEPCAO) |
+
+Corpo de erro 422: `{ "error": "<mensagem>", "code": "NO_ITEMS" | "NO_PATIENT_DOCUMENT" }`.
+`escapeXml` cobre os 5 caracteres reservados XML. Validação XSD oficial ANS permanece fora do POC (Tier 5).
+Testes: `tests/api/tiss-guide.test.ts`.
 
 ### 4.2 Agenda (`AppointmentsView`)
 
@@ -766,7 +781,7 @@ Especificação completa: [`public/openapi.yaml`](../../public/openapi.yaml)
 1. **Proxy ≠ RBAC** — `src/proxy.ts` só verifica cookie; role e perfil validados no servidor.
 2. **SQLite + Prisma 6** — status são `String`, não enums Prisma.
 3. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
-4. **TISS** — XML simplificado; validação XSD pendente (Tier 5).
+4. **TISS** — XML simplificado com validação estrutural (422 `NO_ITEMS` / `NO_PATIENT_DOCUMENT`); XSD oficial ANS pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
 6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
 7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
