@@ -102,6 +102,8 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 
 ## Como usar no piloto
 
+**Playbook consolidado (dia a dia + ações validadas):** [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md).
+
 1. Produção em **modo operação** — `/interno/seguranca` → `OPERAR` ([`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md)).
 2. White label CEDIG — `/interno/branding`.
 3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (escolhe tabela Particular/CentralMed/…; valor sugere sozinho).
@@ -125,14 +127,14 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 |------|---------|--------|
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
 | **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
-| **C** | Homologação browser 4 portais + gestão | ✅ assistida 2026-07-25 · falta humano in loco |
+| **C** | Homologação browser 4 portais + gestão | ✅ 2026-07-25 + mapeamento semana 2026-07-26 · falta humano in loco |
 | **D** | Ponte lançamento → agenda + PPU + fatura/pagamento | ✅ v2.6 · [`FASE_2.md`](FASE_2.md) |
 | **E** | Export Excel mensal + agenda “Lançar na gestão” | ✅ v2.6 |
 | **F** | Beneficiário labels · PJ Bem/Dr Saúde · seed bridge · E2E · dashboard | ✅ v2.6 |
 
 Mapa de gaps e validação: [`FASE_2.md`](FASE_2.md).
 
-Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
+Ações: [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) · Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
 
 ---
 
