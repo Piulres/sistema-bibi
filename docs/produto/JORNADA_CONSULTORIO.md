@@ -294,6 +294,21 @@ Lista completa: [`README.md`](../../README.md) · [`AGENTS.md`](../../AGENTS.md)
 
 ---
 
+## Testes automatizados
+
+| Camada | Arquivo | O que cobre |
+|--------|---------|-------------|
+| API (Atos 1–4) | `tests/api/consultorio-journey.test.ts` | Walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX / marcar paga + RBAC cadastros/estoque |
+| Stepper | `tests/lib/care-journey.test.ts` | Agendado → … → Pago |
+| E2E UI | `e2e/jornada-consultorio.spec.ts` | Módulos operacionais + walk-in/check-in + superfície atendimento |
+| Walk-in | `e2e/walkin-particular.spec.ts` | Cadastro walk-in + check-in |
+| Índice | [`../plataforma/TESTES.md`](../plataforma/TESTES.md) | Matriz completa |
+
+```bash
+npx vitest run tests/api/consultorio-journey.test.ts
+npx playwright test e2e/jornada-consultorio.spec.ts --project=chromium
+```
+
 ## Referências cruzadas
 
 | Documento | Conteúdo |

@@ -71,6 +71,8 @@ Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
+Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
@@ -345,6 +347,7 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao` |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
+| `jornada-consultorio.spec.ts` | Jornada operacional UI — agenda/estoque/cadastros/faturamento + walk-in→check-in→atendimento (PEP/procedimentos/stepper) · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |
 | `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão, hint dashboard (`dashboard-gestao-hint`); **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
 | `assistant.spec.ts` | Assistente operacional serverless |
