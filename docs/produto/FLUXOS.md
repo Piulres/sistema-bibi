@@ -239,6 +239,7 @@ Quando `User.mfaEnabled = true`:
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
+| Calendário externo | `GET/POST/DELETE /api/prestador/calendar` + `.../appointments/[id]/calendar` | Feed ICS + links Google/Outlook — [`CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md) |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
@@ -838,10 +839,11 @@ Detalhe por portal: [`TESTES.md`](../plataforma/TESTES.md) §Mapa de rotas.
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
 
 ### Prestador
-`GET /api/prestador/agenda` · `GET|PATCH /api/prestador/appointments/[id]` ·
+`GET /api/prestador/agenda` · `GET|POST|DELETE /api/prestador/calendar` ·
+`GET .../appointments/[id]/calendar` · `GET|PATCH /api/prestador/appointments/[id]` ·
 `POST .../procedures` · `POST /api/prestador/records` · `GET /api/procedures` ·
 `POST .../patients/[id]/exam-protocols` · `POST .../patients/[id]/medications` ·
-`PATCH /api/prestador/medications/[id]`
+`PATCH /api/prestador/medications/[id]` · feed público `GET /api/calendar/feed/{token}`
 
 ### Beneficiário
 `GET /api/beneficiario/overview|providers|slots` ·
