@@ -15,9 +15,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.7** — deploy `6a65e256` @ `bce3203` (`bibi-poc-2026-07-26g`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.7** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.7** · `main`/`dev` sincronizadas · artefato prod `@ bce3203` |
+| **Release `main` / `dev`** | **v3.0.7** · `main`/`dev` sincronizadas · artefato prod `@ 25385b2` |
 | **Pacote anterior em produção** | **3.0.6** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.7** |
 | **Release** | `main` | **v3.0.7** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.7** · deploy `6a65e256` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.7** · deploy `6a65eac9` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.7
@@ -41,7 +41,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.7` |
+| Landing `/` | 200 · footer `v3.0.7` · deploy `6a65eac9` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
@@ -117,7 +117,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.7`** | `bce3203` | Drawer mobile direita + dashboard + gestão mobile + exports canônicos |
+| **`v3.0.7`** | `25385b2` | Drawer mobile direita + dashboard + gestão mobile + exports + E2E/docs sync |
 | **`v3.0.6`** | `ed14233` | Home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) |
 | **`v3.0.5`** | `cf0eb26` | Atendimento clínico + jornada faturada + UX landing/portais (#221/#225–#227) |
 | **`v3.0.4`** | `fd22ebc` | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219/#220) |
