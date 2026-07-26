@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers sem YAML — ver `npm run openapi:verify`). Revalidar com `npx vitest run` e `npm run openapi:verify` após adicionar testes.
+**Ground truth (jul/2026):** **606** casos Vitest (84 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers sem YAML — ver `npm run openapi:verify`). Revalidar com `npx vitest run` e `npm run openapi:verify` após adicionar testes.
 
 ### Onboarding tour (v3)
 
@@ -68,6 +68,8 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônicos, BOM UTF-8 via `arrayBuffer`, TXT pipe-delimited) · `tests/unit/interchange.test.ts` (dataset canônico CSV/JSON) · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ tabular).
 
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
+
+Cobertura v3.0.9 fuso operacional: `tests/unit/timezone.test.ts` — `parseAppDateTime`, `dayRangeInAppTz`, `civilDateISO`/`civilTimeHM`, `formatDateTimeBR`, bordas 23:30 BRT vs 00:30 do dia seguinte. Consumidores: agenda, slots beneficiário, exports, seed.
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 

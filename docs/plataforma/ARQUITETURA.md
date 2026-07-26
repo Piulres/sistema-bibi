@@ -765,6 +765,33 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
 
+### Fuso operacional — `America/Sao_Paulo` (v3.0.9)
+
+Netlify e Node rodam em **UTC**. Agenda, slots, dashboards, exports e seed usam o fuso civil **`America/Sao_Paulo`** via `src/lib/timezone.ts` — não use `Date#getHours()`, `toLocaleString()` sem `timeZone` nem `new Date("YYYY-MM-DD")` para lógica de negócio.
+
+| Função | Uso |
+|--------|-----|
+| `parseAppDateTime(dateISO, timeHM)` | Formulário agenda → `scheduledAt` UTC (`Appointment.scheduledAt`) |
+| `civilDateISO()` / `civilTimeHM()` | “Hoje” e hora atual no fuso da clínica |
+| `dayRangeInAppTz(dateISO)` | Filtro Prisma `{ gte: from, lte: to }` por dia civil BRT |
+| `formatDateTimeBR` / `formatDateBR` / `formatTimeBR` | Labels na UI e exports |
+| `shiftCivilDate(dateISO, days)` | Navegação de calendário sem drift de host |
+
+**Persistência:** `Appointment.scheduledAt` é `DateTime` UTC no SQLite; a UI interpreta com `formatDateTimeBR`. Ex.: walk-in `15:30` BRT → `2026-07-26T18:30:00.000Z` → label `26/07/2026, 15:30`.
+
+**Consumidores principais:** `scheduling-service.ts` (slots 8h–18h BRT), `appointment-service.ts`, `AgendaView` / `AppointmentsView`, `exports/builders.ts`, seed (`prisma/seed-data/helpers.ts`), assistente (`assistant/tools/*/write.ts`).
+
+**Armadilhas comuns:**
+
+| Evitar | Fazer |
+|--------|-------|
+| `date.getDate()` para “hoje” | `civilDateISO()` |
+| `toLocaleString("pt-BR")` sem `timeZone` | `formatDateTimeBR(date)` |
+| `new Date("2026-07-26")` (meia-noite UTC) | `parseAppDateTime("2026-07-26", "09:00")` ou `startOfDayInAppTz` |
+| Range do dia com `setHours(0,0,0,0)` local | `dayRangeInAppTz(dateISO)` |
+
+Testes: `tests/unit/timezone.test.ts` · smoke produção: walk-in 15:30 BRT → label `15:30` (não `18:30`).
+
 ### Exports tabulares (v3.0.7)
 
 | Camada | Arquivo | Papel |

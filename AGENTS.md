@@ -69,6 +69,7 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 4. **Pós-`npm test`:** dual-store pode quebrar login → `npm run setup`
 5. **E2E:** pare `npm run dev` antes de `test:e2e` (porta 3100)
 6. **Schema-sync operation.db:** Blob congela schema — ver `docs/plataforma/OPERACAO_DADOS.md` §Schema-sync
+7. **Datas/horas:** Netlify roda em UTC — use `src/lib/timezone.ts` (`parseAppDateTime`, `civilDateISO`, `formatDateTimeBR`) em vez de `Date#getHours()` ou `toLocaleString` sem `timeZone` — ver `docs/plataforma/ARQUITETURA.md` §17
 
 ## Índice de documentação
 

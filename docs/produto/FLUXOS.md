@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.9** em produção (jul/2026): hotfix timezone `America/Sao_Paulo` — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../plataforma/ARQUITETURA.md`](../plataforma/ARQUITETURA.md) §17. Pacote anterior (v3.0.8): jornada consultório + reset CEDIG. Pacote v3.0.7: drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -360,6 +360,8 @@ sequenceDiagram
 ```
 
 Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicine.ts`
+
+**Fuso (v3.0.9):** data/hora civil em `America/Sao_Paulo` — `parseAppDateTime` na criação, `dayRangeInAppTz` no filtro por dia, `formatDateTimeBR` nos labels. Ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md) §17.
 
 ### 4.2.1 Gestão clínica CEDIG (`ClinicFinanceView`) — v2.4 / v2.6
 
