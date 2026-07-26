@@ -80,10 +80,24 @@ test.describe("navegação responsiva", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await loginAs(page, "prestador", "dra.helena@bibi.health");
 
-    await expect(page.getByRole("button", { name: /início/i })).toBeVisible();
-    await page.getByRole("button", { name: /início/i }).click();
+    const trigger = page.locator('[data-tour-id="mobile-nav-trigger"]');
+    await expect(trigger).toBeVisible();
+    await expect(trigger).not.toContainText(/módulos/i);
+    await trigger.click();
+
+    const dialog = page.getByRole("dialog", { name: "Módulos do prestador" });
+    await expect(dialog).toBeVisible();
+
+    const box = await dialog.boundingBox();
+    const viewport = page.viewportSize();
+    expect(box).toBeTruthy();
+    expect(viewport).toBeTruthy();
+    // Abre pela direita (alinhado ao botão hamburger)
+    expect((box?.x ?? 0) + (box?.width ?? 0)).toBeGreaterThan((viewport?.width ?? 0) - 8);
+
     const drawer = page.getByRole("navigation", { name: "Módulos do prestador" });
-    await expect(drawer).toBeVisible();
+    await expect(drawer.getByText("Agenda", { exact: true })).toBeVisible();
+    await expect(drawer.getByText("Financeiro", { exact: true })).toBeVisible();
     await drawer.getByRole("link", { name: "Agenda" }).click();
     await expect(page).toHaveURL(/\/prestador$/);
   });
