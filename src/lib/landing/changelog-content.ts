@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.1",
+    version: "3.0.2",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Correção operacional: a gestão clínica (CEDIG) volta a registrar lançamentos com a agenda e o faturamento sincronizados, mesmo em bancos provisionados antes da ponte Pay Per Use.",
+    highlights: [
+      {
+        title: "Gestão clínica estável",
+        items: [
+          "Lançamentos e indicadores de /interno/gestao sem erro interno",
+          "Sincronização de esquema do banco de operação aplicada no boot",
+          "Ponte lançamento → agenda → fatura preservada",
+        ],
+      },
+    ],
+    testStats: "566 testes Vitest · 152 E2E · schema-sync · pre-release OK",
+  },
+  {
+    version: "3.0.1",
+    label: "Sistema Bibi - ServiceOS v3.0.1",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Pacote de qualidade: vocabulário do tenant em todas as telas (Pet/Tutor/Cliente…), regras de negócio da agenda mais seguras e experiência multi-nicho mais consistente.",
     highlights: [
