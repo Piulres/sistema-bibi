@@ -1,15 +1,33 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 
-function escapeXml(value: string): string {
+/** Erro de validação da guia — fatura existe mas não gera guia válida. */
+export class TissBuildError extends Error {
+  code: "NO_ITEMS" | "NO_PATIENT_DOCUMENT";
+
+  constructor(message: string, code: TissBuildError["code"]) {
+    super(message);
+    this.name = "TissBuildError";
+    this.code = code;
+  }
+}
+
+export function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 
-/** Gera XML simplificado de guia TISS/ANS para fatura Pay Per Use (POC Tier 4). */
+/**
+ * Gera XML simplificado de guia TISS/ANS para fatura Pay Per Use (POC Tier 4).
+ *
+ * Validação estrutural (auditoria §8): guia sem procedimentos ou sem documento
+ * do beneficiário lança `TissBuildError` em vez de servir XML semanticamente
+ * inválido para a operadora. Validação XSD oficial ANS fica fora do POC.
+ */
 export async function buildTissGuideXml(tenantId: string, invoiceId: string): Promise<string | null> {
   const prisma = await getPrisma();
   const invoice = await prisma.invoice.findFirst({
@@ -32,6 +50,20 @@ export async function buildTissGuideXml(tenantId: string, invoiceId: string): Pr
   });
 
   if (!invoice) return null;
+
+  if (invoice.items.length === 0) {
+    throw new TissBuildError(
+      "Fatura sem procedimentos — não é possível gerar guia TISS.",
+      "NO_ITEMS",
+    );
+  }
+
+  if (!invoice.patient.cpf.replace(/\D/g, "")) {
+    throw new TissBuildError(
+      "Beneficiário sem documento — número da carteira ficaria vazio na guia.",
+      "NO_PATIENT_DOCUMENT",
+    );
+  }
 
   const guiaDate = invoice.createdAt.toISOString().slice(0, 10);
   const itemsXml = invoice.items
