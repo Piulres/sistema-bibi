@@ -156,3 +156,51 @@ Ver [`FALHAS.md`](FALHAS.md).
 | P2-c | Seed: 3 exames na agenda, 4 launches, 2 despesas |
 | P3-a | Dismiss do tour principal bloqueia micro-tours |
 | S2 | Empresa Dr Saúde no seed |
+
+---
+
+### 2026-07-26 — Mapeamento operacional 4 portais + agenda da semana
+
+Ambiente: `localhost:3000` · **modo operação** (`operation.db`) · `/?tenant=cedig`.  
+Scripts: `scripts/cedig-enrich-operation.ts` · `scripts/cedig-week-mapping.mjs`.  
+Evidências: `/opt/cursor/artifacts/cedig-mapeamento/`.
+
+#### Massa criada nesta rodada
+
+| Ação | Resultado |
+|------|-----------|
+| Exames agendados (27/07–01/08) | **21** via API (`AGENDADO`, 5 procedimentos × 5 médicos) |
+| Walk-ins | **4** (Carlos, Helena, Roberto, Lucia) |
+| Lançamentos gestão C1–C4 | **4 SYNCED** (ponte → Appointment + Usage + Invoice) |
+| Despesas | lab R$ 300 + equipe R$ 500 |
+| Contagem diária API | 26→8 · 27→5 · 28→4 · 29→4 · 30→3 · 31→4 · 01/08→3 |
+
+#### Portais (browser)
+
+| Portal | Conta | Status | Observado |
+|--------|-------|--------|-----------|
+| Interno | `alana@cedig.demo` | ✅ | Dashboard KPIs · Agenda walk-in · Gestão (lançamentos/despesas/indicadores) |
+| Prestador | `bruno.dias@cedig.demo` | ✅ | Fila do dia · Extrato R$ 2.150 (José Colo + Maria Endo) |
+| PJ | `rh@centralmed.demo` | ✅ | 2 beneficiários · consumo PPU R$ 2.550 · faturas abertas R$ 1.650 |
+| Beneficiário | `maria.cedig@email.com` | ✅ | Labels **Exame/Exames** · agenda · faturas |
+
+#### KPIs gestão (mês 07/2026)
+
+| Métrica | Valor |
+|---------|-------|
+| Receita | R$ 11.750,00 |
+| Despesas | R$ 1.600,00 |
+| Lucro operacional | R$ 10.150,00 |
+| Exames / ticket médio | 8 · R$ 1.468,75 |
+
+#### Fluxo ponta a ponta confirmado
+
+```text
+Alana agenda / walk-in / lança gestão
+  → ponte SYNCED (Appointment REALIZADO + ProcedureUsage + Invoice)
+  → Bruno vê fila + extrato
+  → CentralMed vê consumo/faturas
+  → Maria vê Exames + faturas
+```
+
+Bugs bloqueantes: nenhum. Nota: `?tenant=cedig` força store **operation** (não demo).
