@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.6",
+    version: "3.0.7",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Portais mais claros no mobile: menu pela direita, dashboard executivo com hierarquia e gestão clínica responsiva; relatórios em formatos canônicos.",
+    highlights: [
+      {
+        title: "Navegação e dashboards",
+        items: [
+          "Drawer mobile abre pela direita, sem contagem de módulos e com categorias legíveis",
+          "Dashboard executivo com KPIs prioritários e menos ruído visual",
+          "Gestão clínica com layout responsivo no mobile",
+        ],
+      },
+      {
+        title: "Relatórios",
+        items: [
+          "Exports unificados em CSV/JSON/TXT/PDF canônicos nos portais",
+          "BOM UTF-8 validado nos downloads tabulares",
+        ],
+      },
+    ],
+    testStats: "Vitest · E2E mobile-nav · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.6",
+    label: "Sistema Bibi - ServiceOS v3.0.6",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Home comercial alinhada à proposta Pay Per Use, navegação dos portais redesenhada no mobile e desktop, e assistente que fecha ao navegar.",
     highlights: [
