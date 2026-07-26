@@ -97,6 +97,20 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
+### Scripts operacionais (Blob / CEDIG — fora do npm)
+
+Manutenção do `operation.db` em produção (Netlify Blobs). **Só humano** — requer `NETLIFY_AUTH_TOKEN` + `NETLIFY_SITE_ID` para republicar.
+
+| Script | O que faz | Doc |
+|--------|-----------|-----|
+| `scripts/publish-operation-blob.mjs` | Republica `operation.db` com metadata `updatedAt` | [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Limpeza |
+| `scripts/reset-cedig-transactional.mjs` | Zera fluxos CEDIG (`--confirm=LIMPAR-FLUXOS`) | [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md) |
+| `scripts/cedig-ensure-commercial.ts` | Restaura empresas + PricingRules pós-reset | idem |
+| `scripts/cleanup-operation-test-data.mjs` | Limpeza pontual (duplicatas, massa smoke) | [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Limpeza |
+| `scripts/cedig-mapear.sh` | Enrich local (semana + lançamentos) | [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md) |
+
+Fluxo típico reset CEDIG: baixar Blob → backup → `reset-cedig-transactional` → `cedig-ensure-commercial` → `publish-operation-blob` → timeline em `STATUS.md`.
+
 ### Revalidar métricas documentais
 
 Após adicionar Route Handlers, testes ou specs E2E, atualize o ground truth em [`TESTES.md`](TESTES.md) e [`API_DOCS.md`](API_DOCS.md):
@@ -319,6 +333,8 @@ Pedido de validação
 | Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
+| Narrativa operacional no consultório (atos, ramificações) | `JORNADA_CONSULTORIO.md` |
+| Manutenção `operation.db` / reset CEDIG | `OPERACAO_DADOS.md` §Limpeza · `clientes/cedig/OPERACAO.md` · `STATUS.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/router.mdc`, `.cursor/rules/operacoes-bibi.mdc` |
 | Base RAG / NotebookLM | `NOTEBOOKLM.md` |
 | Auditoria de PRs/deploys | `HISTORICO_2026-06-21.md` ou novo histórico datado |
@@ -349,6 +365,7 @@ Pedido de validação
 | [`RELEASES.md`](../versoes/RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |
 | [`FLUXOS.md`](../produto/FLUXOS.md) | Fluxos de negócio |
+| [`../produto/JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) | Narrativa operacional no consultório |
 | [`../produto/JORNADA_CLIENTE.md`](../produto/JORNADA_CLIENTE.md) | Jornada UX nos 4 portais |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](../evidencias/README.md) | Vídeos e screenshots |
