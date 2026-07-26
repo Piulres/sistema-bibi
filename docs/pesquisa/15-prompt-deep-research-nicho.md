@@ -7,7 +7,7 @@ Use em **Cursor**, **Perplexity**, **NotebookLM** ou consultor externo para repl
 ## Prompt mestre
 
 ```text
-Atue como analista de mercado sênior especializado em [NICHO: Veterinário | Jurídico | Odontológico | Educação | Spa/Bem-estar] no Brasil.
+Atue como analista de mercado sênior especializado em [NICHO: Veterinário | Jurídico | Odontológico | Educação | Spa/Bem-estar | Saúde | Engenharia/CONSTRUCTION] no Brasil.
 
 Contexto: O Sistema Bibi - ServiceOS é uma infraestrutura SaaS multi-tenant Pay Per Use (cobrança por uso real com preço congelado no ato — Price Snapshot). Precisamos de pesquisa para alimentar dicionário de labels, preços do seed e benchmark competitivo.
 
@@ -79,8 +79,10 @@ Após a pesquisa:
 
 | Nicho | Arquivo |
 |-------|---------|
-| VET | [`nichos/10-nicho-vet.md`](nichos/10-nicho-vet.md) |
-| LEGAL | [`nichos/11-nicho-legal.md`](nichos/11-nicho-legal.md) |
-| DENTAL | [`nichos/12-nicho-dental.md`](nichos/12-nicho-dental.md) |
-| EDUCATION | [`nichos/13-nicho-education.md`](nichos/13-nicho-education.md) |
-| SPA | [`nichos/14-nicho-spa.md`](nichos/14-nicho-spa.md) |
+| VET | [`../segmentos/vet/pesquisa.md`](../segmentos/vet/pesquisa.md) |
+| LEGAL | [`../segmentos/legal/pesquisa.md`](../segmentos/legal/pesquisa.md) |
+| DENTAL | [`../segmentos/dental/pesquisa.md`](../segmentos/dental/pesquisa.md) |
+| EDUCATION | [`../segmentos/education/pesquisa.md`](../segmentos/education/pesquisa.md) |
+| SPA | [`../segmentos/spa/pesquisa.md`](../segmentos/spa/pesquisa.md) |
+| MEDICAL | [`../segmentos/medical/pesquisa-expansao-2026.md`](../segmentos/medical/pesquisa-expansao-2026.md) |
+| CONSTRUCTION | [`../segmentos/construction/POSICIONAMENTO.md`](../segmentos/construction/POSICIONAMENTO.md) |

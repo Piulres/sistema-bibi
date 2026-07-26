@@ -17,6 +17,15 @@ const OBSOLETE_DOC_PATHS = [
   "docs/pesquisa/nichos/10-nicho-vet.md",
   "docs/pesquisa/08-prompt-healthos-expansao.md",
   "docs/pesquisa/nichos/README.md",
+  // CEDIG: docs vivas em STATUS/OPERACAO/HOMOLOGACAO — não recriar fragmentos
+  "docs/clientes/cedig/FASE_2.md",
+  "docs/clientes/cedig/GO_LIVE_CHECKLIST.md",
+  "docs/clientes/cedig/HISTORICO_VALIDACAO.md",
+  "docs/clientes/cedig/FALHAS.md",
+  "docs/clientes/cedig/ACOES_OPERACIONAIS.md",
+  "docs/clientes/cedig/ROTEIRO_HOMOLOGACAO.md",
+  "docs/PLANO_V1_4_VOA.md",
+  "docs/VOA_INTEGRATION.md",
 ];
 
 /** Links quebrados: doc de plataforma referenciado sem ../plataforma/ */

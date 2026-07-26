@@ -103,7 +103,8 @@ Para voltar à demo: confirmar com `DEMO`.
 
 ### Provisionar CEDIG na operação
 
-O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem pacientes/PJ nem histórico de homologação).
+O bootstrap de operação inclui o tenant **CEDIG Cruzeiro** (equipe + catálogo; sem `portalMass` por padrão — pacientes/PJ entram via enrich local ou uso real).
+Para massa dos 4 portais em local: `./scripts/cedig-mapear.sh` · playbook [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md).
 Se a base em Blobs for anterior a esse bootstrap, um ADMIN pode chamar:
 
 ```bash

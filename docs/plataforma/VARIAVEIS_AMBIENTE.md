@@ -3,7 +3,7 @@
 Referência única de **todas as variáveis** usadas pelo projeto: runtime da aplicação,
 seed, deploy Netlify, CI, testes e restrições do **Cursor Cloud Agent**.
 
-Template local: [`.env.example`](../.env.example) → copiar para `.env` (`cp .env.example .env`).
+Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp .env.example .env`).
 
 ---
 
@@ -239,7 +239,7 @@ META_WHATSAPP_TOKEN=
 
 ### Integração — Voa Health (IA clínica)
 
-Ver [`docs/VOA_INTEGRATION.md`](VOA_INTEGRATION.md).
+Ver [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md).
 
 | Variável | Obrigatória | Padrão | Descrição |
 |----------|-------------|--------|-----------|
@@ -295,7 +295,7 @@ Guia de campanhas UTM: [`MARKETING_CAMPAIGNS.md`](MARKETING_CAMPAIGNS.md).
 
 ## 7. Deploy Netlify
 
-Definidas em [`netlify.toml`](../netlify.toml) e/ou no painel Netlify.
+Definidas em [`netlify.toml`](../../netlify.toml) e/ou no painel Netlify.
 
 | Variável | Onde | Valor / nota |
 |----------|------|----------------|
@@ -306,7 +306,7 @@ Definidas em [`netlify.toml`](../netlify.toml) e/ou no painel Netlify.
 | `SESSION_SECRET` | `netlify.toml` (fallback) + **painel** | Trocar em produção |
 | `NODE_ENV` | `context.production` | `production` |
 
-O script [`scripts/netlify-build.mjs`](../scripts/netlify-build.mjs) no build:
+O script [`scripts/netlify-build.mjs`](../../scripts/netlify-build.mjs) no build:
 
 1. Resolve `DATABASE_URL` absoluto para `prisma/dev.db`
 2. Grava `.env` temporário com `DATABASE_URL`, `NETLIFY`, `SESSION_SECRET`
@@ -318,7 +318,7 @@ Guia completo: [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 ## 8. CI / GitHub Actions
 
-Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
+Arquivo: [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml).
 
 | Variável | Job | Valor no CI |
 |----------|-----|-------------|
@@ -332,7 +332,7 @@ Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
 ## 9. Testes automatizados
 
-### Vitest ([`vitest.config.ts`](../vitest.config.ts))
+### Vitest ([`vitest.config.ts`](../../vitest.config.ts))
 
 Defaults injetados em todos os testes:
 
@@ -344,7 +344,7 @@ PAYMENT_GATEWAY=mock
 COMMUNICATION_PROVIDER=console
 ```
 
-### Banco de testes ([`tests/helpers/db.ts`](../tests/helpers/db.ts))
+### Banco de testes ([`tests/helpers/db.ts`](../../tests/helpers/db.ts))
 
 - Usa `prisma/test.db` (isolado do `dev.db`)
 - `DATABASE_URL` sobrescrito em runtime dos testes de integração/API
@@ -367,7 +367,7 @@ Variáveis detectadas pelo código ou pela plataforma — **não** colocar no `.
 
 ## 11. Cursor Cloud Agent
 
-O repositório **não define** variáveis `CURSOR_*` no código. O ambiente **Cursor Cloud** segue regras documentadas em [`AGENTS.md`](../AGENTS.md) (seção *Cursor Cloud specific instructions*).
+O repositório **não define** variáveis `CURSOR_*` no código. O ambiente **Cursor Cloud** segue regras documentadas em [`AGENTS.md`](../../AGENTS.md) (seção *Cursor Cloud specific instructions*).
 
 ### Setup inicial na VM do agente
 
@@ -425,8 +425,8 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 
 ## Ver também
 
-- [`.env.example`](../.env.example) — template comentado
-- [`README.md`](../README.md) — início rápido
+- [`.env.example`](../../.env.example) — template comentado
+- [`README.md`](../../README.md) — início rápido
 - [`PAYMENTS.md`](PAYMENTS.md) — gateways PIX
 - [`COMMUNICATIONS.md`](COMMUNICATIONS.md) — provedores de mensagem
 - [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) — painel Netlify
