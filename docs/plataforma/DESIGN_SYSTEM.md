@@ -88,9 +88,37 @@ Localizados em `src/components/ui/`:
 | `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
 | `AppointmentCard` | Card de consulta com horário, status e faixa lateral por estado |
-| `TabBar` | Abas client-side com sublinhado (ex.: Cadastros) |
+| `TabBar` | Abas client-side com sublinhado — suporta `shortLabel` até `xl` (ex.: Cadastros, atendimento prestador) |
 
-Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário e walk-in da agenda.
+Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário, prestador e walk-in da agenda.
+
+### Landing — navegação (v3.0.5)
+
+Fonte: `src/lib/landing/navigation.ts`.
+
+| Contexto | Âncoras | Observação |
+|----------|---------|------------|
+| Home (`/`) | 6 itens: Solução, Demo, Segmentos, Portais, Contato, FAQ | Seções ROI/comparativo/para-quem ficam na página, fora do menu |
+| Segmento (`/segmentos/*`) | Recursos, Como funciona, Portais, FAQ | Link **Início** volta à home |
+
+Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
+
+### Portal header (v3.0.5)
+
+`PortalHeader` nos quatro portais autenticados:
+
+- Sem faixa **Powered by** (`platformLabel` deprecated — mantido só por compatibilidade em `PortalShell`).
+- Botão de tour: rótulo **Tour** (`OnboardingTrigger`, `data-testid="onboarding-trigger"`).
+- `ServiceOsBadges` (versão + nicho): ocultos em viewports `< sm` (`hidden sm:flex`).
+
+### TabBar — rótulos curtos (v3.0.5)
+
+Padrão para abas com muitos itens (`AtendimentoView`, `PrestadorPatientHistoryView`, `ClinicFinanceView`):
+
+1. Definir `shortLabel` junto com `label` em cada aba.
+2. `TabBar` exibe `shortLabel` até breakpoint `xl`; acima disso, `label` completo.
+3. Container `ScrollableNavRail` adiciona scroll horizontal com gradientes quando o conteúdo transborda.
+4. Páginas com shell de portal usam `min-w-0` no `main` (`PortalShell`) para evitar corte em colunas estreitas.
 
 ## Layout
 

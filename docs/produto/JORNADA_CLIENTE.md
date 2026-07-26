@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.4** (base multi-nicho desde v2.0) — labels por tenant, landing segmentada, tenants demo multi-nicho.
+Última revisão: **ServiceOS v3.0.5** na `main` (produção **v3.0.4** até deploy confirmado) — labels por tenant, landing segmentada, jornada faturada no prestador, documentos clínicos estruturados.
 
 ---
 
@@ -185,12 +185,14 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | 4. Registrar uso | Adiciona procedimento do catálogo | Formulário de procedimentos | `ProcedureUsage` com `priceCharged` congelado |
 | 5. PEP | Salva evolução/receita/atestado | Templates PEP | `MedicalRecord` + timeline |
 | 6. Concluir | Marca REALIZADO | Botão de conclusão | Libera faturamento interno |
+| 7. Acompanhar ciclo PPU | Vê stepper Agendado → Pago | `FlowStepper` no topo do atendimento | `deriveCareJourneyBilling()` + `invoiceStatus` nos usages (v3.0.5) |
 
 ### 4.2 Pontos fortes
 
 - Fluxo clínico enxuto: agenda → atendimento → PEP → conclusão.
 - Preço congelado no momento do uso (Pay Per Use).
 - Templates PEP (`pep-templates.ts`) aceleram documentação.
+- **v3.0.5:** stepper avança para **Faturado**/**Pago** quando o interno emite fatura ou o beneficiário paga; abas do atendimento com `shortLabel` e scroll horizontal sem corte.
 
 ### 4.3 Gaps e melhorias
 
@@ -200,7 +202,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
 | Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
-| Média | Sem assinatura digital / Atesta CFM / SNCR | POC com atestado/receita estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
+| Média | Sem assinatura digital / Atesta CFM / SNCR | **Parcial (v3.0.5):** atestado CFM e receita comum/controle especial estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
 | Baixa | Sem fila automática de atendimento | “Próximo paciente” após marcar REALIZADO |
 
 **Código:** `src/components/AgendaView.tsx` · `src/components/AtendimentoView.tsx`
@@ -315,7 +317,7 @@ sequenceDiagram
 | # | Gap | Impacto | Melhoria sugerida |
 |---|-----|---------|-------------------|
 | 1 | Beneficiário agenda, mas confirmação é manual na recepção | Fricção operacional | Confirmação automática ou notificação push |
-| 2 | Sem indicador visual de progresso entre portais | Usuário não sabe “onde está” no ciclo | **Parcial:** `FlowStepper` + `care-journey.ts` no Beneficiário e Prestador; mapa em `flow-improvements-map.ts` |
+| 2 | Sem indicador visual de progresso entre portais | Usuário não sabe “onde está” no ciclo | **Parcial (v3.0.5):** `FlowStepper` + `care-journey.ts` no Beneficiário e Prestador — prestador vê **Faturado/Pago** via `invoiceStatus`; mapa em `flow-improvements-map.ts` |
 | 3 | PJ vê alertas, mas não pode resolver | RH depende de suporte | Self-service de regularização ou chat |
 | 4 | Lembretes automáticos mock (`console`) | Paciente não recebe lembrete real | Adapter SendGrid/Twilio em produção |
 | 5 | Sem repasse ao prestador | Prestador não vê receita gerada | Módulo de repasse / extrato prestador |
@@ -334,7 +336,7 @@ Escala por dimensão de jornada (não cobertura de código).
 | Self-service | ✅ agendar + pagar | ❌ só leitura | 🟡 só atendimento | ✅ CRUD completo |
 | Transparência financeira | ⭐ ✅ | ⭐ ✅ | 🟡 vê preço no ato | ✅ |
 | Comunicação proativa | 🟡 mock | 🟡 alertas passivos | ❌ | 🟡 fila mock |
-| Mobile / PWA | 🟡 drawer + nav rolável | 🟡 drawer seções | ✅ 1 aba | 🟡 drawer &lt; lg |
+| Mobile / PWA | 🟡 drawer + nav rolável | 🟡 drawer seções | ✅ abas com `shortLabel` + scroll (v3.0.5) | 🟡 drawer &lt; lg |
 | Integrações reais | 🟡 PIX mock | 🟡 CSV only | ❌ | 🟡 webhooks OK, TISS parcial |
 
 Legenda: ✅ implementado · 🟡 parcial/mock · ❌ ausente · ⭐ diferencial vs mercado clínico.

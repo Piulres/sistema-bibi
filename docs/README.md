@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.4** @ https://sistema-bibi.netlify.app · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.4** @ https://sistema-bibi.netlify.app · pacote **v3.0.5** na `main` (deploy pendente) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.4** (`bibi-poc-2026-07-26d`); TISS 422 em [`produto/FLUXOS.md`](produto/FLUXOS.md) §4.1 · contrato API em [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) §6 · `cursor:verify` em [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md).
+> **Última revisão factual:** 26/07/2026 — **v3.0.5** na `main`: jornada faturada no prestador (`care-journey.ts`), documentos clínicos ([`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md)), landing nav 6 itens e header dos portais limpo — ver [`produto/FLUXOS.md`](produto/FLUXOS.md) §8.9 · [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -129,7 +129,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.4 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.4 em produção** · **v3.0.5 na main** (deploy pendente) |
 | [`versoes/V3_0.md`](versoes/V3_0.md) | Changelog v3.0 — PWA / app shell mobile |
 | [`versoes/V2_6.md`](versoes/V2_6.md) | Changelog v2.6 — CEDIG pontes PPU + export |
 | [`versoes/V2_5.md`](versoes/V2_5.md) | Changelog v2.5 — login tenant/portal |
