@@ -20,6 +20,8 @@ let persistTimer: ReturnType<typeof setTimeout> | null = null;
 let persistInFlight: Promise<void> | null = null;
 /** Versão do Blob já materializada em /tmp nesta instância Lambda. */
 let localBlobUpdatedAt: string | null = null;
+/** Última versão do banco em que o schema-sync rodou (evita reprocesso). */
+let schemaSyncedVersion: string | null = null;
 
 function resolveBuildArtifact(mode: DataStoreMode): string {
   if (mode === "demo") {
@@ -100,14 +102,12 @@ async function ensureLambdaDemoDb(): Promise<string> {
   return TMP_DEMO_DB;
 }
 
-/** Última versão do banco em que o schema-sync rodou (evita reprocesso). */
-let schemaSyncedVersion: string | null = null;
-
 /**
  * O Blob de operação congela o schema da época do primeiro persist — `db push`
  * não roda na Lambda, então tabelas/colunas novas nunca chegariam à produção
  * (incidente: ClinicExamLaunch sem colunas da ponte v2.6 → 500 na gestão).
  * Aplica adições de schema usando o artefato de build como referência.
+ * Se houve migração, faz flush imediato no Blob para o schema upgraded persistir.
  */
 async function ensureOperationSchemaCurrent(activePath: string): Promise<void> {
   const buildArtifact = resolveBuildArtifact("operation");
@@ -125,15 +125,20 @@ async function ensureOperationSchemaCurrent(activePath: string): Promise<void> {
       referencePath = TMP_SCHEMA_REF_DB;
     }
     const result = await syncSqliteSchema(activePath, referencePath);
-    if (
-      result.createdTables.length ||
-      result.addedColumns.length ||
-      result.createdIndexes.length ||
-      result.skipped.length
-    ) {
+    const mutated =
+      result.createdTables.length > 0 ||
+      result.addedColumns.length > 0 ||
+      result.createdIndexes.length > 0;
+    if (mutated || result.skipped.length > 0) {
       console.log("[operation-schema-sync]", JSON.stringify(result));
     }
     schemaSyncedVersion = versionKey;
+    // Persiste o schema upgraded no Blob — senão o próximo cold start
+    // rebaixa para o schema antigo e re-migra a cada instância.
+    if (mutated && isLambdaSqliteRuntime()) {
+      await persistOperationDatabaseNow();
+      schemaSyncedVersion = `${activePath}:${localBlobUpdatedAt ?? "bootstrap"}`;
+    }
   } catch (error) {
     // Não bloquear o boot — sem o sync, o comportamento volta ao anterior.
     console.error("[operation-schema-sync] falha ao migrar schema:", error);

@@ -254,60 +254,77 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   async function submitLaunch(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch("/api/interno/clinic-finance/launches", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...form,
-        patientId: form.patientId || undefined,
-        appointmentId: form.appointmentId || undefined,
-        amountReceived: Number(form.amountReceived),
-        biopsies: Number(form.biopsies),
-        polypectomies: Number(form.polypectomies),
-        polypectomyTier: form.polypectomyTier || null,
-        mucosectomies: Number(form.mucosectomies),
-        clips: Number(form.clips),
-        performedAt: form.performedAt,
-      }),
-    });
-    const json = await res.json();
-    setSaving(false);
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/interno/clinic-finance/launches", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          patientId: form.patientId || undefined,
+          appointmentId: form.appointmentId || undefined,
+          amountReceived: Number(form.amountReceived),
+          biopsies: Number(form.biopsies),
+          polypectomies: Number(form.polypectomies),
+          polypectomyTier: form.polypectomyTier || null,
+          mucosectomies: Number(form.mucosectomies),
+          clips: Number(form.clips),
+          performedAt: form.performedAt,
+        }),
+      });
+      let json: {
+        error?: string;
+        bridge?: { bridgeStatus?: string; bridgeNote?: string | null } | null;
+      } = {};
+      try {
+        json = (await res.json()) as typeof json;
+      } catch {
+        json = {};
+      }
+      if (!res.ok) {
+        showToast({
+          message:
+            json.error ??
+            (res.status >= 500
+              ? "Erro no servidor ao salvar o lançamento. Tente novamente."
+              : "Não foi possível salvar o lançamento."),
+          tone: "danger",
+        });
+        return;
+      }
+      const bridge = json.bridge;
+      const bridgeMsg =
+        bridge?.bridgeStatus === "SYNCED"
+          ? " Agenda, extrato do médico e fatura atualizados."
+          : bridge?.bridgeStatus === "PARTIAL"
+            ? ` Ponte parcial: ${bridge.bridgeNote ?? "verifique faturamento"}.`
+            : bridge?.bridgeStatus === "FAILED"
+              ? ` Lançamento ok; ponte falhou: ${bridge.bridgeNote ?? "erro"}.`
+              : "";
       showToast({
-        message: json.error ?? "Não foi possível salvar o lançamento.",
+        message: `Lançamento registrado.${bridgeMsg}`,
+        tone: bridge?.bridgeStatus === "FAILED" ? "info" : "success",
+      });
+      setForm((f) => ({
+        ...f,
+        appointmentId: "",
+        patientId: "",
+        patientName: "",
+        biopsies: "0",
+        polypectomies: "0",
+        polypectomyTier: "",
+        mucosectomies: "0",
+        clips: "0",
+        notes: "",
+      }));
+      await loadAll();
+    } catch {
+      showToast({
+        message: "Falha de rede ao salvar o lançamento. Verifique a conexão.",
         tone: "danger",
       });
-      return;
+    } finally {
+      setSaving(false);
     }
-    const bridge = json.bridge as
-      | { bridgeStatus?: string; bridgeNote?: string | null }
-      | null
-      | undefined;
-    const bridgeMsg =
-      bridge?.bridgeStatus === "SYNCED"
-        ? " Agenda, extrato do médico e fatura atualizados."
-        : bridge?.bridgeStatus === "PARTIAL"
-          ? ` Ponte parcial: ${bridge.bridgeNote ?? "verifique faturamento"}.`
-          : bridge?.bridgeStatus === "FAILED"
-            ? ` Lançamento ok; ponte falhou: ${bridge.bridgeNote ?? "erro"}.`
-            : "";
-    showToast({
-      message: `Lançamento registrado.${bridgeMsg}`,
-      tone: bridge?.bridgeStatus === "FAILED" ? "info" : "success",
-    });
-    setForm((f) => ({
-      ...f,
-      appointmentId: "",
-      patientId: "",
-      patientName: "",
-      biopsies: "0",
-      polypectomies: "0",
-      polypectomyTier: "",
-      mucosectomies: "0",
-      clips: "0",
-      notes: "",
-    }));
-    await loadAll();
   }
 
   function exportMonth() {
@@ -318,26 +335,43 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   async function submitExpense(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
-    const res = await fetch("/api/interno/clinic-finance/expenses", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...expenseForm,
-        amount: Number(expenseForm.amount),
-      }),
-    });
-    const json = await res.json();
-    setSaving(false);
-    if (!res.ok) {
+    try {
+      const res = await fetch("/api/interno/clinic-finance/expenses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...expenseForm,
+          amount: Number(expenseForm.amount),
+        }),
+      });
+      let json: { error?: string } = {};
+      try {
+        json = (await res.json()) as typeof json;
+      } catch {
+        json = {};
+      }
+      if (!res.ok) {
+        showToast({
+          message:
+            json.error ??
+            (res.status >= 500
+              ? "Erro no servidor ao salvar a despesa. Tente novamente."
+              : "Não foi possível salvar a despesa."),
+          tone: "danger",
+        });
+        return;
+      }
+      showToast({ message: "Despesa registrada.", tone: "success" });
+      setExpenseForm((f) => ({ ...f, description: "", amount: "" }));
+      await loadAll();
+    } catch {
       showToast({
-        message: json.error ?? "Não foi possível salvar a despesa.",
+        message: "Falha de rede ao salvar a despesa. Verifique a conexão.",
         tone: "danger",
       });
-      return;
+    } finally {
+      setSaving(false);
     }
-    showToast({ message: "Despesa registrada.", tone: "success" });
-    setExpenseForm((f) => ({ ...f, description: "", amount: "" }));
-    await loadAll();
   }
 
   if (loading) {

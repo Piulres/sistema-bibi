@@ -56,6 +56,7 @@ describe("operation schema-sync", () => {
     "nome" TEXT NOT NULL
 )`,
       `CREATE INDEX "ClinicExamLaunch_bridgeStatus_idx" ON "ClinicExamLaunch"("bridgeStatus")`,
+      `CREATE UNIQUE INDEX "ClinicExamLaunch_appointmentId_key" ON "ClinicExamLaunch"("appointmentId")`,
     ]);
 
     // Ativo = schema antigo (era v2.5, sem colunas da ponte) + dado legado
@@ -78,7 +79,10 @@ describe("operation schema-sync", () => {
       "ClinicExamLaunch.usageId",
     ]);
     expect(result.createdTables).toEqual(["NovaTabela"]);
-    expect(result.createdIndexes).toEqual(["ClinicExamLaunch_bridgeStatus_idx"]);
+    expect(result.createdIndexes.sort()).toEqual([
+      "ClinicExamLaunch_appointmentId_key",
+      "ClinicExamLaunch_bridgeStatus_idx",
+    ]);
     expect(result.skipped).toEqual([]);
 
     // Dado legado preservado e coluna nova utilizável
@@ -116,5 +120,60 @@ describe("operation schema-sync", () => {
     expect(extractColumnDefinition(ddl, "semDefault")).toBeNull(); // NOT NULL sem default
     expect(extractColumnDefinition(ddl, "unica")).toBeNull(); // UNIQUE
     expect(extractColumnDefinition(ddl, "inexistente")).toBeNull();
+  });
+
+  it("migra ClinicExamLaunch legado contra prisma/dev.db real (incidente prod)", async () => {
+    const { existsSync } = await import("node:fs");
+    const realRef = join(process.cwd(), "prisma", "dev.db");
+    if (!existsSync(realRef)) return;
+
+    const legacyPath = join(dir, "legacy-clinic.db");
+    await runSql(legacyPath, [
+      `CREATE TABLE "ClinicExamLaunch" (
+    "id" TEXT NOT NULL PRIMARY KEY,
+    "performedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "patientName" TEXT NOT NULL,
+    "paymentMethod" TEXT NOT NULL,
+    "priceTable" TEXT NOT NULL DEFAULT 'PARTICULAR',
+    "amountReceived" REAL NOT NULL,
+    "biopsies" INTEGER NOT NULL DEFAULT 0,
+    "polypectomies" INTEGER NOT NULL DEFAULT 0,
+    "polypectomyTier" TEXT,
+    "mucosectomies" INTEGER NOT NULL DEFAULT 0,
+    "clips" INTEGER NOT NULL DEFAULT 0,
+    "notes" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "tenantId" TEXT NOT NULL,
+    "providerId" TEXT NOT NULL,
+    "procedureId" TEXT NOT NULL,
+    "patientId" TEXT,
+    "createdById" TEXT
+)`,
+    ]);
+
+    const before = new PrismaClient({
+      datasources: { db: { url: `file:${legacyPath}` } },
+    });
+    await expect(before.clinicExamLaunch.findMany({ take: 1 })).rejects.toThrow(
+      /bridgeStatus|no such column/i,
+    );
+    await before.$disconnect();
+
+    const result = await syncSqliteSchema(legacyPath, realRef);
+    expect(result.addedColumns).toEqual(
+      expect.arrayContaining([
+        "ClinicExamLaunch.bridgeStatus",
+        "ClinicExamLaunch.bridgeNote",
+        "ClinicExamLaunch.appointmentId",
+        "ClinicExamLaunch.usageId",
+        "ClinicExamLaunch.invoiceId",
+      ]),
+    );
+
+    const after = new PrismaClient({
+      datasources: { db: { url: `file:${legacyPath}` } },
+    });
+    await expect(after.clinicExamLaunch.findMany({ take: 1 })).resolves.toEqual([]);
+    await after.$disconnect();
   });
 });
