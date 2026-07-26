@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.4** em produção (jul/2026): PWA `/instalar` + vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v3.0.5** na `main` (jul/2026) — produção ainda **v3.0.4** até deploy confirmado: PWA `/instalar`, vocabulário por nicho via `useLabels()`, jornada faturada no prestador — ver [§0](#0-serviceos-v20--labels-e-landing) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -642,8 +642,24 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 | Cancelar consulta | Beneficiário | `/beneficiario` → Minha agenda | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` |
 | Confirmar presença | Prestador | `/prestador/atendimento/[id]` | `PATCH …/prestador/appointments/[id]` `{ status: "CONFIRMADO" }` |
 | Stepper PPU | Beneficiário / Prestador | FlowStepper no resumo e atendimento | `care-journey.ts` |
+| Stepper faturado/pago (v3.0.5) | Prestador | `/prestador/atendimento/[id]` — passos **Faturado** e **Pago** | `deriveCareJourneyBilling()` + `invoiceStatus` nos usages |
+| Abas sem corte (v3.0.5) | Prestador | `TabBar` com `shortLabel` + `ScrollableNavRail` | `AtendimentoView.tsx` |
 | QR PIX mock | Beneficiário | `/beneficiario` → Faturas | `POST …/invoices/[id]/pay` |
 | Walk-in + check-in | Interno | `/interno/agenda` | §8.5 |
+
+#### Stepper PPU — faturamento (v3.0.5)
+
+Módulo: `src/lib/care-journey.ts` · testes: `tests/lib/care-journey.test.ts`.
+
+1. `GET /api/prestador/appointments/[id]` inclui `usages[].invoiceStatus` (join `invoiceItem → invoice`).
+2. `deriveCareJourneyBilling({ usages })` deriva:
+   - `hasUnbilledUsages` — algum `ProcedureUsage` com `billed: false`;
+   - `hasOpenInvoice` — fatura vinculada com status ≠ `PAGA`, ou todos os usages `billed` sem link de fatura ainda;
+   - `hasPaidInvoice` — algum usage com `invoiceStatus === "PAGA"`.
+3. `resolveCareJourneyStep()` prioriza `pago` → `faturado` → `realizado` → `confirmado` → `agendado` (pagamento vence `REALIZADO` no prestador).
+4. `AtendimentoView` e `BeneficiarioView` passam as flags ao `FlowStepper`.
+
+Documentos clínicos no atendimento (atestado, receita, protocolos): [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
 

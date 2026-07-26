@@ -5,7 +5,8 @@
 - Adapters: `src/lib/payments/` (`PAYMENT_GATEWAY=mock`)
 - UI faturamento interno: módulo interno com RBAC `FATURAMENTO`
 - Guia TISS: `src/lib/tiss-service.ts` · `GET /api/interno/invoices/[id]/tiss`
-- Docs: `docs/plataforma/PAYMENTS.md` · fluxo TISS: `docs/produto/FLUXOS.md` §4.1
+- Jornada faturada (stepper prestador): `src/lib/care-journey.ts` · `invoiceStatus` em `GET /api/prestador/appointments/[id]`
+- Docs: `docs/plataforma/PAYMENTS.md` · fluxo TISS: `docs/produto/FLUXOS.md` §4.1 · stepper PPU: §8.9
 
 ## Padrão
 
