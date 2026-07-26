@@ -9,9 +9,9 @@ export const PLATFORM = {
   /** Semver completo do pacote em produção (title, footer, badges). */
   release: "3.0.5",
   versionLabel: "Sistema Bibi - ServiceOS v3.0.5",
-  tagline: "Infraestrutura Pay Per Use multi-nicho para serviços profissionais",
+  tagline: "Pay Per Use multi-nicho — empresa, prestador e cliente na mesma operação",
   description:
-    "Sistema Bibi - ServiceOS: plataforma Pay Per Use com quatro portais integrados, white label por tenant e vocabulário adaptável por segmento (saúde, veterinária, odontologia, jurídico, bem-estar, educação e engenharia).",
+    "Sistema Bibi - ServiceOS: infraestrutura horizontal Pay Per Use com quatro portais integrados. Conecte empresa, prestador e cliente final — cobre só pelo uso real, com white label e vocabulário por segmento.",
   applicationCategory: "BusinessApplication",
   poweredBy: "Sistema Bibi - ServiceOS · Pay Per Use",
   loginDisplayName: "Portal da operação",

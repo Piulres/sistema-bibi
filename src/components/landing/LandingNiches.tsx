@@ -19,7 +19,7 @@ export default function LandingNiches() {
           id="niches-heading"
           eyebrow="Multi-nicho"
         title="Sete segmentos, uma infraestrutura"
-        description="Cada vertical tem página dedicada com demonstração segmentada — labels, cores e portais pré-configurados para o tenant demo."
+        description="Cada vertical tem página dedicada com demonstração segmentada — labels, cores e portais pré-configurados. Escolha o seu nicho e explore como o ServiceOS se adapta."
         />
 
         <ul className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
