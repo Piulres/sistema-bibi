@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
+import { usePathname } from "next/navigation";
 import Alert from "@/components/ui/Alert";
 import { useAssistant } from "@/components/assistant/AssistantProvider";
 import AssistantMessageList from "@/components/assistant/AssistantMessageList";
@@ -19,6 +20,22 @@ export default function AssistantPanel({ portal }: Props) {
   const { labels } = useLabels();
   const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
   const panelRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const pathnameWhenOpened = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!open) {
+      pathnameWhenOpened.current = null;
+      return;
+    }
+    if (pathnameWhenOpened.current === null) {
+      pathnameWhenOpened.current = pathname;
+      return;
+    }
+    if (pathnameWhenOpened.current !== pathname) {
+      setOpen(false);
+    }
+  }, [open, pathname, setOpen]);
 
   useEffect(() => {
     if (!open) return;

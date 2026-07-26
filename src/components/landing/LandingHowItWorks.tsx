@@ -1,13 +1,32 @@
 import type { NicheId } from "@/lib/niche/types";
+import type { LandingStep } from "@/lib/niche/landing-content";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 
-type Props = {
-  niche: NicheId;
-};
+type Props =
+  | {
+      niche: NicheId;
+      steps?: never;
+      section?: never;
+    }
+  | {
+      niche?: never;
+      steps: LandingStep[];
+      section: {
+        eyebrow: string;
+        title: string;
+        description: string;
+      };
+    };
 
-export default function LandingHowItWorks({ niche }: Props) {
-  const { steps } = getNicheLandingContent(niche);
+export default function LandingHowItWorks(props: Props) {
+  const steps = props.steps ?? getNicheLandingContent(props.niche).steps;
+  const section = props.section ?? {
+    eyebrow: "Como funciona",
+    title: "Do agendamento ao faturamento em três etapas",
+    description:
+      "Fluxos curtos e integrados — sem telas excessivas, sem perda de informação entre operação e financeiro.",
+  };
 
   return (
     <section
@@ -18,9 +37,9 @@ export default function LandingHowItWorks({ niche }: Props) {
       <div className="mx-auto max-w-6xl px-6 py-24">
         <LandingSectionHeader
           id="how-heading"
-          eyebrow="Como funciona"
-          title="Do agendamento ao faturamento em três etapas"
-          description="Fluxos curtos e integrados — sem telas excessivas, sem perda de informação entre operação e financeiro."
+          eyebrow={section.eyebrow}
+          title={section.title}
+          description={section.description}
         />
 
         <ol className="relative mt-14 grid gap-6 lg:grid-cols-3 lg:gap-8">
