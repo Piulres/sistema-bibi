@@ -55,10 +55,10 @@ via API.
 | Resultado | Detalhe |
 |-----------|---------|
 | **Fluxos felizes** | 598 testes Vitest (83 arquivos) + 156 e2e Playwright passando · `npm run lint` limpo |
-| **P0 anteriores** | **Corrigidos** — RBAC de API interno (94/94 rotas com guard de módulo), bypass CRM fechado, MFA restrito a `seguranca`, proxy com HMAC |
+| **P0 anteriores** | **Corrigidos** — RBAC de API interno (96/96 rotas com guard de módulo), bypass CRM fechado, MFA restrito a `seguranca`, proxy com HMAC |
 | **Falha alta (negócio) — PERSISTE** | Prestador: API aceita registrar procedimento (cobrança + baixa de estoque) em agendamento `CANCELADO`/`FALTOU`; PATCH de status sem máquina de estados — **confirmado em runtime** |
 | **Falha média (UX) — PERSISTE** | Beneficiário: `billed:false` renderizado como badge "ABERTA"; dropdown de prestadores vazio sem mensagem quando `/providers` falha |
-| **Guards de escrita — PARCIAL** | Só 2 de ~65 rotas mutáveis do interno usam `requireInternoModuleWrite`; risco prático baixo pela matriz atual, mas o padrão de defesa em profundidade não foi generalizado |
+| **Guards de escrita — PARCIAL** | **7** de ~65 rotas mutáveis do interno usam `requireInternoModuleWrite` (gestão clínica + ações destrutivas); risco prático baixo pela matriz atual, mas o padrão de defesa em profundidade não foi generalizado |
 | **Isolamento cross-portal** | OK — APIs retornam 403 entre roles; assistente filtra tools por role |
 
 ```mermaid
@@ -84,7 +84,7 @@ flowchart LR
 
 | Camada | Comando / artefato | Resultado rodada 3 |
 |--------|-------------------|--------------------|
-| Unitário + API + segurança | `npm run test` | **550 passed** (76 arquivos) |
+| Unitário + API + segurança | `npm run test` | **598 passed** (83 arquivos) |
 | E2E browser | `npm run test:e2e` | **156 passed** (chromium + mobile) |
 | Lint | `npm run lint` | **limpo** |
 | RBAC manual | `curl` com cookie `bibi_session` por perfil | ver §5 |
@@ -107,7 +107,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 3 | Procedimento aceito em `CANCELADO`/`FALTOU` | **CORRIGIDA (3.1)** | `procedures/route.ts` usa `canRegisterProcedureForStatus` → 409; runtime confirmado |
 | 4 | PATCH de status sem regras de transição | **CORRIGIDA (3.1)** | `canTransitionAppointmentStatus` (FLUXOS §10.1) no PATCH prestador/interno → 409/400 |
 | 5 | Agenda API sem `tenantId` | **CORRIGIDA** | `baseWhere = { providerId, tenantId }`; resíduo em `appointments/[id]` (só `providerId`) |
-| 6 | ~29/39 rotas interno sem `requireInternoModule` | **CORRIGIDA** | 94/94 rotas com guard de módulo (`tests/security/rbac-gaps.test.ts` afirma `[]`) |
+| 6 | ~29/39 rotas interno sem `requireInternoModule` | **CORRIGIDA** | 96/96 rotas com guard de módulo (`tests/security/rbac-gaps.test.ts` afirma `[]`) |
 | 7 | Bypass CRM `PATCH companies/[id]` | **CORRIGIDA** | rota rejeita `status` com 403 e aponta endpoint dedicado |
 | 8 | MFA setup aberto a qualquer role | **CORRIGIDA** | `requireInternoModule("seguranca")` em GET e POST |
 | 9 | `/interno/beneficiarios/[id]` sem guard | **CORRIGIDA** | `requireInternoPage("cadastros")` |
@@ -177,14 +177,14 @@ Comportamento **observado** hoje (era o P0 crítico na rodada 1):
 | RECEPCAO | `GET /api/interno/patients` | **200** | Correto (RECEPCAO tem `cadastros`) |
 | FATURAMENTO | `GET /api/interno/patients` | **403** | Correto (FATURAMENTO não tem `cadastros`) |
 
-Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` /
+Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` /
 `requireInternoAdmin`. Teste `tests/security/rbac-gaps.test.ts` trava a regressão.
 
 ### Falha remanescente (média — defesa em profundidade)
 
 | Sev. | Área | Problema | Nota |
 |------|------|----------|------|
-| **Média** | Guards de escrita | ~63 rotas mutáveis (POST/PATCH/DELETE) usam só `requireInternoModule` (leitura+escrita no mesmo módulo); apenas `clinic-finance/launches` e `clinic-finance/expenses` usam `requireInternoModuleWrite` | Risco prático baixo: na matriz atual, quem tem o módulo pode escrever e READONLY não tem módulos de escrita. Vira risco se algum perfil ganhar módulo só-leitura no futuro |
+| **Média** | Guards de escrita | ~58 rotas mutáveis (POST/PATCH/DELETE) usam só `requireInternoModule` (leitura+escrita no mesmo módulo); **7** rotas usam `requireInternoModuleWrite` (`clinic-finance/launches`, `clinic-finance/expenses`, `invoices/void`, `stock/reverse`, `webhooks/retry`, `change/revert-recent`, `procedure-usages/void`) | Risco prático baixo: na matriz atual, quem tem o módulo pode escrever e READONLY não tem módulos de escrita. Vira risco se algum perfil ganhar módulo só-leitura no futuro |
 | **Média** | `ClinicFinanceView` | `loadAll()` faz 4 `fetch` e só popula se `res.ok`; em 403 deixa KPIs/listas vazios sem mensagem de permissão | `src/components/ClinicFinanceView.tsx` (padrão antigo pré-`useAsyncData`) |
 
 ---
@@ -222,7 +222,7 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 | Sev. | Área | Status | Nota |
 |------|------|--------|------|
 | — | `src/proxy.ts` | **OK** | Valida HMAC do cookie (`verifySessionToken`); role validada no server por página/handler |
-| — | RBAC interno UI vs API | **OK** | Matriz UI = matriz API (94/94 rotas) |
+| — | RBAC interno UI vs API | **OK** | Matriz UI = matriz API (96/96 rotas) |
 | — | MFA API | **OK** | `requireInternoModule("seguranca")` |
 | **Baixa** | `SESSION_SECRET` | Endurecido | Fallback dev só fora de produção; produção exige ≥32 chars e rejeita fracos (`src/lib/security/config.ts`) |
 | **Baixa** | TISS | POC endurecido (3.3) | Validação estrutural (422 para guia sem procedimentos/documento) em `src/lib/tiss-service.ts`; XSD oficial ANS fora do POC |

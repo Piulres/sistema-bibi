@@ -262,7 +262,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | RBAC incompleto nas APIs — RECEPCAO pode chamar URLs diretas | `requireInternoModule()` em todas as mutações |
+| Alta | ~~RBAC incompleto nas APIs~~ | **Corrigido (v3.0.3+)** — 96/96 rotas internas com `requireInternoModule`; ver `tests/security/rbac-gaps.test.ts` |
 | Alta | Cliente 360° sem RBAC de módulo | Restringir por perfil (ex.: ADMIN/RECEPCAO) |
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
