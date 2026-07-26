@@ -116,6 +116,44 @@ Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
 
 ---
 
+## Schema-sync do `operation.db` (v3.0.2+)
+
+O banco de **operação** em Netlify Blobs **congela o schema** da época do primeiro
+`persist`. O `prisma db push` roda só no build — não na Lambda — então tabelas e
+colunas novas (ex.: ponte v2.6 em `ClinicExamLaunch`) não chegavam ao Blob e
+`/interno/gestao` retornava **500** (`no such column: bridgeStatus`).
+
+### Como funciona
+
+1. **Boot Lambda** (`ensureLambdaOperationDb` em `src/lib/sqlite-blob-persistence.ts`):
+   reidrata `/tmp/operation.db` do Blob e compara com o artefato de build
+   (`prisma/operation.db` embutido no deploy).
+2. **Migração aditiva** (`src/lib/operation/schema-sync.ts`):
+   `CREATE TABLE` / `ALTER TABLE … ADD COLUMN` / `CREATE INDEX IF NOT EXISTS`
+   idempotentes. Drops, renames e `NOT NULL` sem default ficam fora — exigem
+   migração assistida (log `[operation-schema-sync]`).
+3. **Flush no Blob (v3.0.3):** se houve alteração de schema, persiste imediatamente
+   no Blob. Sem isso, cada cold start re-migrava e o schema antigo voltava.
+
+Escritas de negócio continuam com `flushOperationDatabasePersist()` após mutações
+(`src/lib/db.ts`) — ver §Persistência acima.
+
+### Sintomas e diagnóstico
+
+| Sintoma | Causa provável | Ação |
+|---------|----------------|------|
+| `/interno/gestao` 500 ao listar/salvar | Blob sem colunas/tabelas do schema atual | Deploy com pacote ≥ v3.0.2; conferir logs `[operation-schema-sync]` |
+| Schema migra a cada cold start | Blob não recebeu flush pós-sync | Deploy ≥ v3.0.3 |
+| Gestão OK local, 500 só em produção | Local usa `operation.db` do build; produção usa Blob antigo | Normal até o primeiro boot pós-deploy com schema-sync |
+
+### Testes e referências
+
+- Unitário: `tests/unit/operation-schema-sync.test.ts`
+- Incidente e correção: [`../versoes/V3_0.md`](../versoes/V3_0.md) (§v3.0.2 / §v3.0.3)
+- Timeline CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md)
+
+---
+
 ## Limpeza pontual (operation.db em Blobs)
 
 Quando houver sujeira de testes no banco de **operação** (duplicata clínica, usuários `golive.*` / `*.persist.*`, smoke R$1):
@@ -157,6 +195,7 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 - Modo ativo: `src/lib/data-store-mode.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
+- Schema-sync operação: `src/lib/operation/schema-sync.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
 - UI seletor: `src/components/DataStoreCard.tsx`
 - API: `GET|POST /api/interno/data-store`
