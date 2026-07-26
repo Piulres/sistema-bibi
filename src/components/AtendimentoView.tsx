@@ -28,7 +28,11 @@ import {
   type PrescriptionKind,
 } from "@/lib/clinical/receita";
 import FlowStepper from "@/components/ui/FlowStepper";
-import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
+import {
+  CARE_JOURNEY_STEPS,
+  deriveCareJourneyBilling,
+  resolveCareJourneyStep,
+} from "@/lib/care-journey";
 import {
   canRegisterProcedureForStatus,
   isTerminalAppointmentStatus,
@@ -50,6 +54,8 @@ type Usage = {
   priceCharged: number;
   priceLabel: string;
   billed: boolean;
+  invoiceId?: string | null;
+  invoiceStatus?: string | null;
 };
 type RecordItem = {
   id: string;
@@ -366,9 +372,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
     >
       {detail && (() => {
   const total = detail.usages.reduce((s, u) => s + u.priceCharged, 0);
+  const billing = deriveCareJourneyBilling({ usages: detail.usages });
   const journeyStep = resolveCareJourneyStep({
     appointmentStatus: detail.appointment.status,
-    hasUnbilledUsages: detail.usages.some((u) => !u.billed),
+    ...billing,
   });
   const hasPet = Boolean(detail.pet?.id);
   const careTabs = hasPet
@@ -468,10 +475,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
         <ClinicalSidebar data={clinicalSidebar} loading={clinicalLoading} />
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <TabBar tabs={[...careTabs]} active={careTab} onSelect={(k) => setCareTab(k as CareTab)} aria-label="Abas do atendimento clínico" />
 
           {careTab === "procedimentos" && (
