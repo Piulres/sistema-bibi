@@ -14,7 +14,7 @@ Checklist de execução após merge na **`dev`**. Atualizar status manualmente.
 | 2 | Docs | `npm run docs:verify` | ✅ via pre-release |
 | 3 | Testes comerciais | `npm test -- roi-calculator lead-form` | ✅ 7/7 |
 | 4 | Pre-release | `npm run pre-release` | ✅ 2026-06-27 |
-| 5 | Registro | [`VALIDACAO_TESTES.md`](VALIDACAO_TESTES.md) | ✅ |
+| 5 | Registro | [`PROXIMOS_PASSOS.md`](PROXIMOS_PASSOS.md) | ✅ |
 
 ---
 

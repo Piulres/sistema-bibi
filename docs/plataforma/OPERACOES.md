@@ -213,7 +213,8 @@ Exemplo atual em produção: **`v3.0.0`** — **Sistema Bibi - ServiceOS** (PWA 
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
 **Produção:** https://sistema-bibi.netlify.app · **v3.0.0** · modo **operação** (CEDIG) · Stop builds **ON**  
-**Contas CEDIG:** [`../clientes/cedig/ACOES_OPERACIONAIS.md`](../clientes/cedig/ACOES_OPERACIONAIS.md)  
+**CEDIG:** status [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · operação [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md)  
+**Docs vivas:** [`DOCUMENTACAO.md`](DOCUMENTACAO.md)  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.

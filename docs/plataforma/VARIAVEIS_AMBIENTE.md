@@ -239,7 +239,7 @@ META_WHATSAPP_TOKEN=
 
 ### Integração — Voa Health (IA clínica)
 
-Ver [`docs/VOA_INTEGRATION.md`](../VOA_INTEGRATION.md).
+Ver [`VOA_INTEGRATION.md`](VOA_INTEGRATION.md).
 
 | Variável | Obrigatória | Padrão | Descrição |
 |----------|-------------|--------|-----------|

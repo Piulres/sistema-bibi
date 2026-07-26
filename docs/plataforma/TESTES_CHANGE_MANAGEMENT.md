@@ -86,7 +86,7 @@ npm run pre-release
 2. `prisma db push` aplicado sem erro (novas colunas + `EntityRevision`)
 3. Lint sem erros novos
 4. `pre-release` (build local) OK
-5. Documento `CHANGE_MANAGEMENT_DEPLOY.md` revisado pelo humano antes de publicar em ambiente integrado
+5. Documento `OPERACOES.md` revisado pelo humano antes de publicar em ambiente integrado
 
 ---
 

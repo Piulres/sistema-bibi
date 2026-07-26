@@ -1,166 +1,79 @@
 # Cliente: CEDIG Cruzeiro
 
-**Tenant piloto** do ServiceOS em operação real — Centro de Endoscopia e Diagnóstico (Cruzeiro/SP).
+**Tenant piloto** do ServiceOS — Centro de Endoscopia e Diagnóstico (Cruzeiro/SP).
 
 | Campo | Valor |
 |-------|-------|
 | **Site** | [cedigcruzeiro.com.br](https://www.cedigcruzeiro.com.br) |
-| **Segmento** | `MEDICAL` (endoscopia digestiva) · labels UI **Exame** |
+| **Segmento** | `MEDICAL` · labels UI **Exame** |
 | **Slug** | `cedig` (`/?tenant=cedig`) |
 | **Produção** | **v3.0.0** @ https://sistema-bibi.netlify.app · modo **operação** |
-| **Contato público** | (12) 3199-7871 · WhatsApp |
-| **Foco clínico** | Endoscopia · Colonoscopia · Teste respiratório |
-| **Não confundir** | Clínica CEDIG de São Paulo (Vila Mariana/Tucuruvi) é outra rede |
-| **Playbook** | [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) |
+| **Contato** | (12) 3199-7871 · WhatsApp |
+| **Foco** | Endoscopia · Colonoscopia · Teste respiratório |
+| **Não confundir** | CEDIG São Paulo (Vila Mariana/Tucuruvi) é outra rede |
+
+### Documentação viva (usar estes)
+
+| Doc | Papel |
+|-----|-------|
+| [`STATUS.md`](STATUS.md) | **Status + timeline** — atualizar em toda entrega |
+| [`OPERACAO.md`](OPERACAO.md) | Playbook diário (Alana / médicos / PJ) |
+| [`HOMOLOGACAO.md`](HOMOLOGACAO.md) | Checklist de preços C1–C4 |
 
 ---
 
-## Equipe (operação)
+## Equipe e credenciais
 
-| Papel | Nome |
-|-------|------|
-| Secretária | Alana |
-| Enfermeiro | João Marcos |
-| Téc. enfermagem | Márcia |
-| Médicos | Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Auto |
+| Papel | Nome / conta | Senha |
+|-------|----------------|-------|
+| Secretária | Alana · `alana@cedig.demo` | `bibi123` |
+| ADMIN | `operacao@cedig.demo` | `bibi123` |
+| Enfermagem | `joao.marcos@cedig.demo` · `marcia@cedig.demo` | `bibi123` |
+| Médicos | `alexandre.marcal` · `luiza.lage` · `bruno.dias` · `luiza.zeraik` · `fernanda.auto` `@cedig.demo` | `bibi123` |
+| PJ | `rh@centralmed.demo` · `rh@bemsaude.demo` · `rh@drsaude.demo` | `bibi123` |
+| Beneficiário | `maria.cedig@email.com` | `bibi123` |
 
-Credenciais (`/?tenant=cedig`, senha `bibi123`) — massa demo e bootstrap de **operação**:
+- Provisionar produção: `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }`
+- Criar usuários: só ADMIN (`operacao@cedig.demo`)
+- Prestador: `/login?tenant=cedig` — **não** `/interno/login`
 
-- `alana@cedig.demo` / `recepcao@cedig.demo` — secretária
-- `joao.marcos@cedig.demo` · `marcia@cedig.demo`
-- `alexandre.marcal@cedig.demo` · `luiza.lage@cedig.demo` · `bruno.dias@cedig.demo` · `luiza.zeraik@cedig.demo` · `fernanda.auto@cedig.demo`
-- `operacao@cedig.demo` — ADMIN
+---
 
-Em produção (modo operação): provisionar com `POST /api/interno/operation/provision-cedig` + `{ "confirm": "CEDIG" }` se o tenant ainda não existir na base Blobs.
+## Pedido do cliente
 
-**Criar usuários** (Cadastros → Usuários): somente ADMIN — `operacao@cedig.demo`. A conta Alana (`RECEPCAO`) lista usuários, mas não cria/edita (RBAC).
+Substituir a planilha por gestão simples para a secretária:
 
-**Login do prestador criado:** `/login?tenant=cedig` (Portal Prestador) · e-mail/senha do cadastro — senha padrão sugerida `bibi123`. Não usar `/interno/login`.
+1. **Lançamentos** — 1 linha/paciente (exame, tabela, pagamento, biópsias, polipectomias, clips…)
+2. **Despesas** — lab, equipe, insumos, cartão…
+3. **Indicadores** — receita, lucro, produção, frascos, ticket
+
+A secretária **não faz contas** — valor sugerido + KPIs automáticos.
 
 ---
 
 ## Tabelas de preço
 
-Fonte: tabelas institucionais do cliente. Motor: `src/lib/clinic-finance/cedig-pricing.ts`.
-
-### Exames diagnósticos
+Motor: `src/lib/clinic-finance/cedig-pricing.ts`.
 
 | Exame | Particular | CentralMed |
 |-------|------------|------------|
 | Endoscopia Digestiva Alta | R$ 750 | R$ 650 |
 | Colonoscopia | R$ 1.450 | R$ 1.250 |
 | Endoscopia + Colonoscopia | R$ 2.000 | R$ 1.900 |
-
-### Teste respiratório
-
-| Tabela | Valor |
-|--------|-------|
-| Particular | R$ 500 |
-| Bem Saúde / Dr Saúde | R$ 450 |
-| CentralMed | R$ 400 |
-
-### Biópsias
-
-R$ 150 por frasco (todas as tabelas).
-
-### Polipectomias
-
-| Faixa | Particular | CentralMed |
-|-------|------------|------------|
-| Simples ≤ 5 mm | R$ 550 | R$ 550 |
-| Intermediária 5–10 mm | R$ 850 | R$ 800 |
-| Avançada 10–15 mm | R$ 1.200 | R$ 1.150 |
-| Complexa 15–20 mm | R$ 1.600 | R$ 1.400 |
-
-### Mucosectomia (colonoscopia terapêutica)
-
-- Particular: a partir de R$ 3.200  
-- CentralMed: a partir de R$ 3.100  
-- Inclui agulha injetora, solução para lifting e 1 alça padrão
-
-### Clips / OPME
-
-| Item | Particular | CentralMed |
-|------|------------|------------|
+| Mucosectomia | a partir de R$ 3.200 | a partir de R$ 3.100 |
+| Teste respiratório | R$ 500 | R$ 400 (Bem/Dr Saúde: R$ 450) |
+| Biópsia (frasco) | R$ 150 | R$ 150 |
 | Clip hemostático | R$ 900 | R$ 800 |
 
-Materiais especiais podem ser cobrados à parte (campo observações no lançamento).
-
-**Bem Saúde / Dr Saúde:** preço próprio só no teste respiratório; demais itens usam Particular no cálculo sugerido.
+Polipectomias: Simples 550 · Intermediária 850/800 · Avançada 1200/1150 · Complexa 1600/1400 (Particular/CentralMed).
 
 ---
 
-## O que o dono pediu (síntese)
+## Código
 
-Substituir a planilha por gestão profissional, **simples para a secretária** e útil para decisão:
-
-1. **Uma aba de lançamentos** — 1 linha por paciente (paciente, médico, tipo de exame, tabela, pagamento, valor, biópsias, polipectomias, mucosectomias, clips).
-2. **Uma aba de despesas** — laboratório, anestesista, equipe, insumos, medicamentos, taxas de cartão, outras.
-3. **Indicadores automáticos** — receita, despesas, lucro operacional, exames por tipo, produção por médico, frascos para lab, ticket médio, lucro por exame.
-
-A secretária **não faz contas** — menus prontos + valor sugerido; o sistema calcula os indicadores.
-
----
-
-## Como usar no piloto
-
-**Playbook consolidado (dia a dia + ações validadas):** [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md).
-
-1. Produção em **modo operação** — `/interno/seguranca` → `OPERAR` ([`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md)).
-2. White label CEDIG — `/interno/branding`.
-3. Secretária Alana: `/interno/gestao` → aba **Lançamentos** (escolhe tabela Particular/CentralMed/…; valor sugere sozinho).
-4. Admin/financeiro: aba **Despesas** + **Indicadores**.
-
-| Portal | Login | Senha |
-|--------|-------|-------|
-| Interno ADMIN | `operacao@cedig.demo` | `bibi123` |
-| Secretária | `alana@cedig.demo` | `bibi123` |
-| Prestador | `bruno.dias@cedig.demo` | `bibi123` |
-| PJ CentralMed | `rh@centralmed.demo` | `bibi123` |
-| PJ Bem Saúde | `rh@bemsaude.demo` | `bibi123` |
-| PJ Dr Saúde | `rh@drsaude.demo` | `bibi123` |
-| Beneficiário | `maria.cedig@email.com` | `bibi123` |
-
----
-
-## Roadmap do piloto
-
-| Fase | Entrega | Status |
-|------|---------|--------|
-| **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
-| **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ `/?tenant=cedig` |
-| **C** | Homologação browser 4 portais + gestão | ✅ 25–26/07 · ⏳ humano in loco |
-| **D** | Ponte lançamento → agenda + PPU + fatura/pagamento | ✅ desde v2.6 · em prod **v3.0.0** · [`FASE_2.md`](FASE_2.md) |
-| **E** | Export Excel mensal + agenda “Lançar na gestão” | ✅ |
-| **F** | Beneficiário labels · PJ Bem/Dr Saúde · seed bridge · E2E · dashboard | ✅ |
-
-Mapa técnico: [`FASE_2.md`](FASE_2.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
-
-| Doc | Uso |
-|-----|-----|
-| [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) | Playbook diário + massa mapeada |
-| [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) | Homologação gestão (C1–C4) |
-| [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) | Rodadas assistidas |
-| [`FALHAS.md`](FALHAS.md) | Falhas corrigidas / restante |
-
-### Scripts locais
-
-| Script | Função |
-|--------|--------|
-| `scripts/cedig-mapear.sh` | Enrich operation + agenda semana + lançamentos |
-| `scripts/cedig-enrich-operation.ts` | `portalMass` CEDIG na `operation.db` |
-| `scripts/cedig-week-mapping.mjs` | Semana / walk-ins / C1–C4 via API |
-| `scripts/cedig-golive-smoke.sh` | Smoke produção (v3.0.0) |
-
----
-
-## Referências de código
-
-- Tabelas de preço: `src/lib/clinic-finance/cedig-pricing.ts`
-- Constantes: `src/lib/clinic-finance/constants.ts`
-- Serviço: `src/lib/clinic-finance/service.ts`
+- Preço: `src/lib/clinic-finance/cedig-pricing.ts`
 - Ponte PPU: `src/lib/clinic-finance/bridge.ts`
 - UI: `src/components/ClinicFinanceView.tsx`
-- API: `/api/interno/clinic-finance/*` (+ `export`)
-- Catálogo / equipe seed: `prisma/seed-data/cedig-catalog.ts`
-- Store: `cedig` ∈ `OPERATION_TENANT_SLUGS` (`src/lib/data-store/ensure-data-store-for-segment.ts`)
+- API: `/api/interno/clinic-finance/*`
+- Seed: `prisma/seed-data/cedig-catalog.ts`
+- Store: `cedig` ∈ `OPERATION_TENANT_SLUGS`

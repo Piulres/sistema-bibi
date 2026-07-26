@@ -56,7 +56,7 @@ Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
 | `eduprime` | EDUCATION | Educação | ~8 |
 | `cedig` | MEDICAL | Piloto CEDIG Cruzeiro (endoscopia) | — |
 
-**CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · playbook [`docs/clientes/cedig/ACOES_OPERACIONAIS.md`](../clientes/cedig/ACOES_OPERACIONAIS.md) · roteiro [`ROTEIRO_HOMOLOGACAO.md`](../clientes/cedig/ROTEIRO_HOMOLOGACAO.md) · histórico [`HISTORICO_VALIDACAO.md`](../clientes/cedig/HISTORICO_VALIDACAO.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.  
+**CEDIG (piloto):** secretária `alana@cedig.demo` · gestão `/interno/gestao` · PJ `rh@centralmed.demo` · beneficiário `maria.cedig@email.com` · playbook [`docs/clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md) · roteiro [`HOMOLOGACAO.md`](../clientes/cedig/HOMOLOGACAO.md) · histórico [`STATUS.md`](../clientes/cedig/STATUS.md) · catálogo `prisma/seed-data/cedig-catalog.ts`.  
 `?tenant=cedig` usa store **operation** (`OPERATION_TENANT_SLUGS`). Em local, enriquecer com `./scripts/cedig-mapear.sh`.
 
 **Modo operação** (`operation.db`): tenant `bibi-saude` (bootstrap mínimo) **+** tenant `cedig` (catálogo/equipe; `portalMass` via enrich). Ver `operation-bootstrap.ts` · `cedig-catalog.ts`.

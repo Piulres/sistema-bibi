@@ -81,7 +81,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Tag git** | `v2.6.0` |
 | **Commit publicado** | `579f686` / tip PWA `e738f12` |
 | **PRs** | [#186](https://github.com/Piulres/sistema-bibi/pull/186) · [#187](https://github.com/Piulres/sistema-bibi/pull/187) · [#188](https://github.com/Piulres/sistema-bibi/pull/188) · [#189](https://github.com/Piulres/sistema-bibi/pull/189) · [#193](https://github.com/Piulres/sistema-bibi/pull/193) |
-| **Doc** | [`V2_6.md`](V2_6.md) · [`V2_5.md`](V2_5.md) · [`clientes/cedig/FASE_2.md`](../clientes/cedig/FASE_2.md) |
+| **Doc** | [`V2_6.md`](V2_6.md) · [`V2_5.md`](V2_5.md) · [`clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) |
 | **Inclui** | Ponte gestão→Patient/Appointment/PPU/Invoice · export · labels CLINIC_* · PJ×3 · E2E · login tenant/portal (v2.5) · skill agentes · matriz CRUD testes |
 | **Publicado em** | 25/07/2026 — deploy Netlify `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`; anterior `6a6534e9` @ `579f686`) |
 
@@ -132,7 +132,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **Commit do pacote** | `05a63eb` (prepare v2.3.0) — produção inclui commits posteriores (#151–#161) |
 | **PRs** | [#148](https://github.com/Piulres/sistema-bibi/pull/148)*, [#149](https://github.com/Piulres/sistema-bibi/pull/149), [#152](https://github.com/Piulres/sistema-bibi/pull/152), construction+, [#156](https://github.com/Piulres/sistema-bibi/pull/156)–[#161](https://github.com/Piulres/sistema-bibi/pull/161) |
 | **Doc** | [`V2_3.md`](V2_3.md) · [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md) |
-| **Validação** | [`evidencias/V2_3_VALIDACAO_DEV.md`](../evidencias/V2_3_VALIDACAO_DEV.md) |
+| **Validação** | [`versoes/V2_3.md`](V2_3.md) |
 | **Publicado em** | 25/07/2026 — deploy Netlify `6a6436ef` @ `374b13e` (`bibi-poc-2026-07-25a`; anterior `6a3f68e8` @ `38a3885`) |
 
 \* PR #148 permanece aberto no GitHub, mas o conteúdo equivalente já entrou via merges posteriores na `dev`/`main`.
@@ -282,7 +282,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
 | **2.3.x** | [`V2_3.md`](V2_3.md) | Histórico — title/footer · assistente · obras |
-| **1.4.x** | [`VOA_INTEGRATION.md`](../VOA_INTEGRATION.md) · [`PLANO_V1_4_VOA.md`](../PLANO_V1_4_VOA.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
+| **1.4.x** | [`plataforma/VOA_INTEGRATION.md`](../plataforma/VOA_INTEGRATION.md) · [`plataforma/VOA_INTEGRATION.md`](../plataforma/VOA_INTEGRATION.md) | ✅ Fase 1 em **v2.1.0** ([#95](https://github.com/Piulres/sistema-bibi/pull/95)) |
 
 ---
 

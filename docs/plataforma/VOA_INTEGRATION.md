@@ -2,7 +2,7 @@
 
 Documentação técnica da integração com a [Voa Health](https://voa.health/), assistente de IA para transcrição de consultas e geração de documentos clínicos (anamnese, SOAP, evolução).
 
-**Planejamento:** [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md)  
+**Histórico Fase 1:** entregue em v2.1.0 — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V2_1.md`](../versoes/V2_1.md)  
 **Docs oficiais Voa:** https://docs.voa.health/  
 **Suporte integração:** integration@voahealth.com
 
@@ -157,7 +157,7 @@ O token de integração **nunca** vai em `NEXT_PUBLIC_*`; o client obtém via GE
 | `VOA_PLUGIN_SCRIPT_URL` | Não | `https://integration.voa.health/plugin.js` | URL do script |
 | `VOA_IDENTIFY_URL` | Não | `https://api.voa.health/integration/identify/` | API identify (fase 2) |
 
-Detalhes: [`VARIAVEIS_AMBIENTE.md`](plataforma/VARIAVEIS_AMBIENTE.md) § Integrações — Voa.
+Detalhes: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) § Integrações — Voa.
 
 ---
 

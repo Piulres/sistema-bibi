@@ -47,7 +47,7 @@ npm run db:push && npm run db:seed
 ```
 
 > Agentes: `npm run db:reset` é **bloqueado**. Use `db:push && db:seed` ou `db:bootstrap:demo`.  
-> Dual-store / CEDIG: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · [`../clientes/cedig/ACOES_OPERACIONAIS.md`](../clientes/cedig/ACOES_OPERACIONAIS.md).
+> Dual-store / CEDIG: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md).
 
 ---
 
