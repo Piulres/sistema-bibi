@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { canRegisterProcedureForStatus } from "@/lib/appointment-status";
 import { computePrice, formatBRL } from "@/lib/pricing";
 import {
   recordTimelineEvent,
@@ -33,6 +34,15 @@ export async function POST(
     });
     if (!appointment) {
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
+    }
+
+    if (!canRegisterProcedureForStatus(appointment.status)) {
+      return NextResponse.json(
+        {
+          error: `Não é possível registrar procedimento em um agendamento ${appointment.status.toLowerCase()}.`,
+        },
+        { status: 409 },
+      );
     }
 
     const { price } = await computePrice(
