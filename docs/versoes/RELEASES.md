@@ -11,24 +11,40 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.4** — TISS endurecido, config Cursor enxuta e docs schema-sync **publicado em produção**.
+> Pacote **v3.0.5** — atendimento clínico + jornada faturada + UX landing/portais — **em publicação** (deploy pendente de confirmação).
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.4** — deploy `6a65b8e6` @ `fd22ebc` (`bibi-poc-2026-07-26d`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.4** — deploy `6a65b8e6` @ `fd22ebc` (`bibi-poc-2026-07-26d`) · **próximo: 3.0.5** (`bibi-poc-2026-07-26e`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.4** · tip `1b9a597` |
-| **Pacote anterior em produção** | **3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) |
+| **Release `main` / `dev`** | **v3.0.5** · tip a preencher pós-push |
+| **Pacote anterior em produção** | **3.0.4** — deploy `6a65b8e6` @ `fd22ebc` (`bibi-poc-2026-07-26d`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.4** |
-| **Release** | `main` | **v3.0.4** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.4** · deploy `6a65b8e6` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.5** (PRs #221–#227) |
+| **Release** | `main` | **v3.0.5** (merge + bump; deploy em andamento) |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.4** até confirmar `bibi-poc-2026-07-26e` · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.5
+
+- **Prontuário / Care Chart (#221):** protocolos de exames editáveis + aplicar em lote; atestado estruturado (CFM); receita comum / controle especial com reativar.
+- **Jornada do atendimento (#225):** stepper avança para Faturado/Pago com `hasPaidInvoice`/`hasOpenInvoice`; abas sem corte (scroll + rótulos curtos).
+- **Landing (#226):** nav da home com 6 itens; marca do header = Sistema Bibi.
+- **Portais (#227):** Tour sem `?`; remove faixa Powered by; badges de versão/nicho ocultos no mobile.
+
+### Smoke (26/07/2026) — produção v3.0.5
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | pendente pós-deploy |
+| CSS `/_next/static/chunks/*.css` | pendente |
+| Footer `v3.0.5` | pendente |
+| Cota Netlify | verificar 1× antes do deploy |
 
 ### Conteúdo do pacote v3.0.4
 

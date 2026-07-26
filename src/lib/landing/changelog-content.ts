@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.4",
+    version: "3.0.5",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Atendimento clínico mais completo para o prestador, jornada que acompanha o pagamento, e landing/portais mais limpos no desktop e no celular.",
+    highlights: [
+      {
+        title: "Prontuário e Care Chart",
+        items: [
+          "Protocolos de exames editáveis e aplicáveis em lote no atendimento",
+          "Atestado estruturado (CFM) e receita comum / controle especial com reativar",
+          "Stepper do atendimento avança para Faturado/Pago quando a fatura está paga",
+        ],
+      },
+      {
+        title: "UX portais e landing",
+        items: [
+          "Abas do atendimento sem corte (scroll e rótulos curtos)",
+          "Menu da home com 6 itens; marca do header só Sistema Bibi",
+          "Header dos portais: Tour sem ?, sem faixa Powered by; badges ocultos no mobile",
+        ],
+      },
+    ],
+    testStats: "Vitest · E2E · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.4",
+    label: "Sistema Bibi - ServiceOS v3.0.4",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Qualidade e operação: guias TISS inválidas são rejeitadas antes do download, agentes Cursor carregam menos contexto fixo, e a documentação do schema-sync do banco de operação fica completa.",
     highlights: [
