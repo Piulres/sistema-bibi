@@ -11,13 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.3** — flush Blob pós schema-sync, UX gestão e limpeza da operação CEDIG **publicado em produção**.
+> Pacote **v3.0.4** — TISS endurecido, config Cursor enxuta e docs schema-sync **integrado na `dev`** · aguardando merge `dev` → `main` e deploy manual.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.3** · tip `ef75485` |
+| **Release `dev`** | **v3.0.4** · tip `dev` (pós-merge #212/#218/#219) |
+| **Release `main`** | **v3.0.3** · tip `d40f4ae` |
 | **Pacote anterior em produção** | **3.0.2** — deploy `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +26,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.3** |
-| **Release** | `main` | **v3.0.3** |
+| **Integração** | `dev` | **v3.0.4** |
+| **Release** | `main` | **v3.0.3** (até merge + deploy) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.3** · deploy `6a65b0e3` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.4
+
+- **TISS:** validação estrutural da guia XML — fatura sem itens ou beneficiário sem documento → 422 `TissBuildError`; `escapeXml` completo (#212).
+- **Cursor:** router único always-on, rules escopadas (tests, docs-release, interno), skill modular com references por domínio, `npm run cursor:verify` (#218).
+- **Docs:** runbook schema-sync do `operation.db` em `OPERACAO_DADOS.md` + refs v3.0.3 (#219).
 
 ### Smoke (26/07/2026) — produção v3.0.3
 
@@ -43,6 +50,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
 
+### Conteúdo do pacote v3.0.3
+
+- Flush do `operation.db` no Blob após schema-sync (evita re-migração a cada cold start).
+- UX de erro em `/interno/gestao` (listagem/registro com mensagem útil).
+- Limpeza da operação CEDIG: anamneses duplicadas unificadas; remoção de usuários/massa efêmera de golive/smoke (`scripts/cleanup-operation-test-data.mjs`).
+
+### Conteúdo do pacote v3.0.2
+
+- Hotfix: `src/lib/operation/schema-sync.ts` — migrações aditivas no boot Lambda quando o Blob está defasado em relação ao artefato de build (incidente 500 em `/interno/gestao`).
+
 ### Conteúdo do pacote v3.0.1
 
 - Auditoria de fluxos rodada 3 — correções P1–P3 (#205): máquina de estados do agendamento, guards do beneficiário, feedback de erro, MFA/CRM já endurecidos.
@@ -53,6 +70,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.4`** | _(após merge dev→main)_ | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219) |
 | **`v3.0.3`** | `fc9afa7` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
 | **`v3.0.2`** | `9ceeb49` | Hotfix: schema-sync do operation.db (incidente 500 em /interno/gestao) |
 | **`v3.0.1`** | `daf690e` | Qualidade multi-nicho + regras da agenda (auditoria P1–P3 + labels + CI) |
@@ -289,7 +307,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.3` em produção** — PWA + gestão + limpeza operação |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.4` na `dev`** · produção **v3.0.3** até deploy |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

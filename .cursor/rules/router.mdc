@@ -1,0 +1,44 @@
+---
+description: Router mínimo — sempre ativo. Aponta para rules, skills e docs conforme a tarefa.
+alwaysApply: true
+---
+
+# Router — Sistema Bibi - ServiceOS
+
+**Produto:** Sistema Bibi - ServiceOS **v3.0.2** · produção em `docs/versoes/RELEASES.md`  
+**Índice:** `AGENTS.md` · `docs/README.md` · `docs/plataforma/OPERACOES.md`
+
+## Invariantes (toda sessão)
+
+- Branch `cursor/<nome>-<suffix>` → PR base **`dev`** (nunca `main` direto em feature/bugfix)
+- **Proibido** sem pedido explícito: `netlify deploy`, `db:reset`, loops em produção
+- `503 usage_exceeded` = cota Netlify, não bug
+- UI autenticada: `useLabels()` — nunca "Paciente"/"Beneficiário" fixos
+- Prisma **6** · proxy em `src/proxy.ts` · `await params`/`searchParams`/`cookies()`
+
+## Qual recurso carregar
+
+| Tarefa | Recurso |
+|--------|---------|
+| Feature, bugfix, refatoração, testes | Skill `/serviceos-dev-quality` → `.cursor/skills/serviceos-dev-quality/SKILL.md` |
+| Código `src/**` ou `prisma/**` | `.cursor/rules/stack-nextjs.mdc` |
+| Labels, segmento, nomenclatura | `.cursor/rules/serviceos-dev.mdc` |
+| Ops, branches, token budget | `.cursor/rules/operacoes-bibi.mdc` |
+| Deploy, release, Netlify, cota | `.cursor/rules/netlify-release.mdc` |
+| Testes Vitest/Playwright | `.cursor/rules/tests.mdc` |
+| Fechar pacote / changelog | `.cursor/rules/docs-release.mdc` |
+| Portal interno RBAC | `src/app/interno/AGENTS.md` |
+
+## Domínios (skill references)
+
+| Domínio | Arquivo |
+|---------|---------|
+| CRUD / entidade nova | `.cursor/skills/serviceos-dev-quality/references/crud-entity.md` |
+| CEDIG / gestão clínica | `.cursor/skills/serviceos-dev-quality/references/cedig-clinic.md` |
+| PIX / faturamento | `.cursor/skills/serviceos-dev-quality/references/billing-pix.md` |
+| Login tenant/portal | `.cursor/skills/serviceos-dev-quality/references/auth-tenant.md` |
+| Release / changelog | `.cursor/skills/serviceos-dev-quality/references/release-package.md` |
+
+## Fluxo mínimo
+
+Diagnosticar → padrão do repo → Vitest (se lógica nova) → `npm run lint` → PR → `dev`

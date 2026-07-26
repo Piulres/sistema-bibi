@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (25/07/2026):** **v3.0.0** — deploy `6a654c88` @ `e30fc70` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+**Produção (26/07/2026):** **v3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ---
 

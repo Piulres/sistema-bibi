@@ -1,7 +1,7 @@
-# Sistema Bibi - ServiceOS v3.0.0 — Base de Conhecimento (NotebookLM)
+# Sistema Bibi - ServiceOS v3.0.3 — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
-Última atualização: reflete **ServiceOS v3.0.0** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, logos Blobs),
+Última atualização: reflete **ServiceOS v3.0.3** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, logos Blobs),
 **design system semântico**, Tiers 1–4 e fluxos em [`../produto/FLUXOS.md`](../produto/FLUXOS.md).
 
 ---
@@ -393,7 +393,7 @@ src/
 - SQLite dual-store (demo + operação em Blobs) — Postgres (Netlify Database) = escala futura
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.0**:
+- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.3**:
   https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
   Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual; Stop builds ON).
   Se retornar **503 `usage_exceeded`**, é cota Netlify — não é bug de código.
@@ -541,4 +541,4 @@ src/
 
 ---
 
-*Fim do documento — Sistema Bibi - ServiceOS v3.0.0 (corpus RAG; base multi-nicho desde v2.0)*
+*Fim do documento — Sistema Bibi - ServiceOS v3.0.3 (corpus RAG; base multi-nicho desde v2.0)*

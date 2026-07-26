@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.3",
+    version: "3.0.4",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Qualidade e operação: guias TISS inválidas são rejeitadas antes do download, agentes Cursor carregam menos contexto fixo, e a documentação do schema-sync do banco de operação fica completa.",
+    highlights: [
+      {
+        title: "Faturamento TISS",
+        items: [
+          "Guia sem procedimentos ou documento do beneficiário retorna erro claro (422)",
+          "XML com caracteres especiais escapados corretamente",
+          "Testes automatizados da rota de exportação TISS",
+        ],
+      },
+      {
+        title: "Agentes e documentação",
+        items: [
+          "Configuração Cursor enxuta: router único + rules escopadas por tarefa",
+          "Runbook schema-sync do operation.db em produção (Netlify Blobs)",
+          "Validação npm run cursor:verify para evitar drift de config",
+        ],
+      },
+    ],
+    testStats: "572 testes Vitest · 152 E2E · docs:verify · cursor:verify · pre-release OK",
+  },
+  {
+    version: "3.0.3",
+    label: "Sistema Bibi - ServiceOS v3.0.3",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Operação mais robusta: a gestão clínica grava o schema atualizado no Blob, feedback claro ao salvar, e a base de operação CEDIG fica limpa após unificar o prontuário de teste e remover usuários efêmeros.",
     highlights: [

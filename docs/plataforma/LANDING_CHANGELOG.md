@@ -85,7 +85,7 @@ export type ChangelogRelease = {
 };
 ```
 
-**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **3.0.0**).
+**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **3.0.3**).
 
 ---
 
