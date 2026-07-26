@@ -170,7 +170,7 @@ Componente UI: `src/components/ExportButtons.tsx` — links `<a download>` com `
 | `REPORT_EXPORT_FORMATS` | PDF, CSV, JSON, TXT | `/interno/relatorios`, `/prestador/relatorios`, `/api/pj/reports` |
 | `LIST_EXPORT_FORMATS` | PDF, XLSX, CSV, JSON | Faturamento, auditoria, gestão clínica, extrato, beneficiário |
 
-Servidor: `src/lib/exports/serve.ts` (`serveTabularExport`, `serveBufferExport`) · tipos em `format.ts` · builders em `builders.ts`.
+Servidor: `src/lib/exports/serve.ts` (`serveTabularExport`, `serveBufferExport`) · tipos em `tabular-types.ts` (`TabularExport`) · formatos em `format.ts` · builders em `builders.ts`.
 
 **Contrato CSV:** BOM UTF-8 (`\uFEFF`) para Excel/LibreOffice no Windows — ver `serializeInterchangeDataset` em `src/lib/imports/interchange.ts`. Colunas canônicas via `buildInterchangeDataset`.
 

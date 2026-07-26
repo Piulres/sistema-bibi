@@ -99,7 +99,7 @@ Executa, em sequência (`scripts/pre-release.mjs`):
 3. `npm run openapi:verify`
 4. `npm run db:bootstrap:demo` (`SEED_SCALE=small`)
 5. `npm run db:verify`
-6. `npm test` (598 Vitest)
+6. `npm test` (598 Vitest · 83 arquivos)
 7. `npm run netlify:build` (mesmo pipeline do CI Netlify)
 8. `npm run smoke:netlify-pwa` (smoke PWA/estáticos no artefato)
 
