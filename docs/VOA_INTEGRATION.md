@@ -157,7 +157,7 @@ O token de integração **nunca** vai em `NEXT_PUBLIC_*`; o client obtém via GE
 | `VOA_PLUGIN_SCRIPT_URL` | Não | `https://integration.voa.health/plugin.js` | URL do script |
 | `VOA_IDENTIFY_URL` | Não | `https://api.voa.health/integration/identify/` | API identify (fase 2) |
 
-Detalhes: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) § Integrações — Voa.
+Detalhes: [`VARIAVEIS_AMBIENTE.md`](plataforma/VARIAVEIS_AMBIENTE.md) § Integrações — Voa.
 
 ---
 

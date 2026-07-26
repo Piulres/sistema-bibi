@@ -100,7 +100,7 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 | Branding CEDIG (nome / teal) | ✅ |
 | Labels MEDICAL (`Exame`, Beneficiário, Prestador) | ✅ |
 | Tours de onboarding | 🟡 frequentes — ok em demo; pode cansar |
-| Empty states | ✅ claros (greenfield) |
+| Empty states | ✅ claros (época greenfield 25b; massa resolvida depois) |
 | Erros 500 / build | ✅ nenhum nesta rodada |
 | Bugs bloqueantes | ✅ nenhum |
 

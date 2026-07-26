@@ -56,7 +56,7 @@ Login: `faturamento@bibi.health` → tour principal. Depois navegue para `/inter
 
 ## Pendências conhecidas
 
-- ~~Produção em v2.2.0~~ → **resolvido 25/07/2026:** produção **v2.3.0** · deploy `6a6436ef` (`bibi-poc-2026-07-25a`) · tags `v2.2.0`/`v2.3.0`
+- ~~Produção em v2.2.0~~ → **resolvido 25/07/2026 (época):** produção **v2.3.0** · deploy `6a6436ef`. Tip atual: **v3.0.0** — [`../versoes/RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 

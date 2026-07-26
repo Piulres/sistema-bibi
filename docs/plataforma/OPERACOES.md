@@ -197,7 +197,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v2.6.0`** — **Sistema Bibi - ServiceOS** (CEDIG pontes + login tenant/portal). Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v3.0.0`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + CEDIG em modo operação). Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -212,7 +212,8 @@ Exemplo atual em produção: **`v2.6.0`** — **Sistema Bibi - ServiceOS** (CEDI
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v2.6.0** · modo **operação** (CEDIG) · Stop builds **ON**  
+**Produção:** https://sistema-bibi.netlify.app · **v3.0.0** · modo **operação** (CEDIG) · Stop builds **ON**  
+**Contas CEDIG:** [`../clientes/cedig/ACOES_OPERACIONAIS.md`](../clientes/cedig/ACOES_OPERACIONAIS.md)  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
 
 **Cota:** se o site retornar `503 usage_exceeded`, é limite do plano Netlify (não regressão). Em 25/07/2026 o site respondia HTTP 200.
@@ -318,10 +319,10 @@ Pedido de validação
 | [`RELEASES.md`](../versoes/RELEASES.md) | Pacotes fechados e histórico |
 | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | Netlify técnico + troubleshooting |
 | [`FLUXOS.md`](../produto/FLUXOS.md) | Fluxos de negócio |
-| [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) | Jornada UX nos 4 portais |
+| [`../produto/JORNADA_CLIENTE.md`](../produto/JORNADA_CLIENTE.md) | Jornada UX nos 4 portais |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](../evidencias/README.md) | Vídeos e screenshots |
-| [`AGENTS.md`](../AGENTS.md) | Instruções para IA |
-| [`.cursor/rules/operacoes-bibi.mdc`](../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |
-| [`.cursor/rules/netlify-release.mdc`](../.cursor/rules/netlify-release.mdc) | Deploy e release (ativação inteligente) |
-| [`.cursor/rules/stack-nextjs.mdc`](../.cursor/rules/stack-nextjs.mdc) | Stack e código (`src/**`) |
+| [`../../AGENTS.md`](../../AGENTS.md) | Instruções para IA |
+| [`../../.cursor/rules/operacoes-bibi.mdc`](../../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |
+| [`../../.cursor/rules/netlify-release.mdc`](../../.cursor/rules/netlify-release.mdc) | Deploy e release (ativação inteligente) |
+| [`../../.cursor/rules/stack-nextjs.mdc`](../../.cursor/rules/stack-nextjs.mdc) | Stack e código (`src/**`) |

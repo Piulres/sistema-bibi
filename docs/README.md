@@ -48,7 +48,7 @@ docs/
 
 ---
 
-## Segmentos (ServiceOS v2.0)
+## Segmentos (base multi-nicho desde v2.0)
 
 | Segmento | Pasta | Tenant demo | Login interno |
 |----------|-------|-------------|---------------|

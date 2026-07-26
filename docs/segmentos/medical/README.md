@@ -27,7 +27,7 @@ Senha: **`bibi123`**
 ## Pesquisa
 
 - [Expansão segmento saúde 2026](./pesquisa-expansao-2026.md)
-- [Síntese consultor](../pesquisa/09-sintese-consultor-senior.md) (ROI corporativo)
+- [Síntese consultor](../../pesquisa/09-sintese-consultor-senior.md) (ROI corporativo)
 
 ## Comercial
 
