@@ -146,6 +146,63 @@ Ao criar ou alterar Route Handlers em `src/app/api/**/route.ts`:
 
 O sync automático cobre **123 paths** de **163** Route Handlers — **40** ainda sem entrada no YAML (ex.: `clinic-finance/*`, `attachments/*`, `beneficiario/projects/*`). `openapi:verify` lista os primeiros 10 e emite aviso (não falha); paths órfãos no YAML **falham**. Endpoints novos recebem documentação mínima após `openapi:sync`; enriqueça descrições conforme necessário.
 
+### 5.1 Inventário — handlers sem OpenAPI (v3.0.7)
+
+`npm run openapi:verify` lista **40** Route Handlers ainda sem path no YAML (jul/2026). Agrupados por domínio — use as seções deste guia ou o README do segmento até o sync cobrir o módulo:
+
+| Domínio | Paths | Doc canônica |
+|---------|-------|--------------|
+| Gestão clínica CEDIG | `/api/interno/clinic-finance/*` (6 rotas) | §8 · [`FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 |
+| Documentos clínicos | `/api/interno/exam-protocol-templates`, `.../{id}`, `/api/prestador/patients/{id}/exam-protocols` | §7 · [`DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
+| Obras / Engenharia | `/api/interno/projects/*`, `/api/interno/construction/*`, `/api/pj/projects/*`, `/api/prestador/campo/projects`, `/api/prestador/field-reports/*`, `/api/beneficiario/projects/*` (26 rotas) | [`segmentos/construction/README.md`](../segmentos/construction/README.md) |
+| Anexos (upload/download) | `/api/interno/attachments`, `.../download`, `/api/pj/attachments/{id}/download`, `/api/interno/field-reports/attachments/{id}/download`, `/api/prestador/field-reports/attachments/*` | construction README · `src/lib/attachments/` |
+| Operação CEDIG | `/api/interno/operation/provision-cedig` | [`clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md) |
+
+Lista completa (ordenada):
+
+```text
+/api/beneficiario/projects
+/api/beneficiario/projects/{id}
+/api/beneficiario/projects/attachments/{id}/download
+/api/interno/attachments
+/api/interno/attachments/{id}/download
+/api/interno/clinic-finance/expenses
+/api/interno/clinic-finance/export
+/api/interno/clinic-finance/kpis
+/api/interno/clinic-finance/launches
+/api/interno/clinic-finance/meta
+/api/interno/construction/finance
+/api/interno/construction/goals
+/api/interno/construction/pipeline
+/api/interno/exam-protocol-templates
+/api/interno/exam-protocol-templates/{id}
+/api/interno/field-reports/attachments/{id}/download
+/api/interno/operation/provision-cedig
+/api/interno/projects
+/api/interno/projects/meta
+/api/interno/projects/{id}
+/api/interno/projects/{id}/allocations
+/api/interno/projects/{id}/bdi
+/api/interno/projects/{id}/budgets
+/api/interno/projects/{id}/budgets/{budgetId}/pdf
+/api/interno/projects/{id}/cash
+/api/interno/projects/{id}/contracts
+/api/interno/projects/{id}/environments
+/api/interno/projects/{id}/field-reports
+/api/interno/projects/{id}/financial-report
+/api/interno/projects/{id}/tasks
+/api/pj/attachments/{id}/download
+/api/pj/projects
+/api/pj/projects/{id}
+/api/pj/projects/{id}/budgets
+/api/pj/projects/{id}/budgets/{budgetId}/pdf
+/api/prestador/campo/projects
+/api/prestador/field-reports
+/api/prestador/field-reports/attachments
+/api/prestador/field-reports/attachments/{id}/download
+/api/prestador/patients/{id}/exam-protocols
+```
+
 Roadmap: testes de contrato de resposta (P1 em [`TESTES.md`](TESTES.md)).
 
 ---
