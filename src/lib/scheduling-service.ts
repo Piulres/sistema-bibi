@@ -8,10 +8,11 @@ import {
 } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
 import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
-
-/** Horário comercial simplificado para slots (POC). */
-const SLOT_START_HOUR = 8;
-const SLOT_END_HOUR = 18;
+import { generateDaySlots } from "@/lib/availability/slot-grid";
+import {
+  loadBlocksForDay,
+  resolveWindowsForProviderDay,
+} from "@/lib/availability/provider-availability-service";
 
 export type AppointmentSlot = {
   start: string;
@@ -35,54 +36,69 @@ function endOfDay(date: Date): Date {
   return d;
 }
 
-function buildDaySlots(dayStart: Date, bookedSet: Set<number>): AppointmentSlot[] {
-  const slots: AppointmentSlot[] = [];
-  const now = Date.now();
-
-  for (let hour = SLOT_START_HOUR; hour < SLOT_END_HOUR; hour++) {
-    for (const minute of [0, 30]) {
-      const slot = new Date(dayStart);
-      slot.setHours(hour, minute, 0, 0);
-      if (slot.getTime() < now) continue;
-      if (bookedSet.has(slot.getTime())) continue;
-
-      slots.push({
-        start: slot.toISOString(),
-        label: slot.toLocaleString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
-      });
-    }
-  }
-
-  return slots;
-}
-
-/** Gera slots de 30min entre 8h e 18h excluindo horários já ocupados. */
+/**
+ * Slots livres do prestador no dia.
+ * Usa a grade semanal publicada; se ainda não configurou, fallback 08:00–18:00 / 30 min.
+ * Exclui agendamentos ativos e bloqueios pontuais.
+ */
 export async function getAvailableSlots(input: {
   tenantId: string;
   providerId: string;
   date: Date;
-}): Promise<{ slots: AppointmentSlot[] }> {
+}): Promise<{ slots: AppointmentSlot[]; usingDefault: boolean }> {
   const prisma = await getPrisma();
   const dayStart = startOfDay(input.date);
   const dayEnd = endOfDay(input.date);
+  const weekday = dayStart.getDay();
 
-  const booked = await prisma.appointment.findMany({
-    where: {
-      tenantId: input.tenantId,
-      providerId: input.providerId,
-      scheduledAt: { gte: dayStart, lte: dayEnd },
-      status: { notIn: ["CANCELADO", "FALTOU"] },
-    },
-    select: { scheduledAt: true },
+  const { windows, usingDefault } = await resolveWindowsForProviderDay({
+    tenantId: input.tenantId,
+    providerId: input.providerId,
+    weekday,
   });
 
+  if (windows.length === 0) {
+    return { slots: [], usingDefault };
+  }
+
+  const [booked, blocks] = await Promise.all([
+    prisma.appointment.findMany({
+      where: {
+        tenantId: input.tenantId,
+        providerId: input.providerId,
+        scheduledAt: { gte: dayStart, lte: dayEnd },
+        status: { notIn: ["CANCELADO", "FALTOU"] },
+      },
+      select: { scheduledAt: true },
+    }),
+    loadBlocksForDay({
+      tenantId: input.tenantId,
+      providerId: input.providerId,
+      dayStart,
+      dayEnd,
+    }),
+  ]);
+
   const bookedSet = new Set(booked.map((b) => b.scheduledAt.getTime()));
-  return { slots: buildDaySlots(dayStart, bookedSet) };
+  const generated = generateDaySlots({
+    dayStart,
+    windows,
+    blocks,
+    bookedStartMs: bookedSet,
+  });
+
+  return {
+    usingDefault,
+    slots: generated.map((s) => ({
+      start: s.start.toISOString(),
+      label: s.start.toLocaleString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+    })),
+  };
 }
 
 /** Slots livres de todos os prestadores em uma data (para quem não tem preferência). */
@@ -139,16 +155,14 @@ export async function findAvailableProviderAt(input: {
     : providers;
 
   for (const provider of ordered) {
-    const conflict = await prisma.appointment.findFirst({
-      where: {
-        tenantId: input.tenantId,
-        providerId: provider.id,
-        scheduledAt: input.scheduledAt,
-        status: { notIn: ["CANCELADO", "FALTOU"] },
-      },
-      select: { id: true },
+    const { slots } = await getAvailableSlots({
+      tenantId: input.tenantId,
+      providerId: provider.id,
+      date: startOfDay(input.scheduledAt),
     });
-    if (!conflict) return provider;
+    if (slots.some((s) => s.start === input.scheduledAt.toISOString())) {
+      return provider;
+    }
   }
 
   return null;

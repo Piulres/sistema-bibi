@@ -524,6 +524,54 @@ paths:
         '401': { description: Não autenticado }
         '403': { description: Acesso negado (role != PRESTADOR) }
 
+  /api/prestador/availability:
+    get:
+      tags: [Prestador]
+      summary: Grade semanal de disponibilidade do prestador
+      responses:
+        '200': { description: Janelas + flag usingDefault }
+    put:
+      tags: [Prestador]
+      summary: Substitui a grade semanal publicada
+      responses:
+        '200': { description: Grade salva }
+
+  /api/prestador/availability/blocks:
+    get:
+      tags: [Prestador]
+      summary: Lista bloqueios pontuais
+      responses:
+        '200': { description: Bloqueios }
+    post:
+      tags: [Prestador]
+      summary: Cria bloqueio (almoço/folga/férias)
+      responses:
+        '200': { description: Bloqueio criado }
+
+  /api/prestador/availability/blocks/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    delete:
+      tags: [Prestador]
+      summary: Remove bloqueio
+      responses:
+        '200': { description: Removido }
+
+  /api/prestador/availability/preview:
+    get:
+      tags: [Prestador]
+      summary: Prévia de slots livres em uma data
+      parameters:
+        - name: date
+          in: query
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Lista de slots }
+
   /api/prestador/calendar:
     get:
       tags: [Prestador]

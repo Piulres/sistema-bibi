@@ -6,9 +6,14 @@ import type {
   CalendarProviderId,
 } from "@/lib/calendar/providers/types";
 
-/** `CALENDAR_OAUTH_MOCK=true` força adapters mock (testes / demo sem secrets). */
+/**
+ * Mock OAuth por padrão até haver CLIENT_ID/SECRET reais.
+ * Desliga com `CALENDAR_OAUTH_MOCK=false`.
+ */
 export function isCalendarOAuthMock(): boolean {
-  return process.env.CALENDAR_OAUTH_MOCK === "true";
+  const v = process.env.CALENDAR_OAUTH_MOCK?.trim().toLowerCase();
+  if (v === "false" || v === "0" || v === "off") return false;
+  return true;
 }
 
 export function getCalendarAdapter(provider: CalendarProviderId): CalendarProviderAdapter {

@@ -59,6 +59,8 @@ model Tenant {
   clinicExamLaunches    ClinicExamLaunch[]
   calendarFeeds         CalendarFeed[]
   calendarConnections   CalendarConnection[]
+  providerAvailabilities ProviderAvailability[]
+  providerBlockedTimes   ProviderBlockedTime[]
   clinicExpenses        ClinicExpense[]
 }
 
@@ -137,6 +139,8 @@ model User {
   clinicExpensesCreated        ClinicExpense[]    @relation("ClinicExpenseCreatedBy")
   calendarFeeds                CalendarFeed[]
   calendarConnections          CalendarConnection[]
+  providerAvailabilities        ProviderAvailability[]
+  providerBlockedTimes          ProviderBlockedTime[]
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -414,6 +418,45 @@ model PricingRule {
 
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
+}
+
+
+/// Grade semanal do prestador (janelas de atendimento).
+/// weekday: 0=Domingo … 6=Sábado (Date.getDay()).
+/// startMinute/endMinute: minutos desde 00:00 (ex.: 480=08:00, 1080=18:00).
+model ProviderAvailability {
+  id          String   @id @default(cuid())
+  weekday     Int
+  startMinute Int
+  endMinute   Int
+  slotMinutes Int      @default(30)
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tenantId   String
+  tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   User   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, providerId, weekday, active])
+  @@index([providerId, weekday])
+}
+
+/// Bloqueio pontual (almoço, folga, férias) — remove slots no intervalo.
+model ProviderBlockedTime {
+  id        String   @id @default(cuid())
+  startsAt  DateTime
+  endsAt    DateTime
+  reason    String?
+  createdAt DateTime @default(now())
+
+  tenantId   String
+  tenant     Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  providerId String
+  provider   User   @relation(fields: [providerId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, providerId, startsAt, endsAt])
 }
 
 /// Feed ICS assinável (Google / Outlook / Apple Calendar via URL).

@@ -94,4 +94,12 @@ describe("calendar provider env gate", () => {
     const status = listCalendarProviderStatus();
     expect(status.every((p) => p.configured && p.mock)).toBe(true);
   });
+
+  it("ausente ou true → mock; false desliga", async () => {
+    delete process.env.CALENDAR_OAUTH_MOCK;
+    const mod = await import("@/lib/calendar/providers");
+    expect(mod.isCalendarOAuthMock()).toBe(true);
+    process.env.CALENDAR_OAUTH_MOCK = "false";
+    expect(mod.isCalendarOAuthMock()).toBe(false);
+  });
 });

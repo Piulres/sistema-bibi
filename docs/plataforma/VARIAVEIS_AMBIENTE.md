@@ -41,7 +41,7 @@ Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp
 | `GOOGLE_CALENDAR_CLIENT_ID` / `_SECRET` | Para push Google | — | OAuth Google Calendar |
 | `MICROSOFT_CALENDAR_CLIENT_ID` / `_SECRET` | Para push Microsoft | — | OAuth Microsoft Graph |
 | `MICROSOFT_CALENDAR_TENANT` | Não | `common` | Tenant Azure (`common` ou GUID) |
-| `CALENDAR_OAUTH_MOCK` | Não | `false` | `true` = adapters mock (demo/teste) |
+| `CALENDAR_OAUTH_MOCK` | Não | `true` (mock) | `false` só com CLIENT_ID/SECRET reais |
 | `NEXT_PUBLIC_SALES_WHATSAPP` | Não | — | CTA comercial WhatsApp na landing |
 | `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Não | mensagem padrão | Texto pré-preenchido no wa.me |
 | `NEXT_PUBLIC_DEMO_VIDEO_URL` | Não | — | URL YouTube para embed em `#demo-video` na home |
@@ -288,7 +288,7 @@ Também usada como host absoluto dos redirects OAuth e feeds ICS — ver [`CALEN
 | `MICROSOFT_CALENDAR_CLIENT_ID` | Application (client) ID Azure |
 | `MICROSOFT_CALENDAR_CLIENT_SECRET` | Client secret Azure |
 | `MICROSOFT_CALENDAR_TENANT` | `common` (multi-tenant) ou ID do tenant |
-| `CALENDAR_OAUTH_MOCK` | `true` força adapters mock sem chamar APIs reais |
+| `CALENDAR_OAUTH_MOCK` | Padrão mock (`true` / ausente). `false` usa Google/Microsoft reais |
 
 Redirects obrigatórios:
 

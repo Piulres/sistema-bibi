@@ -352,6 +352,16 @@ export function buildPrestadorFeatures(labels: NicheLabels, niche: NicheId = "ME
       order: 100,
     }),
     step({
+      id: "page-disponibilidade",
+      target: TOUR.content,
+      title: "Disponibilidade",
+      content:
+        "Publique sua grade semanal e bloqueios. Só esses horários aparecem para o beneficiário agendar.",
+      placement: "top",
+      route: "/prestador/disponibilidade*",
+      order: 100,
+    }),
+    step({
       id: "page-pacientes",
       target: TOUR.content,
       title: `Lista de ${labels.patients.toLowerCase()}`,

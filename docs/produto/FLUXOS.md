@@ -240,6 +240,7 @@ Quando `User.mfaEnabled = true`:
 |------------|-----|------------------|
 | Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
 | Calendário externo | OAuth Google/Microsoft + feed ICS + `.../appointments/[id]/calendar` | Push automático + fallback ICS — [`CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md) |
+| Disponibilidade | `/prestador/disponibilidade` · `GET/PUT /api/prestador/availability` + blocks | Grade semanal + bloqueios → slots do beneficiário |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |

@@ -422,6 +422,24 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     delete: none,
   },
   {
+    entity: "Disponibilidade (prestador)",
+    portal: "Prestador",
+    description: "Grade semanal + bloqueios que alimentam slots do beneficiário.",
+    create: [
+      ui("Bloquear intervalo", "/prestador/disponibilidade", "POST /api/prestador/availability/blocks"),
+    ],
+    read: [
+      ui("Grade e prévia", "/prestador/disponibilidade", "GET /api/prestador/availability"),
+      ui("Prévia de slots", "/prestador/disponibilidade", "GET /api/prestador/availability/preview"),
+    ],
+    update: [
+      ui("Salvar grade semanal", "/prestador/disponibilidade", "PUT /api/prestador/availability"),
+    ],
+    delete: [
+      ui("Remover bloqueio", "/prestador/disponibilidade", "DELETE /api/prestador/availability/blocks/[id]"),
+    ],
+  },
+  {
     entity: "Uso de procedimento (PPU)",
     portal: "Prestador",
     description: "ProcedureUsage com preço congelado (Pay Per Use).",

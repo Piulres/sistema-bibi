@@ -63,11 +63,11 @@ MICROSOFT_CALENDAR_CLIENT_ID=
 MICROSOFT_CALENDAR_CLIENT_SECRET=
 MICROSOFT_CALENDAR_TENANT=common
 
-# Demo/testes sem secrets reais (adapters mock)
-CALENDAR_OAUTH_MOCK=false
+# Mock por padrão (até haver apps OAuth reais). Push real: false + CLIENT_* 
+CALENDAR_OAUTH_MOCK=true
 ```
 
-Tokens OAuth são cifrados com chave derivada de `SESSION_SECRET`.
+Com `CALENDAR_OAUTH_MOCK` ausente ou `true`, os botões **Conectar** usam adapters mock (não escrevem no Google/Outlook). Tokens OAuth reais são cifrados com chave derivada de `SESSION_SECRET`.
 
 ### Setup Google (resumo)
 
