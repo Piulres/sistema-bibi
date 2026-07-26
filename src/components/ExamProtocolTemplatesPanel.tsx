@@ -4,33 +4,33 @@ import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
-import type { ProtocolChecklistItem } from "@/lib/clinical/constants";
+import type { ExamProtocolItem } from "@/lib/clinical/constants";
 
 type Template = {
   id: string;
   name: string;
   specialty: string | null;
-  checklist: ProtocolChecklistItem[];
-  suggestedReturnDays: number | null;
+  exams: ExamProtocolItem[];
+  clinicalIndication: string | null;
   active: boolean;
 };
 
 const fieldClass =
   "mt-1 w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-sm";
 
-function checklistToText(items: ProtocolChecklistItem[]): string {
-  return items.map((item) => item.label).join("\n");
+function examsToText(items: ExamProtocolItem[]): string {
+  return items.map((item) => item.examName).join("\n");
 }
 
-function parseChecklist(text: string): ProtocolChecklistItem[] {
+function parseExams(text: string): ExamProtocolItem[] {
   return text
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean)
-    .map((label, index) => ({ id: `item-${index + 1}`, label, required: true }));
+    .map((examName, index) => ({ id: `exam-${index + 1}`, examName }));
 }
 
-export default function ProtocolTemplatesPanel() {
+export default function ExamProtocolTemplatesPanel() {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
@@ -40,12 +40,12 @@ export default function ProtocolTemplatesPanel() {
   const [form, setForm] = useState({
     name: "",
     specialty: "",
-    suggestedReturnDays: "",
-    checklistText: "",
+    clinicalIndication: "",
+    examsText: "",
   });
 
   async function reloadTemplates() {
-    const res = await fetch("/api/interno/protocol-templates");
+    const res = await fetch("/api/interno/exam-protocol-templates");
     const data = await res.json();
     if (res.ok) setTemplates(data.templates);
   }
@@ -53,7 +53,7 @@ export default function ProtocolTemplatesPanel() {
   useEffect(() => {
     let active = true;
     (async () => {
-      const res = await fetch("/api/interno/protocol-templates");
+      const res = await fetch("/api/interno/exam-protocol-templates");
       const data = await res.json();
       if (!active) return;
       if (res.ok) setTemplates(data.templates);
@@ -68,8 +68,8 @@ export default function ProtocolTemplatesPanel() {
     setForm({
       name: template.name,
       specialty: template.specialty ?? "",
-      suggestedReturnDays: template.suggestedReturnDays?.toString() ?? "",
-      checklistText: checklistToText(template.checklist),
+      clinicalIndication: template.clinicalIndication ?? "",
+      examsText: examsToText(template.exams),
     });
     setMsg(null);
     setError(null);
@@ -77,13 +77,13 @@ export default function ProtocolTemplatesPanel() {
 
   function cancelEdit() {
     setEditingId(null);
-    setForm({ name: "", specialty: "", suggestedReturnDays: "", checklistText: "" });
+    setForm({ name: "", specialty: "", clinicalIndication: "", examsText: "" });
   }
 
   async function saveTemplate() {
-    const checklist = parseChecklist(form.checklistText);
-    if (!form.name.trim() || checklist.length === 0) {
-      setError("Informe nome e itens do checklist (um por linha).");
+    const exams = parseExams(form.examsText);
+    if (!form.name.trim() || exams.length === 0) {
+      setError("Informe nome e exames (um por linha).");
       return;
     }
 
@@ -94,16 +94,14 @@ export default function ProtocolTemplatesPanel() {
       const payload = {
         name: form.name,
         specialty: form.specialty || undefined,
-        suggestedReturnDays: form.suggestedReturnDays
-          ? Number(form.suggestedReturnDays)
-          : undefined,
-        checklist,
+        clinicalIndication: form.clinicalIndication || undefined,
+        exams,
       };
 
       const res = await fetch(
         editingId
-          ? `/api/interno/protocol-templates/${editingId}`
-          : "/api/interno/protocol-templates",
+          ? `/api/interno/exam-protocol-templates/${editingId}`
+          : "/api/interno/exam-protocol-templates",
         {
           method: editingId ? "PATCH" : "POST",
           headers: { "Content-Type": "application/json" },
@@ -116,7 +114,7 @@ export default function ProtocolTemplatesPanel() {
         return;
       }
       cancelEdit();
-      setMsg(editingId ? "Protocolo atualizado." : "Protocolo criado.");
+      setMsg(editingId ? "Protocolo de exames atualizado." : "Protocolo de exames criado.");
       await reloadTemplates();
     } finally {
       setBusy(false);
@@ -127,7 +125,7 @@ export default function ProtocolTemplatesPanel() {
     setBusy(true);
     setError(null);
     try {
-      const res = await fetch(`/api/interno/protocol-templates/${template.id}`, {
+      const res = await fetch(`/api/interno/exam-protocol-templates/${template.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ active: !template.active }),
@@ -151,10 +149,10 @@ export default function ProtocolTemplatesPanel() {
       <div className="grid gap-3 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <p className="text-sm font-semibold text-[var(--text-primary)]">
-            {editingId ? "Editar protocolo de cuidado" : "Novo protocolo de cuidado"}
+            {editingId ? "Editar protocolo de exames" : "Novo protocolo de exames"}
           </p>
           <p className="text-xs text-[var(--text-muted)]">
-            Checklist editável — ativar/desativar sem perder o histórico de matrículas.
+            Painéis reutilizáveis (pré-op, check-up, DM2…). No atendimento, aplica todos os pedidos de uma vez.
           </p>
         </div>
         <div className="min-w-0">
@@ -163,6 +161,7 @@ export default function ProtocolTemplatesPanel() {
             className={fieldClass}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
+            placeholder="Ex.: Pré-operatório"
           />
         </div>
         <div className="min-w-0">
@@ -173,27 +172,28 @@ export default function ProtocolTemplatesPanel() {
             onChange={(e) => setForm({ ...form, specialty: e.target.value })}
           />
         </div>
-        <div className="min-w-0">
-          <label className="text-sm font-medium">Retorno sugerido (dias)</label>
+        <div className="min-w-0 sm:col-span-2">
+          <label className="text-sm font-medium">Indicação clínica padrão</label>
           <input
-            type="number"
             className={fieldClass}
-            value={form.suggestedReturnDays}
-            onChange={(e) => setForm({ ...form, suggestedReturnDays: e.target.value })}
+            value={form.clinicalIndication}
+            onChange={(e) => setForm({ ...form, clinicalIndication: e.target.value })}
+            placeholder="Opcional — usada em cada pedido gerado"
           />
         </div>
         <div className="min-w-0 sm:col-span-2">
-          <label className="text-sm font-medium">Checklist (um item por linha)</label>
+          <label className="text-sm font-medium">Exames (um por linha)</label>
           <textarea
-            rows={4}
+            rows={5}
             className={fieldClass}
-            value={form.checklistText}
-            onChange={(e) => setForm({ ...form, checklistText: e.target.value })}
+            value={form.examsText}
+            onChange={(e) => setForm({ ...form, examsText: e.target.value })}
+            placeholder={"Hemograma completo\nGlicemia de jejum\nCreatinina"}
           />
         </div>
         <div className="flex flex-col gap-2 sm:col-span-2 sm:flex-row">
           <Button onClick={saveTemplate} disabled={busy}>
-            {editingId ? "Salvar alterações" : "Criar protocolo"}
+            {editingId ? "Salvar alterações" : "Criar protocolo de exames"}
           </Button>
           {editingId && (
             <Button variant="secondary" onClick={cancelEdit} disabled={busy}>
@@ -204,6 +204,9 @@ export default function ProtocolTemplatesPanel() {
       </div>
 
       <div className="space-y-3">
+        {templates.length === 0 && (
+          <p className="text-sm text-[var(--text-muted)]">Nenhum protocolo de exames cadastrado.</p>
+        )}
         {templates.map((t) => (
           <article
             key={t.id}
@@ -214,6 +217,9 @@ export default function ProtocolTemplatesPanel() {
                 <p className="font-semibold">{t.name}</p>
                 {t.specialty && (
                   <p className="text-sm text-[var(--text-muted)]">{t.specialty}</p>
+                )}
+                {t.clinicalIndication && (
+                  <p className="mt-1 text-xs text-[var(--text-muted)]">{t.clinicalIndication}</p>
                 )}
               </div>
               <div className="flex flex-wrap items-center gap-2">
@@ -230,8 +236,8 @@ export default function ProtocolTemplatesPanel() {
               </div>
             </div>
             <ul className="mt-2 list-inside list-disc text-sm text-[var(--text-secondary)]">
-              {t.checklist.map((item) => (
-                <li key={item.id}>{item.label}</li>
+              {t.exams.map((item) => (
+                <li key={item.id}>{item.examName}</li>
               ))}
             </ul>
           </article>

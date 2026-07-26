@@ -41,6 +41,7 @@ model Tenant {
   branding       TenantBranding?
   webhooks       WebhookEndpoint[]
   careProtocolTemplates CareProtocolTemplate[]
+  examProtocolTemplates ExamProtocolTemplate[]
   medicalProducts       MedicalProduct[]
   stockLots             StockLot[]
   stockMovements        StockMovement[]
@@ -505,6 +506,7 @@ model PatientClinicalProfile {
 
 /// Prescrição estruturada de medicação.
 /// status: ATIVA | SUSPENSA | ENCERRADA
+/// prescriptionKind: COMUM | CONTROLE_ESPECIAL (Portaria 344 / RDC 1000)
 model MedicationPrescription {
   id            String   @id @default(cuid())
   patientId     String
@@ -516,11 +518,14 @@ model MedicationPrescription {
   appointmentId String?
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
   status        String   @default("ATIVA")
+  /// COMUM (receita simples) | CONTROLE_ESPECIAL (listas C1/C5 e afins — duas vias)
+  prescriptionKind String @default("COMUM")
   medication    String
   dosage        String
   frequency     String
   route         String?
   durationDays  Int?
+  quantity      String?
   notes         String?
   startDate     DateTime @default(now())
   endDate       DateTime?
@@ -571,6 +576,22 @@ model CareProtocolTemplate {
   createdAt           DateTime @default(now())
 
   enrollments PatientProtocolEnrollment[]
+
+  @@index([tenantId, active])
+}
+
+/// Template de protocolo de exames (painel reutilizável: pré-op, check-up, etc.).
+model ExamProtocolTemplate {
+  id                 String   @id @default(cuid())
+  tenantId           String
+  tenant             Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  name               String
+  specialty          String?
+  /// JSON: [{ id, examName, procedureId? }]
+  exams              String
+  clinicalIndication String?
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
 
   @@index([tenantId, active])
 }

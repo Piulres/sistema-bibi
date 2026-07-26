@@ -21,6 +21,11 @@ import {
 } from "@/app/api/interno/protocol-templates/route";
 import { PATCH as protocolPatch } from "@/app/api/interno/protocol-templates/[id]/route";
 import {
+  GET as examProtocolsGet,
+  POST as examProtocolsPost,
+} from "@/app/api/interno/exam-protocol-templates/route";
+import { PATCH as examProtocolPatch } from "@/app/api/interno/exam-protocol-templates/[id]/route";
+import {
   GET as webhooksGet,
   POST as webhooksPost,
 } from "@/app/api/interno/webhooks/route";
@@ -243,6 +248,56 @@ describe("API — matriz CRUD do sistema", () => {
       expect(patchRes.status).toBe(200);
       const patched = await patchRes.json();
       expect(patched.template.suggestedReturnDays).toBe(45);
+    });
+  });
+
+  describe("Protocolo de exames", () => {
+    beforeEach(async () => {
+      await setSessionForEmail(DEMO_EMAILS.internoAdmin);
+    });
+
+    it("lista, cria, edita e desativa template", async () => {
+      const listRes = await examProtocolsGet();
+      expect(listRes.status).toBe(200);
+
+      const suffix = unique();
+      const createRes = await examProtocolsPost(
+        jsonRequest("http://localhost/api/interno/exam-protocol-templates", {
+          method: "POST",
+          body: {
+            name: `Exames CRUD ${suffix}`,
+            specialty: "Clínica Geral",
+            clinicalIndication: "Check-up",
+            exams: [
+              { id: "e1", examName: "Hemograma" },
+              { id: "e2", examName: "Glicemia" },
+            ],
+          },
+        }),
+      );
+      expect(createRes.status).toBe(200);
+      const created = await createRes.json();
+      const id = created.template.id as string;
+
+      const patchRes = await examProtocolPatch(
+        jsonRequest(`http://localhost/api/interno/exam-protocol-templates/${id}`, {
+          method: "PATCH",
+          body: {
+            name: `Exames CRUD ${suffix} v2`,
+            exams: [
+              { id: "e1", examName: "Hemograma completo" },
+              { id: "e2", examName: "Glicemia de jejum" },
+              { id: "e3", examName: "Creatinina" },
+            ],
+            active: false,
+          },
+        }),
+        { params: Promise.resolve({ id }) },
+      );
+      expect(patchRes.status).toBe(200);
+      const patched = await patchRes.json();
+      expect(patched.template.active).toBe(false);
+      expect(patched.template.exams).toHaveLength(3);
     });
   });
 
