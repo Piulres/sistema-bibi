@@ -44,5 +44,5 @@ Se tocar em build/deploy: `npm run pre-release` (não publica).
 
 ## Banco (agentes)
 
-- VM nova: `npm run db:push && npm run db:seed`
+- VM nova: `npm run setup` (idempotente; ver `scripts/dev-setup.mjs`)
 - **Nunca** `npm run db:reset` (bloqueado / destrutivo)

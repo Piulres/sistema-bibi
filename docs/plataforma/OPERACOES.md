@@ -46,7 +46,7 @@ flowchart LR
 | Validar pacote | Antes de release | Humano ou agente | `npm run pre-release` |
 | Publicar produção | **Raro** | **Só humano** | §5 · `DEPLOY_NETLIFY.md` |
 | Fechar pacote | Após deploy | Humano | `RELEASES.md` § Publicar |
-| Reset banco local | Evitar em agente | Humano | `db:push && db:seed` |
+| Reset banco local | Evitar em agente | Humano | `npm run setup` ou `db:push && db:seed` |
 
 ---
 
@@ -55,11 +55,13 @@ flowchart LR
 ```bash
 git clone https://github.com/Piulres/sistema-bibi.git
 cd sistema-bibi
-cp .env.example .env          # se não existir
 npm install                     # postinstall → prisma generate
-npm run db:push && npm run db:seed
+npm run setup                   # .env + db:push + seed condicional (idempotente)
 npm run dev                     # http://localhost:3000
 ```
+
+> Alternativa manual: `cp .env.example .env` + `npm run db:push && npm run db:seed`.  
+> Gotchas (dual-store, `--skip-generate`): [`TESTES.md`](TESTES.md) §Gotchas.
 
 | Variável | Padrão POC | Uso |
 |----------|------------|-----|
@@ -153,7 +155,7 @@ Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos 
 
 | Situação | Comando |
 |----------|---------|
-| VM nova / sem `dev.db` | `npm run db:push && npm run db:seed` |
+| VM nova / sem `dev.db` | `npm run setup` (recomendado) ou `npm run db:push && npm run db:seed` |
 | Dual-store (demo + operação) | `npm run db:bootstrap:demo` |
 | Só banco de operação | `npm run db:bootstrap:operation` |
 | Schema alterado | `npm run db:push` (depois seed se necessário) |
@@ -267,7 +269,7 @@ Validar drift: `npm run cursor:verify`. Detalhes também em `AGENTS.md`.
 | `npm run lint` antes de finalizar | Qualidade |
 | Abrir PR com base **`dev`** | Integração antes de release |
 | `npm run pre-release` se pedirem “validar release” | Sem publicar |
-| Usar `db:push && db:seed` em VM nova | `db:reset` é bloqueado |
+| Usar `npm run setup` em VM nova | Idempotente; `db:reset` é bloqueado |
 | Consultar `RELEASES.md` para saber o que está em produção | Fonte única |
 | **`useLabels()` em telas novas dos portais** | v2.0 — ver `AGENTS.md` e `src/constants/niches.ts` |
 | Consultar `docs/versoes/V2_0.md` antes de features multi-nicho | Escopo canônico v2.0 |

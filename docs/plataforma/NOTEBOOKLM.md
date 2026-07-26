@@ -61,10 +61,11 @@ Escopo: [`V2_0.md`](../versoes/V2_0.md). Labels: `useLabels()` — nunca hardcod
 
 ```bash
 npm install
-cp .env.example .env          # se não existir
-npm run db:push && npm run db:seed
+npm run setup                   # .env + schema + seed (idempotente)
 npm run dev                   # http://localhost:3000
 ```
+
+> Alternativa manual: `cp .env.example .env` + `npm run db:push && npm run db:seed`.
 
 Variáveis `.env`:
 
@@ -77,7 +78,7 @@ Variáveis `.env`:
 | `CRON_SECRET` | Protege `POST /api/cron/reminders` e `/api/cron/webhooks` |
 | `TELEMEDICINE_BASE_URL` | Base das salas virtuais mock — Tier 4 |
 
-Scripts úteis: `npm run db:reset`, `npm run netlify:build`, `npm run lint`.
+Scripts úteis: `npm run setup`, `npm run netlify:build`, `npm run lint`.
 
 ---
 

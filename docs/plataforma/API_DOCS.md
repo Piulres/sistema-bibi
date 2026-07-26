@@ -18,9 +18,9 @@ Fonte da spec: [`public/openapi.yaml`](../../public/openapi.yaml) · Fluxos de n
 ### Pré-requisitos
 
 ```bash
-cp .env.example .env          # se ainda não existir
+cp .env.example .env          # opcional — setup cria .env se ausente
 npm install                     # postinstall gera Prisma + copia Swagger UI
-npm run db:push && npm run db:seed   # VM nova sem banco
+npm run setup                   # VM nova: schema + seed condicional (idempotente)
 ```
 
 ### Passo 1 — Subir o servidor
