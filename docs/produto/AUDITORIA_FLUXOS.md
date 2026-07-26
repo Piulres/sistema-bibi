@@ -14,7 +14,13 @@ via API.
 |--------|------|-------------|--------|
 | 1 | 2026-06-22 | `93f466a` | Fluxos core, RBAC manual |
 | 2 | 2026-06-23 | — | Atualização v2.0 (labels) |
-| **3 (atual)** | **2026-07-26** | `0c9d800` (v3.0.0) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente) |
+| 3 | 2026-07-26 | `0c9d800` (v3.0.0) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente) |
+| **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
+
+> **Correções aplicadas nesta rodada (3.1):** máquina de estados do agendamento
+> (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
+> feedback de erro em prestadores (P2), tratamento de erro em `ClinicalCarePanel`
+> e `ClinicFinanceView` (P2) e aviso de conta PJ sem empresa (P3). Detalhe no §11.
 
 **Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](../plataforma/TESTES.md)
 
@@ -91,8 +97,8 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 |---|----------------|--------|-----------------|
 | 1 | `AtendimentoView.markRealizado` sem `res.ok`; erro com `tone="success"` | **CORRIGIDA** | usa `useAsyncAction().run` → toast `danger` em `!parsed.ok` (`src/hooks/useAsyncAction.ts`) |
 | 2 | `AgendaView` sem `res.ok` → agenda vazia | **CORRIGIDA** | `fetchJson` + `useAsyncData` + `ViewStateBoundary` |
-| 3 | Procedimento aceito em `CANCELADO`/`FALTOU` | **PERSISTE** | `procedures/route.ts` não checa `appointment.status` — confirmado 200 em runtime |
-| 4 | PATCH de status sem regras de transição | **PERSISTE** | `appointments/[id]/route.ts` aceita qualquer status da lista |
+| 3 | Procedimento aceito em `CANCELADO`/`FALTOU` | **CORRIGIDA (3.1)** | `procedures/route.ts` usa `canRegisterProcedureForStatus` → 409; runtime confirmado |
+| 4 | PATCH de status sem regras de transição | **CORRIGIDA (3.1)** | `canTransitionAppointmentStatus` (FLUXOS §10.1) no PATCH prestador/interno → 409/400 |
 | 5 | Agenda API sem `tenantId` | **CORRIGIDA** | `baseWhere = { providerId, tenantId }`; resíduo em `appointments/[id]` (só `providerId`) |
 | 6 | ~29/39 rotas interno sem `requireInternoModule` | **CORRIGIDA** | 94/94 rotas com guard de módulo (`tests/security/rbac-gaps.test.ts` afirma `[]`) |
 | 7 | Bypass CRM `PATCH companies/[id]` | **CORRIGIDA** | rota rejeita `status` com 403 e aponta endpoint dedicado |
@@ -101,7 +107,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 10 | `BillingView` 403 = lista vazia | **CORRIGIDA** | `useAsyncData` seta `error` (403) → `ViewStateBoundary` |
 | 11 | `AppointmentsView.updateStatus` ignora falha | **CORRIGIDA** | usa `useAsyncAction().run` |
 | 12 | PJ login sem `companyId`; `PjView` sem `res.ok` | **PARCIAL** | `PjView` corrigido (`fetchJson`); página só valida role `PJ`, não `companyId` |
-| 13 | Beneficiário: `billed:false` = "ABERTA"; dropdown vazio | **PERSISTE** | `BeneficiarioView.tsx` badge `usage.billed ? "PAGA" : "ABERTA"`; `/providers` falho vira dropdown vazio |
+| 13 | Beneficiário: `billed:false` = "ABERTA"; dropdown vazio | **CORRIGIDA (3.1)** | badge "Faturado"/"A faturar"; falha em `/providers` exibe mensagem + retry |
 | 14 | Guards beneficiário inconsistentes | **PERSISTE** | `overview`/`export` usam `requireBeneficiary()`; `slots`/`providers`/`appointments` só `requireUser(["BENEFICIARIO"])` |
 | 15 | `proxy.ts` só presença do cookie | **MUDOU → OK** | agora valida HMAC (`verifySessionToken`); role fica no server-side (documentado) |
 | 16 | `SESSION_SECRET` fallback dev | **PERSISTE (endurecido)** | fallback só fora de produção; em produção exige ≥32 chars e rejeita fracos (`security/config.ts`) |
@@ -253,15 +259,15 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 
 ## 11. Priorização de correção
 
-| Prioridade | Pacote | Ações |
-|------------|--------|-------|
-| **P1** | Regras de negócio prestador | Bloquear POST procedures em agendamento terminal (`CANCELADO`/`FALTOU`/`REALIZADO`); validar transições de status no PATCH |
-| **P1** | Higiene de testes (dev) | `data-store-mode.test.ts` deve restaurar/limpar `prisma/.data-store-mode` no `afterEach` (evita 500 no dev local pós-suíte) |
-| **P2** | UX interno | `ClinicFinanceView` migrar para `useAsyncData` (mensagem de permissão em 403) |
-| **P2** | Beneficiário | Label de consumo PPU distinta de status de fatura; mensagem quando `/providers` falha |
-| **P2** | Guards clínicos | Checar `res.ok` nos PATCH de `ClinicalCarePanel` |
-| **P3** | Defesa em profundidade | Generalizar `requireInternoModuleWrite` nas rotas mutáveis do interno |
-| **P3** | PJ | Validar `companyId` na página `/pj`; tenant scope em `prestador/appointments/[id]` |
+| Prioridade | Pacote | Ações | Status |
+|------------|--------|-------|--------|
+| **P1** | Regras de negócio prestador | Bloquear POST procedures em agendamento terminal (`CANCELADO`/`FALTOU`); validar transições de status no PATCH | ✅ **Feito (3.1)** — `appointment-status.ts` |
+| **P1** | Higiene de testes (dev) | `data-store-mode.test.ts` restaura/limpa `prisma/.data-store-mode` no `afterEach` | ✅ **Feito (3.1)** |
+| **P2** | UX interno | `ClinicFinanceView` exibe mensagem de permissão/erro em 403 com retry | ✅ **Feito (3.1)** |
+| **P2** | Beneficiário | Label de consumo PPU distinta de status de fatura; mensagem quando `/providers` falha | ✅ **Feito (3.1)** |
+| **P2** | Guards clínicos | Checar `res.ok` nos PATCH de `ClinicalCarePanel` | ✅ **Feito (3.1)** |
+| **P3** | PJ + tenant scope | Aviso de conta PJ sem empresa; `tenantId` no GET/PATCH `prestador/appointments/[id]` | ✅ **Feito (3.1)** |
+| **P3** | Defesa em profundidade | Generalizar `requireInternoModuleWrite` nas rotas mutáveis do interno | ⏳ Aberto (risco prático baixo pela matriz atual) |
 
 ---
 
