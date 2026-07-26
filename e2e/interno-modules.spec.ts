@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAs, openInternoNav, portalMain } from "./helpers/auth";
+import { expectInternoNavHref, loginAs, portalMain } from "./helpers/auth";
 
 const ADMIN_MODULES: { path: string; heading: RegExp | string }[] = [
   { path: "/interno/dashboard", heading: /Dashboard Executivo/i },
@@ -34,7 +34,6 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
 
   test("nav exibe todos os módulos para admin", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    const nav = await openInternoNav(page);
     for (const href of [
       "/interno/dashboard",
       "/interno",
@@ -50,7 +49,7 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
       "/interno/integracoes",
       "/interno/seguranca",
     ]) {
-      await expect(nav.locator(`a[href="${href}"]`)).toBeVisible();
+      await expectInternoNavHref(page, href, true);
     }
   });
 
