@@ -159,6 +159,7 @@ type BeneficiarioData = {
   overview: Overview | null;
   clinical: ClinicalData | null;
   providers: { id: string; name: string }[];
+  providersFailed: boolean;
   procedures: { id: string; name: string }[];
   pets: { id: string; name: string; speciesLabel: string }[];
 };
@@ -211,6 +212,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         overview: overviewRes.data.overview ?? null,
         clinical: clinicalRes.ok ? (clinicalRes.data.clinical ?? null) : null,
         providers: providersRes.ok ? (providersRes.data.providers ?? []) : [],
+        providersFailed: !providersRes.ok,
         procedures: proceduresRes.ok ? (proceduresRes.data.procedures ?? []) : [],
         pets: petsRes?.ok ? (petsRes.data.pets ?? []) : [],
       },
@@ -223,6 +225,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   const overview = data?.overview ?? null;
   const clinical = data?.clinical ?? null;
   const providers = data?.providers ?? [];
+  const providersFailed = data?.providersFailed ?? false;
   const procedures = data?.procedures ?? [];
   const pets = data?.pets ?? [];
 
@@ -459,6 +462,14 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
+            {providersFailed && (
+              <p className="mt-1 text-xs text-[var(--danger-text,#b91c1c)]">
+                Não foi possível carregar a lista de {labels.providers.toLowerCase()}.{" "}
+                <button type="button" className="underline" onClick={() => void reload()}>
+                  Tentar novamente
+                </button>
+              </p>
+            )}
           </label>
           <label className="block text-sm">
             <span className="text-[var(--text-secondary)]">Data</span>
@@ -665,7 +676,11 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                     </td>
                     <td className="px-4 py-2 text-[var(--text-muted)]">{usage.appointmentDateLabel}</td>
                     <td className="px-4 py-2">
-                      <StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
+                      <StatusBadge
+                        value={usage.billed ? "FECHADA" : "ABERTA"}
+                        label={usage.billed ? "Faturado" : "A faturar"}
+                        map="invoice"
+                      />
                     </td>
                     <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">{usage.priceLabel}</td>
                   </tr>
