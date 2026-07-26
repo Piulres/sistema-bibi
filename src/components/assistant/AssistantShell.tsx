@@ -23,7 +23,7 @@ export default function AssistantShell({ portal, enabled = true, children }: Pro
 
   return (
     <AssistantProvider pageContext={pathname}>
-      {children}
+      <div className="min-w-0 pb-24">{children}</div>
       <AssistantTrigger />
       <AssistantPanel portal={portal} />
     </AssistantProvider>

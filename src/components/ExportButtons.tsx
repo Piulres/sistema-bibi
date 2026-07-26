@@ -38,8 +38,13 @@ export default function ExportButtons({
   return (
     <div className="flex flex-wrap gap-2">
       {formats.map((format) => (
-        <a key={format} href={buildUrl(format)} download>
-          <Button variant={variant} size={size} type="button">
+        <a
+          key={format}
+          href={buildUrl(format)}
+          download
+          className="inline-flex min-h-10"
+        >
+          <Button variant={variant} size={size} type="button" className="w-full">
             {FORMAT_LABELS[format]}
           </Button>
         </a>

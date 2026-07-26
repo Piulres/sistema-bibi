@@ -422,35 +422,63 @@ export default function StockView() {
               {products.length === 0 ? (
                 <EmptyState title="Sem produtos" message="Cadastre o primeiro item médico." />
               ) : (
-                <div className="ds-scroll-x mt-4">
-                  <table className="w-full min-w-[28rem] text-sm">
-                    <thead>
-                      <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
-                        <th className="py-2 pr-3">SKU</th>
-                        <th className="py-2 pr-3">Nome</th>
-                        <th className="py-2 pr-3">Categoria</th>
-                        <th className="py-2 pr-3">Saldo</th>
-                        <th className="py-2">Mín.</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((p) => (
-                        <tr key={p.id} className="border-b border-[var(--border-muted)]/60">
-                          <td className="py-2 pr-3 font-mono text-xs">{p.sku}</td>
-                          <td className="py-2 pr-3">
-                            {p.name}
-                            {p.lowStock && (
-                              <span className="ml-2 text-xs text-amber-600">baixo</span>
-                            )}
-                          </td>
-                          <td className="py-2 pr-3">{p.categoryLabel}</td>
-                          <td className="py-2 pr-3">{p.stockLabel}</td>
-                          <td className="py-2">{p.minStock}</td>
+                <>
+                  <ul className="mt-4 space-y-2 md:hidden">
+                    {products.map((p) => (
+                      <li
+                        key={p.id}
+                        className="rounded-lg border border-[var(--border-muted)] px-3 py-2"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="break-words font-medium text-[var(--text-primary)]">
+                              {p.name}
+                              {p.lowStock && (
+                                <span className="ml-2 text-xs text-amber-600">baixo</span>
+                              )}
+                            </p>
+                            <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
+                              {p.sku} · {p.categoryLabel}
+                            </p>
+                          </div>
+                          <div className="shrink-0 text-right text-sm">
+                            <p className="font-semibold text-[var(--text-primary)]">{p.stockLabel}</p>
+                            <p className="text-xs text-[var(--text-muted)]">mín. {p.minStock}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="ds-scroll-x mt-4 hidden md:block">
+                    <table className="w-full min-w-[28rem] text-sm">
+                      <thead>
+                        <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
+                          <th className="py-2 pr-3">SKU</th>
+                          <th className="py-2 pr-3">Nome</th>
+                          <th className="py-2 pr-3">Categoria</th>
+                          <th className="py-2 pr-3">Saldo</th>
+                          <th className="py-2">Mín.</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {products.map((p) => (
+                          <tr key={p.id} className="border-b border-[var(--border-muted)]/60">
+                            <td className="py-2 pr-3 font-mono text-xs">{p.sku}</td>
+                            <td className="py-2 pr-3">
+                              {p.name}
+                              {p.lowStock && (
+                                <span className="ml-2 text-xs text-amber-600">baixo</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3">{p.categoryLabel}</td>
+                            <td className="py-2 pr-3">{p.stockLabel}</td>
+                            <td className="py-2">{p.minStock}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </Card>
 
