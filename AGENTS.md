@@ -79,11 +79,13 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 | Workflow Cursor | `docs/plataforma/WORKFLOW_CURSOR.md` |
 | Testes | `docs/plataforma/TESTES.md` |
 | Fluxos de negócio | `docs/produto/FLUXOS.md` |
+| Jornada no consultório (narrativa) | `docs/produto/JORNADA_CONSULTORIO.md` |
 | Arquitetura | `docs/plataforma/ARQUITETURA.md` |
 | Env vars | `docs/plataforma/VARIAVEIS_AMBIENTE.md` |
 | Demo vs operação | `docs/plataforma/OPERACAO_DADOS.md` |
 | Deploy Netlify | `docs/plataforma/DEPLOY_NETLIFY.md` |
-| CEDIG | `docs/clientes/cedig/STATUS.md` |
+| CEDIG (status) | `docs/clientes/cedig/STATUS.md` |
+| CEDIG (operação / reset Blob) | `docs/clientes/cedig/OPERACAO.md` · `docs/plataforma/OPERACAO_DADOS.md` §Limpeza |
 | Prompts | `docs/prompts/README.md` |
 
 Detalhes de navegação SPA, RBAC, CRUD, design system e histórico: ver índice em `docs/README.md`.

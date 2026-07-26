@@ -20,3 +20,14 @@
 
 - Atualizar `STATUS.md` ao fechar entrega CEDIG — não criar `FASE_N` / `GO_LIVE_*`
 - Modo operação: ver `docs/plataforma/OPERACAO_DADOS.md`
+- Reset de fluxos em produção: **não** usar `db:reset` nem “Restaurar demo” — ver `OPERACAO.md` §Limpar fluxos
+
+## Scripts operacionais
+
+| Script | Quando |
+|--------|--------|
+| `scripts/cedig-mapear.sh` | Enrich local (dev) |
+| `scripts/reset-cedig-transactional.mjs` | Zerar atendimentos/fluxos no Blob (`--confirm=LIMPAR-FLUXOS`) |
+| `scripts/cedig-ensure-commercial.ts` | Restaurar empresas + PricingRules após reset |
+| `scripts/publish-operation-blob.mjs` | Republicar `operation.db` com `updatedAt` |
+| `scripts/cleanup-operation-test-data.mjs` | Limpeza pontual (duplicatas, massa smoke) |

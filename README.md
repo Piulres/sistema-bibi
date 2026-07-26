@@ -271,7 +271,7 @@ Paciente chega na clínica sem cadastro prévio nem vínculo corporativo:
 4. **Prestador** atende normalmente; preço **base** (sem desconto PJ).
 5. **Faturamento** gera fatura PPU; cobrança PIX ou manual.
 
-Demo particular: `pedro.almeida@email.com` / `bibi123`. Detalhe técnico: [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md) §4.2 e §8.5.
+Demo particular: `pedro.almeida@email.com` / `bibi123`. Detalhe técnico: [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md) §4.2 e §8.5. Narrativa operacional completa (todos os atos e ramificações): [`docs/produto/JORNADA_CONSULTORIO.md`](docs/produto/JORNADA_CONSULTORIO.md).
 
 ### 7.3 Mapa de operações CRUD
 
@@ -491,6 +491,17 @@ sistema-bibi/
 | `npm run cursor:verify` | Guardrail de drift em `.cursor/` e `AGENTS.md`. |
 | `npm run pre-release` | Gate completo: lint + docs + openapi + db + test + build. |
 
+**Scripts operacionais (fora do npm)** — manutenção do `operation.db` em Netlify Blobs e piloto CEDIG:
+
+| Script | Função |
+|--------|--------|
+| `scripts/publish-operation-blob.mjs` | Republica `operation.db` no Blob com `updatedAt` |
+| `scripts/reset-cedig-transactional.mjs` | Zera fluxos CEDIG (mantém equipe/catálogo) |
+| `scripts/cedig-ensure-commercial.ts` | Restaura empresas + PricingRules pós-reset |
+| `scripts/cleanup-operation-test-data.mjs` | Limpeza pontual (duplicatas, massa smoke) |
+
+Playbook: [`docs/plataforma/OPERACAO_DADOS.md`](docs/plataforma/OPERACAO_DADOS.md) · [`docs/clientes/cedig/OPERACAO.md`](docs/clientes/cedig/OPERACAO.md).
+
 ## 12. Segurança e LGPD
 
 - Sessão por **cookie httpOnly** assinado com **HMAC-SHA256** (`SESSION_SECRET`),
@@ -531,6 +542,8 @@ sistema-bibi/
   [`docs/versoes/V3_0.md`](docs/versoes/V3_0.md) · [`docs/versoes/V2_6.md`](docs/versoes/V2_6.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md)
+- **Jornada no consultório (narrativa operacional — chegada → pagamento):**
+  [`docs/produto/JORNADA_CONSULTORIO.md`](docs/produto/JORNADA_CONSULTORIO.md)
 - **Jornada do cliente nos 4 portais (UX, gaps e melhorias):**
   [`docs/produto/JORNADA_CLIENTE.md`](docs/produto/JORNADA_CLIENTE.md)
 - **Auditoria de falhas nos quatro portais:**
