@@ -2,7 +2,7 @@
 
 Documentação técnica da integração com a [Voa Health](https://voa.health/), assistente de IA para transcrição de consultas e geração de documentos clínicos (anamnese, SOAP, evolução).
 
-**Planejamento:** [`PLANO_V1_4_VOA.md`](PLANO_V1_4_VOA.md)  
+**Histórico Fase 1:** entregue em v2.1.0 — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V2_1.md`](../versoes/V2_1.md)  
 **Docs oficiais Voa:** https://docs.voa.health/  
 **Suporte integração:** integration@voahealth.com
 

@@ -83,7 +83,7 @@ Ao escrever ou reescrever:
 
 | Domínio | Onde ler antes de codar |
 |---------|-------------------------|
-| CEDIG / gestão clínica | `docs/clientes/cedig/FASE_2.md` · `src/lib/clinic-finance/bridge.ts` |
+| CEDIG / gestão clínica | `docs/clientes/cedig/STATUS.md` · `src/lib/clinic-finance/bridge.ts` |
 | Login tenant/portal | `docs/versoes/V2_5.md` · `src/lib/auth/login-access.ts` · `src/lib/segment/auth.ts` |
 | Matriz CRUD | `src/lib/crud-operations-map.ts` · `docs/plataforma/TESTES.md` §Matriz CRUD |
 
@@ -104,6 +104,7 @@ Não inventar Jest — o projeto usa **Vitest**. E2E = **Playwright**.
 - Branch `cursor/<nome>-5f67` → PR → **`dev`** (nunca `main` direto).
 - **Proibido** sem pedido explícito: `netlify deploy`, `db:reset`, loops em produção.
 - Validar local: `npm run dev` / smoke do fluxo; `pre-release` só ao fechar pacote.
+- Docs vivas: atualizar `STATUS.md` do domínio / `RELEASES.md` — ver `docs/plataforma/DOCUMENTACAO.md`. Não criar `FASE_N` / `GO_LIVE_*`.
 
 ---
 
