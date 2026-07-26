@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.5** em produção — labels por tenant, landing segmentada, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.6** em produção — home comercial, nav portais redesenhada, assistente fecha ao navegar; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
 
 ---
 
@@ -336,7 +336,7 @@ Escala por dimensão de jornada (não cobertura de código).
 | Self-service | ✅ agendar + pagar | ❌ só leitura | 🟡 só atendimento | ✅ CRUD completo |
 | Transparência financeira | ⭐ ✅ | ⭐ ✅ | 🟡 vê preço no ato | ✅ |
 | Comunicação proativa | 🟡 mock | 🟡 alertas passivos | ❌ | 🟡 fila mock |
-| Mobile / PWA | 🟡 drawer + nav rolável | 🟡 drawer seções | ✅ abas com `shortLabel` + scroll (v3.0.5) | 🟡 drawer &lt; lg |
+| Mobile / PWA | ✅ drawer + menu Mais (v3.0.6) | 🟡 drawer seções | ✅ abas com `shortLabel` + scroll (v3.0.5) | ✅ drawer módulos (v3.0.6) |
 | Integrações reais | 🟡 PIX mock | 🟡 CSV only | ❌ | 🟡 webhooks OK, TISS parcial |
 
 Legenda: ✅ implementado · 🟡 parcial/mock · ❌ ausente · ⭐ diferencial vs mercado clínico.

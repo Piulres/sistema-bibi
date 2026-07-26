@@ -65,6 +65,8 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 
+Cobertura v3.0.6 nav portais: `e2e/mobile-nav.spec.ts` — drawer nos 4 portais, menu **Mais** no interno desktop, landing mobile menu.
+
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.

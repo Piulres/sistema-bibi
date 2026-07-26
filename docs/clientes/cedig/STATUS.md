@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-26 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.5** |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.6** |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.5** |
+| Pacote em produção | ✅ | **v3.0.6** |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 
@@ -92,6 +92,7 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
+| 2026-07-26 | Pacote **v3.0.6** em produção: home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) | ✅ |
 | 2026-07-26 | Pacote **v3.0.5** em produção: jornada faturada + documentos clínicos + UX landing/portais (#221/#225–#227) | ✅ |
 | 2026-07-26 | Pacote **v3.0.4** em produção: TISS 422 + config Cursor enxuta + docs schema-sync (#220/#222) | ✅ |
 | 2026-07-26 | Pacote **v3.0.3**: flush Blob pós schema-sync + UX gestão (#214) + docs/script da limpeza (#217) | ✅ |

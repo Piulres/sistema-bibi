@@ -1,6 +1,6 @@
 # Branding — Energia Brasileira
 
-Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.5**; white-label desde v2.0).
+Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.6**; white-label desde v2.0).
 
 ## Cores principais
 

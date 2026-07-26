@@ -88,13 +88,18 @@ Chave: `bibi_onboarding`
 
 ---
 
-## Mobile
+## Mobile e nav dos portais (v3.0.6)
 
-- Nav desktop (`lg+`): abas com `data-tour-nav`
-- Mobile: `MobileNavDrawer` com `data-tour-nav` nos links + `data-tour-id="mobile-nav-trigger"` no botão Módulos
+| Breakpoint | Comportamento |
+|------------|---------------|
+| Desktop (`lg+`) | `NavTabs` com faixa rolável; módulos `priority: "secondary"` no menu **Mais** |
+| Mobile (`< lg`) | `MobileNavDrawer` — gatilho mostra módulo ativo; grupos via `group` nas tabs |
+| Sticky | `data-tour-id="portal-nav"` em wrapper com `PORTAL_NAV_STICKY_CLASS` |
+
 - Botão **Tour** no header (sem `?`) — `OnboardingTrigger` com `data-testid="onboarding-trigger"`
+- E2E: `e2e/mobile-nav.spec.ts` — drawer nos 4 portais + menu Mais no interno
 
-## Superfície do header (v3.0.5)
+## Superfície do header (v3.0.5+)
 
 | Elemento | Comportamento |
 |----------|---------------|

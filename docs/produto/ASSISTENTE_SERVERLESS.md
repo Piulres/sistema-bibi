@@ -54,6 +54,18 @@ Cliente                          API (serverless)
 
 Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
 
+## UX do painel (v3.0.6)
+
+O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automático evita sobrepor a tela de destino após navegação.
+
+| Gatilho | Implementação |
+|---------|---------------|
+| Clique em ação `link` ou `form_draft` | `AssistantActionCard` → `closeOnNavigate()` → `setOpen(false)` |
+| Mudança de rota enquanto aberto | `AssistantPanel` compara `pathname` com o valor ao abrir; divergência → `setOpen(false)` |
+| Escape / backdrop / botão ✕ | Handlers explícitos em `AssistantPanel` |
+
+Ações `confirm` e `choice` **não** fecham o painel — o usuário confirma ou escolhe in-place. Testes E2E do assistente: `e2e/assistant.spec.ts` (MEDICAL + VET).
+
 ## Analytics
 
 Cada tool executada registra evento na timeline (`entityType: Assistant`, ações `ASSISTANT_TOOL_OK` / `ASSISTANT_TOOL_ERR`). Visível em `/interno/auditoria`.
