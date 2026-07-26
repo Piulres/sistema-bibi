@@ -4,7 +4,7 @@
 
 > **Produção:** **v3.0.0** @ https://sistema-bibi.netlify.app — [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** julho/2026 — fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
+> **Última revisão factual:** 26/07/2026 — docs alinhados à produção **v3.0.0** (operação/CEDIG/PWA); fluxos em [`produto/FLUXOS.md`](produto/FLUXOS.md); veracidade de pesquisa em [`pesquisa/README.md`](pesquisa/README.md#política-de-veracidade).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -24,31 +24,40 @@
 
 ---
 
+## Documentação viva
+
+Regras e checklist para agentes: [`plataforma/DOCUMENTACAO.md`](plataforma/DOCUMENTACAO.md).
+
+- **Versão em produção** → [`versoes/RELEASES.md`](versoes/RELEASES.md) (única fonte)
+- **Piloto CEDIG** → [`clientes/cedig/STATUS.md`](clientes/cedig/STATUS.md) (status + timeline)
+- **Não criar** `FASE_N.md` / `GO_LIVE_*.md` / `HISTORICO_YYYY-MM-DD.md` — atualize o status vivo
+
 ## Estrutura de pastas
 
 ```
 docs/
 ├── README.md                 ← você está aqui
-├── segmentos/                ← documentação por vertical (VET, LEGAL, …)
+├── clientes/                 ← pilotos (STATUS + OPERACAO + HOMOLOGACAO)
+├── segmentos/                ← documentação por vertical
 ├── plataforma/               ← operação, arquitetura, deploy, design system
 ├── produto/                  ← fluxos, jornada UX, auditoria
-├── versoes/                  ← V1_x, V2_0, RELEASES
-├── pesquisa/                 ← benchmark de mercado (transversal)
-├── prompts/                  ← prompts ServiceOS v2.0 (implementação e sessão Cursor)
-└── evidencias/               ← capturas e vídeos de validação
+├── versoes/                  ← RELEASES + changelogs V1/V2/V3
+├── pesquisa/                 ← benchmark de mercado
+├── prompts/                  ← prompts para agentes
+└── evidencias/               ← capturas e vídeos
 ```
 
 ---
 
 ## Clientes (piloto)
 
-| Cliente | Doc |
-|---------|-----|
-| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) |
+| Cliente | Docs vivos |
+|---------|------------|
+| CEDIG Cruzeiro | [`STATUS.md`](clientes/cedig/STATUS.md) · [`OPERACAO.md`](clientes/cedig/OPERACAO.md) · [`README.md`](clientes/cedig/README.md) |
 
 ---
 
-## Segmentos (ServiceOS v2.0)
+## Segmentos (base multi-nicho desde v2.0)
 
 | Segmento | Pasta | Tenant demo | Login interno |
 |----------|-------|-------------|---------------|
@@ -68,7 +77,9 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
+| [`plataforma/DOCUMENTACAO.md`](plataforma/DOCUMENTACAO.md) | Regras de documentação viva (agentes) |
 | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) | Mapa de operações e regras para agentes |
+| [`plataforma/VOA_INTEGRATION.md`](plataforma/VOA_INTEGRATION.md) | Integração Voa Health (assistente) |
 | [`plataforma/ARQUITETURA.md`](plataforma/ARQUITETURA.md) | Diagramas, épicos, stack |
 | [`plataforma/DEPLOY_NETLIFY.md`](plataforma/DEPLOY_NETLIFY.md) | Deploy e troubleshooting |
 | [`plataforma/OPERACAO_DADOS.md`](plataforma/OPERACAO_DADOS.md) | Dual-store demo/operação |

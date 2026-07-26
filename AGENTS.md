@@ -50,10 +50,10 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** **`v3.0.0`** @ https://sistema-bibi.netlify.app · PWA `/instalar` · CEDIG + login tenant/portal · ver `docs/versoes/RELEASES.md` · `V3_0.md`.
-Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
+Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao` · status vivo `docs/clientes/cedig/STATUS.md`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
-Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
+Ver `docs/plataforma/WORKFLOW_CURSOR.md` · **`docs/plataforma/OPERACOES.md`** · docs vivas `docs/plataforma/DOCUMENTACAO.md`.
 **Preferências IA:** `AGENTS.md` · `docs/prompts/README.md` · `.cursor/skills/serviceos-dev-quality/SKILL.md` · `.cursor/rules/serviceos-dev.mdc` · `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/plataforma/HISTORICO_2026-06-21.md`
@@ -176,6 +176,14 @@ Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particula
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
+- **Gotcha pós-`npm test`:** a suíte Vitest (`tests/lib/data-store-mode.test.ts`)
+ chama `setDataStoreMode("operation")` e deixa `prisma/.data-store-mode=operation`
+ no diretório real. Como o dual-store está ligado em dev, o `npm run dev` sobe em
+ **modo operação** apontando para `prisma/operation.db` (vazio) e o login quebra com
+ `Erro de conexão` / `The table main.User does not exist`. **Correção:** apague
+ `prisma/.data-store-mode` (volta a `demo`, usa o `prisma/dev.db` seedado) ou troque
+ para demo em `/interno/seguranca`. Rode `npm run dev` **depois** de limpar esse arquivo
+ se acabou de rodar os testes.
 - **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
   build CI em `npm run netlify:build`; ver `docs/plataforma/DEPLOY_NETLIFY.md` e `docs/plataforma/WORKFLOW_CURSOR.md`.
   Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.

@@ -1,4 +1,4 @@
-# Ações × Benchmark — Sistema Bibi - ServiceOS v2.0
+# Ações × Benchmark — Sistema Bibi - ServiceOS
 
 Comparativo entre **o que a plataforma implementa hoje** (ações/funcionalidades no código)
 e **referências de mercado** citadas no projeto.
@@ -20,7 +20,7 @@ e **referências de mercado** citadas no projeto.
 | ❌ | Não implementado (roadmap) |
 | ⭐ | Diferencial do Bibi vs benchmark típico de clínica |
 
-Última revisão: **ServiceOS v2.0** — multi-nicho, `useLabels()`, landing por nicho, seed VET/DENTAL/LEGAL/SPA/EDUCATION (PR [#101](https://github.com/Piulres/sistema-bibi/pull/101)).
+Última revisão: **ServiceOS v3.0.0** — multi-nicho desde v2.0 (`useLabels()`, landing por nicho, 7 segmentos incl. CONSTRUCTION).
 
 ---
 
@@ -35,7 +35,7 @@ e **referências de mercado** citadas no projeto.
 | Pay Per Use + Price Snapshot | ⭐ ✅ | ❌ | ✅ | 🟡 |
 | Portal PJ + beneficiário self-service | ⭐ ✅ | ❌ | ✅ | ✅ |
 
-**Leitura:** o v2.0 não compete em profundidade clínica (receituário CFM, grade flexível) — compete em **infraestrutura transacional horizontal** com vocabulário e marca do cliente. Ver [`pesquisa/01-matriz-competitiva.md`](pesquisa/01-matriz-competitiva.md).
+**Leitura:** o v2.0 não compete em profundidade clínica (receituário CFM, grade flexível) — compete em **infraestrutura transacional horizontal** com vocabulário e marca do cliente. Ver [`pesquisa/01-matriz-competitiva.md`](../pesquisa/01-matriz-competitiva.md).
 
 ---
 
@@ -269,10 +269,10 @@ Escala: **0** ausente · **1** parcial/mock · **2** implementado alinhado ao me
 | [`V2_0.md`](../versoes/V2_0.md) | Escopo e changelog ServiceOS v2.0 |
 | [`V2_0_ARCHITECTURE.md`](../versoes/V2_0_ARCHITECTURE.md) | Arquitetura técnica multi-nicho |
 | [`pesquisa/README.md`](../pesquisa/README.md) | Benchmark estratégico 2026 (matriz, mercado, roadmap, prompts) |
-| [`pesquisa/01-matriz-competitiva.md`](pesquisa/01-matriz-competitiva.md) | Bibi × Conexa, Vitta, Alice, Pipo, Feegow, iClinic, etc. |
-| [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) | Síntese executiva consultor — ROI, script CFO, Tier 1 |
+| [`pesquisa/01-matriz-competitiva.md`](../pesquisa/01-matriz-competitiva.md) | Bibi × Conexa, Vitta, Alice, Pipo, Feegow, iClinic, etc. |
+| [`pesquisa/09-sintese-consultor-senior.md`](../pesquisa/09-sintese-consultor-senior.md) | Síntese executiva consultor — ROI, script CFO, Tier 1 |
 | [`FLUXOS.md`](../produto/FLUXOS.md) | Fluxos detalhados de cada ação |
-| [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) | Jornada UX nos 4 portais e backlog priorizado |
+| [`JORNADA_CLIENTE.md`](../produto/JORNADA_CLIENTE.md) | Jornada UX nos 4 portais e backlog priorizado |
 | [`NOTEBOOKLM.md`](NOTEBOOKLM.md) | Tiers 1–4 e épicos |
 | [`ARQUITETURA.md`](ARQUITETURA.md) | Diagramas técnicos |
 | [`PAYMENTS.md`](PAYMENTS.md) | Motor de cobrança vs mercado |

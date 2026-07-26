@@ -17,10 +17,10 @@ trap 'rm -f "$ADMIN" "$OP" "$PREST" "$ALANA" "$OP2" "$ALANA2"' EXIT
 
 echo "=== 1. Home / versão ==="
 curl -sS "$BASE/" -o /tmp/cedig-home.html
-if python3 -c 'from pathlib import Path; assert "2.4.0" in Path("/tmp/cedig-home.html").read_text()'; then
-  note "home v2.4.0"
+if python3 -c 'from pathlib import Path; assert "3.0.0" in Path("/tmp/cedig-home.html").read_text()'; then
+  note "home v3.0.0"
 else
-  fail "home sem v2.4.0"
+  fail "home sem v3.0.0"
 fi
 CSS=$(python3 -c 'import re; from pathlib import Path; m=re.findall(r"/_next/static/[^\"]+\.css", Path("/tmp/cedig-home.html").read_text()); print(m[0] if m else "")')
 CODE=$(curl -sS -o /dev/null -w "%{http_code}" "$BASE$CSS")

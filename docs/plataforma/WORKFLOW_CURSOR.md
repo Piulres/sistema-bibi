@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (25/07/2026):** **v2.6.0** — deploy `6a6534e9` @ `579f686` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+**Produção (25/07/2026):** **v3.0.0** — deploy `6a654c88` @ `e30fc70` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ---
 
@@ -39,10 +39,15 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 ```bash
 cp .env.example .env          # se não existir
 npm install
+# Dev simples (dev.db):
 npm run db:push && npm run db:seed
+# Dual-store (demo.db + operation.db) — recomendado:
+# npm run db:bootstrap:demo
+# CEDIG local (?tenant=cedig → operation): ./scripts/cedig-mapear.sh
 ```
 
-> Agentes: `npm run db:reset` é **bloqueado**. Use `db:push && db:seed`.
+> Agentes: `npm run db:reset` é **bloqueado**. Use `db:push && db:seed` ou `db:bootstrap:demo`.  
+> Dual-store / CEDIG: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md).
 
 ---
 
