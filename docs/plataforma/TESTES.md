@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **572** casos Vitest (80 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~160** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **587** casos Vitest (80 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~160** Route Handlers · **123** paths no OpenAPI.
 
 ### Onboarding tour (v3)
 

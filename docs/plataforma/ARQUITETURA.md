@@ -828,7 +828,7 @@ flowchart LR
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/openapi.yaml).
 
-| Métrica | Valor (v3.0.4) |
+| Métrica | Valor (v3.0.5) |
 |---------|----------------|
 | Route Handlers | **160** em `src/app/api/**/route.ts` |
 | Paths OpenAPI | **123** (sync automático) |

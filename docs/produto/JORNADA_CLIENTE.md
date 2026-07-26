@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.5** na `main` (produção **v3.0.4** até deploy confirmado) — labels por tenant, landing segmentada, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.5** (base multi-nicho desde v2.0) — jornada faturada no prestador, labels por tenant, landing segmentada, documentos clínicos estruturados.
 
 ---
 
