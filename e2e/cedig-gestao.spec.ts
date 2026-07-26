@@ -88,4 +88,30 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
       timeout: 20_000,
     });
   });
+
+  test("gestão clínica não estoura horizontal no mobile", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await loginAs(page, "interno", "alana@cedig.demo", "bibi123", "cedig");
+    await page.goto("/interno/gestao");
+    await expect(page.getByRole("heading", { name: /Gestão clínica/i })).toBeVisible({
+      timeout: 20_000,
+    });
+    await expect(page.getByText(/Carregando gestão clínica/i)).toHaveCount(0, {
+      timeout: 20_000,
+    });
+
+    const root = page.locator('[data-cursor-id="clinic-finance-root"]');
+    await expect(root).toBeVisible();
+    await expect(page.getByRole("button", { name: /Registrar lançamento/i })).toBeVisible();
+    await expect(page.getByLabel(/Nome do paciente/i)).toBeVisible();
+
+    const overflow = await page.evaluate(() => {
+      const doc = document.documentElement;
+      return {
+        scrollWidth: doc.scrollWidth,
+        clientWidth: doc.clientWidth,
+      };
+    });
+    expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+  });
 });
