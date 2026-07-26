@@ -1,0 +1,27 @@
+---
+description: Fechamento de pacote, RELEASES.md, changelog da landing, platform.ts e docs:verify no ServiceOS.
+globs:
+  - "docs/versoes/**"
+  - "src/lib/landing/changelog-content.ts"
+  - "src/lib/platform.ts"
+  - "docs/plataforma/LANDING_CHANGELOG.md"
+alwaysApply: false
+---
+
+# Docs e release — ServiceOS
+
+Referências: `docs/plataforma/LANDING_CHANGELOG.md` · `.cursor/rules/netlify-release.mdc` · skill `references/release-package.md`
+
+## Quando atualizar
+
+| Evento | Arquivos |
+|--------|----------|
+| Fechar pacote (pós-deploy confirmado) | `docs/versoes/RELEASES.md`, `src/lib/landing/changelog-content.ts`, `src/lib/platform.ts` |
+| Mudar fluxo deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, `OPERACOES.md` |
+
+## Regras
+
+- **Não** marcar publicado em `RELEASES.md` sem deploy confirmado pelo humano
+- Validar: `npm run docs:verify`
+- Não criar `FASE_N` / `GO_LIVE_*` — usar `STATUS.md` do domínio
+- Versão canônica UI: `src/lib/platform.ts` → `PLATFORM.release`

@@ -20,10 +20,11 @@
 
 | Skill | Quando usar |
 |-------|-------------|
-| [`.cursor/skills/serviceos-dev-quality/SKILL.md`](../../.cursor/skills/serviceos-dev-quality/SKILL.md) | **Obrigatório** — feature, bugfix, testes, refatoração, análise de desempenho; `/serviceos-dev-quality` |
+| [`.cursor/skills/serviceos-dev-quality/SKILL.md`](../../.cursor/skills/serviceos-dev-quality/SKILL.md) | **Obrigatório** — feature, bugfix, testes, refatoração; `/serviceos-dev-quality` |
+| References por domínio | `references/crud-entity.md`, `cedig-clinic.md`, `billing-pix.md`, `auth-tenant.md`, `release-package.md` |
 | Checklist | [`.cursor/skills/serviceos-dev-quality/references/CHECKLIST.md`](../../.cursor/skills/serviceos-dev-quality/references/CHECKLIST.md) |
 
-A rule always-on `.cursor/rules/serviceos-agent-skill.mdc` aponta para esse skill em toda sessão.
+Router always-on: `.cursor/rules/router.mdc` · Validar config: `npm run cursor:verify`
 
 ---
 
@@ -42,7 +43,7 @@ A rule always-on `.cursor/rules/serviceos-agent-skill.mdc` aponta para esse skil
 1. **`AGENTS.md`** — glossário, credenciais, stack, segmentos
 2. **`docs/versoes/V2_0.md`** — escopo v2.0
 3. **`docs/segmentos/README.md`** — roteamento `?tenant=` e demos por vertical
-4. **`.cursor/rules/serviceos-dev.mdc`** — invariantes ServiceOS em código
+4. **`.cursor/rules/router.mdc`** + **`.cursor/rules/serviceos-dev.mdc`** — router e invariantes ServiceOS
 
 ---
 

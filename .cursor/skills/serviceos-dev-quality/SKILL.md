@@ -1,136 +1,77 @@
 ---
 name: serviceos-dev-quality
 description: >-
-  Fluxo obrigatório de qualidade para qualquer feature, bugfix, refatoração
-  ou skill nova no Sistema Bibi - ServiceOS. Use em implementação de lógica,
-  correção de erros, testes unitários, limpeza de código, análise de desempenho,
-  design patterns, integração com APIs e algoritmos. Aplique em todo trabalho
-  de código neste repositório.
+  Fluxo obrigatório de qualidade para feature, bugfix, refatoração ou testes
+  no Sistema Bibi - ServiceOS. Router para references por domínio (CRUD,
+  CEDIG, PIX, auth tenant, release). Use /serviceos-dev-quality em todo
+  trabalho de código neste repositório.
 ---
 
-# ServiceOS — skill de qualidade para agentes
+# ServiceOS — skill de qualidade
 
 Atue como engenheiro sênior no **Sistema Bibi - ServiceOS** (Next.js 16, React 19, Prisma 6, Vitest, Playwright).
 
-Leia primeiro (nesta ordem, só o necessário):
+## Leitura inicial (só o necessário)
 
-1. `AGENTS.md`
-2. `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md`
-3. `.cursor/rules/operacoes-bibi.mdc` (branches, lint, proibido deploy)
-4. Domínio tocado (ex.: `docs/clientes/cedig/`, `docs/segmentos/`, `docs/plataforma/`)
+1. `AGENTS.md` (índice)
+2. `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md` (features novas)
+3. Domínio tocado — tabela abaixo
 
-Checklist resumido: [references/CHECKLIST.md](references/CHECKLIST.md)
+Checklist: [references/CHECKLIST.md](references/CHECKLIST.md)
 
----
+## References por domínio
 
-## Quando usar
+| Domínio | Reference |
+|---------|-----------|
+| CRUD / entidade nova | [crud-entity.md](references/crud-entity.md) |
+| CEDIG / gestão clínica | [cedig-clinic.md](references/cedig-clinic.md) |
+| PIX / faturamento | [billing-pix.md](references/billing-pix.md) |
+| Login tenant/portal | [auth-tenant.md](references/auth-tenant.md) |
+| Fechar pacote | [release-package.md](references/release-package.md) |
 
-- Nova funcionalidade / “skill” de produto
-- Bugfix ou “identifique e corrija os erros”
-- Pedido de testes unitários / e2e
-- Refatoração (“mais limpo, eficiente, legível”)
-- Análise de desempenho / escalabilidade / organização
-- Integração com API interna (`/api/...`) ou adapter externo
+## Fluxo (5 passos)
 
----
+### 1) Diagnosticar
 
-## Fluxo obrigatório (5 passos)
+Reproduza → causa raiz → explique em 2–4 frases → escopo mínimo.
 
-### 1) Diagnosticar antes de codificar
+### 2) Implementar (padrões do repo)
 
-- Reproduza o sintoma (teste, curl local, UI).
-- Localize causa raiz (não só o sintoma).
-- Explique em 2–4 frases: **o que quebrava**, **por quê**, **o que corrige**.
-- Escopo mínimo: não refatore arquivos não relacionados.
-
-### 2) Implementar com padrões do projeto
-
-Escolha o padrão que já existe no repo (não invente framework):
-
-| Situação | Padrão / local canônico |
-|----------|-------------------------|
-| Precificação / tabelas | Funções puras em `src/lib/...` + testes Vitest |
-| Auth / RBAC | `requireInternoModule` / `requireInternoModuleWrite` / `api-auth.ts` |
-| UI autenticada | `useLabels()` · `PortalShell` · pages só `PageHeader` + view |
-| Persistência | Prisma 6 em `service`/`route` — sem Prisma 7 |
+| Situação | Local |
+|----------|-------|
+| Lógica pura | `src/lib/...` + Vitest |
+| Auth / RBAC | `requireInternoModule` / `api-auth.ts` |
+| UI autenticada | `useLabels()` · `PortalShell` · `PageHeader` + view |
+| Persistência | Prisma 6 — sem v7 |
 | Segmento | `?tenant=` · `bibi_segment` · `src/lib/segment/` |
-| Export | `TabularExport` + `serveTabularExport` |
-| Pagamentos | adapters em `src/lib/payments/` (`PAYMENT_GATEWAY=mock`) |
 
-Algoritmos: prefira complexidade clara (O(n) / O(n log n)); evite N+1 Prisma — use `include`/`select` e batch.
+Rules escopadas: `.cursor/rules/stack-nextjs.mdc` · `serviceos-dev.mdc` · `tests.mdc`
 
-### 3) Qualidade do código
+### 3) Qualidade
 
-Ao escrever ou reescrever:
+Early return · sem `any` desnecessário · ESLint (`set-state-in-effect` = IIFE async) · **nunca** hardcodar labels de nicho.
 
-- Nomes explícitos; funções pequenas; early return.
-- Comentários só onde a intenção não é óbvia (ponte de domínio, invariante de negócio).
-- Sem `any` desnecessário; tipar inputs/outputs públicos.
-- Respeitar ESLint (`react-hooks/set-state-in-effect` = IIFE async, não `setState` síncrono no effect).
-- **Nunca** hardcodar “Paciente/Consulta/Beneficiário” em portais — use `useLabels()` / `getTenantLabelsById`.
+### 4) Testes
 
-### 4) Testes (obrigatório para lógica nova)
-
-| Tipo | Onde | Quando |
-|------|------|--------|
-| Unitário puro | `tests/unit/*.test.ts` | Helpers, pricing, mappers, RBAC |
-| Integração DB | `tests/unit/*-integration.test.ts` | Serviços que usam Prisma (massa seed) |
-| API / fluxo | `tests/api/` ou e2e | Contratos críticos |
-| E2E | `e2e/*.spec.ts` | Jornada multi-portal / piloto cliente |
-| **CRUD matrix** | `tests/lib/crud-coverage-registry.ts` + `tests/api/system-crud-matrix.test.ts` | Nova entidade no mapa → registry + teste API obrigatório |
-
-**Domínios com docs canônicas:**
-
-| Domínio | Onde ler antes de codar |
-|---------|-------------------------|
-| CEDIG / gestão clínica | `docs/clientes/cedig/STATUS.md` · `src/lib/clinic-finance/bridge.ts` |
-| Login tenant/portal | `docs/versoes/V2_5.md` · `src/lib/auth/login-access.ts` · `src/lib/segment/auth.ts` |
-| Matriz CRUD | `src/lib/crud-operations-map.ts` · `docs/plataforma/TESTES.md` §Matriz CRUD |
-
-Rodar o mínimo relevante:
+Vitest (não Jest) · E2E Playwright · CRUD → ver [crud-entity.md](references/crud-entity.md)
 
 ```bash
 npm run lint
 npx vitest run path/to/test.ts
-npm run docs:verify   # se mexeu em docs/version/changelog
+npm run docs:verify   # se versão/changelog/docs
 ```
 
-Não inventar Jest — o projeto usa **Vitest**. E2E = **Playwright**.
+### 5) Entrega
 
-### 5) Integração, docs e entrega
-
-- API route: auth + validação + status HTTP coerentes; erros com mensagem útil.
-- Documentar parâmetros/retorno em JSDoc da função pública ou em `docs/` do domínio.
-- Branch `cursor/<nome>-5f67` → PR → **`dev`** (nunca `main` direto).
-- **Proibido** sem pedido explícito: `netlify deploy`, `db:reset`, loops em produção.
-- Validar local: `npm run dev` / smoke do fluxo; `pre-release` só ao fechar pacote.
-- Docs vivas: atualizar `STATUS.md` do domínio / `RELEASES.md` — ver `docs/plataforma/DOCUMENTACAO.md`. Não criar `FASE_N` / `GO_LIVE_*`.
-
----
-
-## Prompt-mestre (copie mentalmente em cada feature)
-
-> Atue como desenvolvedor especialista em TypeScript/Next.js neste repo ServiceOS.  
-> Implemente **[feature]** de forma modular (padrão já usado no projeto), com algoritmo eficiente onde houver processamento, integração segura às rotas/APIs internas, documentação clara e testes Vitest.  
-> Explique causa raiz se for bugfix. Não altere deploy/infra. Use `useLabels()` em UI autenticada. PR para `dev`.
-
----
+- Branch `cursor/<nome>-<suffix>` → PR → **`dev`**
+- Proibido sem pedido: `netlify deploy`, `db:reset`, loops produção
+- Handoff: o que mudou · causa raiz · como validar · riscos
 
 ## Anti-patterns
 
 | Evitar | Fazer |
 |--------|-------|
-| HealthOS / só-saúde em copy nova | ServiceOS + segmento (`MEDICAL`, …) |
-| Refatoração cosmética sem teste | Teste que trava a regressão |
-| Novo framework de state/DI | Seguir `service` + route + view |
-| Deploy “para validar” | Validar local / `pre-release` |
-| Duplicar docs longos no chat | Referenciar `docs/` |
-
----
-
-## Saída esperada no PR / handoff
-
-1. O que mudou (1 parágrafo)  
-2. Causa raiz (se bug)  
-3. Como validar (comandos + fluxo)  
-4. Riscos / fora de escopo  
+| HealthOS em copy nova | ServiceOS + segmento |
+| Refatoração sem teste | Teste de regressão |
+| Deploy para validar | `npm run dev` / `pre-release` |
+| Duplicar docs no chat | Referenciar `docs/` |

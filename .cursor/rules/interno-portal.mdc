@@ -1,0 +1,17 @@
+---
+description: Portal interno ServiceOS — RBAC, InternoNav, gestão clínica, cadastros CRUD e padrão PageHeader + view.
+globs:
+  - "src/app/interno/**"
+  - "src/lib/interno-*"
+  - "src/components/interno/**"
+alwaysApply: false
+---
+
+# Portal interno
+
+Ver também: `src/app/interno/AGENTS.md`
+
+- RBAC: `requireInternoModule` / `requireInternoModuleWrite`
+- Pages: só `PageHeader` + view (shell no `layout.tsx`)
+- Gestão clínica: condicional MEDICAL/DENTAL em `/interno/gestao`
+- Labels: `useLabels()` — nunca strings fixas de paciente/procedimento
