@@ -1,0 +1,35 @@
+---
+description: Convenções de testes Vitest e Playwright no ServiceOS — dual-store, E2E, matriz CRUD, sem Jest.
+globs:
+  - "tests/**"
+  - "e2e/**"
+  - "vitest.config.*"
+  - "playwright.config.*"
+alwaysApply: false
+---
+
+# Testes — ServiceOS
+
+Referências: `docs/plataforma/TESTES.md` · skill `references/CHECKLIST.md`
+
+## Stack
+
+- **Unitário / integração:** Vitest (`tests/unit/`, `tests/api/`, `tests/lib/`)
+- **E2E:** Playwright (`e2e/*.spec.ts`) — **não** usar Jest
+- Nova entidade CRUD: ver `references/crud-entity.md` no skill de qualidade
+
+## Comandos
+
+```bash
+npx vitest run tests/unit/<arquivo>.test.ts
+npm run test:e2e          # Playwright sobe servidor na 3100
+npm run lint
+```
+
+## Gotchas obrigatórios
+
+1. **Pare `npm run dev`** antes de `npm run test:e2e` (Next 16 = um dev server por projeto)
+2. **Playwright:** `npx playwright install chromium` uma vez por VM
+3. **Dual-store pós-teste:** se login falhar com `table main.User does not exist` → `npm run setup` ou `rm -f prisma/.data-store-mode prisma/operation.db`
+4. **ESLint em componentes de teste:** sem `setState` síncrono em `useEffect` — IIFE async
+5. E2E interno: escopar nav com `getByRole('navigation', { name: 'Navegação por abas' })`
