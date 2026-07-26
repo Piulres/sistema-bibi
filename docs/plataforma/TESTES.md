@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~160** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~163** Route Handlers · **123** paths no OpenAPI. Revalidar com `npx vitest run` após adicionar testes.
 
 ### Onboarding tour (v3)
 
@@ -65,7 +65,7 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 
-Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônicos, BOM UTF-8 via `arrayBuffer`) · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ tabular).
+Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônicos, BOM UTF-8 via `arrayBuffer`, TXT pipe-delimited) · `tests/unit/interchange.test.ts` (dataset canônico CSV/JSON) · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ tabular).
 
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
 
@@ -352,7 +352,7 @@ Padrão para testar a nav redesenhada (v3.0.6) sem duplicar lógica do menu **Ma
 
 **Pitfall:** módulos `priority: "secondary"` não aparecem na faixa até serem abertos pelo menu **Mais**; após navegação, a aba ativa fica pinada na faixa (`mobile-nav.spec.ts`).
 
-**Pitfall (drawer prestador, v3.0.7):** categorias (`group`) usam `<p>` para o rótulo e `<a>` para o módulo — o mesmo texto (ex.: "Agenda") aparece duas vezes. Use `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para clicar; `getByText("Agenda")` falha em strict mode. Gatilho: `[data-cursor-id="mobile-nav-trigger"]`; painel `role="dialog"` à direita (`boundingBox`). Ver `e2e/mobile-nav.spec.ts`.
+**Pitfall (drawer prestador, v3.0.7):** categorias (`group`) usam `<p>` para o rótulo e `<a>` para o módulo — o mesmo texto (ex.: "Agenda") aparece duas vezes. Use `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para clicar; `getByText("Agenda")` falha em strict mode. Gatilho: `[data-tour-id="mobile-nav-trigger"]` (tour onboarding — **não** `data-cursor-id`); painel `role="dialog"` à direita (`boundingBox`). Ver `e2e/mobile-nav.spec.ts`.
 
 **Contrato aria-label por portal** (Prestador, Beneficiário, PJ): [`produto/ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Navegação → Contrato a11y para E2E.
 

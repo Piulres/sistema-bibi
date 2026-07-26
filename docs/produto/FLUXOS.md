@@ -476,9 +476,11 @@ Motor unificado para relatórios e listagens nos portais.
 | Camada | Arquivo | Papel |
 |--------|---------|-------|
 | UI | `ExportButtons.tsx` | Botões por formato; query `?format=` no `baseUrl` |
+| Tipos | `src/lib/exports/tabular-types.ts` | `TabularExport` / `TabularColumn` — contrato entre builders e servidor |
 | Formatos | `src/lib/exports/format.ts` | `EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, `REPORT_EXPORT_FORMATS` |
 | Builders | `src/lib/exports/builders.ts` | Monta `TabularExport` por domínio (PJ, auditoria, faturamento, …) |
 | Servidor | `src/lib/exports/serve.ts` | `serveTabularExport()` — CSV com BOM UTF-8, JSON, TXT, PDF tabular, XLSX |
+| TXT | `src/lib/exports/text.ts` | `buildTxtFromTabular` — colunas separadas por ` \| ` |
 | Intercâmbio | `src/lib/imports/interchange.ts` | Dataset canônico compartilhado com import CSV/JSON |
 
 **Query comum:** `?format=pdf|csv|json|txt|xlsx` (fallback por rota em `parseExportFormat`).

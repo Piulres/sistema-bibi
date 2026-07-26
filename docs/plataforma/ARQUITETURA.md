@@ -770,8 +770,10 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 | Camada | Arquivo | Papel |
 |--------|---------|-------|
 | UI | `ExportButtons.tsx` | Links `?format=` por portal |
+| Tipos | `exports/tabular-types.ts` | `TabularExport`, `TabularColumn` — contrato entre builders e `serveTabularExport` |
 | Formatos | `exports/format.ts` | `REPORT_EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, MIME types |
 | Servidor | `exports/serve.ts` | `serveTabularExport`, `serveBufferExport` |
+| TXT | `exports/text.ts` | `buildTxtFromTabular` — tabela pipe-delimited legível |
 | CSV | `imports/interchange.ts` | BOM UTF-8 + colunas canônicas |
 | Builders | `exports/builders.ts` | Datasets por domínio (billing, CRM, auditoria…) |
 

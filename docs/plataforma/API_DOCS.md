@@ -287,7 +287,7 @@ Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de
 |----------|------|------------|
 | `csv` | `text/csv; charset=utf-8` | Planilhas, ERP (BOM UTF-8) |
 | `json` | `application/json` | Integração, dataset canônico |
-| `txt` | `text/plain` | Leitura humana tabular |
+| `txt` | `text/plain` | Leitura humana — tabela pipe-delimited (`buildTxtFromTabular` em `exports/text.ts`) |
 | `pdf` | `application/pdf` | Impressão / arquivo |
 | `xlsx` | Excel OpenXML | Listagens internas (`LIST_EXPORT_FORMATS`) |
 
