@@ -373,7 +373,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | KPIs | `GET /api/interno/clinic-finance/kpis` | Dashboard da gestão |
 | Export mensal | `GET /api/interno/clinic-finance/export?format=` | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` |
 
-**Mobile (v3.0.7):** colunas extras e ações empilham em coluna (`flex-col`) abaixo de `md` — ver `ClinicFinanceView.tsx`.
+**Mobile (v3.0.7):** abaixo de `md` (`< 768px`), a lista de lançamentos usa **cards** (`md:hidden`) em vez da tabela (`hidden md:block`); formulários e filtros empilham em coluna (`flex-col`). Em desktop, tabela completa com scroll horizontal (`ds-scroll-x`). Ver `ClinicFinanceView.tsx`.
 
 **Ponte automática (v2.6):** ao registrar lançamento, `src/lib/clinic-finance/bridge.ts` cria ou vincula `Patient`, `Appointment`, `ProcedureUsage` e `Invoice`. Estados: `bridgeStatus` = `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`.
 
