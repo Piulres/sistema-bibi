@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import Card from "@/components/ui/Card";
 import StatCard from "@/components/ui/StatCard";
-import CalloutCard from "@/components/ui/CalloutCard";
+import Alert from "@/components/ui/Alert";
 import SectionHeader from "@/components/ui/SectionHeader";
 import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
@@ -129,18 +129,15 @@ export default function ExecutiveDashboardView() {
             </Button>
           </div>
 
-          <CalloutCard
-            variant="info"
-            title="Fonte dos números"
-            description="Lançamentos e despesas do piloto ficam em Gestão clínica. Este painel resume PPU e CRM — exames lançados também geram fatura aqui, sem somar a receita operacional duas vezes."
-            data-cursor-id="dashboard-gestao-hint"
-          >
-            <Link href="/interno/gestao">
-              <Button variant="portal" size="sm">
-                Abrir gestão clínica
-              </Button>
+          <Alert tone="info" data-cursor-id="dashboard-gestao-hint" className="flex flex-wrap items-center justify-between gap-2">
+            <p className="min-w-0 flex-1 text-[var(--text-secondary)]">
+              <span className="font-medium text-[var(--text-primary)]">Fonte dos números · </span>
+              Lançamentos e despesas ficam em Gestão clínica; este painel resume PPU e CRM (sem somar a receita operacional duas vezes).
+            </p>
+            <Link href="/interno/gestao" className="ds-touch-link shrink-0">
+              Gestão clínica →
             </Link>
-          </CalloutCard>
+          </Alert>
 
           <section>
             <SectionHeader
@@ -204,6 +201,18 @@ export default function ExecutiveDashboardView() {
                 </span>
               </li>
             </ul>
+
+            <nav className="mt-4 flex flex-wrap gap-2" aria-label="Acesso rápido">
+              {quickLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="inline-flex min-h-10 items-center rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] px-3.5 text-sm font-medium text-[var(--text-secondary)] transition hover:border-[var(--portal-accent)] hover:text-[var(--portal-accent)]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </section>
 
           {dashboard.clinicFinance && (
@@ -414,20 +423,6 @@ export default function ExecutiveDashboardView() {
             )}
           </section>
 
-          <section>
-            <SectionHeader title="Acesso rápido" />
-            <nav className="mt-3 flex flex-wrap gap-2" aria-label="Acesso rápido">
-              {quickLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="inline-flex min-h-10 items-center rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] px-3.5 text-sm font-medium text-[var(--text-secondary)] transition hover:border-[var(--portal-accent)] hover:text-[var(--portal-accent)]"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
-          </section>
         </div>
       )}
     </ViewStateBoundary>
