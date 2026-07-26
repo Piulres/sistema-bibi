@@ -35,6 +35,7 @@ ver [`../plataforma/HISTORICO_2026-06-21.md`](../plataforma/HISTORICO_2026-06-21
 12. [Observações da POC](#12-observações-da-poc)
 
 Jornada do cliente (UX, gaps e melhorias por portal): [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md).  
+Narrativa operacional no consultório (todas as ramificações): [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md).  
 Auditoria de falhas (segurança, RBAC API, bugs de fluxo): [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md).
 
 ---
@@ -606,6 +607,8 @@ sequenceDiagram
 3. **Faturar** — interno agrupa usages não faturados → `Invoice` FECHADA.
 4. **Cobrar** — PIX mock ou marcação manual → `Invoice` PAGA.
 5. **Acompanhar** — beneficiário (self-service) e PJ (corporativo).
+
+**Narrativa operacional (todas as ramificações):** [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md) — chegada → agenda → atendimento → fechamento com pagamento e anexos.
 
 ---
 
