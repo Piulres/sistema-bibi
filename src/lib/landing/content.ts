@@ -2,7 +2,7 @@ import { PLATFORM } from "@/lib/platform";
 
 export const LANDING_STATS = [
   { value: "~87%", label: "economia vs. plano fechado", suffix: "" },
-  { value: "6", label: "segmentos na mesma plataforma", suffix: "" },
+  { value: "7", label: "segmentos na mesma plataforma", suffix: "" },
   { value: "4", label: "portais integrados", suffix: "" },
   { value: "Price Snapshot", label: "preço congelado no atendimento", suffix: "" },
 ] as const;

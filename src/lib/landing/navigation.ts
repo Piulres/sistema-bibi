@@ -6,11 +6,12 @@ export type LandingNavItem = {
   external?: boolean;
 };
 
-/** Âncoras da home — menu enxuto (seções ROI/comparativo/para-quem seguem na página). */
+/** Âncoras da home — menu enxuto alinhado ao funil comercial. */
 export const HOME_NAV_ANCHORS: LandingNavItem[] = [
   { href: "#solucao", label: "Solução" },
-  { href: "#demo-video", label: "Demo" },
+  { href: "#como-funciona", label: "Como funciona" },
   { href: "#segmentos", label: "Segmentos" },
+  { href: "#demo-video", label: "Demo" },
   { href: "#portais", label: "Portais" },
   { href: "#contato", label: "Contato" },
   { href: "#faq", label: "FAQ" },

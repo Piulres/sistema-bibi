@@ -8,8 +8,9 @@ describe("landing navigation (home)", () => {
     const labels = HOME_NAV_ANCHORS.map((item) => item.label);
     expect(labels).toEqual([
       "Solução",
-      "Demo",
+      "Como funciona",
       "Segmentos",
+      "Demo",
       "Portais",
       "Contato",
       "FAQ",
