@@ -4,9 +4,10 @@ Mapeamento de **falhas e lacunas** nos fluxos de usuário dos quatro portais do
 Sistema Bibi - ServiceOS, com evidências de código, testes automatizados e validação manual
 via API.
 
-> **Nota v2.0:** migração para `useLabels()` está **parcial** — várias strings fixas
-> ("Paciente", "Beneficiário") permanecem em `routes.ts`, breadcrumbs e APIs.
-> Ver backlog em [`../versoes/V2_0.md`](../versoes/V2_0.md) §7.
+> **Nota v2.0 / v3.0.1:** migração para `useLabels()` nas **views e breadcrumbs**
+> dos portais foi ampliada no pacote **3.0.1** (ver [`../versoes/V3_0.md`](../versoes/V3_0.md)).
+> Strings fixas ainda podem aparecer em `src/lib/navigation/routes.ts` (labels de nav)
+> e em pontos do backlog v2.0 §7.
 
 **Rodadas de auditoria:**
 
@@ -17,6 +18,7 @@ via API.
 | 3 | 2026-07-26 | `0c9d800` (v3.0.0) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **3.3 (release)** | **2026-07-26** | `daf690e` (v3.0.1) | Labels multi-nicho nas views/breadcrumbs (#209); publicado em produção |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -243,7 +245,7 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 |------|------|---------|-------|
 | **Alta (DX)** | Dual-store demo/operação | `tests/lib/data-store-mode.test.ts` | O teste grava `prisma/.data-store-mode=operation` e não restaura; em VM de dev o servidor passa a apontar para `operation.db` (vazio) → login retorna 500 `The table main.User does not exist`. Reproduzido nesta rodada; contornado apagando `prisma/.data-store-mode` + `prisma/operation.db`. Não afeta produção (Blobs), mas quebra o dev local após rodar a suíte |
 | **Média** | `ClinicalCarePanel` | `src/components/clinical/ClinicalCarePanel.tsx` | Vários PATCH (`medications/[id]`, `exam-orders/[id]`, `protocols/[id]`) sem checar `res.ok` → estado inconsistente silencioso se a API falhar |
-| **Média** | Labels hardcoded | `src/lib/navigation/routes.ts`, `ClinicFinanceView.tsx` | Strings fixas "Pacientes"/"Beneficiários"/"Paciente" em nav e gestão clínica — deveriam usar `useLabels()`/`getTenantLabelsById` (backlog v2.0 §7) |
+| **Média** | Labels hardcoded | `src/lib/navigation/routes.ts` | Strings fixas "Pacientes"/"Beneficiários" na config de nav — views principais migraram para `useLabels()` no v3.0.1; `routes.ts` permanece no backlog v2.0 §7 |
 | **Baixa** | Assistente | `src/app/api/assistant/chat/route.ts` | Auth = `requireUser()` (qualquer role); tools filtradas por role no registry. `confirm/route.ts` faz RBAC por ação mas não chama `canInternoWrite` — bypass só se a matriz der módulo de escrita a perfil read-only no futuro |
 | **Baixa** | Segmento público | `src/app/api/segment/persist/route.ts` | POST **sem autenticação** grava cookie de segmento e pode acionar `ensureDataStoreForSegmentAccess`. Intencional para landing multi-nicho, mas sem rate-limit |
 | ~~Baixa~~ ✅ | Ponte clinic-finance | `src/lib/clinic-finance/bridge.ts` | **Verificado (rodada 3.2):** a UI já trata `bridgeStatus` — toast com mensagem por status (SYNCED/PARTIAL/FAILED + `bridgeNote`) e coluna "Ponte" na lista de lançamentos. Retry automático de ponte parcial fica como feature futura |
@@ -255,8 +257,8 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 
 | Fluxo | Cobertura atual | Gap |
 |-------|-----------------|-----|
-| Procedimento em agendamento terminal | Nenhuma | Sem teste que negue POST procedures em `CANCELADO`/`FALTOU` |
-| Máquina de estados appointment | Documentada em FLUXOS §10.1 | Sem enforcement server-side nem teste de transição inválida |
+| Procedimento em agendamento terminal | `appointment-status.ts` + rotas prestador | ✅ Enforcement server-side (v3.0.1) — ampliar testes de negação |
+| Máquina de estados appointment | `appointment-status.ts` + FLUXOS §10.1 | ✅ Enforcement no PATCH (409) — ampliar testes de transição inválida |
 | Pay Per Use E2E na UI | Smoke (agenda prestador) | Fatura + PIX na interface não testados end-to-end |
 | Beneficiário — label consumo | Nenhuma | `billed:false` vs status de fatura não coberto |
 | `ClinicalCarePanel` PATCH sem `res.ok` | Nenhuma | Falha de API em medicação/exame/protocolo não testada |
@@ -285,8 +287,10 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 ### Ambiente (VM nova)
 
 ```bash
-cp .env.example .env
 npm install
+npm run setup   # preferido: .env + db push + seed condicional (idempotente)
+# ou manual:
+cp .env.example .env
 npm run db:push && npm run db:seed   # NÃO usar db:reset (bloqueado p/ agentes)
 npm run dev
 ```
@@ -336,9 +340,9 @@ curl -s -b /tmp/ck.txt -o /dev/null -w "%{http_code}\n" \
 | Matriz RBAC | `src/lib/interno-permissions.ts` |
 | Guard de API interno | `src/lib/api-auth.ts` (`requireInternoModule` / `requireInternoModuleWrite`) |
 | Cobertura RBAC (teste) | `tests/security/rbac-gaps.test.ts` |
-| Máquina de estados esperada | [`FLUXOS.md`](FLUXOS.md) §10.1 |
+| Máquina de estados (implementação) | `src/lib/appointment-status.ts` |
 | Dual-store | `src/lib/data-store-mode.ts`, `src/lib/db.ts` |
 
 ---
 
-*Documento de auditoria — rodada 3 (2026-07-26). Atualizar após correções ou nova rodada de testes.*
+*Documento de auditoria — rodada 3 (2026-07-26). Pacote **v3.0.1** publicado com correções P1–P3 e labels nas views. Atualizar após nova rodada de testes.*

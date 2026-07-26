@@ -67,6 +67,15 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
+**Caminho rápido (v3.0.1):** `tests/helpers/db.ts` grava o marker `prisma/.test-db-ready` com
+fingerprint de `schema.prisma` + `seed.ts` + `prisma/seed-data/`. O `globalSetup` roda
+`db push` + staleness + seed **uma vez** por execução; o `beforeAll` de cada arquivo
+(`tests/setup.ts`) reutiliza o banco sem subprocesso — evita timeout de hook no CI
+(~112s → ~30s na suíte completa). Se o marker estiver desatualizado ou corrompido, apague
+`prisma/.test-db-ready` e `prisma/test.db` para forçar recriação.
+
+**CI (jul/2026):** `.github/workflows/ci.yml` — `actions/checkout@v6` e `actions/setup-node@v6` com **Node 24**.
+
 **Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).
 
 **Mapa completo da massa (perfis, portais, segmentos):** [`MASSA_TESTES.md`](MASSA_TESTES.md) — inclui perfil `operation-1y` (20 clientes, 3–9 usuários PJ, 1 ano).

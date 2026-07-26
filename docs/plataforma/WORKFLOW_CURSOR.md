@@ -30,15 +30,17 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (25/07/2026):** **v3.0.0** — deploy `6a654c88` @ `e30fc70` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+**Produção (26/07/2026):** **v3.0.1** — deploy `6a6594ac` @ `daf690e` (`bibi-poc-2026-07-26a`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ---
 
 ## Setup inicial (uma vez por VM)
 
 ```bash
-cp .env.example .env          # se não existir
 npm install
+npm run setup   # cria .env, prisma db push + seed condicional (idempotente)
+# ou manual:
+cp .env.example .env          # se não existir
 # Dev simples (dev.db):
 npm run db:push && npm run db:seed
 # Dual-store (demo.db + operation.db) — recomendado:

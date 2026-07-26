@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-26 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.0** |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.1** |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.0** |
+| Pacote em produção | ✅ | **v3.0.1** |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 
@@ -94,6 +94,7 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 |------|--------|----------|
 | 2026-07-26 | Docs vivas: status único; removidos FASE_2 / GO_LIVE / HISTORICO / FALHAS fragmentados | ✅ |
 | 2026-07-26 | Mapeamento 4 portais + agenda semana (21 exames, 4 walk-ins, 4 SYNCED) | ✅ KPIs 11.750 / 1.600 / 10.150 |
+| 2026-07-26 | Produção **v3.0.1** · qualidade multi-nicho + regras da agenda | ✅ |
 | 2026-07-25 | Produção **v3.0.0** · modo operação · CEDIG provisionado · PWA `/instalar` | ✅ |
 | 2026-07-25 | Homologação gestão C1–C4 + correção falhas (labels, walk-in demo, RBAC, Blob) | ✅ |
 | 2026-07-25 | Pacote v2.6.0 — pontes PPU + login tenant/portal | ✅ (sucedido por v3.0.0) |

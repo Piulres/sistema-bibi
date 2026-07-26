@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.0** em produção (jul/2026): PWA `/instalar` + vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v3.0.1** em produção (jul/2026): PWA `/instalar` + vocabulário por nicho via `useLabels()` (views e breadcrumbs alinhados no pacote 3.0.1) — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -688,6 +688,15 @@ stateDiagram-v2
 ```
 
 `CANCELADO` / `FALTOU` liberam slot (`scheduling-service.ts`).
+
+**Implementação (v3.0.1):** módulo puro `src/lib/appointment-status.ts` — usado no servidor
+(PATCH prestador/interno, POST de procedimento) e no cliente (views de agenda/atendimento).
+
+| Regra | Função / comportamento |
+|-------|------------------------|
+| Transição válida | `canTransitionAppointmentStatus(from, to)` — estados terminais (`REALIZADO`, `FALTOU`, `CANCELADO`) não saem; `AGENDADO → REALIZADO` é permitido (concluir sem confirmar presença) |
+| Transição inválida | API retorna **409** com mensagem de negócio |
+| Procedimento / cobrança | `canRegisterProcedureForStatus(status)` — bloqueado em `CANCELADO` e `FALTOU` |
 
 Modality: `PRESENCIAL | TELE` — TELE gera `telemedicineUrl`.
 

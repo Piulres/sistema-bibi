@@ -69,7 +69,19 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v3.0.0` — Sistema Bibi - ServiceOS (PWA mobile)
+### `v3.0.1` — Qualidade multi-nicho + regras da agenda
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v3.0.1` @ `daf690e` |
+| **Commit publicado** | `daf690e` (release) · docs deploy `38f47c8` |
+| **Doc** | [`V3_0.md`](V3_0.md) |
+| **Inclui** | Labels `useLabels()` nas views/breadcrumbs · máquina de estados appointment (`appointment-status.ts`) · guards beneficiário · feedback 403/erro · `npm run setup` · CI Node 24 + fast path `test.db` |
+| **Publicado em** | 26/07/2026 — deploy Netlify `6a6594ac` @ `daf690e` (`bibi-poc-2026-07-26a`) |
+
+---
+
+### `v3.0.0` — Sistema Bibi - ServiceOS (PWA mobile) *(substituído por v3.0.1)*
 
 | Campo | Valor |
 |-------|-------|
@@ -284,7 +296,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.0` em produção** — PWA / app shell mobile |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.1` em produção** — qualidade multi-nicho + PWA |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
