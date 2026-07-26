@@ -34,6 +34,7 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Obras / Engenharia (`CONSTRUCTION`) | `segmentos/construction/README.md` · `API_DOCS.md` §5.1 (handlers sem OpenAPI) |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |
+| CEDIG reset / publish Blob | `OPERACAO_DADOS.md` §Reset · `clientes/cedig/OPERACAO.md` · `scripts/reset-cedig-transactional.mjs` |
 
 ---
 
