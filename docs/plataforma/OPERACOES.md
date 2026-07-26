@@ -229,11 +229,17 @@ Regras obrigatórias para Cursor, Cloud Agent e assistentes. Implementadas em:
 
 | Arquivo | Ativação | Conteúdo |
 |---------|----------|----------|
-| `.cursor/rules/operacoes-bibi.mdc` | Always apply | Operações core, token budget, matriz de decisão |
-| `.cursor/rules/netlify-release.mdc` | Inteligente (deploy/release) | Netlify, deploy com build, cota, checklist publicação |
+| `.cursor/rules/router.mdc` | **Always apply** (único) | Router mínimo — aponta rules/skills por tarefa |
+| `.cursor/rules/operacoes-bibi.mdc` | Inteligente | Operações core, token budget, matriz de decisão |
+| `.cursor/rules/serviceos-dev.mdc` | Globs `src/**`, `docs/**` | Labels, segmentos, nomenclatura v3 |
 | `.cursor/rules/stack-nextjs.mdc` | Globs `src/**`, `prisma/**` | Next 16, Prisma 6, ESLint, UI |
+| `.cursor/rules/tests.mdc` | Globs `tests/**`, `e2e/**` | Vitest, Playwright, gotchas dual-store |
+| `.cursor/rules/docs-release.mdc` | Globs versão/changelog | RELEASES, changelog landing, platform.ts |
+| `.cursor/rules/interno-portal.mdc` | Globs `src/app/interno/**` | RBAC, InternoNav, gestão clínica |
+| `.cursor/rules/netlify-release.mdc` | Globs `netlify.toml`, scripts | Deploy, cota, checklist publicação |
+| `.cursor/skills/serviceos-dev-quality/` | `/serviceos-dev-quality` | Fluxo qualidade + references por domínio |
 
-Detalhes também em `AGENTS.md`.
+Validar drift: `npm run cursor:verify`. Detalhes também em `AGENTS.md`.
 
 ### 7.1 Sempre fazer
 
@@ -290,7 +296,7 @@ Pedido de validação
 | Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
-| Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |
+| Preferências de IA | `AGENTS.md`, `.cursor/rules/router.mdc`, `.cursor/rules/operacoes-bibi.mdc` |
 | Base RAG / NotebookLM | `NOTEBOOKLM.md` |
 | Auditoria de PRs/deploys | `HISTORICO_2026-06-21.md` ou novo histórico datado |
 
@@ -323,7 +329,9 @@ Pedido de validação
 | [`../produto/JORNADA_CLIENTE.md`](../produto/JORNADA_CLIENTE.md) | Jornada UX nos 4 portais |
 | [`HISTORICO_2026-06-21.md`](HISTORICO_2026-06-21.md) | Auditoria PRs #1–#39 |
 | [`evidencias/README.md`](../evidencias/README.md) | Vídeos e screenshots |
-| [`../../AGENTS.md`](../../AGENTS.md) | Instruções para IA |
-| [`../../.cursor/rules/operacoes-bibi.mdc`](../../.cursor/rules/operacoes-bibi.mdc) | Regras core (always apply) |
-| [`../../.cursor/rules/netlify-release.mdc`](../../.cursor/rules/netlify-release.mdc) | Deploy e release (ativação inteligente) |
-| [`../../.cursor/rules/stack-nextjs.mdc`](../../.cursor/rules/stack-nextjs.mdc) | Stack e código (`src/**`) |
+| [`../../AGENTS.md`](../../AGENTS.md) | Instruções para IA (índice) |
+| [`../../.cursor/rules/router.mdc`](../../.cursor/rules/router.mdc) | Router always-on |
+| [`../../.cursor/rules/operacoes-bibi.mdc`](../../.cursor/rules/operacoes-bibi.mdc) | Operações core |
+| [`../../.cursor/rules/netlify-release.mdc`](../../.cursor/rules/netlify-release.mdc) | Deploy e release |
+| [`../../.cursor/rules/stack-nextjs.mdc`](../../.cursor/rules/stack-nextjs.mdc) | Stack e código |
+| [`../../.cursor/skills/serviceos-dev-quality/SKILL.md`](../../.cursor/skills/serviceos-dev-quality/SKILL.md) | Skill de qualidade |

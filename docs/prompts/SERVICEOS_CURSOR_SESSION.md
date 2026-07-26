@@ -13,8 +13,8 @@ Não é HealthOS: saúde é o segmento `MEDICAL`; há também VET, DENTAL, LEGAL
 ## Antes de codificar
 
 1. Ler `AGENTS.md` e `docs/prompts/SERVICEOS_V2_IMPLEMENTATION.md`
-2. Seguir o skill **`/serviceos-dev-quality`** (`.cursor/skills/serviceos-dev-quality/SKILL.md`) — diagnóstico, padrões, testes Vitest, PR → `dev`
-3. Confirmar segmento/tenant: `docs/segmentos/README.md` e `?tenant=` (ex. `petcare`, `horizonte`)
+2. Seguir o skill **`/serviceos-dev-quality`** — router em `.cursor/rules/router.mdc`
+3. Confirmar segmento/tenant: `docs/segmentos/README.md` e `?tenant=` (ex. `petcare`, `cedig`)
 4. Branch `cursor/*` → PR para **`dev`** (nunca `main` direto)
 
 ## Invariantes de produto

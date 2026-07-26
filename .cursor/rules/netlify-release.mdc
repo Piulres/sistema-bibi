@@ -1,5 +1,10 @@
 ---
-description: Deploy, release e Netlify do Sistema Bibi - ServiceOS. Use em tarefas de publicação, produção, cota 503, netlify.toml, CLI deploy ou pacotes fechados.
+description: Deploy, release e Netlify do Sistema Bibi - ServiceOS — publicação manual, pre-release, cota 503 usage_exceeded, netlify.toml, CLI deploy e pacotes fechados.
+globs:
+  - "netlify.toml"
+  - "scripts/netlify*.mjs"
+  - "scripts/pre-release.mjs"
+  - "docs/plataforma/DEPLOY_NETLIFY.md"
 alwaysApply: false
 ---
 
