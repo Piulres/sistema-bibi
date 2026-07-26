@@ -379,12 +379,16 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
     : [...CARE_TABS];
 
   function applyPepTemplate() {
+    // Nested function: TS não preserva o narrowing do `detail &&` externo.
+    if (!detail) return;
+    const appointmentDetail = detail;
+
     if (recordType === "ATESTADO") {
       const validationError = validateAtestadoForm({
         kind: atestadoKind,
-        patientName: detail.patient.name,
+        patientName: appointmentDetail.patient.name,
         days: Number(atestadoDays),
-        startDateLabel: new Date(detail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+        startDateLabel: new Date(appointmentDetail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
         cid: atestadoCid,
         cidAuthorizedByPatient: atestadoCidAuthorized,
       });
@@ -395,9 +399,9 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
     }
 
     const tpl = buildPepTemplate(recordType, {
-      patientName: detail.patient.name,
-      appointmentDate: new Date(detail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
-      patientCpf: detail.patient.cpf,
+      patientName: appointmentDetail.patient.name,
+      appointmentDate: new Date(appointmentDetail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+      patientCpf: appointmentDetail.patient.cpf,
       prescriptionKind: recordType === "RECEITA" ? prescriptionKind : undefined,
       atestadoKind: recordType === "ATESTADO" ? atestadoKind : undefined,
       atestadoDays: Number(atestadoDays) || 1,
