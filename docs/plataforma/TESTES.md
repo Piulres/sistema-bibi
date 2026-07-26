@@ -65,7 +65,7 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 
-Cobertura v3.0.6 nav portais: `e2e/mobile-nav.spec.ts` — drawer nos 4 portais, menu **Mais** no interno desktop, landing mobile menu.
+Cobertura v3.0.6 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais, menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
@@ -325,8 +325,8 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | Módulos interno (nav `INTERNO_NAV_TABS` — **sem** `/interno/gestao`) |
-| `rbac.spec.ts` | RECEPCAO e FATURAMENTO — nav e bloqueios |
+| `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao` |
+| `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 | `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
@@ -334,7 +334,23 @@ Senha única: `bibi123`
 | `api-docs.spec.ts` | Swagger UI `/api-docs` |
 | `flow-improvements.spec.ts` | Melhorias de fluxo multi-portal |
 | `interno-reports.spec.ts` | Relatórios interno |
-| `mobile-nav.spec.ts` | Navegação mobile drawer |
+| `mobile-nav.spec.ts` | Landing drawer + nav responsiva nos 4 portais (drawer `< lg`, menu **Mais** desktop, pin de aba secundária) |
+
+### Helpers E2E — portal nav (`e2e/helpers/auth.ts`)
+
+Padrão para testar a nav redesenhada (v3.0.6) sem duplicar lógica do menu **Mais**:
+
+| Helper | Uso |
+|--------|-----|
+| `internoNav(page)` | Faixa desktop — `getByRole('navigation', { name: 'Navegação por abas' })` |
+| `internoNavDrawer(page)` | Drawer mobile — `getByRole('navigation', { name: 'Módulos internos' })` |
+| `openInternoNav(page)` | Retorna faixa desktop ou abre drawer via gatilho “Navegação” |
+| `expectInternoNavHref(page, href, present)` | Valida link na faixa, no menu **Mais** (`menu` “Mais módulos”) ou no drawer |
+| `portalMain(page)` | Escopo `.portal-page-content` — evita asserts em header/nav ocultos |
+
+**Pitfall:** módulos `priority: "secondary"` não aparecem na faixa até serem abertos pelo menu **Mais**; após navegação, a aba ativa fica pinada na faixa (`mobile-nav.spec.ts`).
+
+Doc de componentes: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · [`produto/ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Navegação.
 
 ---
 
