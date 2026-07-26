@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { isInternoAdmin } from "@/lib/interno-permissions";
 import { voidInvoice } from "@/lib/change-management/invoice-void";
 
@@ -7,7 +7,7 @@ type Params = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("billing");
+    const user = await requireInternoModuleWrite("billing");
     if (!isInternoAdmin(user.role, user.internoProfile)) {
       return NextResponse.json({ error: "Somente administrador pode anular fatura" }, { status: 403 });
     }
