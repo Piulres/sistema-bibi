@@ -486,6 +486,10 @@ sistema-bibi/
 | `npm run build:netlify` | Pipeline de build da Netlify (`setup-database` + `next build`). |
 | `npm run netlify:build` | Alias de `build:netlify` — validar localmente sem publicar. |
 | `npm run netlify:dev` | `netlify dev` — emula Netlify na porta 8888. |
+| `npm run docs:verify` | Valida estrutura docs, marca e changelog landing. |
+| `npm run openapi:verify` | Valida `openapi.yaml` vs Route Handlers (≥115 paths). |
+| `npm run cursor:verify` | Guardrail de drift em `.cursor/` e `AGENTS.md`. |
+| `npm run pre-release` | Gate completo: lint + docs + openapi + db + test + build. |
 
 ## 12. Segurança e LGPD
 

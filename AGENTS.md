@@ -27,7 +27,9 @@ Next.js 16 · React 19 · Prisma **6** · SQLite · Tailwind v4 · Vitest · Pla
 npm run setup    # VM nova: .env + db (idempotente)
 npm run dev      # http://localhost:3000
 npm run lint
-npm run pre-release   # validar pacote (não publica)
+npm run docs:verify     # marca, links e changelog
+npm run openapi:verify  # YAML vs Route Handlers
+npm run pre-release     # validar pacote (não publica)
 ```
 
 **Setup:** `npm run setup` ou `db:push && db:seed` · **`db:reset` bloqueado** para agentes.
