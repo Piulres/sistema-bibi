@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.8** — jornada consultório + reset operacional CEDIG — **publicação em andamento / registrar deploy id abaixo**.
+> Pacote **v3.0.8** — jornada consultório + reset operacional CEDIG **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.8** — deploy `PENDING` @ `PENDING` (`bibi-poc-2026-07-26i`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.8** — deploy `6a668d13` @ `5c94251` (`bibi-poc-2026-07-26i`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG (fluxos zerados; masters intactos) |
-| **Release `main` / `dev`** | **v3.0.8** · `main`/`dev` sincronizadas |
+| **Release `main` / `dev`** | **v3.0.8** · `main`/`dev` sincronizadas · artefato prod `@ 5c94251` |
 | **Pacote anterior em produção** | **3.0.7** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.8** |
 | **Release** | `main` | **v3.0.8** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.8** · deploy `PENDING` · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.8** · deploy `6a668d13` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.8
@@ -42,6 +42,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Dashboard executivo:** hierarquia de KPIs e menos ruído visual.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
+
+### Smoke (26/07/2026) — produção v3.0.8
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.8` · deploy `6a668d13` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (26/07/2026) — produção v3.0.7
 
@@ -123,6 +133,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.8`** | `5c94251` | Jornada consultório + reset operacional CEDIG + docs sync |
 | **`v3.0.7`** | `25385b2` | Drawer mobile direita + dashboard + gestão mobile + exports + E2E/docs sync |
 | **`v3.0.6`** | `ed14233` | Home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) |
 | **`v3.0.5`** | `cf0eb26` | Atendimento clínico + jornada faturada + UX landing/portais (#221/#225–#227) |
