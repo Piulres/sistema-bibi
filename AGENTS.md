@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Sistema Bibi - ServiceOS — guia para agentes
 
-**Versão:** v3.0.2 · **Produção:** `docs/versoes/RELEASES.md` · https://sistema-bibi.netlify.app
+**Versão:** v3.0.3 · **Produção:** `docs/versoes/RELEASES.md` · https://sistema-bibi.netlify.app
 
 Plataforma **multi-segmento** Pay Per Use com **quatro portais** (Prestador, Interno, PJ, Beneficiário). Saúde = segmento `MEDICAL` — não é HealthOS.
 
@@ -66,6 +66,7 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 3. **Prisma 7 quebra** o schema — fixado em v6
 4. **Pós-`npm test`:** dual-store pode quebrar login → `npm run setup`
 5. **E2E:** pare `npm run dev` antes de `test:e2e` (porta 3100)
+6. **Schema-sync operation.db:** Blob congela schema — ver `docs/plataforma/OPERACAO_DADOS.md` §Schema-sync
 
 ## Índice de documentação
 

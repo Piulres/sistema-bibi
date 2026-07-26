@@ -43,6 +43,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
 
+### Conteúdo do pacote v3.0.3
+
+- Flush do `operation.db` no Blob após schema-sync (evita re-migração a cada cold start).
+- UX de erro em `/interno/gestao` (listagem/registro com mensagem útil).
+- Limpeza da operação CEDIG: anamneses duplicadas unificadas; remoção de usuários/massa efêmera de golive/smoke (`scripts/cleanup-operation-test-data.mjs`).
+
+### Conteúdo do pacote v3.0.2
+
+- Hotfix: `src/lib/operation/schema-sync.ts` — migrações aditivas no boot Lambda quando o Blob está defasado em relação ao artefato de build (incidente 500 em `/interno/gestao`).
+
 ### Conteúdo do pacote v3.0.1
 
 - Auditoria de fluxos rodada 3 — correções P1–P3 (#205): máquina de estados do agendamento, guards do beneficiário, feedback de erro, MFA/CRM já endurecidos.
