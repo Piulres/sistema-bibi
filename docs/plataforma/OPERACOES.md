@@ -197,7 +197,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v3.0.0`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + CEDIG em modo operação). Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v3.0.2`** — hotfix schema-sync do `operation.db` (gestão clínica CEDIG). Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -212,7 +212,7 @@ Exemplo atual em produção: **`v3.0.0`** — **Sistema Bibi - ServiceOS** (PWA 
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v3.0.0** · modo **operação** (CEDIG) · Stop builds **ON**  
+**Produção:** https://sistema-bibi.netlify.app · **v3.0.2** · modo **operação** (CEDIG) · Stop builds **ON**  
 **CEDIG:** status [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · operação [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md)  
 **Docs vivas:** [`DOCUMENTACAO.md`](DOCUMENTACAO.md)  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).
@@ -288,6 +288,7 @@ Pedido de validação
 | Fechar pacote em produção | `docs/versoes/RELEASES.md` |
 | Mudar fluxo de deploy | `DEPLOY_NETLIFY.md`, `WORKFLOW_CURSOR.md`, este arquivo |
 | Demo vs operação / dual SQLite | `OPERACAO_DADOS.md`, `VARIAVEIS_AMBIENTE.md` §3 |
+| Schema-sync do `operation.db` (Netlify) | `OPERACAO_DADOS.md` § schema-sync, `V3_0.md`, `DEPLOY_NETLIFY.md` troubleshooting |
 | Nova feature de negócio | `FLUXOS.md`, `README.md` se necessário |
 | Mudança de jornada UX / backlog de portais | `JORNADA_CLIENTE.md` |
 | Preferências de IA | `AGENTS.md`, `.cursor/rules/operacoes-bibi.mdc` |

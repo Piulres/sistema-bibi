@@ -47,6 +47,7 @@ Médicos no select: Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zerai
 ### Último resultado
 | Data | Ambiente | Resultado |
 |------|----------|-----------|
+| 2026-07-26 | produção v3.0.2 | ✅ launches/meta/kpis 200 · POST SYNCED |
 | 2026-07-26 | operation.db local | ✅ C1–C4 SYNCED + 4 portais |
 | 2026-07-25 | local | ✅ C1–C4 / D1–D2 |
 

@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-26 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.0** |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.2** |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.0** |
+| Pacote em produção | ✅ | **v3.0.2** (hotfix schema-sync 26/07) |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 
@@ -69,6 +69,7 @@ Código: `src/lib/clinic-finance/bridge.ts`.
 | Login prestador falha | Portal errado | `/login?tenant=cedig` |
 | Criar usuário 403 | Conta RECEPÇÃO | Usar `operacao@cedig.demo` |
 | Massa vazia no local | Operation sem enrich | `./scripts/cedig-mapear.sh` |
+| 500 em gestão (`no such column`) | Blob com schema antigo | Deploy ≥ v3.0.2 · ver [`OPERACAO_DADOS.md`](../../plataforma/OPERACAO_DADOS.md) § schema-sync |
 
 Smoke produção: `bash scripts/cedig-golive-smoke.sh`
 

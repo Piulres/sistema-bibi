@@ -101,6 +101,16 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts`
 
+### Dual-store e schema-sync (operação)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Modo demo/operação | `tests/lib/data-store-mode.test.ts` | Troca de store; restaura `.data-store-mode` no `afterEach` |
+| Schema-sync SQLite | `tests/unit/operation-schema-sync.test.ts` | `ADD COLUMN`/`CREATE TABLE` idempotente (caso `ClinicExamLaunch` v2.5→atual); `extractColumnDefinition` ignora PK/NOT NULL sem default |
+| Gestão CEDIG E2E | `e2e/cedig-gestao.spec.ts` | Fluxo `/interno/gestao` com ponte SYNCED |
+
+Runbook: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § schema-sync.
+
 ---
 
 ## O que você **não vê** (lacunas e riscos)
@@ -267,6 +277,7 @@ Gotchas confirmados em runtime (jul/2026):
 | `npm run test:e2e` falha com **"Another next dev server is already running"** | Next 16 permite **um** `next dev` por diretório de projeto; Playwright sobe o próprio dev server (porta 3100) | **Pare o `npm run dev`** antes de rodar e2e (o Playwright inicia e derruba o dele) |
 | E2E aborta com `browserType.launch: Executable doesn't exist` | Browser do Playwright não baixado na VM | `npx playwright install chromium` (uma vez por VM) |
 | Login retorna **500 `The table main.User does not exist`** após `npm run test` | O teste de dual-store gravava `prisma/.data-store-mode=operation`, apontando o dev para `operation.db` (vazio) | Corrigido no `afterEach` do teste; se ainda ocorrer: `rm -f prisma/.data-store-mode prisma/operation.db` (ou `npm run setup`) |
+| 500 `no such column` em gestão clínica (produção) | Blob de operação com schema anterior ao deploy | Deploy ≥ v3.0.2; schema-sync no boot — ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § schema-sync |
 | RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
 
 ### Variáveis em testes

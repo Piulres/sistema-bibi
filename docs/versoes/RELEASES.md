@@ -43,6 +43,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 > Nota: o smoke do POST criou um lançamento de teste (`Smoke Hotfix 3.0.2`, R$1) na operação. Fatura nasceu **PAGA** e não é anulável por regra de negócio — registro permanece rotulado para remoção manual.
 
+### Conteúdo do pacote v3.0.2
+
+- Hotfix **schema-sync** do `operation.db` em Netlify Blobs — corrige 500 em
+  `/interno/gestao` quando o Blob tinha schema anterior à ponte v2.6.
+- Módulo `src/lib/operation/schema-sync.ts` + integração em
+  `sqlite-blob-persistence.ts` (boot Lambda).
+- Testes: `tests/unit/operation-schema-sync.test.ts` (566 Vitest no pacote).
+- Docs: runbook em `OPERACAO_DADOS.md` § schema-sync.
+
 ### Conteúdo do pacote v3.0.1
 
 - Auditoria de fluxos rodada 3 — correções P1–P3 (#205): máquina de estados do agendamento, guards do beneficiário, feedback de erro, MFA/CRM já endurecidos.
@@ -73,7 +82,19 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Pacote em produção (fechado)
 
-### `v3.0.0` — Sistema Bibi - ServiceOS (PWA mobile)
+### `v3.0.2` — Hotfix schema-sync do banco de operação
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v3.0.2` @ `9ceeb49` |
+| **Commit publicado** | `9ceeb49` (schema-sync) · docs `d22309b` |
+| **Doc** | [`V3_0.md`](V3_0.md) · [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) § schema-sync |
+| **Inclui** | Migrações aditivas idempotentes no boot Lambda · corrige incidente CEDIG `/interno/gestao` |
+| **Publicado em** | 26/07/2026 — deploy Netlify `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
+
+---
+
+### `v3.0.0` — Sistema Bibi - ServiceOS (PWA mobile) *(substituído por v3.0.2)*
 
 | Campo | Valor |
 |-------|-------|

@@ -10,15 +10,15 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 
 ---
 
-## Status atual (25/07/2026)
+## Status atual (26/07/2026)
 
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v3.0.0`** — deploy `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
-| Pacote anterior | **`v2.6.0`** — deploy `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`) |
-| `main` / `dev` | Sincronizadas · tag `v3.0.0` |
-| Tags git | ✅ `v2.4.0` · `v2.5.0` · `v2.6.0` · `v3.0.0` |
+| Pacote em produção | **`v3.0.2`** — deploy `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
+| Pacote anterior | **`v3.0.1`** — deploy `6a6594ac` @ `daf690e` (`bibi-poc-2026-07-26a`) |
+| `main` / `dev` | Sincronizadas · tag `v3.0.2` |
+| Tags git | ✅ `v2.4.0` … `v3.0.0` · `v3.0.1` · `v3.0.2` |
 | Doc | [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V3_0.md`](../versoes/V3_0.md) |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
@@ -169,6 +169,7 @@ Configure scheduled functions ou serviço externo para chamar:
 | Walk-in some na agenda (modo demo) | Instâncias Lambda diferentes | Alternar para **modo operação** em `/interno/seguranca` |
 | Dados “voltam” ao demo após deploy | Modo demo ativo ou cold start | Usar modo **operação**; dados reais ficam em Blobs |
 | Front sem estilo / JS não carrega | Deploy com `--no-build` — chunks `/_next/static` em 404 | Republicar com `npx netlify deploy --prod` (sem `--no-build`); smoke test no chunk CSS |
+| 500 em `/interno/gestao` · `no such column: bridgeStatus` (ou coluna nova) | Blob de operação com schema anterior ao deploy | Deploy **≥ v3.0.2** (schema-sync no boot); ver log `[operation-schema-sync]` · [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) § schema-sync |
 
 ---
 

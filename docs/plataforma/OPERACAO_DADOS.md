@@ -116,6 +116,62 @@ Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
 
 ---
 
+## Schema-sync do banco de operação (v3.0.2+)
+
+O `operation.db` em **Netlify Blobs** congela o schema da época do primeiro
+persist. O `prisma db push` roda só no **build** — na Lambda o banco ativo
+sempre vence o artefato embutido (`syncOperationDatabaseFromBlob`). Colunas e
+tabelas novas (ex.: ponte v2.6 em `ClinicExamLaunch`) **não** chegavam à
+produção até o hotfix **v3.0.2** (incidente: 500 `no such column: bridgeStatus`
+em `/interno/gestao`).
+
+### Como funciona
+
+No boot da Lambda (modo operação), `src/lib/sqlite-blob-persistence.ts` chama
+`ensureOperationSchemaCurrent()`:
+
+1. Reidrata `/tmp/bibi-operation.db` a partir do Blob (se existir).
+2. Compara o banco ativo com o artefato de build (`prisma/operation.db`,
+   schema atual gerado no `db:setup`).
+3. Aplica migrações **aditivas idempotentes** via `src/lib/operation/schema-sync.ts`:
+   - `CREATE TABLE IF NOT EXISTS` para tabelas ausentes;
+   - `ALTER TABLE … ADD COLUMN` para colunas ausentes (nullable ou com default);
+   - `CREATE INDEX IF NOT EXISTS` para índices ausentes.
+4. Registra o resultado em log: `[operation-schema-sync] {"addedColumns":[…]}`.
+
+O sync roda **uma vez por versão do Blob** na instância (cache em memória) —
+não reprocessa a cada request.
+
+### O que o schema-sync **não** faz
+
+| Tipo de mudança | Comportamento |
+|-----------------|---------------|
+| `DROP` / `RENAME` de coluna ou tabela | Ignorado — exige migração assistida |
+| `NOT NULL` sem `DEFAULT` em coluna nova | Coluna entra em `skipped` — não bloqueia o boot |
+| `PRIMARY KEY` / `UNIQUE` em `ADD COLUMN` | Ignorado (limitação SQLite) |
+| Índice `UNIQUE` com dados legados conflitantes | Falha silenciosa → `skipped` |
+
+Mudanças destrutivas exigem intervenção manual (novo Blob, script one-off ou
+migração para Postgres).
+
+### Sintomas e diagnóstico
+
+| Sintoma | Causa provável | Ação |
+|---------|----------------|------|
+| 500 em `/interno/gestao` · `no such column: …` | Blob com schema anterior ao deploy | Deploy **≥ v3.0.2**; verificar log `[operation-schema-sync]` |
+| 500 persiste após deploy | Coluna não migrável (`skipped`) | Inspecionar log; avaliar script manual ou reset assistido do Blob |
+| Funciona local, falha em produção | Local usa `db push` a cada bootstrap; produção usa Blob congelado | Esperado antes do v3.0.2 — schema-sync corrige no boot |
+
+### Testes
+
+- Unitário: `tests/unit/operation-schema-sync.test.ts` — caso `ClinicExamLaunch`
+  v2.5 → atual (colunas da ponte, idempotência, `extractColumnDefinition`).
+- Smoke CEDIG: `bash scripts/cedig-golive-smoke.sh` · E2E `e2e/cedig-gestao.spec.ts`.
+
+Detalhe do incidente e smoke de produção: [`../versoes/V3_0.md`](../versoes/V3_0.md) · [`../versoes/RELEASES.md`](../versoes/RELEASES.md).
+
+---
+
 ## Limitações conhecidas
 
 | Aspecto | Demo | Operação |
@@ -144,6 +200,7 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 - Modo ativo: `src/lib/data-store-mode.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
+- Schema-sync operação: `src/lib/operation/schema-sync.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
 - UI seletor: `src/components/DataStoreCard.tsx`
 - API: `GET|POST /api/interno/data-store`
