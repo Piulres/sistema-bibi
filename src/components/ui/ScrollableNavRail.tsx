@@ -42,7 +42,7 @@ export default function ScrollableNavRail({ children, className }: Props) {
   }
 
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative min-w-0 max-w-full", className)}>
       {canScrollLeft && (
         <>
           <div
@@ -80,7 +80,7 @@ export default function ScrollableNavRail({ children, className }: Props) {
       <div
         ref={scrollRef}
         className={cn(
-          "overflow-x-auto scroll-smooth",
+          "ds-scroll-x scroll-smooth",
           "snap-x snap-mandatory scroll-px-4",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           canScrollLeft && "pl-8",

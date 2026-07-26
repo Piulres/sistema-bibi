@@ -284,7 +284,7 @@ export default function SubscriptionsView() {
                     <div>
                       <Link
                         href={`/interno/beneficiarios/${sub.patientId}?from=/interno/assinaturas`}
-                        className="font-semibold text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link px-0 font-semibold"
                       >
                         {sub.patientName}
                       </Link>
@@ -324,7 +324,7 @@ export default function SubscriptionsView() {
                             {sub.amountLabel}
                             <button
                               type="button"
-                              className="ml-2 text-xs text-[var(--portal-accent)] hover:underline"
+                              className="ds-touch-link ml-1"
                               onClick={() => {
                                 setEditingAmountId(sub.id);
                                 setEditAmount(String(sub.amount));
@@ -345,7 +345,7 @@ export default function SubscriptionsView() {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <select
-                        className="rounded-[var(--radius-button)] border border-[var(--border-muted)] px-2 py-1.5 text-sm"
+                        className="ds-touch-select"
                         value={sub.status}
                         disabled={isBusy(sub.id)}
                         onChange={(e) => updateStatus(sub.id, e.target.value, sub.patientName)}

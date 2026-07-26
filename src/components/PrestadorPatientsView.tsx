@@ -94,8 +94,8 @@ export default function PrestadorPatientsView() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {pets.map((p) => (
-                <Link key={p.id} href={`/prestador/paciente/${p.id}`}>
-                  <Card padding="md" className="transition hover:border-[var(--portal-accent)]">
+                <Link key={p.id} href={`/prestador/paciente/${p.id}`} className="block min-h-[5.5rem]">
+                  <Card padding="md" className="h-full transition hover:border-[var(--portal-accent)]">
                     <p className="font-semibold text-[var(--text-primary)]">{p.name}</p>
                     <p className="text-sm text-[var(--text-muted)]">
                       {p.speciesLabel}{p.breed ? ` · ${p.breed}` : ""}
@@ -105,7 +105,7 @@ export default function PrestadorPatientsView() {
                       {labels.beneficiary}: {p.tutorName}
                     </p>
                     {p.company && <p className="text-xs text-[var(--text-muted)]">{p.company}</p>}
-                    <p className="mt-2 text-xs text-[var(--portal-accent)]">
+                    <p className="mt-3 text-sm font-medium text-[var(--portal-accent)]">
                       {p.appointmentsCount} atendimento(s) · Ver histórico →
                     </p>
                   </Card>
@@ -124,13 +124,13 @@ export default function PrestadorPatientsView() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {patients.map((p) => (
-              <Link key={p.id} href={`/prestador/paciente/${p.id}`}>
-                <Card padding="md" className="transition hover:border-[var(--portal-accent)]">
+              <Link key={p.id} href={`/prestador/paciente/${p.id}`} className="block min-h-[5.5rem]">
+                <Card padding="md" className="h-full transition hover:border-[var(--portal-accent)]">
                   <p className="font-semibold text-[var(--text-primary)]">{p.name}</p>
                   <p className="text-sm text-[var(--text-muted)]">CPF {p.cpf}</p>
                   {p.company && <p className="text-xs text-[var(--text-muted)]">{p.company}</p>}
-                  <p className="mt-2 text-xs text-[var(--portal-accent)]">
-                    {p.appointmentsCount} atendimento(s) · Ver histórico clínico →
+                  <p className="mt-3 text-sm font-medium text-[var(--portal-accent)]">
+                    {p.appointmentsCount} atendimento(s) · Ver histórico →
                   </p>
                 </Card>
               </Link>

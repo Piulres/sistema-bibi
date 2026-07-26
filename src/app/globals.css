@@ -144,13 +144,73 @@ body {
   border: 1px solid var(--border-default);
   background: var(--surface-card);
   box-shadow: var(--shadow-card);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .ds-page-shell {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
   margin-inline: auto;
   max-width: 64rem;
-  padding-inline: 1.5rem;
-  padding-block: 2rem;
+  padding-inline: 1rem;
+  padding-block: 1.5rem;
+  /* Contém tabelas/kanban largos — scroll fica nos wrappers .ds-scroll-x */
+  overflow-x: clip;
+}
+
+@media (min-width: 640px) {
+  .ds-page-shell {
+    padding-inline: 1.5rem;
+    padding-block: 2rem;
+  }
+}
+
+/* Faixa/tabela horizontal sem estourar a largura do viewport */
+.ds-scroll-x {
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Links de ação com alvo de toque utilizável (~40px) */
+.ds-touch-link {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-button);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--portal-accent);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ds-touch-link:hover {
+  background: var(--surface-muted);
+}
+
+.ds-touch-link-solid {
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+.ds-touch-link-solid:hover {
+  background: var(--surface-muted);
+}
+
+.ds-touch-select {
+  min-height: 2.5rem;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--border-muted);
+  background: var(--surface-card);
+  padding-inline: 0.625rem;
+  font-size: 0.875rem;
 }
 
 .ds-gradient-brand {

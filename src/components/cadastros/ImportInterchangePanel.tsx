@@ -25,7 +25,7 @@ type ImportSummary = {
 };
 
 const fieldClass =
-  "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 font-mono text-xs";
+  "mt-1 w-full min-w-0 max-w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 font-mono text-xs break-all";
 
 export default function ImportInterchangePanel({
   entity,

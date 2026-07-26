@@ -26,7 +26,7 @@ export default function BeneficiarioPortalShell({ user, assistantEnabled = true,
       <FeedbackProvider>
       <PortalShell
         portal="beneficiario"
-        portalLabel={user.labels.portalBeneficiary}
+        portalLabel={user.labels.beneficiary}
         loginPath={portal.loginPath}
         userName={user.name}
         branding={user.branding}

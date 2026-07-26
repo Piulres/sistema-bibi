@@ -394,7 +394,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             </p>
             <Link
               href={historyHref}
-              className="mt-2 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
+              className="ds-touch-link mt-2"
             >
               {hasPet ? "Ver histórico completo do pet →" : "Ver histórico completo do paciente →"}
             </Link>

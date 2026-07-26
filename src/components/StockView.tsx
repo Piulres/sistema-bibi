@@ -84,8 +84,8 @@ const TABS = [
   { key: "resumo", label: "Resumo" },
   { key: "produtos", label: "Produtos" },
   { key: "lotes", label: "Lotes" },
-  { key: "movimentos", label: "Movimentações" },
-  { key: "kits", label: "Kits por procedimento" },
+  { key: "movimentos", label: "Movimentos" },
+  { key: "kits", label: "Kits" },
 ] as const;
 
 type TabKey = (typeof TABS)[number]["key"];
@@ -422,35 +422,63 @@ export default function StockView() {
               {products.length === 0 ? (
                 <EmptyState title="Sem produtos" message="Cadastre o primeiro item médico." />
               ) : (
-                <div className="mt-4 overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
-                        <th className="py-2 pr-3">SKU</th>
-                        <th className="py-2 pr-3">Nome</th>
-                        <th className="py-2 pr-3">Categoria</th>
-                        <th className="py-2 pr-3">Saldo</th>
-                        <th className="py-2">Mín.</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {products.map((p) => (
-                        <tr key={p.id} className="border-b border-[var(--border-muted)]/60">
-                          <td className="py-2 pr-3 font-mono text-xs">{p.sku}</td>
-                          <td className="py-2 pr-3">
-                            {p.name}
-                            {p.lowStock && (
-                              <span className="ml-2 text-xs text-amber-600">baixo</span>
-                            )}
-                          </td>
-                          <td className="py-2 pr-3">{p.categoryLabel}</td>
-                          <td className="py-2 pr-3">{p.stockLabel}</td>
-                          <td className="py-2">{p.minStock}</td>
+                <>
+                  <ul className="mt-4 space-y-2 md:hidden">
+                    {products.map((p) => (
+                      <li
+                        key={p.id}
+                        className="rounded-lg border border-[var(--border-muted)] px-3 py-2"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="break-words font-medium text-[var(--text-primary)]">
+                              {p.name}
+                              {p.lowStock && (
+                                <span className="ml-2 text-xs text-amber-600">baixo</span>
+                              )}
+                            </p>
+                            <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
+                              {p.sku} · {p.categoryLabel}
+                            </p>
+                          </div>
+                          <div className="shrink-0 text-right text-sm">
+                            <p className="font-semibold text-[var(--text-primary)]">{p.stockLabel}</p>
+                            <p className="text-xs text-[var(--text-muted)]">mín. {p.minStock}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="ds-scroll-x mt-4 hidden md:block">
+                    <table className="w-full min-w-[28rem] text-sm">
+                      <thead>
+                        <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
+                          <th className="py-2 pr-3">SKU</th>
+                          <th className="py-2 pr-3">Nome</th>
+                          <th className="py-2 pr-3">Categoria</th>
+                          <th className="py-2 pr-3">Saldo</th>
+                          <th className="py-2">Mín.</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {products.map((p) => (
+                          <tr key={p.id} className="border-b border-[var(--border-muted)]/60">
+                            <td className="py-2 pr-3 font-mono text-xs">{p.sku}</td>
+                            <td className="py-2 pr-3">
+                              {p.name}
+                              {p.lowStock && (
+                                <span className="ml-2 text-xs text-amber-600">baixo</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3">{p.categoryLabel}</td>
+                            <td className="py-2 pr-3">{p.stockLabel}</td>
+                            <td className="py-2">{p.minStock}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </Card>
 
@@ -479,35 +507,66 @@ export default function StockView() {
               {lots.length === 0 ? (
                 <EmptyState title="Sem lotes" message="Registre uma entrada de estoque." />
               ) : (
-                <div className="mt-4 overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
-                        <th className="py-2 pr-3">Produto</th>
-                        <th className="py-2 pr-3">Lote</th>
-                        <th className="py-2 pr-3">Validade</th>
-                        <th className="py-2 pr-3">Qtd</th>
-                        <th className="py-2">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {lots.map((lot) => (
-                        <tr key={lot.id} className="border-b border-[var(--border-muted)]/60">
-                          <td className="py-2 pr-3">{lot.productName}</td>
-                          <td className="py-2 pr-3 font-mono text-xs">{lot.lotNumber}</td>
-                          <td className="py-2 pr-3">
-                            {lot.expiryDateLabel}
-                            {lot.expiringSoon && lot.daysToExpiry >= 0 && (
-                              <span className="ml-1 text-xs text-amber-600">({lot.daysToExpiry}d)</span>
-                            )}
-                          </td>
-                          <td className="py-2 pr-3">{lot.quantity}</td>
-                          <td className="py-2">{lot.statusLabel}</td>
+                <>
+                  <ul className="mt-4 space-y-2 md:hidden">
+                    {lots.map((lot) => (
+                      <li
+                        key={lot.id}
+                        className="rounded-lg border border-[var(--border-muted)] px-3 py-2"
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="break-words font-medium text-[var(--text-primary)]">
+                              {lot.productName}
+                            </p>
+                            <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
+                              Lote {lot.lotNumber}
+                            </p>
+                            <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                              Val. {lot.expiryDateLabel}
+                              {lot.expiringSoon && lot.daysToExpiry >= 0
+                                ? ` (${lot.daysToExpiry}d)`
+                                : ""}
+                            </p>
+                          </div>
+                          <div className="shrink-0 text-right text-sm">
+                            <p className="font-semibold text-[var(--text-primary)]">{lot.quantity}</p>
+                            <p className="text-xs text-[var(--text-muted)]">{lot.statusLabel}</p>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="ds-scroll-x mt-4 hidden md:block">
+                    <table className="w-full min-w-[28rem] text-sm">
+                      <thead>
+                        <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
+                          <th className="py-2 pr-3">Produto</th>
+                          <th className="py-2 pr-3">Lote</th>
+                          <th className="py-2 pr-3">Validade</th>
+                          <th className="py-2 pr-3">Qtd</th>
+                          <th className="py-2">Status</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {lots.map((lot) => (
+                          <tr key={lot.id} className="border-b border-[var(--border-muted)]/60">
+                            <td className="py-2 pr-3">{lot.productName}</td>
+                            <td className="py-2 pr-3 font-mono text-xs">{lot.lotNumber}</td>
+                            <td className="py-2 pr-3">
+                              {lot.expiryDateLabel}
+                              {lot.expiringSoon && lot.daysToExpiry >= 0 && (
+                                <span className="ml-1 text-xs text-amber-600">({lot.daysToExpiry}d)</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-3">{lot.quantity}</td>
+                            <td className="py-2">{lot.statusLabel}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </Card>
 

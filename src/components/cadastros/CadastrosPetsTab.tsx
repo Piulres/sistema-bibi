@@ -271,7 +271,7 @@ export default function CadastrosPetsTab() {
             message={`Cadastre o primeiro ${labels.patient.toLowerCase()} vinculado a um tutor.`}
           />
         ) : (
-          <div className="overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-muted)]">
+          <div className="ds-scroll-x rounded-[var(--radius-card)] border border-[var(--border-muted)]">
             <table className="min-w-full text-sm">
               <thead className="bg-[var(--surface-muted)] text-left text-[var(--text-muted)]">
                 <tr>

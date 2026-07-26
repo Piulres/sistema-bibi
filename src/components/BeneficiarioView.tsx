@@ -613,7 +613,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                         href={appointment.telemedicineUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-xs text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link text-xs"
                       >
                         Entrar na videochamada
                       </a>
@@ -657,37 +657,69 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
             Nenhum {labels.procedure.toLowerCase()} registrado.
           </p>
         ) : (
-          <div className="mt-3 overflow-x-auto rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm">
-            <table className="w-full min-w-[32rem] text-left text-sm">
-              <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                <tr>
-                  <th className="px-4 py-2 font-medium">{labels.procedure}</th>
-                  <th className="px-4 py-2 font-medium">{labels.appointment}</th>
-                  <th className="px-4 py-2 font-medium">Situação</th>
-                  <th className="px-4 py-2 text-right font-medium">Valor</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-default)]">
-                {overview.usages.map((usage) => (
-                  <tr key={usage.id}>
-                    <td className="px-4 py-2">
-                      <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
-                      <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
-                    </td>
-                    <td className="px-4 py-2 text-[var(--text-muted)]">{usage.appointmentDateLabel}</td>
-                    <td className="px-4 py-2">
-                      <StatusBadge
-                        value={usage.billed ? "FECHADA" : "ABERTA"}
-                        label={usage.billed ? "Faturado" : "A faturar"}
-                        map="invoice"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">{usage.priceLabel}</td>
+          <>
+            <ul className="mt-3 space-y-2 md:hidden">
+              {overview.usages.map((usage) => (
+                <li
+                  key={usage.id}
+                  className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-sm"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="break-words font-medium text-[var(--text-secondary)]">
+                        {usage.procedure}
+                      </p>
+                      <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                        {usage.appointmentDateLabel}
+                        {usage.category ? ` · ${usage.category}` : ""}
+                      </p>
+                    </div>
+                    <p className="shrink-0 font-semibold text-[var(--text-primary)]">
+                      {usage.priceLabel}
+                    </p>
+                  </div>
+                  <div className="mt-2">
+                    <StatusBadge
+                      value={usage.billed ? "FECHADA" : "ABERTA"}
+                      label={usage.billed ? "Faturado" : "A faturar"}
+                      map="invoice"
+                    />
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div className="ds-scroll-x mt-3 hidden rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm md:block">
+              <table className="w-full min-w-[32rem] text-left text-sm">
+                <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                  <tr>
+                    <th className="px-4 py-2 font-medium">{labels.procedure}</th>
+                    <th className="px-4 py-2 font-medium">{labels.appointment}</th>
+                    <th className="px-4 py-2 font-medium">Situação</th>
+                    <th className="px-4 py-2 text-right font-medium">Valor</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-[var(--border-default)]">
+                  {overview.usages.map((usage) => (
+                    <tr key={usage.id}>
+                      <td className="px-4 py-2">
+                        <p className="font-medium text-[var(--text-secondary)]">{usage.procedure}</p>
+                        <p className="text-xs text-[var(--text-muted)]">{usage.category}</p>
+                      </td>
+                      <td className="px-4 py-2 text-[var(--text-muted)]">{usage.appointmentDateLabel}</td>
+                      <td className="px-4 py-2">
+                        <StatusBadge
+                          value={usage.billed ? "FECHADA" : "ABERTA"}
+                          label={usage.billed ? "Faturado" : "A faturar"}
+                          map="invoice"
+                        />
+                      </td>
+                      <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">{usage.priceLabel}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </section>
       )}

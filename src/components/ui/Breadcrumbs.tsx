@@ -24,15 +24,13 @@ export default function Breadcrumbs({ items, className }: Props) {
                 </span>
               )}
               {item.href && !isLast ? (
-                <Link
-                  href={item.href}
-                  className="font-medium text-[var(--portal-accent)] transition hover:underline"
-                >
+                <Link href={item.href} className="ds-touch-link px-1.5 font-medium">
                   {item.label}
                 </Link>
               ) : (
                 <span
                   className={cn(
+                    "inline-flex min-h-10 items-center",
                     isLast
                       ? "font-medium text-[var(--text-primary)]"
                       : "text-[var(--text-muted)]",
