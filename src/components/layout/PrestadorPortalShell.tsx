@@ -27,7 +27,7 @@ export default function PrestadorPortalShell({ user, assistantEnabled = true, ch
       <FeedbackProvider>
       <PortalShell
         portal="prestador"
-        portalLabel={user.labels.portalProvider}
+        portalLabel={user.labels.provider}
         loginPath={portal.loginPath}
         userName={user.name}
         branding={user.branding}

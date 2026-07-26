@@ -232,16 +232,16 @@ export default function AgendaView() {
                     status={a.status}
                     particular={!a.patient.company}
                     actions={
-                      <div className="flex flex-col items-end gap-1">
+                      <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
                         <Link
                           href={`/prestador/atendimento/${a.id}`}
-                          className="text-xs font-medium text-[var(--portal-accent)] hover:underline"
+                          className="ds-touch-link ds-touch-link-solid"
                         >
                           Abrir atendimento
                         </Link>
                         <Link
                           href={`/prestador/paciente/${a.patient.id}`}
-                          className="text-xs text-[var(--text-muted)] hover:underline"
+                          className="ds-touch-link"
                         >
                           Histórico
                         </Link>

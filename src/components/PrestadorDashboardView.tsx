@@ -145,7 +145,7 @@ export default function PrestadorDashboardView() {
                   )}
                   <Link
                     href={`/prestador/atendimento/${item.id}`}
-                    className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                    className="ds-touch-link ds-touch-link-solid"
                   >
                     Atender
                   </Link>

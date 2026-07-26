@@ -175,6 +175,44 @@ body {
   -webkit-overflow-scrolling: touch;
 }
 
+/* Links de ação com alvo de toque utilizável (~40px) */
+.ds-touch-link {
+  display: inline-flex;
+  min-height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-button);
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--portal-accent);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.ds-touch-link:hover {
+  background: var(--surface-muted);
+}
+
+.ds-touch-link-solid {
+  border: 1px solid var(--border-default);
+  background: var(--surface-card);
+  color: var(--text-primary);
+}
+
+.ds-touch-link-solid:hover {
+  background: var(--surface-muted);
+}
+
+.ds-touch-select {
+  min-height: 2.5rem;
+  border-radius: var(--radius-button);
+  border: 1px solid var(--border-muted);
+  background: var(--surface-card);
+  padding-inline: 0.625rem;
+  font-size: 0.875rem;
+}
+
 .ds-gradient-brand {
   background: linear-gradient(
     to bottom right,

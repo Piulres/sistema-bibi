@@ -94,10 +94,7 @@ export default function PjView() {
               <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
                 <span className="min-w-0 break-words">{a.message}</span>
                 {a.href && a.actionLabel && (
-                  <a
-                    href={a.href}
-                    className="inline-flex items-center rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
-                  >
+                  <a href={a.href} className="ds-touch-link ds-touch-link-solid shrink-0">
                     {a.actionLabel}
                   </a>
                 )}
