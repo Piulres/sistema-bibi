@@ -75,7 +75,7 @@ Execute **na mesma sessão** que atualiza `RELEASES.md` e `src/lib/platform.ts`:
 
 ```ts
 export type ChangelogRelease = {
-  version: string;           // "3.0.0" — alinhar com package.json
+  version: string;           // "3.0.1" — alinhar com package.json
   label: string;             // PLATFORM.versionLabel na release current
   date: string;              // "27/06/2026"
   status: "current" | "previous";
@@ -85,7 +85,7 @@ export type ChangelogRelease = {
 };
 ```
 
-**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **3.0.0**).
+**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **3.0.1** na `main`; produção pode estar uma versão atrás até o deploy).
 
 ---
 

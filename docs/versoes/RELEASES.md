@@ -9,15 +9,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ---
 
-## Status agora (25/07/2026)
+## Status agora (26/07/2026)
 
-> Pacote **v3.0.0** — PWA mobile (`/instalar`) **publicado em produção**.
+> Pacote **v3.0.1** fechado na **`main`** — aguardando deploy manual em produção.
+> Netlify ainda em **v3.0.0**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.0** — deploy `6a654c88` @ `e30fc70` (`bibi-poc-2026-07-25k`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.0** · tag `v3.0.0` · tip `e30fc70` |
+| **Release `main` / `dev`** | **v3.0.1** · tag `v3.0.1` · tip `daf690e` |
 | **Pacote anterior em produção** | **2.6.0** — deploy `6a654678` @ `e738f12` (`bibi-poc-2026-07-25j`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,8 +26,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.0** |
-| **Release** | `main` | **v3.0.0** |
+| **Integração** | `dev` | **v3.0.1** |
+| **Release** | `main` | **v3.0.1** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.0** · deploy `6a654c88` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
@@ -37,13 +38,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Title | `Sistema Bibi - ServiceOS v3.0.0 — …` |
 | CSS `/_next/static` | 200 |
 | `/instalar` · `/manifest.webmanifest` · `/icons/*` | 200 · `display: standalone` |
-| `#novidades` | current **3.0.0** |
+| `#novidades` | current **3.0.0** (atualizar após deploy 3.0.1) |
 | Logins `/login`, `/interno/login` | 200 |
 
 ### Tags git (histórico)
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.1`** | `daf690e` | Qualidade multi-nicho + regras da agenda · #205 + #209 |
 | **`v3.0.0`** | `d2e0548` | PWA `/instalar` · manifest standalone · smoke Netlify |
 | **`v2.6.0`** | `579f686` | CEDIG fase 2+F — ponte PPU + export + v2.5 login · #186–#189 · #193 |
 | **`v2.5.0`** | _(empilhado)_ | Login tenant digitável + seletor de portal · PR #186 |
@@ -58,6 +60,20 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `v1.0.2` | `e30b2b0` | White label plataforma vs clínicas |
 | `v1.0.1` | `e4d8a43` | Deploy Netlify inicial |
 | `v1.0.0` | `685cc21` | POC inicial |
+---
+
+## Pacote fechado na `main` (aguardando deploy)
+
+### `v3.0.1` — Qualidade multi-nicho + regras da agenda
+
+| Campo | Valor |
+|-------|-------|
+| **Tag git** | `v3.0.1` @ `daf690e` |
+| **Doc** | [`V3_0.md`](V3_0.md) §v3.0.1 |
+| **Inclui** | `useLabels()` nas views/breadcrumbs · `appointment-status.ts` (máquina de estados) · guards beneficiário/destrutivos · `npm run setup` · fast path `test.db` · CI Node 24 / actions v6 |
+| **Empilha** | PR #205 (auditoria P1–P3) · PR #209 (labels + CI) |
+| **Testes** | 563 Vitest · 152 Playwright · `docs:verify` · `pre-release` OK |
+
 ---
 
 ## Pacote em produção (fechado)
@@ -277,7 +293,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.0` em produção** — PWA / app shell mobile |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.1` na `main`** (deploy pendente) · **`v3.0.0` em produção** — PWA / app shell mobile |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

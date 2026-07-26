@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **529+** casos Vitest · **12** specs Playwright E2E · **~160** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **563** casos Vitest · **12** specs Playwright E2E · **~160** Route Handlers · **123** paths no OpenAPI.
 
 ### Onboarding tour (v3)
 
@@ -59,6 +59,8 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 | Unitário | Vitest | `tests/unit/` | `npm run test` |
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
+
+**Máquina de estados do agendamento (v3.0.1):** `tests/lib/appointment-status.test.ts` (transições puras) · `tests/api/appointment-state-machine.test.ts` (409 em terminal via API). Módulo: `src/lib/appointment-status.ts` · doc: [`FLUXOS.md`](../produto/FLUXOS.md) §10.1.
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
@@ -66,6 +68,12 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 | CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main`, `dev`, `cursor/**` |
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
+
+**Caminho rápido (v3.0.1):** o `globalSetup` roda `db push` + staleness + seed uma vez
+e grava o marker `prisma/.test-db-ready` com fingerprint de `schema.prisma` + `seed.ts` +
+`prisma/seed-data/`. O `beforeAll` de cada arquivo (`tests/setup.ts`) reutiliza o banco
+sem subprocesso `prisma db push` por suíte — suíte CI cai de ~112s para ~30s. Implementação:
+`tests/helpers/db.ts` (`ensureTestDatabase`, `resetTestDatabaseMarker`).
 
 **Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).
 
@@ -333,7 +341,7 @@ Senha única: `bibi123`
 
 ## CI (GitHub Actions)
 
-Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
+Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais (Node **24**, `actions/checkout@v6`, `actions/setup-node@v6`):
 
 1. **unit-integration-api** — `lint` → `docs:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
 2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)

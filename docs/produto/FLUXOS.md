@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.0** em produção (jul/2026): PWA `/instalar` + vocabulário por nicho via `useLabels()` — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
+> **ServiceOS v3.0.1** na `main` (jul/2026): PWA `/instalar` + vocabulário por tenant via `useLabels()` nas views — ver [§0](#0-serviceos-v20--labels-e-landing). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · base multi-nicho: [`../versoes/V2_0.md`](../versoes/V2_0.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -672,11 +672,18 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 
 Valores: `AGENDADO | CONFIRMADO | REALIZADO | FALTOU | CANCELADO`
 
+**Implementação:** `src/lib/appointment-status.ts` (módulo puro, sem Prisma) — usado no
+servidor (PATCH prestador/interno, POST procedures) e no cliente (views). Estados
+`REALIZADO`, `FALTOU` e `CANCELADO` são **terminais** (não transicionam). `AGENDADO`
+pode ir direto para `REALIZADO` (prestador conclui sem confirmar presença).
+`canRegisterProcedureForStatus` bloqueia procedimento em `CANCELADO`/`FALTOU` → **409**.
+
 ```mermaid
 stateDiagram-v2
   [*] --> AGENDADO: beneficiário / recepção
   [*] --> CONFIRMADO: recepção (form default)
   AGENDADO --> CONFIRMADO: PATCH interno
+  AGENDADO --> REALIZADO: prestador (sem confirmar)
   AGENDADO --> CANCELADO: PATCH
   AGENDADO --> FALTOU: PATCH
   CONFIRMADO --> REALIZADO: prestador ou interno
@@ -688,6 +695,9 @@ stateDiagram-v2
 ```
 
 `CANCELADO` / `FALTOU` liberam slot (`scheduling-service.ts`).
+
+Testes: `tests/lib/appointment-status.test.ts` · `tests/api/appointment-state-machine.test.ts`.
+Auditoria: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §4.
 
 Modality: `PRESENCIAL | TELE` — TELE gera `telemedicineUrl`.
 
