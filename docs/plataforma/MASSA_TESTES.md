@@ -18,12 +18,31 @@ Dois eixos independentes controlam a massa:
 > Com `SEED_PROFILE=operation-1y`, a escala é forçada para `operation-1y`
 > (365 dias, 12 meses de baseline, ~320 agendamentos no Horizonte).
 
+### Mês operacional (sempre atual)
+
+Além do histórico esparso de `seedOperationalMass`, o seed aplica uma **camada densa de ~30 dias** (datas relativas a “hoje”):
+
+- Agenda com walk-in, corporativo, autosserviço e particular
+- Vários médicos, modalidades PRESENCIAL/TELE
+- Mix REALIZADO / FALTOU / CANCELADO (passado) + AGENDADO/CONFIRMADO (futuro)
+- PPU com descontos corporativos, PEP, baixa de estoque (kit CON-CLM)
+- Faturas ABERTA/FECHADA/PAGA + PIX + eventos de timeline
+- CEDIG: launches (várias tabelas/pagamentos) + despesas semanais + bridge
+
+Marcador idempotente: `[seed-operation-month]` · código: `prisma/seed-data/operation-month.ts` · plano puro: `operation-month-plan.ts`.
+
+```bash
+npm run db:seed
+npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts
+```
+
 ### `market` — pipeline comercial (padrão)
 
 - **50 empresas PJ** no tenant Horizonte (24 ATIVO + pipeline CRM)
 - **1 usuário PJ** por empresa com contrato (RH)
 - Baseline de faturamento: **6 meses**
 - Histórico operacional: 90–365 dias conforme `SEED_SCALE`
+- **+ mês operacional denso** (camada acima)
 
 ### `operation-1y` — operação realista (1 ano)
 
@@ -32,6 +51,7 @@ Dois eixos independentes controlam a massa:
 - **365 dias** de histórico em agenda/PPU
 - Baseline de faturamento: **12 meses**
 - TechCorp permanece âncora demo (João, Maria, `rh@techcorp.com`)
+- **+ mês operacional denso** (camada acima)
 
 ```bash
 # Gerar massa de 1 ano com 20 clientes
@@ -39,7 +59,7 @@ SEED_PROFILE=operation-1y npm run db:seed
 SEED_PROFILE=operation-1y npm run db:verify
 ```
 
-Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts`
+Código: `prisma/seed-data/profile.ts` · `companies-operation.ts` · `scale.ts` · `operation-month.ts`
 
 ---
 
@@ -170,6 +190,8 @@ Validação: `?tenant=petcare` → login bloqueia contas de outro tenant.
 | `tests/helpers/seed-fixtures.ts` | E-mails/CPFs estáveis (João, Maria, Pedro, Helena) |
 | `tests/lib/seed-mass-portal.test.ts` | Entidades mínimas **por portal** e **por segmento** |
 | `tests/unit/seed-profile.test.ts` | Perfil `operation-1y` e glossário comum |
+| `tests/unit/operation-month-plan.test.ts` | Plano puro do mês (~30 dias): fontes, status, CEDIG |
+| `tests/lib/operation-month-consistency.test.ts` | Consistência seed: agenda, descontos, PPU, PEP, estoque, timeline, CEDIG |
 | `tests/security/tenant-isolation.test.ts` | Horizonte ≠ PetCare (cross-tenant 404) |
 | `scripts/verify-databases.mjs` | Integridade pós-seed (`demo.db` + `operation.db`) |
 
@@ -193,8 +215,8 @@ SEED_PROFILE=operation-1y npm run db:verify
 | Empresas PJ | 50 |
 | Beneficiários | ~199 |
 | Usuários PJ | ~27 (1/empresa) |
-| Agendamentos | ~120+ bulk + 4 demo |
-| Faturas | baseline 6m + PPU |
+| Agendamentos | ~120+ bulk + 4 demo + **~70 mês operacional** |
+| Faturas | baseline 6m + PPU + mês operacional |
 
 ### Horizonte — `SEED_PROFILE=operation-1y`
 
@@ -203,8 +225,8 @@ SEED_PROFILE=operation-1y npm run db:verify
 | Empresas PJ | 20 |
 | Beneficiários | ~80–100 |
 | Usuários PJ | ~48–144 (3–9 × 16 contratos) |
-| Agendamentos | ~320 bulk + 4 demo |
-| Faturas | baseline **12 meses** |
+| Agendamentos | ~320 bulk + 4 demo + **~70 mês operacional** |
+| Faturas | baseline **12 meses** + mês operacional |
 
 ### Todos os tenants (demo completo)
 

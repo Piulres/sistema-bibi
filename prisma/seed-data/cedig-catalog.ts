@@ -468,11 +468,13 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
 }
 
 /**
- * Histórico mínimo para demos dos 4 portais (idempotente por notes marker).
+ * Ponte CEDIG → agenda/PPU/fatura para launches ainda sem vínculo.
+ * Exportada para o mês operacional (volume > homologação mínima).
  */
-async function bridgeUnsyncedCedigLaunches(
+export async function bridgeUnsyncedCedigLaunches(
   prisma: PrismaClient,
   tenantId: string,
+  take = 200,
 ): Promise<void> {
   const pending = await prisma.clinicExamLaunch.findMany({
     where: {
@@ -480,7 +482,7 @@ async function bridgeUnsyncedCedigLaunches(
       OR: [{ appointmentId: null }, { usageId: null }, { invoiceId: null }],
     },
     select: { id: true },
-    take: 20,
+    take,
   });
   if (pending.length === 0) return;
 

@@ -83,7 +83,7 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 **Massa rica multi-nicho:** todos os 5 tenants nicho recebem RBAC interno (3 usuários), estoque, perfil clínico, pricing B2B, baseline, webhooks e 3 personas estrela (PPU/PIX/particular). PetCare: label `Banho/Tosa`.
 
-**Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts`
+**Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts` · mês operacional (~30 dias, timeline sempre atual): `tests/unit/operation-month-plan.test.ts` + `tests/lib/operation-month-consistency.test.ts` · doc [`MASSA_TESTES.md`](MASSA_TESTES.md)
 
 | Fixture | E-mail / CPF | Uso típico |
 |---------|----------------|------------|

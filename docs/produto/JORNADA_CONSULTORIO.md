@@ -294,6 +294,21 @@ Lista completa: [`README.md`](../../README.md) · [`AGENTS.md`](../../AGENTS.md)
 
 ---
 
+## 9. Massa e testes do dia a dia (~1 mês)
+
+O seed inclui uma **camada de mês operacional** com datas relativas a “hoje” (agenda, PPU, PEP, estoque, faturas, timeline e launches CEDIG). Marcador `[seed-operation-month]` — ver [`../plataforma/MASSA_TESTES.md`](../plataforma/MASSA_TESTES.md).
+
+| Camada | Arquivo | O que valida |
+|--------|---------|--------------|
+| Plano puro | `tests/unit/operation-month-plan.test.ts` | Fontes, status, CEDIG, janela |
+| Consistência seed | `tests/lib/operation-month-consistency.test.ts` | Densidade, descontos, PPU↔fatura, PEP, estoque, timeline |
+
+```bash
+npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts
+```
+
+---
+
 ## Referências cruzadas
 
 | Documento | Conteúdo |
@@ -303,6 +318,7 @@ Lista completa: [`README.md`](../../README.md) · [`AGENTS.md`](../../AGENTS.md)
 | [`FLUXOS.md`](FLUXOS.md) §8.9 | Melhorias de fluxo (check-in, cancelar, stepper) |
 | [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) §6 | Jornada E2E UX |
 | [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) | Atestado, receita, protocolos |
+| [`../plataforma/MASSA_TESTES.md`](../plataforma/MASSA_TESTES.md) | Perfis de seed + mês operacional |
 | [`../plataforma/PAYMENTS.md`](../plataforma/PAYMENTS.md) | Motor PIX |
 | [`../evidencias/README.md`](../evidencias/README.md) | Screenshots e vídeos |
 
