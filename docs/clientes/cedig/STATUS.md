@@ -92,7 +92,7 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
-| 2026-07-26 | Pacote **v3.0.5** em produção: atendimento clínico + jornada faturada + UX landing/portais (#221/#225–#227) | ✅ |
+| 2026-07-26 | Pacote **v3.0.5** em produção: jornada faturada + documentos clínicos + UX landing/portais (#221/#225–#227) | ✅ |
 | 2026-07-26 | Pacote **v3.0.4** em produção: TISS 422 + config Cursor enxuta + docs schema-sync (#220/#222) | ✅ |
 | 2026-07-26 | Pacote **v3.0.3**: flush Blob pós schema-sync + UX gestão (#214) + docs/script da limpeza (#217) | ✅ |
 | 2026-07-26 | Limpeza operation.db (Blobs): unificou 2 anamneses da consulta Renan Emigdio + Dra. Gabriela Lage; removeu 8 usuários e massa efêmera de testes (golive/smoke/persist). Script `scripts/cleanup-operation-test-data.mjs` + eventos de timeline `MEDICAL_RECORD_MERGED` / `OPERATION_TEST_DATA_CLEANUP` | ✅ |

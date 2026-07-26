@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.5** (base multi-nicho desde v2.0) — jornada faturada no prestador, labels por tenant, landing segmentada, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.5** em produção — labels por tenant, landing segmentada, jornada faturada no prestador, documentos clínicos estruturados.
 
 ---
 
@@ -199,7 +199,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
 | Alta | Só exibe agenda do dia | Calendário semanal/mensal + filtros |
-| Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
+| ~~Alta~~ | ~~Sem confirmação de chegada do paciente~~ | **✅ v3.0.5** — ação “Paciente presente” → `PATCH .../appointments/[id]` `{ status: CONFIRMADO }` (`flow-improvements-map` id `prestador-confirm-arrival`) |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
 | Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
 | Média | Sem assinatura digital / Atesta CFM / SNCR | **Parcial (v3.0.5):** atestado CFM e receita comum/controle especial estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |

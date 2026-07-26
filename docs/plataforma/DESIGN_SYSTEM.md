@@ -27,7 +27,7 @@ model TenantBranding {
   accentColor    String
   heroFrom       String   // gradiente do hero
   heroTo         String
-  platformLabel  String   // ex. "Powered by Sistema Bibi - ServiceOS"
+  platformLabel  String   // legado — não renderizado no header dos portais desde v3.0.5
   colorScheme    String   // light | dark | system
   customDomain   String?  // ex. saude.cliente.com.br (Tier 3)
   customDomainVerified Boolean
@@ -191,7 +191,7 @@ Três camadas (v1.0.2+):
 
 1. Cada tenant possui registro `TenantBranding`.
 2. Após login, `getSessionUser()` retorna `user.branding`.
-3. `PortalHeader` exibe logo/nome do tenant e faixa `{platformLabel} · white label`.
+3. `PortalHeader` exibe logo/nome do tenant; badges de versão/nicho em `ServiceOsBadges` (ocultos em `< sm`). Campo `platformLabel` permanece no schema mas **não** é renderizado (v3.0.5).
 4. Cores são aplicadas via `TenantTheme` sem rebuild do front-end.
 
 ## Administração de branding (Portal Interno)

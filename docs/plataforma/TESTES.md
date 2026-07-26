@@ -57,15 +57,17 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 | Camada | Runner | Pasta | Comando |
 |--------|--------|-------|---------|
 | Unitário | Vitest | `tests/unit/` | `npm run test` |
-
-Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
-
-Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
 | E2E | Playwright | `e2e/` | `npm run test:e2e` |
 | CI | GitHub Actions | `.github/workflows/ci.yml` | push/PR em `main`, `dev`, `cursor/**` |
+
+Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
+
+Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
+
+Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 

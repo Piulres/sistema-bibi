@@ -17,7 +17,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
 | Pacote em produção | **`v3.0.5`** — deploy `6a65c17d` @ `cf0eb26` (`bibi-poc-2026-07-26e`) |
 | Pacote anterior | **`v3.0.4`** — deploy `6a65b8e6` @ `fd22ebc` (`bibi-poc-2026-07-26d`) |
-| `main` / `dev` | **v3.0.5** · sincronizadas · artefato prod `@ cf0eb26` |
+| `main` / `dev` | **v3.0.5** · `main` @ `cf0eb26` · `dev` + #232 (assistant mobile) |
 | Tags git | ✅ `v2.4.0` … `v3.0.5` |
 | Doc | [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V3_0.md`](../versoes/V3_0.md) |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + openapi + db + test + build + smoke PWA) |
