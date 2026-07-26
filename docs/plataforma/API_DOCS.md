@@ -113,7 +113,7 @@ scripts/copy-swagger-ui.mjs  ← cópia de node_modules/swagger-ui-dist
 
 | Camada | Arquivo | O que valida |
 |--------|---------|--------------|
-| Script | `npm run openapi:verify` | YAML válido, ≥70 paths, sem paths órfãos |
+| Script | `npm run openapi:verify` | YAML válido, ≥115 paths, sem paths órfãos; avisa handlers sem YAML |
 | Vitest | `tests/unit/openapi-contract.test.ts` | Metadados, cookie auth, servidores, assets |
 | Playwright | `e2e/api-docs.spec.ts` | UI carrega, YAML 200, redirect legado |
 | Pre-release | `scripts/pre-release.mjs` | Inclui `openapi:verify` no pipeline |

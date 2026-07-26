@@ -285,11 +285,12 @@ Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 ### Ambiente (VM nova)
 
 ```bash
-cp .env.example .env
 npm install
-npm run db:push && npm run db:seed   # NÃO usar db:reset (bloqueado p/ agentes)
+npm run setup    # .env + db:push + seed condicional (idempotente; NÃO usar db:reset)
 npm run dev
 ```
+
+> Alternativa manual: `cp .env.example .env` → `npm run db:push && npm run db:seed`.
 
 > Se rodou `npm run test` antes e o login passar a dar 500 (`table main.User does not exist`),
 > apague o resíduo do dual-store: `rm -f prisma/.data-store-mode prisma/operation.db` (ver §9).
