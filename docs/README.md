@@ -3,8 +3,10 @@
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
 > **Produção:** **v3.0.8** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26i` (`6a668d13` @ `5c94251`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+>
+> **Pacote na `main`:** **v3.0.9** (hotfix timezone BRT) — aguardando deploy; ver [`versoes/V3_0.md`](versoes/V3_0.md) §v3.0.9.
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.8** (`bibi-poc-2026-07-26i` @ `5c94251`): jornada narrativa do consultório + reset operacional CEDIG — ver [`produto/JORNADA_CONSULTORIO.md`](produto/JORNADA_CONSULTORIO.md) · [`clientes/cedig/OPERACAO.md`](clientes/cedig/OPERACAO.md) · [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 26/07/2026 — `main` com **v3.0.9** (timezone `America/Sao_Paulo`); produção ainda **v3.0.8** até deploy confirmado — ver [`versoes/RELEASES.md`](versoes/RELEASES.md) · doc [`plataforma/TIMEZONE.md`](plataforma/TIMEZONE.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -82,6 +84,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`plataforma/OPERACOES.md`](plataforma/OPERACOES.md) | Mapa de operações e regras para agentes |
 | [`plataforma/VOA_INTEGRATION.md`](plataforma/VOA_INTEGRATION.md) | Integração Voa Health (assistente) |
 | [`plataforma/ARQUITETURA.md`](plataforma/ARQUITETURA.md) | Diagramas, épicos, stack |
+| [`plataforma/TIMEZONE.md`](plataforma/TIMEZONE.md) | Fuso operacional `America/Sao_Paulo` (agenda, slots, labels) |
 | [`plataforma/DEPLOY_NETLIFY.md`](plataforma/DEPLOY_NETLIFY.md) | Deploy e troubleshooting |
 | [`plataforma/OPERACAO_DADOS.md`](plataforma/OPERACAO_DADOS.md) | Dual-store demo/operação |
 | [`plataforma/VARIAVEIS_AMBIENTE.md`](plataforma/VARIAVEIS_AMBIENTE.md) | Env vars (local, CI, Netlify) |

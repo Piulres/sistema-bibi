@@ -73,6 +73,8 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
+Cobertura v3.0.9 timezone: `tests/unit/timezone.test.ts` — `parseAppDateTime`, `dayRangeInAppTz`, `civilDateISO`/`civilTimeHM`, `formatDateTimeBR`, `shiftCivilDate`, bordas 23:30 BRT. Doc: [`TIMEZONE.md`](TIMEZONE.md).
+
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
 **Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).

@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Sistema Bibi - ServiceOS — guia para agentes
 
-**Versão:** v3.0.8 · **Produção:** `docs/versoes/RELEASES.md` · https://sistema-bibi.netlify.app
+**Versão:** v3.0.9 · **Produção:** `docs/versoes/RELEASES.md` · https://sistema-bibi.netlify.app
 
 Plataforma **multi-segmento** Pay Per Use com **quatro portais** (Prestador, Interno, PJ, Beneficiário). Saúde = segmento `MEDICAL` — não é HealthOS.
 
@@ -69,6 +69,7 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 4. **Pós-`npm test`:** dual-store pode quebrar login → `npm run setup`
 5. **E2E:** pare `npm run dev` antes de `test:e2e` (porta 3100)
 6. **Schema-sync operation.db:** Blob congela schema — ver `docs/plataforma/OPERACAO_DADOS.md` §Schema-sync
+7. **Data/hora:** Netlify = UTC — usar `src/lib/timezone.ts` (nunca `toLocaleString`/`getHours` sem fuso) — ver `docs/plataforma/TIMEZONE.md`
 
 ## Índice de documentação
 
@@ -81,6 +82,7 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 | Fluxos de negócio | `docs/produto/FLUXOS.md` |
 | Jornada no consultório (narrativa) | `docs/produto/JORNADA_CONSULTORIO.md` |
 | Arquitetura | `docs/plataforma/ARQUITETURA.md` |
+| Fuso operacional (BRT) | `docs/plataforma/TIMEZONE.md` |
 | Env vars | `docs/plataforma/VARIAVEIS_AMBIENTE.md` |
 | Demo vs operação | `docs/plataforma/OPERACAO_DADOS.md` |
 | Deploy Netlify | `docs/plataforma/DEPLOY_NETLIFY.md` |

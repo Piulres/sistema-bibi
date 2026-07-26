@@ -35,6 +35,7 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |
 | CEDIG reset / `operation.db` Blob | `OPERACAO_DADOS.md` §Limpeza/Reset · `clientes/cedig/OPERACAO.md` · `scripts/reset-cedig-transactional.mjs` · `publish-operation-blob.mjs` |
+| Agenda / slots / data-hora / labels BRT | `TIMEZONE.md` · `src/lib/timezone.ts` · `tests/unit/timezone.test.ts` |
 
 ---
 

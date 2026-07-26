@@ -765,6 +765,20 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
 
+### Fuso operacional (v3.0.9)
+
+Agenda, slots, dashboards e labels usam **`America/Sao_Paulo`** via `src/lib/timezone.ts`.
+Netlify roda em UTC — conversão civil↔UTC é obrigatória em entrada, queries e formatação.
+
+| Camada | Arquivo |
+|--------|---------|
+| Módulo | `src/lib/timezone.ts` |
+| Slots | `scheduling-service.ts` |
+| Agenda | `appointment-service.ts`, `AgendaView.tsx` |
+| Lembretes | `reminder-service.ts` |
+
+Doc completa: [`TIMEZONE.md`](TIMEZONE.md) · testes: `tests/unit/timezone.test.ts`.
+
 ### Exports tabulares (v3.0.7)
 
 | Camada | Arquivo | Papel |
