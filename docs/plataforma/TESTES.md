@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~163** Route Handlers · **123** paths no OpenAPI. Revalidar com `npx vitest run` após adicionar testes.
+**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers ainda sem path — ver `npm run openapi:verify`). Revalidar com `npx vitest run` após adicionar testes.
 
 ### Onboarding tour (v3)
 
@@ -215,7 +215,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa das rotas API
 
-**FATO:** existem **160** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **37** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); ver [`API_DOCS.md`](API_DOCS.md) §5.
+**FATO:** existem **163** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **40** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); ver [`API_DOCS.md`](API_DOCS.md) §5 e §8 (gestão clínica).
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -330,7 +330,7 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao` |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
-| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU |
+| `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão; **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
 | `assistant.spec.ts` | Assistente operacional serverless |
 | `api-docs.spec.ts` | Swagger UI `/api-docs` |

@@ -377,7 +377,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 
 **Ponte automática (v2.6):** ao registrar lançamento, `src/lib/clinic-finance/bridge.ts` cria ou vincula `Patient`, `Appointment`, `ProcedureUsage` e `Invoice`. Estados: `bridgeStatus` = `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`.
 
-Doc completa: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · [`../versoes/V2_6.md`](../versoes/V2_6.md).
+Doc completa: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · [`../versoes/V2_6.md`](../versoes/V2_6.md) · contrato HTTP: [`../plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §8.
 
 ### 4.3 Cadastros (`CadastrosView`)
 
