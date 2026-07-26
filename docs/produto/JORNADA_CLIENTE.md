@@ -267,7 +267,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
-| Baixa | 13 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
+| Baixa | 14–15 abas na nav interna — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
 
 **Melhorias visuais implementadas (2026-06):** `StatCard` unificado em dashboard/PJ/beneficiário/faturamento; `FlowStepper` na jornada PPU; `CalloutCard` + `AppointmentCard` na agenda interna e prestador; `TabBar` em Cadastros; `EmptyState` com título e dica.
 
