@@ -118,7 +118,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 14 | Guards beneficiário inconsistentes | **CORRIGIDA (3.2)** | todas as rotas `src/app/api/beneficiario/*` usam `requireBeneficiary()` — `patientId` garantido e 403 consistente |
 | 15 | `proxy.ts` só presença do cookie | **MUDOU → OK** | agora valida HMAC (`verifySessionToken`); role fica no server-side (documentado) |
 | 16 | `SESSION_SECRET` fallback dev | **PERSISTE (endurecido)** | fallback só fora de produção; em produção exige ≥32 chars e rejeita fracos (`security/config.ts`) |
-| 17 | TISS XML sem XSD | **PERSISTE** | `buildTissGuideXml` gera XML simplificado (POC) |
+| 17 | TISS XML sem XSD | **PARCIAL (3.3)** | Validação estrutural adicionada: guia sem procedimentos ou sem documento → 422 `TissBuildError`; `escapeXml` cobre os 5 reservados. XSD oficial ANS segue fora do POC |
 | 18 | `rbac-gaps.test.ts` documenta lacuna | **MUDOU** | agora **afirma cobertura** (`withoutModuleGuard === []`, 15 módulos) |
 
 Resumo: **9 corrigidas**, **6 persistem**, **1 parcial**, **2 mudaram para OK/mais rígido**.
@@ -225,7 +225,7 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 | — | RBAC interno UI vs API | **OK** | Matriz UI = matriz API (94/94 rotas) |
 | — | MFA API | **OK** | `requireInternoModule("seguranca")` |
 | **Baixa** | `SESSION_SECRET` | Endurecido | Fallback dev só fora de produção; produção exige ≥32 chars e rejeita fracos (`src/lib/security/config.ts`) |
-| **Baixa** | TISS | POC | XML simplificado sem validação XSD (`src/lib/tiss-service.ts`) |
+| **Baixa** | TISS | POC endurecido (3.3) | Validação estrutural (422 para guia sem procedimentos/documento) em `src/lib/tiss-service.ts`; XSD oficial ANS fora do POC |
 
 ### O que funciona bem
 

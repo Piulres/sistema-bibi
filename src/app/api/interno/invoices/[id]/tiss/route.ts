@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildTissGuideXml } from "@/lib/tiss-service";
+import { buildTissGuideXml, TissBuildError } from "@/lib/tiss-service";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 
 type Params = { params: Promise<{ id: string }> };
@@ -21,6 +21,9 @@ export async function GET(_request: Request, { params }: Params) {
       },
     });
   } catch (error) {
+    if (error instanceof TissBuildError) {
+      return NextResponse.json({ error: error.message, code: error.code }, { status: 422 });
+    }
     return authErrorResponse(error);
   }
 }
