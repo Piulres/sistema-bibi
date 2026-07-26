@@ -432,26 +432,16 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
         <p className="hidden min-w-0 text-sm text-[var(--text-secondary)] md:block md:flex-1">
           Menus prontos + valor sugerido pela tabela. Confirme e salve.
         </p>
-<<<<<<< HEAD
-        <div data-tour-id="clinic-finance-export">
+        <div
+          className="w-full min-w-0 sm:ml-auto sm:w-auto"
+          data-cursor-id="clinic-finance-export"
+        >
           <ExportButtons
             baseUrl="/api/interno/clinic-finance/export"
             query={{ year: String(year), month: String(month) }}
             formats={LIST_EXPORT_FORMATS}
           />
         </div>
-=======
-        <Button
-          type="button"
-          variant="secondary"
-          size="sm"
-          onClick={exportMonth}
-          className="w-full sm:ml-auto sm:w-auto"
-          data-cursor-id="clinic-finance-export"
-        >
-          Exportar mês (Excel)
-        </Button>
->>>>>>> c34b957 (fix(gestao): layout responsivo da gestão clínica no mobile)
       </div>
 
       {form.appointmentId ? (
