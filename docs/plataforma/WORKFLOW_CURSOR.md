@@ -92,10 +92,16 @@ Evidências gravadas: [`../evidencias/`](../evidencias/).
 npm run pre-release
 ```
 
-Executa, em sequência:
+Executa, em sequência (`scripts/pre-release.mjs`):
 
 1. `npm run lint`
-2. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+2. `npm run docs:verify`
+3. `npm run openapi:verify`
+4. `npm run db:bootstrap:demo` (`SEED_SCALE=small`)
+5. `npm run db:verify`
+6. `npm test` (572 Vitest)
+7. `npm run netlify:build` (mesmo pipeline do CI Netlify)
+8. `npm run smoke:netlify-pwa` (smoke PWA/estáticos no artefato)
 
 Se passar, o pacote está **pronto para publicação** — mas ainda **não** foi publicado.
 

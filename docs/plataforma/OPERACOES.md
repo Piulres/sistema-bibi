@@ -78,10 +78,16 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 |--------|-----------|-------------|
 | `npm run dev` | Next.js dev server (:3000) | Desenvolvimento diário |
 | `npm run netlify:dev` | Netlify Dev (:8888 → :3000) | Testar Blobs, headers, proxy |
+| `npm run setup` | `.env` + `db:push` + seed condicional | VM nova (idempotente) |
 | `npm run lint` | ESLint | Antes de PR |
+| `npm run test` | Vitest (unit + security + integration + api) | Após mudança de lógica |
+| `npm run docs:verify` | Valida estrutura docs, marca e changelog | Antes de PR com docs |
+| `npm run cursor:verify` | Guardrail de drift `.cursor/` e `AGENTS.md` | Após mudar config Cursor |
+| `npm run openapi:sync` | Sincroniza paths novos no `openapi.yaml` | Após criar Route Handler |
+| `npm run openapi:verify` | Valida YAML vs Route Handlers | CI e pre-release |
 | `npm run build` | `next build` | Build Next puro |
 | `npm run netlify:build` | `db:push` + seed + `next build` | Mesmo pipeline do CI Netlify |
-| `npm run pre-release` | lint + `netlify:build` | **Validar pacote sem publicar** |
+| `npm run pre-release` | lint + docs + openapi + db + test + build + smoke PWA | **Validar pacote sem publicar** |
 | `npm run db:push` | Sincroniza schema SQLite | Após mudar `schema.prisma` |
 | `npm run db:seed` | Popula massa demo | Após push ou banco vazio |
 | `npm run db:bootstrap:demo` | Gera `demo.db` + `operation.db` + seed | Setup dual-store local |

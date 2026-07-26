@@ -20,7 +20,7 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | `main` / `dev` | **v3.0.4** · tip `1b9a597` |
 | Tags git | ✅ `v2.4.0` … `v3.0.4` |
 | Doc | [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V3_0.md`](../versoes/V3_0.md) |
-| Validação pré-deploy | `npm run pre-release` (lint + docs + db + test + build) |
+| Validação pré-deploy | `npm run pre-release` (lint + docs + openapi + db + test + build + smoke PWA) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |
 | Deploy Git automático | ✅ **Stop builds ON** — publicação só manual |
 | Plugin Blobs regional | ✅ `netlify/plugins/patch-regional-blobs` |
@@ -83,7 +83,7 @@ Credenciais de gateways reais: ver [`PAYMENTS.md`](PAYMENTS.md) e [`COMMUNICATIO
 ## Comandos locais (sem publicar)
 
 ```bash
-# Validar pacote fechado (lint + build Netlify) — RECOMENDADO antes de publicar
+# Validar pacote fechado (lint + docs + openapi + db + test + build + smoke PWA) — RECOMENDADO antes de publicar
 npm run pre-release
 
 # Validar só o build Netlify (mesmo pipeline do CI)
