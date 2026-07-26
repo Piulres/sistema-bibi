@@ -246,7 +246,7 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 | **Média** | Labels hardcoded | `src/lib/navigation/routes.ts`, `ClinicFinanceView.tsx` | Strings fixas "Pacientes"/"Beneficiários"/"Paciente" em nav e gestão clínica — deveriam usar `useLabels()`/`getTenantLabelsById` (backlog v2.0 §7) |
 | **Baixa** | Assistente | `src/app/api/assistant/chat/route.ts` | Auth = `requireUser()` (qualquer role); tools filtradas por role no registry. `confirm/route.ts` faz RBAC por ação mas não chama `canInternoWrite` — bypass só se a matriz der módulo de escrita a perfil read-only no futuro |
 | **Baixa** | Segmento público | `src/app/api/segment/persist/route.ts` | POST **sem autenticação** grava cookie de segmento e pode acionar `ensureDataStoreForSegmentAccess`. Intencional para landing multi-nicho, mas sem rate-limit |
-| **Baixa** | Ponte clinic-finance | `src/lib/clinic-finance/bridge.ts` | Cria paciente/appointment/usage/invoice em cascata; status `PARTIAL` em falha parcial → risco de dados órfãos se a UI não tratar `bridgeStatus` |
+| ~~Baixa~~ ✅ | Ponte clinic-finance | `src/lib/clinic-finance/bridge.ts` | **Verificado (rodada 3.2):** a UI já trata `bridgeStatus` — toast com mensagem por status (SYNCED/PARTIAL/FAILED + `bridgeNote`) e coluna "Ponte" na lista de lançamentos. Retry automático de ponte parcial fica como feature futura |
 | **Baixa** | Procedures compartilhada | `src/app/api/procedures/route.ts` | `requireUser(["PRESTADOR","INTERNO","BENEFICIARIO"])` — INTERNO sem guard de módulo (leitura de catálogo; impacto baixo) |
 
 ---
