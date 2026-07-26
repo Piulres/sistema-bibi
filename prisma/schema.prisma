@@ -58,6 +58,7 @@ model Tenant {
   projectContracts      ProjectContract[]
   clinicExamLaunches    ClinicExamLaunch[]
   calendarFeeds         CalendarFeed[]
+  calendarConnections   CalendarConnection[]
   clinicExpenses        ClinicExpense[]
 }
 
@@ -135,6 +136,7 @@ model User {
   clinicExamLaunchesCreated    ClinicExamLaunch[] @relation("ClinicExamLaunchCreatedBy")
   clinicExpensesCreated        ClinicExpense[]    @relation("ClinicExpenseCreatedBy")
   calendarFeeds                CalendarFeed[]
+  calendarConnections          CalendarConnection[]
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -437,6 +439,57 @@ model CalendarFeed {
   @@index([userId])
 }
 
+
+/// Conexão OAuth com calendário externo (push automático).
+/// provider: GOOGLE | MICROSOFT
+/// scope: PROVIDER | TENANT
+/// status: ACTIVE | ERROR | REVOKED
+model CalendarConnection {
+  id              String   @id @default(cuid())
+  provider        String
+  scope           String
+  accountEmail    String?
+  /// primary (Google) ou id do calendário (Microsoft)
+  calendarId      String   @default("primary")
+  accessTokenEnc  String
+  refreshTokenEnc String?
+  expiresAt       DateTime?
+  status          String   @default("ACTIVE")
+  lastError       String?
+  lastSyncedAt    DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  externalEvents AppointmentExternalEvent[]
+
+  @@unique([tenantId, userId, provider, scope])
+  @@index([tenantId, scope, status])
+  @@index([userId, status])
+}
+
+/// Mapeamento Appointment ↔ evento externo (para update/delete).
+model AppointmentExternalEvent {
+  id              String   @id @default(cuid())
+  externalEventId String
+  lastSyncedAt    DateTime @default(now())
+  createdAt       DateTime @default(now())
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  connectionId String
+  connection   CalendarConnection @relation(fields: [connectionId], references: [id], onDelete: Cascade)
+
+  @@unique([appointmentId, connectionId])
+  @@index([connectionId])
+}
+
 /// Agendamento (Agenda Inteligente).
 /// status: AGENDADO | CONFIRMADO | REALIZADO | FALTOU | CANCELADO
 /// modality: PRESENCIAL | TELE
@@ -473,6 +526,7 @@ model Appointment {
   examOrders     ExamOrder[]
   protocolEnrollments PatientProtocolEnrollment[]
   clinicExamLaunch ClinicExamLaunch?
+  externalCalendarEvents AppointmentExternalEvent[]
 }
 
 /// Uso efetivo de procedimento (nucleo do Pay Per Use).

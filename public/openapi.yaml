@@ -572,6 +572,61 @@ paths:
           description: text/calendar
         '404': { description: Token inválido ou revogado }
 
+  /api/calendar/oauth/{provider}/start:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+      - name: scope
+        in: query
+        schema: { type: string, enum: [PROVIDER, TENANT] }
+      - name: returnTo
+        in: query
+        schema: { type: string }
+    get:
+      tags: [Público]
+      summary: Inicia OAuth Google/Microsoft Calendar
+      responses:
+        '302': { description: Redirect ao provedor }
+        '503': { description: Credenciais OAuth não configuradas }
+
+  /api/calendar/oauth/{provider}/callback:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    get:
+      tags: [Público]
+      summary: Callback OAuth — grava CalendarConnection
+      responses:
+        '302': { description: Redirect de volta ao portal }
+
+  /api/prestador/calendar/connections/{provider}:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    delete:
+      tags: [Prestador]
+      summary: Desconecta calendário OAuth do prestador
+      responses:
+        '200': { description: Desconectado }
+
+  /api/interno/calendar/connections/{provider}:
+    parameters:
+      - name: provider
+        in: path
+        required: true
+        schema: { type: string, enum: [google, microsoft] }
+    delete:
+      tags: [Interno]
+      summary: Desconecta calendário OAuth da operação
+      responses:
+        '200': { description: Desconectado }
+
   /api/prestador/appointments/{id}:
     parameters:
       - name: id

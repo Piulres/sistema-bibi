@@ -12,6 +12,7 @@ import {
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
+import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
 
 /** Detalhe de um agendamento: paciente, procedimentos usados e prontuario. */
 export async function GET(
@@ -161,6 +162,8 @@ export async function PATCH(
         scheduledAt: updated.scheduledAt.toISOString(),
       },
     });
+
+    queueAppointmentCalendarSync(updated.id);
 
     return NextResponse.json({ ok: true, status: body.status });
   } catch (error) {

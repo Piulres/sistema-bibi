@@ -11,6 +11,7 @@ import {
 import { validatePetForAppointment } from "@/lib/pet-service";
 import { requiresPet } from "@/lib/vet-niche";
 import { canTransitionAppointmentStatus } from "@/lib/appointment-status";
+import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
 
 export {
   APPOINTMENT_STATUSES,
@@ -303,6 +304,8 @@ export async function createAppointment(input: {
     },
   });
 
+  queueAppointmentCalendarSync(finalAppointment.id);
+
   return { appointment: mapAppointment(finalAppointment) };
 }
 
@@ -395,6 +398,8 @@ export async function updateAppointment(input: {
       previousScheduledAt: existing.scheduledAt.toISOString(),
     },
   });
+
+  queueAppointmentCalendarSync(appointment.id);
 
   return { appointment: mapAppointment(appointment) };
 }

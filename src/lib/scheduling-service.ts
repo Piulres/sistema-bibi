@@ -7,6 +7,7 @@ import {
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
 import { dispatchWebhooks } from "@/lib/webhook-service";
+import { queueAppointmentCalendarSync } from "@/lib/calendar/calendar-sync-service";
 
 /** Horário comercial simplificado para slots (POC). */
 const SLOT_START_HOUR = 8;
@@ -265,6 +266,8 @@ export async function cancelBeneficiaryAppointment(input: {
       scheduledAt: appointment.scheduledAt.toISOString(),
     },
   });
+
+  queueAppointmentCalendarSync(appointment.id);
 
   return { ok: true as const, status: "CANCELADO" as const };
 }

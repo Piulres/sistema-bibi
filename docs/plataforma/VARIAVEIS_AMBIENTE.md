@@ -37,7 +37,11 @@ Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp
 | `VOA_ENABLED` | Não | `false` | Assistente IA Voa no atendimento |
 | `VOA_INTEGRATION_TOKEN` | Se Voa ativo | — | Token plugin Voa Health |
 | `VOA_ENV` | Não | `homologacao` | `homologacao` \| `producao` (referência operacional) |
-| `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph, URLs de feed ICS de calendário |
+| `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph, redirect OAuth e feeds ICS |
+| `GOOGLE_CALENDAR_CLIENT_ID` / `_SECRET` | Para push Google | — | OAuth Google Calendar |
+| `MICROSOFT_CALENDAR_CLIENT_ID` / `_SECRET` | Para push Microsoft | — | OAuth Microsoft Graph |
+| `MICROSOFT_CALENDAR_TENANT` | Não | `common` | Tenant Azure (`common` ou GUID) |
+| `CALENDAR_OAUTH_MOCK` | Não | `false` | `true` = adapters mock (demo/teste) |
 | `NEXT_PUBLIC_SALES_WHATSAPP` | Não | — | CTA comercial WhatsApp na landing |
 | `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Não | mensagem padrão | Texto pré-preenchido no wa.me |
 | `NEXT_PUBLIC_DEMO_VIDEO_URL` | Não | — | URL YouTube para embed em `#demo-video` na home |
@@ -273,7 +277,23 @@ Contato sandbox: integration@voahealth.com
 NEXT_PUBLIC_SITE_URL=https://sistema-bibi.netlify.app
 ```
 
-Também usada como host absoluto dos feeds ICS (`/api/calendar/feed/{token}`) — ver [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md).
+Também usada como host absoluto dos redirects OAuth e feeds ICS — ver [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md).
+
+### OAuth de calendário (Google / Microsoft)
+
+| Variável | Uso |
+|----------|-----|
+| `GOOGLE_CALENDAR_CLIENT_ID` | Client ID OAuth Web (Google Cloud) |
+| `GOOGLE_CALENDAR_CLIENT_SECRET` | Secret do client Google |
+| `MICROSOFT_CALENDAR_CLIENT_ID` | Application (client) ID Azure |
+| `MICROSOFT_CALENDAR_CLIENT_SECRET` | Client secret Azure |
+| `MICROSOFT_CALENDAR_TENANT` | `common` (multi-tenant) ou ID do tenant |
+| `CALENDAR_OAUTH_MOCK` | `true` força adapters mock sem chamar APIs reais |
+
+Redirects obrigatórios:
+
+- `{NEXT_PUBLIC_SITE_URL}/api/calendar/oauth/google/callback`
+- `{NEXT_PUBLIC_SITE_URL}/api/calendar/oauth/microsoft/callback`
 
 ### `URL` (Netlify)
 

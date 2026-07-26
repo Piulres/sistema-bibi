@@ -186,7 +186,7 @@ export default function IntegracoesView() {
         <Card>
           <SectionHeader
             title="Calendários externos"
-            description="Médicos e recepção sincronizam a agenda via feed ICS (Google Agenda, Outlook, Apple Calendar) nas telas de Agenda. Para automações B2B (Zapier/Make → Google Calendar), use os webhooks APPOINTMENT_* abaixo."
+            description="Melhor caminho: conectar Google ou Microsoft com OAuth nas telas de Agenda (push automático). Feed ICS permanece como fallback (Apple). Automações B2B: webhooks APPOINTMENT_* abaixo."
           />
           <p className="mt-3 text-sm text-[var(--text-muted)]">
             Portal prestador:{" "}
@@ -198,7 +198,7 @@ export default function IntegracoesView() {
             <a href="/interno/agenda" className="text-[var(--portal-accent)] underline">
               /interno/agenda
             </a>
-            . Documentação:{" "}
+            . Doc:{" "}
             <span className="font-mono text-xs">docs/plataforma/CALENDAR_INTEGRATION.md</span>
           </p>
         </Card>

@@ -9,8 +9,12 @@ import {
   getActiveCalendarFeed,
   revokeCalendarFeed,
 } from "@/lib/calendar/calendar-feed-service";
+import {
+  listCalendarConnections,
+  oauthStartPath,
+} from "@/lib/calendar/calendar-connection-service";
 
-/** Feed ICS operacional do tenant (recepção / operação). */
+/** Feed ICS + conexões OAuth da operação. */
 export async function GET() {
   try {
     const user = await requireInternoModule("agenda");
@@ -18,7 +22,20 @@ export async function GET() {
       tenantId: user.tenantId,
       scope: "TENANT",
     });
-    return NextResponse.json({ feed });
+    const { connections, providers } = await listCalendarConnections({
+      tenantId: user.tenantId,
+      userId: user.id,
+      scope: "TENANT",
+    });
+    return NextResponse.json({
+      feed,
+      connections,
+      providers,
+      oauth: {
+        googleStart: oauthStartPath("GOOGLE", "TENANT", "/interno/agenda"),
+        microsoftStart: oauthStartPath("MICROSOFT", "TENANT", "/interno/agenda"),
+      },
+    });
   } catch (error) {
     return authErrorResponse(error);
   }

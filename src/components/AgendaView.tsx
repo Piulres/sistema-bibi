@@ -125,8 +125,9 @@ export default function AgendaView() {
       <div className="space-y-4">
         <CalendarFeedPanel
           apiPath="/api/prestador/calendar"
+          connectionsApiPath="/api/prestador/calendar/connections"
           title="Levar agenda para Google, Outlook ou Apple"
-          description="Assine um feed secreto: a agenda deste prestador atualiza sozinha no calendário pessoal. Também dá para adicionar um atendimento avulso pelo botão Calendário em cada card."
+          description="Conecte Google ou Microsoft para push automático. Use o feed ICS para Apple. Em cada card, o botão Calendário adiciona um atendimento avulso."
         />
 
         {summary && (

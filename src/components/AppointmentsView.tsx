@@ -275,8 +275,9 @@ export default function AppointmentsView() {
       <div className="space-y-8">
         <CalendarFeedPanel
           apiPath="/api/interno/calendar"
+          connectionsApiPath="/api/interno/calendar/connections"
           title="Calendário da operação (Google / Outlook / Apple)"
-          description="Assine a agenda do tenant no calendário da recepção. Cada card também tem Calendário para um atendimento avulso."
+          description="Conecte Google ou Microsoft na recepção para push automático da agenda do tenant. Feed ICS fica como fallback (Apple)."
         />
 
         {walkInEphemeral ? (

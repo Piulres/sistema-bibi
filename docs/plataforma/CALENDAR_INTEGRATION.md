@@ -1,96 +1,122 @@
 # Integração de agendas com calendários externos
 
-Sistema Bibi - ServiceOS — Google Agenda, Microsoft Outlook / 365, Apple Calendar e qualquer cliente que aceite **ICS (RFC 5545)**.
+Sistema Bibi - ServiceOS — **push OAuth** (Google Agenda + Microsoft Outlook/365) e fallback **ICS** (Apple e inscrição por URL).
 
-## Como funciona (escolha por persona)
+## Experiência recomendada (melhor caminho)
 
-| Persona | Caminho | O que ganha |
-|---------|---------|-------------|
-| **Médico / prestador** | `/prestador` → painel “Levar agenda…” | Feed ICS pessoal + botão **Calendário** por atendimento |
-| **Operador / recepção** | `/interno/agenda` → painel da operação | Feed ICS do tenant + botão por atendimento |
-| **Integrações B2B** | `/interno/integracoes` + webhooks `APPOINTMENT_*` | Zapier/Make → Google Calendar / Graph sem OAuth no Bibi |
+| Persona | Onde | O que fazer |
+|---------|------|-------------|
+| **Médico** | `/prestador` | **Conectar** Google ou Microsoft → agenda espelhada com push automático |
+| **Operador** | `/interno/agenda` | **Conectar** Google/Microsoft da operação → vê a agenda do tenant |
+| **Apple / sem OAuth** | mesmo painel → Feed ICS | Assinar URL secreta |
+| **Atendimento avulso** | botão **Calendário** no card | Template Google / Outlook / `.ics` |
+| **B2B / Zapier** | `/interno/integracoes` | Webhooks `APPOINTMENT_*` |
 
-Não há OAuth Google/Microsoft nesta versão: a sincronização contínua usa **inscrição por URL** (padrão suportado pelos três grandes). Push OAuth (Graph / Google Calendar API) fica como evolução — ver §Roadmap.
+Fluxo feliz do médico:
 
-## Fluxos
+1. Login prestador → painel **Conexão direta** → Conectar Google (ou Microsoft).
+2. Autoriza o app no provedor (OAuth).
+3. Novos agendamentos, remarcações e cancelamentos são **empurrados** para o calendário em segundos.
+4. (Opcional) Feed ICS para Apple no mesmo painel.
 
-### 1) Assinar a agenda (sync contínuo)
+## Arquitetura
 
-1. Prestador ou interno gera o link secreto no painel.
-2. Copia a URL `/api/calendar/feed/{token}`.
-3. No calendário externo:
-   - **Google Agenda** → Outros calendários → + → A partir de URL
-   - **Outlook** → Adicionar calendário → Subscrever a partir da web
-   - **Apple Calendar** → Arquivo → Nova inscrição de calendário
-4. O cliente consulta o feed periodicamente; criações, remarcações e cancelamentos refletem no ICS (`STATUS:CANCELLED` quando aplicável).
+```mermaid
+flowchart LR
+  A[create/update/cancel Appointment] --> Q[queueAppointmentCalendarSync]
+  Q --> S[calendar-sync-service]
+  S --> G[Google Calendar API]
+  S --> M[Microsoft Graph]
+  S --> Map[AppointmentExternalEvent]
+  UI[Conectar] --> OAuth[OAuth start/callback]
+  OAuth --> Conn[CalendarConnection]
+  Conn --> S
+  Feed[CalendarFeed token] --> ICS[/api/calendar/feed/token]
+```
 
-O token é opaco (32 bytes base64url). **Rotacionar** invalida a URL antiga; **Revogar** desativa o feed.
+| Peça | Papel |
+|------|--------|
+| `CalendarConnection` | Tokens OAuth cifrados (AES-GCM) por usuário + provedor + escopo |
+| `AppointmentExternalEvent` | Mapa `appointmentId` ↔ `externalEventId` (update/delete) |
+| `CalendarFeed` | Feed ICS assinável (fallback) |
+| Adapters | `src/lib/calendar/providers/{google,microsoft,mock}.ts` |
 
 Escopos:
 
-- `PROVIDER` — só agendamentos do prestador logado
+- `PROVIDER` — só agenda do prestador conectado
 - `TENANT` — agenda operacional do tenant (recepção)
 
-Janela do feed: **7 dias atrás → 90 dias à frente**. Duração implícita do evento: **30 minutos** (igual ao motor de slots).
+## Variáveis de ambiente
 
-### 2) Um atendimento avulso
+```env
+# Host público (redirect OAuth + URLs de feed)
+NEXT_PUBLIC_SITE_URL=https://seu-dominio.com
 
-No card da agenda → **Calendário**:
+# Google Cloud Console → OAuth client (Web)
+# Redirect: {SITE}/api/calendar/oauth/google/callback
+GOOGLE_CALENDAR_CLIENT_ID=
+GOOGLE_CALENDAR_CLIENT_SECRET=
 
-- Abrir template no **Google Agenda**
-- Abrir compose no **Outlook** / **Microsoft 365**
-- Baixar **`.ics`** (Apple e outros)
+# Azure App Registration → Web redirect
+# Redirect: {SITE}/api/calendar/oauth/microsoft/callback
+MICROSOFT_CALENDAR_CLIENT_ID=
+MICROSOFT_CALENDAR_CLIENT_SECRET=
+MICROSOFT_CALENDAR_TENANT=common
 
-APIs:
+# Demo/testes sem secrets reais (adapters mock)
+CALENDAR_OAUTH_MOCK=false
+```
 
-- `GET /api/prestador/appointments/{id}/calendar`
-- `GET /api/interno/appointments/{id}/calendar`
-- `?format=ics` → download
+Tokens OAuth são cifrados com chave derivada de `SESSION_SECRET`.
 
-### 3) Automação via webhook
+### Setup Google (resumo)
 
-Eventos (além dos já existentes):
+1. Google Cloud Console → APIs → enable **Google Calendar API**
+2. Credenciais → OAuth 2.0 Client ID (Web)
+3. Authorized redirect URI = `https://<host>/api/calendar/oauth/google/callback`
+4. Escopos usados: `calendar.events`, `email`, `openid`
 
-- `APPOINTMENT_CREATED`
-- `APPOINTMENT_UPDATED`
-- `APPOINTMENT_CANCELLED`
+### Setup Microsoft (resumo)
 
-Úteis para Make/Zapier criarem/atualizarem eventos no Google Calendar ou Microsoft Graph sem armazenar tokens OAuth no ServiceOS.
+1. Azure Portal → App registration
+2. Redirect URI (Web) = `https://<host>/api/calendar/oauth/microsoft/callback`
+3. Certificates & secrets → client secret
+4. API permissions (delegated): `Calendars.ReadWrite`, `User.Read`, `offline_access`
 
-## Modelo e código
+## APIs
 
-| Peça | Caminho |
-|------|---------|
-| Prisma `CalendarFeed` | `prisma/schema.prisma` |
-| ICS puro | `src/lib/calendar/ics.ts` |
-| Mapeamento Appointment → evento | `src/lib/calendar/appointment-event.ts` |
-| Links Google/Outlook | `src/lib/calendar/external-links.ts` |
-| Feed service | `src/lib/calendar/calendar-feed-service.ts` |
-| Feed público | `src/app/api/calendar/feed/[token]/route.ts` |
-| UI | `CalendarFeedPanel`, `AddToCalendarMenu` |
+| Método | Path | Auth |
+|--------|------|------|
+| GET | `/api/prestador/calendar` | Prestador — feed + connections + oauth starts |
+| GET | `/api/interno/calendar` | Interno agenda — idem (scope TENANT) |
+| DELETE | `/api/{portal}/calendar/connections/{google\|microsoft}` | Desconecta |
+| GET | `/api/calendar/oauth/{google\|microsoft}/start` | Inicia OAuth |
+| GET | `/api/calendar/oauth/{google\|microsoft}/callback` | Callback |
+| GET | `/api/calendar/feed/{token}` | Feed ICS público |
+| GET | `/api/{portal}/appointments/{id}/calendar` | Links one-shot + ICS |
 
-## Variáveis
-
-`NEXT_PUBLIC_SITE_URL` (ou `URL` na Netlify) define o host absoluto das URLs de feed. Sem isso, o fallback é a URL canônica de produção — em local, configure o site URL se for testar inscrição real no Google.
+Webhooks: `APPOINTMENT_CREATED`, `APPOINTMENT_UPDATED`, `APPOINTMENT_CANCELLED`.
 
 ## Segurança
 
-- Feed **não** usa cookie de sessão: o segredo é o token na URL.
-- Trate o link como senha; não publique em canais abertos.
-- Em vazamento → **Rotacionar** ou **Revogar**.
-- Isolamento por `tenantId` (+ `providerId` no escopo PROVIDER).
+- Access/refresh tokens **nunca** em texto puro no banco
+- State OAuth assinado (HMAC) + cookie httpOnly + nonce + TTL 10 min
+- `returnTo` só paths internos (`/…`)
+- Feed ICS: token opaco = segredo; rotacionar se vazar
+- Isolamento por `tenantId` / `userId`
 
-## Roadmap (não neste pacote)
+## Limitações atuais
 
-1. OAuth Google Calendar / Microsoft Graph com push bidirecional e `CalendarConnection`
-2. Feed do beneficiário (“minha agenda”)
-3. Duração configurável por procedimento (hoje fixa em 30 min)
-4. Evento `APPOINTMENT_RESCHEDULED` dedicado (hoje cobre-se com `APPOINTMENT_UPDATED`)
+- Sync **outbound** (ServiceOS → calendário). Mudanças feitas só no Google/Outlook não voltam (ainda).
+- Duração do evento: **30 min** (slots)
+- Um calendário `primary` por conexão
 
-## Validação rápida
+## Validação
 
 ```bash
 npx prisma db push
-npx vitest run tests/lib/calendar-ics.test.ts
-# UI: login prestador → /prestador → Gerar link → abrir URL do feed no browser (deve baixar/ver VCALENDAR)
+npx vitest run tests/lib/calendar-ics.test.ts tests/lib/calendar-oauth.test.ts
+# Demo sem secrets:
+# CALENDAR_OAUTH_MOCK=true npm run dev
+# Login prestador → Conectar Google → mock completa o fluxo
 ```

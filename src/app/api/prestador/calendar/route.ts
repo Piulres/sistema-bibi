@@ -5,8 +5,12 @@ import {
   getActiveCalendarFeed,
   revokeCalendarFeed,
 } from "@/lib/calendar/calendar-feed-service";
+import {
+  listCalendarConnections,
+  oauthStartPath,
+} from "@/lib/calendar/calendar-connection-service";
 
-/** Status do feed ICS do prestador logado. */
+/** Status do feed ICS + conexões OAuth do prestador. */
 export async function GET() {
   try {
     const user = await requireUser(["PRESTADOR"]);
@@ -15,7 +19,20 @@ export async function GET() {
       scope: "PROVIDER",
       userId: user.id,
     });
-    return NextResponse.json({ feed });
+    const { connections, providers } = await listCalendarConnections({
+      tenantId: user.tenantId,
+      userId: user.id,
+      scope: "PROVIDER",
+    });
+    return NextResponse.json({
+      feed,
+      connections,
+      providers,
+      oauth: {
+        googleStart: oauthStartPath("GOOGLE", "PROVIDER", "/prestador"),
+        microsoftStart: oauthStartPath("MICROSOFT", "PROVIDER", "/prestador"),
+      },
+    });
   } catch (error) {
     return authErrorResponse(error);
   }
