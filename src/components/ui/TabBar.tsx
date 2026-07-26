@@ -4,7 +4,7 @@ import ScrollableNavRail from "@/components/ui/ScrollableNavRail";
 export type TabBarItem = {
   key: string;
   label: string;
-  /** Rótulo curto em viewports estreitas (mobile). */
+  /** Rótulo curto em viewports estreitas / colunas com sidebar. */
   shortLabel?: string;
 };
 
@@ -26,7 +26,7 @@ export default function TabBar({
   return (
     <ScrollableNavRail className={className}>
       <nav
-        className="flex w-max min-w-full gap-0.5 border-b border-[var(--border-default)] sm:gap-1"
+        className="flex w-max min-w-full gap-0.5 border-b border-[var(--border-default)]"
         aria-label={ariaLabel}
       >
         {tabs.map((tab) => (
@@ -36,8 +36,8 @@ export default function TabBar({
             onClick={() => onSelect(tab.key)}
             title={tab.label}
             className={cn(
-              "-mb-px shrink-0 snap-start border-b-2 px-3 py-3 text-sm font-medium transition sm:px-4 sm:py-2.5",
-              "min-h-11 touch-manipulation",
+              "-mb-px shrink-0 snap-start border-b-2 px-2.5 py-2.5 text-sm font-medium transition",
+              "min-h-11 touch-manipulation sm:px-3 xl:px-4",
               active === tab.key
                 ? "border-[var(--brand-accent)] text-[var(--brand-accent)]"
                 : "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]",
@@ -46,8 +46,9 @@ export default function TabBar({
           >
             {tab.shortLabel ? (
               <>
-                <span className="sm:hidden">{tab.shortLabel}</span>
-                <span className="hidden sm:inline">{tab.label}</span>
+                {/* shortLabel até xl: coluna com sidebar corta rótulos longos no desktop médio */}
+                <span className="xl:hidden">{tab.shortLabel}</span>
+                <span className="hidden xl:inline">{tab.label}</span>
               </>
             ) : (
               tab.label

@@ -217,10 +217,10 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
         <ClinicalSidebar data={clinicalSidebar} />
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <TabBar
             tabs={[...careTabs]}
             active={historyTab}

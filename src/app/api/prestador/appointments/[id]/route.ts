@@ -27,7 +27,13 @@ export async function GET(
       include: {
         patient: { include: { company: true } },
         pet: { select: { id: true, name: true, species: true, breed: true } },
-        usages: { include: { procedure: true }, orderBy: { performedAt: "asc" } },
+        usages: {
+          include: {
+            procedure: true,
+            invoiceItem: { include: { invoice: { select: { id: true, status: true } } } },
+          },
+          orderBy: { performedAt: "asc" },
+        },
         medicalRecords: { orderBy: { createdAt: "desc" } },
       },
     });
@@ -65,6 +71,8 @@ export async function GET(
         priceCharged: u.priceCharged,
         priceLabel: formatBRL(u.priceCharged),
         billed: u.billed,
+        invoiceId: u.invoiceItem?.invoice?.id ?? null,
+        invoiceStatus: u.invoiceItem?.invoice?.status ?? null,
       })),
       records: appointment.medicalRecords.map((r) => ({
         id: r.id,

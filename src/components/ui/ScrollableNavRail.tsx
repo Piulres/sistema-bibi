@@ -27,32 +27,46 @@ export default function ScrollableNavRail({ children, className }: Props) {
     if (!el) return;
 
     updateScrollState();
+    // Remedir após paint — largura dos botões de aba pode ainda não estar estável.
+    const raf = requestAnimationFrame(() => updateScrollState());
+
     el.addEventListener("scroll", updateScrollState, { passive: true });
-    const observer = new ResizeObserver(updateScrollState);
-    observer.observe(el);
+    const resizeObserver = new ResizeObserver(updateScrollState);
+    resizeObserver.observe(el);
+    // Observa o filho (nav) — tabs dinâmicas mudam scrollWidth sem redimensionar o wrapper.
+    const child = el.firstElementChild;
+    if (child) resizeObserver.observe(child);
+
+    const mutationObserver = new MutationObserver(updateScrollState);
+    mutationObserver.observe(el, { childList: true, subtree: true, characterData: true });
+
+    window.addEventListener("resize", updateScrollState);
 
     return () => {
+      cancelAnimationFrame(raf);
       el.removeEventListener("scroll", updateScrollState);
-      observer.disconnect();
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+      window.removeEventListener("resize", updateScrollState);
     };
-  }, [updateScrollState]);
+  }, [updateScrollState, children]);
 
   function scrollByPage(direction: -1 | 1) {
-    scrollRef.current?.scrollBy({ left: direction * 200, behavior: "smooth" });
+    scrollRef.current?.scrollBy({ left: direction * 180, behavior: "smooth" });
   }
 
   return (
-    <div className={cn("relative min-w-0 max-w-full", className)}>
+    <div className={cn("relative min-w-0 max-w-full overflow-hidden", className)}>
       {canScrollLeft && (
         <>
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--surface-page)] to-transparent"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--surface-card)] via-[var(--surface-card)]/80 to-transparent"
             aria-hidden
           />
           <button
             type="button"
             onClick={() => scrollByPage(-1)}
-            className="absolute left-0 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            className="absolute left-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             aria-label="Rolar navegação para a esquerda"
           >
             <ChevronIcon direction="left" />
@@ -63,13 +77,13 @@ export default function ScrollableNavRail({ children, className }: Props) {
       {canScrollRight && (
         <>
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--surface-page)] to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--surface-card)] via-[var(--surface-card)]/80 to-transparent"
             aria-hidden
           />
           <button
             type="button"
             onClick={() => scrollByPage(1)}
-            className="absolute right-0 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            className="absolute right-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
             aria-label="Rolar navegação para a direita"
           >
             <ChevronIcon direction="right" />
@@ -80,11 +94,11 @@ export default function ScrollableNavRail({ children, className }: Props) {
       <div
         ref={scrollRef}
         className={cn(
-          "ds-scroll-x scroll-smooth",
+          "ds-scroll-x min-w-0 max-w-full scroll-smooth overflow-x-auto",
           "snap-x snap-mandatory scroll-px-4",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          canScrollLeft && "pl-8",
-          canScrollRight && "pr-8",
+          canScrollLeft && "pl-9",
+          canScrollRight && "pr-9",
         )}
       >
         {children}
