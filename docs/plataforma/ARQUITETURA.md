@@ -756,7 +756,7 @@ Bridge assinatura → fatura, PIX mock, marcar PAGA, lembretes automáticos.
 
 ## 17. Tier 2 — Operação
 
-CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estruturado, hash scrypt.
+CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato, PEP estruturado, hash scrypt.
 
 | Rota UI | Serviço |
 |---------|---------|
@@ -764,6 +764,18 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 | `/interno/agenda` | `appointment-service` |
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
+
+### Exports tabulares (v3.0.7)
+
+| Camada | Arquivo | Papel |
+|--------|---------|-------|
+| UI | `ExportButtons.tsx` | Links `?format=` por portal |
+| Formatos | `exports/format.ts` | `REPORT_EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, MIME types |
+| Servidor | `exports/serve.ts` | `serveTabularExport`, `serveBufferExport` |
+| CSV | `imports/interchange.ts` | BOM UTF-8 + colunas canônicas |
+| Builders | `exports/builders.ts` | Datasets por domínio (billing, CRM, auditoria…) |
+
+Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes: `tests/api/exports.test.ts`.
 
 ---
 
@@ -795,6 +807,9 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 Visão consolidada de KPIs do tenant no Portal Interno, agregando dados dos
 épicos anteriores sem duplicar entidades.
 
+**UX v3.0.7:** hierarquia em camadas — 4 KPIs principais (`StatCard`), barra secundária compacta, alerta com link para Gestão clínica (evita dupla contagem de receita operacional), atalhos rápidos e seções Receita/CRM em grid 2 colunas.
+
+
 ```mermaid
 flowchart LR
   Page["/interno/dashboard"] --> API["GET /api/interno/dashboard"]
@@ -813,6 +828,9 @@ flowchart LR
 | MRR estimado | `Subscription` ATIVA (normalizado mensal) |
 | Pipeline CRM | `Company` por status |
 | Atividade recente | `TimelineEvent` (últimos 10) |
+| Gestão clínica (mês) | `clinicFinance` — exames, receita, despesas, lucro |
+
+**Hierarquia UI (v3.0.7):** alerta de fonte dos números → 4 KPIs principais (`StatCard`) → faixa secundária → cards Receita/CRM/atividade. Ver `ExecutiveDashboardView.tsx`.
 
 ### Checklist de homologação (Épico 8)
 
@@ -828,7 +846,7 @@ flowchart LR
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/openapi.yaml).
 
-| Métrica | Valor (v3.0.6) |
+| Métrica | Valor (v3.0.7) |
 |---------|----------------|
 | Route Handlers | **160** em `src/app/api/**/route.ts` |
 | Paths OpenAPI | **123** (sync automático) |
