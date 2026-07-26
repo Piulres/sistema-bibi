@@ -92,6 +92,7 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
+| 2026-07-26 | Reset operacional CEDIG (produção Blobs): zerou pacientes/agenda/lançamentos/faturas/despesas/PEP; manteve 11 usuários + 5 exames; restaurou 3 empresas + 15 PricingRules. Scripts `reset-cedig-transactional.mjs` + `cedig-ensure-commercial.ts` + `publish-operation-blob.mjs` · evento `CEDIG_TRANSACTIONAL_RESET` | ✅ |
 | 2026-07-26 | Pacote **v3.0.7** em produção: drawer mobile direita + dashboard executivo + gestão mobile + exports canônicos | ✅ |
 | 2026-07-26 | Pacote **v3.0.6** em produção: home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) | ✅ |
 | 2026-07-26 | Pacote **v3.0.5** em produção: jornada faturada + documentos clínicos + UX landing/portais (#221/#225–#227) | ✅ |
