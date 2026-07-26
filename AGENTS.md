@@ -181,14 +181,13 @@ Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particula
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
-- **Gotcha pós-`npm test`:** a suíte Vitest (`tests/lib/data-store-mode.test.ts`)
- chama `setDataStoreMode("operation")` e deixa `prisma/.data-store-mode=operation`
- no diretório real. Como o dual-store está ligado em dev, o `npm run dev` sobe em
- **modo operação** apontando para `prisma/operation.db` (vazio) e o login quebra com
- `Erro de conexão` / `The table main.User does not exist`. **Correção:** apague
- `prisma/.data-store-mode` (volta a `demo`, usa o `prisma/dev.db` seedado) ou troque
- para demo em `/interno/seguranca`. Rode `npm run dev` **depois** de limpar esse arquivo
- se acabou de rodar os testes.
+- **Gotcha pós-`npm test` (causa raiz corrigida):** a suíte Vitest
+ (`tests/lib/data-store-mode.test.ts`) chamava `setDataStoreMode("operation")` e deixava
+ `prisma/.data-store-mode=operation` no diretório real — o `npm run dev` subia em **modo
+ operação** apontando para `prisma/operation.db` (vazio) e o login quebrava com
+ `The table main.User does not exist`. O teste agora restaura o arquivo no `afterEach`.
+ Se o sintoma reaparecer (ex.: suíte interrompida no meio): `npm run setup` ou
+ `rm -f prisma/.data-store-mode prisma/operation.db` antes do `npm run dev`.
 - **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
   build CI em `npm run netlify:build`; ver `docs/plataforma/DEPLOY_NETLIFY.md` e `docs/plataforma/WORKFLOW_CURSOR.md`.
   Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.
