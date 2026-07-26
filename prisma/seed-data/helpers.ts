@@ -1,5 +1,11 @@
 import type { CompanyStatus } from "../../src/lib/company-crm";
 import { contractActiveFromStatus } from "../../src/lib/company-crm";
+import {
+  civilDateISO,
+  parseAppDateTime,
+  shiftCivilDate,
+  zonedDateTimeToUtc,
+} from "../../src/lib/timezone";
 
 /** Formata 14 dígitos como CNPJ (XX.XXX.XXX/XXXX-XX). */
 export function formatCnpj(digits: string): string {
@@ -108,43 +114,46 @@ export function contractActiveForStatus(status: CompanyStatus): boolean {
   return contractActiveFromStatus(status);
 }
 
-/** Retorna uma data de hoje com a hora informada (horário local). */
+/** Retorna uma data de hoje com a hora informada (America/Sao_Paulo). */
 export function todayAt(hour: number, minute = 0): Date {
-  const d = new Date();
-  d.setHours(hour, minute, 0, 0);
-  return d;
+  const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  return parseAppDateTime(civilDateISO(), time);
 }
 
-/** Primeiro dia do mês daqui a N meses. */
+/** Primeiro dia do mês daqui a N meses (BRT). */
 export function firstDayOfMonthFromNow(monthsAhead: number): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(1);
-  d.setMonth(d.getMonth() + monthsAhead);
-  return d;
+  const [year, month] = civilDateISO().split("-").map(Number);
+  const total = year * 12 + (month - 1) + monthsAhead;
+  const y = Math.floor(total / 12);
+  const m = (total % 12) + 1;
+  return zonedDateTimeToUtc({ year: y, month: m, day: 1, hour: 0, minute: 0 });
 }
 
-/** Dias atrás a partir de hoje. */
+/** Dias atrás a partir de hoje (BRT). */
 export function daysAgo(days: number, hour = 10, minute = 0): Date {
-  const d = new Date();
-  d.setDate(d.getDate() - days);
-  d.setHours(hour, minute, 0, 0);
-  return d;
+  const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  return parseAppDateTime(shiftCivilDate(civilDateISO(), -days), time);
 }
 
-/** Meses atrás (primeiro dia do mês). */
+/** Meses atrás (dia civil no fuso da app). */
 export function monthsAgo(months: number, day = 15, hour = 10): Date {
-  const d = new Date();
-  d.setMonth(d.getMonth() - months);
-  d.setDate(day);
-  d.setHours(hour, 0, 0, 0);
-  return d;
+  const [year, month] = civilDateISO().split("-").map(Number);
+  const total = year * 12 + (month - 1) - months;
+  const y = Math.floor(total / 12);
+  const m = (total % 12) + 1;
+  // Clamp ao último dia do mês alvo.
+  const lastDay = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  return zonedDateTimeToUtc({
+    year: y,
+    month: m,
+    day: Math.min(day, lastDay),
+    hour,
+    minute: 0,
+  });
 }
 
-/** Dias à frente a partir de hoje. */
+/** Dias à frente a partir de hoje (BRT). */
 export function daysFromNow(days: number, hour = 10, minute = 0): Date {
-  const d = new Date();
-  d.setDate(d.getDate() + days);
-  d.setHours(hour, minute, 0, 0);
-  return d;
+  const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+  return parseAppDateTime(shiftCivilDate(civilDateISO(), days), time);
 }

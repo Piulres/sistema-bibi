@@ -1,15 +1,8 @@
 import "server-only";
+import { formatDateTimeBR as dateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { getPatientTimelineEvents, type TimelineEventView } from "@/lib/timeline";
 
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 const dateOnly = (value: Date) =>
   value.toLocaleDateString("pt-BR", {

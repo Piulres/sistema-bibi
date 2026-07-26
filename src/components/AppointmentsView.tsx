@@ -16,6 +16,7 @@ import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
+import { civilDateISO, civilTimeHM, parseAppDateTime } from "@/lib/timezone";
 
 type Appointment = {
   id: string;
@@ -66,7 +67,7 @@ export default function AppointmentsView() {
   const { niche, labels } = useLabels();
   const isVet = niche === "VET";
   const { isBusy, run, showToast } = useAsyncAction();
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => civilDateISO());
 
   const loadAppointments = useCallback(
     () =>
@@ -116,7 +117,7 @@ export default function AppointmentsView() {
 
   async function createAppointment(e: React.FormEvent) {
     e.preventDefault();
-    const scheduledAt = new Date(`${date}T${form.time}:00`).toISOString();
+    const scheduledAt = parseAppDateTime(date, form.time).toISOString();
     await run(
       "create",
       () =>
@@ -162,10 +163,8 @@ export default function AppointmentsView() {
       return;
     }
 
-    const time =
-      walkIn.time ||
-      `${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}`;
-    const scheduledAt = new Date(`${date}T${time}:00`).toISOString();
+    const time = walkIn.time || civilTimeHM();
+    const scheduledAt = parseAppDateTime(date, time).toISOString();
 
     await run(
       "walkin",

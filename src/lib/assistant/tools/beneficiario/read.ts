@@ -4,7 +4,8 @@ import { getBeneficiaryOverview } from "@/lib/beneficiary-overview";
 import { getAvailableSlots } from "@/lib/scheduling-service";
 import { listProviders } from "@/lib/appointment-service";
 import { createPendingAction } from "@/lib/assistant/pending-actions";
-import { parseAssistantDate } from "@/lib/assistant/dates";
+import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
+import { formatDateBR, formatDateTimeBR, parseAppDateTime } from "@/lib/timezone";
 import {
   resolveAppointmentDraft,
   type AppointmentDraftArgs,
@@ -95,7 +96,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
         providerId,
         date,
       });
-      return { providerId, date: date.toLocaleDateString("pt-BR"), slots: slots.slice(0, 8) };
+      return { providerId, date: formatDateBR(date), slots: slots.slice(0, 8) };
     },
   },
   {
@@ -138,12 +139,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
 
       const scheduled = data.scheduledAt
         ? new Date(data.scheduledAt)
-        : (() => {
-            const base = parseAssistantDate(finalData.date!);
-            const [hour, minute] = finalData.time!.split(":").map(Number);
-            base.setHours(hour, minute, 0, 0);
-            return base;
-          })();
+        : parseAppDateTime(toIsoDate(parseAssistantDate(finalData.date!)), finalData.time!);
 
       const providers = await listProviders(ctx.user.tenantId);
       const provider = providers.find((p) => p.id === finalData.providerId);
@@ -172,7 +168,7 @@ export const beneficiarioReadTools: AssistantToolDefinition[] = [
             ? { [ctx.labels.patient]: resolved.petLabel }
             : {}),
           [ctx.labels.provider]: provider?.name ?? finalData.providerName ?? "—",
-          Horário: scheduled.toLocaleString("pt-BR"),
+          Horário: formatDateTimeBR(scheduled),
           ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),
           ...(reason && !procedureLabel ? { Motivo: reason } : {}),
         },

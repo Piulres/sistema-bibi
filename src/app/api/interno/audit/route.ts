@@ -6,6 +6,7 @@ import {
   TIMELINE_ENTITY_TYPES,
   TIMELINE_ENTITY_LABELS,
 } from "@/lib/timeline";
+import { endOfDayInAppTz, startOfDayInAppTz } from "@/lib/timezone";
 
 export async function GET(request: Request) {
   try {
@@ -19,8 +20,8 @@ export async function GET(request: Request) {
 
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
-    const from = fromParam ? new Date(`${fromParam}T00:00:00`) : undefined;
-    const to = toParam ? new Date(`${toParam}T23:59:59.999`) : undefined;
+    const from = fromParam ? startOfDayInAppTz(fromParam) : undefined;
+    const to = toParam ? endOfDayInAppTz(toParam) : undefined;
 
     const result = await getTenantAuditEvents(user.tenantId, {
       entityType,

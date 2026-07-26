@@ -1,4 +1,5 @@
 import "server-only";
+import { formatDateTimeBR as dateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { getTenantBranding } from "@/lib/theme/branding";
 import {
@@ -8,14 +9,6 @@ import {
   type InvoiceExportData,
 } from "@/lib/exports/invoice-pdf";
 
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 /** Carrega fatura com itens e pagamento PIX pendente para exportação. */
 export async function fetchInvoiceExportData(
