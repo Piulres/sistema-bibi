@@ -32,7 +32,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ### Conteúdo do pacote v3.0.7
 
-- **Drawer mobile:** abre pela direita; remove contagem de módulos; categorias com contraste e separador.
+- **Drawer mobile:** abre pela direita; remove contagem de módulos; categorias com contraste e separador; E2E prestador escopa cabeçalho `<p>` vs link (`mobile-nav.spec.ts`).
 - **Dashboard executivo:** hierarquia de KPIs e menos ruído visual.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.

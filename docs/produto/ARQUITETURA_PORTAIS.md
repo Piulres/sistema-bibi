@@ -99,7 +99,7 @@ flowchart TB
 
 Menu **Mais** (desktop): `button` "Mais" → `menu` "Mais módulos".
 
-**Categorias no drawer (v3.0.7):** tabs com `group` renderizam cabeçalho de categoria como `<p>` (ex.: "Agenda", "Financeiro") e links de módulo como `<a>`. Em E2E, não use `getByText("Agenda")` — o texto aparece duas vezes (categoria + link) e dispara strict mode. Prefira `getByRole("paragraph", { name: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para navegar.
+**Categorias no drawer (v3.0.7):** tabs com `group` renderizam cabeçalho de categoria como `<p>` (ex.: "Agenda", "Financeiro") e links de módulo como `<a>`. Em E2E, não use `getByText("Agenda")` — o texto aparece duas vezes (categoria + link) e dispara strict mode. Prefira `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para navegar. Gatilho: `data-cursor-id="mobile-nav-trigger"` (módulo ativo, sem contagem).
 
 Helpers interno: `e2e/helpers/auth.ts` (`internoNav`, `expectInternoNavHref`). Demais portais: locators diretos em `e2e/mobile-nav.spec.ts`.
 
