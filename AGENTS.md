@@ -63,8 +63,13 @@ Ver `docs/plataforma/WORKFLOW_CURSOR.md` · **`docs/plataforma/OPERACOES.md`** �
 - Comandos padrão estão em `package.json`: `npm run dev`, `npm run build`, `npm run lint`.
 - Banco local (Prisma + SQLite): primeiro setup em uma VM nova exige criar o `.env`
   e popular o banco (o `dev.db` e o `.env` são gitignored, então **não** vêm no checkout):
- - `cp .env.example .env` (se `.env` não existir)
- - `npm run db:reset` (faz `prisma db push --force-reset` + seed) ou `npm run db:push && npm run db:seed`
+ - **Atalho (recomendado): `npm run setup`** — idempotente e não destrutivo: cria `.env`,
+   roda `prisma db push` + `prisma db seed` (só se o banco estiver vazio) e remove resíduo
+   do dual-store (`prisma/.data-store-mode`). Não instala deps nem browser do Playwright.
+ - Manual: `cp .env.example .env` (se ausente) e `npm run db:push && npm run db:seed`.
+ - E2E: `npx playwright install chromium` (uma vez por VM) e **pare o `npm run dev`** antes
+   de `npm run test:e2e` (Next 16 só permite um dev server por projeto; o Playwright sobe o
+   próprio na porta 3100). Gotchas completos: `docs/plataforma/TESTES.md` §Setup e gotchas.
 - O `postinstall` roda `prisma generate` automaticamente no `npm install`.
 - **Agentes (Cursor): `npm run db:reset` é BLOQUEADO** — qualquer comando Prisma
  destrutivo (`--force-reset`/`migrate`) dispara um prompt de consentimento e aborta.
@@ -176,14 +181,13 @@ Detalhe de fluxos: `docs/produto/FLUXOS.md` §4.2, §8.5–8.6 · Demo particula
   não chame funções que fazem `setState` de forma síncrona dentro de `useEffect`;
   use uma IIFE assíncrona (padrão já adotado em `BillingView`/`AtendimentoView`).
 - SQLite não suporta enums no Prisma; `role`/`status`/`category` são `String`.
-- **Gotcha pós-`npm test`:** a suíte Vitest (`tests/lib/data-store-mode.test.ts`)
- chama `setDataStoreMode("operation")` e deixa `prisma/.data-store-mode=operation`
- no diretório real. Como o dual-store está ligado em dev, o `npm run dev` sobe em
- **modo operação** apontando para `prisma/operation.db` (vazio) e o login quebra com
- `Erro de conexão` / `The table main.User does not exist`. **Correção:** apague
- `prisma/.data-store-mode` (volta a `demo`, usa o `prisma/dev.db` seedado) ou troque
- para demo em `/interno/seguranca`. Rode `npm run dev` **depois** de limpar esse arquivo
- se acabou de rodar os testes.
+- **Gotcha pós-`npm test` (causa raiz corrigida):** a suíte Vitest
+ (`tests/lib/data-store-mode.test.ts`) chamava `setDataStoreMode("operation")` e deixava
+ `prisma/.data-store-mode=operation` no diretório real — o `npm run dev` subia em **modo
+ operação** apontando para `prisma/operation.db` (vazio) e o login quebrava com
+ `The table main.User does not exist`. O teste agora restaura o arquivo no `afterEach`.
+ Se o sintoma reaparecer (ex.: suíte interrompida no meio): `npm run setup` ou
+ `rm -f prisma/.data-store-mode prisma/operation.db` antes do `npm run dev`.
 - **Netlify:** config em `netlify.toml`; validar pacote com `npm run pre-release` (não publica);
   build CI em `npm run netlify:build`; ver `docs/plataforma/DEPLOY_NETLIFY.md` e `docs/plataforma/WORKFLOW_CURSOR.md`.
   Site pode retornar `503 usage_exceeded` se a cota estiver esgotada — **não** tratar como bug de código.

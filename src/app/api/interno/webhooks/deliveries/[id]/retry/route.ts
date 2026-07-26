@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { retryWebhookDelivery } from "@/lib/webhook-service";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(_request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("integracoes");
+    const user = await requireInternoModuleWrite("integracoes");
     const { id } = await params;
 
     const result = await retryWebhookDelivery(user.tenantId, id);

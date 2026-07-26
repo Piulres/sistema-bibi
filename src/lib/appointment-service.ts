@@ -10,6 +10,13 @@ import {
 } from "@/lib/telemedicine";
 import { validatePetForAppointment } from "@/lib/pet-service";
 import { requiresPet } from "@/lib/vet-niche";
+import { canTransitionAppointmentStatus } from "@/lib/appointment-status";
+
+export {
+  APPOINTMENT_STATUSES,
+  isAppointmentStatus,
+  canTransitionAppointmentStatus,
+} from "@/lib/appointment-status";
 
 const dateTime = (value: Date) =>
   value.toLocaleString("pt-BR", {
@@ -19,18 +26,6 @@ const dateTime = (value: Date) =>
     hour: "2-digit",
     minute: "2-digit",
   });
-
-export const APPOINTMENT_STATUSES = [
-  "AGENDADO",
-  "CONFIRMADO",
-  "REALIZADO",
-  "FALTOU",
-  "CANCELADO",
-] as const;
-
-export function isAppointmentStatus(value: string): boolean {
-  return (APPOINTMENT_STATUSES as readonly string[]).includes(value);
-}
 
 export type AppointmentView = {
   id: string;
@@ -325,6 +320,12 @@ export async function updateAppointment(input: {
     include: { patient: true, provider: true },
   });
   if (!existing) return null;
+
+  if (input.status && !canTransitionAppointmentStatus(existing.status, input.status)) {
+    return {
+      error: `Transição de status inválida: ${existing.status} → ${input.status}` as const,
+    };
+  }
 
   if (input.scheduledAt) {
     const conflict = await prisma.appointment.findFirst({

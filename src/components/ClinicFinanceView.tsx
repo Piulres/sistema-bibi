@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
+import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { suggestCedigAmount } from "@/lib/clinic-finance/cedig-pricing";
 import type {
@@ -82,6 +84,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [providers, setProviders] = useState<Provider[]>([]);
@@ -174,6 +177,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
 
   async function loadAll() {
     setLoading(true);
+    setLoadError(null);
     const q = `year=${year}&month=${month}`;
     const [metaRes, launchesRes, expensesRes, kpisRes] = await Promise.all([
       fetch("/api/interno/clinic-finance/meta"),
@@ -181,6 +185,18 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       fetch(`/api/interno/clinic-finance/expenses?${q}`),
       fetch(`/api/interno/clinic-finance/kpis?${q}`),
     ]);
+
+    if (metaRes.status === 403 || kpisRes.status === 403) {
+      setLoadError("Sem permissão para acessar a gestão clínico-financeira.");
+      setLoading(false);
+      return;
+    }
+    if (!metaRes.ok && !launchesRes.ok && !kpisRes.ok) {
+      setLoadError("Não foi possível carregar a gestão clínico-financeira. Tente novamente.");
+      setLoading(false);
+      return;
+    }
+
     const meta = await metaRes.json();
     const launchesJson = await launchesRes.json();
     const expensesJson = await expensesRes.json();
@@ -324,6 +340,17 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
 
   if (loading) {
     return <LoadingState message="Carregando gestão clínica…" />;
+  }
+
+  if (loadError) {
+    return (
+      <div className="space-y-3">
+        <Alert tone="danger">{loadError}</Alert>
+        <Button variant="secondary" onClick={() => void loadAll()}>
+          Tentar novamente
+        </Button>
+      </div>
+    );
   }
 
   const tabs: { id: Tab; label: string; shortLabel: string }[] = [

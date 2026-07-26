@@ -13,6 +13,7 @@
     "openapi:verify": "node scripts/verify-openapi.mjs",
     "openapi:sync": "node scripts/sync-openapi-paths.mjs",
     "start": "next start",
+    "setup": "node scripts/dev-setup.mjs",
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",

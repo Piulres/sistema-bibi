@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import {
   getAvailableSlots,
   getAvailableSlotsAcrossProviders,
@@ -7,7 +7,7 @@ import {
 
 export async function GET(request: Request) {
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
+    const user = await requireBeneficiary();
     const url = new URL(request.url);
     const providerId = url.searchParams.get("providerId");
     const date = url.searchParams.get("date");

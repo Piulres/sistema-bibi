@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { RestoreError, revertRecentChange } from "@/lib/change-management/restore";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const body = (await request.json()) as {
       entityType: string;
       entityId: string;

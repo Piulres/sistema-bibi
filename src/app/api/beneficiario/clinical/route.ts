@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import { getPatientClinicalOverview } from "@/lib/clinical-overview";
 import { getPetClinicalOverview } from "@/lib/pet-clinical-overview";
 import { listPatientMedications } from "@/lib/medication-service";
@@ -11,10 +11,7 @@ import { requiresPet } from "@/lib/vet-niche";
 
 export async function GET() {
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
-    if (!user.patientId) {
-      return NextResponse.json({ error: "Beneficiário sem vínculo" }, { status: 403 });
-    }
+    const user = await requireBeneficiary();
 
     const prisma = await getPrisma();
     const tenant = await prisma.tenant.findFirst({

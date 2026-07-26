@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import { listProviders } from "@/lib/appointment-service";
 
 export async function GET() {
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
+    const user = await requireBeneficiary();
     const providers = await listProviders(user.tenantId);
     return NextResponse.json({ providers });
   } catch (error) {

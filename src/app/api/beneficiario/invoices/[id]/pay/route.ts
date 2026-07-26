@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireUser, authErrorResponse } from "@/lib/api-auth";
+import { requireBeneficiary, authErrorResponse } from "@/lib/api-auth";
 import {
   confirmInvoicePixPayment,
   createInvoicePixCharge,
@@ -11,12 +11,8 @@ type Params = { params: Promise<{ id: string }> };
 export async function POST(_request: Request, { params }: Params) {
   const prisma = await getPrisma();
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
+    const user = await requireBeneficiary();
     const { id } = await params;
-
-    if (!user.patientId) {
-      return NextResponse.json({ error: "Beneficiário não vinculado" }, { status: 403 });
-    }
 
     const invoice = await prisma.invoice.findFirst({
       where: { id, tenantId: user.tenantId, patientId: user.patientId },
@@ -47,13 +43,10 @@ export async function POST(_request: Request, { params }: Params) {
 export async function PATCH(request: Request, { params }: Params) {
   const prisma = await getPrisma();
   try {
-    const user = await requireUser(["BENEFICIARIO"]);
+    const user = await requireBeneficiary();
     const { id } = await params;
     const body = (await request.json()) as { paymentId?: string };
 
-    if (!user.patientId) {
-      return NextResponse.json({ error: "Beneficiário não vinculado" }, { status: 403 });
-    }
     if (!body.paymentId) {
       return NextResponse.json({ error: "Informe paymentId" }, { status: 400 });
     }
