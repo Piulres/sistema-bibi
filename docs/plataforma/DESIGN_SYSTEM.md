@@ -101,6 +101,8 @@ Fonte: `src/lib/landing/navigation.ts`.
 | Home (`/`) | 7 itens: Solução, Como funciona, Segmentos, Demo, Portais, Contato, FAQ | Seções ROI/comparativo/para-quem ficam na página, fora do menu |
 | Segmento (`/segmentos/*`) | Recursos, Como funciona, Portais, FAQ | Link **Início** volta à home |
 
+**CTA "Acessar portais":** na home (`/`) o header e o drawer mobile levam a `/segmentos/saude` (`SEGMENT_ACCESS_HREF`); nas páginas de segmento o mesmo CTA rola para `#portais`. O item de menu **Portais** na home continua sendo âncora `#portais`.
+
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
 
 ### Portal nav — abas de rota (v3.0.6)

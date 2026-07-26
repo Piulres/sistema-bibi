@@ -641,10 +641,11 @@ Quando `DUAL_DATA_STORE=true` (dev e Netlify):
 
 ### 8.9 Melhorias de fluxo (jornada clínica)
 
-Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?tab=operations` (aba Mapa CRUD).
+Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?tab=operations` — seção **Mapa de melhorias de fluxo** (abaixo do Mapa de operações CRUD na mesma aba) · E2E: `e2e/flow-improvements.spec.ts`.
 
 | Melhoria | Portal | UI | API |
 |----------|--------|-----|-----|
+| Nav portais v3.0.6 | Cross-portal | NavTabs + menu Mais + drawer nos 4 portais | — |
 | Cancelar consulta | Beneficiário | `/beneficiario` → Minha agenda | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` |
 | Confirmar presença | Prestador | `/prestador/atendimento/[id]` | `PATCH …/prestador/appointments/[id]` `{ status: "CONFIRMADO" }` |
 | Stepper PPU | Beneficiário / Prestador | FlowStepper no resumo e atendimento | `care-journey.ts` |

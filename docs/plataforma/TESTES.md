@@ -350,6 +350,8 @@ Padrão para testar a nav redesenhada (v3.0.6) sem duplicar lógica do menu **Ma
 
 **Pitfall:** módulos `priority: "secondary"` não aparecem na faixa até serem abertos pelo menu **Mais**; após navegação, a aba ativa fica pinada na faixa (`mobile-nav.spec.ts`).
 
+**Contrato aria-label por portal** (Prestador, Beneficiário, PJ): [`produto/ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Navegação → Contrato a11y para E2E.
+
 Doc de componentes: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · [`produto/ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Navegação.
 
 ---

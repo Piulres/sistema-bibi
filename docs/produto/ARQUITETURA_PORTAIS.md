@@ -88,6 +88,19 @@ flowchart TB
 
 **Regra para novos módulos:** declarar `priority: "secondary"` quando o portal tiver muitas abas (ex.: interno com 14 módulos). Tour onboarding referencia `data-tour-id="portal-nav"` — ver [`ONBOARDING_TOUR.md`](ONBOARDING_TOUR.md).
 
+### Contrato a11y para E2E (v3.0.6)
+
+| Portal | Desktop nav | Drawer mobile (`< lg`) | PJ seções |
+|--------|-------------|------------------------|-----------|
+| Interno | `navigation` "Navegação por abas" | `navigation` "Módulos internos" | — |
+| Prestador | idem | "Módulos do prestador" | — |
+| Beneficiário | idem | "Módulos do portal" | — |
+| PJ | `SectionNav` faixa | `dialog` "Seções da empresa" | gatilho `aria-controls="mobile-section-drawer"` |
+
+Menu **Mais** (desktop): `button` "Mais" → `menu` "Mais módulos".
+
+Helpers interno: `e2e/helpers/auth.ts` (`internoNav`, `expectInternoNavHref`). Demais portais: locators diretos em `e2e/mobile-nav.spec.ts`.
+
 ## Rotas públicas
 
 | Rota | Papel |

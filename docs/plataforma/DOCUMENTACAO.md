@@ -62,7 +62,7 @@ Ao fechar trabalho no domínio: **atualize `STATUS.md`** (tabela Status + linha 
 1. `RELEASES.md` / `STATUS.md` do domínio refletem a realidade?
 2. Links apontam para docs vivos (não arquivos removidos)?
 3. Subsistema alterado tem doc correspondente? (ver tabela acima)
-4. UX flow implementado? Atualizar `src/lib/flow-improvements-map.ts` (`status: "implemented"` + `docRef`)
+4. UX flow implementado? Atualizar `src/lib/flow-improvements-map.ts` (`status: "implemented"` + `docRef`); se `docRef` aponta para § de FLUXOS/JORNADA, atualizar esse §; rodar `e2e/flow-improvements.spec.ts` quando aplicável.
 5. `npm run docs:verify`
 6. `npm run cursor:verify` (se tocou `.cursor/` ou `AGENTS.md`)
 7. PR base **`dev`** (nunca `main` direto)
