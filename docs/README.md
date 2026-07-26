@@ -4,7 +4,7 @@
 
 > **Produção:** **v3.0.5** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26e` · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.5** (`bibi-poc-2026-07-26e` @ `cf0eb26`): jornada faturada no prestador (`care-journey.ts`), documentos clínicos ([`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md)), landing nav 6 itens e header limpo — ver [`produto/FLUXOS.md`](produto/FLUXOS.md) §8.9 · [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) · TISS 422 §4.1 · OpenAPI **123 paths / 160 handlers** · **587 Vitest** · `pre-release` e `cursor:verify` em [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md).
+> **Última revisão factual:** 26/07/2026 — produção **v3.0.5** (`bibi-poc-2026-07-26e` @ `cf0eb26`): jornada faturada no prestador (`care-journey.ts`), documentos clínicos ([`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md)), landing nav 6 itens e header limpo — ver [`produto/FLUXOS.md`](produto/FLUXOS.md) §8.9 · [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) · TISS 422 §4.1 · contrato API em [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) §6 · OpenAPI **123 paths / 160 handlers** · **587 Vitest** em [`plataforma/TESTES.md`](plataforma/TESTES.md) · `pre-release` e `cursor:verify` em [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 

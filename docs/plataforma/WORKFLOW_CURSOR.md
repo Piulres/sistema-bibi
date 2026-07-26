@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (26/07/2026):** **v3.0.5** em Netlify (`bibi-poc-2026-07-26e` @ `cf0eb26`) · `main` = `dev` · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+**Produção (26/07/2026):** **v3.0.5** em Netlify (`bibi-poc-2026-07-26e` @ `cf0eb26`) · `dev` inclui #232 (assistant mobile) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ---
 
@@ -99,7 +99,7 @@ Executa, em sequência (`scripts/pre-release.mjs`):
 3. `npm run openapi:verify`
 4. `npm run db:bootstrap:demo` (`SEED_SCALE=small`)
 5. `npm run db:verify`
-6. `npm test` (572 Vitest)
+6. `npm test` (587 Vitest)
 7. `npm run netlify:build` (mesmo pipeline do CI Netlify)
 8. `npm run smoke:netlify-pwa` (smoke PWA/estáticos no artefato)
 

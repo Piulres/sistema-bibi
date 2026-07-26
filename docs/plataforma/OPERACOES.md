@@ -203,7 +203,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v3.0.5`** — **Sistema Bibi - ServiceOS** (jornada faturada + documentos clínicos + UX landing/portais). Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v3.0.5`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + jornada faturada + documentos clínicos + UX landing/portais). Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
