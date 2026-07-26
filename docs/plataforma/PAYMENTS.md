@@ -61,6 +61,7 @@ PixProvider BoletoProvider CardProvider   (interfaces)
 | `POST` | `/api/interno/invoices/{id}/pix` | Gera cobrança PIX |
 | `POST` | `/api/interno/invoices/{id}/confirm-pix` | Confirma PIX pendente |
 | `POST` | `/api/interno/invoices/{id}/pay` | Marca fatura PAGA (manual) |
+| `GET` | `/api/interno/invoices/{id}/tiss` | Exporta guia TISS/ANS em XML (RBAC `billing`) |
 | `POST` | `/api/beneficiario/invoices/{id}/pay` | Gera PIX (beneficiário) |
 | `PATCH` | `/api/beneficiario/invoices/{id}/pay` | Confirma PIX (beneficiário) |
 | `POST` | `/api/interno/subscriptions/charges/{chargeId}/invoice` | Cobrança → fatura |
@@ -106,6 +107,20 @@ INTER_CLIENT_CERT=
 ## Compatibilidade PostgreSQL
 
 Entidade `Payment` e contratos TypeScript são compatíveis com migração para Postgres (Netlify Database).
+
+## Export TISS (v3.0.4)
+
+Complementa o ciclo de faturamento — **não** passa pelo motor PIX/Strategy.
+
+| Camada | Arquivo |
+|--------|---------|
+| Serviço | `src/lib/tiss-service.ts` — `buildTissGuideXml`, `TissBuildError`, `escapeXml` |
+| Rota | `GET /api/interno/invoices/{id}/tiss` |
+| UI | `BillingView` — coluna TISS (download XML) |
+
+Validação estrutural antes de emitir XML: fatura sem itens → **422** `NO_ITEMS`; beneficiário sem documento → **422** `NO_PATIENT_DOCUMENT`. Validação XSD oficial ANS permanece fora do POC (Tier 5).
+
+Detalhes: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.1 · [`API_DOCS.md`](API_DOCS.md) §6.
 
 ---
 
