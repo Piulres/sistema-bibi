@@ -69,12 +69,18 @@ export default function MobileSectionDrawer({
       <button
         ref={triggerRef}
         type="button"
+        data-tour-id="mobile-nav-trigger"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
+        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--surface-muted)]"
         aria-expanded={open}
         aria-controls="mobile-section-drawer"
       >
-        <span className="truncate">{currentLabel}</span>
+        <span className="min-w-0">
+          <span className="block text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+            Navegação · {sections.length} seções
+          </span>
+          <span className="mt-0.5 block truncate">{currentLabel}</span>
+        </span>
         <svg
           className="h-5 w-5 shrink-0 text-[var(--text-muted)]"
           fill="none"

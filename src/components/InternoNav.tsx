@@ -7,8 +7,10 @@ import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PORTAL_MOBILE_ACTIVE_CLASS, PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
 import { resolveInternoActive } from "@/lib/navigation";
 import { buildInternoNavTabs } from "@/lib/navigation/niche-nav";
+import { PORTAL_NAV_STICKY_CLASS } from "@/lib/navigation/portal-nav";
 import { useLabels } from "@/hooks/useLabels";
 import type { InternoModule } from "@/lib/interno-permissions";
+import { cn } from "@/lib/utils/cn";
 
 export default function InternoNav({
   active,
@@ -28,7 +30,7 @@ export default function InternoNav({
       : allTabs;
 
   return (
-    <div className="mt-6" data-tour-id="portal-nav">
+    <div className={cn(PORTAL_NAV_STICKY_CLASS)} data-tour-id="portal-nav">
       <MobileNavDrawer
         tabs={tabs}
         active={resolvedActive}

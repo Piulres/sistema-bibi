@@ -80,10 +80,10 @@ Localizados em `src/components/ui/`:
 | `Card` | Container padrão (`.ds-card`) — prop `accent` para borda orange |
 | `Badge` | Pill de status com tons semânticos — tom `accent` para orange |
 | `Alert` | Mensagens info/success/warning/danger |
-| `NavTabs` | Navegação horizontal entre rotas — `ScrollableNavRail` (`aria-label="Navegação por abas"`) |
+| `NavTabs` | Navegação horizontal entre rotas — `shortLabel` até `xl`, menu **Mais** para `priority: secondary`, `ScrollableNavRail` |
 | `Breadcrumbs` | Trilha hierárquica (`Cliente 360°`, atendimento prestador) |
-| `SectionNav` | Âncoras PJ/beneficiário — drawer abaixo de lg + faixa rolável |
-| `ScrollableNavRail` | Scroll horizontal com gradientes e setas quando transborda |
+| `SectionNav` | Âncoras do PJ — drawer abaixo de lg + faixa rolável (`shortLabel`) |
+| `ScrollableNavRail` | Scroll horizontal com gradientes/setas; rola aba ativa para o centro |
 | `StatCard` | KPI com label, valor, hint e tom semântico (`warning`, `success`, `accent`…) |
 | `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
@@ -111,14 +111,16 @@ Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlat
 - Botão de tour: rótulo **Tour** (`OnboardingTrigger`, `data-testid="onboarding-trigger"`).
 - `ServiceOsBadges` (versão + nicho): ocultos em viewports `< sm` (`hidden sm:flex`).
 
-### TabBar — rótulos curtos (v3.0.5)
+### TabBar / NavTabs — rótulos curtos
 
-Padrão para abas com muitos itens (`AtendimentoView`, `PrestadorPatientHistoryView`, `ClinicFinanceView`):
+Padrão para abas com muitos itens (portal-nav + atendimento/cadastros):
 
-1. Definir `shortLabel` junto com `label` em cada aba.
-2. `TabBar` exibe `shortLabel` até breakpoint `xl`; acima disso, `label` completo.
-3. Container `ScrollableNavRail` adiciona scroll horizontal com gradientes quando o conteúdo transborda.
-4. Páginas com shell de portal usam `min-w-0` no `main` (`PortalShell`) para evitar corte em colunas estreitas.
+1. Definir `shortLabel` junto com `label` em cada aba (`niche-nav.ts` / view).
+2. `TabBar` e `NavTabs` exibem `shortLabel` até breakpoint `xl`; acima disso, `label` completo.
+3. Em portais com muitos módulos (interno, beneficiário), marcar `priority: "secondary"` — vão para o menu **Mais** no desktop; a aba ativa secundária fica pinada na faixa.
+4. `ScrollableNavRail` adiciona scroll + setas e centraliza a aba `[aria-current]` / `data-nav-key`.
+5. `portal-nav` é **sticky** (`PORTAL_NAV_STICKY_CLASS`) nos quatro portais.
+6. Mobile (`< lg`): drawer portaled com grupos (`group`) e gatilho “Navegação · N módulos”.
 
 ## Layout
 
@@ -128,9 +130,9 @@ Padrão para abas com muitos itens (`AtendimentoView`, `PrestadorPatientHistoryV
 | `PortalShell` | Header + main padronizado para portais autenticados |
 | `PageHeader` | Título + descrição de página |
 | `InternoPortalShell` / `PrestadorPortalShell` / `PjPortalShell` / `BeneficiarioPortalShell` | Shell client-side persistente por portal (em `layout.tsx`) |
-| `InternoNav` | Abas internas + `MobileNavDrawer` abaixo de **lg** (1024px) |
-| `MobileNavDrawer` | Drawer de rotas (interno) |
-| `MobileSectionDrawer` | Drawer de seções (PJ, beneficiário) |
+| `InternoNav` / `PrestadorNav` / `BeneficiarioNav` | Abas de rota + `MobileNavDrawer` abaixo de **lg** |
+| `MobileNavDrawer` | Drawer de rotas (interno, prestador, beneficiário) — portal + grupos |
+| `MobileSectionDrawer` | Drawer de seções (PJ) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
 | `LandingMobileMenu` | Menu hamburger da landing |
 | `LandingChangelog` | Seção `#novidades` — changelog curado para demonstração |

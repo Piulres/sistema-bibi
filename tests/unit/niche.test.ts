@@ -111,10 +111,22 @@ describe("niche.buildInternoNavTabs", () => {
     expect(vet.find((t) => t.key === "estoque")?.label).toBe("Estoque pet");
   });
 
+  it("define shortLabel, group e prioridade para a faixa portal-nav", () => {
+    const medical = buildInternoNavTabs(getDefaultLabels("MEDICAL"), "MEDICAL");
+    expect(medical.find((t) => t.key === "cadastros")?.shortLabel).toBe("Cadastros");
+    expect(medical.find((t) => t.key === "crm")?.shortLabel).toBe("CRM");
+    expect(medical.find((t) => t.key === "gestao")?.priority).toBe("primary");
+    expect(medical.find((t) => t.key === "branding")?.priority).toBe("secondary");
+    expect(medical.find((t) => t.key === "seguranca")?.group).toBe("Administração");
+    expect(medical.filter((t) => t.priority === "primary").length).toBeGreaterThanOrEqual(6);
+    expect(medical.filter((t) => t.priority === "secondary").length).toBeGreaterThanOrEqual(5);
+  });
+
   it("inclui aba Pets nos cadastros VET", () => {
     const tabs = buildCadastrosTabs(getDefaultLabels("VET"), "VET");
     expect(tabs.find((t) => t.key === "pets")?.label).toBe("Pets");
     expect(tabs.find((t) => t.key === "patients")?.label).toBe("Tutores");
+    expect(tabs.find((t) => t.key === "operations")?.shortLabel).toBe("CRUD");
   });
 });
 

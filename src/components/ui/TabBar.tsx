@@ -24,7 +24,7 @@ export default function TabBar({
   "aria-label": ariaLabel = "Abas da página",
 }: Props) {
   return (
-    <ScrollableNavRail className={className}>
+    <ScrollableNavRail className={className} activeKey={active}>
       <nav
         className="flex w-max min-w-full gap-0.5 border-b border-[var(--border-default)]"
         aria-label={ariaLabel}
@@ -35,6 +35,7 @@ export default function TabBar({
             type="button"
             onClick={() => onSelect(tab.key)}
             title={tab.label}
+            data-nav-key={tab.key}
             className={cn(
               "-mb-px shrink-0 snap-start border-b-2 px-2.5 py-2.5 text-sm font-medium transition",
               "min-h-11 touch-manipulation sm:px-3 xl:px-4",

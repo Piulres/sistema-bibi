@@ -23,33 +23,158 @@ export function estoqueTabLabel(niche: NicheId): string {
   }
 }
 
+function estoqueShortLabel(niche: NicheId): string {
+  switch (niche) {
+    case "MEDICAL":
+    case "DENTAL":
+    case "VET":
+      return "Estoque";
+    case "CONSTRUCTION":
+      return "Materiais";
+    default:
+      return estoqueTabLabel(niche);
+  }
+}
+
+/** Encurta rótulos longos do dicionário de nicho para a faixa de abas. */
+function compactLabel(label: string, max = 12): string {
+  if (label.length <= max) return label;
+  const first = label.split(/\s+/)[0];
+  return first && first.length >= 3 ? first : label.slice(0, max);
+}
+
 /** Abas do portal interno com termos do nicho. */
 export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab[] {
   const tabs: NavTab[] = [
-    { href: "/interno/dashboard", label: "Dashboard", key: "dashboard" as InternoModule },
-    { href: "/interno", label: "Faturamento", key: "billing" },
-    { href: "/interno/agenda", label: labels.appointments, key: "agenda" },
-    { href: "/interno/cadastros", label: `Cadastros · ${labels.beneficiaries}`, key: "cadastros" },
-    { href: "/interno/estoque", label: estoqueTabLabel(niche), key: "estoque" },
-    { href: "/interno/crm", label: "CRM Corporativo", key: "crm" },
+    {
+      href: "/interno/dashboard",
+      label: "Dashboard",
+      shortLabel: "Home",
+      key: "dashboard" as InternoModule,
+      group: "Operação",
+      priority: "primary",
+    },
+    {
+      href: "/interno",
+      label: "Faturamento",
+      shortLabel: "Faturas",
+      key: "billing",
+      group: "Financeiro",
+      priority: "primary",
+    },
+    {
+      href: "/interno/agenda",
+      label: labels.appointments,
+      shortLabel: compactLabel(labels.appointment),
+      key: "agenda",
+      group: "Operação",
+      priority: "primary",
+    },
+    {
+      href: "/interno/cadastros",
+      label: `Cadastros · ${labels.beneficiaries}`,
+      shortLabel: "Cadastros",
+      key: "cadastros",
+      group: "Operação",
+      priority: "primary",
+    },
+    {
+      href: "/interno/estoque",
+      label: estoqueTabLabel(niche),
+      shortLabel: estoqueShortLabel(niche),
+      key: "estoque",
+      group: "Operação",
+      priority: "primary",
+    },
+    {
+      href: "/interno/crm",
+      label: "CRM Corporativo",
+      shortLabel: "CRM",
+      key: "crm",
+      group: "Financeiro",
+      priority: "primary",
+    },
   ];
 
   if (niche === "CONSTRUCTION") {
-    tabs.push({ href: "/interno/projetos", label: labels.patients, key: "projetos" });
+    tabs.push({
+      href: "/interno/projetos",
+      label: labels.patients,
+      shortLabel: compactLabel(labels.patient),
+      key: "projetos",
+      group: "Operação",
+      priority: "primary",
+    });
   }
 
   if (niche === "MEDICAL" || niche === "DENTAL") {
-    tabs.push({ href: "/interno/gestao", label: "Gestão clínica", key: "gestao" });
+    tabs.push({
+      href: "/interno/gestao",
+      label: "Gestão clínica",
+      shortLabel: "Gestão",
+      key: "gestao",
+      group: "Operação",
+      priority: "primary",
+    });
   }
 
   tabs.push(
-    { href: "/interno/assinaturas", label: "Recorrência", key: "subscriptions" },
-    { href: "/interno/comunicacao", label: "Comunicação", key: "comunicacao" },
-    { href: "/interno/relatorios", label: "Relatórios", key: "relatorios" },
-    { href: "/interno/auditoria", label: "Auditoria", key: "auditoria" },
-    { href: "/interno/branding", label: "White Label", key: "branding" },
-    { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
-    { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
+    {
+      href: "/interno/assinaturas",
+      label: "Recorrência",
+      shortLabel: "Recorr.",
+      key: "subscriptions",
+      group: "Financeiro",
+      priority: "secondary",
+    },
+    {
+      href: "/interno/comunicacao",
+      label: "Comunicação",
+      shortLabel: "Comunicação",
+      key: "comunicacao",
+      group: "Administração",
+      priority: "secondary",
+    },
+    {
+      href: "/interno/relatorios",
+      label: "Relatórios",
+      shortLabel: "Relatórios",
+      key: "relatorios",
+      group: "Financeiro",
+      priority: "secondary",
+    },
+    {
+      href: "/interno/auditoria",
+      label: "Auditoria",
+      shortLabel: "Auditoria",
+      key: "auditoria",
+      group: "Administração",
+      priority: "secondary",
+    },
+    {
+      href: "/interno/branding",
+      label: "White Label",
+      shortLabel: "Marca",
+      key: "branding",
+      group: "Administração",
+      priority: "secondary",
+    },
+    {
+      href: "/interno/integracoes",
+      label: "Integrações",
+      shortLabel: "Integrações",
+      key: "integracoes",
+      group: "Administração",
+      priority: "secondary",
+    },
+    {
+      href: "/interno/seguranca",
+      label: "Segurança",
+      shortLabel: "Segurança",
+      key: "seguranca",
+      group: "Administração",
+      priority: "secondary",
+    },
   );
 
   return tabs;
@@ -58,18 +183,60 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
 /** Abas do prestador com termos do nicho. */
 export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): NavTab[] {
   const tabs: NavTab[] = [
-    { href: "/prestador/dashboard", label: "Início", key: "dashboard" },
+    {
+      href: "/prestador/dashboard",
+      label: "Início",
+      shortLabel: "Início",
+      key: "dashboard",
+      group: "Agenda",
+      priority: "primary",
+    },
   ];
 
   if (niche === "CONSTRUCTION") {
-    tabs.push({ href: "/prestador/campo", label: "Campo", key: "campo" });
+    tabs.push({
+      href: "/prestador/campo",
+      label: "Campo",
+      shortLabel: "Campo",
+      key: "campo",
+      group: "Agenda",
+      priority: "primary",
+    });
   }
 
   tabs.push(
-    { href: "/prestador", label: "Agenda", key: "agenda" },
-    { href: "/prestador/pacientes", label: labels.beneficiaries, key: "pacientes" },
-    { href: "/prestador/extrato", label: "Extrato", key: "extrato" },
-    { href: "/prestador/relatorios", label: "Relatórios", key: "relatorios" },
+    {
+      href: "/prestador",
+      label: "Agenda",
+      shortLabel: "Agenda",
+      key: "agenda",
+      group: "Agenda",
+      priority: "primary",
+    },
+    {
+      href: "/prestador/pacientes",
+      label: labels.beneficiaries,
+      shortLabel: compactLabel(labels.beneficiary),
+      key: "pacientes",
+      group: "Agenda",
+      priority: "primary",
+    },
+    {
+      href: "/prestador/extrato",
+      label: "Extrato",
+      shortLabel: "Extrato",
+      key: "extrato",
+      group: "Financeiro",
+      priority: "primary",
+    },
+    {
+      href: "/prestador/relatorios",
+      label: "Relatórios",
+      shortLabel: "Relatórios",
+      key: "relatorios",
+      group: "Financeiro",
+      priority: "primary",
+    },
   );
 
   return tabs;
@@ -79,38 +246,148 @@ export function buildPrestadorNavTabs(labels: NicheLabels, niche?: NicheId): Nav
 export function buildBeneficiarioNavTabs(labels: NicheLabels, niche?: NicheId): NavTab[] {
   if (niche === "CONSTRUCTION") {
     return [
-      { href: "/beneficiario/obras", label: labels.patients, key: "obras" },
-      { href: "/beneficiario/resumo", label: "Resumo", key: "resumo" },
-      { href: "/beneficiario/faturas", label: "Faturas", key: "faturas" },
-      { href: "/beneficiario/historico", label: "Histórico", key: "historico" },
+      {
+        href: "/beneficiario/obras",
+        label: labels.patients,
+        shortLabel: compactLabel(labels.patient),
+        key: "obras",
+        group: "Obra",
+        priority: "primary",
+      },
+      {
+        href: "/beneficiario/resumo",
+        label: "Resumo",
+        shortLabel: "Resumo",
+        key: "resumo",
+        group: "Conta",
+        priority: "primary",
+      },
+      {
+        href: "/beneficiario/faturas",
+        label: "Faturas",
+        shortLabel: "Faturas",
+        key: "faturas",
+        group: "Conta",
+        priority: "primary",
+      },
+      {
+        href: "/beneficiario/historico",
+        label: "Histórico",
+        shortLabel: "Histórico",
+        key: "historico",
+        group: "Conta",
+        priority: "secondary",
+      },
     ];
   }
 
   return [
-    { href: "/beneficiario/agendar", label: "Agendar", key: "agendar" },
-    { href: "/beneficiario/resumo", label: "Resumo", key: "resumo" },
-    { href: "/beneficiario/agenda", label: "Agenda", key: "agenda" },
-    { href: "/beneficiario/consumo", label: "Consumo", key: "consumo" },
-    { href: "/beneficiario/faturas", label: "Faturas", key: "faturas" },
-    { href: "/beneficiario/medicacoes", label: "Medicações", key: "medicacoes" },
-    { href: "/beneficiario/exames", label: "Exames", key: "exames" },
-    { href: "/beneficiario/plano", label: "Plano", key: "plano" },
-    { href: "/beneficiario/assinatura", label: "Assinatura", key: "assinatura" },
-    { href: "/beneficiario/prontuario", label: labels.medicalRecord, key: "prontuario" },
-    { href: "/beneficiario/historico", label: "Histórico", key: "historico" },
+    {
+      href: "/beneficiario/agendar",
+      label: "Agendar",
+      shortLabel: "Agendar",
+      key: "agendar",
+      group: "Agenda",
+      priority: "primary",
+    },
+    {
+      href: "/beneficiario/resumo",
+      label: "Resumo",
+      shortLabel: "Resumo",
+      key: "resumo",
+      group: "Agenda",
+      priority: "primary",
+    },
+    {
+      href: "/beneficiario/agenda",
+      label: "Agenda",
+      shortLabel: "Agenda",
+      key: "agenda",
+      group: "Agenda",
+      priority: "primary",
+    },
+    {
+      href: "/beneficiario/consumo",
+      label: "Consumo",
+      shortLabel: "Consumo",
+      key: "consumo",
+      group: "Conta",
+      priority: "primary",
+    },
+    {
+      href: "/beneficiario/faturas",
+      label: "Faturas",
+      shortLabel: "Faturas",
+      key: "faturas",
+      group: "Conta",
+      priority: "primary",
+    },
+    {
+      href: "/beneficiario/medicacoes",
+      label: "Medicações",
+      shortLabel: "Meds",
+      key: "medicacoes",
+      group: "Clínico",
+      priority: "secondary",
+    },
+    {
+      href: "/beneficiario/exames",
+      label: "Exames",
+      shortLabel: "Exames",
+      key: "exames",
+      group: "Clínico",
+      priority: "secondary",
+    },
+    {
+      href: "/beneficiario/plano",
+      label: "Plano",
+      shortLabel: "Plano",
+      key: "plano",
+      group: "Conta",
+      priority: "secondary",
+    },
+    {
+      href: "/beneficiario/assinatura",
+      label: "Assinatura",
+      shortLabel: "Assinatura",
+      key: "assinatura",
+      group: "Conta",
+      priority: "secondary",
+    },
+    {
+      href: "/beneficiario/prontuario",
+      label: labels.medicalRecord,
+      shortLabel: compactLabel(labels.medicalRecord),
+      key: "prontuario",
+      group: "Clínico",
+      priority: "secondary",
+    },
+    {
+      href: "/beneficiario/historico",
+      label: "Histórico",
+      shortLabel: "Histórico",
+      key: "historico",
+      group: "Conta",
+      priority: "secondary",
+    },
   ];
 }
 
 /** Seções do portal PJ. */
 export function buildPjSectionNav(labels: NicheLabels, niche?: NicheId) {
-  const sections: { id: string; label: string; href?: string }[] = [
-    { id: "resumo", label: "Resumo" },
-    { id: "beneficiarios", label: labels.beneficiaries },
-    { id: "assinaturas", label: "Assinaturas" },
-    { id: "faturas", label: "Faturas" },
+  const sections: { id: string; label: string; shortLabel?: string; href?: string }[] = [
+    { id: "resumo", label: "Resumo", shortLabel: "Resumo" },
+    { id: "beneficiarios", label: labels.beneficiaries, shortLabel: compactLabel(labels.beneficiary) },
+    { id: "assinaturas", label: "Assinaturas", shortLabel: "Assinaturas" },
+    { id: "faturas", label: "Faturas", shortLabel: "Faturas" },
   ];
   if (niche === "CONSTRUCTION") {
-    sections.splice(1, 0, { id: "projetos", label: labels.patients, href: "/pj/projetos" });
+    sections.splice(1, 0, {
+      id: "projetos",
+      label: labels.patients,
+      shortLabel: compactLabel(labels.patient),
+      href: "/pj/projetos",
+    });
   }
   return sections;
 }
@@ -138,14 +415,30 @@ export function buildCadastrosTabs(labels: NicheLabels, niche: NicheId) {
       : "Protocolos";
 
   return [
-    { key: "patients" as const, label: labels.beneficiaries },
-    ...(niche === "VET" ? [{ key: "pets" as const, label: labels.patients }] : []),
-    { key: "companies" as const, label: companiesTabLabel(labels) },
-    { key: "procedures" as const, label: labels.procedures },
-    { key: "pricing" as const, label: "Precificação" },
-    { key: "protocols" as const, label: protocolsLabel },
-    { key: "users" as const, label: "Usuários" },
-    { key: "operations" as const, label: "Mapa CRUD" },
+    {
+      key: "patients" as const,
+      label: labels.beneficiaries,
+      shortLabel: compactLabel(labels.beneficiary),
+    },
+    ...(niche === "VET"
+      ? [
+          {
+            key: "pets" as const,
+            label: labels.patients,
+            shortLabel: compactLabel(labels.patient),
+          },
+        ]
+      : []),
+    { key: "companies" as const, label: companiesTabLabel(labels), shortLabel: "Empresas" },
+    {
+      key: "procedures" as const,
+      label: labels.procedures,
+      shortLabel: compactLabel(labels.procedure),
+    },
+    { key: "pricing" as const, label: "Precificação", shortLabel: "Preços" },
+    { key: "protocols" as const, label: protocolsLabel, shortLabel: "Protocolos" },
+    { key: "users" as const, label: "Usuários", shortLabel: "Usuários" },
+    { key: "operations" as const, label: "Mapa CRUD", shortLabel: "CRUD" },
   ];
 }
 

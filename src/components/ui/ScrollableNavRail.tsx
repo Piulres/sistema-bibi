@@ -6,10 +6,12 @@ import { cn } from "@/lib/utils/cn";
 type Props = {
   children: ReactNode;
   className?: string;
+  /** Quando muda, rola o item `[data-nav-key]` / `[aria-current]` para a área visível. */
+  activeKey?: string;
 };
 
 /** Faixa horizontal com scroll, gradientes e setas quando o conteúdo transborda. */
-export default function ScrollableNavRail({ children, className }: Props) {
+export default function ScrollableNavRail({ children, className, activeKey }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -22,13 +24,29 @@ export default function ScrollableNavRail({ children, className }: Props) {
     setCanScrollRight(maxScroll > 4 && el.scrollLeft < maxScroll - 4);
   }, []);
 
+  const scrollActiveIntoView = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const activeEl =
+      (activeKey
+        ? el.querySelector<HTMLElement>(`[data-nav-key="${CSS.escape(activeKey)}"]`)
+        : null) ??
+      el.querySelector<HTMLElement>('[aria-current="page"], [aria-current="true"]');
+    if (!activeEl) return;
+    activeEl.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+    requestAnimationFrame(updateScrollState);
+  }, [activeKey, updateScrollState]);
+
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
     updateScrollState();
     // Remedir após paint — largura dos botões de aba pode ainda não estar estável.
-    const raf = requestAnimationFrame(() => updateScrollState());
+    const raf = requestAnimationFrame(() => {
+      updateScrollState();
+      scrollActiveIntoView();
+    });
 
     el.addEventListener("scroll", updateScrollState, { passive: true });
     const resizeObserver = new ResizeObserver(updateScrollState);
@@ -49,7 +67,12 @@ export default function ScrollableNavRail({ children, className }: Props) {
       mutationObserver.disconnect();
       window.removeEventListener("resize", updateScrollState);
     };
-  }, [updateScrollState, children]);
+  }, [updateScrollState, scrollActiveIntoView, children]);
+
+  useEffect(() => {
+    const raf = requestAnimationFrame(scrollActiveIntoView);
+    return () => cancelAnimationFrame(raf);
+  }, [activeKey, scrollActiveIntoView]);
 
   function scrollByPage(direction: -1 | 1) {
     scrollRef.current?.scrollBy({ left: direction * 180, behavior: "smooth" });
@@ -60,7 +83,7 @@ export default function ScrollableNavRail({ children, className }: Props) {
       {canScrollLeft && (
         <>
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--surface-card)] via-[var(--surface-card)]/80 to-transparent"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--surface-page)] via-[var(--surface-page)]/80 to-transparent"
             aria-hidden
           />
           <button
@@ -77,7 +100,7 @@ export default function ScrollableNavRail({ children, className }: Props) {
       {canScrollRight && (
         <>
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--surface-card)] via-[var(--surface-card)]/80 to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--surface-page)] via-[var(--surface-page)]/80 to-transparent"
             aria-hidden
           />
           <button
@@ -95,7 +118,7 @@ export default function ScrollableNavRail({ children, className }: Props) {
         ref={scrollRef}
         className={cn(
           "ds-scroll-x min-w-0 max-w-full scroll-smooth overflow-x-auto",
-          "snap-x snap-mandatory scroll-px-4",
+          "snap-x snap-proximity scroll-px-4",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           canScrollLeft && "pl-9",
           canScrollRight && "pr-9",
