@@ -14,8 +14,6 @@ env:
   CRON_SECRET: ci-cron-secret-32-characters-min
   SEED_SCALE: small
   ALLOW_DEMO_RESET: "true"
-  # Alinha seed (todayAt local) e agenda UI com fuso do produto
-  TZ: America/Sao_Paulo
 
 jobs:
   unit-integration-api:
