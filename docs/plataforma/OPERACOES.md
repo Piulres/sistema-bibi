@@ -109,7 +109,7 @@ Manutenção do `operation.db` em produção (Netlify Blobs). **Só humano** —
 | `scripts/cleanup-operation-test-data.mjs` | Limpeza pontual (duplicatas, massa smoke) | [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Limpeza |
 | `scripts/cedig-mapear.sh` | Enrich local (semana + lançamentos) | [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md) |
 
-Fluxo típico reset CEDIG: baixar Blob → backup → `reset-cedig-transactional` → `cedig-ensure-commercial` → `publish-operation-blob` → timeline em `STATUS.md`.
+Fluxo típico reset CEDIG: baixar Blob → backup → `reset-cedig-transactional` (**`--dry-run` primeiro**) → `cedig-ensure-commercial` → `publish-operation-blob` → timeline em `STATUS.md`.
 
 ### Revalidar métricas documentais
 

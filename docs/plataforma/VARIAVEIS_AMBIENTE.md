@@ -306,6 +306,24 @@ Definidas em [`netlify.toml`](../../netlify.toml) e/ou no painel Netlify.
 | `SESSION_SECRET` | `netlify.toml` (fallback) + **painel** | Trocar em produção |
 | `NODE_ENV` | `context.production` | `production` |
 
+### Scripts operacionais locais (fora do runtime Lambda)
+
+Usados por `scripts/publish-operation-blob.mjs` e pelo Netlify CLI para republicar `operation.db` em Blobs. **Não** commitar no repositório.
+
+| Variável | Obrigatória | Uso |
+|----------|-------------|-----|
+| `NETLIFY_AUTH_TOKEN` | Sim (publish Blob) | Token pessoal Netlify — painel → User settings → Applications |
+| `NETLIFY_SITE_ID` | Sim (publish Blob) | ID do site; alternativa: `.netlify/state.json` após `netlify link` |
+| `NETLIFY_BLOBS_TOKEN` | Não | Alias aceito por `publish-operation-blob.mjs` se `NETLIFY_AUTH_TOKEN` ausente |
+
+```bash
+export NETLIFY_AUTH_TOKEN=...   # ou NETLIFY_BLOBS_TOKEN
+export NETLIFY_SITE_ID=...
+node scripts/publish-operation-blob.mjs /tmp/operation.db
+```
+
+Playbook: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Reset de fluxos CEDIG · [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md).
+
 O script [`scripts/netlify-build.mjs`](../../scripts/netlify-build.mjs) no build:
 
 1. Resolve `DATABASE_URL` absoluto para `prisma/dev.db`
@@ -420,6 +438,8 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 | `SEED_SCALE` | `prisma/seed-data/scale.ts` |
 | `ALLOW_DEMO_RESET` | `src/lib/demo-reset.ts` |
 | `NETLIFY` | `scripts/netlify-build.mjs` |
+| `NETLIFY_AUTH_TOKEN` / `NETLIFY_BLOBS_TOKEN` | `scripts/publish-operation-blob.mjs` |
+| `NETLIFY_SITE_ID` | `scripts/publish-operation-blob.mjs` |
 | `NODE_ENV` | `src/lib/db.ts`, bootstraps payment/communication |
 
 ---

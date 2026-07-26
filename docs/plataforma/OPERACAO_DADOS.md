@@ -169,13 +169,40 @@ O script de 2026-07-26 unificou as anamneses da consulta **Renan Emigdio** / **D
 
 Para zerar **atendimentos e fluxos** do tenant `cedig` sem apagar equipe/catálogo/preços:
 
-1. Baixar + backup (como acima)
-2. `node scripts/reset-cedig-transactional.mjs /tmp/operation.db --confirm=LIMPAR-FLUXOS`
-3. `DATABASE_URL="file:/tmp/operation.db" npx tsx scripts/cedig-ensure-commercial.ts` (empresas + PricingRules)
-4. `node scripts/publish-operation-blob.mjs /tmp/operation.db`
+1. Baixar + backup:
+   ```bash
+   npx netlify blobs:get bibi-databases operation.db --output /tmp/operation.db
+   cp /tmp/operation.db /tmp/operation.backup.db
+   ```
+2. **Dry-run** (conta registros, não escreve):
+   ```bash
+   node scripts/reset-cedig-transactional.mjs /tmp/operation.db --confirm=LIMPAR-FLUXOS --dry-run
+   ```
+3. Aplicar reset:
+   ```bash
+   node scripts/reset-cedig-transactional.mjs /tmp/operation.db --confirm=LIMPAR-FLUXOS
+   DATABASE_URL="file:/tmp/operation.db" npx tsx scripts/cedig-ensure-commercial.ts
+   ```
+4. Republicar (exige `NETLIFY_AUTH_TOKEN` + `NETLIFY_SITE_ID` — ver [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) §7):
+   ```bash
+   node scripts/publish-operation-blob.mjs /tmp/operation.db
+   ```
 5. Timeline: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · playbook: [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md)
 
+| Remove (tenant `cedig`) | Mantém |
+|-------------------------|--------|
+| Pacientes, agenda, lançamentos gestão, despesas, faturas, usages, PEP, medicações, exames, enrollments, mensagens, timeline, charges/assinaturas | Tenant/branding, usuários (staff/PJ), `Procedure`, empresas, `PricingRules`, templates de protocolo/cuidado, catálogo de estoque |
+
 **Não** usar `db:reset` nem o botão “Restaurar demo” (só vale no modo demo).
+
+**Troubleshooting**
+
+| Sintoma | Causa provável | Ação |
+|---------|----------------|------|
+| Produção ainda mostra dados antigos após publish | Blob sem `metadata.updatedAt` ou Lambdas não reidrataron | Republicar com `publish-operation-blob.mjs` (grava `updatedAt`); aguardar próxima cold start ou forçar novo deploy |
+| `Faltam NETLIFY_AUTH_TOKEN e/ou NETLIFY_SITE_ID` | Env local ausente | Exportar token do painel Netlify; `siteID` em `.netlify/state.json` após `netlify link` |
+| `Tenant slug "cedig" não encontrado` | Arquivo não é `operation.db` ou tenant não provisionado | Confirmar path; rodar `cedig-ensure-commercial` em banco bootstrap |
+| Gestão 500 após editar Blob manualmente | Schema do arquivo ≠ código em produção | Ver §Schema-sync abaixo; não editar Blob de versão antiga sem `db:push` no arquivo local |
 
 ---
 
