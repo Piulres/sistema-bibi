@@ -81,12 +81,39 @@ describe("API — exportações PDF/Excel", () => {
       expect(res.headers.get("content-type")).toBe("application/pdf");
     });
 
-    it("GET /api/interno/reports mantém CSV como padrão", async () => {
+    it("GET /api/interno/reports mantém CSV como padrão com BOM e colunas canônicas", async () => {
       const res = await internoReportsGet(
         new Request("http://localhost/api/interno/reports?type=billing"),
       );
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("text/csv");
+      expect(res.headers.get("content-disposition")).toContain("faturamento.csv");
+      const body = await res.text();
+      expect(body.startsWith("\uFEFF")).toBe(true);
+      expect(body).toMatch(/Tipo|Beneficiário|Valor|Status|Data/i);
+    });
+
+    it("GET /api/interno/reports?format=json retorna dataset estruturado", async () => {
+      const res = await internoReportsGet(
+        new Request("http://localhost/api/interno/reports?type=billing&format=json"),
+      );
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toContain("application/json");
+      const json = await res.json();
+      expect(json.title).toBeTruthy();
+      expect(Array.isArray(json.columns)).toBe(true);
+      expect(Array.isArray(json.rows)).toBe(true);
+    });
+
+    it("GET /api/interno/reports?format=txt retorna texto legível", async () => {
+      const res = await internoReportsGet(
+        new Request("http://localhost/api/interno/reports?type=crm&format=txt"),
+      );
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toContain("text/plain");
+      const body = await res.text();
+      expect(body.length).toBeGreaterThan(20);
+      expect(body).toContain("|");
     });
   });
 
@@ -228,6 +255,28 @@ describe("API — exportações PDF/Excel", () => {
       );
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("spreadsheetml");
+    });
+
+    it("GET /api/pj/reports?format=csv retorna CSV canônico (não legado quebrado)", async () => {
+      const res = await pjReportsGet(
+        new Request("http://localhost/api/pj/reports?format=csv"),
+      );
+      expect(res.status).toBe(200);
+      expect(res.headers.get("content-type")).toContain("text/csv");
+      const body = await res.text();
+      expect(body.startsWith("\uFEFF")).toBe(true);
+      const header = body.replace(/^\uFEFF/, "").split("\n")[0] ?? "";
+      expect(header.split(",").length).toBeGreaterThanOrEqual(3);
+      expect(header).toMatch(/Se[cç][aã]o/i);
+    });
+
+    it("GET /api/pj/reports?format=json retorna JSON", async () => {
+      const res = await pjReportsGet(
+        new Request("http://localhost/api/pj/reports?format=json"),
+      );
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(Array.isArray(json.rows)).toBe(true);
     });
   });
 });

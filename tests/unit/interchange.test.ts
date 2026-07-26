@@ -60,8 +60,18 @@ describe("imports.interchange", () => {
     });
     expect(toCsv.ok).toBe(true);
     if (toCsv.ok && toCsv.content) {
+      expect(toCsv.content.startsWith("\uFEFF")).toBe(true);
       expect(toCsv.content).toContain("nome,cpf,data_nascimento");
       expect(toCsv.content).toContain("João");
+    }
+  });
+
+  it("parseia CSV com BOM UTF-8 (export Excel-friendly)", () => {
+    const csv = "\uFEFFnome,cpf,data_nascimento\nAna,529.982.247-25,1992-01-01";
+    const parsed = parseInterchangeContent(csv, "csv", "patients", columns);
+    expect(parsed.ok).toBe(true);
+    if (parsed.ok) {
+      expect(parsed.dataset.rows[0].name).toBe("Ana");
     }
   });
 

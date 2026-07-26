@@ -4,6 +4,7 @@ import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
 import InfoTooltip from "@/components/ui/InfoTooltip";
+import { REPORT_EXPORT_FORMATS } from "@/lib/exports/format";
 
 export default function PrestadorReportsView() {
   return (
@@ -11,7 +12,7 @@ export default function PrestadorReportsView() {
       <Card>
         <SectionHeader
           title="Exportar relatórios"
-          description="Downloads em PDF, Excel ou CSV dos seus atendimentos e procedimentos."
+          description="Downloads em PDF, CSV, JSON ou TXT dos seus atendimentos e procedimentos."
         />
         <div className="mt-6 space-y-4">
           <div>
@@ -19,7 +20,7 @@ export default function PrestadorReportsView() {
             <ExportButtons
               baseUrl="/api/prestador/reports"
               query={{ type: "procedures" }}
-              formats={["pdf", "xlsx", "csv"]}
+              formats={REPORT_EXPORT_FORMATS}
             />
           </div>
           <div>
@@ -27,7 +28,7 @@ export default function PrestadorReportsView() {
             <ExportButtons
               baseUrl="/api/prestador/reports"
               query={{ type: "appointments" }}
-              formats={["pdf", "xlsx", "csv"]}
+              formats={REPORT_EXPORT_FORMATS}
             />
           </div>
         </div>

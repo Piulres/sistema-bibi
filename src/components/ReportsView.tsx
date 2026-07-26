@@ -3,6 +3,7 @@
 import Card from "@/components/ui/Card";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
+import { REPORT_EXPORT_FORMATS } from "@/lib/exports/format";
 
 export default function ReportsView() {
   return (
@@ -10,7 +11,7 @@ export default function ReportsView() {
       <Card>
         <SectionHeader
           title="Exportar relatórios"
-          description="Downloads em PDF, Excel ou CSV para análise externa ou integração contábil."
+          description="Downloads em PDF, CSV, JSON ou TXT para análise externa ou integração contábil."
         />
         <div className="mt-6 space-y-4">
           <div>
@@ -20,7 +21,7 @@ export default function ReportsView() {
             <ExportButtons
               baseUrl="/api/interno/reports"
               query={{ type: "billing" }}
-              formats={["pdf", "xlsx", "csv"]}
+              formats={REPORT_EXPORT_FORMATS}
             />
           </div>
           <div>
@@ -28,7 +29,7 @@ export default function ReportsView() {
             <ExportButtons
               baseUrl="/api/interno/reports"
               query={{ type: "crm" }}
-              formats={["pdf", "xlsx", "csv"]}
+              formats={REPORT_EXPORT_FORMATS}
             />
           </div>
         </div>
@@ -43,6 +44,9 @@ export default function ReportsView() {
           </li>
           <li>
             <strong>CRM:</strong> empresas por status, CNPJ, beneficiários vinculados e volume de faturas.
+          </li>
+          <li>
+            <strong>Formatos:</strong> PDF (documento), CSV (planilha), JSON (integração) e TXT (texto legível).
           </li>
         </ul>
       </Card>

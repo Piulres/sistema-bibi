@@ -8,7 +8,8 @@ test.describe("portal interno — relatórios", () => {
     await expect(page.getByRole("heading", { name: "Relatórios", exact: true })).toBeVisible();
     await expect(page.getByText("Faturamento e Pay Per Use")).toBeVisible();
     await expect(page.getByRole("button", { name: "PDF" }).first()).toBeVisible();
-    await expect(page.getByRole("button", { name: "Excel" }).first()).toBeVisible();
     await expect(page.getByRole("button", { name: "CSV" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "JSON" }).first()).toBeVisible();
+    await expect(page.getByRole("button", { name: "TXT" }).first()).toBeVisible();
   });
 });

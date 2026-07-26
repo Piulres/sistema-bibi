@@ -112,7 +112,7 @@ gestores de RH e benefícios — camada acima do dashboard básico do Portal PJ.
 - Utilização por departamento, faixa etária e tipo de procedimento.
 - Tendências de consumo e projeção de custo (Pay Per Use vs capitação).
 - Indicadores para negociação com operadoras e auditoria interna.
-- Export CSV/BI (`buildPjReportCsv` em `pj-portal-service.ts` como base).
+- Export CSV/JSON/TXT/PDF (`serveTabularExport` + `buildPjTabularExport`).
 
 **Status na POC:** relatórios básicos via `/api/pj/reports`; analytics premium
 no roadmap Q3/Q4 ([`pesquisa/03-estrategia-produto-posicionamento.md`](pesquisa/03-estrategia-produto-posicionamento.md)).

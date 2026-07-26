@@ -1,9 +1,4 @@
-import { NextResponse } from "next/server";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
-import {
-  buildBillingReportCsv,
-  buildCrmReportCsv,
-} from "@/lib/reports/billing-report";
 import { buildBillingTabularExport, buildCrmTabularExport } from "@/lib/exports/builders";
 import { parseExportFormat } from "@/lib/exports/format";
 import { serveTabularExport } from "@/lib/exports/serve";
@@ -15,20 +10,6 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const type = url.searchParams.get("type") ?? "billing";
     const format = parseExportFormat(url.searchParams.get("format"), "csv");
-
-    if (format === "csv") {
-      const csv =
-        type === "crm"
-          ? await buildCrmReportCsv(user.tenantId)
-          : await buildBillingReportCsv(user.tenantId);
-      const filename = type === "crm" ? "crm-pipeline.csv" : "faturamento.csv";
-      return new NextResponse(csv, {
-        headers: {
-          "Content-Type": "text/csv; charset=utf-8",
-          "Content-Disposition": `attachment; filename="${filename}"`,
-        },
-      });
-    }
 
     const data =
       type === "crm"
