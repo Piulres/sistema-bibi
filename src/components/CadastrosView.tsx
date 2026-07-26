@@ -24,6 +24,7 @@ import {
   emptyUserProfessional,
 } from "@/components/cadastros/CadastroExtraFields";
 import ProtocolTemplatesPanel from "@/components/ProtocolTemplatesPanel";
+import ExamProtocolTemplatesPanel from "@/components/ExamProtocolTemplatesPanel";
 import CadastrosPetsTab from "@/components/cadastros/CadastrosPetsTab";
 import ImportInterchangePanel from "@/components/cadastros/ImportInterchangePanel";
 import { useLabels } from "@/hooks/useLabels";
@@ -1034,15 +1035,26 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
       )}
 
       {tab === "protocols" && (
-        <Card>
-          <SectionHeader
-            title="Protocolos clínicos"
-            description="Templates de cuidado aplicáveis no atendimento (HAS, DM2, etc.)."
-          />
-          <div className="mt-4">
-            <ProtocolTemplatesPanel />
-          </div>
-        </Card>
+        <div className="space-y-6">
+          <Card>
+            <SectionHeader
+              title="Protocolos de cuidado"
+              description="Checklists editáveis (HAS, DM2, etc.) — ativar/desativar e revisar no atendimento."
+            />
+            <div className="mt-4">
+              <ProtocolTemplatesPanel />
+            </div>
+          </Card>
+          <Card>
+            <SectionHeader
+              title="Protocolos de exames"
+              description="Painéis de exames reutilizáveis (pré-op, check-up…). Aplicáveis em lote na aba Exames do prestador."
+            />
+            <div className="mt-4">
+              <ExamProtocolTemplatesPanel />
+            </div>
+          </Card>
+        </div>
       )}
 
       {tab === "users" && (

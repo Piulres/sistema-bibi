@@ -154,12 +154,12 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
   const isPet = subjectType === "pet";
   const clinicalPatientId = isPet && tutorPatientId ? tutorPatientId : patientId;
   const careTabs = [
-    { key: "historico", label: "Histórico" },
-    { key: "medicacao", label: "Medicação" },
-    { key: "exames", label: "Exames" },
-    ...(isPet ? [] : [{ key: "protocolos", label: "Protocolos" }]),
-    ...(isPet ? [{ key: "vacinas", label: "Vacinas" }] : []),
-    { key: "perfil", label: "Perfil clínico" },
+    { key: "historico", label: "Histórico", shortLabel: "Hist." },
+    { key: "medicacao", label: "Medicação", shortLabel: "Meds" },
+    { key: "exames", label: "Exames", shortLabel: "Exames" },
+    ...(isPet ? [] : [{ key: "protocolos", label: "Protocolos", shortLabel: "Prot." }]),
+    ...(isPet ? [{ key: "vacinas", label: "Vacinas", shortLabel: "Vacinas" }] : []),
+    { key: "perfil", label: "Perfil clínico", shortLabel: "Perfil" },
   ] as const;
 
   return (
@@ -217,10 +217,10 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
         <ClinicalSidebar data={clinicalSidebar} />
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <TabBar
             tabs={[...careTabs]}
             active={historyTab}

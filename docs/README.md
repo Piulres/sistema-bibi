@@ -103,6 +103,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`produto/FLUXOS.md`](produto/FLUXOS.md) | Fluxos E2E nos quatro portais |
 | [`produto/ONBOARDING_TOUR.md`](produto/ONBOARDING_TOUR.md) | Tour guiado v3 (duas fases, micro-tours) |
 | [`produto/JORNADA_CLIENTE.md`](produto/JORNADA_CLIENTE.md) | Jornada UX por portal |
+| [`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md) | Atestado, receita comum/especial, protocolos de exames |
 | [`produto/AUDITORIA_FLUXOS.md`](produto/AUDITORIA_FLUXOS.md) | Gaps mapeados |
 
 ---

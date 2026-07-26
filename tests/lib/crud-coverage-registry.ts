@@ -42,6 +42,10 @@ export const CRUD_COVERAGE_REGISTRY: CrudCoverageEntry[] = [
     tests: ["tests/api/system-crud-matrix.test.ts"],
   },
   {
+    entity: "Protocolo de exames",
+    tests: ["tests/api/system-crud-matrix.test.ts"],
+  },
+  {
     entity: "Produto de estoque",
     tests: ["tests/api/stock.test.ts", "tests/api/system-crud-matrix.test.ts"],
   },

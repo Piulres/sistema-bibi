@@ -15,8 +15,24 @@ import {
   PEP_RECORD_TYPES,
   type PepRecordType,
 } from "@/lib/pep-templates";
+import {
+  ATESTADO_KINDS,
+  atestadoKindLabel,
+  validateAtestadoForm,
+  type AtestadoKind,
+} from "@/lib/clinical/atestado";
+import {
+  PRESCRIPTION_KINDS,
+  prescriptionKindHint,
+  prescriptionKindLabel,
+  type PrescriptionKind,
+} from "@/lib/clinical/receita";
 import FlowStepper from "@/components/ui/FlowStepper";
-import { CARE_JOURNEY_STEPS, resolveCareJourneyStep } from "@/lib/care-journey";
+import {
+  CARE_JOURNEY_STEPS,
+  deriveCareJourneyBilling,
+  resolveCareJourneyStep,
+} from "@/lib/care-journey";
 import {
   canRegisterProcedureForStatus,
   isTerminalAppointmentStatus,
@@ -38,6 +54,8 @@ type Usage = {
   priceCharged: number;
   priceLabel: string;
   billed: boolean;
+  invoiceId?: string | null;
+  invoiceStatus?: string | null;
 };
 type RecordItem = {
   id: string;
@@ -80,20 +98,20 @@ const currency = (v: number) =>
   v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 const CARE_TABS = [
-  { key: "procedimentos", label: "Procedimentos" },
-  { key: "materiais", label: "Materiais" },
-  { key: "voa", label: "Assistente IA" },
-  { key: "prontuario", label: "Prontuário" },
-  { key: "medicacao", label: "Medicação" },
-  { key: "exames", label: "Exames" },
-  { key: "protocolos", label: "Protocolos" },
-  { key: "perfil", label: "Perfil clínico" },
+  { key: "procedimentos", label: "Procedimentos", shortLabel: "Procs" },
+  { key: "materiais", label: "Materiais", shortLabel: "Mats" },
+  { key: "voa", label: "Assistente IA", shortLabel: "IA" },
+  { key: "prontuario", label: "Prontuário", shortLabel: "PEP" },
+  { key: "medicacao", label: "Medicação", shortLabel: "Meds" },
+  { key: "exames", label: "Exames", shortLabel: "Exames" },
+  { key: "protocolos", label: "Protocolos", shortLabel: "Prot." },
+  { key: "perfil", label: "Perfil clínico", shortLabel: "Perfil" },
 ] as const;
 
 type CareTab = (typeof CARE_TABS)[number]["key"] | "vacinas";
 
 const fieldClass =
-  "w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
+  "w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
 
 export default function AtendimentoView({ appointmentId }: { appointmentId: string }) {
   const { labels } = useLabels();
@@ -107,6 +125,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
   const setNote = pepDraft.setValue;
   const [recordType, setRecordType] = useState<PepRecordType>("EVOLUCAO");
   const [recordTitle, setRecordTitle] = useState("");
+  const [prescriptionKind, setPrescriptionKind] = useState<PrescriptionKind>("COMUM");
+  const [atestadoKind, setAtestadoKind] = useState<AtestadoKind>("AFASTAMENTO");
+  const [atestadoDays, setAtestadoDays] = useState("1");
+  const [atestadoCid, setAtestadoCid] = useState("");
+  const [atestadoCidAuthorized, setAtestadoCidAuthorized] = useState(false);
+  const [atestadoNotes, setAtestadoNotes] = useState("");
   const [careTab, setCareTab] = useState<CareTab>("procedimentos");
   const [clinicalLoading, setClinicalLoading] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState("");
@@ -348,17 +372,53 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
     >
       {detail && (() => {
   const total = detail.usages.reduce((s, u) => s + u.priceCharged, 0);
+  const billing = deriveCareJourneyBilling({ usages: detail.usages });
   const journeyStep = resolveCareJourneyStep({
     appointmentStatus: detail.appointment.status,
-    hasUnbilledUsages: detail.usages.some((u) => !u.billed),
+    ...billing,
   });
   const hasPet = Boolean(detail.pet?.id);
   const careTabs = hasPet
     ? [
         ...CARE_TABS.filter((t) => t.key !== "protocolos"),
-        { key: "vacinas" as const, label: "Vacinas" },
+        { key: "vacinas" as const, label: "Vacinas", shortLabel: "Vacinas" },
       ]
     : [...CARE_TABS];
+
+  function applyPepTemplate() {
+    // Nested function: TS não preserva o narrowing do `detail &&` externo.
+    if (!detail) return;
+    const appointmentDetail = detail;
+
+    if (recordType === "ATESTADO") {
+      const validationError = validateAtestadoForm({
+        kind: atestadoKind,
+        patientName: appointmentDetail.patient.name,
+        days: Number(atestadoDays),
+        startDateLabel: new Date(appointmentDetail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+        cid: atestadoCid,
+        cidAuthorizedByPatient: atestadoCidAuthorized,
+      });
+      if (validationError) {
+        showToast({ message: validationError, tone: "danger" });
+        return;
+      }
+    }
+
+    const tpl = buildPepTemplate(recordType, {
+      patientName: appointmentDetail.patient.name,
+      appointmentDate: new Date(appointmentDetail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+      patientCpf: appointmentDetail.patient.cpf,
+      prescriptionKind: recordType === "RECEITA" ? prescriptionKind : undefined,
+      atestadoKind: recordType === "ATESTADO" ? atestadoKind : undefined,
+      atestadoDays: Number(atestadoDays) || 1,
+      cid: atestadoCid || null,
+      cidAuthorizedByPatient: atestadoCidAuthorized,
+      notes: recordType === "ATESTADO" ? atestadoNotes || null : undefined,
+    });
+    setRecordTitle(tpl.title);
+    setNote(tpl.content);
+  }
   const historyHref = hasPet
     ? `/prestador/paciente/${detail.pet!.id}`
     : `/prestador/paciente/${detail.patient.id}`;
@@ -415,10 +475,10 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         </div>
       </Card>
 
-      <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,280px)_minmax(0,1fr)]">
         <ClinicalSidebar data={clinicalSidebar} loading={clinicalLoading} />
 
-        <div className="space-y-4">
+        <div className="min-w-0 space-y-4">
           <TabBar tabs={[...careTabs]} active={careTab} onSelect={(k) => setCareTab(k as CareTab)} aria-label="Abas do atendimento clínico" />
 
           {careTab === "procedimentos" && (
@@ -429,11 +489,11 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           />
 
           {canRegisterProcedureForStatus(detail.appointment.status) ? (
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch">
               <select
                 value={selectedProc}
                 onChange={(e) => setSelectedProc(e.target.value)}
-                className={`flex-1 ${fieldClass}`}
+                className={`min-w-0 flex-1 ${fieldClass}`}
               >
                 <option value="">Selecione um procedimento...</option>
                 {procedures.map((p) => (
@@ -487,11 +547,11 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             title="Dispensação de materiais"
             description="Baixa de estoque vinculada ao paciente — rastreabilidade por lote (FIFO)."
           />
-          <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch">
             <select
               value={selectedMaterial}
               onChange={(e) => setSelectedMaterial(e.target.value)}
-              className={`flex-1 ${fieldClass}`}
+              className={`min-w-0 flex-1 ${fieldClass}`}
             >
               <option value="">Selecione o material...</option>
               {stockProducts.map((p) => (
@@ -506,7 +566,8 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               step="0.01"
               value={materialQty}
               onChange={(e) => setMaterialQty(e.target.value)}
-              className={`w-24 ${fieldClass}`}
+              className={`w-full sm:w-24 ${fieldClass}`}
+              aria-label="Quantidade"
             />
             <Button onClick={dispenseMaterial} disabled={isBusy("dispense-material") || !selectedMaterial}>
               Dispensar
@@ -541,11 +602,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           {careTab === "prontuario" && (
         <Card padding="lg" data-tour-id="atendimento-pep">
           <SectionHeader title="Prontuário Eletrônico (PEP)" />
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
             <select
               value={recordType}
               onChange={(e) => setRecordType(e.target.value as PepRecordType)}
               className={fieldClass}
+              aria-label="Tipo de registro"
             >
               {PEP_RECORD_TYPES.map((t) => (
                 <option key={t.value} value={t.value}>
@@ -556,19 +618,85 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             <Button
               type="button"
               variant="secondary"
-              size="sm"
-              onClick={() => {
-                const tpl = buildPepTemplate(recordType, {
-                  patientName: detail.patient.name,
-                  appointmentDate: new Date(detail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
-                });
-                setRecordTitle(tpl.title);
-                setNote(tpl.content);
-              }}
+              onClick={applyPepTemplate}
             >
-              Usar template
+              Gerar / usar template
             </Button>
           </div>
+
+          {recordType === "RECEITA" && (
+            <div className="mt-3 space-y-2 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-muted)] p-3">
+              <label className="text-sm font-medium">Tipo de receita</label>
+              <select
+                className={fieldClass}
+                value={prescriptionKind}
+                onChange={(e) => setPrescriptionKind(e.target.value as PrescriptionKind)}
+              >
+                {PRESCRIPTION_KINDS.map((kind) => (
+                  <option key={kind} value={kind}>
+                    {prescriptionKindLabel(kind)}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-[var(--text-muted)]">
+                {prescriptionKindHint(prescriptionKind)}
+              </p>
+            </div>
+          )}
+
+          {recordType === "ATESTADO" && (
+            <div className="mt-3 space-y-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-muted)] p-3">
+              <p className="text-sm font-medium">Atestado (CFM 2.381/2024)</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                <select
+                  className={fieldClass}
+                  value={atestadoKind}
+                  onChange={(e) => setAtestadoKind(e.target.value as AtestadoKind)}
+                  aria-label="Tipo de atestado"
+                >
+                  {ATESTADO_KINDS.map((kind) => (
+                    <option key={kind} value={kind}>
+                      {atestadoKindLabel(kind)}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  type="number"
+                  min={1}
+                  className={fieldClass}
+                  value={atestadoDays}
+                  onChange={(e) => setAtestadoDays(e.target.value)}
+                  placeholder="Dias"
+                  aria-label="Dias de afastamento"
+                />
+                <input
+                  className={fieldClass}
+                  value={atestadoCid}
+                  onChange={(e) => setAtestadoCid(e.target.value)}
+                  placeholder="CID (opcional)"
+                />
+                <label className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                  <input
+                    type="checkbox"
+                    checked={atestadoCidAuthorized}
+                    onChange={(e) => setAtestadoCidAuthorized(e.target.checked)}
+                  />
+                  Paciente autorizou CID no atestado
+                </label>
+                <input
+                  className={`sm:col-span-2 ${fieldClass}`}
+                  value={atestadoNotes}
+                  onChange={(e) => setAtestadoNotes(e.target.value)}
+                  placeholder="Observações (opcional)"
+                />
+              </div>
+              <p className="text-xs text-[var(--text-muted)]">
+                POC: gera texto no PEP. Em produção nacional, emissão oficial via Atesta CFM
+                (Res. CFM 2.382/2024). CID só com autorização do paciente.
+              </p>
+            </div>
+          )}
+
           <input
             value={recordTitle}
             onChange={(e) => setRecordTitle(e.target.value)}
@@ -578,11 +706,11 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
-            rows={6}
+            rows={8}
             placeholder="Registrar evolução clínica, conduta, prescrição..."
             className={`mt-3 ${fieldClass}`}
           />
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <Button onClick={addNote} disabled={isBusy("add-note") || !note.trim()}>
               Salvar no prontuário
             </Button>

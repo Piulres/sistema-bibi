@@ -1,7 +1,6 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { PLATFORM } from "@/lib/platform";
 import Button from "@/components/ui/Button";
 import ServiceOsBadges from "@/components/niche/ServiceOsBadges";
 import HomeBrandLink from "@/components/brand/HomeBrandLink";
@@ -14,6 +13,7 @@ type Props = {
   logoUrl?: string | null;
   userName: string;
   loginPath: string;
+  /** @deprecated Removido da UI — mantido por compatibilidade com PortalShell. */
   platformLabel?: string;
 };
 
@@ -23,7 +23,6 @@ export default function PortalHeader({
   logoUrl,
   userName,
   loginPath,
-  platformLabel = PLATFORM.poweredBy,
 }: Props) {
   const router = useRouter();
   const { niche } = useLabels();
@@ -71,10 +70,6 @@ export default function PortalHeader({
           </Button>
         </div>
       </div>
-      <p className="border-t border-[var(--border-default)] bg-[var(--surface-muted)] px-3 py-1 text-center text-[10px] uppercase tracking-widest text-[var(--text-muted)] sm:px-6">
-        <span className="sm:hidden">ServiceOS · white label</span>
-        <span className="hidden sm:inline">{platformLabel} · white label</span>
-      </p>
     </header>
   );
 }

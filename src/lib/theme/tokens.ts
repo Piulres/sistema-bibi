@@ -21,7 +21,7 @@ export const CLINIC_BRANDING_DEFAULTS = {
 
 /** Identidade comercial da plataforma (landing e marketing). */
 export const PLATFORM_BRANDING: BrandingTokens = {
-  displayName: PLATFORM.name,
+  displayName: PLATFORM.brandName,
   tagline: PLATFORM.tagline,
   ...SHARED_BRAND_COLORS,
   platformLabel: `${PLATFORM.versionLabel} · Pay Per Use Multi-Nicho`,

@@ -237,7 +237,9 @@ Quando `User.mfaEnabled = true`:
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |
-| Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline |
+| Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline (receita/atestado estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md)) |
+| Aplicar protocolo de exames | `POST .../patients/[id]/exam-protocols` | N× `ExamOrder` a partir do template |
+| Prescrever (comum / controle especial) | `POST .../medications` | `MedicationPrescription.prescriptionKind` + status ATIVA/SUSPENSA/ENCERRADA |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
 ```mermaid

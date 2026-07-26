@@ -200,7 +200,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Alta | Sem confirmação de chegada do paciente | Ação “Paciente presente” → status CONFIRMADO |
 | Média | Telemedicina mock | Embed real (Twilio/Whereby) na tela de atendimento |
 | Média | Sem histórico clínico no atendimento | Sidebar com PEP anterior, alergias, últimos procedimentos |
-| Média | Sem assinatura digital em receitas/atestados | Conformidade CFM + PDF |
+| Média | Sem assinatura digital / Atesta CFM / SNCR | POC com atestado/receita estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
 | Baixa | Sem fila automática de atendimento | “Próximo paciente” após marcar REALIZADO |
 
 **Código:** `src/components/AgendaView.tsx` · `src/components/AtendimentoView.tsx`

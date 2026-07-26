@@ -38,6 +38,7 @@ export async function seedClinicalDemo(
       patientId: input.patientId,
       providerId: input.providerId,
       status: "ATIVA",
+      prescriptionKind: "COMUM",
       medication: "Losartana 50mg",
       dosage: "1 comprimido",
       frequency: "1x ao dia (manhã)",
@@ -51,11 +52,28 @@ export async function seedClinicalDemo(
       patientId: input.patientId,
       providerId: input.providerId,
       status: "ATIVA",
+      prescriptionKind: "COMUM",
       medication: "Metformina 850mg",
       dosage: "1 comprimido",
       frequency: "2x ao dia",
       route: "VO",
       durationDays: 90,
+    },
+  });
+
+  await prisma.medicationPrescription.create({
+    data: {
+      patientId: input.patientId,
+      providerId: input.providerId,
+      status: "ATIVA",
+      prescriptionKind: "CONTROLE_ESPECIAL",
+      medication: "Clonazepam 2mg",
+      dosage: "1 comprimido",
+      frequency: "à noite",
+      route: "VO",
+      quantity: "30 (trinta)",
+      durationDays: 30,
+      notes: "Receita de controle especial — demo",
     },
   });
 
@@ -110,6 +128,36 @@ export async function seedClinicalDemo(
         { id: "labs", label: "Painel laboratorial básico", required: true },
         { id: "ecg", label: "Eletrocardiograma", required: false },
         { id: "vacinas", label: "Atualizar calendário vacinal", required: false },
+      ]),
+    },
+  });
+
+  await prisma.examProtocolTemplate.create({
+    data: {
+      tenantId: input.tenantId,
+      name: "Painel DM2 trimestral",
+      specialty: "Endocrinologia",
+      clinicalIndication: "Controle metabólico — diabetes tipo 2",
+      exams: JSON.stringify([
+        { id: "exam-1", examName: "Hemoglobina glicada (HbA1c)" },
+        { id: "exam-2", examName: "Glicemia de jejum" },
+        { id: "exam-3", examName: "Creatinina sérica" },
+        { id: "exam-4", examName: "Lipidograma" },
+      ]),
+    },
+  });
+
+  await prisma.examProtocolTemplate.create({
+    data: {
+      tenantId: input.tenantId,
+      name: "Pré-operatório básico",
+      specialty: "Cirurgia",
+      clinicalIndication: "Avaliação pré-operatória",
+      exams: JSON.stringify([
+        { id: "exam-1", examName: "Hemograma completo" },
+        { id: "exam-2", examName: "Coagulograma" },
+        { id: "exam-3", examName: "Eletrocardiograma" },
+        { id: "exam-4", examName: "Raio-X de tórax" },
       ]),
     },
   });
