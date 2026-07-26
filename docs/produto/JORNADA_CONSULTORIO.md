@@ -294,17 +294,23 @@ Lista completa: [`README.md`](../../README.md) · [`AGENTS.md`](../../AGENTS.md)
 
 ---
 
-## 9. Massa e testes do dia a dia (~1 mês)
+## 9. Massa e testes automatizados
 
 O seed inclui uma **camada de mês operacional** com datas relativas a “hoje” (agenda, PPU, PEP, estoque, faturas, timeline e launches CEDIG). Marcador `[seed-operation-month]` — ver [`../plataforma/MASSA_TESTES.md`](../plataforma/MASSA_TESTES.md).
 
-| Camada | Arquivo | O que valida |
-|--------|---------|--------------|
-| Plano puro | `tests/unit/operation-month-plan.test.ts` | Fontes, status, CEDIG, janela |
+| Camada | Arquivo | O que cobre |
+|--------|---------|-------------|
+| Plano puro (~30 dias) | `tests/unit/operation-month-plan.test.ts` | Fontes, status, CEDIG, janela |
 | Consistência seed | `tests/lib/operation-month-consistency.test.ts` | Densidade, descontos, PPU↔fatura, PEP, estoque, timeline |
+| API (Atos 1–4) | `tests/api/consultorio-journey.test.ts` | Walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX / marcar paga + RBAC cadastros/estoque |
+| Stepper | `tests/lib/care-journey.test.ts` | Agendado → … → Pago |
+| E2E UI | `e2e/jornada-consultorio.spec.ts` | Módulos operacionais + walk-in/check-in + superfície atendimento |
+| Walk-in | `e2e/walkin-particular.spec.ts` | Cadastro walk-in + check-in |
+| Índice | [`../plataforma/TESTES.md`](../plataforma/TESTES.md) | Matriz completa |
 
 ```bash
-npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts
+npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts tests/api/consultorio-journey.test.ts
+npx playwright test e2e/jornada-consultorio.spec.ts --project=chromium
 ```
 
 ---

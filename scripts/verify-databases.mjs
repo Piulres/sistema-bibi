@@ -89,6 +89,37 @@ async function verifyDemo() {
     if (!petcare?.users.length) {
       errors.push(`demo.db: operacao@petcare.demo não vinculado ao tenant petcare`);
     }
+
+    const horizonteTenant = await prisma.tenant.findFirst({
+      where: { slug: "horizonte" },
+      select: { id: true },
+    });
+    if (horizonteTenant) {
+      const opmAppointments = await prisma.appointment.count({
+        where: {
+          tenantId: horizonteTenant.id,
+          reason: { contains: "[seed-operation-month]" },
+        },
+      });
+      if (opmAppointments < 40) {
+        errors.push(
+          `demo.db: mês operacional ausente/baixo (esperado ≥40 agenda com [seed-operation-month], encontrado ${opmAppointments})`,
+        );
+      }
+      const opmTimeline = await prisma.timelineEvent.count({
+        where: {
+          tenantId: horizonteTenant.id,
+          createdAt: {
+            gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+          },
+        },
+      });
+      if (opmTimeline < 20) {
+        errors.push(
+          `demo.db: timeline do mês operacional baixa (esperado ≥20 eventos em 30d, encontrado ${opmTimeline})`,
+        );
+      }
+    }
   } finally {
     await prisma.$disconnect();
   }

@@ -95,6 +95,45 @@ describe("Mês operacional — consistência da timeline e do dia a dia", () => 
     expect(grouped.length).toBeGreaterThanOrEqual(2);
   });
 
+  it("agenda de hoje tem slots do mês operacional (timeline sempre atual)", async () => {
+    const tenant = await horizonte();
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date();
+    end.setHours(23, 59, 59, 999);
+
+    // Domingo o plano não gera slots; nesses dias valida a janela ±1 dia útil.
+    const dow = start.getDay();
+    const dayStart = new Date(start);
+    const dayEnd = new Date(end);
+    if (dow === 0) {
+      dayStart.setDate(dayStart.getDate() - 1);
+      dayStart.setHours(0, 0, 0, 0);
+    }
+
+    const todayCount = await prisma.appointment.count({
+      where: {
+        tenantId: tenant.id,
+        reason: { contains: OPERATION_MONTH_MARKER },
+        scheduledAt: { gte: dayStart, lte: dayEnd },
+      },
+    });
+    expect(todayCount).toBeGreaterThanOrEqual(dow === 0 ? 1 : 2);
+
+    const timelineToday = await prisma.timelineEvent.count({
+      where: {
+        tenantId: tenant.id,
+        createdAt: { gte: dayStart, lte: dayEnd },
+        OR: [
+          { action: TIMELINE_ACTIONS.CREATED },
+          { action: TIMELINE_ACTIONS.APPOINTMENT_COMPLETED },
+          { action: TIMELINE_ACTIONS.PROCEDURE_REGISTERED },
+        ],
+      },
+    });
+    expect(timelineToday).toBeGreaterThan(0);
+  });
+
   it("descontos corporativos: PPU corporativo ≤ base em categoria com regra", async () => {
     const tenant = await horizonte();
     const usage = await prisma.procedureUsage.findFirst({
