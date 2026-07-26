@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.7",
+    version: "3.0.8",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Documentação operacional do consultório ponta a ponta e ferramentas para zerar fluxos de teste da CEDIG sem perder catálogo e equipe.",
+    highlights: [
+      {
+        title: "Produto e operação",
+        items: [
+          "Jornada narrativa do consultório (chegada → atendimento → pagamento) com todas as ramificações",
+          "Scripts para reset transacional CEDIG + republicação do operation.db nos Blobs",
+          "Playbook e timeline CEDIG atualizados após limpeza em produção",
+        ],
+      },
+      {
+        title: "Documentação",
+        items: [
+          "Auditoria e inventário de páginas reconciliados",
+          "Lacunas pós-v3.0.7 fechadas (setup, versão, OpenAPI)",
+        ],
+      },
+    ],
+    testStats: "598 testes Vitest · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.7",
+    label: "Sistema Bibi - ServiceOS v3.0.7",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Portais mais claros no mobile: menu pela direita, dashboard executivo com hierarquia e gestão clínica responsiva; relatórios em formatos canônicos.",
     highlights: [

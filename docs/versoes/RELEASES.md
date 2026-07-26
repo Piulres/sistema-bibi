@@ -11,24 +11,30 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.7** — UX mobile portais + dashboard + exports **publicado em produção**.
+> Pacote **v3.0.8** — jornada consultório + reset operacional CEDIG — **publicação em andamento / registrar deploy id abaixo**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.7** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
-| **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.7** · `main`/`dev` sincronizadas · artefato prod `@ 25385b2` |
-| **Pacote anterior em produção** | **3.0.6** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.8** — deploy `PENDING` @ `PENDING` (`bibi-poc-2026-07-26i`) |
+| **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG (fluxos zerados; masters intactos) |
+| **Release `main` / `dev`** | **v3.0.8** · `main`/`dev` sincronizadas |
+| **Pacote anterior em produção** | **3.0.7** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.7** |
-| **Release** | `main` | **v3.0.7** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.7** · deploy `6a65eac9` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.8** |
+| **Release** | `main` | **v3.0.8** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.8** · deploy `PENDING` · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.8
+
+- **Jornada consultório:** narrativa operacional com todas as ramificações (`JORNADA_CONSULTORIO.md`).
+- **CEDIG ops:** scripts de reset transacional + ensure comercial + publish Blob; playbook/timeline atualizados.
+- **Docs:** auditoria/inventário reconciliados; lacunas pós-v3.0.7 (setup, versão, OpenAPI).
 
 ### Conteúdo do pacote v3.0.7
 

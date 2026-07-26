@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.7** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26h` (`6a65eac9` @ `25385b2`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.8** @ https://sistema-bibi.netlify.app · ver [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.7** (`bibi-poc-2026-07-26h` @ `25385b2`): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [`produto/FLUXOS.md`](produto/FLUXOS.md) §4.0.1/§4.11 · [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) §5.1/§8–§9 · [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) · **598 Vitest · 156 E2E** · `mobile-nav` + `cedig-gestao` em [`plataforma/TESTES.md`](plataforma/TESTES.md).
+> **Última revisão factual:** 26/07/2026 — produção **v3.0.8**: jornada narrativa do consultório + reset operacional CEDIG — ver [`produto/JORNADA_CONSULTORIO.md`](produto/JORNADA_CONSULTORIO.md) · [`clientes/cedig/OPERACAO.md`](clientes/cedig/OPERACAO.md) · [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -131,7 +131,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.7 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.8 em produção** |
 | [`versoes/V3_0.md`](versoes/V3_0.md) | Changelog v3.0 — PWA / app shell mobile |
 | [`versoes/V2_6.md`](versoes/V2_6.md) | Changelog v2.6 — CEDIG pontes PPU + export |
 | [`versoes/V2_5.md`](versoes/V2_5.md) | Changelog v2.5 — login tenant/portal |
