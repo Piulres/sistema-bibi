@@ -32,6 +32,14 @@ type AgendaPayload = {
   summary?: Summary;
 };
 
+/** Data civil no fuso local (evita UTC ISO que muda o “hoje” perto da meia-noite). */
+function localDateISO(d = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function formatDateLabel(iso: string): string {
   return new Date(`${iso}T12:00:00`).toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -44,7 +52,7 @@ function formatDateLabel(iso: string): string {
 function shiftDate(iso: string, days: number): string {
   const d = new Date(`${iso}T12:00:00`);
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  return localDateISO(d);
 }
 
 export default function AgendaView() {
@@ -52,7 +60,7 @@ export default function AgendaView() {
   const appt = labels.appointment;
   const apptsLabel = labels.appointments;
   const [view, setView] = useState<View>("day");
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [date, setDate] = useState(() => localDateISO());
 
   const tabs = useMemo(
     () =>
@@ -87,7 +95,7 @@ export default function AgendaView() {
   const appts = data?.appointments ?? [];
   const summary = data?.summary ?? null;
 
-  const isToday = date === new Date().toISOString().slice(0, 10);
+  const isToday = date === localDateISO();
 
   const headerTitle =
     view === "day"
@@ -175,7 +183,7 @@ export default function AgendaView() {
               <Button
                 variant="secondary"
                 size="sm"
-                onClick={() => setDate(new Date().toISOString().slice(0, 10))}
+                onClick={() => setDate(localDateISO())}
               >
                 Hoje
               </Button>
