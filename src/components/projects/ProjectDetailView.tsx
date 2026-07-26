@@ -416,10 +416,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <Link
-            href="/interno/projetos"
-            className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-          >
+          <Link href="/interno/projetos" className="ds-touch-link px-0 text-[var(--text-muted)]">
             ← Voltar às obras
           </Link>
           <h2 className="mt-2 text-xl font-semibold text-[var(--text-primary)]">
@@ -441,13 +438,13 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
 
       {msg && <Alert tone="info">{msg}</Alert>}
 
-      <div className="flex flex-wrap gap-2 border-b border-[var(--border-default)] pb-2">
+      <div className="ds-scroll-x flex gap-2 border-b border-[var(--border-default)] pb-2">
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => setTab(t.id)}
-            className={`rounded-md px-3 py-1.5 text-sm font-medium ${
+            className={`min-h-10 shrink-0 rounded-md px-3 py-2 text-sm font-medium ${
               tab === t.id
                 ? "bg-[var(--brand-primary)] text-white"
                 : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
@@ -496,7 +493,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
               <button
                 type="submit"
                 disabled={busy}
-                className="rounded-md bg-[var(--brand-primary)] px-4 py-2 text-sm text-white sm:col-span-2 disabled:opacity-50"
+                className="min-h-10 rounded-md bg-[var(--brand-primary)] px-4 py-2 text-sm text-white sm:col-span-2 disabled:opacity-50"
               >
                 Salvar vínculos
               </button>
@@ -543,7 +540,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
             <span className="font-medium">{formatBrl(activeBudget.total)}</span>
             <a
               href={`/api/interno/projects/${projectId}/budgets/${activeBudget.id}/pdf`}
-              className="text-[var(--brand-primary)] hover:underline"
+              className="ds-touch-link"
               target="_blank"
               rel="noreferrer"
             >
@@ -553,7 +550,71 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
 
           {activeBudget.status === "RASCUNHO" && (
             <>
-              <div className="ds-scroll-x rounded-xl border border-[var(--border-default)]">
+              <ul className="space-y-3 md:hidden">
+                {budgetForm.lineItems.map((li, idx) => (
+                  <li
+                    key={idx}
+                    className="space-y-2 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3"
+                  >
+                    <label className="block text-xs text-[var(--text-muted)]">
+                      Descrição
+                      <input
+                        value={li.description}
+                        onChange={(e) => {
+                          const items = [...budgetForm.lineItems];
+                          items[idx] = { ...items[idx], description: e.target.value };
+                          setBudgetForm((f) => ({ ...f, lineItems: items }));
+                        }}
+                        className="mt-1 min-h-10 w-full rounded border px-3 py-2 text-sm"
+                      />
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <label className="block text-xs text-[var(--text-muted)]">
+                        Un
+                        <input
+                          value={li.unit}
+                          onChange={(e) => {
+                            const items = [...budgetForm.lineItems];
+                            items[idx] = { ...items[idx], unit: e.target.value };
+                            setBudgetForm((f) => ({ ...f, lineItems: items }));
+                          }}
+                          className="mt-1 min-h-10 w-full rounded border px-2 py-2 text-sm"
+                        />
+                      </label>
+                      <label className="block text-xs text-[var(--text-muted)]">
+                        Qtd
+                        <input
+                          type="number"
+                          value={li.quantity}
+                          onChange={(e) => {
+                            const items = [...budgetForm.lineItems];
+                            items[idx] = { ...items[idx], quantity: Number(e.target.value) };
+                            setBudgetForm((f) => ({ ...f, lineItems: items }));
+                          }}
+                          className="mt-1 min-h-10 w-full rounded border px-2 py-2 text-sm"
+                        />
+                      </label>
+                      <label className="block text-xs text-[var(--text-muted)]">
+                        Preço un.
+                        <input
+                          type="number"
+                          value={li.unitPrice}
+                          onChange={(e) => {
+                            const items = [...budgetForm.lineItems];
+                            items[idx] = { ...items[idx], unitPrice: Number(e.target.value) };
+                            setBudgetForm((f) => ({ ...f, lineItems: items }));
+                          }}
+                          className="mt-1 min-h-10 w-full rounded border px-2 py-2 text-sm"
+                        />
+                      </label>
+                    </div>
+                    <p className="text-sm font-medium text-[var(--text-secondary)]">
+                      Total {formatBrl(li.quantity * li.unitPrice)}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+              <div className="ds-scroll-x hidden rounded-xl border border-[var(--border-default)] md:block">
                 <table className="min-w-full text-sm">
                   <thead className="bg-[var(--surface-muted)] text-left text-xs uppercase text-[var(--text-muted)]">
                     <tr>
@@ -629,7 +690,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                     lineItems: [...f.lineItems, { description: "", unit: "un", quantity: 1, unitPrice: 0 }],
                   }))
                 }
-                className="text-sm text-[var(--brand-accent)] hover:underline"
+                className="ds-touch-link px-0"
               >
                 + Adicionar item
               </button>
@@ -649,7 +710,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                   type="button"
                   disabled={busy}
                   onClick={saveBudget}
-                  className="rounded-md bg-[var(--brand-primary)] px-4 py-2 text-sm text-white disabled:opacity-50"
+                  className="min-h-10 rounded-md bg-[var(--brand-primary)] px-4 py-2 text-sm text-white disabled:opacity-50"
                 >
                   Salvar orçamento
                 </button>
@@ -657,7 +718,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                   type="button"
                   disabled={busy}
                   onClick={() => budgetAction("send")}
-                  className="rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900 disabled:opacity-50"
+                  className="min-h-10 rounded-md border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-900 disabled:opacity-50"
                 >
                   Enviar proposta
                 </button>
@@ -677,7 +738,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("approve")}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+                className="min-h-10 rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
               >
                 Finalizar aprovação e faturar
               </button>
@@ -685,7 +746,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("reject")}
-                className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
+                className="min-h-10 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
               >
                 Recusar proposta
               </button>
@@ -698,7 +759,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("approve")}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+                className="min-h-10 rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
               >
                 Aprovar orçamento
               </button>
@@ -706,7 +767,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("reject")}
-                className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
+                className="min-h-10 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
               >
                 Recusar proposta
               </button>
@@ -714,7 +775,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("new-version")}
-                className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+                className="min-h-10 rounded-md border px-4 py-2 text-sm disabled:opacity-50"
               >
                 Nova revisão
               </button>
@@ -727,7 +788,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("new-version")}
-                className="rounded-md border px-4 py-2 text-sm disabled:opacity-50"
+                className="min-h-10 rounded-md border px-4 py-2 text-sm disabled:opacity-50"
               >
                 Nova revisão
               </button>
@@ -743,7 +804,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                   Fatura{" "}
                   <Link
                     href={`/interno?invoice=${activeBudget.invoiceId}`}
-                    className="text-[var(--brand-primary)] hover:underline"
+                    className="ds-touch-link px-0"
                   >
                     {activeBudget.invoiceId.slice(0, 8)}
                   </Link>{" "}
@@ -934,11 +995,8 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
             )}
             {project.attachments.map((att) => (
               <li key={att.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
-                <div>
-                  <a
-                    href={att.downloadUrl}
-                    className="font-medium text-[var(--brand-primary)] hover:underline"
-                  >
+                <div className="min-w-0">
+                  <a href={att.downloadUrl} className="ds-touch-link break-words px-0 font-medium">
                     {att.fileName}
                   </a>
                   <p className="text-xs text-[var(--text-muted)]">
@@ -950,7 +1008,7 @@ export default function ProjectDetailView({ projectId }: { projectId: string }) 
                   type="button"
                   disabled={busy}
                   onClick={() => removeAttachment(att.id)}
-                  className="text-xs text-red-600 hover:underline disabled:opacity-50"
+                  className="ds-touch-link shrink-0 text-red-600 disabled:opacity-50"
                 >
                   Remover
                 </button>

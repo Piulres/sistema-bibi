@@ -175,13 +175,13 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
 
       {msg && <Alert tone="info">{msg}</Alert>}
 
-      <nav className="flex flex-wrap gap-2 border-b border-[var(--border-default)] pb-px">
+      <nav className="ds-scroll-x flex gap-2 border-b border-[var(--border-default)] pb-px">
         {tabs.map((t) => (
           <button
             key={t.key}
             type="button"
             onClick={() => setTab(t.key)}
-            className={`-mb-px border-b-2 px-4 py-2 text-sm font-medium transition ${
+            className={`-mb-px min-h-10 shrink-0 border-b-2 px-4 py-2 text-sm font-medium transition ${
               tab === t.key
                 ? "border-[var(--brand-accent)] text-[var(--brand-accent)]"
                 : "border-transparent text-[var(--text-muted)] hover:text-[var(--brand-accent)]"
@@ -228,7 +228,7 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
             <span className="font-medium">{formatBrl(activeBudget.total)}</span>
             <a
               href={`/api/pj/projects/${projectId}/budgets/${activeBudget.id}/pdf`}
-              className="text-[var(--brand-primary)] hover:underline"
+              className="ds-touch-link"
               target="_blank"
               rel="noreferrer"
             >
@@ -242,7 +242,7 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("approve")}
-                className="rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
+                className="min-h-10 rounded-md bg-emerald-600 px-4 py-2 text-sm text-white disabled:opacity-50"
               >
                 Aprovar proposta
               </button>
@@ -250,7 +250,7 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
                 type="button"
                 disabled={busy}
                 onClick={() => budgetAction("reject")}
-                className="rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
+                className="min-h-10 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-800 disabled:opacity-50"
               >
                 Recusar proposta
               </button>
@@ -337,10 +337,7 @@ export default function PjProjectDetailView({ projectId }: { projectId: string }
           {project.attachments.map((att) => (
             <li key={att.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-3">
               <div>
-                <a
-                  href={att.downloadUrl}
-                  className="font-medium text-[var(--brand-primary)] hover:underline"
-                >
+                <a href={att.downloadUrl} className="ds-touch-link px-0 font-medium">
                   {att.fileName}
                 </a>
                 <p className="text-xs text-[var(--text-muted)]">
