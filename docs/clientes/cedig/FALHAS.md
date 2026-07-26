@@ -17,4 +17,6 @@ Fonte: homologação browser 2026-07-25 · [`HISTORICO_VALIDACAO.md`](HISTORICO_
 | P2-d | Média | “Criar usuário” falha na recepção (Alana) | ✅ esperado RBAC ADMIN; UI esconde formulário + aviso (`operacao@cedig.demo`) |
 | P1-e | Alta | Prestador criado some / login falha | ✅ flush Blob imediato + sync entre Lambdas; login exige `/login?tenant=cedig` (mensagem corrigida) |
 
-Backlog fase 2/F (v2.6): ✅ export Excel · ✅ lançamento → PPU · ✅ E2E `cedig-gestao` · ✅ Beneficiário labels Exame · ✅ PJ Bem/Dr Saúde. Restante: homologação humana in loco + deploy.
+Backlog fase 2/F: ✅ export Excel · ✅ lançamento → PPU · ✅ E2E `cedig-gestao` · ✅ Beneficiário labels Exame · ✅ PJ Bem/Dr Saúde · ✅ mapeamento 4 portais (26/07) · ✅ pacote **v3.0.0** em produção (modo operação).
+
+**Restante:** homologação humana in loco + treino Alana ([`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md)).

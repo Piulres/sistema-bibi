@@ -6,20 +6,22 @@ Complementa [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · [`README.md`](
 
 ---
 
-## Massa CEDIG (seed atual)
+## Massa CEDIG (atual)
 
 | Entidade | Quantidade / contas |
 |----------|---------------------|
-| Tenant | `cedig` · MEDICAL · branding CEDIG Cruzeiro |
+| Tenant | `cedig` · MEDICAL · branding CEDIG Cruzeiro · store **operation** |
 | Procedimentos | 5 (Endo, Colo, Endo+Colo, Mucosectomia, Teste respiratório) |
 | Interno | `operacao@cedig.demo` (ADMIN) · `alana@cedig.demo` / `recepcao@cedig.demo` · João Marcos · Márcia |
 | Prestadores | Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Auto |
-| Empresas PJ | CentralMed · Bem Saúde |
-| PJ | `rh@centralmed.demo` |
+| Empresas PJ | CentralMed · Bem Saúde · Dr Saúde |
+| PJ | `rh@centralmed.demo` · `rh@bemsaude.demo` · `rh@drsaude.demo` |
 | Pacientes / Beneficiários | Maria Silva · José Santos · Ana Particular (`*.cedig@email.com`) |
-| Senha demo | `bibi123` |
+| Senha | `bibi123` |
+| Produção | **v3.0.0** · modo operação · CEDIG provisionado |
 
-> Histórico operacional (agenda, faturas, PPU) começa vazio de propósito — clínica greenfield no piloto.
+> Em **operation** bootstrap mínimo o CEDIG nasce sem `portalMass` (sem pacientes/PJ). Para demos locais dos 4 portais: `./scripts/cedig-mapear.sh` ou `cedig-enrich-operation.ts`.  
+> Playbook: [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md).
 
 ---
 
@@ -120,26 +122,27 @@ Evidências: `/opt/cursor/artifacts/cedig-4portais/`.
 
 | Pacote | Pronto? | Comentário |
 |--------|---------|------------|
-| **A — Piloto gestão (Alana + admin)** | ✅ Sim | Core do pedido; homologado no browser |
-| **B — Prestador (médicos)** | ✅ Ponte v2.6 | Agenda REALIZADO + extrato via ProcedureUsage |
-| **C — PJ / Beneficiário** | ✅ Massa + labels | PJ×3 + PricingRules; Beneficiário Exame |
-| **D — Produção white-label** | ⏳ | Deploy pacote v2.6 + modo **operação** |
-| **E — Export Excel / ligação PPU** | ✅ v2.6 | Ver [`FASE_2.md`](FASE_2.md) |
-| **F — E2E + dashboard KPIs gestão** | ✅ v2.6 | `e2e/cedig-gestao.spec.ts` |
+| **A — Piloto gestão (Alana + admin)** | ✅ | Core do pedido; homologado no browser |
+| **B — Prestador (médicos)** | ✅ | Agenda REALIZADO + extrato via ProcedureUsage |
+| **C — PJ / Beneficiário** | ✅ | PJ×3 + PricingRules; Beneficiário Exame |
+| **D — Produção white-label** | ✅ pacote | **v3.0.0** em produção · modo operação · ⏳ logo/treino in loco |
+| **E — Export Excel / ligação PPU** | ✅ | [`FASE_2.md`](FASE_2.md) |
+| **F — E2E + dashboard KPIs gestão** | ✅ | `e2e/cedig-gestao.spec.ts` · mapeamento 26/07 |
 
 ### Veredito
 
-**Pode entregar ao cliente o piloto de gestão clínica + pontes fase 2** (planilha → ferramenta + PPU/portais técnicos).
+**Pode entregar ao cliente o piloto de gestão clínica + pontes PPU** (planilha → ferramenta + portais técnicos) — pacote **v3.0.0** já em produção.
 
-**Não vender ainda como “os 4 portais CEDIG em produção plena”** até homologação humana in loco e deploy do pacote.
+**Não vender ainda como “os 4 portais CEDIG em produção plena”** até homologação humana in loco.
 
 ### Checklist antes de mostrar ao cliente
 
-1. Merge + deploy do pacote v2.6 (quando autorizar)
-2. Modo **operação** + branding final (logo real, se houver)
-3. Treinar Alana com [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) (15 min)
+1. ~~Deploy do pacote~~ → **v3.0.0** publicado ([`RELEASES.md`](../../versoes/RELEASES.md))
+2. Confirmar modo **operação** + branding final (logo real, se houver)
+3. Treinar Alana com [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) / [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) (15 min)
 4. Validar ponte: lançamento → Prestador / Faturamento / PJ
 5. Coletar feedback in loco
+6. Smoke: `bash scripts/cedig-golive-smoke.sh`
 
 ---
 

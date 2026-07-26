@@ -5,11 +5,13 @@
 | Campo | Valor |
 |-------|-------|
 | **Site** | [cedigcruzeiro.com.br](https://www.cedigcruzeiro.com.br) |
-| **Segmento** | `MEDICAL` (endoscopia digestiva) |
-| **Slug sugerido** | `cedig` |
+| **Segmento** | `MEDICAL` (endoscopia digestiva) · labels UI **Exame** |
+| **Slug** | `cedig` (`/?tenant=cedig`) |
+| **Produção** | **v3.0.0** @ https://sistema-bibi.netlify.app · modo **operação** |
 | **Contato público** | (12) 3199-7871 · WhatsApp |
 | **Foco clínico** | Endoscopia · Colonoscopia · Teste respiratório |
 | **Não confundir** | Clínica CEDIG de São Paulo (Vila Mariana/Tucuruvi) é outra rede |
+| **Playbook** | [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) |
 
 ---
 
@@ -126,15 +128,29 @@ A secretária **não faz contas** — menus prontos + valor sugerido; o sistema 
 | Fase | Entrega | Status |
 |------|---------|--------|
 | **A** | Módulo Gestão clínica (lançamentos + despesas + KPIs) | ✅ |
-| **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ seed `/?tenant=cedig` |
-| **C** | Homologação browser 4 portais + gestão | ✅ 2026-07-25 + mapeamento semana 2026-07-26 · falta humano in loco |
-| **D** | Ponte lançamento → agenda + PPU + fatura/pagamento | ✅ v2.6 · [`FASE_2.md`](FASE_2.md) |
-| **E** | Export Excel mensal + agenda “Lançar na gestão” | ✅ v2.6 |
-| **F** | Beneficiário labels · PJ Bem/Dr Saúde · seed bridge · E2E · dashboard | ✅ v2.6 |
+| **B** | Tenant CEDIG (branding, labels, catálogo, equipe, tabelas) | ✅ `/?tenant=cedig` |
+| **C** | Homologação browser 4 portais + gestão | ✅ 25–26/07 · ⏳ humano in loco |
+| **D** | Ponte lançamento → agenda + PPU + fatura/pagamento | ✅ desde v2.6 · em prod **v3.0.0** · [`FASE_2.md`](FASE_2.md) |
+| **E** | Export Excel mensal + agenda “Lançar na gestão” | ✅ |
+| **F** | Beneficiário labels · PJ Bem/Dr Saúde · seed bridge · E2E · dashboard | ✅ |
 
-Mapa de gaps e validação: [`FASE_2.md`](FASE_2.md).
+Mapa técnico: [`FASE_2.md`](FASE_2.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
 
-Ações: [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) · Histórico: [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) · Roteiro: [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · Falhas: [`FALHAS.md`](FALHAS.md) · Go-live: [`GO_LIVE_CHECKLIST.md`](GO_LIVE_CHECKLIST.md).
+| Doc | Uso |
+|-----|-----|
+| [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) | Playbook diário + massa mapeada |
+| [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) | Homologação gestão (C1–C4) |
+| [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md) | Rodadas assistidas |
+| [`FALHAS.md`](FALHAS.md) | Falhas corrigidas / restante |
+
+### Scripts locais
+
+| Script | Função |
+|--------|--------|
+| `scripts/cedig-mapear.sh` | Enrich operation + agenda semana + lançamentos |
+| `scripts/cedig-enrich-operation.ts` | `portalMass` CEDIG na `operation.db` |
+| `scripts/cedig-week-mapping.mjs` | Semana / walk-ins / C1–C4 via API |
+| `scripts/cedig-golive-smoke.sh` | Smoke produção (v3.0.0) |
 
 ---
 
@@ -147,3 +163,4 @@ Ações: [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) · Histórico: [`HISTO
 - UI: `src/components/ClinicFinanceView.tsx`
 - API: `/api/interno/clinic-finance/*` (+ `export`)
 - Catálogo / equipe seed: `prisma/seed-data/cedig-catalog.ts`
+- Store: `cedig` ∈ `OPERATION_TENANT_SLUGS` (`src/lib/data-store/ensure-data-store-for-segment.ts`)

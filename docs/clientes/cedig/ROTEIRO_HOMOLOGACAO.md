@@ -1,22 +1,31 @@
 # Roteiro de homologação — CEDIG `/interno/gestao`
 
-Complementa [`README.md`](README.md). Massa geral: [`docs/plataforma/MASSA_TESTES.md`](../../plataforma/MASSA_TESTES.md). Estratégia: [`docs/plataforma/TESTES.md`](../../plataforma/TESTES.md).
+Complementa [`README.md`](README.md) · playbook [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md).  
+Massa geral: [`docs/plataforma/MASSA_TESTES.md`](../../plataforma/MASSA_TESTES.md). Estratégia: [`docs/plataforma/TESTES.md`](../../plataforma/TESTES.md).
 
 > **Nota:** checklist assistido (browser / secretária Alana). Falhas mapeadas: [`FALHAS.md`](FALHAS.md).  
-> Tours: ao pular o tour principal, os micro-tours do portal não abrem mais. Em demos: `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true`.
+> Tours: ao pular o tour principal, os micro-tours do portal não abrem mais. Em demos: `NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true`.  
+> **`?tenant=cedig` usa store operation** — não basta só `db:seed` na `dev.db`.
 
 ---
 
 ## Pré-condições
 
 ```bash
-npm run db:push && npm run db:seed
-npm run dev   # http://localhost:3000
+# Recomendado (dual-store + CEDIG na operation.db)
+npm run db:bootstrap:demo
+echo operation > prisma/.data-store-mode
+DATABASE_URL="file:./operation.db" DUAL_DATA_STORE=false npx tsx scripts/cedig-enrich-operation.ts
+NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true npm run dev   # http://localhost:3000
+
+# Atalho: enrich + semana + C1–C4 via API
+# ./scripts/cedig-mapear.sh
 ```
 
 | Item | Valor |
 |------|-------|
 | Tenant | `/?tenant=cedig` |
+| Store | **operation** (`prisma/operation.db`) |
 | Login | `alana@cedig.demo` / `bibi123` |
 | Alternativa | `recepcao@cedig.demo` / `bibi123` |
 | Tela | `/interno/gestao` |
@@ -106,16 +115,26 @@ npm run dev   # http://localhost:3000
 
 ---
 
-## Resultado da última execução assistida
+## Resultado das execuções assistidas
+
+### 2026-07-25 — gestão (gestão clínica)
 
 | Campo | Valor |
 |-------|-------|
-| Data | 2026-07-25 |
-| Ambiente | local `localhost:3000` · tenant `cedig` · `alana@cedig.demo` |
-| Modelo | Claude 4.6 Sonnet (computerUse) |
-| Resultado | ✅ **OK** — C1–C4, D1–D2 e KPIs aprovados |
-| Fix na sessão | `getPrisma()` em `clinic-finance/service.ts` (bloqueava a tela) |
+| Ambiente | local · tenant `cedig` · `alana@cedig.demo` |
+| Resultado | ✅ **OK** — C1–C4, D1–D2 e KPIs |
+| Fix na sessão | `getPrisma()` em `clinic-finance/service.ts` |
 | Evidências | `/opt/cursor/artifacts/cedig-homologacao/` |
+
+### 2026-07-26 — C1–C4 + 4 portais (modo operation)
+
+| Campo | Valor |
+|-------|-------|
+| Ambiente | local · **operation.db** · `/?tenant=cedig` |
+| Resultado | ✅ **OK** — C1–C4 SYNCED · despesas · KPIs · Interno/Prestador/PJ/Beneficiário |
+| Massa extra | 21 exames na semana · 4 walk-ins |
+| Evidências | `/opt/cursor/artifacts/cedig-mapeamento/` |
+| Detalhe | [`ACOES_OPERACIONAIS.md`](ACOES_OPERACIONAIS.md) §4 |
 
 ### Valores observados vs esperados
 
@@ -127,4 +146,4 @@ npm run dev   # http://localhost:3000
 | C4 Teste respiratório Bem Saúde | R$ 450 | R$ 450 |
 | D Lab + Pessoal | R$ 300 + R$ 500 | OK |
 
-Bugs UX: nenhum na execução.
+Bugs UX: nenhum nas execuções.

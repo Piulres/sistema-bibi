@@ -44,7 +44,7 @@ docs/
 
 | Cliente | Doc |
 |---------|-----|
-| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) |
+| CEDIG Cruzeiro | [`clientes/cedig/README.md`](clientes/cedig/README.md) · playbook [`ACOES_OPERACIONAIS.md`](clientes/cedig/ACOES_OPERACIONAIS.md) |
 
 ---
 

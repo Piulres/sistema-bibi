@@ -4,7 +4,8 @@ Playbook único do piloto CEDIG Cruzeiro: o que fazer no dia a dia, o que já fo
 
 Complementa [`README.md`](README.md) · [`ROTEIRO_HOMOLOGACAO.md`](ROTEIRO_HOMOLOGACAO.md) · [`FASE_2.md`](FASE_2.md) · [`HISTORICO_VALIDACAO.md`](HISTORICO_VALIDACAO.md).
 
-> **Tenant:** `/?tenant=cedig` · **Store:** modo **operação** · **Senha:** `bibi123`
+> **Tenant:** `/?tenant=cedig` · **Store:** modo **operação** · **Senha:** `bibi123`  
+> **Produção:** ServiceOS **v3.0.0** · https://sistema-bibi.netlify.app
 
 ---
 
@@ -97,16 +98,17 @@ Bugs bloqueantes: **nenhum**.
 ```bash
 npm run db:bootstrap:demo
 echo operation > prisma/.data-store-mode
-DATABASE_URL="file:./operation.db" DUAL_DATA_STORE=false npx tsx scripts/cedig-enrich-operation.ts
 NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true npm run dev
-# outro terminal:
-node scripts/cedig-week-mapping.mjs
+# outro terminal (com o server no ar):
+./scripts/cedig-mapear.sh
 ```
 
 | Script | Função |
 |--------|--------|
+| `scripts/cedig-mapear.sh` | Atalho: enrich + week-mapping |
 | `scripts/cedig-enrich-operation.ts` | Pacientes, PJ e histórico CEDIG na `operation.db` |
 | `scripts/cedig-week-mapping.mjs` | Semana + walk-ins + lançamentos + despesas via API |
+| `scripts/cedig-golive-smoke.sh` | Smoke contra produção (v3.0.0) |
 
 ---
 
