@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.5",
+    version: "3.0.6",
     label: PLATFORM.versionLabel,
     date: "26/07/2026",
     status: "current",
+    summary:
+      "Home comercial alinhada à proposta Pay Per Use, navegação dos portais redesenhada no mobile e desktop, e assistente que fecha ao navegar.",
+    highlights: [
+      {
+        title: "Home e captação",
+        items: [
+          "Funil comercial enxuto: dor → solução → como funciona → segmentos",
+          "Copy focada em conectar empresa, prestador e cliente final",
+          "Menu da home com 7 âncoras incluindo Como funciona",
+        ],
+      },
+      {
+        title: "Portais e assistente",
+        items: [
+          "Nav mobile/desktop redesenhada nos quatro portais (menu Mais, scroll)",
+          "Assistente fecha automaticamente ao clicar em ação de navegação",
+          "Documentação de APIs clínicas §7 e docRefs do flow map",
+        ],
+      },
+    ],
+    testStats: "587 testes Vitest · E2E · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.5",
+    label: "Sistema Bibi - ServiceOS v3.0.5",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Atendimento clínico mais completo para o prestador, jornada que acompanha o pagamento, e landing/portais mais limpos no desktop e no celular.",
     highlights: [
