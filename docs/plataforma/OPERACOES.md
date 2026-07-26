@@ -197,7 +197,7 @@ dev acumula features → merge dev → main → pre-release OK → deploy manual
 bibi-poc-AAAA-MM-DD[a|b|c]
 ```
 
-Exemplo atual em produção: **`v3.0.3`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + CEDIG em modo operação + schema-sync Blob). Ver [`RELEASES.md`](../versoes/RELEASES.md).
+Exemplo atual em produção: **`v3.0.4`** — **Sistema Bibi - ServiceOS** (PWA `/instalar` + TISS 422 + config Cursor enxuta). Ver [`RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -212,7 +212,7 @@ Exemplo atual em produção: **`v3.0.3`** — **Sistema Bibi - ServiceOS** (PWA 
 | Env vars | Painel → Site settings | `SESSION_SECRET`, `CRON_SECRET` obrigatórios |
 | Troubleshooting | [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) | 503, Prisma, Blobs |
 
-**Produção:** https://sistema-bibi.netlify.app · **v3.0.3** · modo **operação** (CEDIG) · Stop builds **ON**  
+**Produção:** https://sistema-bibi.netlify.app · **v3.0.4** · modo **operação** (CEDIG) · Stop builds **ON**  
 **CEDIG:** status [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · operação [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md)  
 **Docs vivas:** [`DOCUMENTACAO.md`](DOCUMENTACAO.md)  
 Fonte: [`RELEASES.md`](../versoes/RELEASES.md).

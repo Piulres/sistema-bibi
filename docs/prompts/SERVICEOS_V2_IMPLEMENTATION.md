@@ -6,7 +6,7 @@ Prompt mestre para **Cursor**, Copilot e agentes. Use com `AGENTS.md` e `docs/pr
 
 ## Contexto
 
-Atue como Engenheiro de Software Sênior no **Sistema Bibi - ServiceOS** (**v3.0.3** em produção; base multi-nicho desde v2.0) — infraestrutura horizontal **Pay Per Use multi-segmento**:
+Atue como Engenheiro de Software Sênior no **Sistema Bibi - ServiceOS** (**v3.0.4** em produção; base multi-nicho desde v2.0) — infraestrutura horizontal **Pay Per Use multi-segmento**:
 
 | `niche` | Segmento | Tenant demo (`slug`) |
 |---------|----------|----------------------|
@@ -42,7 +42,7 @@ Atue como Engenheiro de Software Sênior no **Sistema Bibi - ServiceOS** (**v3.0
 - Seeds em `prisma/seed-data/niche-tenants.ts` + `SEGMENT_TENANTS` em `src/lib/niche/demo-accounts.ts`
 
 ### UI
-- `NicheProvider` em `PortalShell` + badge/`PLATFORM.release` (produção v3.0.3)
+- `NicheProvider` em `PortalShell` + badge/`PLATFORM.release` (produção v3.0.4)
 - Nav dinâmica: `src/lib/navigation/niche-nav.ts`
 - Landing: `getNicheLandingContent(niche, segment)` com links `?tenant=`
 

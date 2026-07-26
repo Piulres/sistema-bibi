@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.3** (base multi-nicho desde v2.0) — labels por tenant, landing segmentada, tenants demo multi-nicho.
+Última revisão: **ServiceOS v3.0.4** (base multi-nicho desde v2.0) — labels por tenant, landing segmentada, tenants demo multi-nicho.
 
 ---
 
