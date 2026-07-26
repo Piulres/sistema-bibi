@@ -227,32 +227,3 @@ export async function getPjPortalOverview(
     },
   };
 }
-
-export async function buildPjReportCsv(companyId: string, tenantId: string): Promise<string | null> {
-  const overview = await getPjPortalOverview(companyId, tenantId);
-  if (!overview) return null;
-
-  const lines = [
-    "secao,campo,valor",
-    `empresa,nome,"${overview.company.name}"`,
-    `empresa,cnpj,${overview.company.cnpj}`,
-    `empresa,status,${overview.company.status}`,
-    `empresa,consumo_total,${overview.company.totalConsumedLabel}`,
-    `empresa,faturas_abertas,${overview.summary.openInvoicesTotalLabel}`,
-  ];
-
-  for (const b of overview.beneficiaries) {
-    lines.push(`beneficiario,nome,"${b.name}"`);
-    lines.push(`beneficiario,cpf,${b.cpf}`);
-    lines.push(`beneficiario,consumo,${b.consumedLabel}`);
-    lines.push(`beneficiario,pendente,${b.pendingLabel}`);
-  }
-
-  for (const inv of overview.invoices) {
-    lines.push(
-      `fatura,data,${inv.createdAtLabel},beneficiario,"${inv.patientName}",valor,${inv.totalLabel},status,${inv.status}`,
-    );
-  }
-
-  return lines.join("\n");
-}

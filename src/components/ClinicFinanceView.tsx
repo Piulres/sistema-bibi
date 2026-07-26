@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
+import ExportButtons from "@/components/ExportButtons";
 import { useToast } from "@/components/ui/Toast";
 import { useLabels } from "@/hooks/useLabels";
+import { LIST_EXPORT_FORMATS } from "@/lib/exports/format";
 import { suggestCedigAmount } from "@/lib/clinic-finance/cedig-pricing";
 import type {
   CedigPolypectomyTierId,
@@ -327,11 +329,6 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     }
   }
 
-  function exportMonth() {
-    const q = `year=${year}&month=${month}&format=xlsx`;
-    window.location.href = `/api/interno/clinic-finance/export?${q}`;
-  }
-
   async function submitExpense(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -424,14 +421,13 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
         <p className="w-full text-sm text-[var(--text-secondary)] sm:w-auto">
           Menus prontos + valor sugerido pela tabela. Alana só confirma e salva.
         </p>
-        <button
-          type="button"
-          onClick={exportMonth}
-          className="min-h-10 rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
-          data-tour-id="clinic-finance-export"
-        >
-          Exportar mês (Excel)
-        </button>
+        <div data-tour-id="clinic-finance-export">
+          <ExportButtons
+            baseUrl="/api/interno/clinic-finance/export"
+            query={{ year: String(year), month: String(month) }}
+            formats={LIST_EXPORT_FORMATS}
+          />
+        </div>
       </div>
 
       {form.appointmentId ? (

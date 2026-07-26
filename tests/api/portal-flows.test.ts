@@ -134,8 +134,12 @@ describe("API — fluxos por portal", () => {
       const res = await pjReportsGet(new Request("http://localhost/api/pj/reports"));
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("text/csv");
-      const text = await res.text();
-      expect(text).toContain("TechCorp");
+      const bytes = Buffer.from(await res.arrayBuffer());
+      const text = bytes.toString("utf8");
+      // CSV canônico tabular (serveTabularExport) — nome da empresa fica no title do PDF/XLSX.
+      expect(text).toMatch(/Se[cç][aã]o/i);
+      expect(text).toContain("Beneficiário");
+      expect(text).toContain("João Pereira");
     });
   });
 

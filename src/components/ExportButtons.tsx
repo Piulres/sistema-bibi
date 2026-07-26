@@ -2,12 +2,14 @@
 
 import Button from "@/components/ui/Button";
 import type { ExportFormat } from "@/lib/exports/format";
+import { LIST_EXPORT_FORMATS } from "@/lib/exports/format";
 
 const FORMAT_LABELS: Record<ExportFormat, string> = {
   pdf: "PDF",
   xlsx: "Excel",
   csv: "CSV",
   json: "JSON",
+  txt: "TXT",
 };
 
 type Props = {
@@ -21,7 +23,7 @@ type Props = {
 export default function ExportButtons({
   baseUrl,
   query = {},
-  formats = ["pdf", "xlsx"],
+  formats = LIST_EXPORT_FORMATS,
   size = "sm",
   variant = "secondary",
 }: Props) {
