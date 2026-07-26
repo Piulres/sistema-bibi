@@ -47,7 +47,7 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     status: "implemented",
     ui: "/beneficiario → Resumo",
     api: "GET /api/beneficiario/overview",
-    docRef: "care-journey.ts",
+    docRef: "FLUXOS.md §8.9",
   },
   {
     id: "benef-pix-qr",
@@ -58,6 +58,7 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     status: "implemented",
     ui: "/beneficiario → Faturas → Pagar com PIX",
     api: "POST /api/beneficiario/invoices/[id]/pay",
+    docRef: "FLUXOS.md §8.9",
   },
   {
     id: "benef-appointment-cards",
@@ -67,6 +68,7 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     description: "Lista de consultas com AppointmentCard, status e ações contextuais.",
     status: "implemented",
     ui: "/beneficiario → Minha agenda",
+    docRef: "JORNADA_CLIENTE.md §2",
   },
   {
     id: "prestador-confirm-arrival",

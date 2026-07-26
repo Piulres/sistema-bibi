@@ -22,7 +22,7 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 
 | Subsistema alterado | Atualizar |
 |---------------------|-----------|
-| Prontuário / Care Chart / protocolos | `DOCUMENTOS_CLINICOS.md` · `FLUXOS.md` §3/§4.3 |
+| Prontuário / Care Chart / protocolos | `DOCUMENTOS_CLINICOS.md` · `FLUXOS.md` §3/§4.3 · `API_DOCS.md` §7 |
 | Jornada PPU / stepper / abas | `FLUXOS.md` §8.9 · `JORNADA_CLIENTE.md` · `src/lib/flow-improvements-map.ts` |
 | Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |

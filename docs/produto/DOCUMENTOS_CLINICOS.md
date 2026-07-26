@@ -64,6 +64,8 @@ No atendimento, **Aplicar protocolo** gera um `ExamOrder` por item.
 - `src/components/ExamProtocolTemplatesPanel.tsx` · `ProtocolTemplatesPanel.tsx`
 - `src/components/clinical/ClinicalCarePanel.tsx` · `AtendimentoView.tsx`
 
+**Contrato HTTP:** [`plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §7 (protocolos de exames e prescrições).
+
 ## Validação rápida
 
 1. Interno → Cadastros → Protocolos: criar/editar/desativar protocolo de exames

@@ -49,7 +49,7 @@ Documento de planejamento e registro das mudanças aplicadas na home (`/`) para 
 
 - Stats: economia 87%, 6 segmentos, 4 portais, Price Snapshot  
 - Seção `#para-quem` na home  
-- Nav: Solução · ROI · Para quem · Segmentos · Portais · FAQ  
+- Nav (v1): Solução · ROI · Para quem · Segmentos · Portais · FAQ  
 
 ### Funil v1
 
@@ -83,11 +83,15 @@ Hero (UTM) → Stats → Prova → Problema → Solução → Demo vídeo
   → FAQ → Novidades → Contato → CTA
 ```
 
-### Navegação atual
+### Navegação atual (v3.0.5)
+
+Menu enxuto com **6 âncoras** em `src/lib/landing/navigation.ts` (`HOME_NAV_ANCHORS`):
 
 ```
-Solução · Demo · ROI · Comparativo · Para quem · Segmentos · Portais · Contato · FAQ
+Solução · Demo · Segmentos · Portais · Contato · FAQ
 ```
+
+Seções **ROI**, **Comparativo** e **Para quem** permanecem na página (scroll), mas saíram do header/footer para reduzir ruído — ver [`produto/FLUXOS.md`](../produto/FLUXOS.md) §0.4 e [`plataforma/DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md).
 
 ---
 

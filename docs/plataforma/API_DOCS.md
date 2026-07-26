@@ -186,7 +186,65 @@ Fluxo completo (emitir fatura → PIX → TISS): [`produto/FLUXOS.md`](../produt
 
 ---
 
-## 7. Referências
+## 7. Documentos clínicos (prestador + cadastros)
+
+Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer sessão **prestador** ou **interno** (`cadastros`), conforme a tabela.
+
+| Método | Path | Auth | Função |
+|--------|------|------|--------|
+| `GET` | `/api/interno/exam-protocol-templates` | `cadastros` | Lista templates de exames (inclui inativos) |
+| `POST` | `/api/interno/exam-protocol-templates` | `cadastros` | Cria template (`name`, `exams[]`, `clinicalIndication?`) |
+| `PATCH` | `/api/interno/exam-protocol-templates/{id}` | `cadastros` | Edita template ou `active: false` |
+| `GET` | `/api/prestador/patients/{id}/exam-protocols` | prestador | Lista templates ativos para aplicar |
+| `POST` | `/api/prestador/patients/{id}/exam-protocols` | prestador | Aplica template → N× `ExamOrder` |
+| `GET` | `/api/prestador/patients/{id}/medications` | prestador | Lista prescrições do paciente |
+| `POST` | `/api/prestador/patients/{id}/medications` | prestador | Nova prescrição (`prescriptionKind`: `COMUM` \| `CONTROLE_ESPECIAL`) |
+| `PATCH` | `/api/prestador/medications/{id}` | prestador | Transição de status: `ATIVA` \| `SUSPENSA` \| `ENCERRADA` |
+
+### Corpo — aplicar protocolo de exames
+
+```json
+{
+  "templateId": "tpl_abc123",
+  "appointmentId": "apt_optional",
+  "clinicalIndication": "Suspeita clínica opcional"
+}
+```
+
+Resposta `200`: `{ orders: ExamOrder[], templateName: string }`. Erros comuns: `400` (template inativo ou sem exames), `404` (paciente).
+
+### Corpo — prescrever medicamento
+
+Campos obrigatórios: `medication`, `dosage`, `frequency`. Opcionais: `route`, `durationDays`, `quantity`, `notes`, `appointmentId`, `prescriptionKind` (default `COMUM`).
+
+### Corpo — atualizar status da prescrição
+
+```json
+{ "status": "SUSPENSA" }
+```
+
+Reativar: `{ "status": "ATIVA" }`. Serviço: `src/lib/medication-service.ts` · `src/lib/exam-protocol-service.ts`.
+
+### Exemplo curl (prestador)
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"dra.helena@bibi.health","password":"bibi123","portal":"prestador"}'
+
+# Aplicar protocolo de exames
+curl -b cookies.txt -X POST http://localhost:3000/api/prestador/patients/PATIENT_ID/exam-protocols \
+  -H "Content-Type: application/json" \
+  -d '{"templateId":"TEMPLATE_ID"}'
+```
+
+Fluxo de produto e validação manual: [`produto/DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) · [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.3.
+
+> **OpenAPI:** paths de `exam-protocol-templates` podem exigir `npm run openapi:sync` após alterações nos Route Handlers. Prescrições já constam em `/api/prestador/medications/*`.
+
+---
+
+## 8. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal
