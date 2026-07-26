@@ -15,9 +15,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.3** — deploy `6a65b0e3` @ `f1ca645` (`bibi-poc-2026-07-26c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.3** · tip `fc9afa7` |
+| **Release `main` / `dev`** | **v3.0.3** · tip `f1ca645` |
 | **Pacote anterior em produção** | **3.0.2** — deploy `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -53,7 +53,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.3`** | `fc9afa7` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
+| **`v3.0.3`** | `f1ca645` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
 | **`v3.0.2`** | `9ceeb49` | Hotfix: schema-sync do operation.db (incidente 500 em /interno/gestao) |
 | **`v3.0.1`** | `daf690e` | Qualidade multi-nicho + regras da agenda (auditoria P1–P3 + labels + CI) |
 | **`v3.0.0`** | `d2e0548` | PWA `/instalar` · manifest standalone · smoke Netlify |
