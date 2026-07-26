@@ -16,11 +16,18 @@ via API.
 | 2 | 2026-06-23 | — | Atualização v2.0 (labels) |
 | 3 | 2026-07-26 | `0c9d800` (v3.0.0) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
+| **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
 
-> **Correções aplicadas nesta rodada (3.1):** máquina de estados do agendamento
+> **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
 > feedback de erro em prestadores (P2), tratamento de erro em `ClinicalCarePanel`
 > e `ClinicFinanceView` (P2) e aviso de conta PJ sem empresa (P3). Detalhe no §11.
+>
+> **Rodada 3.2:** guards do beneficiário padronizados em `requireBeneficiary()`
+> (#14); rotas internas destrutivas (`void`/`reverse`/`retry`/`revert-recent`)
+> passam a exigir `requireInternoModuleWrite` (bloqueio explícito de READONLY);
+> onboarding com `npm run setup` + gotchas de teste documentados
+> (`docs/plataforma/TESTES.md` §Setup e gotchas).
 
 **Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](../plataforma/TESTES.md)
 
@@ -108,7 +115,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 11 | `AppointmentsView.updateStatus` ignora falha | **CORRIGIDA** | usa `useAsyncAction().run` |
 | 12 | PJ login sem `companyId`; `PjView` sem `res.ok` | **PARCIAL** | `PjView` corrigido (`fetchJson`); página só valida role `PJ`, não `companyId` |
 | 13 | Beneficiário: `billed:false` = "ABERTA"; dropdown vazio | **CORRIGIDA (3.1)** | badge "Faturado"/"A faturar"; falha em `/providers` exibe mensagem + retry |
-| 14 | Guards beneficiário inconsistentes | **PERSISTE** | `overview`/`export` usam `requireBeneficiary()`; `slots`/`providers`/`appointments` só `requireUser(["BENEFICIARIO"])` |
+| 14 | Guards beneficiário inconsistentes | **CORRIGIDA (3.2)** | todas as rotas `src/app/api/beneficiario/*` usam `requireBeneficiary()` — `patientId` garantido e 403 consistente |
 | 15 | `proxy.ts` só presença do cookie | **MUDOU → OK** | agora valida HMAC (`verifySessionToken`); role fica no server-side (documentado) |
 | 16 | `SESSION_SECRET` fallback dev | **PERSISTE (endurecido)** | fallback só fora de produção; em produção exige ≥32 chars e rejeita fracos (`security/config.ts`) |
 | 17 | TISS XML sem XSD | **PERSISTE** | `buildTissGuideXml` gera XML simplificado (POC) |
@@ -201,7 +208,7 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 |------|-------|----------|---------|
 | **Baixa** | Tabela de consumo PPU | `billed:false` exibido como badge **"ABERTA"** (confunde com fatura em aberto) | `src/components/BeneficiarioView.tsx` |
 | **Baixa** | Agendar consulta | Falha ao carregar `/providers` → dropdown vazio sem mensagem (só erro de `overview` propaga) | `src/components/BeneficiarioView.tsx` |
-| **Baixa** | Guards inconsistentes | `overview`/`export` usam `requireBeneficiary()` (exige `patientId`); `slots`/`providers`/`appointments`/`clinical` usam só `requireUser(["BENEFICIARIO"])` | rotas em `src/app/api/beneficiario/` |
+| ~~Baixa~~ ✅ | Guards inconsistentes | **Corrigido (3.2):** todas as rotas `src/app/api/beneficiario/*` usam `requireBeneficiary()` (exige `patientId`) | rotas em `src/app/api/beneficiario/` |
 
 ```tsx
 // label enganosa — billed:false = procedimento ainda não faturado, não fatura aberta
@@ -267,7 +274,9 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 | **P2** | Beneficiário | Label de consumo PPU distinta de status de fatura; mensagem quando `/providers` falha | ✅ **Feito (3.1)** |
 | **P2** | Guards clínicos | Checar `res.ok` nos PATCH de `ClinicalCarePanel` | ✅ **Feito (3.1)** |
 | **P3** | PJ + tenant scope | Aviso de conta PJ sem empresa; `tenantId` no GET/PATCH `prestador/appointments/[id]` | ✅ **Feito (3.1)** |
-| **P3** | Defesa em profundidade | Generalizar `requireInternoModuleWrite` nas rotas mutáveis do interno | ⏳ Aberto (risco prático baixo pela matriz atual) |
+| **P3** | Guards beneficiário | Padronizar `requireBeneficiary()` em todas as rotas de `src/app/api/beneficiario/*` | ✅ **Feito (3.2)** |
+| **P3** | Defesa em profundidade | `requireInternoModuleWrite` nas rotas **destrutivas** (`void`/`reverse`/`retry`/`revert-recent`) | ✅ **Feito (3.2)** |
+| **P3** | Defesa em profundidade | Generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis | ⏳ Aberto — **sem exposição na matriz atual** (READONLY não possui esses módulos; `audit/restore` já exige ADMIN). Conversão em massa evitada por ser no-op comportamental; ações destrutivas já endurecidas |
 
 ---
 
