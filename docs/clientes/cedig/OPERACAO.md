@@ -29,6 +29,8 @@ Homologação de preços: [`HOMOLOGACAO.md`](HOMOLOGACAO.md). Cliente/preços: [
 3. **Walk-in** — particular sem hora (topo da agenda)
 4. Após exames → **Gestão** → **Lançamentos** (valor sugerido → Registrar → Ponte **SYNCED**)
 
+> **Mobile (v3.0.7):** no celular, lançamentos aparecem em cards legíveis; use o drawer de navegação (ícone do módulo ativo, abre pela direita) para trocar de módulo. Doc: [`../../produto/FLUXOS.md`](../../produto/FLUXOS.md) §4.2.1.
+
 ### Financeiro
 5. **Despesas** — lab, pessoal, insumos, cartão  
 6. **Indicadores** — receita, lucro, produção, frascos

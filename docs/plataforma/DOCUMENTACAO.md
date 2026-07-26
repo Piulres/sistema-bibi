@@ -63,11 +63,12 @@ Ao fechar trabalho no domínio: **atualize `STATUS.md`** (tabela Status + linha 
 ## Checklist do agente (antes do PR)
 
 1. `RELEASES.md` / `STATUS.md` do domínio refletem a realidade?
-2. Links apontam para docs vivos (não arquivos removidos)?
-3. Subsistema alterado tem doc correspondente? (ver tabela acima)
-4. UX flow implementado? Atualizar `src/lib/flow-improvements-map.ts` (`status: "implemented"` + `docRef`); se `docRef` aponta para § de FLUXOS/JORNADA, atualizar esse §; rodar `e2e/flow-improvements.spec.ts` quando aplicável.
-5. `npm run docs:verify`
-6. `npm run cursor:verify` (se tocou `.cursor/` ou `AGENTS.md`)
-7. PR base **`dev`** (nunca `main` direto)
+2. Ponteiros de produção em `docs/README.md`, `DEPLOY_NETLIFY.md` e `WORKFLOW_CURSOR.md` alinhados a `RELEASES.md` (deploy id + SHA)?
+3. Links apontam para docs vivos (não arquivos removidos)?
+4. Subsistema alterado tem doc correspondente? (ver tabela acima)
+5. UX flow implementado? Atualizar `src/lib/flow-improvements-map.ts` (`status: "implemented"` + `docRef`); se `docRef` aponta para § de FLUXOS/JORNADA, atualizar esse §; rodar `e2e/flow-improvements.spec.ts` quando aplicável.
+6. `npm run docs:verify`
+7. `npm run cursor:verify` (se tocou `.cursor/` ou `AGENTS.md`)
+8. PR base **`dev`** (nunca `main` direto)
 
 Ver também: skill `.cursor/skills/serviceos-dev-quality/SKILL.md`.

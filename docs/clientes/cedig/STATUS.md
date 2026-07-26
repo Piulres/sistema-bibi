@@ -20,7 +20,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 
 | Capacidade | Estado | Nota |
 |------------|--------|------|
-| Gestão clínica (lançamentos, despesas, KPIs) | ✅ | `/interno/gestao` · schema-sync + flush Blob (v3.0.2/v3.0.3) |
+| Gestão clínica (lançamentos, despesas, KPIs) | ✅ | `/interno/gestao` · cards no mobile + tabela desktop (v3.0.7) · schema-sync + flush Blob |
 | Agenda + walk-in (modo operação) | ✅ | Persiste com Blobs |
 | Ponte PPU (lançamento → Appointment + Usage + Invoice) | ✅ | `bridge.ts` · coluna **SYNCED** |
 | Prestador (fila / extrato) | ✅ | Ex.: `bruno.dias@cedig.demo` · `gabriela@cedig.demo` |
