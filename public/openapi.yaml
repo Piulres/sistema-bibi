@@ -151,6 +151,9 @@ components:
         proceduresCount: { type: integer }
     Usage:
       type: object
+      description: >
+        Procedimento Pay Per Use registrado no atendimento. Desde v3.0.5 o detalhe
+        do prestador inclui vínculo com fatura para o stepper Faturado/Pago.
       properties:
         id: { type: string }
         procedure: { type: string }
@@ -158,6 +161,14 @@ components:
         priceCharged: { type: number }
         priceLabel: { type: string, example: "R$ 220,00" }
         billed: { type: boolean }
+        invoiceId:
+          type: string
+          nullable: true
+          description: ID da fatura vinculada (via invoiceItem), ou null
+        invoiceStatus:
+          type: string
+          nullable: true
+          description: Status da fatura (ex. FECHADA, PAGA) — usado por deriveCareJourneyBilling()
     AppointmentDetail:
       type: object
       properties:
@@ -532,7 +543,10 @@ paths:
         schema: { type: string }
     get:
       tags: [Prestador]
-      summary: Detalhe do atendimento (procedimentos + prontuário)
+      summary: Detalhe do atendimento (procedimentos + prontuário + status de fatura)
+      description: >
+        Retorna usages com invoiceId/invoiceStatus para o FlowStepper (jornada PPU v3.0.5).
+        Ver deriveCareJourneyBilling em src/lib/care-journey.ts.
       responses:
         '200':
           description: Detalhe do atendimento

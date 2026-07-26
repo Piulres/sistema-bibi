@@ -186,7 +186,50 @@ Fluxo completo (emitir fatura → PIX → TISS): [`produto/FLUXOS.md`](../produt
 
 ---
 
-## 7. Referências
+## 7. Detalhe do atendimento — jornada PPU (v3.0.5)
+
+O prestador consulta o atendimento para exibir o **FlowStepper** com passos até **Faturado** e **Pago**.
+
+| Método | Path | Resposta |
+|--------|------|----------|
+| `GET` | `/api/prestador/appointments/{id}` | JSON com `appointment`, `patient`, `usages[]`, `records[]` |
+
+### Campo `usages[].invoiceStatus`
+
+Cada item em `usages` inclui o status da fatura vinculada (quando existe `invoiceItem`):
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `billed` | `boolean` | Procedimento já incluído em fatura |
+| `invoiceId` | `string \| null` | ID da fatura vinculada |
+| `invoiceStatus` | `string \| null` | Status da fatura (`FECHADA`, `PAGA`, …) ou `null` se sem vínculo |
+
+A UI deriva as flags do stepper com `deriveCareJourneyBilling({ usages })` em `src/lib/care-journey.ts`:
+
+- `hasPaidInvoice` — algum usage com `invoiceStatus === "PAGA"`
+- `hasOpenInvoice` — fatura em aberto ou todos `billed` sem link ainda
+- `hasUnbilledUsages` — algum usage com `billed: false`
+
+`resolveCareJourneyStep()` prioriza `pago` → `faturado` → `realizado` → … (pagamento vence `REALIZADO` no prestador).
+
+Testes: `tests/lib/care-journey.test.ts` · enforcement de status: `tests/api/appointment-state-machine.test.ts`.
+
+Fluxo de produto: [`FLUXOS.md`](../produto/FLUXOS.md) §8.9 · auditoria: [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §4.
+
+### Exemplo curl
+
+```bash
+curl -s -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"dra.helena@bibi.health","password":"bibi123","portal":"prestador"}'
+
+curl -s -b cookies.txt http://localhost:3000/api/prestador/appointments/APPOINTMENT_ID \
+  | jq '.usages[] | {procedure, billed, invoiceId, invoiceStatus}'
+```
+
+---
+
+## 8. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal

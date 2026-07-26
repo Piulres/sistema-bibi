@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **587** casos Vitest (80 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~160** Route Handlers · **123** paths no OpenAPI.
+**Ground truth (jul/2026):** **587** casos Vitest (80 arquivos) · **12** specs Playwright · **~152** casos E2E (chromium + mobile) · **~163** Route Handlers · **123** paths no OpenAPI.
 
 ### Onboarding tour (v3)
 
@@ -61,6 +61,8 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
+
+Cobertura v3.0.1 máquina de estados: `tests/lib/appointment-status.test.ts` + `tests/api/appointment-state-machine.test.ts` — bloqueio de procedures em `CANCELADO`/`FALTOU` e transições inválidas (409).
 | Segurança | Vitest | `tests/security/` | `npm run test` |
 | Integração | Vitest | `tests/integration/` | `npm run test` |
 | API | Vitest | `tests/api/` | `npm run test` |
@@ -209,7 +211,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa das rotas API
 
-**FATO:** existem **160** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **37** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); ver [`API_DOCS.md`](API_DOCS.md) §5.
+**FATO:** existem **163** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **40** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); ver [`API_DOCS.md`](API_DOCS.md) §5.
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 

@@ -17,6 +17,7 @@ via API.
 | 3 | 2026-07-26 | `fc9afa7` (v3.0.3) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente, schema-sync Blob) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **3.3 (sincronização doc)** | **2026-07-26** | `cff5d50` (v3.0.5) | Alinha §4/§7/§10/§12 com correções v3.0.1+ e contrato `invoiceStatus` no prestador |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -130,31 +131,25 @@ Resumo: **9 corrigidas**, **6 persistem**, **1 parcial**, **2 mudaram para OK/ma
 **Rotas:** `/login` → `/prestador` · `/prestador/atendimento/[id]`
 **Role:** `PRESTADOR`
 
-### Falhas confirmadas em runtime (rodada 3)
+### Falhas da rodada 3 — status atual
 
-Login `dra.helena@bibi.health` · agendamento demo `cms13kuqk…` (revertido após teste):
+| Sev. | Passo | Rodada 3 (antes) | Hoje (v3.0.1+) | Arquivo / teste |
+|------|-------|------------------|----------------|-----------------|
+| ~~Alta~~ ✅ | `POST …/procedures` em `CANCELADO`/`FALTOU` | 200 (criava cobrança + estoque) | **409** — `canRegisterProcedureForStatus()` | `procedures/route.ts` · `tests/api/appointment-state-machine.test.ts` |
+| ~~Alta~~ ✅ | `PATCH …/[id]` transição inválida (`CANCELADO → REALIZADO`) | 200 | **409** — `canTransitionAppointmentStatus()` | `route.ts` · `tests/lib/appointment-status.test.ts` |
+| ~~Baixa~~ ✅ | GET/PATCH sem `tenantId` no `where` | Só `id` + `providerId` | **Corrigido (3.1)** — `tenantId: user.tenantId` | `route.ts` |
 
-| Sev. | Passo | HTTP | Esperado | Arquivo |
-|------|-------|------|----------|---------|
-| **Alta** | `POST /appointments/[id]/procedures` com agendamento `CANCELADO` | **200** (cria cobrança + baixa 2 lotes de estoque) | 4xx | `src/app/api/prestador/appointments/[id]/procedures/route.ts` |
-| **Alta** | `PATCH /appointments/[id]` `CANCELADO → REALIZADO` | **200** | 4xx (transição inválida) | `src/app/api/prestador/appointments/[id]/route.ts` |
+Máquina de estados: `src/lib/appointment-status.ts` · mapa em [`FLUXOS.md`](FLUXOS.md) §10.1.
 
-```jsonc
-// POST procedures em agendamento CANCELADO — resposta real (bug):
-{"usage":{"procedure":"Consulta Clínica Médica","priceCharged":360,"priceLabel":"R$ 360,00"},
- "stockConsumed":[{"productName":"Luva de procedimento — tamanho M","quantity":2},
-                  {"productName":"Gaze estéril 7,5x7,5cm","quantity":1}]}
-```
+### Melhoria v3.0.5 — jornada faturada no stepper
 
-**Impacto:** um agendamento cancelado/faltou pode gerar faturamento Pay Per Use e consumir
-estoque, sem qualquer trava server-side. A máquina de estados documentada em
-[`FLUXOS.md`](FLUXOS.md) §10.1 não é aplicada.
+| Área | Comportamento | Código |
+|------|---------------|--------|
+| Detalhe do atendimento | `GET /api/prestador/appointments/[id]` expõe `usages[].invoiceStatus` (join `invoiceItem → invoice`) | `route.ts` |
+| Stepper PPU | Passos **Faturado** e **Pago** após `REALIZADO` via `deriveCareJourneyBilling()` | `care-journey.ts` · `AtendimentoView.tsx` |
+| Testes | Flags de faturamento + prioridade `pago` sobre `REALIZADO` | `tests/lib/care-journey.test.ts` |
 
-### Falha residual (baixa)
-
-| Sev. | Fluxo | Problema | Arquivo |
-|------|-------|----------|---------|
-| **Baixa** | GET/PATCH agendamento | `where: { id, providerId }` sem `tenantId` (agenda e procedures já têm) | `src/app/api/prestador/appointments/[id]/route.ts` |
+Doc de produto: [`FLUXOS.md`](FLUXOS.md) §8.9 · contrato API: [`API_DOCS.md`](../plataforma/API_DOCS.md) §7.
 
 ---
 
@@ -204,16 +199,13 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 
 **Rotas:** `/beneficiario/login` → `/beneficiario` · **Role:** `BENEFICIARIO` · escopo `user.patientId`
 
-| Sev. | Fluxo | Problema | Arquivo |
-|------|-------|----------|---------|
-| **Baixa** | Tabela de consumo PPU | `billed:false` exibido como badge **"ABERTA"** (confunde com fatura em aberto) | `src/components/BeneficiarioView.tsx` |
-| **Baixa** | Agendar consulta | Falha ao carregar `/providers` → dropdown vazio sem mensagem (só erro de `overview` propaga) | `src/components/BeneficiarioView.tsx` |
+| Sev. | Fluxo | Status | Arquivo |
+|------|-------|--------|---------|
+| ~~Baixa~~ ✅ | Tabela de consumo PPU | **Corrigido (3.1):** badge **"Faturado"** / **"A faturar"** (`label` explícito; `value` interno `FECHADA`/`ABERTA`) | `src/components/BeneficiarioView.tsx` |
+| ~~Baixa~~ ✅ | Agendar consulta | **Corrigido (3.1):** falha em `/providers` exibe mensagem + retry | `src/components/BeneficiarioView.tsx` |
 | ~~Baixa~~ ✅ | Guards inconsistentes | **Corrigido (3.2):** todas as rotas `src/app/api/beneficiario/*` usam `requireBeneficiary()` (exige `patientId`) | rotas em `src/app/api/beneficiario/` |
 
-```tsx
-// label enganosa — billed:false = procedimento ainda não faturado, não fatura aberta
-<StatusBadge value={usage.billed ? "PAGA" : "ABERTA"} map="invoice" />
-```
+Stepper PPU no resumo: `FlowStepper` + `resolveCareJourneyStep()` (flags derivadas de `overview.invoices`, não de `billed` isolado) — ver [`FLUXOS.md`](FLUXOS.md) §8.9.
 
 ---
 
@@ -255,12 +247,13 @@ Todas as 94 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 
 | Fluxo | Cobertura atual | Gap |
 |-------|-----------------|-----|
-| Procedimento em agendamento terminal | Nenhuma | Sem teste que negue POST procedures em `CANCELADO`/`FALTOU` |
-| Máquina de estados appointment | Documentada em FLUXOS §10.1 | Sem enforcement server-side nem teste de transição inválida |
+| Procedimento em agendamento terminal | `tests/api/appointment-state-machine.test.ts` | ✅ Coberto (409 em `CANCELADO`/`FALTOU`) |
+| Máquina de estados appointment | `tests/lib/appointment-status.test.ts` + enforcement nas rotas prestador | ✅ Coberto (transições inválidas → 409) |
+| Jornada PPU faturado/pago (v3.0.5) | `tests/lib/care-journey.test.ts` | ✅ Coberto (flags + `resolveCareJourneyStep`) |
 | Pay Per Use E2E na UI | Smoke (agenda prestador) | Fatura + PIX na interface não testados end-to-end |
-| Beneficiário — label consumo | Nenhuma | `billed:false` vs status de fatura não coberto |
+| Beneficiário — label consumo | Corrigido na UI (3.1); sem teste de snapshot do badge | Teste visual opcional |
 | `ClinicalCarePanel` PATCH sem `res.ok` | Nenhuma | Falha de API em medicação/exame/protocolo não testada |
-| Isolamento `data-store-mode` em testes | `tests/lib/data-store-mode.test.ts` | O próprio teste polui `prisma/.data-store-mode` (ver §9) |
+| Isolamento `data-store-mode` em testes | `tests/lib/data-store-mode.test.ts` | ✅ Restaura `.data-store-mode` no `afterEach` (3.1) |
 
 ---
 
@@ -302,7 +295,7 @@ npm run test          # 587 Vitest (80 arquivos)
 npm run test:e2e      # 152 Playwright (para o dev server antes; ele sobe o próprio)
 ```
 
-### Regras de negócio — prestador (falha §4)
+### Regras de negócio — prestador (§4 — esperado 409 após v3.0.1)
 
 ```bash
 # Login prestador
@@ -310,13 +303,16 @@ curl -s -c /tmp/ck.txt -X POST http://localhost:3000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"dra.helena@bibi.health","password":"bibi123","portal":"prestador"}'
 
-# Cancelar um agendamento e tentar registrar procedimento (esperado 4xx; observado 200)
+# Cancelar um agendamento e tentar registrar procedimento (esperado 409)
 APT=<id-de-um-appointment-do-prestador>
 PROC=$(sqlite3 prisma/dev.db "SELECT id FROM Procedure LIMIT 1;")
 curl -s -b /tmp/ck.txt -X PATCH http://localhost:3000/api/prestador/appointments/$APT \
   -H "Content-Type: application/json" -d '{"status":"CANCELADO"}'
 curl -s -b /tmp/ck.txt -X POST http://localhost:3000/api/prestador/appointments/$APT/procedures \
   -H "Content-Type: application/json" -d "{\"procedureId\":\"$PROC\"}" -w " [%{http_code}]"
+# Transição inválida CANCELADO → REALIZADO também retorna 409
+curl -s -b /tmp/ck.txt -X PATCH http://localhost:3000/api/prestador/appointments/$APT \
+  -H "Content-Type: application/json" -d '{"status":"REALIZADO"}' -w " [%{http_code}]"
 ```
 
 ### RBAC manual (perfil RECEPCAO — agora 403)
