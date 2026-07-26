@@ -322,7 +322,8 @@ sequenceDiagram
 | 4 | Lembretes automáticos mock (`console`) | Paciente não recebe lembrete real | Adapter SendGrid/Twilio em produção |
 | 5 | Sem repasse ao prestador | Prestador não vê receita gerada | Módulo de repasse / extrato prestador |
 
-Detalhe técnico do fluxo: [`FLUXOS.md`](FLUXOS.md) §7.
+Detalhe técnico do fluxo: [`FLUXOS.md`](FLUXOS.md) §7.  
+Narrativa operacional (chegada → fechamento, todas as ramificações): [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md).
 
 ---
 
@@ -370,6 +371,7 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 
 | Documento | Conteúdo relacionado |
 |-----------|---------------------|
+| [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md) | Narrativa operacional no consultório (todas as opções por ato) |
 | [`FLUXOS.md`](FLUXOS.md) | Ações técnicas, APIs, RBAC, máquinas de estado, §8.7 melhorias de fluxo |
 | `src/lib/flow-improvements-map.ts` | Mapa canônico implementado vs backlog |
 | [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) | Falhas mapeadas por portal (segurança, RBAC API, bugs) |
