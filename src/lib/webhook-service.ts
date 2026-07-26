@@ -125,7 +125,22 @@ export async function dispatchWebhooks(input: {
   event: WebhookEvent;
   data: Record<string, unknown>;
 }): Promise<void> {
+  try {
+    await dispatchWebhooksInner(input);
+  } catch (error) {
+    // Fire-and-forget nos handlers: nunca virar Unhandled Rejection no Vitest/runtime.
+    console.error("[webhooks] dispatch failed", error);
+  }
+}
+
+async function dispatchWebhooksInner(input: {
+  tenantId: string;
+  event: WebhookEvent;
+  data: Record<string, unknown>;
+}): Promise<void> {
   const prisma = await getPrisma();
+  if (!prisma.webhookEndpoint?.findMany) return;
+
   const endpoints = await prisma.webhookEndpoint.findMany({
     where: { tenantId: input.tenantId, active: true },
   });

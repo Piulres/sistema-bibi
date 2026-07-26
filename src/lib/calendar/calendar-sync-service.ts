@@ -25,6 +25,8 @@ export async function syncAppointmentToExternalCalendars(
   });
   if (!appointment) return { synced: 0, errors: 0 };
 
+  if (!prisma.calendarConnection?.findMany) return { synced: 0, errors: 0 };
+
   const connections = await prisma.calendarConnection.findMany({
     where: {
       tenantId: appointment.tenantId,
