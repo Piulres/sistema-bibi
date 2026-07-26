@@ -150,7 +150,26 @@ export default function PjView() {
 
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title="Beneficiários" />
-        <div className="ds-scroll-x mt-4 rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
+        <ul className="mt-4 space-y-2 md:hidden">
+          {beneficiaries.map((b) => (
+            <li key={b.id}>
+              <Card padding="sm" className="min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="break-words font-medium text-[var(--text-primary)]">{b.name}</p>
+                    <p className="text-sm text-[var(--text-muted)]">{b.cpf}</p>
+                  </div>
+                  <p className="shrink-0 font-semibold text-[var(--text-primary)]">{b.consumedLabel}</p>
+                </div>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">
+                  {b.usageCount} procedimento{b.usageCount === 1 ? "" : "s"}
+                  {b.pendingLabel ? ` · Pendente ${b.pendingLabel}` : ""}
+                </p>
+              </Card>
+            </li>
+          ))}
+        </ul>
+        <div className="ds-scroll-x mt-4 hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] md:block">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
               <tr>

@@ -326,19 +326,19 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     return <LoadingState message="Carregando gestão clínica…" />;
   }
 
-  const tabs: { id: Tab; label: string }[] = [
-    { id: "lancamentos", label: "1. Lançamentos" },
-    { id: "despesas", label: "2. Despesas" },
-    { id: "indicadores", label: "3. Indicadores" },
+  const tabs: { id: Tab; label: string; shortLabel: string }[] = [
+    { id: "lancamentos", label: "1. Lançamentos", shortLabel: "Lançamentos" },
+    { id: "despesas", label: "2. Despesas", shortLabel: "Despesas" },
+    { id: "indicadores", label: "3. Indicadores", shortLabel: "Indicadores" },
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <div className="flex flex-wrap items-end gap-3">
         <label className="text-sm">
           <span className="mb-1 block text-[var(--text-muted)]">Mês</span>
           <select
-            className="rounded-lg border px-3 py-2"
+            className="min-h-10 rounded-lg border px-3 py-2"
             value={month}
             onChange={(e) => setMonth(Number(e.target.value))}
           >
@@ -353,18 +353,18 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
           <span className="mb-1 block text-[var(--text-muted)]">Ano</span>
           <input
             type="number"
-            className="w-24 rounded-lg border px-3 py-2"
+            className="min-h-10 w-24 rounded-lg border px-3 py-2"
             value={year}
             onChange={(e) => setYear(Number(e.target.value))}
           />
         </label>
-        <p className="text-sm text-[var(--text-secondary)]">
+        <p className="w-full text-sm text-[var(--text-secondary)] sm:w-auto">
           Menus prontos + valor sugerido pela tabela. Alana só confirma e salva.
         </p>
         <button
           type="button"
           onClick={exportMonth}
-          className="rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+          className="min-h-10 rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
           data-tour-id="clinic-finance-export"
         >
           Exportar mês (Excel)
@@ -380,19 +380,26 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
         </p>
       ) : null}
 
-      <div className="flex flex-wrap gap-2 border-b border-[var(--border-default)] pb-2">
+      <div
+        className="ds-scroll-x flex flex-nowrap gap-2 border-b border-[var(--border-default)] pb-2"
+        role="tablist"
+        aria-label="Seções da gestão clínica"
+      >
         {tabs.map((t) => (
           <button
             key={t.id}
             type="button"
+            role="tab"
+            aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+            className={`min-h-10 shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition ${
               tab === t.id
                 ? "bg-[var(--brand-primary)] text-white"
                 : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
             }`}
           >
-            {t.label}
+            <span className="sm:hidden">{t.shortLabel}</span>
+            <span className="hidden sm:inline">{t.label}</span>
           </button>
         ))}
       </div>
@@ -660,7 +667,60 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
             </div>
           </form>
 
-          <div className="ds-scroll-x rounded-xl border">
+          {/* Mobile: cards legíveis */}
+          <div className="space-y-3 md:hidden">
+            {launches.length === 0 && (
+              <p className="rounded-xl border px-3 py-6 text-center text-sm text-[var(--text-muted)]">
+                Nenhum lançamento neste mês.
+              </p>
+            )}
+            {launches.map((l) => (
+              <article
+                key={l.id}
+                className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="break-words font-medium text-[var(--text-primary)]">
+                      {l.patientName}
+                    </p>
+                    <p className="mt-0.5 text-xs text-[var(--text-muted)]">
+                      {new Date(l.performedAt).toLocaleDateString("pt-BR")} · {l.provider.name}
+                    </p>
+                  </div>
+                  <p className="shrink-0 font-semibold text-[var(--brand-accent)]">
+                    {brl(l.amountReceived)}
+                  </p>
+                </div>
+                <p className="mt-2 break-words text-sm text-[var(--text-secondary)]">
+                  {l.procedure.name}
+                </p>
+                <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
+                  <div>
+                    <dt className="inline">Tabela: </dt>
+                    <dd className="inline text-[var(--text-secondary)]">{l.priceTableLabel ?? "—"}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline">Pagamento: </dt>
+                    <dd className="inline text-[var(--text-secondary)]">{l.paymentMethodLabel}</dd>
+                  </div>
+                  <div>
+                    <dt className="inline">Bio/Pól/Muc/Clip: </dt>
+                    <dd className="inline text-[var(--text-secondary)]">
+                      {l.biopsies}/{l.polypectomies}/{l.mucosectomies}/{l.clips}
+                    </dd>
+                  </div>
+                  <div title={l.bridgeNote ?? undefined}>
+                    <dt className="inline">Ponte: </dt>
+                    <dd className="inline text-[var(--text-secondary)]">{l.bridgeStatus ?? "—"}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+
+          {/* Desktop: tabela completa */}
+          <div className="ds-scroll-x hidden rounded-xl border md:block">
             <table className="min-w-[52rem] w-full text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-xs uppercase text-[var(--text-muted)]">
                 <tr>

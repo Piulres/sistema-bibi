@@ -726,20 +726,23 @@ export default function CadastrosView({ canManageUsers = false }: CadastrosViewP
                         </div>
                       </form>
                     ) : (
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
+                      <div className="flex min-w-0 items-start justify-between gap-2">
+                        <div className="min-w-0 flex-1">
                           <Link
                             href={`/interno/beneficiarios/${p.id}?from=/interno/cadastros`}
-                            className="font-medium text-[var(--portal-accent)] hover:underline"
+                            className="break-words font-medium text-[var(--portal-accent)] hover:underline"
                           >
                             {p.name}
                           </Link>
-                          <p className="text-[var(--text-muted)]">
-                            {p.cpf} · {p.companyName ?? "Particular"}
+                          <p className="break-words text-sm text-[var(--text-muted)]">
+                            {p.cpf}
+                          </p>
+                          <p className="break-words text-sm text-[var(--text-muted)]">
+                            {p.companyName ?? "Particular"}
                             {p.phone ? ` · ${p.phone}` : ""}
                           </p>
                         </div>
-                        <Button type="button" size="sm" variant="ghost" onClick={() => {
+                        <Button type="button" size="sm" variant="ghost" className="shrink-0" onClick={() => {
                           patientEditUndo.reset({ ...p });
                           setEditingPatient({ ...p });
                         }}>
