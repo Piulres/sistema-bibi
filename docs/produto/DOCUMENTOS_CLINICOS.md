@@ -48,7 +48,7 @@ eletrônica Anvisa, modelos oficiais PDF tipográficos.
 ## Protocolos de exames
 
 Modelo `ExamProtocolTemplate` — lista de nomes de exames + indicação clínica padrão.
-No atendimento, **Aplicar protocolo** gera um `ExamOrder` por item.
+No atendimento, **Aplicar protocolo** gera um `ExamOrder` por item. Pedidos avulsos e laudos usam `POST/PATCH …/exam-orders` — ver [`API_DOCS.md`](../plataforma/API_DOCS.md) §7.
 
 ## UI mobile / desktop (correções)
 

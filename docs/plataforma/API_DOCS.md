@@ -200,6 +200,14 @@ Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer
 | `GET` | `/api/prestador/patients/{id}/medications` | prestador | Lista prescrições do paciente |
 | `POST` | `/api/prestador/patients/{id}/medications` | prestador | Nova prescrição (`prescriptionKind`: `COMUM` \| `CONTROLE_ESPECIAL`) |
 | `PATCH` | `/api/prestador/medications/{id}` | prestador | Transição de status: `ATIVA` \| `SUSPENSA` \| `ENCERRADA` |
+| `GET` | `/api/prestador/patients/{id}/exam-orders` | prestador | Lista pedidos (`?appointmentId=` opcional) |
+| `POST` | `/api/prestador/patients/{id}/exam-orders` | prestador | Cria pedido avulso (`examName` ou `procedureId`, `clinicalIndication?`) |
+| `PATCH` | `/api/prestador/exam-orders/{id}` | prestador | Atualiza status, laudo (`resultSummary`), `markReviewed` |
+| `GET` | `/api/prestador/patients/{id}/clinical-overview` | prestador | Visão agregada: medicações ativas, exames pendentes, protocolos |
+| `GET` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Perfil clínico estruturado (alergias, condições crônicas) |
+| `PUT` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Atualiza perfil clínico |
+
+Variantes **VET** (pet): `/api/prestador/pets/{id}/exam-orders`, `clinical-overview`, `clinical-profile` — mesmo contrato.
 
 ### Corpo — aplicar protocolo de exames
 
@@ -224,6 +232,31 @@ Campos obrigatórios: `medication`, `dosage`, `frequency`. Opcionais: `route`, `
 ```
 
 Reativar: `{ "status": "ATIVA" }`. Serviço: `src/lib/medication-service.ts` · `src/lib/exam-protocol-service.ts`.
+
+### Corpo — criar pedido de exame avulso
+
+```json
+{
+  "examName": "Hemograma completo",
+  "clinicalIndication": "Controle pós-operatório",
+  "appointmentId": "apt_optional",
+  "procedureId": "proc_optional"
+}
+```
+
+Obrigatório: `examName` **ou** `procedureId`. Resposta `200`: `{ examOrder }`.
+
+### Corpo — atualizar pedido de exame (laudo / status)
+
+```json
+{
+  "status": "LAUDADO",
+  "resultSummary": "Resultado dentro da normalidade",
+  "markReviewed": true
+}
+```
+
+Status válidos: `SOLICITADO` · `AGENDADO` · `REALIZADO` · `LAUDADO` · `CANCELADO` (`src/lib/clinical/constants.ts`). Serviço: `src/lib/exam-order-service.ts`.
 
 ### Exemplo curl (prestador)
 

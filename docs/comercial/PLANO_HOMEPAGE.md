@@ -92,6 +92,14 @@ Solução · Como funciona · Segmentos · Demo · Portais · Contato · FAQ
 
 Seções **ROI**, **Comparativo** e **Para quem** permanecem na página (scroll), mas saíram do header/footer para reduzir ruído — ver [`produto/FLUXOS.md`](../produto/FLUXOS.md) §0.4 e [`plataforma/DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md).
 
+### CTA "Acessar portais" vs âncora `#portais`
+
+| Contexto | Comportamento | Constante / origem |
+|----------|---------------|-------------------|
+| Home (`/`) — CTA header/drawer | Navega para `/segmentos/saude` (entrada segmentada) | `SEGMENT_ACCESS_HREF` em `navigation.ts` |
+| Home — item de menu | Rola para seção `#portais` na mesma página | `HOME_NAV_ANCHORS` |
+| Página de segmento (`/segmentos/*`) | CTA usa `#portais` na própria página | `LandingHeader` prop `portalsHref` |
+
 ---
 
 ## Métricas sugeridas (pós-deploy)
