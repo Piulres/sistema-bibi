@@ -41,6 +41,7 @@ import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
 import { seedMedicalStock } from "./stock-demo";
+import { seedClinicOperationMonth } from "./operation-month";
 import { currentTotpCode, DEMO_MFA_SECRET } from "./totp-demo";
 
 const DEMO_PASSWORD = hashPassword("bibi123");
@@ -830,6 +831,28 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
   console.log(
     `  CEDIG slug=cedig · ${cedig.created ? "criado" : "atualizado"} · ${cedig.procedures} exames`,
   );
+
+  console.log("\nMês operacional do consultório (timeline ~30 dias, sempre atual)...");
+  const operationMonth = await seedClinicOperationMonth({
+    prisma,
+    tenantId: tenant.id,
+    procedures,
+    providerIds,
+    internoId: interno.id,
+    patients: patientRefs,
+    discountByCompanyIndex,
+    includeCedig: true,
+  });
+  if (operationMonth.skipped) {
+    console.log("  Mês operacional já presente (marcador) — pulado.");
+  } else {
+    console.log(
+      `  +${operationMonth.appointments} agenda · ${operationMonth.procedureUsages} PPU · ` +
+        `${operationMonth.medicalRecords} PEP · ${operationMonth.invoices} faturas · ` +
+        `${operationMonth.stockMovements} baixas · ${operationMonth.timelineEvents} timeline · ` +
+        `${operationMonth.cedigLaunches} launches CEDIG · ${operationMonth.cedigExpenses} despesas`,
+    );
+  }
 
   console.log("\nMassa operacional multi-nicho (histórico + futuro)...");
   const nicheOperational = await seedAllNicheOperational(prisma, DEMO_PASSWORD, scale);

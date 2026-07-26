@@ -53,7 +53,10 @@ function uniqueAppointmentPhrase(): string {
   const yyyy = day.getFullYear();
   const hour = 9 + (salt % 4);
   const minute = (salt % 4) * 15;
-  return `${dd}/${mm}/${yyyy} às ${hour}:${String(minute).padStart(2, "0")} com a Dra Helena`;
+  // Parser do assistente exige HH:MM (zero à esquerda) — senão retorna "Hora inválida".
+  const hh = String(hour).padStart(2, "0");
+  const min = String(minute).padStart(2, "0");
+  return `${dd}/${mm}/${yyyy} às ${hh}:${min} com a Dra Helena`;
 }
 
 describe("Integração — fluxo do assistente via API", () => {
