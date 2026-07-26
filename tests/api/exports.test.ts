@@ -88,8 +88,10 @@ describe("API — exportações PDF/Excel", () => {
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("text/csv");
       expect(res.headers.get("content-disposition")).toContain("faturamento.csv");
-      const body = await res.text();
-      expect(body.startsWith("\uFEFF")).toBe(true);
+      const bytes = Buffer.from(await res.arrayBuffer());
+      // BOM UTF-8 (Response.text() pode removê-lo na decodificação)
+      expect(bytes.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]))).toBe(true);
+      const body = bytes.toString("utf8");
       expect(body).toMatch(/Tipo|Beneficiário|Valor|Status|Data/i);
     });
 
@@ -263,8 +265,9 @@ describe("API — exportações PDF/Excel", () => {
       );
       expect(res.status).toBe(200);
       expect(res.headers.get("content-type")).toContain("text/csv");
-      const body = await res.text();
-      expect(body.startsWith("\uFEFF")).toBe(true);
+      const bytes = Buffer.from(await res.arrayBuffer());
+      expect(bytes.subarray(0, 3).equals(Buffer.from([0xef, 0xbb, 0xbf]))).toBe(true);
+      const body = bytes.toString("utf8");
       const header = body.replace(/^\uFEFF/, "").split("\n")[0] ?? "";
       expect(header.split(",").length).toBeGreaterThanOrEqual(3);
       expect(header).toMatch(/Se[cç][aã]o/i);
