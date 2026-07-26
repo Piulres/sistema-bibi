@@ -6,7 +6,7 @@ Guia para explorar, testar e validar o contrato **OpenAPI 3.0** do **Sistema Bib
 |---------|-----------|----------------|
 | **Swagger UI (interativo)** | http://localhost:3000/api/docs | https://sistema-bibi.netlify.app/api/docs |
 | **Spec YAML** | http://localhost:3000/openapi.yaml | https://sistema-bibi.netlify.app/openapi.yaml |
-| **Paths documentados** | 123 (cobertura total dos Route Handlers) | idem |
+| **Paths documentados** | 123 de 163 Route Handlers (`openapi:verify` lista ~40 sem path) | idem |
 | Legado (redirect) | `/api-docs.html` → `/api/docs` | idem |
 
 Fonte da spec: [`public/openapi.yaml`](../../public/openapi.yaml) · Fluxos de negócio: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §11.
@@ -144,7 +144,7 @@ Ao criar ou alterar Route Handlers em `src/app/api/**/route.ts`:
 2. Refine manualmente summaries/schemas dos endpoints críticos (Voa, estoque, billing)
 3. Rode `npm run openapi:verify` — paths documentados sem handler correspondente **falham**
 
-O sync automático cobre **123 paths** (paridade com Route Handlers). Endpoints novos recebem documentação mínima; enriqueça descrições conforme necessário.
+O sync automático adiciona paths mínimos ao YAML (**123** documentados vs **163** handlers). Endpoints novos — em especial `clinic-finance/*`, anexos e obras — podem exigir `openapi:sync` + refinamento manual. `openapi:verify` falha se houver path órfão no YAML.
 
 Roadmap: testes de contrato de resposta (P1 em [`TESTES.md`](TESTES.md)).
 
@@ -277,7 +277,58 @@ Fluxo de produto e validação manual: [`produto/DOCUMENTOS_CLINICOS.md`](../pro
 
 ---
 
-## 8. Exportações tabulares (v3.0.7)
+## 8. Gestão clínica CEDIG (interno `gestao`)
+
+APIs do módulo **Gestão clínica** (`/interno/gestao` · `ClinicFinanceView`). Visível em nichos `MEDICAL` e `DENTAL`. Leitura: `requireInternoModule("gestao")`; escrita: `requireInternoModuleWrite("gestao")`.
+
+| Método | Path | Função |
+|--------|------|--------|
+| `GET` | `/api/interno/clinic-finance/meta` | Metadados (médicos, procedimentos, tabelas de preço) |
+| `GET` | `/api/interno/clinic-finance/launches` | Lista lançamentos (`year?`, `month?`) |
+| `POST` | `/api/interno/clinic-finance/launches` | Registra exame; dispara ponte PPU (`bridgeExamLaunchToOperations`) |
+| `GET` | `/api/interno/clinic-finance/expenses` | Lista despesas (`year?`, `month?`) |
+| `POST` | `/api/interno/clinic-finance/expenses` | Cria despesa operacional |
+| `GET` | `/api/interno/clinic-finance/kpis` | KPIs do período (`year?`, `month?`) |
+| `GET` | `/api/interno/clinic-finance/export` | Export tabular (`format`, `year`, `month`) — ver §9 |
+
+### POST `/launches` — campos principais
+
+| Campo | Tipo | Obrigatório | Notas |
+|-------|------|-------------|-------|
+| `patientName` | string | sim | Nome do paciente |
+| `providerId` | string | sim | ID do prestador |
+| `procedureId` | string | sim | Tipo de exame |
+| `paymentMethod` | string | sim | Ex.: `PIX`, `DINHEIRO` |
+| `priceTable` | string | não | Default `PARTICULAR` |
+| `amountReceived` | number | sim | Valor recebido |
+| `syncOperations` | boolean | não | Default `true` — ponte automática |
+| `appointmentId` | string | não | Prefill vindo da agenda |
+
+Resposta `201`: `{ launch, bridgeStatus }` com `bridgeStatus` = `SYNCED` \| `PARTIAL` \| `FAILED` \| `SKIPPED`.
+
+Serviço: `src/lib/clinic-finance/service.ts` · ponte: `src/lib/clinic-finance/bridge.ts`.
+
+### Exemplo curl (tenant CEDIG)
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"alana@cedig.demo","password":"bibi123","portal":"interno","tenant":"cedig"}'
+
+curl -b cookies.txt http://localhost:3000/api/interno/clinic-finance/meta
+
+curl -b cookies.txt -X POST http://localhost:3000/api/interno/clinic-finance/launches \
+  -H "Content-Type: application/json" \
+  -d '{"patientName":"Teste API","providerId":"PROVIDER_ID","procedureId":"PROC_ID","paymentMethod":"PIX","amountReceived":750}'
+```
+
+Fluxo de produto: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 · piloto: [`clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · E2E: `e2e/cedig-gestao.spec.ts`.
+
+> **OpenAPI:** rotas `clinic-finance/*` ainda não constam no YAML — use este §8 + `FLUXOS.md` até `openapi:sync` cobrir o módulo.
+
+---
+
+## 9. Exportações tabulares (v3.0.7)
 
 Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI monta links via `ExportButtons` (`src/components/ExportButtons.tsx`).
 
@@ -322,7 +373,7 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 9. Referências
+## 10. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal

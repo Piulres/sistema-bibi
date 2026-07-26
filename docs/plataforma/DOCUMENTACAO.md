@@ -27,8 +27,8 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
 | Portal nav (NavTabs, Mais, drawer) | `DESIGN_SYSTEM.md` · `ARQUITETURA_PORTAIS.md` §Navegação · `TESTES.md` (helpers E2E) |
 | Dashboard executivo (KPIs interno) | `FLUXOS.md` §4.0.1 · `ARQUITETURA.md` §15 · `ExecutiveDashboardView.tsx` |
-| Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `ClinicFinanceView.tsx` |
-| Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §8 · `src/lib/exports/` |
+| Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |
+| Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |
 

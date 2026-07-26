@@ -54,7 +54,7 @@ via API.
 
 | Resultado | Detalhe |
 |-----------|---------|
-| **Fluxos felizes** | 598 testes Vitest (83 arquivos) + 152 e2e Playwright passando · `npm run lint` limpo |
+| **Fluxos felizes** | 598 testes Vitest (83 arquivos) + 156 e2e Playwright passando · `npm run lint` limpo |
 | **P0 anteriores** | **Corrigidos** — RBAC de API interno (94/94 rotas com guard de módulo), bypass CRM fechado, MFA restrito a `seguranca`, proxy com HMAC |
 | **Falha alta (negócio) — PERSISTE** | Prestador: API aceita registrar procedimento (cobrança + baixa de estoque) em agendamento `CANCELADO`/`FALTOU`; PATCH de status sem máquina de estados — **confirmado em runtime** |
 | **Falha média (UX) — PERSISTE** | Beneficiário: `billed:false` renderizado como badge "ABERTA"; dropdown de prestadores vazio sem mensagem quando `/providers` falha |
@@ -299,7 +299,7 @@ npm run dev
 ```bash
 npm run lint          # limpo
 npm run test          # 598 Vitest (83 arquivos)
-npm run test:e2e      # 152 Playwright (para o dev server antes; ele sobe o próprio)
+npm run test:e2e      # 156 Playwright (para o dev server antes; ele sobe o próprio)
 ```
 
 ### Regras de negócio — prestador (falha §4)
