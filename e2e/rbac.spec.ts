@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { loginAs, internoNavLink, openInternoNav } from "./helpers/auth";
+import { loginAs, expectInternoNavHref } from "./helpers/auth";
 
 test.describe("RBAC — perfil RECEPCAO", () => {
   test.beforeEach(async ({ page }) => {
@@ -9,12 +9,11 @@ test.describe("RBAC — perfil RECEPCAO", () => {
 
   test("nav limitada: agenda e cadastros, sem faturamento", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    await openInternoNav(page);
-    await expect(internoNavLink(page, "/interno/agenda")).toBeVisible();
-    await expect(internoNavLink(page, "/interno/cadastros")).toBeVisible();
-    await expect(internoNavLink(page, "/interno/comunicacao")).toBeVisible();
-    await expect(internoNavLink(page, "/interno")).toHaveCount(0);
-    await expect(internoNavLink(page, "/interno/integracoes")).toHaveCount(0);
+    await expectInternoNavHref(page, "/interno/agenda", true);
+    await expectInternoNavHref(page, "/interno/cadastros", true);
+    await expectInternoNavHref(page, "/interno/comunicacao", true);
+    await expectInternoNavHref(page, "/interno", false);
+    await expectInternoNavHref(page, "/interno/integracoes", false);
   });
 
   test("acesso direto a faturamento redireciona para dashboard", async ({ page }) => {
@@ -36,12 +35,11 @@ test.describe("RBAC — perfil FATURAMENTO", () => {
 
   test("nav limitada: faturamento e recorrência, sem cadastros", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    await openInternoNav(page);
-    await expect(internoNavLink(page, "/interno")).toBeVisible();
-    await expect(internoNavLink(page, "/interno/assinaturas")).toBeVisible();
-    await expect(internoNavLink(page, "/interno/relatorios")).toBeVisible();
-    await expect(internoNavLink(page, "/interno/cadastros")).toHaveCount(0);
-    await expect(internoNavLink(page, "/interno/seguranca")).toHaveCount(0);
+    await expectInternoNavHref(page, "/interno", true);
+    await expectInternoNavHref(page, "/interno/assinaturas", true);
+    await expectInternoNavHref(page, "/interno/relatorios", true);
+    await expectInternoNavHref(page, "/interno/cadastros", false);
+    await expectInternoNavHref(page, "/interno/seguranca", false);
   });
 
   test("acesso direto a cadastros redireciona para dashboard", async ({ page }) => {

@@ -36,14 +36,18 @@ test.describe("navegação responsiva", () => {
     await expect(page.getByRole("heading", { name: "White Label", exact: true })).toBeVisible();
   });
 
-  test("interno: abas desktop com faixa rolável", async ({ page }) => {
+  test("interno: abas desktop com menu Mais para módulos secundários", async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 });
     await loginAs(page, "interno", "faturamento@bibi.health");
 
     const tabs = internoNav(page);
     await expect(tabs).toBeVisible();
-    await tabs.getByRole("link", { name: "White Label" }).click();
+    await expect(tabs.getByRole("link", { name: /dashboard|home/i })).toBeVisible();
+    await tabs.getByRole("button", { name: /mais/i }).click();
+    await page.getByRole("menu", { name: /mais módulos/i }).getByRole("menuitem", { name: "White Label" }).click();
     await expect(page).toHaveURL(/\/interno\/branding/);
+    // Aba secundária ativa fica pinada na faixa
+    await expect(tabs.getByRole("link", { name: /white label|marca/i })).toBeVisible();
   });
 
   test("beneficiário: drawer mobile para módulos", async ({ page }) => {

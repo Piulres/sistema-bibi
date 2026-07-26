@@ -40,7 +40,6 @@ export default function PjPortalShell({ user, assistantEnabled = true, children 
           sections={sections}
           activeClass={PORTAL_NAV_ACTIVE_CLASS}
           idleClass={PORTAL_NAV_IDLE_CLASS}
-          className="mt-6"
           drawerTitle="Seções da empresa"
         />
         <AssistantShell portal="pj" enabled={assistantEnabled}>

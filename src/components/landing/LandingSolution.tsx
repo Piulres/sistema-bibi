@@ -1,23 +1,6 @@
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import LandingIcon from "@/components/landing/LandingIcon";
-
-const SOLUTIONS = [
-  {
-    icon: "pay-per-use" as const,
-    title: "Pay Per Use nativo",
-    description: "Cada serviço registrado gera snapshot de preço — transparência total para RH, operação e cliente.",
-  },
-  {
-    icon: "portals" as const,
-    title: "Quatro portais integrados",
-    description: "Prestador, interno, empresa e beneficiário compartilham a mesma base de dados em tempo real.",
-  },
-  {
-    icon: "enterprise" as const,
-    title: "Multi-nicho e white label",
-    description: "Seis segmentos com labels automáticos, paleta por nicho e Orange como accent universal.",
-  },
-] as const;
+import { HOME_SOLUTION } from "@/lib/landing/home-content";
 
 export default function LandingSolution() {
   return (
@@ -29,13 +12,13 @@ export default function LandingSolution() {
       <div className="mx-auto max-w-6xl px-6 py-24">
         <LandingSectionHeader
           id="solution-heading"
-          eyebrow="A solução"
-          title="ServiceOS — infraestrutura horizontal com identidade brasileira"
-          description="Dark Slate para confiança, Orange para ação. Uma plataforma que escala de clínicas a escolas sem reinventar o core."
+          eyebrow={HOME_SOLUTION.eyebrow}
+          title={HOME_SOLUTION.title}
+          description={HOME_SOLUTION.description}
         />
 
         <ul className="mt-14 grid gap-6 lg:grid-cols-3">
-          {SOLUTIONS.map((item) => (
+          {HOME_SOLUTION.items.map((item) => (
             <li key={item.title}>
               <article className="landing-card-hover h-full rounded-2xl border border-[var(--border-default)] border-l-4 border-l-[var(--brand-accent)] bg-[var(--surface-card)] p-6 shadow-sm">
                 <div

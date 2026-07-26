@@ -6,10 +6,13 @@ import { useCallback, useEffect, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import ScrollableNavRail from "@/components/ui/ScrollableNavRail";
 import MobileSectionDrawer from "@/components/layout/MobileSectionDrawer";
+import { PORTAL_NAV_STICKY_CLASS } from "@/lib/navigation/portal-nav";
 
 export type SectionNavItem = {
   id: string;
   label: string;
+  /** Rótulo curto até `xl`. */
+  shortLabel?: string;
   /** Rota absoluta — quando definida, navega em vez de âncora na mesma página. */
   href?: string;
 };
@@ -84,7 +87,7 @@ export default function SectionNav({
   }, [sections, pathname, routeSection]);
 
   return (
-    <div className={className} data-tour-id="portal-nav">
+    <div className={cn(PORTAL_NAV_STICKY_CLASS, className)} data-tour-id="portal-nav">
       <MobileSectionDrawer
         sections={sections}
         activeId={activeId}
@@ -93,41 +96,55 @@ export default function SectionNav({
         idleClass="text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
         title={drawerTitle}
       />
-      <ScrollableNavRail className="hidden lg:block">
+      <ScrollableNavRail className="hidden lg:block" activeKey={activeId}>
         <nav
           aria-label="Seções da página"
-          className="flex w-max min-w-full gap-2 border-b border-[var(--border-default)] pb-px"
+          className="flex w-max min-w-full gap-0.5 border-b border-[var(--border-default)] pb-px"
         >
-          {sections.map((section) =>
-            section.href ? (
+          {sections.map((section) => {
+            const label = section.shortLabel ? (
+              <>
+                <span className="xl:hidden">{section.shortLabel}</span>
+                <span className="hidden xl:inline">{section.label}</span>
+              </>
+            ) : (
+              section.label
+            );
+            const itemClass = cn(
+              "-mb-px shrink-0 snap-start border-b-2 text-sm font-medium transition",
+              "min-h-11 touch-manipulation px-2.5 py-2.5 sm:px-3 xl:px-4",
+            );
+
+            return section.href ? (
               <Link
                 key={section.id}
                 href={section.href}
+                title={section.label}
                 data-tour-nav={section.id}
+                data-nav-key={section.id}
                 className={cn(
-                  "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
+                  itemClass,
                   pathname.startsWith(section.href) ? activeClass : idleClass,
                 )}
                 aria-current={pathname.startsWith(section.href) ? "page" : undefined}
               >
-                {section.label}
+                {label}
               </Link>
             ) : (
               <button
                 key={section.id}
                 type="button"
+                title={section.label}
                 data-tour-nav={section.id}
+                data-nav-key={section.id}
                 onClick={() => handleClick(section.id)}
-                className={cn(
-                  "-mb-px shrink-0 snap-start border-b-2 px-4 py-2 text-sm font-medium transition",
-                  activeId === section.id ? activeClass : idleClass,
-                )}
+                className={cn(itemClass, activeId === section.id ? activeClass : idleClass)}
                 aria-current={activeId === section.id ? "true" : undefined}
               >
-                {section.label}
+                {label}
               </button>
-            ),
-          )}
+            );
+          })}
         </nav>
       </ScrollableNavRail>
     </div>

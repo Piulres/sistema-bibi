@@ -6,8 +6,10 @@ import NavTabs from "@/components/ui/NavTabs";
 import MobileNavDrawer from "@/components/layout/MobileNavDrawer";
 import { PORTAL_MOBILE_ACTIVE_CLASS, PORTAL_NAV_ACTIVE_CLASS, PORTAL_NAV_IDLE_CLASS } from "@/lib/theme/portals";
 import { buildBeneficiarioNavTabs } from "@/lib/navigation/niche-nav";
+import { PORTAL_NAV_STICKY_CLASS } from "@/lib/navigation/portal-nav";
 import { resolveBeneficiarioActive } from "@/lib/navigation";
 import { useLabels } from "@/hooks/useLabels";
+import { cn } from "@/lib/utils/cn";
 
 export default function BeneficiarioNav() {
   const pathname = usePathname();
@@ -16,7 +18,7 @@ export default function BeneficiarioNav() {
   const tabs = useMemo(() => buildBeneficiarioNavTabs(labels, niche), [labels, niche]);
 
   return (
-    <div className="mt-6" data-tour-id="portal-nav">
+    <div className={cn(PORTAL_NAV_STICKY_CLASS)} data-tour-id="portal-nav">
       <MobileNavDrawer
         tabs={tabs}
         active={active}

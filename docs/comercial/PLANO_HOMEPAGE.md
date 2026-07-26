@@ -47,7 +47,7 @@ Documento de planejamento e registro das mudanças aplicadas na home (`/`) para 
 
 ### Stats, audiência e nav
 
-- Stats: economia 87%, 6 segmentos, 4 portais, Price Snapshot  
+- Stats: economia 87%, 7 segmentos, 4 portais, Price Snapshot  
 - Seção `#para-quem` na home  
 - Nav (v1): Solução · ROI · Para quem · Segmentos · Portais · FAQ  
 
@@ -74,21 +74,20 @@ Hero → Stats → Problema → Solução → ROI → Para quem → Segmentos �
 | Comparativo dinâmico por UTM | ✅ v4 | Coluna mercado muda com `utm_segment` |
 | `roi_calculator_change` dataLayer | ✅ v4 | Debounce 600ms na calculadora |
 
-### Funil atual (v4)
+### Funil atual (v5 — v3.0.6)
 
 ```
-Hero (UTM) → Stats → Prova → Problema → Solução → Demo vídeo
-  → ROI (calculadora) → Cenários POC → Comparativo (mercado por UTM)
-  → Para quem → Segmentos → Recursos → Produto/Visão/Valores → Portais
-  → FAQ → Novidades → Contato → CTA
+Hero (UTM) → Stats → Problema → Solução → Como funciona → Segmentos → Recursos
+  → Para quem → Demo vídeo → ROI → Cenários POC → Comparativo
+  → Portais → FAQ → Contato → CTA → Novidades
 ```
 
-### Navegação atual (v3.0.5)
+### Navegação atual (v3.0.6)
 
-Menu enxuto com **6 âncoras** em `src/lib/landing/navigation.ts` (`HOME_NAV_ANCHORS`):
+Menu enxuto com **7 âncoras** em `src/lib/landing/navigation.ts` (`HOME_NAV_ANCHORS`):
 
 ```
-Solução · Demo · Segmentos · Portais · Contato · FAQ
+Solução · Como funciona · Segmentos · Demo · Portais · Contato · FAQ
 ```
 
 Seções **ROI**, **Comparativo** e **Para quem** permanecem na página (scroll), mas saíram do header/footer para reduzir ruído — ver [`produto/FLUXOS.md`](../produto/FLUXOS.md) §0.4 e [`plataforma/DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md).

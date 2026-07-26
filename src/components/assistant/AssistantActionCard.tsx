@@ -12,10 +12,12 @@ type Props = {
 };
 
 export default function AssistantActionCard({ actions }: Props) {
-  const { confirmAction, sendMessage, loading } = useAssistant();
+  const { confirmAction, sendMessage, loading, setOpen } = useAssistant();
   const [password, setPassword] = useState("");
 
   if (actions.length === 0) return null;
+
+  const closeOnNavigate = () => setOpen(false);
 
   return (
     <div className="space-y-2 border-t border-[var(--border-muted)] p-3">
@@ -71,6 +73,7 @@ export default function AssistantActionCard({ actions }: Props) {
             <Link
               key={`link-${index}`}
               href={action.href}
+              onClick={closeOnNavigate}
               className="block rounded-lg border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--portal-accent)] hover:bg-[var(--surface-muted)]"
             >
               {action.label} →
@@ -107,6 +110,7 @@ export default function AssistantActionCard({ actions }: Props) {
             <Link
               key={`draft-${index}`}
               href={action.href}
+              onClick={closeOnNavigate}
               className="block rounded-lg border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--portal-accent)] hover:bg-[var(--surface-muted)]"
             >
               {action.label} →
