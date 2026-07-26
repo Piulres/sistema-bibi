@@ -1,4 +1,5 @@
 import "server-only";
+import { formatDateTimeBR } from "@/lib/timezone";
 import PDFDocument from "pdfkit";
 
 export type PepExportContext = {
@@ -125,7 +126,7 @@ function drawPepPage(doc: PDFKit.PDFDocument, ctx: PepExportContext): void {
   const footerY = doc.page.height - margin;
   doc.fontSize(8).fillColor("#94a3b8");
   doc.text(
-    `Documento gerado em ${new Date().toLocaleString("pt-BR")}. Uso exclusivo assistencial.`,
+    `Documento gerado em ${formatDateTimeBR(new Date())}. Uso exclusivo assistencial.`,
     margin,
     footerY,
     { width: contentWidth, align: "center" },

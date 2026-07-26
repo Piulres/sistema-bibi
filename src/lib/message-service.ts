@@ -1,4 +1,5 @@
 import "server-only";
+import { formatDateTimeBR as dateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import {
   CommunicationProviderNotConfiguredError,
@@ -18,14 +19,6 @@ import {
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
 
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 export type MessageView = {
   id: string;

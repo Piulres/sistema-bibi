@@ -1,4 +1,5 @@
 import "server-only";
+import { formatDateTimeBR } from "@/lib/timezone";
 import PDFDocument from "pdfkit";
 import { formatBRL } from "@/lib/pricing";
 
@@ -69,7 +70,7 @@ export async function buildInvoicePdfBuffer(data: InvoiceExportData): Promise<Bu
   }
 
   doc.fontSize(8).fillColor("#94a3b8").text(
-    `Gerado em ${new Date().toLocaleString("pt-BR")} · ${data.platformLabel}`,
+    `Gerado em ${formatDateTimeBR(new Date())} · ${data.platformLabel}`,
     margin,
     doc.page.height - margin,
     { width: w, align: "center" },

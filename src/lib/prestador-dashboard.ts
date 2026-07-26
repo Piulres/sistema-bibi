@@ -1,34 +1,46 @@
 import "server-only";
+import {
+  APP_TIMEZONE,
+  civilDateISO,
+  endOfDayInAppTz,
+  formatDateTimeBR,
+  shiftCivilDate,
+  startOfDayInAppTz,
+} from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
 
+const dateTime = (value: Date) => formatDateTimeBR(value);
+
 function startOfToday(): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
+  return startOfDayInAppTz();
 }
 
 function endOfToday(): Date {
-  const d = new Date();
-  d.setHours(23, 59, 59, 999);
-  return d;
+  return endOfDayInAppTz();
 }
 
+/** Segunda-feira 00:00 no fuso da app (semana operacional). */
 function startOfWeek(): Date {
-  const d = startOfToday();
-  const day = d.getDay();
-  const diff = day === 0 ? 6 : day - 1;
-  d.setDate(d.getDate() - diff);
-  return d;
+  const todayISO = civilDateISO();
+  // getDay() em UTC no instante de início do dia BRT: usar partes do meio-dia BRT.
+  const noon = new Date(startOfDayInAppTz(todayISO).getTime() + 12 * 60 * 60 * 1000);
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: APP_TIMEZONE,
+    weekday: "short",
+  }).format(noon);
+  const map: Record<string, number> = {
+    Mon: 0,
+    Tue: 1,
+    Wed: 2,
+    Thu: 3,
+    Fri: 4,
+    Sat: 5,
+    Sun: 6,
+  };
+  const diff = map[weekday] ?? 0;
+  return startOfDayInAppTz(shiftCivilDate(todayISO, -diff));
 }
-
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 export type PrestadorDashboardData = {
   generatedAtLabel: string;

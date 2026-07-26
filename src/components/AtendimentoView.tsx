@@ -46,6 +46,7 @@ import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
+import { formatDateBR, formatDateTimeBR } from "@/lib/timezone";
 
 type Usage = {
   id: string;
@@ -395,7 +396,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
         kind: atestadoKind,
         patientName: appointmentDetail.patient.name,
         days: Number(atestadoDays),
-        startDateLabel: new Date(appointmentDetail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+        startDateLabel: formatDateBR(new Date(appointmentDetail.appointment.scheduledAt)),
         cid: atestadoCid,
         cidAuthorizedByPatient: atestadoCidAuthorized,
       });
@@ -407,7 +408,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
 
     const tpl = buildPepTemplate(recordType, {
       patientName: appointmentDetail.patient.name,
-      appointmentDate: new Date(appointmentDetail.appointment.scheduledAt).toLocaleDateString("pt-BR"),
+      appointmentDate: formatDateBR(new Date(appointmentDetail.appointment.scheduledAt)),
       patientCpf: appointmentDetail.patient.cpf,
       prescriptionKind: recordType === "RECEITA" ? prescriptionKind : undefined,
       atestadoKind: recordType === "ATESTADO" ? atestadoKind : undefined,
@@ -449,7 +450,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               </p>
             )}
             <p className="mt-1 text-sm text-[var(--text-muted)]">
-              {new Date(detail.appointment.scheduledAt).toLocaleString("pt-BR")} ·{" "}
+              {formatDateTimeBR(new Date(detail.appointment.scheduledAt))} ·{" "}
               {detail.appointment.reason ?? labels.appointment}
             </p>
             <Link
@@ -583,7 +584,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               <li key={d.id} className="flex items-center justify-between py-3 text-sm">
                 <span className="font-medium text-[var(--text-secondary)]">{d.productName}</span>
                 <span className="text-[var(--text-muted)]">
-                  {d.quantity} {d.unit} · {new Date(d.createdAt).toLocaleString("pt-BR")}
+                  {d.quantity} {d.unit} · {formatDateTimeBR(new Date(d.createdAt))}
                 </span>
               </li>
             ))}
@@ -729,7 +730,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
                     {r.title && <p className="text-xs font-semibold text-[var(--portal-accent)]">{r.title}</p>}
                     <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">{r.content}</p>
                     <p className="mt-1 text-xs text-[var(--text-muted)]">
-                      {new Date(r.createdAt).toLocaleString("pt-BR")}
+                      {formatDateTimeBR(new Date(r.createdAt))}
                     </p>
                   </div>
                   <ExportButtons

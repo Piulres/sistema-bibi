@@ -1,4 +1,5 @@
 import type { TabularExport } from "@/lib/exports/tabular-types";
+import { formatDateTimeBR } from "@/lib/timezone";
 
 function cellValue(value: string | number | boolean | null | undefined): string {
   if (value === null || value === undefined) return "";
@@ -17,6 +18,6 @@ export function buildTxtFromTabular(data: TabularExport): string {
     lines.push(data.columns.map((column) => cellValue(row[column.key])).join(" | "));
   }
   lines.push("");
-  lines.push(`Gerado em ${new Date().toLocaleString("pt-BR")}`);
+  lines.push(`Gerado em ${formatDateTimeBR(new Date())}`);
   return `${lines.join("\n")}\n`;
 }
