@@ -371,6 +371,10 @@ Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 1. **unit-integration-api** — `lint` → `docs:verify` → `openapi:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
 2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)
 
+**Runtime CI:** Node **24** · `actions/checkout@v6` · `actions/setup-node@v6`.
+
+**Otimização `test.db`:** o job unitário usa `DATABASE_URL=file:./test.db`. O helper `tests/helpers/db.ts` grava `prisma/.test-db-ready` com fingerprint de schema + seed; nos workers, `ensureTestDatabase()` pula subprocessos `prisma db push` quando o marker é válido (suíte ~112s → ~30s em runners lentos). Invalida ao mudar `schema.prisma` ou arquivos em `prisma/seed-data/`.
+
 **Variáveis globais do workflow** (obrigatórias — Prisma falha sem `DATABASE_URL`):
 
 | Variável | Valor CI |

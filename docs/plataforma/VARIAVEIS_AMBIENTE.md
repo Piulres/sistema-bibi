@@ -373,8 +373,9 @@ O repositório **não define** variáveis `CURSOR_*` no código. O ambiente **Cu
 
 | Passo | Comando / artefato | Notas |
 |-------|-------------------|--------|
-| Criar `.env` | `cp .env.example .env` | `.env` é **gitignored** — não vem no checkout |
-| Banco | `npm run db:push && npm run db:seed` | Caminho **não destrutivo** |
+| Instalar deps | `npm install` | postinstall gera Prisma + Swagger UI |
+| Setup banco | `npm run setup` | Idempotente — `.env` + `db:push` + seed condicional |
+| Alternativa manual | `cp .env.example .env` + `db:push && db:seed` | Mesmo resultado, sem limpar resíduo dual-store |
 | Evitar | `npm run db:reset` | **Bloqueado** para agentes (consentimento Prisma) |
 | Persistência | Snapshot da VM | Após primeiro setup, `.env` e `dev.db` persistem |
 
@@ -383,7 +384,7 @@ O repositório **não define** variáveis `CURSOR_*` no código. O ambiente **Cu
 | Regra | Detalhe |
 |-------|---------|
 | `db:reset` / `prisma migrate` destrutivo | Aborta com prompt de consentimento |
-| Setup recomendado | `db:push` + `db:seed` |
+| Setup recomendado | `npm run setup` |
 | Restaurar demo via UI | `ALLOW_DEMO_RESET=true` + login admin em `/interno/seguranca` |
 | Branches CI | `cursor/**` disparam workflow (ver `ci.yml`) |
 

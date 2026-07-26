@@ -37,16 +37,15 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 ## Setup inicial (uma vez por VM)
 
 ```bash
-cp .env.example .env          # se não existir
+cp .env.example .env          # opcional — setup cria .env se ausente
 npm install
-# Dev simples (dev.db):
-npm run db:push && npm run db:seed
+npm run setup                 # dev simples (dev.db) — idempotente
 # Dual-store (demo.db + operation.db) — recomendado:
 # npm run db:bootstrap:demo
 # CEDIG local (?tenant=cedig → operation): ./scripts/cedig-mapear.sh
 ```
 
-> Agentes: `npm run db:reset` é **bloqueado**. Use `db:push && db:seed` ou `db:bootstrap:demo`.  
+> Agentes: `npm run db:reset` é **bloqueado**. Use `npm run setup` ou `db:bootstrap:demo`.  
 > Dual-store / CEDIG: [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) · [`../clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md).
 
 ---
