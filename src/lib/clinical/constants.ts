@@ -1,6 +1,21 @@
 export const MEDICATION_STATUSES = ["ATIVA", "SUSPENSA", "ENCERRADA"] as const;
 export type MedicationStatus = (typeof MEDICATION_STATUSES)[number];
 
+export {
+  PRESCRIPTION_KINDS,
+  isPrescriptionKind,
+  prescriptionKindLabel,
+  prescriptionKindHint,
+  type PrescriptionKind,
+} from "@/lib/clinical/receita";
+
+export {
+  ATESTADO_KINDS,
+  isAtestadoKind,
+  atestadoKindLabel,
+  type AtestadoKind,
+} from "@/lib/clinical/atestado";
+
 export const EXAM_ORDER_STATUSES = [
   "SOLICITADO",
   "AGENDADO",
@@ -32,6 +47,13 @@ export type ProtocolChecklistItem = {
   id: string;
   label: string;
   required?: boolean;
+};
+
+/** Item de um protocolo de exames (painel reutilizável). */
+export type ExamProtocolItem = {
+  id: string;
+  examName: string;
+  procedureId?: string | null;
 };
 
 export function parseJsonArray<T>(value: string | null | undefined): T[] {

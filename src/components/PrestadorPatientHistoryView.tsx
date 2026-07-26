@@ -154,12 +154,12 @@ export default function PrestadorPatientHistoryView({ patientId }: { patientId: 
   const isPet = subjectType === "pet";
   const clinicalPatientId = isPet && tutorPatientId ? tutorPatientId : patientId;
   const careTabs = [
-    { key: "historico", label: "Histórico" },
-    { key: "medicacao", label: "Medicação" },
-    { key: "exames", label: "Exames" },
-    ...(isPet ? [] : [{ key: "protocolos", label: "Protocolos" }]),
-    ...(isPet ? [{ key: "vacinas", label: "Vacinas" }] : []),
-    { key: "perfil", label: "Perfil clínico" },
+    { key: "historico", label: "Histórico", shortLabel: "Hist." },
+    { key: "medicacao", label: "Medicação", shortLabel: "Meds" },
+    { key: "exames", label: "Exames", shortLabel: "Exames" },
+    ...(isPet ? [] : [{ key: "protocolos", label: "Protocolos", shortLabel: "Prot." }]),
+    ...(isPet ? [{ key: "vacinas", label: "Vacinas", shortLabel: "Vacinas" }] : []),
+    { key: "perfil", label: "Perfil clínico", shortLabel: "Perfil" },
   ] as const;
 
   return (

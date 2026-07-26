@@ -6,6 +6,11 @@ import {
   type MedicationStatus,
 } from "@/lib/clinical/constants";
 import {
+  isPrescriptionKind,
+  prescriptionKindLabel,
+  type PrescriptionKind,
+} from "@/lib/clinical/receita";
+import {
   recordTimelineEvent,
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
@@ -25,9 +30,12 @@ export type MedicationView = {
   frequency: string;
   route: string | null;
   durationDays: number | null;
+  quantity: string | null;
   notes: string | null;
   status: string;
   statusLabel: string;
+  prescriptionKind: string;
+  prescriptionKindLabel: string;
   startDate: string;
   startDateLabel: string;
   endDate: string | null;
@@ -44,14 +52,19 @@ function mapMedication(
     frequency: string;
     route: string | null;
     durationDays: number | null;
+    quantity?: string | null;
     notes: string | null;
     status: string;
+    prescriptionKind?: string | null;
     startDate: Date;
     endDate: Date | null;
     appointmentId: string | null;
     provider: { name: string };
   },
 ): MedicationView {
+  const kind = row.prescriptionKind && isPrescriptionKind(row.prescriptionKind)
+    ? row.prescriptionKind
+    : "COMUM";
   return {
     id: row.id,
     medication: row.medication,
@@ -59,9 +72,12 @@ function mapMedication(
     frequency: row.frequency,
     route: row.route,
     durationDays: row.durationDays,
+    quantity: row.quantity ?? null,
     notes: row.notes,
     status: row.status,
     statusLabel: medicationStatusLabel(row.status),
+    prescriptionKind: kind,
+    prescriptionKindLabel: prescriptionKindLabel(kind),
     startDate: row.startDate.toISOString(),
     startDateLabel: dateOnly(row.startDate),
     endDate: row.endDate?.toISOString() ?? null,
@@ -114,7 +130,9 @@ export async function createMedicationPrescription(input: {
   frequency: string;
   route?: string | null;
   durationDays?: number | null;
+  quantity?: string | null;
   notes?: string | null;
+  prescriptionKind?: PrescriptionKind | string | null;
   patientName: string;
 }): Promise<MedicationView> {
   const prisma = await getPrisma();
@@ -125,6 +143,11 @@ export async function createMedicationPrescription(input: {
     });
     if (!pet) throw new Error("Pet não encontrado");
   }
+
+  const kind: PrescriptionKind =
+    input.prescriptionKind && isPrescriptionKind(input.prescriptionKind)
+      ? input.prescriptionKind
+      : "COMUM";
 
   const endDate =
     input.durationDays && input.durationDays > 0
@@ -137,11 +160,13 @@ export async function createMedicationPrescription(input: {
       petId: input.petId ?? null,
       providerId: input.providerId,
       appointmentId: input.appointmentId ?? null,
+      prescriptionKind: kind,
       medication: input.medication.trim(),
       dosage: input.dosage.trim(),
       frequency: input.frequency.trim(),
       route: input.route?.trim() || null,
       durationDays: input.durationDays ?? null,
+      quantity: input.quantity?.trim() || null,
       notes: input.notes?.trim() || null,
       endDate,
     },
@@ -153,7 +178,7 @@ export async function createMedicationPrescription(input: {
     entityType: TIMELINE_ENTITY_TYPES.MEDICATION_PRESCRIPTION,
     entityId: row.id,
     action: TIMELINE_ACTIONS.MEDICATION_PRESCRIBED,
-    description: `Prescrição de ${row.medication} para ${input.patientName}`,
+    description: `Prescrição (${prescriptionKindLabel(kind)}) de ${row.medication} para ${input.patientName}`,
     createdBy: input.providerId,
   });
 
@@ -183,7 +208,12 @@ export async function updateMedicationStatus(input: {
     where: { id: input.id },
     data: {
       status: input.status,
-      endDate: input.status === "ENCERRADA" ? new Date() : existing.endDate,
+      endDate:
+        input.status === "ENCERRADA"
+          ? new Date()
+          : input.status === "ATIVA"
+            ? null
+            : existing.endDate,
     },
     include: { provider: { select: { name: true } } },
   });

@@ -7,7 +7,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
 
 const fieldClass =
-  "w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
+  "w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
 
 type Medication = {
   id: string;
@@ -17,6 +17,9 @@ type Medication = {
   route: string | null;
   status: string;
   statusLabel: string;
+  prescriptionKind: string;
+  prescriptionKindLabel: string;
+  quantity: string | null;
   notes: string | null;
 };
 
@@ -45,6 +48,14 @@ type ProtocolTemplate = {
   id: string;
   name: string;
   specialty: string | null;
+};
+
+type ExamProtocolTemplate = {
+  id: string;
+  name: string;
+  specialty: string | null;
+  exams: { id: string; examName: string }[];
+  clinicalIndication: string | null;
 };
 
 type ClinicalProfile = {
@@ -97,18 +108,22 @@ export default function ClinicalCarePanel({
   const [examOrders, setExamOrders] = useState<ExamOrder[]>([]);
   const [enrollments, setEnrollments] = useState<ProtocolEnrollment[]>([]);
   const [templates, setTemplates] = useState<ProtocolTemplate[]>([]);
+  const [examProtocols, setExamProtocols] = useState<ExamProtocolTemplate[]>([]);
   const [profile, setProfile] = useState<ClinicalProfile | null>(null);
   const [vaccines, setVaccines] = useState<Vaccine[]>([]);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [laudoDraft, setLaudoDraft] = useState<{ id: string; text: string } | null>(null);
 
   const [medForm, setMedForm] = useState({
+    prescriptionKind: "COMUM",
     medication: "",
     dosage: "",
     frequency: "",
     route: "",
     durationDays: "",
+    quantity: "",
     notes: "",
   });
   const [examForm, setExamForm] = useState({
@@ -117,6 +132,7 @@ export default function ClinicalCarePanel({
     clinicalIndication: "",
   });
   const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [selectedExamProtocol, setSelectedExamProtocol] = useState("");
   const [allergyInput, setAllergyInput] = useState({ substance: "", severity: "" });
   const [conditionInput, setConditionInput] = useState("");
   const [vaccineForm, setVaccineForm] = useState({
@@ -137,10 +153,15 @@ export default function ClinicalCarePanel({
     const url = appointmentId
       ? `${apiBase}/exam-orders?appointmentId=${appointmentId}`
       : `${apiBase}/exam-orders`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (res.ok) setExamOrders(data.examOrders);
-  }, [apiBase, appointmentId]);
+    const [ordersRes, protocolsRes] = await Promise.all([
+      fetch(url),
+      fetch(`/api/prestador/patients/${patientId}/exam-protocols`),
+    ]);
+    const ordersData = await ordersRes.json();
+    const protocolsData = await protocolsRes.json();
+    if (ordersRes.ok) setExamOrders(ordersData.examOrders);
+    if (protocolsRes.ok) setExamProtocols(protocolsData.templates ?? []);
+  }, [apiBase, appointmentId, patientId]);
 
   const loadProtocols = useCallback(async () => {
     const res = await fetch(`/api/prestador/patients/${patientId}/protocols`);
@@ -205,7 +226,16 @@ export default function ClinicalCarePanel({
         setError(data.error ?? "Erro ao prescrever");
         return;
       }
-      setMedForm({ medication: "", dosage: "", frequency: "", route: "", durationDays: "", notes: "" });
+      setMedForm({
+        prescriptionKind: "COMUM",
+        medication: "",
+        dosage: "",
+        frequency: "",
+        route: "",
+        durationDays: "",
+        quantity: "",
+        notes: "",
+      });
       setMsg("Medicação prescrita.");
       await loadMedications();
       onChanged?.();
@@ -376,38 +406,100 @@ export default function ClinicalCarePanel({
     }
   }
 
+  async function applyExamProtocol() {
+    if (!selectedExamProtocol) return;
+    setBusy(true);
+    setMsg(null);
+    setError(null);
+    try {
+      const res = await fetch(`/api/prestador/patients/${patientId}/exam-protocols`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          templateId: selectedExamProtocol,
+          appointmentId,
+          petId: isPet ? petId : undefined,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error ?? "Erro ao aplicar protocolo de exames");
+        return;
+      }
+      setSelectedExamProtocol("");
+      setMsg(`${data.examOrders?.length ?? 0} exame(s) solicitados pelo protocolo.`);
+      await loadExams();
+      onChanged?.();
+    } finally {
+      setBusy(false);
+    }
+  }
+
   if (tab === "medicacao") {
     return (
       <div className="space-y-4">
         <SectionHeader
           title="Gestão de medicação"
-          description={isPet ? "Prescrições estruturadas do pet." : "Prescrições estruturadas do paciente."}
+          description={
+            isPet
+              ? "Receita comum ou de controle especial (pet)."
+              : "Receita comum ou de controle especial — ativar/suspender/encerrar."
+          }
         />
         {msg && <Alert tone="success">{msg}</Alert>}
         {error && <Alert tone="danger">{error}</Alert>}
         <div className="grid gap-2 sm:grid-cols-2">
+          <select
+            className={fieldClass}
+            value={medForm.prescriptionKind}
+            onChange={(e) => setMedForm({ ...medForm, prescriptionKind: e.target.value })}
+            aria-label="Tipo de receita"
+          >
+            <option value="COMUM">Receita comum</option>
+            <option value="CONTROLE_ESPECIAL">Receita de controle especial</option>
+          </select>
           <input className={fieldClass} placeholder="Medicamento" value={medForm.medication} onChange={(e) => setMedForm({ ...medForm, medication: e.target.value })} />
           <input className={fieldClass} placeholder="Dose (ex: 1 comprimido)" value={medForm.dosage} onChange={(e) => setMedForm({ ...medForm, dosage: e.target.value })} />
           <input className={fieldClass} placeholder="Frequência (ex: 12/12h)" value={medForm.frequency} onChange={(e) => setMedForm({ ...medForm, frequency: e.target.value })} />
           <input className={fieldClass} placeholder="Via (opcional)" value={medForm.route} onChange={(e) => setMedForm({ ...medForm, route: e.target.value })} />
           <input className={fieldClass} placeholder="Duração (dias)" type="number" value={medForm.durationDays} onChange={(e) => setMedForm({ ...medForm, durationDays: e.target.value })} />
-          <input className={fieldClass} placeholder="Observações" value={medForm.notes} onChange={(e) => setMedForm({ ...medForm, notes: e.target.value })} />
+          <input
+            className={fieldClass}
+            placeholder={medForm.prescriptionKind === "CONTROLE_ESPECIAL" ? "Quantidade (nº e por extenso)" : "Quantidade (opcional)"}
+            value={medForm.quantity}
+            onChange={(e) => setMedForm({ ...medForm, quantity: e.target.value })}
+          />
+          <input className={`sm:col-span-2 ${fieldClass}`} placeholder="Observações" value={medForm.notes} onChange={(e) => setMedForm({ ...medForm, notes: e.target.value })} />
         </div>
+        {medForm.prescriptionKind === "CONTROLE_ESPECIAL" && (
+          <p className="text-xs text-[var(--text-muted)]">
+            Controle especial: duas vias (1ª farmácia / 2ª paciente). Validade típica 30 dias — Portaria 344 / RDC 1000.
+          </p>
+        )}
         <Button onClick={addMedication} disabled={busy}>Prescrever</Button>
         <ul className="divide-y divide-[var(--border-default)]">
           {medications.map((m) => (
-            <li key={m.id} className="flex flex-wrap items-center justify-between gap-2 py-3">
-              <div>
+            <li key={m.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="font-medium">{m.medication}</p>
-                <p className="text-sm text-[var(--text-muted)]">{m.dosage} · {m.frequency}{m.route ? ` · ${m.route}` : ""}</p>
+                <p className="text-sm text-[var(--text-muted)]">
+                  {m.prescriptionKindLabel} · {m.dosage} · {m.frequency}
+                  {m.route ? ` · ${m.route}` : ""}
+                  {m.quantity ? ` · Qtd: ${m.quantity}` : ""}
+                </p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <StatusBadge value={m.status} label={m.statusLabel} />
                 {m.status === "ATIVA" && (
                   <>
                     <Button size="sm" variant="secondary" disabled={busy} onClick={() => updateMedStatus(m.id, "SUSPENSA")}>Suspender</Button>
                     <Button size="sm" variant="secondary" disabled={busy} onClick={() => updateMedStatus(m.id, "ENCERRADA")}>Encerrar</Button>
                   </>
+                )}
+                {(m.status === "SUSPENSA" || m.status === "ENCERRADA") && (
+                  <Button size="sm" variant="secondary" disabled={busy} onClick={() => updateMedStatus(m.id, "ATIVA")}>
+                    Reativar
+                  </Button>
                 )}
               </div>
             </li>
@@ -421,9 +513,33 @@ export default function ClinicalCarePanel({
     const examProcedures = procedures.filter((p) => p.category === "EXAME");
     return (
       <div className="space-y-4">
-        <SectionHeader title="Pedidos de exame" description="Solicitação, acompanhamento e laudo." />
+        <SectionHeader title="Pedidos de exame" description="Protocolos em lote, solicitação individual e laudo." />
         {msg && <Alert tone="success">{msg}</Alert>}
         {error && <Alert tone="danger">{error}</Alert>}
+
+        {examProtocols.length > 0 && (
+          <div className="rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-muted)] p-3">
+            <p className="mb-2 text-sm font-medium">Aplicar protocolo de exames</p>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <select
+                className={`min-w-0 flex-1 ${fieldClass}`}
+                value={selectedExamProtocol}
+                onChange={(e) => setSelectedExamProtocol(e.target.value)}
+              >
+                <option value="">Selecione um protocolo...</option>
+                {examProtocols.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.name} ({t.exams.length} exame{t.exams.length === 1 ? "" : "s"})
+                  </option>
+                ))}
+              </select>
+              <Button onClick={applyExamProtocol} disabled={busy || !selectedExamProtocol}>
+                Aplicar protocolo
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="grid gap-2 sm:grid-cols-2">
           <select className={fieldClass} value={examForm.procedureId} onChange={(e) => setExamForm({ ...examForm, procedureId: e.target.value })}>
             <option value="">Catálogo (opcional)</option>
@@ -438,26 +554,55 @@ export default function ClinicalCarePanel({
         <ul className="space-y-3">
           {examOrders.map((e) => (
             <li key={e.id} className="rounded-[var(--radius-button)] border border-[var(--border-default)] p-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="font-medium">{e.examName}</p>
+              <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <p className="min-w-0 font-medium">{e.examName}</p>
                 <StatusBadge value={e.status} label={e.statusLabel} />
               </div>
               {e.clinicalIndication && <p className="mt-1 text-sm text-[var(--text-muted)]">{e.clinicalIndication}</p>}
               {e.resultSummary && <p className="mt-2 text-sm text-[var(--text-secondary)]">Laudo: {e.resultSummary}</p>}
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 {e.status === "SOLICITADO" && (
                   <Button size="sm" variant="secondary" disabled={busy} onClick={() => updateExam(e.id, { status: "AGENDADO", scheduledAt: new Date().toISOString() })}>Agendar</Button>
                 )}
                 {e.status === "AGENDADO" && (
                   <Button size="sm" variant="secondary" disabled={busy} onClick={() => updateExam(e.id, { status: "REALIZADO" })}>Marcar realizado</Button>
                 )}
-                {e.status === "REALIZADO" && (
-                  <Button size="sm" variant="secondary" disabled={busy} onClick={() => {
-                    const summary = prompt("Resumo do laudo:");
-                    if (summary) updateExam(e.id, { status: "LAUDADO", resultSummary: summary, markReviewed: true });
-                  }}>Registrar laudo</Button>
+                {e.status === "REALIZADO" && laudoDraft?.id !== e.id && (
+                  <Button size="sm" variant="secondary" disabled={busy} onClick={() => setLaudoDraft({ id: e.id, text: "" })}>
+                    Registrar laudo
+                  </Button>
                 )}
               </div>
+              {laudoDraft?.id === e.id && (
+                <div className="mt-3 space-y-2">
+                  <textarea
+                    className={fieldClass}
+                    rows={3}
+                    placeholder="Resumo do laudo"
+                    value={laudoDraft.text}
+                    onChange={(ev) => setLaudoDraft({ id: e.id, text: ev.target.value })}
+                  />
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <Button
+                      size="sm"
+                      disabled={busy || !laudoDraft.text.trim()}
+                      onClick={async () => {
+                        await updateExam(e.id, {
+                          status: "LAUDADO",
+                          resultSummary: laudoDraft.text.trim(),
+                          markReviewed: true,
+                        });
+                        setLaudoDraft(null);
+                      }}
+                    >
+                      Salvar laudo
+                    </Button>
+                    <Button size="sm" variant="secondary" disabled={busy} onClick={() => setLaudoDraft(null)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>

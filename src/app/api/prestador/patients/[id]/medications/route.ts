@@ -31,7 +31,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       frequency?: string;
       route?: string;
       durationDays?: number;
+      quantity?: string;
       notes?: string;
+      prescriptionKind?: string;
     };
 
     if (!body.medication?.trim() || !body.dosage?.trim() || !body.frequency?.trim()) {
@@ -58,7 +60,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       frequency: body.frequency,
       route: body.route,
       durationDays: body.durationDays,
+      quantity: body.quantity,
       notes: body.notes,
+      prescriptionKind: body.prescriptionKind,
       patientName: patient.name,
     });
 

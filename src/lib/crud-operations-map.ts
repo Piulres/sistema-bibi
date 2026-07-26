@@ -153,6 +153,33 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     delete: none,
   },
   {
+    entity: "Protocolo de exames",
+    portal: "Interno",
+    description: "Painel reutilizável de exames (pré-op, check-up) aplicável em lote no prestador.",
+    create: [
+      ui(
+        "Novo protocolo de exames",
+        "/interno/cadastros → Protocolos",
+        "POST /api/interno/exam-protocol-templates",
+      ),
+    ],
+    read: [
+      ui(
+        "Listar protocolos de exames",
+        "/interno/cadastros → Protocolos",
+        "GET /api/interno/exam-protocol-templates",
+      ),
+    ],
+    update: [
+      ui(
+        "Editar / ativar / desativar",
+        "/interno/cadastros → Protocolos",
+        "PATCH /api/interno/exam-protocol-templates/[id]",
+      ),
+    ],
+    delete: none,
+  },
+  {
     entity: "Produto de estoque",
     portal: "Interno",
     create: [ui("Novo produto", "/interno/estoque", "POST /api/interno/stock/products")],
