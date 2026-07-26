@@ -196,7 +196,7 @@ export default function VoaAssistantPanel({ appointmentId, patientId, onImported
           Solicite o token em integration@voahealth.com.
         </p>
         <p className="mt-2 text-sm text-[var(--text-muted)]">
-          Documentação: <code className="text-xs">docs/VOA_INTEGRATION.md</code>
+          Documentação: <code className="text-xs">docs/plataforma/VOA_INTEGRATION.md</code>
         </p>
       </Card>
     );

@@ -1,6 +1,6 @@
 # Prompt — Iniciar campanhas de marketing (ServiceOS)
 
-Use este documento como **prompt base** para o agente Cursor (ou para briefing humano) ao planejar e executar campanhas de captação do **Sistema Bibi - ServiceOS v2.0**.
+Use este documento como **prompt base** para o agente Cursor (ou para briefing humano) ao planejar e executar campanhas de captação do **Sistema Bibi - ServiceOS**.
 
 > **Contexto do produto:** [`README.md`](README.md) · **Estratégia por nicho:** [`ESTRATEGIA_SEGMENTOS.md`](ESTRATEGIA_SEGMENTOS.md) · **Benchmarks:** [`BENCHMARKS_POR_NICHO.md`](BENCHMARKS_POR_NICHO.md) · **Homepage:** [`PLANO_HOMEPAGE.md`](PLANO_HOMEPAGE.md)
 
@@ -11,7 +11,7 @@ Use este documento como **prompt base** para o agente Cursor (ou para briefing h
 Cole no chat do agente e preencha os campos entre colchetes:
 
 ```text
-Você é um estrategista de marketing B2B para o Sistema Bibi - ServiceOS v2.0
+Você é um estrategista de marketing B2B para o Sistema Bibi - ServiceOS
 (plataforma Pay Per Use multi-nicho: saúde, vet, odonto, jurídico, spa, educação).
 
 ## Objetivo da campanha

@@ -50,10 +50,10 @@ agenda, relatórios, PEP), B2B (RBAC, webhooks, portal PJ, LGPD), enterprise
 **Deploy (PRs #26–#28):** ambiente Cloud Agent, tentativa Netlify Agent (#27) e
 fix produção Blobs regional + Prisma `rhel-openssl-3.0.x` (#28).
 **Produção:** **`v3.0.0`** @ https://sistema-bibi.netlify.app · PWA `/instalar` · CEDIG + login tenant/portal · ver `docs/versoes/RELEASES.md` · `V3_0.md`.
-Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
+Piloto CEDIG: `/?tenant=cedig` · `/interno/gestao` · status vivo `docs/clientes/cedig/STATUS.md`. Title e footer exibem `PLATFORM.release`. Se retornar **503 `usage_exceeded`**, é cota Netlify (não bug). Stop builds **ON**.
 **Fluxo dev-first:** novas atividades em PR → **`dev`**; release merge `dev` → `main`.
 **Workflow:** desenvolver local → `npm run pre-release` → deploy manual só quando o usuário pedir.
-Ver `docs/plataforma/WORKFLOW_CURSOR.md` e **`docs/plataforma/OPERACOES.md`** (mapa completo de operações).
+Ver `docs/plataforma/WORKFLOW_CURSOR.md` · **`docs/plataforma/OPERACOES.md`** · docs vivas `docs/plataforma/DOCUMENTACAO.md`.
 **Preferências IA:** `AGENTS.md` · `docs/prompts/README.md` · `.cursor/skills/serviceos-dev-quality/SKILL.md` · `.cursor/rules/serviceos-dev.mdc` · `.cursor/rules/operacoes-bibi.mdc`.
 **Evidências:** `docs/evidencias/` (vídeos/screenshots dos fluxos validados).
 **Histórico 21/06:** `docs/plataforma/HISTORICO_2026-06-21.md`

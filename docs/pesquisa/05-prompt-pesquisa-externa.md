@@ -186,4 +186,4 @@ Respostas anônimas. Uso apenas para benchmark interno.
 1. Revisar números e preços com fonte primária.
 2. Atualizar [`06-catalogo-players.md`](06-catalogo-players.md) com empresas novas.
 3. Ajustar [`01-matriz-competitiva.md`](01-matriz-competitiva.md) se critérios mudarem.
-4. Cruzar gaps com [`../BENCHMARK.md`](../BENCHMARK.md) (implementação na POC).
+4. Cruzar gaps com [`../BENCHMARK.md`](../plataforma/BENCHMARK.md) (implementação na POC).

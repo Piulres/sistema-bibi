@@ -5,7 +5,7 @@
 | Versão | **2.0 (ServiceOS)** |
 | Data | Junho/2026 |
 
-> Escopo técnico v2.0: [`../V2_0.md`](../V2_0.md) · Matriz competitiva: [`01-matriz-competitiva.md`](01-matriz-competitiva.md)
+> Escopo técnico v2.0: [`../V2_0.md`](../versoes/V2_0.md) · Matriz competitiva: [`01-matriz-competitiva.md`](01-matriz-competitiva.md)
 
 ---
 

@@ -188,7 +188,7 @@
 | Q3 | Limitação em RFPs formais | Início processo SBIS |
 | Q4 | Dependência de referências | **Liberado** pipeline enterprise + operadoras regionais |
 
-**Recomendação:** Iniciar gap analysis SBIS no **Q2** (documentação + Postgres), submissão **Q3**, certificado **Q4** — alinhado a [`03-estrategia-produto-posicionamento.md`](03-estrategia-produto-posicionamento.md).
+**Recomendação:** Iniciar gap analysis SBIS no **Q2** (documentação + Postgres), submissão **Q3**, certificado **Q4** — alinhado a [`03-estrategia-produto-posicionamento.md`](../../pesquisa/03-estrategia-produto-posicionamento.md).
 
 ---
 
@@ -207,7 +207,7 @@
 | Demo Portal PJ | Consumo por CPF, procedimento, desconto automático |
 | Fechamento | “Quanto de economia nos dados para trocar custo fixo por sob demanda?” |
 
-Detalhe completo em [`09-sintese-consultor-senior.md`](09-sintese-consultor-senior.md) §3.
+Detalhe completo em [`09-sintese-consultor-senior.md`](../../pesquisa/09-sintese-consultor-senior.md) §3.
 
 ---
 
@@ -354,7 +354,7 @@ Detalhe completo em [`09-sintese-consultor-senior.md`](09-sintese-consultor-seni
 ## Referências
 
 - Código: `src/lib/pricing.ts`, `ProcedureUsage.priceCharged`, `src/lib/pj-portal-service.ts`
-- Docs: [`../PAYMENTS.md`](../PAYMENTS.md), [`../COMMUNICATIONS.md`](../COMMUNICATIONS.md), [`03-estrategia-produto-posicionamento.md`](03-estrategia-produto-posicionamento.md)
+- Docs: [`../PAYMENTS.md`](../../plataforma/PAYMENTS.md), [`../COMMUNICATIONS.md`](../../plataforma/COMMUNICATIONS.md), [`03-estrategia-produto-posicionamento.md`](../../pesquisa/03-estrategia-produto-posicionamento.md)
 - Tier 1: [Pipo Saúde](https://www.piposaude.com.br/), [Vitta](https://www.vitta.com.br/), [Conexa](https://www.conexasaude.com.br/para-empregadores)
 
 *Projeções financeiras são ilustrativas — validar com dados reais de utilização em piloto.*

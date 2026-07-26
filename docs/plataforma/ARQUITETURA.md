@@ -1,4 +1,4 @@
-# Arquitetura — Sistema Bibi - ServiceOS v2.0
+# Arquitetura — Sistema Bibi - ServiceOS
 
 Documento técnico com os diagramas de arquitetura, modelo de dados (ER) e os
 principais fluxos do sistema. Os diagramas usam [Mermaid](https://mermaid.js.org/)
@@ -419,8 +419,8 @@ sequenceDiagram
 O beneficiário e o Portal PJ consultam os mesmos `priceCharged` — não há divergência
 entre “preço mostrado no atendimento” e “preço na fatura”.
 
-> Referência de negócio: [`pesquisa/09-sintese-consultor-senior.md`](pesquisa/09-sintese-consultor-senior.md) ·
-> Monetização: [`MONETIZACAO.md`](MONETIZACAO.md)
+> Referência de negócio: [`pesquisa/09-sintese-consultor-senior.md`](../pesquisa/09-sintese-consultor-senior.md) ·
+> Monetização: [`MONETIZACAO.md`](../MONETIZACAO.md)
 
 ---
 
@@ -826,7 +826,7 @@ flowchart LR
 
 ## 20. Documentação da API
 
-A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../public/openapi.yaml).
+A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/openapi.yaml).
 Fluxos de usuário detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
 Com o servidor rodando (`npm run dev`), acesse a UI interativa em:
 
