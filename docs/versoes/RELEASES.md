@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.5** — atendimento clínico + jornada faturada + UX landing/portais — **em publicação** (deploy pendente de confirmação).
+> Pacote **v3.0.5** — atendimento clínico + jornada faturada + UX landing/portais **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.4** — deploy `6a65b8e6` @ `fd22ebc` (`bibi-poc-2026-07-26d`) · **próximo: 3.0.5** (`bibi-poc-2026-07-26e`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.5** — deploy `6a65c17d` @ `cf0eb26` (`bibi-poc-2026-07-26e`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.5** · tip a preencher pós-push |
+| **Release `main` / `dev`** | **v3.0.5** · tip `cf0eb26` |
 | **Pacote anterior em produção** | **3.0.4** — deploy `6a65b8e6` @ `fd22ebc` (`bibi-poc-2026-07-26d`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,9 +25,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.5** (PRs #221–#227) |
-| **Release** | `main` | **v3.0.5** (merge + bump; deploy em andamento) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.4** até confirmar `bibi-poc-2026-07-26e` · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.5** |
+| **Release** | `main` | **v3.0.5** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.5** · deploy `6a65c17d` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.5
@@ -41,10 +41,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | pendente pós-deploy |
-| CSS `/_next/static/chunks/*.css` | pendente |
-| Footer `v3.0.5` | pendente |
-| Cota Netlify | verificar 1× antes do deploy |
+| Landing `/` | 200 · footer `v3.0.5` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.4
 
@@ -94,6 +94,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.5`** | `cf0eb26` | Atendimento clínico + jornada faturada + UX landing/portais (#221/#225–#227) |
 | **`v3.0.4`** | `fd22ebc` | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219/#220) |
 | **`v3.0.3`** | `fc9afa7` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
 | **`v3.0.2`** | `9ceeb49` | Hotfix: schema-sync do operation.db (incidente 500 em /interno/gestao) |
