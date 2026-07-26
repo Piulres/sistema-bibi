@@ -105,7 +105,7 @@ Fonte: `src/lib/landing/navigation.ts`.
 
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
 
-### Portal nav — abas de rota (v3.0.6)
+### Portal nav — abas de rota (v3.0.7)
 
 Fonte: `src/components/ui/NavTabs.tsx` + `src/lib/navigation/portal-nav.ts`.
 
@@ -113,7 +113,8 @@ Fonte: `src/components/ui/NavTabs.tsx` + `src/lib/navigation/portal-nav.ts`.
 |------------|---------------|
 | Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com abas primárias; módulos `priority: "secondary"` no menu **Mais** |
 | Aba secundária ativa | Pinada na faixa principal (não some no dropdown) |
-| Mobile (`< lg`) | `MobileNavDrawer` portaled — gatilho com módulo ativo + contagem |
+| Mobile (`< lg`) | `MobileNavDrawer` portaled — abre pela **direita**; gatilho mostra rótulo **Navegação** + módulo ativo (sem contagem) |
+| Grupos no drawer | Separador e título com contraste quando há mais de um `group` nas tabs |
 | Sticky | `PORTAL_NAV_STICKY_CLASS` em `data-tour-id="portal-nav"` nos 4 portais |
 
 Definição das abas: `buildInternoNavTabs()`, `buildPrestadorNavTabs()`, etc. em `src/lib/navigation/`. E2E: `e2e/mobile-nav.spec.ts`.
@@ -135,7 +136,7 @@ Padrão para abas com muitos itens (portal-nav + atendimento/cadastros):
 3. Em portais com muitos módulos (interno, beneficiário), marcar `priority: "secondary"` — vão para o menu **Mais** no desktop; a aba ativa secundária fica pinada na faixa.
 4. `ScrollableNavRail` adiciona scroll + setas e centraliza a aba `[aria-current]` / `data-nav-key`.
 5. `portal-nav` é **sticky** (`PORTAL_NAV_STICKY_CLASS`) nos quatro portais.
-6. Mobile (`< lg`): drawer portaled com grupos (`group`) e gatilho “Navegação · N módulos”.
+6. Mobile (`< lg`): drawer portaled pela direita com grupos (`group`); gatilho “Navegação” + módulo ativo.
 
 ## Layout
 
@@ -146,7 +147,7 @@ Padrão para abas com muitos itens (portal-nav + atendimento/cadastros):
 | `PageHeader` | Título + descrição de página |
 | `InternoPortalShell` / `PrestadorPortalShell` / `PjPortalShell` / `BeneficiarioPortalShell` | Shell client-side persistente por portal (em `layout.tsx`) |
 | `InternoNav` / `PrestadorNav` / `BeneficiarioNav` | Abas de rota + `MobileNavDrawer` abaixo de **lg** |
-| `MobileNavDrawer` | Drawer de rotas (interno, prestador, beneficiário) — portal + grupos |
+| `MobileNavDrawer` | Drawer de rotas (interno, prestador, beneficiário) — portaled pela direita, grupos com separador |
 | `MobileSectionDrawer` | Drawer de seções (PJ) |
 | `NavigationProgress` | Barra de progresso no topo durante troca de rota |
 | `LandingMobileMenu` | Menu hamburger da landing |
@@ -159,6 +160,23 @@ Config de menus e rótulos: `src/lib/navigation/routes.ts` (portais autenticados
 Conteúdo em `src/lib/landing/changelog-content.ts` — **atualizar sempre ao fechar pacote**, junto com `RELEASES.md` e `src/lib/platform.ts`.
 
 Instruções completas: [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md).
+
+### Exports tabulares (v3.0.7)
+
+Componente UI: `src/components/ExportButtons.tsx` — links `<a download>` com `?format=` na `baseUrl`.
+
+| Constante | Formatos | Uso típico |
+|-----------|----------|------------|
+| `REPORT_EXPORT_FORMATS` | PDF, CSV, JSON, TXT | `/interno/relatorios`, `/prestador/relatorios`, `/api/pj/reports` |
+| `LIST_EXPORT_FORMATS` | PDF, XLSX, CSV, JSON | Faturamento, auditoria, gestão clínica, extrato, beneficiário |
+
+Servidor: `src/lib/exports/serve.ts` (`serveTabularExport`, `serveBufferExport`) · tipos em `format.ts` · builders em `builders.ts`.
+
+**Contrato CSV:** BOM UTF-8 (`\uFEFF`) para Excel/LibreOffice no Windows — ver `serializeInterchangeDataset` em `src/lib/imports/interchange.ts`. Colunas canônicas via `buildInterchangeDataset`.
+
+**JSON:** payload com `title`, `columns[]`, `rows[]` (interchange). **TXT:** tabela pipe-delimited legível (`buildTxtFromTabular`).
+
+Testes: `tests/api/exports.test.ts` · `tests/unit/export-formats.test.ts` · E2E PJ em `e2e/interno-reports.spec.ts`.
 
 ## Uso em páginas
 

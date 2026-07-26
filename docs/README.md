@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.6** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26f` · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.6** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26f` · **v3.0.7 em publicação** · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.6** (`bibi-poc-2026-07-26f` @ `ed14233`): home comercial (funil + nav 7 âncoras), nav portais redesenhada (`NavTabs` + menu Mais) e assistente que fecha ao navegar — ver [`comercial/PLANO_HOMEPAGE.md`](comercial/PLANO_HOMEPAGE.md) · [`produto/FLUXOS.md`](produto/FLUXOS.md) §0.4 · [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) · [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) · TISS 422 [`API_DOCS.md`](plataforma/API_DOCS.md) §6 · APIs clínicas §7 · OpenAPI **123 paths / 160 handlers** · **587 Vitest** em [`plataforma/TESTES.md`](plataforma/TESTES.md).
+> **Última revisão factual:** 26/07/2026 — pacote **v3.0.7** (prep em `main`): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, gestão clínica responsiva e exports canônicos PDF/CSV/JSON/TXT — ver [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) §Portal nav + §Exports · [`produto/FLUXOS.md`](produto/FLUXOS.md) §4.0 · [`produto/ARQUITETURA_PORTAIS.md`](produto/ARQUITETURA_PORTAIS.md) · produção ainda **v3.0.6** até deploy confirmado.
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 

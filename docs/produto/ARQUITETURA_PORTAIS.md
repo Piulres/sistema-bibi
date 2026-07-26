@@ -56,7 +56,7 @@ Página comercial separada da demonstração por segmento: `/venda`
 - URLs canônicas por segmento: `/segmentos/[slug]`
 - Cookie `bibi_segment` persiste o tenant ao navegar entre páginas
 
-## Navegação dos portais autenticados (v3.0.6)
+## Navegação dos portais autenticados (v3.0.7)
 
 Implementação compartilhada nos quatro portais (Interno, Prestador, PJ, Beneficiário).
 
@@ -70,8 +70,8 @@ flowchart TB
     RAIL --> MORE
   end
   subgraph Mobile["Mobile (< lg)"]
-    DRAWER[MobileNavDrawer / MobileSectionDrawer]
-    TRIGGER[Gatilho com módulo ativo]
+    TRIGGER[Gatilho Navegação + módulo ativo]
+    DRAWER[MobileNavDrawer / MobileSectionDrawer — direita]
     TRIGGER --> DRAWER
   end
   STICKY[PORTAL_NAV_STICKY_CLASS] --> RAIL
@@ -82,7 +82,7 @@ flowchart TB
 |------------|---------|-------|
 | Abas de rota | `NavTabs.tsx` | Split primary/secondary, menu **Mais**, `shortLabel` até `xl` |
 | Faixa rolável | `ScrollableNavRail.tsx` | Scroll horizontal + centraliza aba ativa |
-| Drawer mobile | `MobileNavDrawer.tsx` / `MobileSectionDrawer.tsx` | Lista completa de módulos ou seções |
+| Drawer mobile | `MobileNavDrawer.tsx` / `MobileSectionDrawer.tsx` | Lista completa de módulos ou seções — **abre pela direita** (`right-0`), sem contagem no gatilho |
 | Wrapper sticky | `portal-nav.ts` | `PORTAL_NAV_STICKY_CLASS` + `data-tour-id="portal-nav"` |
 | Nav por portal | `InternoNav.tsx`, `PrestadorNav.tsx`, `BeneficiarioNav.tsx`, `SectionNav.tsx` (PJ) | Montam tabs a partir de `src/lib/navigation/` |
 

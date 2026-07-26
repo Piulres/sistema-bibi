@@ -137,7 +137,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 ## 3. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export CSV
+**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export multi-formato
 
 ### 3.1 Jornada típica
 
@@ -147,13 +147,13 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | 2. Alertas | Lê avisos de inadimplência, faturas abertas, cobranças vencidas | Topo da página | Alertas com âncoras (`#assinaturas`) |
 | 3. KPIs | Vê contrato, beneficiários, consumo PPU, MRR | Cards de resumo | `getPjPortalOverview()` |
 | 4. Drill-down | Analisa consumo por colaborador | Tabela “Beneficiários” | Consumo e pendente por CPF |
-| 5. Export | Baixa relatório CSV | Botão “Exportar relatório CSV” | `GET /api/pj/reports` |
+| 5. Export | Baixa relatório corporativo | `ExportButtons` (PDF, CSV, JSON, TXT) | `GET /api/pj/reports?format=` |
 
 ### 3.2 Pontos fortes
 
 - Alertas proativos (inadimplência, negociação, faturas abertas).
 - Consumo granular por beneficiário — core B2B.
-- Export CSV para integração com ERP/planilha.
+- Export PDF/CSV/JSON/TXT para integração com ERP/planilha ou BI.
 
 ### 3.3 Gaps e melhorias
 

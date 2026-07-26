@@ -197,7 +197,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 |-------|-------|
 | PJ overview/reports | ✅ `portal-flows.test.ts` |
 | Beneficiário booking | ✅ E2E parcial (`flows`, `walkin-particular`) |
-| Exportações PDF/Excel | ✅ `exports.test.ts` (PEP, faturas, auditoria, portais) |
+| Exportações PDF/Excel/CSV/JSON/TXT | ✅ `exports.test.ts` (PEP, faturas, auditoria, portais, BOM UTF-8) |
 | LGPD export JSON | ✅ `exports.test.ts` + guard cadastros |
 
 ### Enterprise

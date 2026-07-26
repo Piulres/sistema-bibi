@@ -88,12 +88,12 @@ Chave: `bibi_onboarding`
 
 ---
 
-## Mobile e nav dos portais (v3.0.6)
+## Mobile e nav dos portais (v3.0.7)
 
 | Breakpoint | Comportamento |
 |------------|---------------|
 | Desktop (`lg+`) | `NavTabs` com faixa rolável; módulos `priority: "secondary"` no menu **Mais** |
-| Mobile (`< lg`) | `MobileNavDrawer` — gatilho mostra módulo ativo; grupos via `group` nas tabs |
+| Mobile (`< lg`) | `MobileNavDrawer` pela **direita** — gatilho “Navegação” + módulo ativo; grupos via `group` nas tabs com separador |
 | Sticky | `data-tour-id="portal-nav"` em wrapper com `PORTAL_NAV_STICKY_CLASS` |
 
 - Botão **Tour** no header (sem `?`) — `OnboardingTrigger` com `data-testid="onboarding-trigger"`

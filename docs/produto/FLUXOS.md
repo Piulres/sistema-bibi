@@ -278,14 +278,30 @@ flowchart LR
 | `crm` | `/interno/crm` | `CrmPipelineView` | Pipeline kanban |
 | `subscriptions` | `/interno/assinaturas` | `SubscriptionsView` | Assinaturas e cobranças |
 | `comunicacao` | `/interno/comunicacao` | `ComunicacaoView` | Fila de mensagens |
-| `relatorios` | `/interno/relatorios` | `ReportsView` | CSV faturamento/CRM |
-| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal, export CSV/PDF |
+| `relatorios` | `/interno/relatorios` | `ReportsView` | Relatórios faturamento/CRM — PDF, CSV, JSON, TXT |
+| `auditoria` | `/interno/auditoria` | `AuditoriaView` | Timeline universal, export PDF/XLSX/CSV/JSON |
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav: **14 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL` (`niche-nav.ts`). Sem permissão → redirect `/interno/dashboard`.
+
+### 4.0 Dashboard executivo (`ExecutiveDashboardView`) — v3.0.7
+
+**Rota:** `/interno/dashboard` · **API:** `GET /api/interno/dashboard` · **Serviço:** `getExecutiveDashboard()`
+
+Hierarquia visual (de cima para baixo):
+
+1. **Alerta de fonte** — link para Gestão clínica; deixa claro que lançamentos/despesas operacionais não duplicam PPU/CRM neste painel.
+2. **Indicadores principais** — 4 `StatCard`: PPU pendente, total faturado, MRR estimado, atendimentos hoje.
+3. **Barra secundária** — beneficiários, empresas/contratos, recorrência pendente, mensagens na fila.
+4. **Acesso rápido** — links para gestão, faturamento, CRM, recorrência, comunicação, auditoria.
+5. **Gestão clínica** (quando nicho MEDICAL/DENTAL) — snapshot mensal: exames, receita, despesas, lucro.
+6. **Receita + CRM** — composição de pendências/faturas e pipeline por estágio.
+7. **Top pendências + atividade recente** — tabela PPU e últimos `TimelineEvent`.
+
+Código: `src/components/ExecutiveDashboardView.tsx` · doc arquitetura: [`../plataforma/ARQUITETURA.md`](../plataforma/ARQUITETURA.md) §15.
 
 ### 4.1 Faturamento (`BillingView`)
 
@@ -347,10 +363,12 @@ sequenceDiagram
 
 Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicine.ts`
 
-### 4.2.1 Gestão clínica CEDIG (`ClinicFinanceView`) — v2.4 / v2.6
+### 4.2.1 Gestão clínica CEDIG (`ClinicFinanceView`) — v2.4 / v2.6 / v3.0.7
 
 **Rota:** `/interno/gestao` · **RBAC:** módulo `gestao` (ADMIN/FATURAMENTO/RECEPCAO write; READONLY somente leitura)  
 **Visível em:** nichos `MEDICAL` e `DENTAL` apenas.
+
+**Layout mobile (v3.0.7):** filtros mês/ano em grid 2 colunas; `ExportButtons` em linha própria; abas internas (Lançamentos / Despesas / Indicadores) em pill grid 3 colunas com scroll horizontal em `sm+`.
 
 | Ação | API | Efeito |
 |------|-----|--------|
@@ -358,7 +376,7 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 | Criar lançamento | `POST /api/interno/clinic-finance/launches` | Dispara `bridgeExamLaunchToOperations` |
 | Despesas | `GET/POST /api/interno/clinic-finance/expenses` | Despesas operacionais |
 | KPIs | `GET /api/interno/clinic-finance/kpis` | Dashboard da gestão |
-| Export mensal | `GET /api/interno/clinic-finance/export` | Excel do mês |
+| Export mensal | `GET /api/interno/clinic-finance/export?year=&month=&format=` | PDF, XLSX, CSV ou JSON do mês (`LIST_EXPORT_FORMATS`) |
 
 **Ponte automática (v2.6):** ao registrar lançamento, `src/lib/clinic-finance/bridge.ts` cria ou vincula `Patient`, `Appointment`, `ProcedureUsage` e `Invoice`. Estados: `bridgeStatus` = `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`.
 
@@ -440,7 +458,7 @@ Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`i
 | Ação | API | Efeito |
 |------|-----|--------|
 | Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis |
-| Export | `GET /api/interno/audit/export` | CSV/PDF via `exports/` |
+| Export | `GET /api/interno/audit/export?format=` | PDF, XLSX, CSV ou JSON via `serveTabularExport` |
 
 Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 
@@ -471,7 +489,7 @@ Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 | Ação | API | Serviço |
 |------|-----|---------|
 | Painel | `GET /api/pj/overview` | `pj-portal-service.ts` |
-| CSV | `GET /api/pj/reports` | Export corporativo |
+| Relatório | `GET /api/pj/reports?format=` | PDF, CSV, JSON ou TXT (`REPORT_EXPORT_FORMATS`) |
 
 ```mermaid
 flowchart LR

@@ -756,7 +756,7 @@ Bridge assinatura → fatura, PIX mock, marcar PAGA, lembretes automáticos.
 
 ## 17. Tier 2 — Operação
 
-CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estruturado, hash scrypt.
+CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato, PEP estruturado, hash scrypt.
 
 | Rota UI | Serviço |
 |---------|---------|
@@ -764,6 +764,18 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 | `/interno/agenda` | `appointment-service` |
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
+
+### Exports tabulares (v3.0.7)
+
+| Camada | Arquivo | Papel |
+|--------|---------|-------|
+| UI | `ExportButtons.tsx` | Links `?format=` por portal |
+| Formatos | `exports/format.ts` | `REPORT_EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, MIME types |
+| Servidor | `exports/serve.ts` | `serveTabularExport`, `serveBufferExport` |
+| CSV | `imports/interchange.ts` | BOM UTF-8 + colunas canônicas |
+| Builders | `exports/builders.ts` | Datasets por domínio (billing, CRM, auditoria…) |
+
+Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes: `tests/api/exports.test.ts`.
 
 ---
 
@@ -795,6 +807,8 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 Visão consolidada de KPIs do tenant no Portal Interno, agregando dados dos
 épicos anteriores sem duplicar entidades.
 
+**UX v3.0.7:** hierarquia em camadas — 4 KPIs principais (`StatCard`), barra secundária compacta, alerta com link para Gestão clínica (evita dupla contagem de receita operacional), atalhos rápidos e seções Receita/CRM em grid 2 colunas.
+
 ```mermaid
 flowchart LR
   Page["/interno/dashboard"] --> API["GET /api/interno/dashboard"]
@@ -804,6 +818,7 @@ flowchart LR
   Svc --> Sub["MRR / recorrência"]
   Svc --> Msg["Fila de comunicação"]
   Svc --> TL["Timeline recente"]
+  Svc --> CF["Gestão clínica (mês)"]
 ```
 
 | KPI | Fonte |
@@ -813,6 +828,9 @@ flowchart LR
 | MRR estimado | `Subscription` ATIVA (normalizado mensal) |
 | Pipeline CRM | `Company` por status |
 | Atividade recente | `TimelineEvent` (últimos 10) |
+| Gestão clínica (snapshot) | `clinic-finance/kpis` — exames, receita, despesas, lucro do mês |
+
+UI: `ExecutiveDashboardView.tsx` · fluxo detalhado: [`FLUXOS.md`](../produto/FLUXOS.md) §4.0.
 
 ### Checklist de homologação (Épico 8)
 
