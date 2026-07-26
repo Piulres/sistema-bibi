@@ -92,18 +92,20 @@ Localizados em `src/components/ui/`:
 
 Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário, prestador e walk-in da agenda.
 
-### Landing — navegação (v3.0.5)
+### Landing — navegação (v3.0.6)
 
 Fonte: `src/lib/landing/navigation.ts`.
 
 | Contexto | Âncoras | Observação |
 |----------|---------|------------|
-| Home (`/`) | 6 itens: Solução, Demo, Segmentos, Portais, Contato, FAQ | Seções ROI/comparativo/para-quem ficam na página, fora do menu |
+| Home (`/`) | 7 itens: Solução, **Como funciona**, Segmentos, Demo, Portais, Contato, FAQ | Seções ROI/comparativo/para-quem ficam na página, fora do menu |
 | Segmento (`/segmentos/*`) | Recursos, Como funciona, Portais, FAQ | Link **Início** volta à home |
+
+Funil comercial e métricas: [`comercial/PLANO_HOMEPAGE.md`](../comercial/PLANO_HOMEPAGE.md).
 
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
 
-### Portal header (v3.0.5)
+### Portal header (v3.0.5+)
 
 `PortalHeader` nos quatro portais autenticados:
 
@@ -111,16 +113,18 @@ Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlat
 - Botão de tour: rótulo **Tour** (`OnboardingTrigger`, `data-testid="onboarding-trigger"`).
 - `ServiceOsBadges` (versão + nicho): ocultos em viewports `< sm` (`hidden sm:flex`).
 
-### TabBar / NavTabs — rótulos curtos
+### TabBar / NavTabs — rótulos curtos (v3.0.6)
 
 Padrão para abas com muitos itens (portal-nav + atendimento/cadastros):
 
 1. Definir `shortLabel` junto com `label` em cada aba (`niche-nav.ts` / view).
 2. `TabBar` e `NavTabs` exibem `shortLabel` até breakpoint `xl`; acima disso, `label` completo.
-3. Em portais com muitos módulos (interno, beneficiário), marcar `priority: "secondary"` — vão para o menu **Mais** no desktop; a aba ativa secundária fica pinada na faixa.
+3. Em portais com muitos módulos (interno, beneficiário), marcar `priority: "secondary"` — vão para o menu **Mais** no desktop; a aba ativa secundária fica **pinada** na faixa (`NavTabs.tsx`).
 4. `ScrollableNavRail` adiciona scroll + setas e centraliza a aba `[aria-current]` / `data-nav-key`.
 5. `portal-nav` é **sticky** (`PORTAL_NAV_STICKY_CLASS`) nos quatro portais.
-6. Mobile (`< lg`): drawer portaled com grupos (`group`) e gatilho “Navegação · N módulos”.
+6. Mobile (`< lg`): drawer portaled (`MobileNavDrawer` / `MobileSectionDrawer` no PJ) com grupos (`group`) e gatilho pelo módulo ativo (ex.: "Navegação · N módulos", "Início", "Resumo").
+
+Redesign v3.0.6: `#235` · E2E `e2e/mobile-nav.spec.ts` · helper `internoNav` / `expectInternoNavHref` em `e2e/helpers/auth.ts`.
 
 ## Layout
 

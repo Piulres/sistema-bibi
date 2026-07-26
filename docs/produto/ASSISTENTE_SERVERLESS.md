@@ -36,6 +36,7 @@ Cliente                          API (serverless)
 | `session-state.ts` | `encode/decodePendingEnvelope` — payload da ação (TTL 10 min) + **JTI** |
 | `pending-consumed.ts` | Marca JTI como consumido (Netlify Blobs + fallback memória em dev) |
 | `AssistantProvider.tsx` | Persiste e reenvia `sessionState` a cada turno |
+| `AssistantActionCard.tsx` | Renderiza ações; `link`/`form_draft` chamam `setOpen(false)` antes de navegar (v3.0.6) |
 | `mock-context.ts` | Maps **por requisição** — populados via `applyMockContext` no início do turno |
 
 ### Segurança dos tokens
@@ -53,6 +54,18 @@ Cliente                          API (serverless)
 | **gateway** | `ASSISTANT_PROVIDER=gateway` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` | Netlify AI Gateway / OpenAI-compatible; fallback automático para mock |
 
 Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
+
+## UX do painel (v3.0.6)
+
+Ações de navegação (`type: "link"` e `type: "form_draft"`) fecham o painel antes de seguir o `href`. Motivação: no mobile o drawer do assistente cobria a tela de destino após o clique.
+
+```tsx
+// AssistantActionCard.tsx — padrão para novas ações com href
+const closeOnNavigate = () => setOpen(false);
+<Link href={action.href} onClick={closeOnNavigate}>…</Link>
+```
+
+Ações `confirm`, `choice` e `table` **não** fecham o painel — o usuário permanece no chat até confirmar ou escolher.
 
 ## Analytics
 
@@ -75,7 +88,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 - `tests/unit/assistant.test.ts` — multi-turno stateless
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
-- `e2e/assistant.spec.ts` — MEDICAL + VET PetCare
+- `e2e/assistant.spec.ts` — MEDICAL + VET PetCare; fecha painel ao clicar link de ação (mobile)
 
 ## Referências
 

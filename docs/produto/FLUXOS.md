@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.5** em produção (jul/2026): PWA `/instalar`, vocabulário por nicho via `useLabels()`, jornada faturada no prestador — ver [§0](#0-serviceos-v20--labels-e-landing) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.6** em `main` (produção **v3.0.5** até deploy): PWA `/instalar`, vocabulário por nicho via `useLabels()`, jornada faturada no prestador, home comercial e nav portais redesenhada — ver [§0](#0-serviceos-v20--labels-e-landing) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). Produção: [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -91,7 +91,7 @@ Fluxo em `src/app/page.tsx`:
 2. `nicheLandingBranding()` aplica paleta do nicho.
 3. `getNicheLandingContent(niche)` — features, FAQ, descrição dos portais com vocabulário correto.
 
-**Nav da home (v3.0.5):** 6 âncoras em `src/lib/landing/navigation.ts` (`HOME_NAV_ANCHORS`) — Solução, Demo, Segmentos, Portais, Contato, FAQ. Renderizado em `LandingHeader`, `LandingMobileMenu` e `LandingFooter`.
+**Nav da home (v3.0.6):** 7 âncoras em `src/lib/landing/navigation.ts` (`HOME_NAV_ANCHORS`) — Solução, **Como funciona**, Segmentos, Demo, Portais, Contato, FAQ. Renderizado em `LandingHeader`, `LandingMobileMenu` e `LandingFooter`. Funil: [`comercial/PLANO_HOMEPAGE.md`](../comercial/PLANO_HOMEPAGE.md).
 
 **Marca no header:** `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` em `src/lib/platform.ts` — sem sufixo ServiceOS no título visível.
 
@@ -668,6 +668,14 @@ Módulo: `src/lib/care-journey.ts` · testes: `tests/lib/care-journey.test.ts`.
 Documentos clínicos no atendimento (atestado, receita, protocolos): [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
+
+### 8.10 UX portais e assistente (v3.0.6)
+
+| Melhoria | Portal | UI | Código / teste |
+|----------|--------|-----|----------------|
+| Nav redesenhada | Interno, Prestador, Beneficiário, PJ | Menu **Mais** (desktop); drawer portaled (`< lg`) | `NavTabs.tsx`, `MobileNavDrawer.tsx`, `SectionNav.tsx` · `e2e/mobile-nav.spec.ts` |
+| Assistente fecha ao navegar | 4 portais | Link de ação no chat fecha o painel antes do `router.push` | `AssistantActionCard.tsx` (`closeOnNavigate`) · `e2e/assistant.spec.ts` |
+| Home comercial | Landing `/` | Funil dor → solução → como funciona; 7 âncoras no header | `home-content.ts`, `navigation.ts` · `PLANO_HOMEPAGE.md` |
 
 ---
 

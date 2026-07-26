@@ -65,6 +65,10 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 
+Cobertura v3.0.6 nav portais: `e2e/mobile-nav.spec.ts` — drawer mobile nos 4 portais, menu **Mais** no interno desktop, aba secundária pinada.
+
+Cobertura v3.0.6 assistente: `e2e/assistant.spec.ts` — painel fecha ao clicar link de ação no mobile (`AssistantActionCard.closeOnNavigate`).
+
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
@@ -328,11 +332,11 @@ Senha única: `bibi123`
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 | `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
-| `assistant.spec.ts` | Assistente operacional serverless |
+| `assistant.spec.ts` | Assistente operacional serverless; fecha painel ao navegar (mobile) |
 | `api-docs.spec.ts` | Swagger UI `/api-docs` |
 | `flow-improvements.spec.ts` | Melhorias de fluxo multi-portal |
 | `interno-reports.spec.ts` | Relatórios interno |
-| `mobile-nav.spec.ts` | Navegação mobile drawer |
+| `mobile-nav.spec.ts` | Nav responsiva — drawer mobile + menu **Mais** desktop (interno) |
 
 ---
 

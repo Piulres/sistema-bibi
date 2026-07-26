@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.5** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26e` · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.5** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-26e` · **`main`/`dev` v3.0.6** · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.5** (`bibi-poc-2026-07-26e` @ `cf0eb26`): jornada faturada no prestador (`care-journey.ts`), documentos clínicos ([`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md)), landing nav 6 itens e header limpo — ver [`produto/FLUXOS.md`](produto/FLUXOS.md) §8.9 · [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) · TISS 422 [`API_DOCS.md`](plataforma/API_DOCS.md) §6 · APIs clínicas §7 · OpenAPI **123 paths / 160 handlers** · **587 Vitest** em [`plataforma/TESTES.md`](plataforma/TESTES.md) · `pre-release` e `cursor:verify` em [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md).
+> **Última revisão factual:** 26/07/2026 — pacote **v3.0.6** em `main`: home comercial (7 âncoras, `#como-funciona`), nav portais redesenhada (menu **Mais**, drawer mobile) — [`plataforma/DESIGN_SYSTEM.md`](plataforma/DESIGN_SYSTEM.md) · assistente fecha ao navegar — [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) · funil [`comercial/PLANO_HOMEPAGE.md`](comercial/PLANO_HOMEPAGE.md) · fluxos §8.10 [`produto/FLUXOS.md`](produto/FLUXOS.md) · APIs clínicas §7 [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) · **587 Vitest** em [`plataforma/TESTES.md`](plataforma/TESTES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 

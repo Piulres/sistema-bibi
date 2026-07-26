@@ -88,13 +88,14 @@ Chave: `bibi_onboarding`
 
 ---
 
-## Mobile
+## Mobile (v3.0.6)
 
-- Nav desktop (`lg+`): abas com `data-tour-nav`
-- Mobile: `MobileNavDrawer` com `data-tour-nav` nos links + `data-tour-id="mobile-nav-trigger"` no botão Módulos
+- Nav desktop (`lg+`): abas com `data-tour-nav`; módulos `priority: secondary` no menu **Mais** (interno)
+- Mobile (`< lg`): `MobileNavDrawer` / `MobileSectionDrawer` (PJ) com `data-tour-nav` nos links + gatilho pelo módulo ativo
 - Botão **Tour** no header (sem `?`) — `OnboardingTrigger` com `data-testid="onboarding-trigger"`
+- E2E: `e2e/mobile-nav.spec.ts` · doc nav: [`DESIGN_SYSTEM.md`](../plataforma/DESIGN_SYSTEM.md) §TabBar/NavTabs
 
-## Superfície do header (v3.0.5)
+## Superfície do header (v3.0.5+)
 
 | Elemento | Comportamento |
 |----------|---------------|
