@@ -352,7 +352,7 @@ Padrão para testar a nav redesenhada (v3.0.6) sem duplicar lógica do menu **Ma
 
 **Pitfall:** módulos `priority: "secondary"` não aparecem na faixa até serem abertos pelo menu **Mais**; após navegação, a aba ativa fica pinada na faixa (`mobile-nav.spec.ts`).
 
-**Pitfall (drawer prestador, v3.0.7):** categorias (`group`) usam `<p>` para o rótulo e `<a>` para o módulo — o mesmo texto (ex.: "Agenda") aparece duas vezes. Use `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para clicar; `getByText("Agenda")` falha em strict mode. Ver `e2e/mobile-nav.spec.ts` (teste prestador).
+**Pitfall (drawer prestador, v3.0.7):** categorias (`group`) usam `<p>` para o rótulo e `<a>` para o módulo — o mesmo texto (ex.: "Agenda") aparece duas vezes. Use `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para clicar; `getByText("Agenda")` falha em strict mode. Gatilho: `[data-cursor-id="mobile-nav-trigger"]`; painel `role="dialog"` à direita (`boundingBox`). Ver `e2e/mobile-nav.spec.ts`.
 
 **Contrato aria-label por portal** (Prestador, Beneficiário, PJ): [`produto/ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Navegação → Contrato a11y para E2E.
 
