@@ -5,9 +5,9 @@ Copie este bloco ao **iniciar uma sessão** no Cursor para alinhar contexto e ev
 ---
 
 ```markdown
-# Contexto — Sistema Bibi - ServiceOS v3.0.6
+# Contexto — Sistema Bibi - ServiceOS v3.0.7
 
-Você trabalha no **Sistema Bibi - ServiceOS v3.0.6** — infraestrutura SaaS **multi-segmento** Pay Per Use (PWA `/instalar` em produção).
+Você trabalha no **Sistema Bibi - ServiceOS v3.0.7** — infraestrutura SaaS **multi-segmento** Pay Per Use (PWA `/instalar` em produção).
 Não é HealthOS: saúde é o segmento `MEDICAL`; há também VET, DENTAL, LEGAL, SPA, EDUCATION, CONSTRUCTION.
 
 ## Antes de codificar

@@ -1,6 +1,6 @@
 # Segmentos — Sistema Bibi - ServiceOS
 
-> Base multi-nicho desde **v2.0** · produção atual **v3.0.6** ([`../versoes/RELEASES.md`](../versoes/RELEASES.md)).
+> Base multi-nicho desde **v2.0** · produção atual **v3.0.7** ([`../versoes/RELEASES.md`](../versoes/RELEASES.md)).
 
 Cada pasta deste diretório documenta um **vertical** suportado pela plataforma: glossário de labels, contas demo, pesquisa de mercado, **playbook comercial** e links para código.
 
