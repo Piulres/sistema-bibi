@@ -1,4 +1,4 @@
-# Sistema Bibi - ServiceOS v3.0.4 — Infraestrutura Pay Per Use Multi-Nicho
+# Sistema Bibi - ServiceOS v3.0.5 — Infraestrutura Pay Per Use Multi-Nicho
 
 > Plataforma **ServiceOS** multi-nicho para faturamento Pay Per Use em saúde, veterinária,
 > odontologia, jurídico, bem-estar, educação e engenharia. White label por tenant, quatro portais
@@ -8,13 +8,13 @@
 
 | | |
 |--|--|
-| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v3.0.4** · deploy `bibi-poc-2026-07-26d` · PWA `/instalar` |
-| **Código** | `main` = `dev` · tag `v3.0.4` |
+| **Produção** | [sistema-bibi.netlify.app](https://sistema-bibi.netlify.app) · **v3.0.5** · deploy `bibi-poc-2026-07-26e` · PWA `/instalar` |
+| **Código** | `main` = `dev` · tag `v3.0.5` |
 | **Publicação** | Manual (`pre-release` → `netlify deploy --prod`) · **Stop builds ON** |
 | **Fonte de verdade** | [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md) · changelog [`V3_0.md`](docs/versoes/V3_0.md) |
 
 > **GitHub About** (painel do repositório — a API do agente não altera Description/Website):  
-> Description: `Sistema Bibi - ServiceOS v3.0.4 — PWA mobile + Pay Per Use multi-nicho`  
+> Description: `Sistema Bibi - ServiceOS v3.0.5 — PWA mobile + Pay Per Use multi-nicho`  
 > Website: `https://sistema-bibi.netlify.app`
 
 ---
@@ -509,7 +509,7 @@ sistema-bibi/
 - Testes automatizados com **Vitest** (unitário, integração, API, segurança) e **Playwright** (E2E).
   Ver [`docs/plataforma/TESTES.md`](docs/plataforma/TESTES.md) para o mapa completo e lacunas conhecidas.
 - **Adapters mock** ativos por padrão (`PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`).
-- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v3.0.4** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
+- **Netlify em produção** — https://sistema-bibi.netlify.app · pacote **v3.0.5** (ver [`RELEASES.md`](docs/versoes/RELEASES.md)).
   Se retornar **503 `usage_exceeded`**, é cota do plano (não regressão de código). Workflow:
   [`docs/plataforma/WORKFLOW_CURSOR.md`](docs/plataforma/WORKFLOW_CURSOR.md). Validação: `npm run pre-release`.
   Deploy manual — [`docs/plataforma/DEPLOY_NETLIFY.md`](docs/plataforma/DEPLOY_NETLIFY.md) · Stop builds ON.
@@ -519,7 +519,7 @@ sistema-bibi/
 
 - **Índice por segmento (ServiceOS):**
   [`docs/README.md`](docs/README.md) · [`docs/segmentos/README.md`](docs/segmentos/README.md)
-- **Changelog v3.0.x (produção atual v3.0.4):**
+- **Changelog v3.0.x (produção atual v3.0.5):**
   [`docs/versoes/V3_0.md`](docs/versoes/V3_0.md) · [`docs/versoes/V2_6.md`](docs/versoes/V2_6.md) · [`docs/versoes/RELEASES.md`](docs/versoes/RELEASES.md)
 - **Fluxos de usuário e negócio (com diagramas Mermaid):**
   [`docs/produto/FLUXOS.md`](docs/produto/FLUXOS.md)
@@ -567,4 +567,4 @@ sistema-bibi/
 
 ---
 
-Construído como POC evoluindo para **Sistema Bibi - ServiceOS v3.0.4** — infraestrutura horizontal Pay Per Use multi-nicho com PWA mobile (piloto CEDIG).
+Construído como POC evoluindo para **Sistema Bibi - ServiceOS v3.0.5** — infraestrutura horizontal Pay Per Use multi-nicho com PWA mobile (piloto CEDIG).
