@@ -285,7 +285,7 @@ flowchart LR
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav: **14 módulos** em `INTERNO_NAV_TABS` (`routes.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL` (`niche-nav.ts`). Sem permissão → redirect `/interno/dashboard`.
+Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.0.1 Dashboard executivo (v3.0.7)
 
@@ -530,7 +530,7 @@ flowchart LR
 
 **Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR)
 
-**Nav:** 11 abas em `BENEFICIARIO_NAV_TABS` (`routes.ts`).
+**Nav:** 11 abas em `BENEFICIARIO_NAV_TABS` (`routes.ts`) + **Obras** (`/beneficiario/obras`) condicional para nicho `CONSTRUCTION` (não listada nas tabs estáticas).
 
 | Aba | Rota | Função |
 |-----|------|--------|
@@ -728,6 +728,8 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | cadastros | ✓ | ✗ | ✓ | ✗ |
 | estoque | ✓ | ✗ | ✓ | ✗ |
 | crm | ✓ | ✗ | ✗ | ✗ |
+| projetos | ✓ | ✓ | ✓ | ✗ |
+| gestao | ✓ | ✓ | ✓ | ✓ (somente leitura) |
 | subscriptions | ✓ | ✓ | ✗ | ✗ |
 | comunicacao | ✓ | ✗ | ✓ | ✗ |
 | relatorios | ✓ | ✓ | ✗ | ✓ |
@@ -814,6 +816,17 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 
 **Inventário (jul/2026):** **163** Route Handlers · **123** paths OpenAPI · **40** handlers sem YAML — ver [`API_DOCS.md`](../plataforma/API_DOCS.md) e `npm run openapi:verify`.
 
+**Páginas App Router (jul/2026):** contagem de `page.tsx` por portal — distinto de abas na nav:
+
+| Portal | Páginas | Nav (abas) | Revalidar |
+|--------|--------:|-----------|-----------|
+| Prestador | 8 | 6 + login | `find src/app/prestador -name page.tsx \| wc -l` |
+| Interno | 21 | 14–15 + login + detalhes | `find src/app/interno -name page.tsx \| wc -l` |
+| PJ | 4 | 2 + login | `find src/app/pj -name page.tsx \| wc -l` |
+| Beneficiário | 15 | 11–12 + login | `find src/app/beneficiario -name page.tsx \| wc -l` |
+
+Detalhe por portal: [`TESTES.md`](../plataforma/TESTES.md) §Mapa de rotas.
+
 ### Auth (todos)
 `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` ·
 `GET|POST /api/auth/mfa/setup` · `POST /api/auth/mfa/verify`
@@ -848,7 +861,7 @@ Especificação completa: [`public/openapi.yaml`](../../public/openapi.yaml)
 
 ## 12. Observações da POC
 
-1. **Proxy ≠ RBAC** — `src/proxy.ts` só verifica cookie; role e perfil validados no servidor.
+1. **Proxy ≠ RBAC** — `src/proxy.ts` valida presença e assinatura HMAC do cookie; role e perfil validados no servidor.
 2. **SQLite + Prisma 6** — status são `String`, não enums Prisma.
 3. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
 4. **TISS** — XML simplificado com validação estrutural (422 `NO_ITEMS` / `NO_PATIENT_DOCUMENT`); XSD oficial ANS pendente (Tier 5).
