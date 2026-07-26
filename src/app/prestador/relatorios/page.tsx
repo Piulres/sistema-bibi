@@ -11,7 +11,7 @@ export default async function PrestadorReportsPage() {
     <>
       <PageHeader
         title="Relatórios"
-        description="Exporte seus dados em CSV para análise."
+        description="Exporte seus dados em PDF, CSV, JSON ou TXT."
       />
       <PrestadorReportsView />
     </>

@@ -3,20 +3,9 @@ import ExcelJS from "exceljs";
 import PDFDocument from "pdfkit";
 import { PLATFORM } from "@/lib/platform";
 import { buildInterchangeDataset, serializeInterchangeDataset } from "@/lib/imports/interchange";
+import type { TabularColumn, TabularExport } from "@/lib/exports/tabular-types";
 
-export type TabularColumn = {
-  header: string;
-  key: string;
-  width?: number;
-};
-
-export type TabularExport = {
-  title: string;
-  subtitle?: string;
-  sheetName?: string;
-  columns: TabularColumn[];
-  rows: Record<string, string | number | boolean | null | undefined>[];
-};
+export type { TabularColumn, TabularExport };
 
 function cellValue(value: string | number | boolean | null | undefined): string {
   if (value === null || value === undefined) return "";

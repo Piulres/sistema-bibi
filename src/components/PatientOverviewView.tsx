@@ -127,7 +127,6 @@ export default function PatientOverviewView({
         <ExportButtons
           baseUrl={`/api/interno/patients/${patientId}/export`}
           query={{ section: "summary" }}
-          formats={["pdf", "xlsx"]}
         />
         <a
           href={`/api/interno/patients/${patientId}/export?format=json`}

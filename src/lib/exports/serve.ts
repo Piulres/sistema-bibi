@@ -14,6 +14,7 @@ import {
   buildXlsxBufferFromTabular,
   type TabularExport,
 } from "@/lib/exports/tabular";
+import { buildTxtFromTabular } from "@/lib/exports/text";
 
 export type ExportBranding = {
   clinicName: string;
@@ -43,7 +44,7 @@ export function serveBufferExport(
   });
 }
 
-/** Converte TabularExport para CSV, XLSX, PDF tabular ou JSON estruturado. */
+/** Converte TabularExport para CSV, XLSX, PDF tabular, JSON ou TXT. */
 export async function serveTabularExport(
   format: ExportFormat,
   filenameBase: string,
@@ -76,6 +77,12 @@ export async function serveTabularExport(
     });
     return new NextResponse(serializeInterchangeDataset(dataset, "csv"), {
       headers: attachmentHeaders("csv", filename),
+    });
+  }
+
+  if (format === "txt") {
+    return new NextResponse(buildTxtFromTabular(data), {
+      headers: attachmentHeaders("txt", filename),
     });
   }
 

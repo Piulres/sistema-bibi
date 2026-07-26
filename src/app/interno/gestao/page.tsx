@@ -20,7 +20,7 @@ export default async function InternoGestaoPage({ searchParams }: PageProps) {
     <>
       <PageHeader
         title="Gestão clínica"
-        description="Lançamentos por paciente, despesas do mês e indicadores automáticos — pensado para a secretária e para a direção. Cada lançamento gera agenda, uso PPU e fatura."
+        description="Lançamentos, despesas e indicadores do mês. Cada lançamento gera agenda, uso PPU e fatura."
       />
       <ClinicFinanceView
         prefill={{

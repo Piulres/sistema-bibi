@@ -114,7 +114,7 @@ export default function PjView() {
         </p>
         <ExportButtons
           baseUrl="/api/pj/reports"
-          formats={["pdf", "xlsx", "csv"]}
+          formats={["pdf", "csv", "json", "txt"]}
         />
       </div>
 

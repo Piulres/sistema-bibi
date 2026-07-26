@@ -338,7 +338,7 @@ src/
 │   ├── invoice-service.ts      # PIX, pagamento, bridge assinatura (Tier 1)
 │   ├── reminder-service.ts     # Lembretes automáticos (Tier 1)
 │   ├── pep-templates.ts        # Templates PEP (Tier 2)
-│   ├── reports/billing-report.ts # CSV (Tier 2)
+│   ├── exports/                   # PDF/CSV/JSON/TXT/XLSX (Tier 2)
 │   ├── beneficiary-overview.ts # Self-service
 │   ├── executive-dashboard.ts  # KPIs
 │   ├── timeline.ts             # Auditoria

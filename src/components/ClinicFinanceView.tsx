@@ -4,8 +4,10 @@ import { useEffect, useMemo, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
+import ExportButtons from "@/components/ExportButtons";
 import { useToast } from "@/components/ui/Toast";
 import { useLabels } from "@/hooks/useLabels";
+import { LIST_EXPORT_FORMATS } from "@/lib/exports/format";
 import { suggestCedigAmount } from "@/lib/clinic-finance/cedig-pricing";
 import type {
   CedigPolypectomyTierId,
@@ -15,6 +17,15 @@ import type {
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
+
+/** Inputs em grid: min-w-0 evita overflow horizontal no mobile. */
+const fieldClass =
+  "mt-1 w-full min-w-0 min-h-10 rounded-lg border border-[var(--border-default)] bg-[var(--surface-card)] px-3 py-2 text-sm text-[var(--text-primary)]";
+
+const labelClass = "block min-w-0 text-sm text-[var(--text-primary)]";
+
+const sectionTitleClass =
+  "text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]";
 
 type Provider = { id: string; name: string; specialty: string | null };
 type Procedure = { id: string; code: string; name: string; basePrice: number };
@@ -327,11 +338,6 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     }
   }
 
-  function exportMonth() {
-    const q = `year=${year}&month=${month}&format=xlsx`;
-    window.location.href = `/api/interno/clinic-finance/export?${q}`;
-  }
-
   async function submitExpense(e: React.FormEvent) {
     e.preventDefault();
     setSaving(true);
@@ -396,42 +402,46 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   ];
 
   return (
-    <div className="min-w-0 space-y-6">
-      <div className="flex flex-wrap items-end gap-3">
-        <label className="text-sm">
-          <span className="mb-1 block text-[var(--text-muted)]">Mês</span>
-          <select
-            className="min-h-10 rounded-lg border px-3 py-2"
-            value={month}
-            onChange={(e) => setMonth(Number(e.target.value))}
-          >
-            {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-              <option key={m} value={m}>
-                {String(m).padStart(2, "0")}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="text-sm">
-          <span className="mb-1 block text-[var(--text-muted)]">Ano</span>
-          <input
-            type="number"
-            className="min-h-10 w-24 rounded-lg border px-3 py-2"
-            value={year}
-            onChange={(e) => setYear(Number(e.target.value))}
-          />
-        </label>
-        <p className="w-full text-sm text-[var(--text-secondary)] sm:w-auto">
-          Menus prontos + valor sugerido pela tabela. Alana só confirma e salva.
+    <div className="min-w-0 space-y-5 sm:space-y-6" data-cursor-id="clinic-finance-root">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+        <div className="grid min-w-0 grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-end">
+          <label className={labelClass}>
+            <span className="mb-1 block text-[var(--text-muted)]">Mês</span>
+            <select
+              className={fieldClass}
+              value={month}
+              onChange={(e) => setMonth(Number(e.target.value))}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
+                <option key={m} value={m}>
+                  {String(m).padStart(2, "0")}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className={labelClass}>
+            <span className="mb-1 block text-[var(--text-muted)]">Ano</span>
+            <input
+              type="number"
+              className={fieldClass}
+              value={year}
+              onChange={(e) => setYear(Number(e.target.value))}
+            />
+          </label>
+        </div>
+        <p className="hidden min-w-0 text-sm text-[var(--text-secondary)] md:block md:flex-1">
+          Menus prontos + valor sugerido pela tabela. Confirme e salve.
         </p>
-        <button
-          type="button"
-          onClick={exportMonth}
-          className="min-h-10 rounded-lg border border-[var(--border-default)] px-3 py-2 text-sm font-medium text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
-          data-tour-id="clinic-finance-export"
+        <div
+          className="w-full min-w-0 sm:ml-auto sm:w-auto"
+          data-cursor-id="clinic-finance-export"
         >
-          Exportar mês (Excel)
-        </button>
+          <ExportButtons
+            baseUrl="/api/interno/clinic-finance/export"
+            query={{ year: String(year), month: String(month) }}
+            formats={LIST_EXPORT_FORMATS}
+          />
+        </div>
       </div>
 
       {form.appointmentId ? (
@@ -444,7 +454,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       ) : null}
 
       <div
-        className="ds-scroll-x flex flex-nowrap gap-2 border-b border-[var(--border-default)] pb-2"
+        className="grid grid-cols-3 gap-1 rounded-xl border border-[var(--border-default)] bg-[var(--surface-muted)] p-1 sm:flex sm:flex-nowrap sm:gap-2 sm:overflow-x-auto sm:rounded-none sm:border-0 sm:border-b sm:border-[var(--border-default)] sm:bg-transparent sm:p-0 sm:pb-2"
         role="tablist"
         aria-label="Seções da gestão clínica"
       >
@@ -455,10 +465,10 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
             role="tab"
             aria-selected={tab === t.id}
             onClick={() => setTab(t.id)}
-            className={`min-h-10 shrink-0 rounded-lg px-3 py-2 text-sm font-medium transition ${
+            className={`min-h-10 min-w-0 flex-1 rounded-lg px-2 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3 sm:text-left ${
               tab === t.id
-                ? "bg-[var(--brand-primary)] text-white"
-                : "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+                ? "bg-[var(--brand-primary)] text-white shadow-sm"
+                : "text-[var(--text-secondary)] hover:bg-[var(--surface-card)] sm:hover:bg-[var(--surface-muted)]"
             }`}
           >
             <span className="sm:hidden">{t.shortLabel}</span>
@@ -468,260 +478,304 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       </div>
 
       {tab === "lancamentos" && (
-        <section className="space-y-6">
+        <section className="min-w-0 space-y-5 sm:space-y-6">
           <form
             onSubmit={submitLaunch}
-            className="grid gap-3 rounded-xl border border-[var(--border-default)] p-4 sm:grid-cols-2 lg:grid-cols-3"
+            className="min-w-0 space-y-5 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 sm:p-4"
           >
-            <p className="sm:col-span-2 lg:col-span-3 text-sm font-medium text-[var(--text-primary)]">
-              Novo lançamento (1 {labels.patient.toLowerCase()} = 1 linha) — sincroniza Prestador e Faturamento
-            </p>
-            <label className="text-sm sm:col-span-2">
-              {labels.patient} cadastrado(a)
-              <select
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.patientId}
-                onChange={(e) => {
-                  const id = e.target.value;
-                  const p = patients.find((x) => x.id === id);
-                  patchForm(
-                    {
-                      patientId: id,
-                      patientName: p?.name ?? form.patientName,
-                    },
-                    { keepAmount: true },
-                  );
-                }}
-              >
-                <option value="">— Digitar nome abaixo (ou escolher) —</option>
-                {patients.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} · {p.cpf}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm sm:col-span-2">
-              Nome do {labels.patient.toLowerCase()} *
-              <input
-                required
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.patientName}
-                onChange={(e) =>
-                  patchForm(
-                    { patientName: e.target.value, patientId: "" },
-                    { keepAmount: true },
-                  )
-                }
-                placeholder="Nome completo (preenche ao escolher o cadastro)"
-              />
-            </label>
-            <label className="text-sm">
-              Data
-              <input
-                type="date"
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.performedAt}
-                onChange={(e) =>
-                  patchForm({ performedAt: e.target.value }, { keepAmount: true })
-                }
-              />
-            </label>
-            <label className="text-sm">
-              Médico *
-              <select
-                required
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.providerId}
-                onChange={(e) =>
-                  patchForm({ providerId: e.target.value }, { keepAmount: true })
-                }
-              >
-                {providers.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              Tabela de preço *
-              <select
-                required
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.priceTable}
-                onChange={(e) => patchForm({ priceTable: e.target.value })}
-              >
-                {(priceTables.length
-                  ? priceTables
-                  : [
-                      { id: "PARTICULAR", label: "Particular" },
-                      { id: "CENTRALMED", label: "CentralMed" },
-                    ]
-                ).map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              Tipo de exame *
-              <select
-                required
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.procedureId}
-                onChange={(e) => patchForm({ procedureId: e.target.value })}
-              >
-                {procedures.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              Forma de pagamento *
-              <select
-                required
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.paymentMethod}
-                onChange={(e) =>
-                  patchForm({ paymentMethod: e.target.value }, { keepAmount: true })
-                }
-              >
-                {paymentMethods.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              Biópsias (frascos) — R$ 150/un
-              <input
-                type="number"
-                min={0}
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.biopsies}
-                onChange={(e) => patchForm({ biopsies: e.target.value })}
-              />
-            </label>
-            <label className="text-sm">
-              Tipo de polipectomia
-              <select
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.polypectomyTier}
-                onChange={(e) =>
-                  patchForm({
-                    polypectomyTier: e.target.value,
-                    polypectomies:
-                      e.target.value && form.polypectomies === "0"
-                        ? "1"
-                        : form.polypectomies,
-                  })
-                }
-              >
-                <option value="">Nenhuma</option>
-                {polypectomyTiers.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm">
-              Qtd. polipectomias
-              <input
-                type="number"
-                min={0}
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.polypectomies}
-                onChange={(e) => patchForm({ polypectomies: e.target.value })}
-              />
-            </label>
-            <label className="text-sm">
-              Mucosectomias (extra)
-              <input
-                type="number"
-                min={0}
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.mucosectomies}
-                onChange={(e) => patchForm({ mucosectomies: e.target.value })}
-              />
-            </label>
-            <label className="text-sm">
-              Clips hemostáticos
-              <input
-                type="number"
-                min={0}
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.clips}
-                onChange={(e) => patchForm({ clips: e.target.value })}
-              />
-            </label>
-            <label className="text-sm">
-              Valor recebido (R$) *
-              <input
-                required
-                type="number"
-                min={0}
-                step="0.01"
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.amountReceived}
-                onChange={(e) =>
-                  patchForm({ amountReceived: e.target.value }, { keepAmount: true })
-                }
-              />
-            </label>
-            {suggestion && (
-              <div className="sm:col-span-2 lg:col-span-3 rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <p>
-                    Sugestão pela tabela:{" "}
-                    <strong>{brl(suggestion.total)}</strong>
-                  </p>
-                  <button
-                    type="button"
-                    onClick={applySuggestion}
-                    className="text-[var(--brand-primary)] underline"
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-[var(--text-primary)]">
+                <span className="sm:hidden">Novo lançamento</span>
+                <span className="hidden sm:inline">
+                  Novo lançamento (1 {labels.patient.toLowerCase()} = 1 linha) —
+                  sincroniza Prestador e Faturamento
+                </span>
+              </p>
+              <p className="mt-0.5 text-xs text-[var(--text-muted)] sm:hidden">
+                1 {labels.patient.toLowerCase()} = 1 linha · sincroniza Prestador e
+                Faturamento
+              </p>
+            </div>
+
+            <div className="min-w-0 space-y-3">
+              <h3 className={sectionTitleClass}>{labels.patient}</h3>
+              <div className="grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <label className={`${labelClass} md:col-span-2 xl:col-span-3`}>
+                  {labels.patient} cadastrado(a)
+                  <select
+                    className={fieldClass}
+                    value={form.patientId}
+                    onChange={(e) => {
+                      const id = e.target.value;
+                      const p = patients.find((x) => x.id === id);
+                      patchForm(
+                        {
+                          patientId: id,
+                          patientName: p?.name ?? form.patientName,
+                        },
+                        { keepAmount: true },
+                      );
+                    }}
                   >
-                    Usar sugestão
-                  </button>
-                </div>
-                <ul className="mt-1 text-xs text-[var(--text-muted)]">
-                  {suggestion.breakdown.map((b) => (
-                    <li key={b.label}>
-                      {b.label}: {brl(b.amount)}
-                    </li>
-                  ))}
-                </ul>
-                {(form.priceTable === "BEM_SAUDE" || form.priceTable === "DR_SAUDE") &&
-                  selectedProcedure?.code !== "CEDIG-RESP" && (
-                    <p className="mt-1 text-xs text-[var(--text-muted)]">
-                      Bem Saúde / Dr Saúde: preço próprio só no teste respiratório; demais
-                      itens usam a tabela Particular.
-                    </p>
-                  )}
+                    <option value="">— Digitar nome abaixo (ou escolher) —</option>
+                    {patients.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name} · {p.cpf}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={`${labelClass} md:col-span-1 xl:col-span-2`}>
+                  Nome do {labels.patient.toLowerCase()} *
+                  <input
+                    required
+                    className={fieldClass}
+                    value={form.patientName}
+                    onChange={(e) =>
+                      patchForm(
+                        { patientName: e.target.value, patientId: "" },
+                        { keepAmount: true },
+                      )
+                    }
+                    placeholder="Nome completo"
+                  />
+                </label>
+                <label className={labelClass}>
+                  Data
+                  <input
+                    type="date"
+                    className={fieldClass}
+                    value={form.performedAt}
+                    onChange={(e) =>
+                      patchForm({ performedAt: e.target.value }, { keepAmount: true })
+                    }
+                  />
+                </label>
               </div>
-            )}
-            <label className="text-sm sm:col-span-2 lg:col-span-3">
-              Observações
-              <input
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={form.notes}
-                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                placeholder="Complexidade, materiais especiais, avaliação individualizada…"
-              />
-            </label>
-            <div className="sm:col-span-2 lg:col-span-3">
-              <button
+            </div>
+
+            <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] pt-4">
+              <h3 className={sectionTitleClass}>Exame e pagamento</h3>
+              <div className="grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <label className={labelClass}>
+                  Médico *
+                  <select
+                    required
+                    className={fieldClass}
+                    value={form.providerId}
+                    onChange={(e) =>
+                      patchForm({ providerId: e.target.value }, { keepAmount: true })
+                    }
+                  >
+                    {providers.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={labelClass}>
+                  Tabela de preço *
+                  <select
+                    required
+                    className={fieldClass}
+                    value={form.priceTable}
+                    onChange={(e) => patchForm({ priceTable: e.target.value })}
+                  >
+                    {(priceTables.length
+                      ? priceTables
+                      : [
+                          { id: "PARTICULAR", label: "Particular" },
+                          { id: "CENTRALMED", label: "CentralMed" },
+                        ]
+                    ).map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={labelClass}>
+                  Tipo de exame *
+                  <select
+                    required
+                    className={fieldClass}
+                    value={form.procedureId}
+                    onChange={(e) => patchForm({ procedureId: e.target.value })}
+                  >
+                    {procedures.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={labelClass}>
+                  Forma de pagamento *
+                  <select
+                    required
+                    className={fieldClass}
+                    value={form.paymentMethod}
+                    onChange={(e) =>
+                      patchForm({ paymentMethod: e.target.value }, { keepAmount: true })
+                    }
+                  >
+                    {paymentMethods.map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+            </div>
+
+            <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] pt-4">
+              <h3 className={sectionTitleClass}>Extras clínicos</h3>
+              <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                <label className={labelClass}>
+                  Biópsias (frascos)
+                  <span className="ml-1 font-normal text-[var(--text-muted)]">
+                    · R$ 150/un
+                  </span>
+                  <input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    className={fieldClass}
+                    value={form.biopsies}
+                    onChange={(e) => patchForm({ biopsies: e.target.value })}
+                  />
+                </label>
+                <label className={labelClass}>
+                  Tipo de polipectomia
+                  <select
+                    className={fieldClass}
+                    value={form.polypectomyTier}
+                    onChange={(e) =>
+                      patchForm({
+                        polypectomyTier: e.target.value,
+                        polypectomies:
+                          e.target.value && form.polypectomies === "0"
+                            ? "1"
+                            : form.polypectomies,
+                      })
+                    }
+                  >
+                    <option value="">Nenhuma</option>
+                    {polypectomyTiers.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className={labelClass}>
+                  Qtd. polipectomias
+                  <input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    className={fieldClass}
+                    value={form.polypectomies}
+                    onChange={(e) => patchForm({ polypectomies: e.target.value })}
+                  />
+                </label>
+                <label className={labelClass}>
+                  Mucosectomias
+                  <input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    className={fieldClass}
+                    value={form.mucosectomies}
+                    onChange={(e) => patchForm({ mucosectomies: e.target.value })}
+                  />
+                </label>
+                <label className={labelClass}>
+                  Clips hemostáticos
+                  <input
+                    type="number"
+                    min={0}
+                    inputMode="numeric"
+                    className={fieldClass}
+                    value={form.clips}
+                    onChange={(e) => patchForm({ clips: e.target.value })}
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] pt-4">
+              <h3 className={sectionTitleClass}>Valor</h3>
+              <div className="grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-3">
+                <label className={labelClass}>
+                  Valor recebido (R$) *
+                  <input
+                    required
+                    type="number"
+                    min={0}
+                    step="0.01"
+                    inputMode="decimal"
+                    className={fieldClass}
+                    value={form.amountReceived}
+                    onChange={(e) =>
+                      patchForm({ amountReceived: e.target.value }, { keepAmount: true })
+                    }
+                  />
+                </label>
+                {suggestion && (
+                  <div className="min-w-0 rounded-lg bg-[var(--surface-muted)] px-3 py-2 text-sm md:col-span-2 xl:col-span-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="min-w-0">
+                        Sugestão pela tabela:{" "}
+                        <strong>{brl(suggestion.total)}</strong>
+                      </p>
+                      <button
+                        type="button"
+                        onClick={applySuggestion}
+                        className="min-h-10 shrink-0 px-1 text-[var(--brand-primary)] underline"
+                      >
+                        Usar sugestão
+                      </button>
+                    </div>
+                    <ul className="mt-1 space-y-0.5 text-xs text-[var(--text-muted)]">
+                      {suggestion.breakdown.map((b) => (
+                        <li key={b.label} className="break-words">
+                          {b.label}: {brl(b.amount)}
+                        </li>
+                      ))}
+                    </ul>
+                    {(form.priceTable === "BEM_SAUDE" || form.priceTable === "DR_SAUDE") &&
+                      selectedProcedure?.code !== "CEDIG-RESP" && (
+                        <p className="mt-1 text-xs text-[var(--text-muted)]">
+                          Bem Saúde / Dr Saúde: preço próprio só no teste respiratório;
+                          demais itens usam a tabela Particular.
+                        </p>
+                      )}
+                  </div>
+                )}
+                <label className={`${labelClass} md:col-span-2 xl:col-span-3`}>
+                  Observações
+                  <input
+                    className={fieldClass}
+                    value={form.notes}
+                    onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                    placeholder="Complexidade, materiais especiais…"
+                  />
+                </label>
+              </div>
+            </div>
+
+            <div className="min-w-0 border-t border-[var(--border-default)] pt-4">
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={saving || providers.length === 0 || procedures.length === 0}
-                className="rounded-lg bg-[var(--brand-primary)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="w-full sm:w-auto"
               >
                 {saving ? "Salvando…" : "Registrar lançamento"}
-              </button>
+              </Button>
               {(providers.length === 0 || procedures.length === 0) && (
                 <p className="mt-2 text-xs text-[var(--text-muted)]">
                   Cadastre médicos (prestadores) e exames do catálogo CEDIG antes de lançar.
@@ -748,10 +802,11 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                       {l.patientName}
                     </p>
                     <p className="mt-0.5 text-xs text-[var(--text-muted)]">
-                      {new Date(l.performedAt).toLocaleDateString("pt-BR")} · {l.provider.name}
+                      {new Date(l.performedAt).toLocaleDateString("pt-BR")} ·{" "}
+                      {l.provider.name}
                     </p>
                   </div>
-                  <p className="shrink-0 font-semibold text-[var(--brand-accent)]">
+                  <p className="shrink-0 font-semibold tabular-nums text-[var(--brand-accent)]">
                     {brl(l.amountReceived)}
                   </p>
                 </div>
@@ -759,23 +814,29 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                   {l.procedure.name}
                 </p>
                 <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-[var(--text-muted)]">
-                  <div>
+                  <div className="min-w-0">
                     <dt className="inline">Tabela: </dt>
-                    <dd className="inline text-[var(--text-secondary)]">{l.priceTableLabel ?? "—"}</dd>
+                    <dd className="inline break-words text-[var(--text-secondary)]">
+                      {l.priceTableLabel ?? "—"}
+                    </dd>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <dt className="inline">Pagamento: </dt>
-                    <dd className="inline text-[var(--text-secondary)]">{l.paymentMethodLabel}</dd>
+                    <dd className="inline break-words text-[var(--text-secondary)]">
+                      {l.paymentMethodLabel}
+                    </dd>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <dt className="inline">Bio/Pól/Muc/Clip: </dt>
                     <dd className="inline text-[var(--text-secondary)]">
                       {l.biopsies}/{l.polypectomies}/{l.mucosectomies}/{l.clips}
                     </dd>
                   </div>
-                  <div title={l.bridgeNote ?? undefined}>
+                  <div className="min-w-0" title={l.bridgeNote ?? undefined}>
                     <dt className="inline">Ponte: </dt>
-                    <dd className="inline text-[var(--text-secondary)]">{l.bridgeStatus ?? "—"}</dd>
+                    <dd className="inline text-[var(--text-secondary)]">
+                      {l.bridgeStatus ?? "—"}
+                    </dd>
                   </div>
                 </dl>
               </article>
@@ -801,7 +862,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
               <tbody>
                 {launches.map((l) => (
                   <tr key={l.id} className="border-t">
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="whitespace-nowrap px-3 py-2">
                       {new Date(l.performedAt).toLocaleDateString("pt-BR")}
                     </td>
                     <td className="px-3 py-2">{l.patientName}</td>
@@ -809,8 +870,8 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                     <td className="px-3 py-2">{l.priceTableLabel ?? "—"}</td>
                     <td className="px-3 py-2">{l.procedure.name}</td>
                     <td className="px-3 py-2">{l.paymentMethodLabel}</td>
-                    <td className="px-3 py-2">{brl(l.amountReceived)}</td>
-                    <td className="px-3 py-2 whitespace-nowrap">
+                    <td className="px-3 py-2 tabular-nums">{brl(l.amountReceived)}</td>
+                    <td className="whitespace-nowrap px-3 py-2">
                       {l.biopsies}/{l.polypectomies}/{l.mucosectomies}/{l.clips}
                     </td>
                     <td
@@ -823,7 +884,10 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                 ))}
                 {launches.length === 0 && (
                   <tr>
-                    <td colSpan={9} className="px-3 py-6 text-center text-[var(--text-muted)]">
+                    <td
+                      colSpan={9}
+                      className="px-3 py-6 text-center text-[var(--text-muted)]"
+                    >
                       Nenhum lançamento neste mês.
                     </td>
                   </tr>
@@ -835,90 +899,97 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       )}
 
       {tab === "despesas" && (
-        <section className="space-y-6">
+        <section className="min-w-0 space-y-5 sm:space-y-6">
           <form
             onSubmit={submitExpense}
-            className="grid gap-3 rounded-xl border p-4 sm:grid-cols-2 lg:grid-cols-4"
+            className="min-w-0 space-y-4 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-3 sm:p-4"
           >
-            <p className="sm:col-span-2 lg:col-span-4 text-sm font-medium">
+            <p className="text-sm font-medium text-[var(--text-primary)]">
               Nova despesa do mês
             </p>
-            <label className="text-sm">
-              Categoria *
-              <select
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={expenseForm.category}
-                onChange={(e) =>
-                  setExpenseForm({ ...expenseForm, category: e.target.value })
-                }
-              >
-                {expenseCategories.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm sm:col-span-2">
-              Descrição *
-              <input
-                required
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={expenseForm.description}
-                onChange={(e) =>
-                  setExpenseForm({ ...expenseForm, description: e.target.value })
-                }
-                placeholder="Ex.: Pagamento Dr. Bruno Dias — julho"
-              />
-            </label>
-            <label className="text-sm">
-              Valor (R$) *
-              <input
-                required
-                type="number"
-                min={0}
-                step="0.01"
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={expenseForm.amount}
-                onChange={(e) =>
-                  setExpenseForm({ ...expenseForm, amount: e.target.value })
-                }
-              />
-            </label>
-            <label className="text-sm">
-              Data
-              <input
-                type="date"
-                className="mt-1 w-full rounded-lg border px-3 py-2"
-                value={expenseForm.expenseDate}
-                onChange={(e) =>
-                  setExpenseForm({ ...expenseForm, expenseDate: e.target.value })
-                }
-              />
-            </label>
-            <div className="lg:col-span-4">
-              <button
+            <div className="grid min-w-0 gap-3 md:grid-cols-2 xl:grid-cols-4">
+              <label className={labelClass}>
+                Categoria *
+                <select
+                  className={fieldClass}
+                  value={expenseForm.category}
+                  onChange={(e) =>
+                    setExpenseForm({ ...expenseForm, category: e.target.value })
+                  }
+                >
+                  {expenseCategories.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className={`${labelClass} md:col-span-2 xl:col-span-2`}>
+                Descrição *
+                <input
+                  required
+                  className={fieldClass}
+                  value={expenseForm.description}
+                  onChange={(e) =>
+                    setExpenseForm({ ...expenseForm, description: e.target.value })
+                  }
+                  placeholder="Ex.: Pagamento Dr. Bruno Dias — julho"
+                />
+              </label>
+              <label className={labelClass}>
+                Valor (R$) *
+                <input
+                  required
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  inputMode="decimal"
+                  className={fieldClass}
+                  value={expenseForm.amount}
+                  onChange={(e) =>
+                    setExpenseForm({ ...expenseForm, amount: e.target.value })
+                  }
+                />
+              </label>
+              <label className={labelClass}>
+                Data
+                <input
+                  type="date"
+                  className={fieldClass}
+                  value={expenseForm.expenseDate}
+                  onChange={(e) =>
+                    setExpenseForm({ ...expenseForm, expenseDate: e.target.value })
+                  }
+                />
+              </label>
+            </div>
+            <div>
+              <Button
                 type="submit"
+                variant="primary"
                 disabled={saving}
-                className="rounded-lg bg-[var(--brand-primary)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+                className="w-full sm:w-auto"
               >
                 {saving ? "Salvando…" : "Registrar despesa"}
-              </button>
+              </Button>
             </div>
           </form>
 
-          <ul className="divide-y rounded-xl border">
+          <ul className="divide-y rounded-xl border border-[var(--border-default)]">
             {expenses.map((e) => (
-              <li key={e.id} className="flex flex-wrap justify-between gap-2 px-4 py-3 text-sm">
-                <span>
+              <li
+                key={e.id}
+                className="flex min-w-0 flex-col gap-1 px-3 py-3 text-sm sm:flex-row sm:flex-wrap sm:items-baseline sm:justify-between sm:gap-2 sm:px-4"
+              >
+                <span className="min-w-0 break-words">
                   <span className="font-medium">{e.categoryLabel}</span>
                   {" · "}
                   {e.description}
-                  <span className="ml-2 text-[var(--text-muted)]">
+                  <span className="mt-0.5 block text-[var(--text-muted)] sm:ml-2 sm:mt-0 sm:inline">
                     {new Date(e.expenseDate).toLocaleDateString("pt-BR")}
                   </span>
                 </span>
-                <span className="font-medium">{brl(e.amount)}</span>
+                <span className="shrink-0 font-medium tabular-nums">{brl(e.amount)}</span>
               </li>
             ))}
             {expenses.length === 0 && (
@@ -931,8 +1002,8 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       )}
 
       {tab === "indicadores" && kpis && (
-        <section className="space-y-6">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="min-w-0 space-y-5 sm:space-y-6">
+          <div className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
             {[
               ["Receita do mês", brl(kpis.revenue)],
               ["Total de despesas", brl(kpis.totalExpenses)],
@@ -946,23 +1017,33 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                 `${kpis.totalsCounters.biopsies}/${kpis.totalsCounters.polypectomies}/${kpis.totalsCounters.mucosectomies}/${kpis.totalsCounters.clips}`,
               ],
             ].map(([label, value]) => (
-              <div key={label} className="rounded-xl border p-4">
-                <p className="text-xs uppercase text-[var(--text-muted)]">{label}</p>
-                <p className="mt-1 text-lg font-semibold text-[var(--text-primary)]">{value}</p>
+              <div
+                key={label}
+                className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4"
+              >
+                <p className="break-words text-xs uppercase text-[var(--text-muted)]">
+                  {label}
+                </p>
+                <p className="mt-1 break-words text-base font-semibold tabular-nums text-[var(--text-primary)] sm:text-lg">
+                  {value}
+                </p>
               </div>
             ))}
           </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-xl border p-4">
+          <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+            <div className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4">
               <h3 className="font-medium">Exames por tipo</h3>
               <ul className="mt-3 space-y-2 text-sm">
                 {kpis.examsByType.map((row) => (
-                  <li key={row.name} className="flex justify-between gap-2">
-                    <span>
+                  <li
+                    key={row.name}
+                    className="flex items-start justify-between gap-3"
+                  >
+                    <span className="min-w-0 break-words">
                       {row.name} · {row.count}x
                     </span>
-                    <span>{brl(row.revenue)}</span>
+                    <span className="shrink-0 tabular-nums">{brl(row.revenue)}</span>
                   </li>
                 ))}
                 {kpis.examsByType.length === 0 && (
@@ -970,15 +1051,18 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                 )}
               </ul>
             </div>
-            <div className="rounded-xl border p-4">
+            <div className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4">
               <h3 className="font-medium">Produção por médico</h3>
               <ul className="mt-3 space-y-2 text-sm">
                 {kpis.productionByDoctor.map((row) => (
-                  <li key={row.name} className="flex justify-between gap-2">
-                    <span>
+                  <li
+                    key={row.name}
+                    className="flex items-start justify-between gap-3"
+                  >
+                    <span className="min-w-0 break-words">
                       {row.name} · {row.count} exames · {row.biopsies} frascos
                     </span>
-                    <span>{brl(row.revenue)}</span>
+                    <span className="shrink-0 tabular-nums">{brl(row.revenue)}</span>
                   </li>
                 ))}
                 {kpis.productionByDoctor.length === 0 && (

@@ -86,7 +86,7 @@ export default function MobileNavDrawer({
       >
         <span className="min-w-0">
           <span className="block text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-            Navegação · {tabs.length} módulos
+            Navegação
           </span>
           <span className="mt-0.5 block truncate">{currentLabel}</span>
         </span>
@@ -103,14 +103,20 @@ export default function MobileNavDrawer({
 
       {open && canPortal
         ? createPortal(
-            <div className="fixed inset-0 z-[60] flex">
+            <>
+              <button
+                type="button"
+                className="fixed inset-0 z-[60] bg-black/40"
+                aria-label="Fechar menu"
+                onClick={() => setOpen(false)}
+              />
               <div
                 id="mobile-nav-drawer"
                 ref={panelRef}
                 role="dialog"
                 aria-modal="true"
                 aria-label={title}
-                className="flex h-full w-[min(100%,20rem)] shrink-0 flex-col bg-[var(--surface-card)] shadow-xl ds-nav-drawer-enter"
+                className="fixed inset-y-0 right-0 z-[70] flex w-[min(100%,20rem)] flex-col bg-[var(--surface-card)] shadow-xl ds-nav-drawer-enter"
               >
                 <div className="flex items-center justify-between border-b border-[var(--border-default)] px-4 py-3">
                   <p className="text-sm font-semibold text-[var(--text-primary)]">{title}</p>
@@ -125,11 +131,14 @@ export default function MobileNavDrawer({
                     </svg>
                   </button>
                 </div>
-                <nav className="flex-1 overflow-y-auto p-2" aria-label={title}>
-                  {groups.map((group) => (
-                    <div key={group.name} className="mb-3 last:mb-0">
+                <nav className="flex-1 overflow-y-auto p-3" aria-label={title}>
+                  {groups.map((group, index) => (
+                    <div
+                      key={group.name}
+                      className={cn(index > 0 && "mt-4 border-t border-[var(--border-default)] pt-4")}
+                    >
                       {showGroups && (
-                        <p className="px-3 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+                        <p className="px-3 pb-2 text-xs font-semibold text-[var(--text-primary)]">
                           {group.name}
                         </p>
                       )}
@@ -155,13 +164,7 @@ export default function MobileNavDrawer({
                   ))}
                 </nav>
               </div>
-              <button
-                type="button"
-                className="min-h-full min-w-0 flex-1 bg-black/40"
-                aria-label="Fechar menu"
-                onClick={() => setOpen(false)}
-              />
-            </div>,
+            </>,
             document.body,
           )
         : null}

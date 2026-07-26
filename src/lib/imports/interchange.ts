@@ -141,6 +141,11 @@ export function buildInterchangeDataset(input: {
   };
 }
 
+/** Remove BOM UTF-8 e espaços nas pontas — necessário após export Excel-friendly. */
+export function stripUtf8Bom(content: string): string {
+  return content.replace(/^\uFEFF/, "").trim();
+}
+
 export function serializeInterchangeDataset(
   dataset: InterchangeDataset,
   format: InterchangeFormat,
@@ -149,11 +154,12 @@ export function serializeInterchangeDataset(
     return JSON.stringify(dataset, null, 2);
   }
 
-  const header = dataset.columns.map((column) => column.header).join(",");
+  const header = serializeCsvRow(dataset.columns.map((column) => column.header));
   const lines = dataset.rows.map((row) =>
     serializeCsvRow(dataset.columns.map((column) => row[column.key] ?? "")),
   );
-  return [header, ...lines].join("\n");
+  // BOM UTF-8 para Excel/LibreOffice abrirem acentos corretamente no Windows.
+  return `\uFEFF${[header, ...lines].join("\n")}`;
 }
 
 export function parseInterchangeContent(
@@ -162,7 +168,7 @@ export function parseInterchangeContent(
   expectedEntity: string,
   columns: InterchangeColumn[],
 ): ParseInterchangeResult {
-  const trimmed = content.trim();
+  const trimmed = stripUtf8Bom(content);
   if (!trimmed) {
     return { ok: false, error: "Arquivo vazio" };
   }

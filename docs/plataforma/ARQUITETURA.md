@@ -762,7 +762,7 @@ CRUD admin, agenda interna, agendamento self-service, relatórios CSV, PEP estru
 |---------|---------|
 | `/interno/cadastros` | `patient-service`, `company-service`, `procedure-service`, `user-service` |
 | `/interno/agenda` | `appointment-service` |
-| `/interno/relatorios` | `reports/billing-report.ts` |
+| `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
 
 ---
