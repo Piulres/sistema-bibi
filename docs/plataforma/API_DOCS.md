@@ -95,7 +95,7 @@ Após deploy manual (`npx netlify deploy --prod`):
 ## 2. Arquitetura da documentação
 
 ```
-public/openapi.yaml          ← contrato (73 paths, v2.1)
+public/openapi.yaml          ← contrato (123 paths, v3.0.4)
 public/swagger-ui/           ← assets gerados (postinstall, gitignored)
 src/app/api/docs/page.tsx    ← URL canônica /api/docs
 src/components/api-docs/     ← cliente Swagger UI (CSP-safe)
@@ -150,7 +150,43 @@ Roadmap: testes de contrato de resposta (P1 em [`TESTES.md`](TESTES.md)).
 
 ---
 
-## 6. Referências
+## 6. Export TISS (faturamento interno)
+
+Endpoint para download da guia XML simplificada (POC Tier 4). Requer sessão interna com módulo **`billing`**.
+
+| Método | Path | Resposta |
+|--------|------|----------|
+| `GET` | `/api/interno/invoices/{id}/tiss` | XML `application/xml` ou JSON de erro |
+
+### Códigos HTTP (v3.0.4+)
+
+| HTTP | Corpo | Causa |
+|------|-------|-------|
+| 200 | XML (`tiss-guia-{id}.xml`) | Fatura com itens e beneficiário com documento |
+| 403 | `{ "error": "..." }` | Perfil sem módulo `billing` (ex.: RECEPCAO) |
+| 404 | `{ "error": "Fatura não encontrada" }` | ID inexistente ou de outro tenant |
+| 422 | `{ "error": "...", "code": "NO_ITEMS" \| "NO_PATIENT_DOCUMENT" }` | Fatura sem procedimentos ou beneficiário sem CPF |
+
+Serviço: `src/lib/tiss-service.ts` (`TissBuildError`, `escapeXml`). Testes: `tests/api/tiss-guide.test.ts`.
+
+### Exemplo curl
+
+```bash
+# Login interno (faturamento)
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"faturamento@bibi.health","password":"bibi123","portal":"interno"}'
+
+# Download da guia (substitua INVOICE_ID)
+curl -b cookies.txt -o tiss-guia.xml \
+  http://localhost:3000/api/interno/invoices/INVOICE_ID/tiss
+```
+
+Fluxo completo (emitir fatura → PIX → TISS): [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.1 · motor de cobrança: [`PAYMENTS.md`](PAYMENTS.md).
+
+---
+
+## 7. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal

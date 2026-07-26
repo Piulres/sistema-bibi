@@ -1491,8 +1491,31 @@ paths:
     get:
       tags: [Interno]
       summary: Exporta guia TISS/ANS em XML
+      description: |
+        Requer módulo interno `billing`. Retorna XML simplificado (POC Tier 4).
+        Validação estrutural (v3.0.4): fatura sem procedimentos ou beneficiário sem documento → 422.
       responses:
-        '200': { description: XML TISS simplificado }
+        '200':
+          description: XML TISS simplificado
+          content:
+            application/xml:
+              schema:
+                type: string
+        '403':
+          description: Perfil sem módulo billing
+        '404':
+          description: Fatura não encontrada ou de outro tenant
+        '422':
+          description: Guia inválida (sem itens ou sem documento do beneficiário)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error: { type: string }
+                  code:
+                    type: string
+                    enum: [NO_ITEMS, NO_PATIENT_DOCUMENT]
 
   /api/interno/subscriptions/charges/{chargeId}/invoice:
     parameters:

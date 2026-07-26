@@ -4,7 +4,7 @@
 
 > **Produção:** **v3.0.4** @ https://sistema-bibi.netlify.app · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 26/07/2026 — produção **v3.0.4** (`bibi-poc-2026-07-26d`); TISS 422 em [`produto/FLUXOS.md`](produto/FLUXOS.md) §4.1 · `cursor:verify` em [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md).
+> **Última revisão factual:** 26/07/2026 — produção **v3.0.4** (`bibi-poc-2026-07-26d`); TISS 422 em [`produto/FLUXOS.md`](produto/FLUXOS.md) §4.1 · contrato API em [`plataforma/API_DOCS.md`](plataforma/API_DOCS.md) §6 · `cursor:verify` em [`plataforma/WORKFLOW_CURSOR.md`](plataforma/WORKFLOW_CURSOR.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
