@@ -338,6 +338,7 @@ Testes: `tests/api/tiss-guide.test.ts`.
 |------|-----|--------|
 | Listar | `GET /api/interno/appointments?date=` | Por data |
 | Criar | `POST /api/interno/appointments` | `createAppointment()`; TELE → `telemedicineUrl`; webhook `APPOINTMENT_CREATED` |
+| Calendário externo | Painel ICS + `GET .../appointments/[id]/calendar` | Feed assinável (Google/Outlook/Apple) e links one-shot — ver [`../plataforma/CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md) |
 | Alterar | `PATCH /api/interno/appointments/[id]` | Status/modalidade |
 | **Walk-in particular** | `POST /api/interno/patients` + `POST /api/interno/appointments` | Cadastro sem `companyId` + agendamento `AGENDADO` na mesma tela |
 | **Check-in** | `PATCH .../appointments/[id]` `{ status: "CONFIRMADO" }` | Paciente chegou à clínica (AGENDADO → CONFIRMADO) |
@@ -435,7 +436,9 @@ Templates: `APPOINTMENT_REMINDER`, `INVOICE_DUE`, `SUBSCRIPTION_DUE`, `GENERIC`
 | Retry manual | `POST .../deliveries/[id]/retry` |
 | Cron retry | `POST /api/cron/webhooks` |
 
-Eventos: `INVOICE_ISSUED`, `APPOINTMENT_CREATED`, `COMPANY_STATUS_CHANGED`, `PATIENT_CREATED`
+Eventos: `INVOICE_ISSUED`, `APPOINTMENT_CREATED`, `APPOINTMENT_UPDATED`, `APPOINTMENT_CANCELLED`, `COMPANY_STATUS_CHANGED`, `PATIENT_CREATED`, `ENTITY_REVERTED`
+
+Calendários externos (ICS / Google / Outlook): [`../plataforma/CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md) · APIs `GET/POST/DELETE /api/{prestador,interno}/calendar` e feed público `GET /api/calendar/feed/{token}`.
 
 Serviço: `src/lib/webhook-service.ts`
 

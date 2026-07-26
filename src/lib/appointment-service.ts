@@ -375,5 +375,26 @@ export async function updateAppointment(input: {
     reversible: appointment.status === "CANCELADO",
   });
 
+  const webhookEvent =
+    appointment.status === "CANCELADO"
+      ? ("APPOINTMENT_CANCELLED" as const)
+      : ("APPOINTMENT_UPDATED" as const);
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: webhookEvent,
+    data: {
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      providerId: appointment.providerId,
+      status: appointment.status,
+      previousStatus: existing.status,
+      modality: appointment.modality,
+      telemedicineUrl: appointment.telemedicineUrl,
+      scheduledAt: appointment.scheduledAt.toISOString(),
+      previousScheduledAt: existing.scheduledAt.toISOString(),
+    },
+  });
+
   return { appointment: mapAppointment(appointment) };
 }

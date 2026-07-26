@@ -6,6 +6,7 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import { dispatchWebhooks } from "@/lib/webhook-service";
 
 /** Horário comercial simplificado para slots (POC). */
 const SLOT_START_HOUR = 8;
@@ -248,6 +249,21 @@ export async function cancelBeneficiaryAppointment(input: {
     description: `${appointment.patient.name} cancelou consulta agendada`,
     createdBy: input.createdBy,
     reversible: false,
+  });
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: "APPOINTMENT_CANCELLED",
+    data: {
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      providerId: appointment.providerId,
+      status: "CANCELADO",
+      previousStatus: appointment.status,
+      modality: appointment.modality,
+      telemedicineUrl: appointment.telemedicineUrl,
+      scheduledAt: appointment.scheduledAt.toISOString(),
+    },
   });
 
   return { ok: true as const, status: "CANCELADO" as const };

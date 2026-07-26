@@ -57,6 +57,7 @@ model Tenant {
   projectAllocations    ProjectAllocation[]
   projectContracts      ProjectContract[]
   clinicExamLaunches    ClinicExamLaunch[]
+  calendarFeeds         CalendarFeed[]
   clinicExpenses        ClinicExpense[]
 }
 
@@ -133,6 +134,7 @@ model User {
   clinicExamLaunchesAsProvider ClinicExamLaunch[] @relation("ClinicExamLaunchProvider")
   clinicExamLaunchesCreated    ClinicExamLaunch[] @relation("ClinicExamLaunchCreatedBy")
   clinicExpensesCreated        ClinicExpense[]    @relation("ClinicExpenseCreatedBy")
+  calendarFeeds                CalendarFeed[]
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -410,6 +412,29 @@ model PricingRule {
 
   companyId String?
   company   Company? @relation(fields: [companyId], references: [id])
+}
+
+/// Feed ICS assinável (Google / Outlook / Apple Calendar via URL).
+/// scope: PROVIDER (agenda do prestador) | TENANT (agenda operacional do tenant)
+model CalendarFeed {
+  id        String    @id @default(cuid())
+  /// Token opaco na URL pública /api/calendar/feed/{token}
+  token     String    @unique
+  scope     String
+  label     String?
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  revokedAt DateTime?
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  /// Prestador dono do feed (obrigatório quando scope=PROVIDER)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, scope, active])
+  @@index([userId])
 }
 
 /// Agendamento (Agenda Inteligente).

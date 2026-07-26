@@ -37,7 +37,7 @@ Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp
 | `VOA_ENABLED` | Não | `false` | Assistente IA Voa no atendimento |
 | `VOA_INTEGRATION_TOKEN` | Se Voa ativo | — | Token plugin Voa Health |
 | `VOA_ENV` | Não | `homologacao` | `homologacao` \| `producao` (referência operacional) |
-| `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph |
+| `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph, URLs de feed ICS de calendário |
 | `NEXT_PUBLIC_SALES_WHATSAPP` | Não | — | CTA comercial WhatsApp na landing |
 | `NEXT_PUBLIC_SALES_WHATSAPP_MESSAGE` | Não | mensagem padrão | Texto pré-preenchido no wa.me |
 | `NEXT_PUBLIC_DEMO_VIDEO_URL` | Não | — | URL YouTube para embed em `#demo-video` na home |
@@ -273,6 +273,8 @@ Contato sandbox: integration@voahealth.com
 NEXT_PUBLIC_SITE_URL=https://sistema-bibi.netlify.app
 ```
 
+Também usada como host absoluto dos feeds ICS (`/api/calendar/feed/{token}`) — ver [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md).
+
 ### `URL` (Netlify)
 
 Injetada automaticamente pela Netlify com a URL do deploy. Usada como fallback de `NEXT_PUBLIC_SITE_URL`. Não precisa definir manualmente.
@@ -430,4 +432,5 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 - [`README.md`](../../README.md) — início rápido
 - [`PAYMENTS.md`](PAYMENTS.md) — gateways PIX
 - [`COMMUNICATIONS.md`](COMMUNICATIONS.md) — provedores de mensagem
+- [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md) — agenda → Google / Outlook / Apple
 - [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md) — painel Netlify

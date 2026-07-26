@@ -14,8 +14,11 @@ import { confirmPresets } from "@/lib/ui/confirm-presets";
 type WebhookEvent =
   | "INVOICE_ISSUED"
   | "APPOINTMENT_CREATED"
+  | "APPOINTMENT_UPDATED"
+  | "APPOINTMENT_CANCELLED"
   | "COMPANY_STATUS_CHANGED"
-  | "PATIENT_CREATED";
+  | "PATIENT_CREATED"
+  | "ENTITY_REVERTED";
 
 type WebhookRow = {
   id: string;
@@ -47,8 +50,11 @@ type IntegracoesData = {
 const EVENT_LABELS: Record<WebhookEvent, string> = {
   INVOICE_ISSUED: "Fatura emitida",
   APPOINTMENT_CREATED: "Agendamento criado",
+  APPOINTMENT_UPDATED: "Agendamento atualizado",
+  APPOINTMENT_CANCELLED: "Agendamento cancelado",
   COMPANY_STATUS_CHANGED: "Status da empresa alterado",
   PATIENT_CREATED: "Beneficiário cadastrado",
+  ENTITY_REVERTED: "Entidade revertida",
 };
 
 const fieldClass =
@@ -177,6 +183,26 @@ export default function IntegracoesView() {
       onRetry={() => void reload()}
     >
       <div className="space-y-8">
+        <Card>
+          <SectionHeader
+            title="Calendários externos"
+            description="Médicos e recepção sincronizam a agenda via feed ICS (Google Agenda, Outlook, Apple Calendar) nas telas de Agenda. Para automações B2B (Zapier/Make → Google Calendar), use os webhooks APPOINTMENT_* abaixo."
+          />
+          <p className="mt-3 text-sm text-[var(--text-muted)]">
+            Portal prestador:{" "}
+            <a href="/prestador" className="text-[var(--portal-accent)] underline">
+              /prestador
+            </a>
+            {" · "}
+            Recepção:{" "}
+            <a href="/interno/agenda" className="text-[var(--portal-accent)] underline">
+              /interno/agenda
+            </a>
+            . Documentação:{" "}
+            <span className="font-mono text-xs">docs/plataforma/CALENDAR_INTEGRATION.md</span>
+          </p>
+        </Card>
+
         <Card>
           <SectionHeader
             title="Webhooks outbound"

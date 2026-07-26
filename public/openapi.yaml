@@ -524,6 +524,54 @@ paths:
         '401': { description: Não autenticado }
         '403': { description: Acesso negado (role != PRESTADOR) }
 
+  /api/prestador/calendar:
+    get:
+      tags: [Prestador]
+      summary: Status do feed ICS pessoal do prestador
+      responses:
+        '200': { description: feed ativo ou null }
+    post:
+      tags: [Prestador]
+      summary: Cria ou rotaciona o feed ICS pessoal
+      responses:
+        '200': { description: Feed gerado }
+    delete:
+      tags: [Prestador]
+      summary: Revoga o feed ICS pessoal
+      responses:
+        '200': { description: Feed revogado }
+
+  /api/prestador/appointments/{id}/calendar:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: format
+        in: query
+        required: false
+        schema: { type: string, enum: [ics] }
+    get:
+      tags: [Prestador]
+      summary: Links Google/Outlook e ICS de um agendamento
+      responses:
+        '200': { description: JSON com links ou arquivo text/calendar }
+        '404': { description: Agendamento não encontrado }
+
+  /api/calendar/feed/{token}:
+    parameters:
+      - name: token
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      tags: [Público]
+      summary: Feed ICS assinável (Google / Outlook / Apple)
+      responses:
+        '200':
+          description: text/calendar
+        '404': { description: Token inválido ou revogado }
+
   /api/prestador/appointments/{id}:
     parameters:
       - name: id
@@ -1419,6 +1467,40 @@ paths:
       summary: Cria agendamento
       responses:
         '200': { description: Agendamento criado }
+
+  /api/interno/calendar:
+    get:
+      tags: [Interno]
+      summary: Status do feed ICS operacional do tenant
+      responses:
+        '200': { description: feed ativo ou null }
+    post:
+      tags: [Interno]
+      summary: Cria ou rotaciona o feed ICS da operação
+      responses:
+        '200': { description: Feed gerado }
+    delete:
+      tags: [Interno]
+      summary: Revoga o feed ICS da operação
+      responses:
+        '200': { description: Feed revogado }
+
+  /api/interno/appointments/{id}/calendar:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+      - name: format
+        in: query
+        required: false
+        schema: { type: string, enum: [ics] }
+    get:
+      tags: [Interno]
+      summary: Links Google/Outlook e ICS de um agendamento
+      responses:
+        '200': { description: JSON com links ou arquivo text/calendar }
+        '404': { description: Agendamento não encontrado }
 
   /api/interno/appointments/{id}:
     parameters:
