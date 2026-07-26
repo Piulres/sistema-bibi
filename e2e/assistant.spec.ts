@@ -35,6 +35,23 @@ test.describe("Assistente — chat nos portais", () => {
     });
   });
 
+  test("prestador: link de ação fecha o assistente no mobile", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await loginAs(page, "prestador", "dra.helena@bibi.health");
+    await page.goto("/prestador");
+
+    await page.getByRole("button", { name: /abrir assistente/i }).click();
+    const dialog = page.getByRole("dialog", { name: /assistente/i });
+    await expect(dialog).toBeVisible();
+
+    await page.getByRole("button", { name: /minha agenda de hoje/i }).click();
+    const actionLink = dialog.getByRole("link").filter({ hasText: /ver agenda|agenda/i }).first();
+    await expect(actionLink).toBeVisible({ timeout: 15_000 });
+    await actionLink.click();
+
+    await expect(dialog).toBeHidden({ timeout: 5_000 });
+  });
+
   test("beneficiário: chip de resumo retorna saudação", async ({ page }) => {
     await loginAs(page, "beneficiario", DEMO_JOAO);
     await page.goto("/beneficiario/resumo");
