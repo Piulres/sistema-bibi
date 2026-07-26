@@ -1,6 +1,8 @@
 /** Identidade da plataforma — fonte única para UI, exports e metadados. */
 export const PLATFORM = {
   name: "Sistema Bibi - ServiceOS",
+  /** Marca curta no header da landing (sem sufixo ServiceOS). */
+  brandName: "Sistema Bibi",
   shortName: "ServiceOS",
   /** Major.minor — prefixo de `release` / package.json (docs:verify). */
   version: "3.0",

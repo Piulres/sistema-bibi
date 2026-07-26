@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HOME_NAV_ANCHORS, landingNavItems } from "@/lib/landing/navigation";
+import { PLATFORM } from "@/lib/platform";
+import { PLATFORM_BRANDING } from "@/lib/theme/tokens";
 
 describe("landing navigation (home)", () => {
   it("mantém menu enxuto sem ROI/Comparativo/Para quem", () => {
@@ -19,5 +21,13 @@ describe("landing navigation (home)", () => {
 
   it("landingNavItems(home) usa as âncoras da home", () => {
     expect(landingNavItems("home")).toBe(HOME_NAV_ANCHORS);
+  });
+});
+
+describe("landing header brand", () => {
+  it("exibe apenas Sistema Bibi no header (sem sufixo ServiceOS)", () => {
+    expect(PLATFORM.brandName).toBe("Sistema Bibi");
+    expect(PLATFORM_BRANDING.displayName).toBe("Sistema Bibi");
+    expect(PLATFORM.name).toBe("Sistema Bibi - ServiceOS");
   });
 });
