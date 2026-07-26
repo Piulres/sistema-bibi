@@ -92,7 +92,18 @@ Chave: `bibi_onboarding`
 
 - Nav desktop (`lg+`): abas com `data-tour-nav`
 - Mobile: `MobileNavDrawer` com `data-tour-nav` nos links + `data-tour-id="mobile-nav-trigger"` no botão Módulos
-- Botão **? Tour** visível em todas as larguras
+- Botão **Tour** no header (sem `?`) — `OnboardingTrigger` com `data-testid="onboarding-trigger"`
+
+## Superfície do header (v3.0.5)
+
+| Elemento | Comportamento |
+|----------|---------------|
+| Faixa **Powered by** | Removida dos portais autenticados |
+| Botão tour | Rótulo **Tour** (antes `? Tour`) |
+| Badges versão/nicho | `ServiceOsBadges` ocultos em `< sm` |
+| Marca do tenant | `displayName` + `portalLabel` permanecem visíveis |
+
+Código: `src/components/PortalHeader.tsx` · `src/components/niche/ServiceOsBadges.tsx`.
 
 ---
 
