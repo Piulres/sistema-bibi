@@ -322,11 +322,19 @@ Arquivo: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml).
 
 | Variável | Job | Valor no CI |
 |----------|-----|-------------|
-| `SESSION_SECRET` | unit + e2e | `ci-test-session-secret-32chars` |
-| `CRON_SECRET` | unit + e2e | `ci-cron-secret` |
-| `DATABASE_URL` | unit (integração) | `file:./prisma/test.db` |
+| `DATABASE_URL` | global + unit (override) | `file:./dev.db` · testes de integração: `file:./test.db` |
+| `SESSION_SECRET` | global | `ci-github-actions-session-secret-32chars-min` |
+| `CRON_SECRET` | global | `ci-cron-secret-32-characters-min` |
+| `SEED_SCALE` | global | `small` |
+| `ALLOW_DEMO_RESET` | global | `true` |
 | `CI` | e2e Playwright | `true` |
 | `PLAYWRIGHT_PORT` | e2e | `3100` |
+
+**`TZ` — não definir no workflow.** Um `TZ: America/Sao_Paulo` global no `env`
+do job quebrou `tests/unit/subscription.test.ts` (literais `YYYY-MM-DD` viram dia
+anterior em `getDate()`). E2E de presença não depende de `TZ` global: o spec
+`e2e/flow-improvements.spec.ts` cria `AGENDADO` fresco via API antes do assert.
+Detalhes: [`TESTES.md` § Fuso horário](TESTES.md#fuso-horário-datas-civis-e-flakes-e2e).
 
 ---
 

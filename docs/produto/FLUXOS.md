@@ -233,7 +233,7 @@ Quando `User.mfaEnabled = true`:
 
 | Ação na UI | API | Serviço / efeito |
 |------------|-----|------------------|
-| Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje) |
+| Carregar agenda | `GET /api/prestador/agenda` | Appointments do provider (hoje — filtro por data civil local na UI) |
 | Abrir atendimento | `GET /api/prestador/appointments/[id]` | Detalhe + usages + records |
 | Catálogo | `GET /api/procedures` | Procedimentos do tenant |
 | Registrar procedimento | `POST .../appointments/[id]/procedures` | `computePrice()` → `ProcedureUsage` (`billed=false`) |

@@ -308,7 +308,7 @@ Senha única: `bibi123`
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
 | `assistant.spec.ts` | Assistente operacional serverless |
 | `api-docs.spec.ts` | Swagger UI `/api-docs` |
-| `flow-improvements.spec.ts` | Melhorias de fluxo multi-portal |
+| `flow-improvements.spec.ts` | Mapa interno + confirmar presença (prestador); cria `AGENDADO` via API antes do assert |
 | `interno-reports.spec.ts` | Relatórios interno |
 | `mobile-nav.spec.ts` | Navegação mobile drawer |
 
@@ -326,9 +326,16 @@ Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 | Variável | Valor CI |
 |----------|----------|
 | `DATABASE_URL` | `file:./dev.db` (relativo ao `schema.prisma`) |
-| `SESSION_SECRET` | secret de 32+ chars para testes |
-| `CRON_SECRET` | secret de 32+ chars para testes |
+| `SESSION_SECRET` | `ci-github-actions-session-secret-32chars-min` |
+| `CRON_SECRET` | `ci-cron-secret-32-characters-min` |
 | `SEED_SCALE` | `small` (seed rápido) |
+| `ALLOW_DEMO_RESET` | `true` |
+
+**`TZ` não é definido no workflow.** Um `TZ: America/Sao_Paulo` global quebrou
+`tests/unit/subscription.test.ts`: `new Date("2026-01-15")` é interpretado como
+meia-noite UTC e, com fuso de São Paulo, `getDate()` vira **14** em vez de **15**.
+O job Vitest roda no fuso padrão do runner (UTC); o E2E não depende de `TZ` global
+porque o spec cria massa fresca via API (ver abaixo).
 
 **Espelhar CI localmente:**
 
@@ -342,6 +349,35 @@ CI=true npm run test:e2e
 `npm run pre-release` executa o mesmo bootstrap antes de `db:verify` (espelha CI + Netlify build).
 
 > Não usar `db:push && db:seed` no CI — `db:verify` exige `demo.db` + `operation.db` (dual-store).
+
+### Fuso horário, datas civis e flakes E2E
+
+**Playwright — dois projetos, um banco:** `playwright.config.ts` roda `chromium` e
+`mobile-chrome` com `workers: 1`, mas **compartilham o mesmo `dev.db`** seedado no job.
+Specs que dependem de um `AGENDADO` fixo do seed podem falhar no segundo projeto
+porque o primeiro já consumiu/alterou o registro.
+
+| Sintoma | Causa | Padrão de correção |
+|---------|-------|-------------------|
+| Prestador sem card `AGENDADO` no segundo projeto | Massa compartilhada entre `chromium` / `mobile-chrome` | Criar consulta via API no início do teste |
+| Agenda mostra “ontem” perto da meia-noite | `toISOString().slice(0, 10)` usa UTC, não o dia civil local | `localDateISO()` em `AgendaView.tsx` |
+
+**Padrão canônico (confirmar presença):** helper `ensureTodayAgendadoForHelena` em
+`e2e/flow-improvements.spec.ts` — login interno (`recepcao@bibi.health`), lista
+prestadores/pacientes, `POST /api/interno/appointments` com horário único no dia
+local (`18:05`–`18:54`) e só então faz login como prestador.
+
+**UI — data civil local:** `AgendaView` usa `localDateISO()` (ano/mês/dia no fuso
+do browser) para estado `date`, botão “Hoje” e `isToday`. Evite `new Date().toISOString().slice(0, 10)`
+em componentes de agenda — o mesmo padrão ainda aparece em `AppointmentsView` e
+deve ser alinhado em refactors futuros.
+
+**Seed:** `todayAt(h, m)` em `prisma/seed-data/helpers.ts` usa horário **local** do
+runner (`setHours`). Em dev, o seed e a UI ficam coerentes sem `TZ` no `.env`.
+
+**Unitário — assinaturas:** `computeUpcomingDueDates` (`src/lib/subscription.ts`)
+deduplica com `toISOString().slice(0, 10)`. Testes usam literais `YYYY-MM-DD`;
+não force `TZ` global no CI nem no Vitest sem revisar esses asserts.
 
 ---
 
