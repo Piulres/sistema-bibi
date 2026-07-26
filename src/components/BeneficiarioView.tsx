@@ -18,6 +18,7 @@ import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { fetchJson, type ApiResult } from "@/lib/ui/api-feedback";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
+import { civilDateISO, formatTimeBR } from "@/lib/timezone";
 
 export type BeneficiarioSection =
   | "agendar"
@@ -178,7 +179,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     procedureId: "",
     noProviderPreference: false,
     petId: "",
-    date: new Date().toISOString().slice(0, 10),
+    date: civilDateISO(),
     slot: "",
     reason: `${labels.appointment} de rotina`,
     modality: "PRESENCIAL",
@@ -595,10 +596,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         ) : (
           <div className="mt-3 space-y-3">
             {overview.appointments.map((appointment) => {
-              const time = new Date(appointment.scheduledAt).toLocaleTimeString("pt-BR", {
-                hour: "2-digit",
-                minute: "2-digit",
-              });
+              const time = formatTimeBR(new Date(appointment.scheduledAt));
               const canCancel = appointment.status === "AGENDADO";
               return (
                 <AppointmentCard

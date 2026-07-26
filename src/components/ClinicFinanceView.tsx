@@ -13,6 +13,7 @@ import type {
   CedigPolypectomyTierId,
   CedigPriceTableId,
 } from "@/lib/clinic-finance/cedig-pricing";
+import { civilDateISO } from "@/lib/timezone";
 
 function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -126,14 +127,14 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     mucosectomies: "0",
     clips: "0",
     notes: "",
-    performedAt: now.toISOString().slice(0, 10),
+    performedAt: civilDateISO(now),
   });
 
   const [expenseForm, setExpenseForm] = useState({
     category: "LABORATORIO",
     description: "",
     amount: "",
-    expenseDate: now.toISOString().slice(0, 10),
+    expenseDate: civilDateISO(now),
   });
 
   const selectedProcedure = procedures.find((p) => p.id === form.procedureId);

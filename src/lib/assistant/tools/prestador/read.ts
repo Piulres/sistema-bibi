@@ -3,7 +3,7 @@ import type { AssistantToolDefinition } from "@/lib/assistant/types";
 import { getPrestadorDashboard } from "@/lib/prestador-dashboard";
 import { listAppointments } from "@/lib/appointment-service";
 import { getPrestadorExtrato } from "@/lib/prestador-extrato";
-import { dayRange, formatDateLabel, parseAssistantDate } from "@/lib/assistant/dates";
+import { dayRange, formatDateLabel, parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
 import { getPrisma } from "@/lib/db";
 
 export const prestadorReadTools: AssistantToolDefinition[] = [
@@ -103,7 +103,3 @@ export const prestadorReadTools: AssistantToolDefinition[] = [
     },
   },
 ];
-
-function toIsoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
-}

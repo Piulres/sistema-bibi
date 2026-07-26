@@ -13,6 +13,7 @@ import { listPets } from "@/lib/pet-service";
 import { getPrisma } from "@/lib/db";
 import { getDataStoreMode, isDualDataStoreEnabled } from "@/lib/data-store-mode";
 import { requiresPet } from "@/lib/vet-niche";
+import { dayRangeInAppTz } from "@/lib/timezone";
 
 export async function GET(request: Request) {
   try {
@@ -24,8 +25,9 @@ export async function GET(request: Request) {
     let from: Date | undefined;
     let to: Date | undefined;
     if (dateParam) {
-      from = new Date(`${dateParam}T00:00:00`);
-      to = new Date(`${dateParam}T23:59:59.999`);
+      const range = dayRangeInAppTz(dateParam);
+      from = range.from;
+      to = range.to;
     }
 
     const prisma = await getPrisma();

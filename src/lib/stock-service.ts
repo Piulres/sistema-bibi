@@ -1,4 +1,5 @@
 import "server-only";
+import { formatDateBR, formatDateTimeBR } from "@/lib/timezone";
 import type { Prisma } from "@prisma/client";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
@@ -84,17 +85,9 @@ export type StockAlertView = {
   minStock?: number;
 };
 
-const dateLabel = (value: Date) =>
-  value.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
+const dateLabel = (value: Date) => formatDateBR(value);
 
-const dateTimeLabel = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+const dateTimeLabel = (value: Date) => formatDateTimeBR(value);
 
 function daysBetween(from: Date, to: Date): number {
   const ms = to.getTime() - from.getTime();

@@ -1,57 +1,66 @@
 import "server-only";
+import {
+  APP_TIMEZONE,
+  civilDateISO,
+  dayRangeInAppTz,
+  formatDateBR,
+  shiftCivilDate,
+  zonedDateTimeToUtc,
+} from "@/lib/timezone";
 
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
 
-/** Interpreta YYYY-MM-DD ou palavras relativas (hoje, ontem, amanhã). */
+/** Interpreta YYYY-MM-DD ou palavras relativas (hoje, ontem, amanhã) no fuso da app. */
 export function parseAssistantDate(input: string | undefined, now = new Date()): Date {
   const normalized = input?.trim().toLowerCase() ?? "hoje";
 
   if (ISO_DATE.test(normalized)) {
-    return new Date(`${normalized}T12:00:00`);
+    const [year, month, day] = normalized.split("-").map(Number);
+    return zonedDateTimeToUtc({ year, month, day, hour: 12 });
   }
 
-  const base = new Date(now);
-  base.setHours(12, 0, 0, 0);
+  const todayISO = civilDateISO(now);
 
-  if (normalized === "hoje" || normalized === "today") return base;
+  if (normalized === "hoje" || normalized === "today") {
+    const [year, month, day] = todayISO.split("-").map(Number);
+    return zonedDateTimeToUtc({ year, month, day, hour: 12 });
+  }
   if (normalized === "ontem" || normalized === "yesterday") {
-    base.setDate(base.getDate() - 1);
-    return base;
+    const iso = shiftCivilDate(todayISO, -1);
+    const [year, month, day] = iso.split("-").map(Number);
+    return zonedDateTimeToUtc({ year, month, day, hour: 12 });
   }
   if (normalized === "amanhã" || normalized === "amanha" || normalized === "tomorrow") {
-    base.setDate(base.getDate() + 1);
-    return base;
+    const iso = shiftCivilDate(todayISO, 1);
+    const [year, month, day] = iso.split("-").map(Number);
+    return zonedDateTimeToUtc({ year, month, day, hour: 12 });
   }
 
   const brMatch = normalized.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
   if (brMatch) {
     const day = Number(brMatch[1]);
-    const month = Number(brMatch[2]) - 1;
+    const month = Number(brMatch[2]);
     const year = brMatch[3]
       ? Number(brMatch[3].length === 2 ? `20${brMatch[3]}` : brMatch[3])
-      : now.getFullYear();
-    return new Date(year, month, day, 12, 0, 0, 0);
+      : Number(todayISO.slice(0, 4));
+    return zonedDateTimeToUtc({ year, month, day, hour: 12 });
   }
 
-  return base;
+  const [year, month, day] = todayISO.split("-").map(Number);
+  return zonedDateTimeToUtc({ year, month, day, hour: 12 });
 }
 
 export function dayRange(date: Date): { from: Date; to: Date } {
-  const from = new Date(date);
-  from.setHours(0, 0, 0, 0);
-  const to = new Date(date);
-  to.setHours(23, 59, 59, 999);
+  const { from, to } = dayRangeInAppTz(date);
   return { from, to };
 }
 
 export function toIsoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return civilDateISO(date);
 }
 
 export function formatDateLabel(date: Date): string {
-  return date.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+  return formatDateBR(date);
 }
+
+export { APP_TIMEZONE };

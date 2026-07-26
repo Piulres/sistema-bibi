@@ -9,6 +9,7 @@ import { hashPassword } from "../../src/lib/password";
 import { getCedigExamBasePrice } from "../../src/lib/clinic-finance/cedig-pricing";
 import type { CedigPriceTableId } from "../../src/lib/clinic-finance/cedig-pricing";
 import { bridgeExamLaunchToOperations } from "../../src/lib/clinic-finance/bridge";
+import { civilDateISO, parseAppDateTime, shiftCivilDate } from "../../src/lib/timezone";
 
 const DEMO_PASSWORD = hashPassword("bibi123");
 
@@ -546,12 +547,10 @@ async function seedCedigOperationalHistory(
     return;
   }
 
-  const today = new Date();
   const at = (hour: number, dayOffset = 0) => {
-    const d = new Date(today);
-    d.setDate(d.getDate() + dayOffset);
-    d.setHours(hour, 0, 0, 0);
-    return d;
+    const dateISO = shiftCivilDate(civilDateISO(), dayOffset);
+    const time = `${String(hour).padStart(2, "0")}:00`;
+    return parseAppDateTime(dateISO, time);
   };
 
   await prisma.appointment.createMany({

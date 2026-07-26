@@ -6,8 +6,14 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "@/lib/timeline";
+import {
+  civilDateISO,
+  dayRangeInAppTz,
+  formatDateTimeBR,
+  zonedDateTimeToUtc,
+} from "@/lib/timezone";
 
-/** Horário comercial simplificado para slots (POC). */
+/** Horário comercial simplificado para slots (POC) — fuso America/Sao_Paulo. */
 const SLOT_START_HOUR = 8;
 const SLOT_END_HOUR = 18;
 
@@ -21,37 +27,20 @@ export type AppointmentSlotWithProvider = AppointmentSlot & {
   providerName: string;
 };
 
-function startOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(0, 0, 0, 0);
-  return d;
-}
-
-function endOfDay(date: Date): Date {
-  const d = new Date(date);
-  d.setHours(23, 59, 59, 999);
-  return d;
-}
-
-function buildDaySlots(dayStart: Date, bookedSet: Set<number>): AppointmentSlot[] {
+function buildDaySlots(dateISO: string, bookedSet: Set<number>): AppointmentSlot[] {
   const slots: AppointmentSlot[] = [];
   const now = Date.now();
+  const [year, month, day] = dateISO.split("-").map(Number);
 
   for (let hour = SLOT_START_HOUR; hour < SLOT_END_HOUR; hour++) {
     for (const minute of [0, 30]) {
-      const slot = new Date(dayStart);
-      slot.setHours(hour, minute, 0, 0);
+      const slot = zonedDateTimeToUtc({ year, month, day, hour, minute });
       if (slot.getTime() < now) continue;
       if (bookedSet.has(slot.getTime())) continue;
 
       slots.push({
         start: slot.toISOString(),
-        label: slot.toLocaleString("pt-BR", {
-          day: "2-digit",
-          month: "2-digit",
-          hour: "2-digit",
-          minute: "2-digit",
-        }),
+        label: formatDateTimeBR(slot, { year: undefined }),
       });
     }
   }
@@ -59,15 +48,15 @@ function buildDaySlots(dayStart: Date, bookedSet: Set<number>): AppointmentSlot[
   return slots;
 }
 
-/** Gera slots de 30min entre 8h e 18h excluindo horários já ocupados. */
+/** Gera slots de 30min entre 8h e 18h (BRT) excluindo horários já ocupados. */
 export async function getAvailableSlots(input: {
   tenantId: string;
   providerId: string;
   date: Date;
 }): Promise<{ slots: AppointmentSlot[] }> {
   const prisma = await getPrisma();
-  const dayStart = startOfDay(input.date);
-  const dayEnd = endOfDay(input.date);
+  const dateISO = civilDateISO(input.date);
+  const { from: dayStart, to: dayEnd } = dayRangeInAppTz(dateISO);
 
   const booked = await prisma.appointment.findMany({
     where: {
@@ -80,7 +69,7 @@ export async function getAvailableSlots(input: {
   });
 
   const bookedSet = new Set(booked.map((b) => b.scheduledAt.getTime()));
-  return { slots: buildDaySlots(dayStart, bookedSet) };
+  return { slots: buildDaySlots(dateISO, bookedSet) };
 }
 
 /** Slots livres de todos os prestadores em uma data (para quem não tem preferência). */
@@ -180,11 +169,10 @@ export async function bookBeneficiaryAppointment(input: {
     providerId = assigned.id;
   }
 
-  const slotDate = startOfDay(input.scheduledAt);
   const { slots } = await getAvailableSlots({
     tenantId: input.tenantId,
     providerId,
-    date: slotDate,
+    date: input.scheduledAt,
   });
 
   const available = slots.some((s) => s.start === input.scheduledAt.toISOString());

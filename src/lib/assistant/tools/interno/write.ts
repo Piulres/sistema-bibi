@@ -5,6 +5,7 @@ import { ROLES } from "@/lib/roles";
 import { isAssignableRole } from "@/lib/user-service";
 import { isInternoProfile } from "@/lib/interno-permissions";
 import { parseAssistantDate, toIsoDate } from "@/lib/assistant/dates";
+import { formatDateBR, formatDateTimeBR, parseAppDateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import {
   resolveAppointmentDraft,
@@ -140,7 +141,7 @@ export const internoWriteTools: AssistantToolDefinition[] = [
         summary: {
           Nome: data.name.trim(),
           CPF: data.cpf.trim(),
-          "Nascimento": birth.toLocaleDateString("pt-BR"),
+          "Nascimento": formatDateBR(birth),
         },
         href: "/interno/cadastros",
       });
@@ -183,12 +184,16 @@ export const internoWriteTools: AssistantToolDefinition[] = [
       const finalData = resolved.data;
       const procedureLabel = resolved.procedureLabel;
 
-      const baseDate = parseAssistantDate(finalData.date!);
-      const [hour, minute] = finalData.time!.split(":").map(Number);
-      if (Number.isNaN(hour) || Number.isNaN(minute)) {
+      const time = finalData.time!.trim();
+      if (!/^\d{2}:\d{2}$/.test(time)) {
         return { error: "Hora inválida. Use HH:MM." };
       }
-      baseDate.setHours(hour, minute, 0, 0);
+      let baseDate: Date;
+      try {
+        baseDate = parseAppDateTime(toIsoDate(parseAssistantDate(finalData.date!)), time);
+      } catch {
+        return { error: "Hora inválida. Use HH:MM." };
+      }
 
       const prisma = await getPrisma();
       const [patient, provider] = await Promise.all([
@@ -224,7 +229,7 @@ export const internoWriteTools: AssistantToolDefinition[] = [
             ? { [ctx.labels.patient]: resolved.petLabel, [ctx.labels.beneficiary]: patient?.name ?? "—" }
             : { [ctx.labels.patient]: patient?.name ?? finalData.patientName ?? "—" }),
           [ctx.labels.provider]: provider?.name ?? finalData.providerName ?? "—",
-          Data: baseDate.toLocaleString("pt-BR"),
+          Data: formatDateTimeBR(baseDate),
           ...(procedureLabel ? { [ctx.labels.procedure]: procedureLabel } : {}),
           ...(reason && !procedureLabel ? { Motivo: reason } : {}),
         },

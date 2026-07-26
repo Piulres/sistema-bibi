@@ -1,3 +1,4 @@
+import { formatDateTimeBR as dateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import type { Prisma, PrismaClient } from "@prisma/client";
 import {
@@ -31,14 +32,6 @@ export type RecordTimelineInput = {
 
 type DbClient = Prisma.TransactionClient | PrismaClient;
 
-const dateTime = (value: Date) =>
-  value.toLocaleString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 
 /**
  * Registra um evento na timeline universal.
