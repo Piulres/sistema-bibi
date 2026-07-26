@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.7** — UX mobile portais + dashboard + exports **em publicação**.
+> Pacote **v3.0.7** — UX mobile portais + dashboard + exports **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.6** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) · *substituir após deploy v3.0.7* |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.7** — deploy `6a65e256` @ `bce3203` (`bibi-poc-2026-07-26g`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.7** (prep) · pendente sync pós-deploy |
+| **Release `main` / `dev`** | **v3.0.7** · `main`/`dev` sincronizadas · artefato prod `@ bce3203` |
 | **Pacote anterior em produção** | **3.0.6** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,9 +25,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.7** (prep) |
-| **Release** | `main` | **v3.0.7** (prep) |
-| **Netlify** | **sistema-bibi.netlify.app** | **3.0.6** até deploy `bibi-poc-2026-07-26g` |
+| **Integração** | `dev` | **v3.0.7** |
+| **Release** | `main` | **v3.0.7** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.7** · deploy `6a65e256` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.7
@@ -37,11 +37,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
 
-### Smoke (26/07/2026) — produção v3.0.6 (atual)
+### Smoke (26/07/2026) — produção v3.0.7
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.6` |
+| Landing `/` | 200 · footer `v3.0.7` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
@@ -117,7 +117,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.7`** | *(pendente deploy)* | Drawer mobile direita + dashboard + gestão mobile + exports canônicos |
+| **`v3.0.7`** | `bce3203` | Drawer mobile direita + dashboard + gestão mobile + exports canônicos |
 | **`v3.0.6`** | `ed14233` | Home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) |
 | **`v3.0.5`** | `cf0eb26` | Atendimento clínico + jornada faturada + UX landing/portais (#221/#225–#227) |
 | **`v3.0.4`** | `fd22ebc` | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219/#220) |
@@ -357,7 +357,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ⏳ **`v3.0.7` em publicação** — drawer mobile + dashboard + exports |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.7` em produção** — drawer mobile + dashboard + exports |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

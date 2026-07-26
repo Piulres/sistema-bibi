@@ -49,7 +49,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "Vitest · E2E mobile-nav · docs:verify · pre-release OK",
+    testStats: "598 testes Vitest · E2E mobile-nav · docs:verify · pre-release OK",
   },
   {
     version: "3.0.6",
