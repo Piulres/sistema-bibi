@@ -288,7 +288,7 @@ export default function ComunicacaoView() {
                     <div>
                       <Link
                         href={`/interno/beneficiarios/${message.patientId}?from=/interno/comunicacao`}
-                        className="font-semibold text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link px-0 font-semibold"
                       >
                         {message.patientName}
                       </Link>

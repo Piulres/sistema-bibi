@@ -86,18 +86,15 @@ export default function PjView() {
       {data && (() => {
         const { company, alerts, beneficiaries, invoices, subscriptions, summary } = data;
         return (
-    <div className="space-y-8">
+    <div className="min-w-0 space-y-8">
       {alerts.length > 0 && (
         <div className="space-y-2">
           {alerts.map((a, i) => (
-            <Alert key={i} tone={alertTone[a.tone]}>
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <span>{a.message}</span>
+            <Alert key={i} tone={alertTone[a.tone]} className="min-w-0 break-words">
+              <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
+                <span className="min-w-0 break-words">{a.message}</span>
                 {a.href && a.actionLabel && (
-                  <a
-                    href={a.href}
-                    className="inline-flex items-center rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-1.5 text-sm text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
-                  >
+                  <a href={a.href} className="ds-touch-link ds-touch-link-solid shrink-0">
                     {a.actionLabel}
                   </a>
                 )}
@@ -150,7 +147,26 @@ export default function PjView() {
 
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title="Beneficiários" />
-        <div className="mt-4 overflow-x-auto rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
+        <ul className="mt-4 space-y-2 md:hidden">
+          {beneficiaries.map((b) => (
+            <li key={b.id}>
+              <Card padding="sm" className="min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="break-words font-medium text-[var(--text-primary)]">{b.name}</p>
+                    <p className="text-sm text-[var(--text-muted)]">{b.cpf}</p>
+                  </div>
+                  <p className="shrink-0 font-semibold text-[var(--text-primary)]">{b.consumedLabel}</p>
+                </div>
+                <p className="mt-2 text-xs text-[var(--text-muted)]">
+                  {b.usageCount} procedimento{b.usageCount === 1 ? "" : "s"}
+                  {b.pendingLabel ? ` · Pendente ${b.pendingLabel}` : ""}
+                </p>
+              </Card>
+            </li>
+          ))}
+        </ul>
+        <div className="ds-scroll-x mt-4 hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] md:block">
           <table className="w-full min-w-[36rem] text-left text-sm">
             <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
               <tr>

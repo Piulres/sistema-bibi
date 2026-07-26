@@ -16,9 +16,10 @@ const variants = {
 } as const;
 
 const sizes = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2.5 text-sm font-semibold",
-  lg: "px-5 py-3 text-base font-semibold",
+  /** min-h-10: alvo de toque utilizável em mobile (~40px) */
+  sm: "min-h-10 px-3 py-2 text-sm",
+  md: "min-h-11 px-4 py-2.5 text-sm font-semibold",
+  lg: "min-h-12 px-5 py-3 text-base font-semibold",
 } as const;
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {

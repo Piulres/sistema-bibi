@@ -229,7 +229,7 @@ export default function BillingView() {
                   <div>
                     <Link
                       href={`/interno/beneficiarios/${g.patientId}?from=/interno`}
-                      className="font-semibold text-[var(--portal-accent)] hover:underline"
+                      className="ds-touch-link px-0 font-semibold"
                     >
                       {g.patientName}
                     </Link>
@@ -259,9 +259,11 @@ export default function BillingView() {
                 </div>
                 <ul className="mt-3 divide-y divide-[var(--border-default)] border-t border-[var(--border-default)]">
                   {g.items.map((it) => (
-                    <li key={it.id} className="flex justify-between py-2 text-sm">
-                      <span className="text-[var(--text-secondary)]">{it.procedure}</span>
-                      <span className="text-[var(--text-muted)]">{it.priceLabel}</span>
+                    <li key={it.id} className="flex items-start justify-between gap-3 py-2 text-sm">
+                      <span className="min-w-0 break-words text-[var(--text-secondary)]">
+                        {it.procedure}
+                      </span>
+                      <span className="shrink-0 text-[var(--text-muted)]">{it.priceLabel}</span>
                     </li>
                   ))}
                 </ul>
@@ -276,8 +278,71 @@ export default function BillingView() {
             <ExportButtons baseUrl="/api/interno/billing/export" />
           </div>
           {invoices.length === 0 && <EmptyState message="Nenhuma fatura emitida ainda." />}
-          <div className="mt-4 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
-            <table className="w-full text-left text-sm">
+          <ul className="mt-4 space-y-3 md:hidden">
+            {invoices.map((inv) => (
+              <li key={inv.id}>
+                <Card padding="sm" className="min-w-0 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <Link
+                        href={`/interno/beneficiarios/${inv.patientId}?from=/interno`}
+                        className="ds-touch-link break-words px-0 font-medium"
+                      >
+                        {inv.patientName}
+                      </Link>
+                      <p className="break-words text-sm text-[var(--text-muted)]">
+                        {inv.company ?? "Particular"} · {inv.itemsCount} item
+                        {inv.itemsCount === 1 ? "" : "s"}
+                      </p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <p className="font-semibold text-[var(--text-primary)]">{inv.totalLabel}</p>
+                      <div className="mt-1">
+                        <StatusBadge value={inv.status} map="invoice" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <ExportButtons
+                      baseUrl={`/api/interno/invoices/${inv.id}/export`}
+                      formats={["pdf", "xlsx"]}
+                    />
+                    <a
+                      href={`/api/interno/invoices/${inv.id}/tiss`}
+                      download
+                      className="ds-touch-link"
+                    >
+                      XML
+                    </a>
+                  </div>
+                  {inv.status !== "PAGA" && (
+                    <div className="flex flex-wrap gap-2">
+                      {gatewayConfigured && (
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={isBusy(`pix-${inv.id}`)}
+                          onClick={() => generatePix(inv.id, inv.totalLabel)}
+                        >
+                          {isBusy(`pix-${inv.id}`) ? "..." : "PIX"}
+                        </Button>
+                      )}
+                      <Button
+                        variant="portal"
+                        size="sm"
+                        disabled={isBusy(`pay-${inv.id}`)}
+                        onClick={() => markPaid(inv.id, inv.totalLabel)}
+                      >
+                        {isBusy(`pay-${inv.id}`) ? "..." : "Marcar paga"}
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+              </li>
+            ))}
+          </ul>
+          <div className="ds-scroll-x mt-4 hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] md:block">
+            <table className="w-full min-w-[44rem] text-left text-sm">
               <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
                 <tr>
                   <th className="px-4 py-2 font-medium">Beneficiário</th>
@@ -295,7 +360,7 @@ export default function BillingView() {
                     <td className="px-4 py-2">
                       <Link
                         href={`/interno/beneficiarios/${inv.patientId}?from=/interno`}
-                        className="font-medium text-[var(--portal-accent)] hover:underline"
+                        className="ds-touch-link px-0 font-medium"
                       >
                         {inv.patientName}
                       </Link>
@@ -319,7 +384,7 @@ export default function BillingView() {
                         <a
                           href={`/api/interno/invoices/${inv.id}/tiss`}
                           download
-                          className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
+                          className="ds-touch-link"
                         >
                           XML
                         </a>

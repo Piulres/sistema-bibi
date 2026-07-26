@@ -606,7 +606,7 @@ export default function AppointmentsView() {
                           href={a.telemedicineUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-sm text-[var(--portal-accent)] hover:underline"
+                          className="ds-touch-link"
                         >
                           Entrar na sala virtual
                         </a>
@@ -632,14 +632,14 @@ export default function AppointmentsView() {
                       {a.status !== "CANCELADO" && a.status !== "FALTOU" && (
                         <Link
                           href={`/interno/gestao?appointmentId=${encodeURIComponent(a.id)}&patientId=${encodeURIComponent(a.patientId)}&patientName=${encodeURIComponent(a.patientName)}&providerId=${encodeURIComponent(a.providerId)}${a.procedureId ? `&procedureId=${encodeURIComponent(a.procedureId)}` : ""}`}
-                          className="inline-flex items-center rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-2.5 py-1 text-sm font-medium text-[var(--text-primary)] transition hover:bg-[var(--surface-muted)]"
+                          className="ds-touch-link ds-touch-link-solid"
                           data-cursor-id="agenda-launch-gestao"
                         >
                           Lançar na gestão
                         </Link>
                       )}
                       <select
-                        className="rounded border border-[var(--border-muted)] bg-[var(--surface-card)] px-2 py-1 text-sm"
+                        className="ds-touch-select"
                         value={a.status}
                         disabled={isBusy(a.id)}
                         onChange={(e) => updateStatus(a.id, e.target.value, a.scheduledAtLabel)}

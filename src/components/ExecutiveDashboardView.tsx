@@ -228,10 +228,7 @@ export default function ExecutiveDashboardView() {
                   ))}
                 </ul>
               )}
-              <Link
-                href="/interno/crm"
-                className="mt-4 inline-block text-sm font-medium text-[var(--portal-accent)] hover:underline"
-              >
+              <Link href="/interno/crm" className="ds-touch-link mt-4">
                 Ver pipeline completo →
               </Link>
             </Card>
@@ -244,45 +241,69 @@ export default function ExecutiveDashboardView() {
                 Nenhum procedimento pendente de faturamento.
               </p>
             ) : (
-              <div className="mt-3 overflow-hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)]">
-                <table className="w-full text-left text-sm">
-                  <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
-                    <tr>
-                      <th className="px-4 py-2 font-medium">{labels.beneficiary}</th>
-                      <th className="px-4 py-2 font-medium">Itens</th>
-                      <th className="px-4 py-2 text-right font-medium">Valor</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[var(--border-default)]">
-                    {dashboard.topPendingBilling.map((row) => (
-                      <tr key={row.patientId}>
-                        <td className="px-4 py-2">
+              <>
+                <ul className="mt-3 space-y-2 md:hidden">
+                  {dashboard.topPendingBilling.map((row) => (
+                    <li
+                      key={row.patientId}
+                      className="rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] p-3 shadow-[var(--shadow-card)]"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
                           <Link
                             href={`/interno/beneficiarios/${row.patientId}?from=/interno/dashboard`}
-                            className="font-medium text-[var(--portal-accent)] hover:underline"
+                            className="ds-touch-link px-0 font-medium"
                           >
                             {row.patientName}
                           </Link>
-                        </td>
-                        <td className="px-4 py-2 text-[var(--text-muted)]">{row.itemsCount}</td>
-                        <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
+                          <p className="mt-1 text-xs text-[var(--text-muted)]">
+                            {row.itemsCount} item{row.itemsCount === 1 ? "" : "s"}
+                          </p>
+                        </div>
+                        <p className="shrink-0 font-semibold text-[var(--text-primary)]">
                           {row.totalLabel}
-                        </td>
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+                <div className="ds-scroll-x mt-3 hidden rounded-[var(--radius-card)] border border-[var(--border-default)] bg-[var(--surface-card)] shadow-[var(--shadow-card)] md:block">
+                  <table className="w-full min-w-[28rem] text-left text-sm">
+                    <thead className="bg-[var(--surface-muted)] text-[var(--text-muted)]">
+                      <tr>
+                        <th className="px-4 py-2 font-medium">{labels.beneficiary}</th>
+                        <th className="px-4 py-2 font-medium">Itens</th>
+                        <th className="px-4 py-2 text-right font-medium">Valor</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-[var(--border-default)]">
+                      {dashboard.topPendingBilling.map((row) => (
+                        <tr key={row.patientId}>
+                          <td className="px-4 py-2">
+                            <Link
+                              href={`/interno/beneficiarios/${row.patientId}?from=/interno/dashboard`}
+                              className="ds-touch-link px-0 font-medium"
+                            >
+                              {row.patientName}
+                            </Link>
+                          </td>
+                          <td className="px-4 py-2 text-[var(--text-muted)]">{row.itemsCount}</td>
+                          <td className="px-4 py-2 text-right font-semibold text-[var(--text-primary)]">
+                            {row.totalLabel}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </section>
 
           <section>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h2 className="text-lg font-semibold text-[var(--text-primary)]">Atividade recente</h2>
-              <Link
-                href="/interno/auditoria"
-                className="text-sm font-medium text-[var(--portal-accent)] hover:underline"
-              >
+              <Link href="/interno/auditoria" className="ds-touch-link">
                 Ver auditoria completa
               </Link>
             </div>

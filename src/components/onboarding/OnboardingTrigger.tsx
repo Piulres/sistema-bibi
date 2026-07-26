@@ -16,13 +16,14 @@ export default function OnboardingTrigger() {
       onClick={onboarding.startTour}
       title="Iniciar tour guiado"
       aria-label="Iniciar tour guiado"
-      className="inline-flex"
+      className="inline-flex min-h-9 min-w-9 justify-center px-2 sm:px-3"
+      data-testid="onboarding-trigger"
       data-tour-id="onboarding-trigger"
     >
-      <span aria-hidden className="mr-1">
+      <span aria-hidden className="sm:mr-1">
         ?
       </span>
-      Tour
+      <span className="hidden sm:inline">Tour</span>
     </Button>
   );
 }

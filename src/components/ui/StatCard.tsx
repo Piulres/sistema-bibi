@@ -30,19 +30,28 @@ export default function StatCard({ label, value, hint, info, tone = "default", c
   const describedBy = hint ? hintId : undefined;
 
   return (
-    <Card padding="sm" className={cn("flex flex-col", className)}>
-      <p className="flex items-center gap-1.5 text-sm text-[var(--text-muted)]">
-        <span>{label}</span>
+    <Card
+      padding="sm"
+      className={cn(
+        "flex flex-col max-sm:!p-3",
+        className,
+      )}
+    >
+      <p className="flex items-center gap-1.5 text-xs text-[var(--text-muted)] sm:text-sm">
+        <span className="min-w-0 break-words">{label}</span>
         {info ? <InfoTooltip content={info} label={`Ajuda: ${label}`} /> : null}
       </p>
       <p
-        className={cn("mt-1 text-2xl font-bold tracking-tight", valueToneClass[tone])}
+        className={cn(
+          "mt-0.5 text-xl font-bold tracking-tight sm:mt-1 sm:text-2xl",
+          valueToneClass[tone],
+        )}
         aria-describedby={describedBy}
       >
         {value}
       </p>
       {hint ? (
-        <p id={hintId} className="mt-1 text-xs text-[var(--text-muted)]">
+        <p id={hintId} className="mt-0.5 text-xs text-[var(--text-muted)] sm:mt-1">
           {hint}
         </p>
       ) : null}
