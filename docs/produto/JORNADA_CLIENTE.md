@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.6** em produção — home comercial, nav portais redesenhada, assistente fecha ao navegar; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.7** em produção — drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
 
 ---
 
@@ -137,7 +137,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 ## 3. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export CSV
+**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export multi-formato
 
 ### 3.1 Jornada típica
 
@@ -147,13 +147,13 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | 2. Alertas | Lê avisos de inadimplência, faturas abertas, cobranças vencidas | Topo da página | Alertas com âncoras (`#assinaturas`) |
 | 3. KPIs | Vê contrato, beneficiários, consumo PPU, MRR | Cards de resumo | `getPjPortalOverview()` |
 | 4. Drill-down | Analisa consumo por colaborador | Tabela “Beneficiários” | Consumo e pendente por CPF |
-| 5. Export | Baixa relatório CSV | Botão “Exportar relatório CSV” | `GET /api/pj/reports` |
+| 5. Export | Baixa relatório | `ExportButtons` (PDF, CSV, JSON, TXT) | `GET /api/pj/reports?format=` |
 
 ### 3.2 Pontos fortes
 
 - Alertas proativos (inadimplência, negociação, faturas abertas).
 - Consumo granular por beneficiário — core B2B.
-- Export CSV para integração com ERP/planilha.
+- Export multi-formato (PDF/CSV/JSON/TXT) para integração com ERP/planilha.
 
 ### 3.3 Gaps e melhorias
 
@@ -336,7 +336,7 @@ Escala por dimensão de jornada (não cobertura de código).
 | Self-service | ✅ agendar + pagar | ❌ só leitura | 🟡 só atendimento | ✅ CRUD completo |
 | Transparência financeira | ⭐ ✅ | ⭐ ✅ | 🟡 vê preço no ato | ✅ |
 | Comunicação proativa | 🟡 mock | 🟡 alertas passivos | ❌ | 🟡 fila mock |
-| Mobile / PWA | ✅ drawer módulos (v3.0.6) | 🟡 drawer seções | ✅ drawer + abas `shortLabel` (v3.0.6) | ✅ drawer + menu Mais (v3.0.6) |
+| Mobile / PWA | ✅ drawer direita (v3.0.7) | 🟡 drawer seções | ✅ drawer + abas `shortLabel` | ✅ drawer + menu Mais |
 | Integrações reais | 🟡 PIX mock | 🟡 CSV only | ❌ | 🟡 webhooks OK, TISS parcial |
 
 Legenda: ✅ implementado · 🟡 parcial/mock · ❌ ausente · ⭐ diferencial vs mercado clínico.

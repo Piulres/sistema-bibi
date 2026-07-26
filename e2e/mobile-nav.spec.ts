@@ -96,8 +96,10 @@ test.describe("navegação responsiva", () => {
     expect((box?.x ?? 0) + (box?.width ?? 0)).toBeGreaterThan((viewport?.width ?? 0) - 8);
 
     const drawer = page.getByRole("navigation", { name: "Módulos do prestador" });
-    await expect(drawer.getByText("Agenda", { exact: true })).toBeVisible();
-    await expect(drawer.getByText("Financeiro", { exact: true })).toBeVisible();
+    // Categorias (heading) e links são textos distintos — evitar getByText ambíguo
+    await expect(drawer.getByRole("paragraph").filter({ hasText: /^Agenda$/ })).toBeVisible();
+    await expect(drawer.getByRole("paragraph").filter({ hasText: /^Financeiro$/ })).toBeVisible();
+    await expect(drawer.getByRole("link", { name: "Agenda" })).toBeVisible();
     await drawer.getByRole("link", { name: "Agenda" }).click();
     await expect(page).toHaveURL(/\/prestador$/);
   });
