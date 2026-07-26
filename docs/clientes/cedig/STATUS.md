@@ -93,7 +93,11 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
+<<<<<<< HEAD
+| 2026-07-26 | Limpeza operation.db (Blobs): unificou 2 anamneses da consulta Renan Emigdio + Dra. Gabriela Lage; removeu 8 usuários e massa efêmera de testes (golive/smoke/persist). Script `scripts/cleanup-operation-test-data.mjs` + eventos de timeline `MEDICAL_RECORD_MERGED` / `OPERATION_TEST_DATA_CLEANUP` | ✅ |
+=======
 | 2026-07-26 | Incidente prod: `/interno/gestao` 500 ao listar/salvar (operation.db Blob sem colunas ponte v2.6) → schema-sync aditivo no boot Lambda | 🔧 fix em PR (requer deploy) |
+>>>>>>> origin/dev
 | 2026-07-26 | Docs vivas: status único; removidos FASE_2 / GO_LIVE / HISTORICO / FALHAS fragmentados | ✅ |
 | 2026-07-26 | Mapeamento 4 portais + agenda semana (21 exames, 4 walk-ins, 4 SYNCED) | ✅ KPIs 11.750 / 1.600 / 10.150 |
 | 2026-07-25 | Produção **v3.0.0** · modo operação · CEDIG provisionado · PWA `/instalar` | ✅ |

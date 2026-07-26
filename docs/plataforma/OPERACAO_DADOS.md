@@ -116,6 +116,19 @@ Depois: `/?tenant=cedig` · `alana@cedig.demo` / `bibi123` · `/interno/gestao`.
 
 ---
 
+## Limpeza pontual (operation.db em Blobs)
+
+Quando houver sujeira de testes no banco de **operação** (duplicata clínica, usuários `golive.*` / `*.persist.*`, smoke R$1):
+
+1. Baixar: `npx netlify blobs:get bibi-databases operation.db --output /tmp/operation.db`
+2. Rodar (sobre cópia): `node scripts/cleanup-operation-test-data.mjs /tmp/operation.db`
+3. Republicar com metadata: usar `@netlify/blobs` `store.set(..., { metadata: { updatedAt } })` para as Lambdas rehidratatem
+4. Registrar na timeline do cliente (ex.: [`docs/clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md))
+
+O script de 2026-07-26 unificou as anamneses da consulta **Renan Emigdio** / **Dra. Gabriela Lage** e removeu a massa efêmera de golive/smoke — mantendo a consulta, a ficha unificada e a prescrição Dexilant.
+
+---
+
 ## Limitações conhecidas
 
 | Aspecto | Demo | Operação |
