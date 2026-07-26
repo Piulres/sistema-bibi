@@ -11,37 +11,37 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (26/07/2026)
 
-> Pacote **v3.0.2** — hotfix schema-sync do banco de operação **publicado em produção**.
+> Pacote **v3.0.3** — flush Blob pós schema-sync, UX gestão e limpeza da operação CEDIG **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.2** — deploy `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.3** — deploy `6a65b0e3` @ `fc9afa7` (`bibi-poc-2026-07-26c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG provisionado |
-| **Release `main` / `dev`** | **v3.0.2** · tip `9ceeb49` |
-| **Pacote anterior em produção** | **3.0.1** — deploy `6a6594ac` @ `daf690e` (`bibi-poc-2026-07-26a`) |
+| **Release `main` / `dev`** | **v3.0.3** · tip `fc9afa7` |
+| **Pacote anterior em produção** | **3.0.2** — deploy `6a65a8a7` @ `9ceeb49` (`bibi-poc-2026-07-26b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.2** |
-| **Release** | `main` | **v3.0.2** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.2** · deploy `6a65a8a7` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.3** |
+| **Release** | `main` | **v3.0.3** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.3** · deploy `6a65b0e3` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
-### Smoke (26/07/2026) — produção v3.0.2 (incidente /interno/gestao)
+### Smoke (26/07/2026) — produção v3.0.3
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.2` |
-| Login CEDIG (`operacao@cedig.demo`, tenant `cedig`) | 200 |
-| `GET /api/interno/clinic-finance/launches` (era **500**) | **200** |
-| `GET .../meta` · `.../kpis` | 200 |
-| `POST .../launches` (fluxo da tela) | 200 · `bridgeStatus: SYNCED` |
+| Landing `/` | 200 · footer `v3.0.3` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| Login CEDIG (`operacao@cedig.demo`) | 200 |
+| `GET /api/interno/clinic-finance/launches` · `.../kpis` | 200 |
+| Users CEDIG sem leftovers golive/teste | 11 · Gabriela presente |
+| Paciente Renan · 1 anamnese unificada | ✅ |
+| `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
-
-> Nota: o smoke do POST criou um lançamento de teste (`Smoke Hotfix 3.0.2`, R$1) na operação. Fatura nasceu **PAGA** e não é anulável por regra de negócio — registro permanece rotulado para remoção manual.
 
 ### Conteúdo do pacote v3.0.1
 
@@ -53,6 +53,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.3`** | `fc9afa7` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
 | **`v3.0.2`** | `9ceeb49` | Hotfix: schema-sync do operation.db (incidente 500 em /interno/gestao) |
 | **`v3.0.1`** | `daf690e` | Qualidade multi-nicho + regras da agenda (auditoria P1–P3 + labels + CI) |
 | **`v3.0.0`** | `d2e0548` | PWA `/instalar` · manifest standalone · smoke Netlify |
@@ -288,7 +289,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.0` em produção** — PWA / app shell mobile |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.3` em produção** — PWA + gestão + limpeza operação |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
