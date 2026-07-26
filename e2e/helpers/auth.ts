@@ -115,9 +115,47 @@ export async function openInternoNav(page: Page) {
   if (await drawer.isVisible()) {
     return drawer;
   }
-  await page.locator(".lg\\:hidden").getByRole("button").first().click();
+  await page.getByRole("button", { name: /navegação/i }).click();
   await expect(drawer).toBeVisible();
   return drawer;
+}
+
+/**
+ * Confere presença de um módulo no portal-nav desktop, incluindo o menu **Mais**.
+ */
+export async function expectInternoNavHref(page: Page, href: string, present: boolean) {
+  await openInternoNav(page);
+  const desktop = internoNav(page);
+  if (await desktop.isVisible()) {
+    const inRail = desktop.locator(`a[href="${href}"]`);
+    if ((await inRail.count()) > 0) {
+      if (present) await expect(inRail.first()).toBeVisible();
+      else await expect(inRail).toHaveCount(0);
+      return;
+    }
+    const moreBtn = desktop.getByRole("button", { name: /^mais$/i });
+    if (await moreBtn.isVisible().catch(() => false)) {
+      const menu = page.getByRole("menu", { name: /mais módulos/i });
+      if (!(await menu.isVisible().catch(() => false))) {
+        await moreBtn.click();
+      }
+      const inMore = menu.locator(`a[href="${href}"]`);
+      if (present) await expect(inMore).toBeVisible();
+      else await expect(inMore).toHaveCount(0);
+      return;
+    }
+    if (present) {
+      await expect(inRail).toBeVisible();
+    } else {
+      await expect(inRail).toHaveCount(0);
+    }
+    return;
+  }
+
+  const drawer = internoNavDrawer(page);
+  const inDrawer = drawer.locator(`a[href="${href}"]`);
+  if (present) await expect(inDrawer).toBeVisible();
+  else await expect(inDrawer).toHaveCount(0);
 }
 
 /** Conteúdo principal de uma página de portal (evita texto oculto no header/nav). */
