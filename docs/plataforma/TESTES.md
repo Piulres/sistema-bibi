@@ -207,7 +207,7 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 ## Mapa das rotas API
 
-**FATO:** existem **~100** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **58** paths — subconjunto intencional para integradores.
+**FATO:** existem **160** Route Handlers em `src/app/api/`. O contrato OpenAPI documenta **123** paths (sync automático via `openapi:sync`). **37** handlers ainda sem path no YAML — `openapi:verify` emite aviso (não falha); ver [`API_DOCS.md`](API_DOCS.md) §5.
 
 Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público | ⏰ = CRON_SECRET
 
@@ -336,7 +336,7 @@ Senha única: `bibi123`
 
 Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 
-1. **unit-integration-api** — `lint` → `docs:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
+1. **unit-integration-api** — `lint` → `docs:verify` → `openapi:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
 2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)
 
 **Variáveis globais do workflow** (obrigatórias — Prisma falha sem `DATABASE_URL`):
@@ -351,7 +351,7 @@ Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 **Espelhar CI localmente:**
 
 ```bash
-npm run lint && npm run docs:verify
+npm run lint && npm run docs:verify && npm run openapi:verify
 SEED_SCALE=small npm run db:bootstrap:demo && npm run db:verify
 npm run test && npm run build
 CI=true npm run test:e2e
