@@ -15,10 +15,10 @@ Documentação relacionada: [`README.md`](../README.md) · [`FLUXOS.md`](../prod
 | Item | Estado |
 |------|--------|
 | Site principal | ✅ https://sistema-bibi.netlify.app (HTTP 200) |
-| Pacote em produção | **`v3.0.7`** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
-| Pacote anterior | **`v3.0.6`** — deploy `6a65cf36` @ `ed14233` (`bibi-poc-2026-07-26f`) |
-| `main` / `dev` | **v3.0.7** · sincronizadas @ `25385b2` |
-| Tags git | ✅ `v2.4.0` … `v3.0.7` |
+| Pacote em produção | **`v3.0.8`** — deploy `6a668d13` @ `5c94251` (`bibi-poc-2026-07-26i`) — ver [`RELEASES.md`](../versoes/RELEASES.md) |
+| Pacote anterior | **`v3.0.7`** — deploy `6a65eac9` @ `25385b2` (`bibi-poc-2026-07-26h`) |
+| `main` / `dev` | **v3.0.8** · sincronizadas @ `5c94251` |
+| Tags git | ✅ `v2.4.0` … `v3.0.8` |
 | Doc | [`../versoes/RELEASES.md`](../versoes/RELEASES.md) · [`../versoes/V3_0.md`](../versoes/V3_0.md) |
 | Validação pré-deploy | `npm run pre-release` (lint + docs + openapi + db + test + build + smoke PWA) |
 | Deploy produção | `npx netlify deploy --prod` (**com build integrado** — não usar `--no-build`) |

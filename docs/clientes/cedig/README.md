@@ -7,7 +7,7 @@
 | **Site** | [cedigcruzeiro.com.br](https://www.cedigcruzeiro.com.br) |
 | **Segmento** | `MEDICAL` · labels UI **Exame** |
 | **Slug** | `cedig` (`/?tenant=cedig`) |
-| **Produção** | **v3.0.7** @ https://sistema-bibi.netlify.app · modo **operação** |
+| **Produção** | **v3.0.8** @ https://sistema-bibi.netlify.app · modo **operação** |
 | **Contato** | (12) 3199-7871 · WhatsApp |
 | **Foco** | Endoscopia · Colonoscopia · Teste respiratório |
 | **Não confundir** | CEDIG São Paulo (Vila Mariana/Tucuruvi) é outra rede |
