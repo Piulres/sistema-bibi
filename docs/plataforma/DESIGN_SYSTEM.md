@@ -92,16 +92,29 @@ Localizados em `src/components/ui/`:
 
 Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário, prestador e walk-in da agenda.
 
-### Landing — navegação (v3.0.5)
+### Landing — navegação (v3.0.6)
 
 Fonte: `src/lib/landing/navigation.ts`.
 
 | Contexto | Âncoras | Observação |
 |----------|---------|------------|
-| Home (`/`) | 6 itens: Solução, Demo, Segmentos, Portais, Contato, FAQ | Seções ROI/comparativo/para-quem ficam na página, fora do menu |
+| Home (`/`) | 7 itens: Solução, Como funciona, Segmentos, Demo, Portais, Contato, FAQ | Seções ROI/comparativo/para-quem ficam na página, fora do menu |
 | Segmento (`/segmentos/*`) | Recursos, Como funciona, Portais, FAQ | Link **Início** volta à home |
 
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
+
+### Portal nav — abas de rota (v3.0.6)
+
+Fonte: `src/components/ui/NavTabs.tsx` + `src/lib/navigation/portal-nav.ts`.
+
+| Breakpoint | Comportamento |
+|------------|---------------|
+| Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com abas primárias; módulos `priority: "secondary"` no menu **Mais** |
+| Aba secundária ativa | Pinada na faixa principal (não some no dropdown) |
+| Mobile (`< lg`) | `MobileNavDrawer` portaled — gatilho com módulo ativo + contagem |
+| Sticky | `PORTAL_NAV_STICKY_CLASS` em `data-tour-id="portal-nav"` nos 4 portais |
+
+Definição das abas: `buildInternoNavTabs()`, `buildPrestadorNavTabs()`, etc. em `src/lib/navigation/`. E2E: `e2e/mobile-nav.spec.ts`.
 
 ### Portal header (v3.0.5)
 

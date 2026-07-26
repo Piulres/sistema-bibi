@@ -110,6 +110,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.6`** | `ed14233` | Home comercial + nav portais + assistente fecha ao navegar (#230/#232/#235) |
 | **`v3.0.5`** | `cf0eb26` | Atendimento clínico + jornada faturada + UX landing/portais (#221/#225–#227) |
 | **`v3.0.4`** | `fd22ebc` | TISS 422 + config Cursor enxuta + docs schema-sync (#212/#218/#219/#220) |
 | **`v3.0.3`** | `fc9afa7` | Flush Blob + UX gestão (#214) + limpeza operação CEDIG (#217) |
@@ -348,7 +349,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.5` em produção** — atendimento clínico + jornada faturada + UX landing/portais |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.6` em produção** — home comercial + nav portais + assistente |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

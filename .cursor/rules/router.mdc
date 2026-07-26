@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Router — Sistema Bibi - ServiceOS
 
-**Produto:** Sistema Bibi - ServiceOS **v3.0.4** · produção em `docs/versoes/RELEASES.md`  
+**Produto:** Sistema Bibi - ServiceOS **v3.0.6** · produção em `docs/versoes/RELEASES.md`  
 **Índice:** `AGENTS.md` · `docs/README.md` · `docs/plataforma/OPERACOES.md`
 
 ## Invariantes (toda sessão)

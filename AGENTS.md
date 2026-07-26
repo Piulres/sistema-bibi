@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Sistema Bibi - ServiceOS — guia para agentes
 
-**Versão:** v3.0.5 · **Produção:** `docs/versoes/RELEASES.md` · https://sistema-bibi.netlify.app
+**Versão:** v3.0.6 · **Produção:** `docs/versoes/RELEASES.md` · https://sistema-bibi.netlify.app
 
 Plataforma **multi-segmento** Pay Per Use com **quatro portais** (Prestador, Interno, PJ, Beneficiário). Saúde = segmento `MEDICAL` — não é HealthOS.
 
