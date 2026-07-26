@@ -106,6 +106,10 @@ find src/app/api -name 'route.ts' | wc -l          # Route Handlers (163)
 npm run openapi:verify                              # paths OpenAPI + handlers sem YAML
 npx vitest run 2>&1 | tail -3                       # casos Vitest (598)
 npx playwright test --list 2>&1 | tail -1           # casos E2E (156)
+# Páginas App Router por portal
+for p in prestador interno pj beneficiario; do
+  echo -n "$p: "; find "src/app/$p" -name page.tsx | wc -l
+done
 ```
 
 ---

@@ -14,6 +14,7 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Piloto CEDIG (status + timeline) | [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) |
 | Escopo da versão atual | [`../versoes/V3_0.md`](../versoes/V3_0.md) (+ histórico `V2_*` / `V1_*`) |
 | Fluxos de produto | [`../produto/FLUXOS.md`](../produto/FLUXOS.md) |
+| Jornada no consultório (narrativa operacional) | [`../produto/JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |
 | Documentos clínicos (atestado, receita, protocolos) | [`../produto/DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
 | Changelog da landing | [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md) |
 | Índice | [`../README.md`](../README.md) |
@@ -23,10 +24,10 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Subsistema alterado | Atualizar |
 |---------------------|-----------|
 | Prontuário / Care Chart / protocolos | `DOCUMENTOS_CLINICOS.md` · `FLUXOS.md` §3/§4.3 · `API_DOCS.md` §7 |
-| Jornada PPU / stepper / abas | `FLUXOS.md` §8.9 · `JORNADA_CLIENTE.md` · `src/lib/flow-improvements-map.ts` |
+| Jornada PPU / stepper / abas | `FLUXOS.md` §8.9 · `JORNADA_CLIENTE.md` · `JORNADA_CONSULTORIO.md` · `src/lib/flow-improvements-map.ts` |
 | Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
 | Portal nav (NavTabs, Mais, drawer) | `DESIGN_SYSTEM.md` · `ARQUITETURA_PORTAIS.md` §Navegação · `TESTES.md` (helpers E2E) |
-| RBAC interno / guards API | `TESTES.md` §lacunas · `AUDITORIA_FLUXOS.md` §5 · `tests/security/rbac-gaps.test.ts` |
+| RBAC interno / guards API | `TESTES.md` §RBAC · `AUDITORIA_FLUXOS.md` §5 · `tests/security/rbac-gaps.test.ts` |
 | Dashboard executivo (KPIs interno) | `FLUXOS.md` §4.0.1 · `ARQUITETURA.md` §15 · `ExecutiveDashboardView.tsx` |
 | Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |
 | Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |

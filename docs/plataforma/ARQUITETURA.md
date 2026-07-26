@@ -113,7 +113,7 @@ flowchart LR
 
 | Camada | Mecanismo | Arquivo |
 |--------|-----------|---------|
-| **Edge/Proxy** | Checagem otimista de cookie antes do App Router | `src/proxy.ts` |
+| **Edge/Proxy** | Validação HMAC do cookie antes do App Router | `src/proxy.ts` (`verifySessionToken`) |
 | **Servidor** | Validação HMAC-SHA256 + `role` + RBAC interno | `src/lib/session.ts`, `interno-guard.ts` |
 | **API** | `requireUser()` / `requireInternoModule()` em cada handler | `src/lib/api-auth.ts` |
 

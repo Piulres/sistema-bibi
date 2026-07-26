@@ -9,8 +9,8 @@ evidência ao código que a implementa.
 
 **Validação v2.3.0 (dev, jun/2026):** [`../versoes/V2_3.md`](../versoes/V2_3.md) — onboarding fase 2, micro-tours, OpenAPI, segmento Build.
 
-> Ambiente validado: `npm install` → `cp .env.example .env` → `npm run db:push` →
-> `npm run db:seed` → `npm run pre-release` (lint + build Netlify, sem publicar) →
+> Ambiente validado: `npm install` → `npm run setup` (`.env` + banco idempotente) →
+> `npm run pre-release` (lint + docs + openapi + test + build, sem publicar) →
 > `npm run dev` (servidor em `http://localhost:3000`). Operações completas em
 > [`../plataforma/OPERACOES.md`](../plataforma/OPERACOES.md). Credenciais de demonstração em
 > [`../../AGENTS.md`](../../AGENTS.md) e [`../../README.md`](../../README.md).

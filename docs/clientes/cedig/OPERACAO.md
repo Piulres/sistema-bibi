@@ -55,5 +55,27 @@ NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true npm run dev
 |--------|--------|
 | `scripts/cedig-mapear.sh` | Enrich + semana + lançamentos |
 | `scripts/cedig-golive-smoke.sh` | Smoke produção |
+| `scripts/reset-cedig-transactional.mjs` | Zera atendimentos/fluxos; mantém usuários, exames e preços |
+| `scripts/cedig-ensure-commercial.ts` | Garante empresas + PricingRules (sem pacientes) |
+| `scripts/publish-operation-blob.mjs` | Republica `operation.db` no Blob com `updatedAt` |
 
-Última massa mapeada (26/07): ver timeline em [`STATUS.md`](STATUS.md).
+### Limpar fluxos (voltar ao “zero operacional”)
+
+Remove agenda, lançamentos, faturas, PEP e pacientes de teste do tenant `cedig`.  
+**Mantém:** equipe, catálogo de exames (`basePrice`) e, após o ensure comercial, empresas/tabelas de preço.
+
+```bash
+# 1) Baixar cópia + backup
+npx netlify blobs:get bibi-databases operation.db --output /tmp/operation.db
+cp /tmp/operation.db /tmp/operation.backup.db
+
+# 2) Preview e aplicar
+node scripts/reset-cedig-transactional.mjs /tmp/operation.db --confirm=LIMPAR-FLUXOS --dry-run
+node scripts/reset-cedig-transactional.mjs /tmp/operation.db --confirm=LIMPAR-FLUXOS
+DATABASE_URL="file:/tmp/operation.db" npx tsx scripts/cedig-ensure-commercial.ts
+
+# 3) Republicar (produção)
+node scripts/publish-operation-blob.mjs /tmp/operation.db
+```
+
+Última massa mapeada / limpeza: ver timeline em [`STATUS.md`](STATUS.md).

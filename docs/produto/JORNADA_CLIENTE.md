@@ -267,7 +267,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
-| Baixa | 13 abas na nav — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
+| Baixa | 14–15 abas na nav interna — sobrecarga cognitiva | Agrupar: Operação · Financeiro · Plataforma |
 
 **Melhorias visuais implementadas (2026-06):** `StatCard` unificado em dashboard/PJ/beneficiário/faturamento; `FlowStepper` na jornada PPU; `CalloutCard` + `AppointmentCard` na agenda interna e prestador; `TabBar` em Cadastros; `EmptyState` com título e dica.
 
@@ -322,7 +322,8 @@ sequenceDiagram
 | 4 | Lembretes automáticos mock (`console`) | Paciente não recebe lembrete real | Adapter SendGrid/Twilio em produção |
 | 5 | Sem repasse ao prestador | Prestador não vê receita gerada | Módulo de repasse / extrato prestador |
 
-Detalhe técnico do fluxo: [`FLUXOS.md`](FLUXOS.md) §7.
+Detalhe técnico do fluxo: [`FLUXOS.md`](FLUXOS.md) §7.  
+Narrativa operacional (chegada → fechamento, todas as ramificações): [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md).
 
 ---
 
@@ -370,6 +371,7 @@ Gaps técnicos adicionais (SSO, Postgres, TISS XSD, telemedicina real): [`BENCHM
 
 | Documento | Conteúdo relacionado |
 |-----------|---------------------|
+| [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md) | Narrativa operacional no consultório (todas as opções por ato) |
 | [`FLUXOS.md`](FLUXOS.md) | Ações técnicas, APIs, RBAC, máquinas de estado, §8.7 melhorias de fluxo |
 | `src/lib/flow-improvements-map.ts` | Mapa canônico implementado vs backlog |
 | [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) | Falhas mapeadas por portal (segurança, RBAC API, bugs) |

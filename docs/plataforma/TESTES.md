@@ -128,11 +128,9 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 
 **Exceção documentada:** `GET /api/procedures` — catálogo compartilhado (`requireUser` sem módulo interno; impacto baixo).
 
-### 2. Proxy só verifica presença do cookie
+### 2. Proxy valida presença e assinatura HMAC do cookie
 
-`src/proxy.ts` redireciona se **não há** cookie `bibi_session`. Um cookie forjado (`fake-token`) passa pelo proxy; a validação HMAC só ocorre no servidor (`session.ts`).
-
-Teste: `tests/unit/proxy.test.ts` — documenta o comportamento intencional (otimista).
+`src/proxy.ts` redireciona para login se o cookie `bibi_session` estiver ausente **ou** com assinatura inválida (`verifySessionToken`). Cookie forjado (`fake-token`) é rejeitado no proxy — teste em `tests/unit/proxy.test.ts`. Role e RBAC continuam validados apenas no servidor (Server Components e Route Handlers).
 
 ### 3. SESSION_SECRET padrão em dev
 
@@ -240,10 +238,23 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 ### Beneficiário (14 rotas) — 🔑 BENEFICIARIO
 - overview, booking, invoices/PIX, export, projects (construction)
 
-### Outros (11 rotas)
+### Outros (12 rotas)
 - `auth` (5) · `cron` (2) · `assistant` (2) · `segment/persist` (1) · `procedures` (1) · `branding/logo` (1)
 
 Contrato OpenAPI: `public/openapi.yaml` — Swagger UI em `/api/docs` (ver [`API_DOCS.md`](API_DOCS.md)).
+
+### Páginas App Router (por portal)
+
+Contagem de `page.tsx` — distinto das abas na nav (detalhe em [`FLUXOS.md`](../produto/FLUXOS.md) §11):
+
+| Portal | Páginas | Notas |
+|--------|--------:|-------|
+| Prestador | 8 | dashboard, pacientes, atendimento, campo, extrato, relatórios |
+| Interno | 21 | 14–15 nav + login + cliente 360° + projetos/* + faturamento |
+| PJ | 4 | overview, projetos, login |
+| Beneficiário | 15 | 11 nav + obras (CONSTRUCTION) + login |
+
+Revalidar: `for p in prestador interno pj beneficiario; do echo -n "$p: "; find src/app/$p -name page.tsx | wc -l; done`
 
 ---
 
@@ -299,7 +310,7 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 
 ## Roadmap sugerido (prioridade)
 
-1. **P0 — Segurança:** testes de negação por perfil em todas as rotas internas + generalizar `requireInternoModuleWrite` onde fizer sentido
+1. **P0 — Segurança:** generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis (RBAC read guard já cobre 96/96 — ver `rbac-gaps.test.ts`)
 2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
 3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
 4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
