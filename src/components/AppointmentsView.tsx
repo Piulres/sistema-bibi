@@ -284,7 +284,7 @@ export default function AppointmentsView() {
           id="walk-in"
           data-tour-id="walk-in-callout"
           variant="walk-in"
-          title="Paciente particular (walk-in)"
+          title={`${labels.patient} particular (walk-in)`}
           description="Chegou na clínica sem cadastro prévio e sem empresa PJ — cadastre e agende em um passo."
           badge="Recepção"
         >
@@ -472,7 +472,7 @@ export default function AppointmentsView() {
               />
             </label>
             <label className="block text-sm">
-              <span className="text-[var(--text-secondary)]">{isVet ? labels.beneficiary : "Beneficiário"}</span>
+              <span className="text-[var(--text-secondary)]">{labels.beneficiary}</span>
               <select
                 required
                 className="mt-1 w-full rounded border px-3 py-2"

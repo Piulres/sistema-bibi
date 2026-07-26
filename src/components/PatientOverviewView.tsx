@@ -5,6 +5,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncData } from "@/hooks/useAsyncData";
+import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
 
 type Overview = {
@@ -83,6 +84,7 @@ export default function PatientOverviewView({
 }: {
   patientId: string;
 }) {
+  const { labels } = useLabels();
   const loadData = useCallback(async () => {
     const [overviewRes, clinicalRes] = await Promise.all([
       fetchJson<{ overview?: Overview }>(
@@ -113,7 +115,7 @@ export default function PatientOverviewView({
   return (
     <ViewStateBoundary
       loading={loading}
-      error={error ?? (!overview && !loading ? "Beneficiário não encontrado" : null)}
+      error={error ?? (!overview && !loading ? `${labels.beneficiary} não encontrado(a)` : null)}
       loadingMessage="Carregando Cliente 360°..."
       onRetry={() => void reload()}
     >

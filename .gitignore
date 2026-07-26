@@ -41,6 +41,7 @@ yarn-error.log*
 /prisma/*.db
 /prisma/*.db-journal
 /prisma/.data-store-mode
+/prisma/.test-db-ready
 /prisma/prisma/
 
 # vercel

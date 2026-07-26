@@ -9,7 +9,12 @@ import { getNicheConfig, getDefaultLabels } from "@/lib/niche/defaults";
 import { mergeNicheLabels } from "@/lib/niche/labels";
 import { getNicheLandingContent } from "@/lib/niche/landing-content";
 import { NICHE_INTERNO_DEMOS } from "@/lib/niche/demo-accounts";
-import { buildInternoNavTabs, buildCadastrosTabs } from "@/lib/navigation/niche-nav";
+import {
+  buildInternoNavTabs,
+  buildCadastrosTabs,
+  estoqueTabLabel,
+} from "@/lib/navigation/niche-nav";
+import { buildPatientHistoryBreadcrumbs } from "@/lib/navigation/breadcrumbs";
 import { isNicheId, NICHE_IDS } from "@/lib/niche/types";
 import { NICHE_DEMOS } from "../../prisma/seed-data/niche-tenants";
 
@@ -110,6 +115,29 @@ describe("niche.buildInternoNavTabs", () => {
     const tabs = buildCadastrosTabs(getDefaultLabels("VET"), "VET");
     expect(tabs.find((t) => t.key === "pets")?.label).toBe("Pets");
     expect(tabs.find((t) => t.key === "patients")?.label).toBe("Tutores");
+  });
+});
+
+describe("niche.estoqueTabLabel", () => {
+  it("usa vocabulário do nicho no módulo de estoque", () => {
+    expect(estoqueTabLabel("MEDICAL")).toBe("Estoque clínico");
+    expect(estoqueTabLabel("VET")).toBe("Estoque pet");
+    expect(estoqueTabLabel("CONSTRUCTION")).toBe("Materiais de obra");
+  });
+});
+
+describe("navigation.buildPatientHistoryBreadcrumbs", () => {
+  it("usa o termo do nicho no histórico", () => {
+    expect(buildPatientHistoryBreadcrumbs("Thor", getDefaultLabels("VET"))[1]?.label).toBe(
+      "Histórico do pet",
+    );
+    expect(buildPatientHistoryBreadcrumbs("Ana", getDefaultLabels("LEGAL"))[1]?.label).toBe(
+      "Histórico do cliente",
+    );
+  });
+
+  it("mantém 'paciente' como fallback sem labels", () => {
+    expect(buildPatientHistoryBreadcrumbs("Ana")[1]?.label).toBe("Histórico do paciente");
   });
 });
 

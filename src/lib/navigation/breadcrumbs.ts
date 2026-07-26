@@ -1,4 +1,5 @@
 import { INTERNO_ROUTE_LABELS } from "@/lib/navigation/routes";
+import type { NicheLabels } from "@/lib/niche/types";
 
 export type BreadcrumbItem = {
   label: string;
@@ -33,11 +34,15 @@ export function buildAtendimentoBreadcrumbs(patientName?: string): BreadcrumbIte
   return items;
 }
 
-/** Monta trilha para histórico do paciente no portal prestador. */
-export function buildPatientHistoryBreadcrumbs(patientName?: string): BreadcrumbItem[] {
+/** Monta trilha para histórico do paciente no portal prestador (termo por nicho). */
+export function buildPatientHistoryBreadcrumbs(
+  patientName?: string,
+  labels?: NicheLabels,
+): BreadcrumbItem[] {
+  const patientTerm = labels?.patient?.toLowerCase() ?? "paciente";
   const items: BreadcrumbItem[] = [
     { label: "Agenda", href: "/prestador" },
-    { label: "Histórico do paciente" },
+    { label: `Histórico do ${patientTerm}` },
   ];
   if (patientName) {
     items.push({ label: patientName });
