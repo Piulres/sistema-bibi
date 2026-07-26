@@ -742,11 +742,9 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs (parcial)** | `requireInternoModule()` em: billing (invoices, TISS), CRM status, branding, integracoes, users (POST), export LGPD |
+| **APIs** | **96/96** rotas internas usam `requireInternoModule` / `requireInternoAdmin` — matriz UI = matriz API. Teste: `tests/security/rbac-gaps.test.ts` |
 
-> **Gap conhecido:** várias APIs internas usam apenas `requireUser(["INTERNO"])`.
-> RECEPCAO poderia chamar URLs diretamente — hardening futuro: alinhar todas as mutações.
-> Evidências e tabela de endpoints: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §4.
+> **Gap remanescente (baixa prioridade):** apenas **7** rotas usam `requireInternoModuleWrite` (gestão clínica + ações destrutivas). Demais mutações confiam na matriz de módulos. Evidências: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §5.
 
 ---
 
@@ -813,6 +811,8 @@ Só `FECHADA` aceita pagamento. `PAGA` é terminal.
 ---
 
 ## 11. Mapa de APIs por portal
+
+**Inventário (jul/2026):** **163** Route Handlers · **123** paths OpenAPI · **40** handlers sem YAML — ver [`API_DOCS.md`](../plataforma/API_DOCS.md) e `npm run openapi:verify`.
 
 ### Auth (todos)
 `POST /api/auth/login` · `POST /api/auth/logout` · `GET /api/auth/me` ·

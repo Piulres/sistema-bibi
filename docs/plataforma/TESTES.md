@@ -116,19 +116,17 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 > **Auditoria completa (2026-06-22):** falhas mapeadas nos quatro portais com
 > evidências de código, testes e `curl` — [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md).
 
-### 1. RBAC inconsistente entre UI e API
+### 1. RBAC interno — API alinhada à matriz UI (corrigido v3.0.3+)
 
 | Onde | Comportamento |
 |------|---------------|
 | **UI** (`interno-permissions.ts`) | Nav filtrada por perfil (READONLY só vê dashboard + relatórios) |
-| **API** (maioria das rotas `/api/interno/*`) | Só exige `role === INTERNO` — **qualquer perfil** acessa billing, cadastros, PIX… |
-| **Teste** | `tests/security/rbac-gaps.test.ts` documenta e falha se a correção for aplicada |
+| **API** (`/api/interno/*`) | **96/96** Route Handlers usam `requireInternoModule` ou `requireInternoAdmin` — perfil sem módulo → **403** |
+| **Teste** | `tests/security/rbac-gaps.test.ts` falha se alguma rota interna ficar sem guard de módulo |
 
-**Rotas com guard correto (`requireInternoModule`):** invoices POST, TISS, users, branding, webhooks, CRM status, export LGPD.
+**Guards de escrita (parcial):** **7** rotas usam `requireInternoModuleWrite` (gestão clínica `launches`/`expenses` + ações destrutivas: `void`, `reverse`, `retry`, `revert-recent`). Demais mutações ainda usam só `requireInternoModule` — risco prático baixo na matriz atual (READONLY não possui módulos de escrita). Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
 
-**Rotas expostas sem guard de módulo (exemplos):** `/interno/billing`, `/interno/procedures`, `/interno/invoices/[id]/pix`, `/interno/dashboard`.
-
-> **Ação recomendada:** alinhar todas as rotas internas à matriz `INTERNO_PROFILES`.
+**Exceção documentada:** `GET /api/procedures` — catálogo compartilhado (`requireUser` sem módulo interno; impacto baixo).
 
 ### 2. Proxy só verifica presença do cookie
 
@@ -188,10 +186,10 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 
 | Perfil | Módulos UI | APIs protegidas |
 |--------|------------|-----------------|
-| ADMIN | todos | parcial |
-| FATURAMENTO | billing, subscriptions… | invoices POST ✅, billing GET ❌ |
-| RECEPCAO | agenda, cadastros… | appointments ✅ (só role) |
-| READONLY | dashboard, relatórios | **pode chamar billing via API** |
+| ADMIN | todos | ✅ `requireInternoModule` em todas as rotas internas |
+| FATURAMENTO | billing, subscriptions… | ✅ billing/invoices — ❌ cadastros (403) |
+| RECEPCAO | agenda, cadastros… | ✅ cadastros/agenda — ❌ billing (403) |
+| READONLY | dashboard, relatórios | ✅ só módulos da matriz — ❌ billing/cadastros (403) |
 
 ### Portais B2B / beneficiário
 
@@ -230,15 +228,20 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 - `POST /api/cron/reminders` — ⏰ ✅ testado
 - `POST /api/cron/webhooks` — ⏰
 
-### Prestador (5 rotas) — 🔑 PRESTADOR
-- agenda, appointments, procedures, records
+### Prestador (34 rotas) — 🔑 PRESTADOR
+- agenda, appointments, procedures, records, documentos clínicos, exports, pets (VET)
 
-### Interno (38 rotas) — 🔑 INTERNO (9 com 🔒)
-- Ver `tests/security/rbac-gaps.test.ts` para lista dinâmica
+### Interno (96 rotas) — 🔑 INTERNO + 🔒 `requireInternoModule` em todas
+- Ver `tests/security/rbac-gaps.test.ts` para inventário dinâmico
 
-### PJ (2) — 🔑 PJ
-### Beneficiário (5) — 🔑 BENEFICIARIO
-### Compartilhado (2) — procedures, branding/logo
+### PJ (7 rotas) — 🔑 PJ
+- overview, reports, construction, projects
+
+### Beneficiário (14 rotas) — 🔑 BENEFICIARIO
+- overview, booking, invoices/PIX, export, projects (construction)
+
+### Outros (11 rotas)
+- `auth` (5) · `cron` (2) · `assistant` (2) · `segment/persist` (1) · `procedures` (1) · `branding/logo` (1)
 
 Contrato OpenAPI: `public/openapi.yaml` — Swagger UI em `/api/docs` (ver [`API_DOCS.md`](API_DOCS.md)).
 
@@ -296,7 +299,7 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 
 ## Roadmap sugerido (prioridade)
 
-1. **P0 — Segurança:** `requireInternoModule` em todas as rotas internas sensíveis + testes de negação por perfil
+1. **P0 — Segurança:** testes de negação por perfil em todas as rotas internas + generalizar `requireInternoModuleWrite` onde fizer sentido
 2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
 3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
 4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)

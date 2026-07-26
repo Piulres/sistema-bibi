@@ -95,6 +95,17 @@ Credenciais demo: senha **`bibi123`** — tabela completa em [`README.md`](../RE
 | `npm run db:setup` | Setup conforme `.env` | Mesmo fluxo do build Netlify |
 | `npm run db:reset` | `--force-reset` + seed | **Bloqueado para agentes** |
 
+### Revalidar métricas documentais
+
+Após adicionar Route Handlers, testes ou specs E2E, atualize o ground truth em [`TESTES.md`](TESTES.md) e [`API_DOCS.md`](API_DOCS.md):
+
+```bash
+find src/app/api -name 'route.ts' | wc -l          # Route Handlers (163)
+npm run openapi:verify                              # paths OpenAPI + handlers sem YAML
+npx vitest run 2>&1 | tail -3                       # casos Vitest (598)
+npx playwright test --list 2>&1 | tail -1           # casos E2E (156)
+```
+
 ---
 
 ## 4. Operações de desenvolvimento
