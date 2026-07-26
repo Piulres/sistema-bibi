@@ -95,7 +95,7 @@ Após deploy manual (`npx netlify deploy --prod`):
 ## 2. Arquitetura da documentação
 
 ```
-public/openapi.yaml          ← contrato (123 paths, v3.0.6)
+public/openapi.yaml          ← contrato (123 paths, v3.0.7)
 public/swagger-ui/           ← assets gerados (postinstall, gitignored)
 src/app/api/docs/page.tsx    ← URL canônica /api/docs
 src/components/api-docs/     ← cliente Swagger UI (CSP-safe)
@@ -277,7 +277,52 @@ Fluxo de produto e validação manual: [`produto/DOCUMENTOS_CLINICOS.md`](../pro
 
 ---
 
-## 8. Referências
+## 8. Exportações tabulares (v3.0.7)
+
+Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI monta links via `ExportButtons` (`src/components/ExportButtons.tsx`).
+
+### Formatos suportados
+
+| `format` | MIME | Uso típico |
+|----------|------|------------|
+| `csv` | `text/csv; charset=utf-8` | Planilhas, ERP (BOM UTF-8) |
+| `json` | `application/json` | Integração, dataset canônico |
+| `txt` | `text/plain` | Leitura humana tabular |
+| `pdf` | `application/pdf` | Impressão / arquivo |
+| `xlsx` | Excel OpenXML | Listagens internas (`LIST_EXPORT_FORMATS`) |
+
+Constantes: `src/lib/exports/format.ts` · servidor: `serveTabularExport()` em `src/lib/exports/serve.ts`.
+
+### Endpoints principais
+
+| Método | Path | Auth | Query |
+|--------|------|------|-------|
+| `GET` | `/api/pj/reports` | PJ | `format` (default `csv`) |
+| `GET` | `/api/interno/reports` | interno `relatorios` | `type=billing\|crm`, `format` |
+| `GET` | `/api/interno/billing/export` | interno `billing` | `format` |
+| `GET` | `/api/interno/audit/export` | interno `auditoria` | `format` + filtros da tela |
+| `GET` | `/api/interno/clinic-finance/export` | interno `gestao` | `format`, `year`, `month` |
+| `GET` | `/api/prestador/extrato/export` | prestador | `format` |
+| `GET` | `/api/beneficiario/export` | beneficiário | `section`, `format` |
+
+Resposta: arquivo em anexo (`Content-Disposition: attachment`) ou JSON estruturado.
+
+### Exemplo curl (PJ)
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"rh@techcorp.com","password":"bibi123","portal":"pj"}'
+
+curl -b cookies.txt -o relatorio.pdf \
+  "http://localhost:3000/api/pj/reports?format=pdf"
+```
+
+Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 · testes: `tests/api/exports.test.ts`.
+
+---
+
+## 9. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal
