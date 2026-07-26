@@ -15,6 +15,7 @@ Homologação de preços: [`HOMOLOGACAO.md`](HOMOLOGACAO.md). Cliente/preços: [
 | Secretária | `alana@cedig.demo` | `/interno/login` | Agenda, walk-in, lançamentos, cadastros leves |
 | ADMIN | `operacao@cedig.demo` | `/interno/login` | Usuários, branding, despesas, indicadores |
 | Médico | `bruno.dias@cedig.demo` | `/login` | Fila, atendimento, extrato |
+| Médica (cadastro operação) | `gabriela@cedig.demo` | `/login` | Anestesia · consulta walk-in Renan Emigdio (anamnese unificada) |
 | PJ CentralMed | `rh@centralmed.demo` | `/pj/login` | Consumo PPU, faturas |
 | Beneficiário | `maria.cedig@email.com` | `/beneficiario/login` | Exames, agenda, faturas |
 
