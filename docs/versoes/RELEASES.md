@@ -11,30 +11,40 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.18** — Estoque Fase 3 (produtos sem lote) **pendente deploy**.
+> Pacote **v3.0.18** — Estoque Fase 3 + Assistente regras **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.18** preparado · produção ainda **v3.0.17** até deploy |
-| **Pacote anterior em produção** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
+| **Release `main` / `dev`** | **v3.0.18** · sincronizados @ `372b5cc` |
+| **Pacote anterior em produção** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.18** (Estoque Fase 3) |
-| **Release** | `main` | **v3.0.17** (até merge) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.17** · deploy `6a66e5f9` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.18** (Estoque Fase 3 + Assistente regras) |
+| **Release** | `main` | **v3.0.18** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.18** · deploy `6a66e9d6` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.18
 
 - **Estoque Fase 3:** `requiresLot=false` — lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade; UI com checkbox e badge SEM LOTE (#319).
 - **Assistente Fase 2:** motor de regras com overrides por nicho/tenant (#321).
-- **Qualidade:** `stock` · `assistant-rule-engine` · CI #319/#321/#326 · pre-release OK.
+- **Qualidade:** `stock` · `assistant-rule-engine` · CI #319/#321/#326 · pre-release OK · deploy `6a66e9d6`.
+
+### Smoke (27/07/2026) — produção v3.0.18
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.18` · deploy `6a66e9d6` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
+| `/interno/estoque` | 307 (auth) |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.17
 
@@ -55,10 +65,6 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `/beneficiario` | 307 (auth) |
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
-
-### Pendente na integração (`dev`) — Estoque Fase 3
-
-- Produtos `requiresLot=false` com lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade (#319).
 
 ### Conteúdo do pacote v3.0.16
 
