@@ -11,24 +11,30 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.25** — Import CSV PJ + qualidade estoque/CEDIG **em produção**.
+> Pacote **v3.0.26** — Monograma Bibi na home da plataforma **pendente deploy produção**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.25** — deploy `6a678e1a` @ `368d83b` (`v3.0.25 import CSV PJ + qualidade estoque/CEDIG`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.25** em produção @ `368d83b` |
-| **Pacote anterior em produção** | **3.0.24** — deploy `6a677dc5` @ `15275c0` (`v3.0.24 BrandMark gradiente + nav Mais + assistente`) |
+| **Release `main` / `dev`** | **v3.0.26** pendente deploy · `dev` @ `d520ac6` |
+| **Pacote anterior em produção** | **3.0.24** — deploy `6a677dc5` @ `15275c0` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.25** (import CSV PJ + fix E2E estoque + CEDIG) |
-| **Release** | `main` | **v3.0.25** |
+| **Integração** | `dev` | **v3.0.26** (monograma Bibi na home) |
+| **Release** | `main` | **v3.0.25** → merge v3.0.26 pendente |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.25** · deploy `6a678e1a` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.26
+
+- **BrandMark:** círculo da home exibe **Bibi** (`PLATFORM.brandMark`); header mantém "Sistema Bibi" (#375).
+- **Tenants:** iniciais inalteradas (CEDIG, Horizonte, etc.).
+- **Qualidade:** CI #375 · brand-mark · ícones PWA regenerados · pre-release OK.
 
 ### Conteúdo do pacote v3.0.25
 
