@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.11",
+    version: "3.0.12",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Dashboard Executivo com KPIs claros: cobrança (a receber / recebido / a faturar) separada da produção clínica do mês.",
+    highlights: [
+      {
+        title: "Dashboard",
+        items: [
+          "Hero de Cobrança: A receber, Recebido e A faturar — sem o rótulo ambíguo Total faturado",
+          "Produção clínica do mês com eixo próprio (Valor lançado ≠ total de faturas)",
+          "Mês clínico em fuso America/Sao_Paulo",
+        ],
+      },
+    ],
+    testStats: "CI unit+E2E · executive-dashboard-kpis · interno-modules · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.11",
+    label: "Sistema Bibi - ServiceOS v3.0.11",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Hotfix do faturamento operacional: Marcar paga passa a persistir corretamente no Blob após o COMMIT.",
     highlights: [

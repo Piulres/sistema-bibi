@@ -11,24 +11,29 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.11** — hotfix marcar paga (persistência Blob pós-COMMIT) **publicado em produção**.
+> Pacote **v3.0.12** — Dashboard KPIs claros (cobrança vs produção clínica) — **em publicação**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.12** — deploy pendente (`bibi-poc-2026-07-27c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.11** · sincronizadas · artefato prod `@ 546f014` |
-| **Pacote anterior em produção** | **3.0.10** — deploy `6a66a38b` @ `b9ff9cb` (`bibi-poc-2026-07-27a`) |
+| **Release `main` / `dev`** | **v3.0.12** · sincronizadas |
+| **Pacote anterior em produção** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.11** |
-| **Release** | `main` | **v3.0.11** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.11** · deploy `6a66b107` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.12** |
+| **Release** | `main` | **v3.0.12** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.12** · deploy em andamento · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.12
+
+- **Dashboard:** Cobrança (A receber / Recebido / A faturar) separada da Produção clínica do mês.
+- **Qualidade:** unit `executive-dashboard-kpis` + E2E interno/CEDIG; mês clínico em BRT.
 
 ### Conteúdo do pacote v3.0.11
 
@@ -60,6 +65,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Dashboard executivo:** hierarquia de KPIs e menos ruído visual.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
+
+### Smoke (27/07/2026) — produção v3.0.12
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | pendente pós-deploy |
+| CSS `/_next/static/chunks/*.css` | pendente |
+| `/instalar` | pendente |
+| `/?tenant=cedig` | pendente |
+| Cota Netlify | verificar antes do deploy |
 
 ### Smoke (27/07/2026) — produção v3.0.11
 
