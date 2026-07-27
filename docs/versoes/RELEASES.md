@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.11** — hotfix marcar paga (persistência Blob pós-COMMIT) — **em publicação**.
+> Pacote **v3.0.11** — hotfix marcar paga (persistência Blob pós-COMMIT) **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.11** — deploy pendente (`bibi-poc-2026-07-27b`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.11** · sincronizadas |
+| **Release `main` / `dev`** | **v3.0.11** · sincronizadas · artefato prod `@ 546f014` |
 | **Pacote anterior em produção** | **3.0.10** — deploy `6a66a38b` @ `b9ff9cb` (`bibi-poc-2026-07-27a`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.11** |
 | **Release** | `main` | **v3.0.11** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.11** · deploy em andamento · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.11** · deploy `6a66b107` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.11
@@ -65,11 +65,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | pendente pós-deploy |
-| CSS `/_next/static/chunks/*.css` | pendente |
-| `/instalar` | pendente |
-| `/?tenant=cedig` | pendente |
-| Cota Netlify | verificar antes do deploy |
+| Landing `/` | 200 · footer `v3.0.11` · deploy `6a66b107` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (27/07/2026) — produção v3.0.10
 
