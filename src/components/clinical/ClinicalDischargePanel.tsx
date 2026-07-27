@@ -78,13 +78,25 @@ export default function ClinicalDischargePanel({
   useEffect(() => {
     let active = true;
     (async () => {
-      await loadDocuments();
+      const params = new URLSearchParams();
+      if (appointmentId) params.set("appointmentId", appointmentId);
+      if (petId) params.set("petId", petId);
+      const qs = params.toString() ? `?${params}` : "";
+      const res = await fetch(
+        `/api/prestador/patients/${patientId}/discharge-documents${qs}`,
+      );
       if (!active) return;
+      const data = await res.json();
+      if (!active || !res.ok) return;
+      setDocuments(data.documents ?? []);
+      if (Array.isArray(data.referralTemplates) && data.referralTemplates.length > 0) {
+        setTemplates(data.referralTemplates);
+      }
     })();
     return () => {
       active = false;
     };
-  }, [loadDocuments]);
+  }, [patientId, appointmentId, petId]);
 
   function applyTemplate(template: ReferralTemplate) {
     setForm({

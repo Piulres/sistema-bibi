@@ -738,7 +738,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
                     checked={atestadoCidAuthorized}
                     onChange={(e) => setAtestadoCidAuthorized(e.target.checked)}
                   />
-                  Paciente autorizou CID no atestado
+                  {labels.patient} autorizou CID no atestado
                 </label>
                 <input
                   className={`sm:col-span-2 ${fieldClass}`}
@@ -749,7 +749,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               </div>
               <p className="text-xs text-[var(--text-muted)]">
                 POC: gera texto no PEP. Em produção nacional, emissão oficial via Atesta CFM
-                (Res. CFM 2.382/2024). CID só com autorização do paciente.
+                (Res. CFM 2.382/2024). CID só com autorização do {labels.patient.toLowerCase()}.
               </p>
             </div>
           )}
