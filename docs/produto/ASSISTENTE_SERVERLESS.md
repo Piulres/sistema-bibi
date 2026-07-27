@@ -70,12 +70,17 @@ Ações `confirm` e `choice` **não** fecham o painel — o usuário confirma ou
 
 Cada tool executada registra evento na timeline (`entityType: Assistant`, ações `ASSISTANT_TOOL_OK` / `ASSISTANT_TOOL_ERR`). Visível em `/interno/auditoria`.
 
+## Painel de regras (Fase 3 · v3.0.19)
+
+CRUD de `ruleOverrides` por tenant em **`/interno/assistente`** (ADMIN). A API `GET/PATCH /api/interno/assistant/settings` devolve `previewRules` com o merge **global → nicho → tenant**.
+
+Detalhes operacionais: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) §Fase 3.
+
 ## O que ainda falta (backlog)
 
 | Item | Prioridade | Notas |
 |------|------------|-------|
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
-| **Painel de regras** | Alta | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
