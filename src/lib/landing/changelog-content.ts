@@ -61,7 +61,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #337/#338/#340/#335 · stock · assistant-hybrid · pj-appointments · prod 6a66fe63",
+      "CI unit+E2E #337/#338/#340/#335 · stock · assistant-hybrid · pj-appointments · prod 6a66fe7f",
   },
   {
     version: "3.0.19",
