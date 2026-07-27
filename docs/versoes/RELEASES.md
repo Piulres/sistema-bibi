@@ -11,23 +11,23 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **pendente deploy**.
+> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.13** — deploy `6a66d0a1` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.13** (preparado) · aguardando merge `dev` → `main` + deploy |
-| **Pacote anterior em produção** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
+| **Release `main` / `dev`** | **v3.0.13** · sincronizadas · artefato prod `@ 78b575f` |
+| **Pacote anterior em produção** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) |
-| **Release** | `main` | **v3.0.12** (até merge) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.12** · deploy `6a66c080` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.13** |
+| **Release** | `main` | **v3.0.13** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d0a1` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.13
@@ -35,6 +35,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Exportações:** downloads autenticados via fetch+blob (`ExportButtons`, `DownloadLink`); Content-Disposition UTF-8; TISS XML, LGPD JSON, import/export e .ics corrigidos.
 - **Portal Prestador:** equipe no atendimento (papéis por nicho, custos PPU); receita multi-medicamento; aba Equipe.
 - **Qualidade:** `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
+
+### Smoke (27/07/2026) — produção v3.0.13
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.13` · deploy `6a66d0a1` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.12
 
