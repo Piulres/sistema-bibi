@@ -17,7 +17,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.21** — deploy `6a670ad1` @ `d9bd043` (`bibi-poc-2026-07-27m`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.21** · sincronizados @ `d9bd043` |
+| **Release `main` / `dev`** | **v3.0.21** em produção @ `d9bd043` · tip `eb9907f` (+ RBAC write-guards #354 na `main`, próximo pacote) |
 | **Pacote anterior em produção** | **3.0.20** — deploy `6a6702f7` @ `75d82eb` (`bibi-poc-2026-07-27l`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
