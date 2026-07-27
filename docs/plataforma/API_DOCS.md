@@ -62,6 +62,8 @@ Você deve ver o cabeçalho do ServiceOS e a árvore de tags (Auth, Prestador, I
 | PJ | `pj` | `rh@techcorp.com` |
 | Beneficiário | `beneficiario` | `joao.pereira@email.com` |
 
+**Portal interno — RBAC na API (v3.0.22):** após login com `portal: "interno"`, endpoints `GET` exigem `requireInternoModule` (módulo na matriz do perfil). Mutações (`POST`/`PATCH`/`PUT`/`DELETE`) exigem `requireInternoModuleWrite` — perfil `READONLY` retorna **403** mesmo em módulos de leitura (`gestao`, `auditoria`, `relatorios`). Matriz completa: [`FLUXOS.md`](../produto/FLUXOS.md) §9 · testes: `tests/security/rbac-gaps.test.ts`.
+
 ### Passo 4 — Validar contrato e testes automatizados
 
 ```bash

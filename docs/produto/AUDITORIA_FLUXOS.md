@@ -17,6 +17,7 @@ via API.
 | 3 | 2026-07-26 | `fc9afa7` (v3.0.3) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente, schema-sync Blob) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **Fase 5 (RBAC escrita)** | **2026-07-27** | v3.0.22 · #354 | `requireInternoModuleWrite` generalizado em todas as mutações `/api/interno/*` |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -73,8 +74,8 @@ flowchart LR
     B[Label consumo beneficiário]
     U[UX res.ok + guards beneficiário]
   end
-  subgraph GAP["Gap remanescente"]
-    W[Write guard não generalizado]
+  subgraph F5["Fase 5 (v3.0.22)"]
+    W[Write guards generalizados]
   end
 ```
 
@@ -121,7 +122,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 17 | TISS XML sem XSD | **PARCIAL (3.3)** | Validação estrutural adicionada: guia sem procedimentos ou sem documento → 422 `TissBuildError`; `escapeXml` cobre os 5 reservados. XSD oficial ANS segue fora do POC |
 | 18 | `rbac-gaps.test.ts` documenta lacuna | **MUDOU** | agora **afirma cobertura** (`withoutModuleGuard === []`, 15 módulos) |
 
-Resumo: **14 corrigidas**, **1 parcial** (`SESSION_SECRET` fallback dev), **1 endurecido** (TISS estrutural), **1 gap aberto** (write guard não generalizado — ver §11).
+Resumo: **15 corrigidas** (inclui write guards Fase 5), **1 parcial** (`SESSION_SECRET` fallback dev), **1 endurecido** (TISS estrutural).
 
 ---
 

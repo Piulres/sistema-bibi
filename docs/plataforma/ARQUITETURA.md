@@ -115,7 +115,7 @@ flowchart LR
 |--------|-----------|---------|
 | **Edge/Proxy** | Validação HMAC do cookie antes do App Router | `src/proxy.ts` (`verifySessionToken`) |
 | **Servidor** | Validação HMAC-SHA256 + `role` + RBAC interno | `src/lib/session.ts`, `interno-guard.ts` |
-| **API** | `requireUser()` / `requireInternoModule()` em cada handler | `src/lib/api-auth.ts` |
+| **API** | `requireUser()` · leitura interna: `requireInternoModule()` · mutação: `requireInternoModuleWrite()` / `requireInternoAdmin()` | `src/lib/api-auth.ts` |
 
 O `proxy.ts` é o substituto do middleware no **Next.js 16** — exclusivo desta versão do framework. A validação real da sessão **nunca** confia apenas no proxy; Server Components e Route Handlers revalidam assinatura e perfil.
 
@@ -785,7 +785,7 @@ Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes
 
 | Feature | Arquivos |
 |---------|----------|
-| RBAC | `interno-permissions.ts`, `interno-guard.ts` |
+| RBAC | `interno-permissions.ts`, `interno-guard.ts`, `api-auth.ts` (`requireInternoModule` / `requireInternoModuleWrite`) |
 | Webhooks | `webhook-service.ts`, `IntegracoesView.tsx` |
 | Portal PJ | `pj-portal-service.ts`, `PjView.tsx` |
 | LGPD | `patient-export.ts`, export JSON |

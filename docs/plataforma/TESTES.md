@@ -138,7 +138,7 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 | **API** (`/api/interno/*`) | **96/96** Route Handlers usam `requireInternoModule` ou `requireInternoAdmin` — perfil sem módulo → **403** |
 | **Teste** | `tests/security/rbac-gaps.test.ts` falha se alguma rota interna ficar sem guard de módulo |
 
-**Guards de escrita (parcial):** **7** rotas usam `requireInternoModuleWrite` (gestão clínica `launches`/`expenses` + ações destrutivas: `void`, `reverse`, `retry`, `revert-recent`). Demais mutações ainda usam só `requireInternoModule` — risco prático baixo na matriz atual (READONLY não possui módulos de escrita). Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
+**Guards de escrita (Fase 5 — v3.0.22):** todo handler mutável (`POST`/`PATCH`/`PUT`/`DELETE`) em `/api/interno/*` usa `requireInternoModuleWrite` ou `requireInternoAdmin`; `GET` permanece em `requireInternoModule`. Perfil `READONLY` com módulo de leitura (ex.: `gestao`, `auditoria`) recebe **403** em mutações — mensagem `Perfil somente leitura`. Inventário estático: `tests/security/rbac-gaps.test.ts` (assert `gaps === []`); integração: `tests/api/interno-write-guards.test.ts`. Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5 · [`FLUXOS.md`](../produto/FLUXOS.md) §9.
 
 **Exceção documentada:** `GET /api/procedures` — catálogo compartilhado (`requireUser` sem módulo interno; impacto baixo).
 
@@ -324,13 +324,12 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 
 ## Roadmap sugerido (prioridade)
 
-1. **P0 — Segurança:** generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis (RBAC read guard já cobre 96/96 — ver `rbac-gaps.test.ts`)
-2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
-3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
-4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
-5. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
-6. **P2 — Webhooks:** integração com fila de retry
-7. **P3 — Performance:** smoke de carga em `computePrice` e dashboard KPIs
+1. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
+2. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
+3. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
+4. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
+5. **P2 — Webhooks:** integração com fila de retry
+6. **P3 — Performance:** smoke de carga em `computePrice` e dashboard KPIs
 
 ---
 

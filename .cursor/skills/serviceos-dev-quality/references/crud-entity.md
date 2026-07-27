@@ -11,7 +11,7 @@
 |------|---------|
 | Registry de cobertura | `tests/lib/crud-coverage-registry.ts` |
 | Teste API matriz | `tests/api/system-crud-matrix.test.ts` |
-| Auth interno | `requireInternoModule` / `requireInternoModuleWrite` |
+| Auth interno | `requireInternoModule` (GET) / `requireInternoModuleWrite` (POST/PATCH/PUT/DELETE) — Fase 5 generalizada |
 
 ## UI
 
