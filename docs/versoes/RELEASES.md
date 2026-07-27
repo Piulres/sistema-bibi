@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.23** — Portal PJ CRUD colaboradores + E2E estoque **pendente deploy**.
+> Pacote **v3.0.23** mergeado em `main` @ `9243c5d` — **pendente deploy** Netlify (produção ainda **v3.0.22**).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.22** — deploy `6a670e42` @ `9466c1c` (`bibi-poc-2026-07-27n`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.23** preparado · produção ainda **v3.0.22** até deploy |
+| **Release `main` / `dev`** | **v3.0.23** @ `9243c5d` (merge #366) · produção ainda **v3.0.22** até deploy |
 | **Pacote anterior em produção** | **3.0.21** — deploy `6a670ad1` @ `d9bd043` (`bibi-poc-2026-07-27m`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -26,7 +26,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.23** (PJ CRUD + E2E estoque + docs assistente) |
-| **Release** | `main` | **v3.0.23** (após merge release) |
+| **Release** | `main` | **v3.0.23** @ `9243c5d` (merge #366) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.22** · deploy `6a670e42` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
@@ -41,7 +41,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 ### Conteúdo do pacote v3.0.22
 
 - **RBAC Fase 5:** mutações internas → `requireInternoModuleWrite` / Admin (#354).
-- **Mapa:** `interno-rbac-hardening` implemented · backlog `pj-beneficiary-crud`.
+- **Mapa:** `interno-rbac-hardening` implemented · `pj-beneficiary-crud` implementado em v3.0.23.
 - **Docs:** FLUXOS §9 alinhado à Fase 5 · `V3_0` / changelog landing.
 - **Qualidade:** `rbac-gaps` · `interno-write-guards` · `flow-improvements-map` · pre-release OK · deploy `6a670e42`.
 

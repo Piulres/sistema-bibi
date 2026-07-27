@@ -439,7 +439,46 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 10. Referências
+## 10. Portal PJ — CRUD colaboradores (v3.0.23)
+
+RH gerencia colaboradores vinculados à empresa sem passar pela recepção. Auth: `requirePj()` — escopo fixo em `user.companyId` (anti-IDOR B2B via `assertCompanyPatient`).
+
+| Método | Path | Corpo (JSON) | Respostas |
+|--------|------|--------------|-----------|
+| `POST` | `/api/pj/beneficiaries` | `name`, `cpf`, `birthDate` (obrig.) · `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType` (opc.) | `200` paciente criado · `400` validação |
+| `PATCH` | `/api/pj/beneficiaries/{id}` | Campos parciais (mesmos do POST) | `200` · `404` fora da empresa |
+| `DELETE` | `/api/pj/beneficiaries/{id}` | — | `200` desvincula (`companyId: null`) · `404` |
+
+> **Semântica do DELETE:** remove o vínculo corporativo; o cadastro clínico (`Patient`) permanece no tenant.
+
+### Exemplo curl
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"rh@techcorp.com","password":"bibi123","portal":"pj"}'
+
+# Incluir colaborador
+curl -b cookies.txt -X POST http://localhost:3000/api/pj/beneficiaries \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Laura Dias","cpf":"52998224725","birthDate":"1990-05-15","employeeId":"MAT-1042"}'
+
+# Editar
+curl -b cookies.txt -X PATCH http://localhost:3000/api/pj/beneficiaries/PATIENT_ID \
+  -H "Content-Type: application/json" \
+  -d '{"phone":"11999990000"}'
+
+# Desvincular da empresa
+curl -b cookies.txt -X DELETE http://localhost:3000/api/pj/beneficiaries/PATIENT_ID
+```
+
+Serviço: `src/lib/pj-beneficiary-service.ts` · UI: `PjBeneficiaryPanel` em `/pj` · testes: `tests/api/pj-beneficiaries.test.ts`.
+
+> **OpenAPI:** rotas `pj/beneficiaries/*` ainda não constam no YAML — use este §10 + `FLUXOS.md` §5 até `openapi:sync` cobrir o módulo.
+
+---
+
+## 11. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal

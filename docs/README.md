@@ -4,7 +4,7 @@
 
 > **Produção:** **v3.0.22** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27n` (`6a670e42` @ `9466c1c`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.22** (`bibi-poc-2026-07-27n` @ `9466c1c`): RBAC write guards Fase 5 — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — produção **v3.0.22** (`bibi-poc-2026-07-27n` @ `9466c1c`); **`main`/`dev` em v3.0.23** (PJ CRUD colaboradores + E2E estoque) — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
