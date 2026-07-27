@@ -61,8 +61,10 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test("dashboard exibe bloco de receita", async ({ page }) => {
+  test("dashboard exibe bloco de cobrança", async ({ page }) => {
     await page.goto("/interno/dashboard");
-    await expect(page.getByRole("heading", { name: /Receita/i })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Cobrança", exact: true })).toBeVisible();
+    await expect(page.getByText("A receber", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Recebido", { exact: true }).first()).toBeVisible();
   });
 });

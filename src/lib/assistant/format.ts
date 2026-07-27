@@ -42,18 +42,23 @@ export function formatToolResult(
           totalCompanies: number;
           pendingBillingLabel: string;
           totalInvoicedLabel: string;
+          toCollectLabel?: string;
+          collectedLabel?: string;
           activeSubscriptions: number;
         };
         revenue: { invoicedPaidLabel: string; invoicedOpenLabel: string };
       };
+      const toCollect = data.kpis.toCollectLabel ?? data.revenue.invoicedOpenLabel;
+      const collected = data.kpis.collectedLabel ?? data.revenue.invoicedPaidLabel;
       return [
         `Indicadores atualizados em ${data.generatedAtLabel}:`,
         `• ${labels.appointment}s hoje: **${data.kpis.appointmentsToday}**`,
         `• Total de ${labels.patients}: ${data.kpis.totalPatients}`,
         `• Empresas: ${data.kpis.totalCompanies}`,
-        `• Faturamento pendente: ${data.kpis.pendingBillingLabel}`,
-        `• Total faturado: ${data.kpis.totalInvoicedLabel}`,
-        `• Receita paga: ${data.revenue.invoicedPaidLabel} · Em aberto: ${data.revenue.invoicedOpenLabel}`,
+        `• A faturar (PPU): ${data.kpis.pendingBillingLabel}`,
+        `• A receber (faturas): ${toCollect}`,
+        `• Recebido (faturas pagas): ${collected}`,
+        `• Emitido (aberto+pago): ${data.kpis.totalInvoicedLabel}`,
         `• Assinaturas ativas: ${data.kpis.activeSubscriptions}`,
       ].join("\n");
     }

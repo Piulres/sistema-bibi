@@ -1,5 +1,6 @@
 import "server-only";
 import {
+  civilDateISO,
   endOfDayInAppTz,
   formatDateTimeBR as dateTime,
   startOfDayInAppTz,
@@ -7,6 +8,7 @@ import {
 import { getPrisma } from "@/lib/db";
 import { companyStatusLabel } from "@/lib/company-crm";
 import { getClinicFinanceKpis } from "@/lib/clinic-finance/service";
+import { summarizeInvoiceMoney } from "@/lib/executive-dashboard-kpis";
 import { formatBRL } from "@/lib/pricing";
 import { monthsForBillingCycle } from "@/lib/subscription";
 
@@ -31,8 +33,19 @@ export type ExecutiveDashboardData = {
     totalPatients: number;
     totalCompanies: number;
     appointmentsToday: number;
+    /** Procedimentos PPU ainda sem fatura. */
     pendingBillingLabel: string;
+    /**
+     * Soma de faturas abertas + pagas (emitidas).
+     * Preferir `toCollectLabel` / `collectedLabel` na UI — menos ambíguo.
+     */
     totalInvoicedLabel: string;
+    /** Faturas FECHADA/ABERTA — a receber. */
+    toCollectLabel: string;
+    toCollectCount: number;
+    /** Faturas PAGA — já recebido. */
+    collectedLabel: string;
+    collectedCount: number;
     activeSubscriptions: number;
     mrrEstimateLabel: string;
     pendingMessages: number;
@@ -61,7 +74,7 @@ export type ExecutiveDashboardData = {
     createdAtLabel: string;
     actorName: string | null;
   }[];
-  /** KPIs do módulo Gestão clínica (mês corrente) — não misturar com total faturado PPU. */
+  /** Produção do módulo Gestão clínica (mês civil BRT) — eixo distinto das faturas. */
   clinicFinance: {
     year: number;
     month: number;
@@ -130,13 +143,7 @@ export async function getExecutiveDashboard(
   const pendingBillingTotal = pendingUsages.reduce((sum, u) => sum + u.priceCharged, 0);
   const pendingRecurrenceTotal = pendingCharges.reduce((sum, c) => sum + c.amount, 0);
 
-  const totalInvoiced = invoices.reduce((sum, inv) => sum + inv.total, 0);
-  const invoicedOpen = invoices
-    .filter((inv) => inv.status === "ABERTA" || inv.status === "FECHADA")
-    .reduce((sum, inv) => sum + inv.total, 0);
-  const invoicedPaid = invoices
-    .filter((inv) => inv.status === "PAGA")
-    .reduce((sum, inv) => sum + inv.total, 0);
+  const invoiceMoney = summarizeInvoiceMoney(invoices);
 
   const mrrEstimate = subscriptions.reduce(
     (sum, sub) => sum + monthlyEquivalent(sub.amount, sub.billingCycle),
@@ -198,32 +205,20 @@ export async function getExecutiveDashboard(
   const actorMap = new Map(actors.map((a) => [a.id, a.name]));
 
   const now = new Date();
-  const launchCount = await prisma.clinicExamLaunch.count({
-    where: {
-      tenantId,
-      performedAt: {
-        gte: new Date(now.getFullYear(), now.getMonth(), 1),
-        lt: new Date(now.getFullYear(), now.getMonth() + 1, 1),
-      },
-    },
-  });
+  const [civilYear, civilMonth] = civilDateISO(now).split("-").map(Number);
 
-  let clinicFinance: ExecutiveDashboardData["clinicFinance"] = null;
-  if (launchCount > 0) {
-    const clinic = await getClinicFinanceKpis(
-      tenantId,
-      now.getFullYear(),
-      now.getMonth() + 1,
-    );
-    clinicFinance = {
-      year: clinic.year,
-      month: clinic.month,
-      examCount: clinic.examCount,
-      revenueLabel: formatBRL(clinic.revenue),
-      expensesLabel: formatBRL(clinic.totalExpenses),
-      profitLabel: formatBRL(clinic.operatingProfit),
-    };
-  }
+  const clinic = await getClinicFinanceKpis(tenantId, civilYear, civilMonth);
+  const clinicFinance: ExecutiveDashboardData["clinicFinance"] =
+    clinic.examCount > 0 || clinic.totalExpenses > 0
+      ? {
+          year: clinic.year,
+          month: clinic.month,
+          examCount: clinic.examCount,
+          revenueLabel: formatBRL(clinic.revenue),
+          expensesLabel: formatBRL(clinic.totalExpenses),
+          profitLabel: formatBRL(clinic.operatingProfit),
+        }
+      : null;
 
   return {
     generatedAt: now.toISOString(),
@@ -233,7 +228,11 @@ export async function getExecutiveDashboard(
       totalCompanies,
       appointmentsToday,
       pendingBillingLabel: formatBRL(pendingBillingTotal),
-      totalInvoicedLabel: formatBRL(totalInvoiced),
+      totalInvoicedLabel: formatBRL(invoiceMoney.emitted),
+      toCollectLabel: formatBRL(invoiceMoney.open),
+      toCollectCount: invoiceMoney.openCount,
+      collectedLabel: formatBRL(invoiceMoney.paid),
+      collectedCount: invoiceMoney.paidCount,
       activeSubscriptions: subscriptions.length,
       mrrEstimateLabel: formatBRL(mrrEstimate),
       pendingMessages,
@@ -242,8 +241,8 @@ export async function getExecutiveDashboard(
     revenue: {
       pendingPayPerUseLabel: formatBRL(pendingBillingTotal),
       pendingRecurrenceLabel: formatBRL(pendingRecurrenceTotal),
-      invoicedOpenLabel: formatBRL(invoicedOpen),
-      invoicedPaidLabel: formatBRL(invoicedPaid),
+      invoicedOpenLabel: formatBRL(invoiceMoney.open),
+      invoicedPaidLabel: formatBRL(invoiceMoney.paid),
     },
     crm: {
       activeContracts,
