@@ -332,6 +332,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.20`** | _(pendente deploy)_ | Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar · #335/#337/#338/#340 |
 | **`v3.0.19`** | `1fca530` | Assistente Fase 3 CRUD + brand mark · deploy `6a66f3a7` · #325/#329/#330 |
 | **`v3.0.18`** | `372b5cc` | Estoque Fase 3 SEM-LOTE + Assistente regras · deploy `6a66e9d6` · #319/#321/#326 |
 | **`v3.0.17`** | `c3eb563` | RBAC clínico 360° + a11y + auto-confirm · deploy `6a66e5f9` · #292/#317/#318 |
