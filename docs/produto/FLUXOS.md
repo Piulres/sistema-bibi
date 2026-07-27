@@ -522,14 +522,14 @@ Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `t
 
 ## 5. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **Leitura + export + agendamento RH**
+**Role:** `PJ` · **Escopo:** `user.companyId` · **Leitura + export + agendamento RH + CRUD colaboradores (v3.0.23)**
 
 | Seção (`PjView`) | Dados |
 |------------------|-------|
 | Alertas | INADIMPLENTE, negociação, faturas abertas, cobranças vencidas |
 | KPIs | Contrato, beneficiários, consumo PPU, MRR |
 | Agendar | RH escolhe colaborador + slot → `CONFIRMADO` + e-mail |
-| Beneficiários | Consumo por colaborador · CTA Agendar |
+| Beneficiários | Consumo por colaborador · incluir/editar/desvincular · CTA Agendar |
 | Assinaturas | Planos e cobranças pendentes |
 | Faturas | Histórico corporativo |
 
@@ -539,17 +539,29 @@ Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `t
 | Prestadores | `GET /api/pj/providers` | `listProviders` |
 | Slots | `GET /api/pj/slots?providerId&date` | `scheduling-service.ts` |
 | Agendar colaborador | `POST /api/pj/appointments` | `bookPjAppointment` → `bookBeneficiaryAppointment` (anti-IDOR `companyId`) |
+| Incluir colaborador | `POST /api/pj/beneficiaries` | `createPjBeneficiary` — vincula `Patient` à `companyId` do RH |
+| Editar colaborador | `PATCH /api/pj/beneficiaries/[id]` | `updatePjBeneficiary` — `assertCompanyPatient` bloqueia IDOR |
+| Desvincular colaborador | `DELETE /api/pj/beneficiaries/[id]` | `detachPjBeneficiary` — `companyId: null` (cadastro clínico permanece) |
 | Export | `GET /api/pj/reports?format=` | `buildPjTabularExport` + `serveTabularExport` (PDF/CSV/JSON/TXT) |
+
+**UI:** `PjBeneficiaryPanel` em `/pj` — formulário com `PatientExtraFields` (matrícula, vínculo, etc.). DELETE pede confirmação: remove só o vínculo corporativo.
+
+**Campos obrigatórios (POST):** `name`, `cpf`, `birthDate`. Opcionais: `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType`.
 
 ```mermaid
 flowchart LR
   RH[Usuário PJ] --> V[PjView]
   V --> O[GET /api/pj/overview]
   V --> A[POST /api/pj/appointments]
+  V --> C[POST/PATCH/DELETE /api/pj/beneficiaries]
   O --> S[pj-portal-service]
   A --> B[bookPjAppointment]
+  C --> P[pj-beneficiary-service]
   B --> DB[(Company.patients + Appointment)]
+  P --> DB
 ```
+
+Testes: `tests/api/pj-beneficiaries.test.ts` · mapa `pj-beneficiary-crud` em `flow-improvements-map.ts`.
 
 ---
 
@@ -877,7 +889,10 @@ Detalhe por portal: [`TESTES.md`](../plataforma/TESTES.md) §Mapa de rotas.
 `POST|PATCH /api/beneficiario/invoices/[id]/pay`
 
 ### PJ
-`GET /api/pj/overview` · `GET /api/pj/reports`
+`GET /api/pj/overview` · `GET /api/pj/providers` · `GET /api/pj/slots` ·
+`POST /api/pj/appointments` ·
+`POST /api/pj/beneficiaries` · `PATCH|DELETE /api/pj/beneficiaries/[id]` ·
+`GET /api/pj/reports`
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
