@@ -11,14 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.24** — Marca Energia Brasileira + nav Mais + assistente **pendente deploy produção**.
+> Pacote **v3.0.24** — BrandMark Energia Brasileira + nav Mais + assistente **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.23** — deploy `6a677005` @ `9243c5d` (`bibi-poc-2026-07-27o`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.24** — deploy `6a677dc5` @ `15275c0` (`v3.0.24 BrandMark gradiente + nav Mais + assistente`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.24** pendente deploy · `dev` @ `d68d5e2` |
-| **Pacote anterior em produção** | **3.0.22** — deploy `6a670e42` @ `9466c1c` (`bibi-poc-2026-07-27n`) |
+| **Release `main` / `dev`** | **v3.0.24** em produção @ `15275c0` |
+| **Pacote anterior em produção** | **3.0.23** — deploy `6a677005` @ `9243c5d` (`bibi-poc-2026-07-27o`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
@@ -26,8 +26,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.24** (BrandMark gradiente + nav Mais + assistente) |
-| **Release** | `main` | **v3.0.23** → merge v3.0.24 pendente |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.23** · deploy `6a677005` · HTTP 200 · **Stop builds ON** |
+| **Release** | `main` | **v3.0.24** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.24** · deploy `6a677dc5` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.24
@@ -35,7 +35,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **BrandMark:** gradiente Energia Brasileira whitelabel, circular estilo iOS, sem borda (#371).
 - **Nav interno:** menu Mais portaled — sem overlay sobre conteúdo (#370).
 - **Assistente:** labels legíveis de ferramentas, overrides por tenant, copy PT (#370).
-- **Qualidade:** CI #371 · brand-mark · nav-overflow · pre-release OK.
+- **Qualidade:** CI #371/#372 · brand-mark · nav-overflow · pre-release OK · deploy `6a677dc5`.
+
+### Smoke (27/07/2026) — produção v3.0.24
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.24` · deploy `6a677dc5` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
 
 ### Conteúdo do pacote v3.0.23
 
