@@ -460,10 +460,20 @@ Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`i
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis |
-| Export | `GET /api/interno/audit/export?format=` | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` |
+| Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis + redação RBAC |
+| Export | `GET /api/interno/audit/export?format=` | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` (já redigido) |
 
-Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
+Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sensível é filtrado em `src/lib/audit-access.ts`:
+
+| Classe | ADMIN | FATURAMENTO | READONLY | RECEPCAO (dashboard/360°) |
+|--------|:-----:|:-----------:|:--------:|:-------------------------:|
+| Clínico | completo | resumo | resumo | oculto |
+| Financeiro | completo | completo | resumo | resumo |
+| PII (cadastro) | completo | valores mascarados | valores mascarados | resumo |
+| Segurança | completo | resumo | resumo | oculto |
+| Operacional | completo | completo | resumo | resumo |
+
+Restore administrativo permanece **ADMIN**. Atividade recente do dashboard e timeline do Cliente 360° usam a mesma política.
 
 ### 4.10 Segurança e dual-store (`SecurityView`)
 

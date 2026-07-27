@@ -34,12 +34,20 @@ type AuditEvent = {
 
 type FilterOption = { value: string; label: string };
 
+type AuditCapabilities = {
+  profile: string;
+  canRestore: boolean;
+  canExport: boolean;
+  canViewFullDiff: boolean;
+};
+
 type AuditResponse = {
   events: AuditEvent[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+  capabilities?: AuditCapabilities;
   filters: {
     entityTypes: FilterOption[];
     actions: string[];
@@ -168,13 +176,15 @@ export default function AuditoriaView() {
 
   const events = data?.events ?? [];
   const filters = data?.filters;
+  const canRestore = data?.capabilities?.canRestore === true;
+  const canExport = data?.capabilities?.canExport !== false;
 
   return (
     <div className="space-y-6">
       <Card>
         <SectionHeader
           title="Filtros"
-          description="Eventos de todo o tenant — timeline universal com paginação."
+          description="Eventos do tenant com visibilidade conforme seu perfil RBAC."
         />
         <form onSubmit={applyFilters} className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <label className="block text-sm">
@@ -252,16 +262,18 @@ export default function AuditoriaView() {
                 : undefined
             }
           />
-          <ExportButtons
-            baseUrl="/api/interno/audit/export"
-            query={{
-              entityType: entityType || undefined,
-              action: action || undefined,
-              search: search.trim() || undefined,
-              from: from || undefined,
-              to: to || undefined,
-            }}
-          />
+          {canExport && (
+            <ExportButtons
+              baseUrl="/api/interno/audit/export"
+              query={{
+                entityType: entityType || undefined,
+                action: action || undefined,
+                search: search.trim() || undefined,
+                from: from || undefined,
+                to: to || undefined,
+              }}
+            />
+          )}
         </div>
         {events.length === 0 ? (
           <EmptyState message="Nenhum evento encontrado para os filtros selecionados." />
@@ -294,7 +306,7 @@ export default function AuditoriaView() {
                           {diffOpen ? "Ocultar alterações" : "Ver alterações"}
                         </Button>
                         {diffOpen && event.metadata && <AuditEventDiff metadata={event.metadata} />}
-                        {event.reversible && event.hasDiff && (
+                        {canRestore && event.reversible && event.hasDiff && (
                           <Button
                             type="button"
                             variant="secondary"
@@ -355,9 +367,9 @@ export default function AuditoriaView() {
       </section>
 
       <Alert tone="info">
-        Eventos de cadastro e precificação passam a registrar antes/depois quando disponível — use
-        &quot;Ver alterações&quot; na linha do evento. Restore administrativo chega no Pacote C;
-        valores já faturados em Pay Per Use permanecem congelados.
+        Conteúdo clínico, financeiro e dados pessoais são filtrados pelo perfil interno. Diffs
+        completos e restore ficam com administradores; faturamento vê precificação/financeiro e
+        cadastros com PII mascarado. Valores já faturados em Pay Per Use permanecem congelados.
       </Alert>
     </div>
   );

@@ -17,7 +17,9 @@ export const internoReadTools: AssistantToolDefinition[] = [
     parameters: { type: "object", properties: {} },
     requiredModule: "dashboard",
     handler: async (ctx) => {
-      const dashboard = await getExecutiveDashboard(ctx.user.tenantId);
+      const dashboard = await getExecutiveDashboard(ctx.user.tenantId, {
+        internoProfile: ctx.user.internoProfile,
+      });
       return {
         generatedAtLabel: dashboard.generatedAtLabel,
         kpis: dashboard.kpis,
