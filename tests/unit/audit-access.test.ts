@@ -7,6 +7,7 @@ import {
   redactTimelineEventForProfile,
   resolveAuditViewerCapabilities,
   sanitizeAuditDescription,
+  searchableAuditEntityTypes,
 } from "@/lib/audit-access";
 import type { TimelineEventMetadata } from "@/lib/change-management/types";
 
@@ -81,10 +82,31 @@ describe("RBAC de auditoria — quem pode ver conteúdo sensível e por quê", (
       sampleEvent({ entityType: "Security", action: "MFA_ENABLED" }),
       "RECEPCAO",
     );
+    const referral = redactTimelineEventForProfile(
+      sampleEvent({
+        entityType: "ClinicalReferral",
+        action: "REFERRAL_CREATED",
+        description: "Encaminhamento para cardiologia",
+      }),
+      "RECEPCAO",
+    );
     expect(clinical).toBeNull();
     expect(security).toBeNull();
+    expect(referral).toBeNull();
     expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("MedicalRecord");
     expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("Security");
+    expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("ClinicalReferral");
+    expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("PrescriptionDocument");
+  });
+
+  it("busca por descrição só cobre tipos full — evita oráculo de existência clínica/PII", () => {
+    expect(searchableAuditEntityTypes("FATURAMENTO")).toContain("PricingRule");
+    expect(searchableAuditEntityTypes("FATURAMENTO")).toContain("Appointment");
+    expect(searchableAuditEntityTypes("FATURAMENTO")).not.toContain("MedicationPrescription");
+    expect(searchableAuditEntityTypes("FATURAMENTO")).not.toContain("Patient");
+    expect(searchableAuditEntityTypes("FATURAMENTO")).not.toContain("ClinicalReferral");
+    expect(searchableAuditEntityTypes("READONLY")).toEqual([]);
+    expect(searchableAuditEntityTypes("ADMIN")).toContain("MedicationPrescription");
   });
 
   it("READONLY vê financeiro só em resumo — sem multiplier no metadata", () => {

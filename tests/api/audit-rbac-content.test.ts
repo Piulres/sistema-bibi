@@ -191,4 +191,60 @@ describe("Auditoria RBAC de conteúdo — evita vazamento de PII/clínico por pe
     const res = await auditGet(jsonRequest("http://localhost/api/interno/audit"));
     expect(res.status).toBe(403);
   });
+
+  it("FATURAMENTO não descobre medicamento via ?search= — oráculo de existência bloqueado", async () => {
+    const prisma = getTestPrisma();
+    const billing = await prisma.user.findUniqueOrThrow({
+      where: { email: "financeiro@bibi.health" },
+    });
+    const secretMed = `ClopidogrelSecreto${Date.now()}`;
+
+    await prisma.timelineEvent.create({
+      data: {
+        tenantId: billing.tenantId,
+        entityType: "MedicationPrescription",
+        entityId: `med-oracle-${Date.now()}`,
+        action: "MEDICATION_PRESCRIBED",
+        description: `Prescrição de ${secretMed} para Laura Dias`,
+        createdBy: billing.id,
+      },
+    });
+
+    await setSessionForEmail("financeiro@bibi.health");
+    const res = await auditGet(
+      jsonRequest(
+        `http://localhost/api/interno/audit?search=${encodeURIComponent(secretMed)}&limit=20`,
+      ),
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.total).toBe(0);
+    expect(body.events).toHaveLength(0);
+  });
+
+  it("encaminhamento clínico não aparece no dashboard da RECEPCAO", async () => {
+    const prisma = getTestPrisma();
+    const reception = await prisma.user.findUniqueOrThrow({
+      where: { email: "recepcao@bibi.health" },
+    });
+    const marker = `EncaminhamentoCardiologia${Date.now()}`;
+
+    await prisma.timelineEvent.create({
+      data: {
+        tenantId: reception.tenantId,
+        entityType: "ClinicalReferral",
+        entityId: `ref-rbac-${Date.now()}`,
+        action: "REFERRAL_CREATED",
+        description: marker,
+        createdBy: reception.id,
+      },
+    });
+
+    await setSessionForEmail("recepcao@bibi.health");
+    const res = await dashboardGet();
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    const activity = body.dashboard.recentActivity as Array<{ description: string }>;
+    expect(activity.some((item) => item.description.includes(marker))).toBe(false);
+  });
 });
