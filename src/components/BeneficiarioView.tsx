@@ -26,6 +26,7 @@ export type BeneficiarioSection =
   | "agenda"
   | "consumo"
   | "faturas"
+  | "documentos"
   | "medicacoes"
   | "exames"
   | "plano"
@@ -111,6 +112,22 @@ type Overview = {
   }[];
 };
 
+type DischargeDocument = {
+  id: string;
+  kind: string;
+  kindLabel: string;
+  title: string;
+  summary: string;
+  statusLabel: string;
+  providerName: string;
+  createdAtLabel: string;
+  exportParams: {
+    type: string;
+    id: string;
+    appointmentId?: string;
+  };
+};
+
 type ClinicalData = {
   activeMedications: {
     id: string;
@@ -159,6 +176,7 @@ type PixState = {
 type BeneficiarioData = {
   overview: Overview | null;
   clinical: ClinicalData | null;
+  documents: DischargeDocument[];
   providers: { id: string; name: string }[];
   providersFailed: boolean;
   procedures: { id: string; name: string }[];
@@ -191,6 +209,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       fetchJson<{ providers?: { id: string; name: string }[] }>("/api/beneficiario/providers"),
       fetchJson<{ clinical?: ClinicalData }>("/api/beneficiario/clinical"),
       fetchJson<{ procedures?: { id: string; name: string }[] }>("/api/procedures"),
+      fetchJson<{ documents?: DischargeDocument[] }>("/api/beneficiario/documents"),
     ];
     if (isVet) {
       fetches.push(fetchJson<{ pets?: { id: string; name: string; speciesLabel: string }[] }>("/api/beneficiario/pets"));
@@ -203,8 +222,11 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
     const providersRes = responses[1] as Awaited<ReturnType<typeof fetchJson<{ providers?: { id: string; name: string }[] }>>>;
     const clinicalRes = responses[2] as Awaited<ReturnType<typeof fetchJson<{ clinical?: ClinicalData }>>>;
     const proceduresRes = responses[3] as Awaited<ReturnType<typeof fetchJson<{ procedures?: { id: string; name: string }[] }>>>;
+    const documentsRes = responses[4] as Awaited<
+      ReturnType<typeof fetchJson<{ documents?: DischargeDocument[] }>>
+    >;
     const petsRes = isVet
-      ? (responses[4] as ApiResult<{ pets?: { id: string; name: string; speciesLabel: string }[] }>)
+      ? (responses[5] as ApiResult<{ pets?: { id: string; name: string; speciesLabel: string }[] }>)
       : undefined;
 
     return {
@@ -212,6 +234,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
       data: {
         overview: overviewRes.data.overview ?? null,
         clinical: clinicalRes.ok ? (clinicalRes.data.clinical ?? null) : null,
+        documents: documentsRes.ok ? (documentsRes.data.documents ?? []) : [],
         providers: providersRes.ok ? (providersRes.data.providers ?? []) : [],
         providersFailed: !providersRes.ok,
         procedures: proceduresRes.ok ? (proceduresRes.data.procedures ?? []) : [],
@@ -225,6 +248,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
 
   const overview = data?.overview ?? null;
   const clinical = data?.clinical ?? null;
+  const documents = data?.documents ?? [];
   const providers = data?.providers ?? [];
   const providersFailed = data?.providersFailed ?? false;
   const procedures = data?.procedures ?? [];
@@ -821,6 +845,54 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                     ))}
                   </ul>
                 )}
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+      )}
+
+      {show("documentos") && (
+      <section id="documentos">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)]">Meus documentos</h3>
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          Receitas, pedidos de exame, encaminhamentos e atestados emitidos no atendimento.
+          Baixe o PDF ou apresente a guia que o profissional entregou em mãos.
+        </p>
+        {documents.length === 0 ? (
+          <p className="mt-3 rounded-lg bg-[var(--surface-card)] p-4 text-[var(--text-muted)]">
+            Nenhum documento clínico disponível ainda.
+          </p>
+        ) : (
+          <div className="mt-3 space-y-3">
+            {documents.map((doc) => (
+              <article
+                key={doc.id}
+                className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-4 shadow-sm"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <StatusBadge value={doc.kindLabel} label={doc.kindLabel} />
+                      <StatusBadge value={doc.statusLabel} label={doc.statusLabel} />
+                    </div>
+                    <p className="font-medium text-[var(--text-primary)]">{doc.title}</p>
+                    <p className="text-sm text-[var(--text-muted)]">{doc.summary}</p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {doc.providerName} · {doc.createdAtLabel}
+                    </p>
+                  </div>
+                  <ExportButtons
+                    baseUrl="/api/beneficiario/clinical-guides/export"
+                    query={{
+                      type: doc.exportParams.type,
+                      id: doc.exportParams.id,
+                      appointmentId: doc.exportParams.appointmentId,
+                    }}
+                    formats={["pdf"]}
+                    size="sm"
+                  />
+                </div>
               </article>
             ))}
           </div>

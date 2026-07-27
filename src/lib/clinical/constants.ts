@@ -16,6 +16,21 @@ export {
   type AtestadoKind,
 } from "@/lib/clinical/atestado";
 
+export {
+  REFERRAL_KINDS,
+  REFERRAL_URGENCIES,
+  REFERRAL_TEMPLATES,
+  isReferralKind,
+  isReferralUrgency,
+  referralKindLabel,
+  referralUrgencyLabel,
+  referralStatusLabel,
+  buildEncaminhamentoDocument,
+  type ReferralKind,
+  type ReferralUrgency,
+  type ReferralTemplate,
+} from "@/lib/clinical/encaminhamento";
+
 export const EXAM_ORDER_STATUSES = [
   "SOLICITADO",
   "AGENDADO",

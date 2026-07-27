@@ -270,6 +270,38 @@ export async function seedAppointmentTeamMass(
     });
   }
 
+  const existingReferral = await prisma.clinicalReferral.findFirst({
+    where: { appointmentId: input.appointmentId },
+  });
+  if (!existingReferral) {
+    const referral = await prisma.clinicalReferral.create({
+      data: {
+        patientId: input.patientId,
+        providerId: input.providerId,
+        appointmentId: input.appointmentId,
+        referralKind: "ESPECIALIDADE",
+        specialty: "Coloproctologia",
+        urgency: "ROTINA",
+        clinicalReason:
+          "Avaliação coloproctológica após indicação de colonoscopia e preparo intestinal.",
+        historySummary: "Queixa digestiva com indicação de investigação endoscópica.",
+        requestedActions:
+          "Revisar laudo da colonoscopia, definir seguimento e condutas complementares.",
+      },
+    });
+
+    await prisma.timelineEvent.create({
+      data: {
+        tenantId: input.tenantId,
+        entityType: TIMELINE_ENTITY_TYPES.CLINICAL_REFERRAL,
+        entityId: referral.id,
+        action: TIMELINE_ACTIONS.REFERRAL_CREATED,
+        description: `Encaminhamento para Coloproctologia — ${input.patientName}`,
+        createdBy: input.providerId,
+      },
+    });
+  }
+
   await prisma.timelineEvent.create({
     data: {
       tenantId: input.tenantId,

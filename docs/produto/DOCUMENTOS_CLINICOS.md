@@ -1,75 +1,71 @@
-# Documentos clínicos — atestado, receita e protocolos
+# Documentos clínicos — saída do atendimento
 
-Referência para prestadores (médicos) e agentes. Escopo: feedback operacional sobre
-protocolos de exames, atestado, receita comum/especial e usabilidade mobile/desktop.
+Referência para prestadores e agentes. Escopo: o que o paciente leva após a consulta
+(receita, pedido de exames, encaminhamento, atestado), templates e impressão de guias.
+
+Padrão de mercado (DocVox, Prescreve, Doctor's Office, Colmeia): emitir no consultório →
+imprimir A4 → entregar em mãos **e** disponibilizar no painel do paciente.
 
 ## O que a plataforma faz hoje
 
-| Documento | Onde | Status |
-|-----------|------|--------|
-| Protocolo de cuidado | `/interno/cadastros?tab=protocols` + aba Protocolos no atendimento | Editável + ativar/desativar |
-| Protocolo de exames | mesma aba Cadastros + aba Exames (aplicar em lote) | Editável + ativar/desativar |
-| Receita comum / controle especial | Care Chart (Medicação) + template PEP | Estruturada + reativar |
-| Atestado (afastamento / acompanhamento / comparecimento) | PEP → tipo Atestado | Texto estruturado CFM |
-| Assinatura digital / Atesta CFM / SNCR | — | Fora do escopo POC |
+| Documento | Onde emitir | Impressão PDF | Painel do beneficiário |
+|-----------|-------------|---------------|------------------------|
+| Receita multi-item | Atendimento → Medicação | Guia tipográfica (+ 2 vias se controle especial) | **Documentos** |
+| Pedido de exames | Atendimento → Exames (avulso ou protocolo) | Guia agregada do atendimento | **Documentos** |
+| Encaminhamento | Atendimento → **Documentos** (templates) | Guia A4 | **Documentos** |
+| Atestado | Atendimento → Prontuário (tipo Atestado) | PDF PEP | **Documentos** + Prontuário |
+| Protocolo de exames | Interno → Cadastros + aplicar no atendimento | Via pedido de exames | (status em Exames) |
 
-## Atestado (pesquisa — CFM)
+**Fluxo otimizado no prestador**
 
-Base: **Resolução CFM nº 2.381/2024** (documentos médicos) e **2.382/2024** (Atesta CFM).
+1. Emitir receita / exames / encaminhamento durante o atendimento  
+2. Aba **Documentos** → revisar guias → **PDF** individual ou **pacote do atendimento**  
+3. Entregar impresso em mãos  
+4. Paciente baixa de novo em `/beneficiario/documentos` se perder o papel  
 
-Campos que o formulário do ServiceOS cobre na POC:
+## Encaminhamento
 
-- Tipo: afastamento, acompanhamento ou declaração de comparecimento
-- Identificação do paciente (nome + CPF quando disponível)
-- Quantidade de dias e data de início / comparecimento
-- CID **somente** com checkbox de autorização do paciente
-- Observações opcionais + aviso de que a emissão oficial nacional é via Atesta CFM
+Modelo `ClinicalReferral` — especialidade/serviço, urgência (rotina/breve/urgente),
+motivo clínico, histórico e condutas pedidas ao destino.
 
-**Não coberto:** integração obrigatória Atesta CFM, QRCode de bloco físico, assinatura
-qualificada ICP-Brasil.
+Templates prontos: Cardiologia, Ortopedia, Gastroenterologia, Endocrinologia,
+Dermatologia, Psiquiatria, Retorno, Fisioterapia.
 
-## Receita comum e de controle especial (pesquisa — Anvisa)
+## Receita comum e de controle especial (Anvisa)
 
-Base: **Portaria SVS/MS 344/1998**, atualizações **RDC 1000/2025** e prazos SNCR.
+Base: **Portaria SVS/MS 344/1998**, atualizações **RDC 1000/2025**.
 
 | Tipo na UI | Uso |
 |------------|-----|
 | `COMUM` | Medicamentos sem controle especial |
-| `CONTROLE_ESPECIAL` | Receita de Controle Especial (duas vias; listas C1/C5 etc.) |
+| `CONTROLE_ESPECIAL` | Duas vias no PDF (1ª farmácia / 2ª paciente) |
 
-**Ativar / inativar:**
+**Não coberto:** Notificações A/B, numeração SNCR, retenção eletrônica Anvisa,
+assinatura ICP-Brasil / QRCode.
 
-- Prescrição estruturada: status `ATIVA` \| `SUSPENSA` \| `ENCERRADA` + botão **Reativar**
-- Templates de protocolo (cuidado e exames): flag `active` no cadastro interno
+## Pedidos de exame
 
-**Não coberto:** Notificações de Receita A/B (amarela/azul), numeração SNCR, retenção
-eletrônica Anvisa, modelos oficiais PDF tipográficos.
+- Avulso ou **Aplicar protocolo** (`ExamProtocolTemplate`)  
+- Guia PDF agrupa os exames do atendimento (padrão de mercado = um pedido com N itens)  
 
-## Protocolos de exames
+## Atestado (CFM)
 
-Modelo `ExamProtocolTemplate` — lista de nomes de exames + indicação clínica padrão.
-No atendimento, **Aplicar protocolo** gera um `ExamOrder` por item. Pedidos avulsos e laudos usam `POST/PATCH …/exam-orders` — ver [`API_DOCS.md`](../plataforma/API_DOCS.md) §7.
-
-## UI mobile / desktop (correções)
-
-- `TabBar`: rótulos curtos no mobile (`shortLabel`), área de toque ≥ 44px
-- Formulários: `min-w-0`, empilhamento `flex-col` → `sm:flex-row`
-- Laudo de exame: textarea inline (sem `window.prompt`)
-- Protocolos de cuidado: edição após criar (antes só ativar/desativar)
+Base: **Resolução CFM nº 2.381/2024** e **2.382/2024** (Atesta CFM).  
+Formulário estruturado no PEP; PDF via exportação de registro. Integração Atesta CFM fora do POC.
 
 ## Código canônico
 
-- `src/lib/clinical/atestado.ts` · `src/lib/clinical/receita.ts`
-- `src/lib/exam-protocol-service.ts` · `src/lib/pep-templates.ts`
-- `src/components/ExamProtocolTemplatesPanel.tsx` · `ProtocolTemplatesPanel.tsx`
-- `src/components/clinical/ClinicalCarePanel.tsx` · `AtendimentoView.tsx`
-
-**Contrato HTTP:** [`plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §7 (protocolos de exames e prescrições).
+- `src/lib/clinical/encaminhamento.ts` · `receita.ts` · `atestado.ts`
+- `src/lib/clinical-referral-service.ts` · `clinical-discharge-service.ts`
+- `src/lib/exports/clinical-guide-pdf.ts` · `clinical-guide-service.ts`
+- `src/components/clinical/ClinicalDischargePanel.tsx`
+- Prestador: `/api/prestador/clinical-guides/export` · `.../discharge-documents` · `.../referrals`
+- Beneficiário: `/beneficiario/documentos` · `/api/beneficiario/documents` · `.../clinical-guides/export`
 
 ## Validação rápida
 
-1. Interno → Cadastros → Protocolos: criar/editar/desativar protocolo de exames
-2. Prestador → Atendimento → Exames → Aplicar protocolo
-3. Medicação → receita controle especial → Suspender → Reativar
-4. Prontuário → Atestado → preencher dias + CID com autorização → Gerar template
-5. Reduzir viewport: abas com rótulos curtos e formulários sem overflow horizontal
+1. Prestador → Atendimento → Medicação → emitir receita multi-item → PDF  
+2. Exames → aplicar protocolo → PDF do pedido  
+3. Documentos → template Cardiologia → emitir → PDF → pacote do atendimento  
+4. Beneficiário (`joao.pereira@email.com`) → Documentos → baixar PDF  
+5. Viewport estreito: abas com `shortLabel` e botões sem overflow  
