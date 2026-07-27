@@ -11,14 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.23** — Portal PJ CRUD colaboradores + E2E estoque **pendente deploy**.
+> Pacote **v3.0.23** — Portal PJ CRUD colaboradores + E2E estoque **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.22** — deploy `6a670e42` @ `9466c1c` (`bibi-poc-2026-07-27n`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.23** — deploy `6a677005` @ `9243c5d` (`bibi-poc-2026-07-27o`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.23** preparado · produção ainda **v3.0.22** até deploy |
-| **Pacote anterior em produção** | **3.0.21** — deploy `6a670ad1` @ `d9bd043` (`bibi-poc-2026-07-27m`) |
+| **Release `main` / `dev`** | **v3.0.23** em produção @ `9243c5d` |
+| **Pacote anterior em produção** | **3.0.22** — deploy `6a670e42` @ `9466c1c` (`bibi-poc-2026-07-27n`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
@@ -26,8 +26,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.23** (PJ CRUD + E2E estoque + docs assistente) |
-| **Release** | `main` | **v3.0.23** (após merge release) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.22** · deploy `6a670e42` · HTTP 200 · **Stop builds ON** |
+| **Release** | `main` | **v3.0.23** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.23** · deploy `6a677005` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.23
@@ -36,7 +36,18 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Mapa:** `pj-beneficiary-crud` → **implemented**.
 - **Assistente:** teste integração runner + `ruleOverrides`; TESTES.md RBAC alinhado.
 - **Estoque:** smoke E2E fases 1–4 (`e2e/estoque-fases.spec.ts`).
-- **Qualidade:** `pj-beneficiaries` · `assistant` ruleOverrides · `estoque-fases` · pre-release OK.
+- **Qualidade:** `pj-beneficiaries` · `assistant` ruleOverrides · `estoque-fases` · pre-release OK · deploy `6a677005`.
+
+### Smoke (27/07/2026) — produção v3.0.23
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.23` · deploy `6a677005` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
+| `/instalar` | 200 |
+| `/interno/assistente` | 307 (auth) |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.22
 

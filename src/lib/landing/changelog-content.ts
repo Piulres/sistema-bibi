@@ -48,7 +48,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "CI #365 · pj-beneficiaries · estoque-fases · pre-release OK",
+    testStats: "CI #365 · pj-beneficiaries · estoque-fases · pre-release OK · prod 6a677005",
   },
   {
     version: "3.0.22",
