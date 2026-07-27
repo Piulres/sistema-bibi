@@ -31,7 +31,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Auditoria com RBAC de conteúdo, estoque clínico validado e cadastros mais rápidos (fetch + code-split por aba).",
+      "Auditoria com RBAC de conteúdo, estoque clínico, cadastros mais rápidos e documentos de saída (receita, exames, encaminhamento) com guias PDF.",
     highlights: [
       {
         title: "Auditoria / RBAC",
@@ -56,9 +56,17 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Abas secundárias em code-split (next/dynamic); Beneficiários permanece no bundle inicial",
         ],
       },
+      {
+        title: "Documentos de saída",
+        items: [
+          "Encaminhamento com templates por especialidade e guia PDF A4",
+          "Impressão de receita e pedido de exames; pacote completo do atendimento",
+          "Painel do beneficiário em /beneficiario/documentos para baixar as guias",
+        ],
+      },
     ],
     testStats:
-      "CI unit+E2E · audit-access · audit-rbac-content · stock · cadastros-resolve-tab · docs:verify · pre-release OK",
+      "CI unit+E2E · audit-access · audit-rbac-content · stock · cadastros-resolve-tab · documentos-saida · docs:verify · pre-release OK",
   },
   {
     version: "3.0.13",

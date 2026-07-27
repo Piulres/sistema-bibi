@@ -25,7 +25,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.14** (auditoria RBAC + estoque) |
+| **Integração** | `dev` | **v3.0.14** (auditoria + estoque + documentos de saída) |
 | **Release** | `main` | **v3.0.14** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d114` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
@@ -37,7 +37,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Perfis:** ADMIN completo + restore; FATURAMENTO financeiro pleno com PII mascarado; READONLY em resumo; RECEPCAO sem clínico/segurança no dashboard.
 - **Estoque:** reversão completa (ENTRADA/SAIDA/DISPENSACAO/…); bloqueio de dispensação em CANCELADO/FALTOU; docs API alinhados.
 - **Cadastros:** tela `/interno/cadastros` com fetch por aba + `next/dynamic` (sem bloquear UI no Promise.all das 4 listas).
-- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` · `cadastros-resolve-tab` · CI #291/#293/#296 verdes · pre-release OK.
+- **Documentos de saída:** encaminhamento (`ClinicalReferral`) + guias PDF (receita, pedido de exames, encaminhamento) + aba Documentos no atendimento + `/beneficiario/documentos`.
+- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` · `cadastros-resolve-tab` · `documentos-saida` · CI #291/#293/#296/#299 verdes · pre-release OK.
 
 ### Conteúdo do pacote v3.0.13
 
