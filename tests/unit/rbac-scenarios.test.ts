@@ -5,13 +5,14 @@ import {
 } from "@/lib/interno-permissions";
 
 describe("Cenários RBAC — matriz perfil × módulo", () => {
-  it("ADMIN acessa todos os 15 módulos", () => {
+  it("ADMIN acessa todos os 16 módulos", () => {
     const perms = resolveInternoPermissions("INTERNO", "ADMIN");
-    expect(perms).toHaveLength(15);
+    expect(perms).toHaveLength(16);
     expect(hasInternoPermission("INTERNO", "ADMIN", "billing")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "projetos")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "auditoria")).toBe(true);
     expect(hasInternoPermission("INTERNO", "ADMIN", "gestao")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "ADMIN", "assistente")).toBe(true);
   });
 
   it("FATURAMENTO: billing sim, cadastros não", () => {

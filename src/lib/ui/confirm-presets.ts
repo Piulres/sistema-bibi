@@ -18,6 +18,14 @@ export const confirmPresets = {
     tone: "warning",
   }),
 
+  rescheduleAppointment: (whenLabel: string, newLabel: string): ConfirmOptions => ({
+    title: "Reagendar consulta",
+    message: `Trocar o horário de ${whenLabel} para ${newLabel}?`,
+    confirmLabel: "Reagendar",
+    cancelLabel: "Voltar",
+    tone: "warning",
+  }),
+
   voidInvoice: (patientName: string, totalLabel: string): ConfirmOptions => ({
     title: "Anular fatura",
     message: `Anular a fatura de ${patientName} (${totalLabel})? Os itens voltarão para faturamento.`,

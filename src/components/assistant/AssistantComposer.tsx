@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import Button from "@/components/ui/Button";
 import { useAssistant } from "@/components/assistant/AssistantProvider";
@@ -14,10 +14,11 @@ type Props = {
 };
 
 export default function AssistantComposer({ portal }: Props) {
-  const { sendMessage, loading } = useAssistant();
+  const { open, sendMessage, loading } = useAssistant();
   const { labels } = useLabels();
   const pathname = usePathname();
   const [input, setInput] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
   const suggestions = useMemo(() => {
@@ -25,6 +26,12 @@ export default function AssistantComposer({ portal }: Props) {
     const merged = [...contextual, ...copy.suggestions];
     return [...new Set(merged)].slice(0, 12);
   }, [portal, pathname, labels, copy.suggestions]);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(timer);
+  }, [open]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -51,6 +58,7 @@ export default function AssistantComposer({ portal }: Props) {
       </div>
       <form onSubmit={(e) => void handleSubmit(e)} className="flex gap-2">
         <input
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder={copy.placeholder}

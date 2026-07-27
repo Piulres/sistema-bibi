@@ -41,6 +41,7 @@ export type PatientOverviewData = {
     modality: string;
     telemedicineUrl: string | null;
     reason: string | null;
+    providerId: string;
     providerName: string;
     usagesCount: number;
   }[];
@@ -95,7 +96,7 @@ export async function getPatientOverview(
       company: true,
       appointments: {
         include: {
-          provider: { select: { name: true } },
+          provider: { select: { id: true, name: true } },
           usages: { include: { procedure: true } },
         },
         orderBy: { scheduledAt: "desc" },
@@ -126,6 +127,7 @@ export async function getPatientOverview(
     modality: appointment.modality,
     telemedicineUrl: appointment.telemedicineUrl,
     reason: appointment.reason,
+    providerId: appointment.provider.id,
     providerName: appointment.provider.name,
     usagesCount: appointment.usages.length,
   }));

@@ -1,8 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import type { AssistantAction, AssistantMessage } from "@/lib/assistant/types";
 import { filterAssistantActions } from "@/lib/assistant/types";
+import {
+  clearAssistantChat,
+  loadAssistantChat,
+  saveAssistantChat,
+} from "@/lib/assistant/chat-storage";
+import type { PortalKey } from "@/lib/roles";
 
 type AssistantContextValue = {
   open: boolean;
@@ -13,6 +19,7 @@ type AssistantContextValue = {
   error: string | null;
   sendMessage: (content: string) => Promise<void>;
   confirmAction: (pendingActionId: string, confirmed: boolean, password?: string) => Promise<void>;
+  resetConversation: () => void;
   clearError: () => void;
 };
 
@@ -25,17 +32,38 @@ export function useAssistant() {
 }
 
 type Props = {
+  portal: PortalKey;
   pageContext?: string;
   children: React.ReactNode;
 };
 
-export default function AssistantProvider({ pageContext, children }: Props) {
+export default function AssistantProvider({ portal, pageContext, children }: Props) {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<AssistantMessage[]>([]);
+  const [messages, setMessages] = useState<AssistantMessage[]>(
+    () => loadAssistantChat(portal)?.messages ?? [],
+  );
   const [actions, setActions] = useState<AssistantAction[]>([]);
-  const [sessionState, setSessionState] = useState<string | undefined>();
+  const [sessionState, setSessionState] = useState<string | undefined>(
+    () => loadAssistantChat(portal)?.sessionState,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (messages.length === 0 && !sessionState) {
+      clearAssistantChat(portal);
+      return;
+    }
+    saveAssistantChat(portal, { messages, sessionState });
+  }, [messages, portal, sessionState]);
+
+  const resetConversation = useCallback(() => {
+    setMessages([]);
+    setActions([]);
+    setSessionState(undefined);
+    setError(null);
+    clearAssistantChat(portal);
+  }, [portal]);
 
   const sendMessage = useCallback(
     async (content: string) => {
@@ -117,9 +145,10 @@ export default function AssistantProvider({ pageContext, children }: Props) {
       error,
       sendMessage,
       confirmAction,
+      resetConversation,
       clearError: () => setError(null),
     }),
-    [open, messages, actions, loading, error, sendMessage, confirmAction],
+    [open, messages, actions, loading, error, sendMessage, confirmAction, resetConversation],
   );
 
   return <AssistantContext.Provider value={value}>{children}</AssistantContext.Provider>;

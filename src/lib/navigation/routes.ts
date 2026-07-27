@@ -21,6 +21,7 @@ export const INTERNO_NAV_TABS: NavTab[] = [
   { href: "/interno/branding", label: "White Label", key: "branding" },
   { href: "/interno/integracoes", label: "Integrações", key: "integracoes" },
   { href: "/interno/seguranca", label: "Segurança", key: "seguranca" },
+  { href: "/interno/assistente", label: "Assistente", key: "assistente" },
 ];
 
 /** Rótulos curtos para breadcrumbs e links de retorno. */
@@ -41,6 +42,7 @@ export const INTERNO_ROUTE_LABELS: Record<string, string> = {
   "/interno/branding": "White Label",
   "/interno/integracoes": "Integrações",
   "/interno/seguranca": "Segurança",
+  "/interno/assistente": "Assistente",
 };
 
 /** Resolve módulo ativo do interno a partir do pathname. */
@@ -60,6 +62,7 @@ export function resolveInternoActive(pathname: string): InternoModule | undefine
   if (pathname.startsWith("/interno/branding")) return "branding";
   if (pathname.startsWith("/interno/integracoes")) return "integracoes";
   if (pathname.startsWith("/interno/seguranca")) return "seguranca";
+  if (pathname.startsWith("/interno/assistente")) return "assistente";
   return undefined;
 }
 
