@@ -31,18 +31,25 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Estoque Fase 3: produtos sem controle de lote (serviços, kits) com movimentação direta por quantidade.",
+      "Estoque Fase 3: produtos sem lote (SEM-LOTE); Assistente com motor de regras e overrides por nicho.",
     highlights: [
       {
         title: "Estoque clínico",
         items: [
-          "Campo requiresLot no produto — desliga rastreio por lote quando não aplicável",
-          "Entrada/saída/dispensação sem lote para SERVICO e insumos genéricos",
-          "UI de estoque adaptada: oculta lotes quando produto não exige",
+          "Campo requiresLot — produto pode dispensar rastreio ANVISA de lote/validade",
+          "Entrada sem lote cria SEM-LOTE; UI mostra badge e omite campos de validade",
+          "Alertas de validade ignoram lotes sintéticos",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "Motor de regras Fase 2 com overrides por nicho e tenant",
         ],
       },
     ],
-    testStats: "CI unit+E2E · stock Fase 3 · requiresLot · docs:verify · pre-release OK",
+    testStats:
+      "CI unit+E2E #319/#321/#326 · stock · assistant-rule-engine · docs:verify · pre-release OK",
   },
   {
     version: "3.0.17",

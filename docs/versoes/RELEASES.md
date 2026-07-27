@@ -32,8 +32,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ### Conteúdo do pacote v3.0.18
 
-- **Estoque Fase 3:** `requiresLot=false` — produtos sem lote (SERVICO, kits); movimentação direta por quantidade; UI oculta gestão de lotes quando desnecessária.
-- **Qualidade:** `stock` API + unit · CI #319 · pre-release OK.
+- **Estoque Fase 3:** `requiresLot=false` — lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade; UI com checkbox e badge SEM LOTE (#319).
+- **Assistente Fase 2:** motor de regras com overrides por nicho/tenant (#321).
+- **Qualidade:** `stock` · `assistant-rule-engine` · CI #319/#321/#326 · pre-release OK.
 
 ### Conteúdo do pacote v3.0.17
 
