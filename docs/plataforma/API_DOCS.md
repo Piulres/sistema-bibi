@@ -430,9 +430,120 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 10. Referências
+## 10. Agenda e calendários externos (v3.0.10)
 
-- [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
+Push **outbound** (ServiceOS → Google/Outlook) com fallback **ICS** (Apple e assinatura por URL). Guia operacional completo: [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md).
+
+### Escopos
+
+| Escopo | Portal | Uso |
+|--------|--------|-----|
+| `PROVIDER` | Prestador | Agenda pessoal do médico/prestador |
+| `TENANT` | Interno | Agenda operacional da recepção |
+
+### Endpoints principais
+
+| Método | Path | Auth | Resposta |
+|--------|------|------|----------|
+| `GET` | `/api/prestador/calendar` | prestador | Feed ICS ativo, conexões OAuth, URLs de start |
+| `POST` | `/api/prestador/calendar` | prestador | Cria ou rotaciona feed (`{ rotate?: boolean }`) |
+| `DELETE` | `/api/prestador/calendar` | prestador | Revoga feed ativo |
+| `DELETE` | `/api/prestador/calendar/connections/{google\|microsoft}` | prestador | Desconecta OAuth |
+| `GET` | `/api/interno/calendar` | interno | Idem, escopo `TENANT` |
+| `POST` / `DELETE` | `/api/interno/calendar` | interno | Criar/rotacionar/revogar feed operacional |
+| `DELETE` | `/api/interno/calendar/connections/{google\|microsoft}` | interno | Desconecta OAuth da operação |
+| `GET` | `/api/calendar/oauth/{google\|microsoft}/start` | prestador ou interno | Redirect 302 ao provedor (`scope`, `returnTo`) |
+| `GET` | `/api/calendar/oauth/{google\|microsoft}/callback` | cookie OAuth | Finaliza conexão; redirect ao `returnTo` |
+| `GET` | `/api/calendar/feed/{token}` | **público** (token na URL) | `text/calendar` — feed assinável |
+| `GET` | `/api/{prestador,interno}/appointments/{id}/calendar` | portal | JSON com links Google/Outlook/ICS; `?format=ics` → download |
+
+### Push automático
+
+`create` / `update` / `cancel` de `Appointment` enfileira sync via `queueAppointmentCalendarSync` → `calendar-sync-service` → Google Calendar API ou Microsoft Graph. Mapa `appointmentId` ↔ `externalEventId` em `AppointmentExternalEvent`.
+
+Webhooks B2B: `APPOINTMENT_CREATED`, `APPOINTMENT_UPDATED`, `APPOINTMENT_CANCELLED`.
+
+### Modo mock (padrão POC)
+
+Com `CALENDAR_OAUTH_MOCK` ausente ou `true`, os botões **Conectar** completam o fluxo com adapters mock — não escrevem no Google/Outlook real. Push real exige `CALENDAR_OAUTH_MOCK=false` + credenciais OAuth em [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md).
+
+### Exemplo curl (prestador — feed ICS)
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"dra.helena@bibi.health","password":"bibi123","portal":"prestador"}'
+
+curl -b cookies.txt http://localhost:3000/api/prestador/calendar
+
+curl -b cookies.txt -X POST http://localhost:3000/api/prestador/calendar \
+  -H "Content-Type: application/json" \
+  -d '{"label":"Agenda Dra. Helena"}'
+```
+
+### Códigos HTTP comuns
+
+| HTTP | Causa |
+|------|-------|
+| 200 | Feed/conexão/lista retornada |
+| 302 | OAuth start redireciona ao provedor |
+| 400 | Provedor inválido, escopo inválido ou provedor não configurado |
+| 403 | Escopo errado para o role (ex.: interno em `PROVIDER`) |
+| 404 | Agendamento ou feed/token inexistente |
+
+Testes: `tests/lib/calendar-ics.test.ts` · `tests/lib/calendar-oauth.test.ts` · UI: painel em `/prestador` e `/interno/agenda`.
+
+---
+
+## 11. Disponibilidade do prestador (v3.0.10)
+
+Grade semanal + bloqueios pontuais → slots consumidos pelo beneficiário (`/beneficiario/agendar`) e pelo motor `getAvailableSlots`. Guia: [`PROVIDER_AVAILABILITY.md`](PROVIDER_AVAILABILITY.md).
+
+| Método | Path | Corpo / query | Resposta |
+|--------|------|---------------|----------|
+| `GET` | `/api/prestador/availability` | — | `{ windows[], usingDefault, slotMinutesDefault }` |
+| `PUT` | `/api/prestador/availability` | `{ windows: WeeklyAvailabilityInput[] }` | Grade substituída (lista completa) |
+| `GET` | `/api/prestador/availability/blocks` | `from`, `to` (ISO, opcional) | `{ blocks[] }` |
+| `POST` | `/api/prestador/availability/blocks` | `{ startsAt, endsAt, reason? }` | Bloqueio criado |
+| `DELETE` | `/api/prestador/availability/blocks/{id}` | — | Bloqueio removido |
+| `GET` | `/api/prestador/availability/preview` | `date` (obrigatório, `YYYY-MM-DD`) | Slots livres do dia |
+
+### Corpo — janela semanal (`windows[]`)
+
+```json
+{
+  "windows": [
+    { "weekday": 1, "startMinute": 480, "endMinute": 720, "slotMinutes": 30, "active": true },
+    { "weekday": 1, "startMinute": 840, "endMinute": 1080, "slotMinutes": 30, "active": true }
+  ]
+}
+```
+
+`weekday`: 0 = domingo … 6 = sábado · `startMinute`/`endMinute`: minutos desde 00:00.
+
+### Fallback
+
+Prestador **sem grade salva** → padrão POC **08:00–18:00 todos os dias / 30 min** (`usingDefault: true`). Após salvar, dia sem janela ativa → **fechado** (zero slots).
+
+### Exemplo curl
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"dra.helena@bibi.health","password":"bibi123","portal":"prestador"}'
+
+curl -b cookies.txt "http://localhost:3000/api/prestador/availability/preview?date=2026-07-28"
+```
+
+Motor: `src/lib/scheduling-service.ts` · `src/lib/availability/provider-availability-service.ts` · fuso operacional: `src/lib/timezone.ts` (v3.0.9+).
+
+---
+
+## 12. Referências
+
+- [`ARQUITETURA.md`](ARQUITETURA.md) §17 — calendário + disponibilidade na camada operacional
+- [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md) — OAuth, ICS, segurança, limitações
+- [`PROVIDER_AVAILABILITY.md`](PROVIDER_AVAILABILITY.md) — grade → slots → agendamento
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal
 - [`RELEASES.md`](../versoes/RELEASES.md) — versão em produção
 - Landing: botão **Ver API (Swagger)** → `/api/docs`

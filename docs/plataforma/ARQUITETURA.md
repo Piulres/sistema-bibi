@@ -779,6 +779,67 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 
 Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes: `tests/api/exports.test.ts`.
 
+### Disponibilidade do prestador (v3.0.10)
+
+```mermaid
+flowchart LR
+  UI["/prestador/disponibilidade"] --> Svc["provider-availability-service"]
+  Svc --> PA[(ProviderAvailability)]
+  Svc --> BT[(BlockedTime)]
+  PA --> Slots["getAvailableSlots"]
+  BT --> Slots
+  Slots --> Ben["/beneficiario/agendar"]
+  Slots --> Book["bookBeneficiaryAppointment"]
+```
+
+| Camada | Arquivo | Papel |
+|--------|---------|-------|
+| UI | `DisponibilidadeView.tsx` | Grade semanal + bloqueios + prévia |
+| API | `/api/prestador/availability/*` | CRUD grade e bloqueios |
+| Motor | `scheduling-service.ts` | Slots livres, booking self-service |
+| Grid | `availability/slot-grid.ts` | Validação de janelas, fallback 08–18 |
+| Fuso | `timezone.ts` | Limites de dia civil BRT (v3.0.9+) |
+
+Doc: [`PROVIDER_AVAILABILITY.md`](PROVIDER_AVAILABILITY.md) · API: [`API_DOCS.md`](API_DOCS.md) §11.
+
+### Calendário externo (v3.0.10)
+
+```mermaid
+flowchart LR
+  Appt[Appointment CRUD] --> Q[queueAppointmentCalendarSync]
+  Q --> Sync[calendar-sync-service]
+  Sync --> G[Google Calendar API]
+  Sync --> M[Microsoft Graph]
+  Sync --> Map[AppointmentExternalEvent]
+  OAuth[OAuth start/callback] --> Conn[CalendarConnection]
+  Conn --> Sync
+  Feed[CalendarFeed token] --> ICS["/api/calendar/feed/{token}"]
+```
+
+| Camada | Arquivo | Papel |
+|--------|---------|-------|
+| Conexão | `calendar-connection-service.ts` | Tokens OAuth cifrados (AES-GCM) |
+| Sync | `calendar-sync-service.ts` | Push create/update/delete outbound |
+| Feed | `calendar-feed-service.ts` | ICS assinável (fallback Apple) |
+| Adapters | `calendar/providers/{google,microsoft,mock}.ts` | OAuth + API dos provedores |
+| UI | `CalendarFeedPanel.tsx`, `AddToCalendarMenu.tsx` | Conectar + links one-shot |
+
+Escopos: `PROVIDER` (prestador) · `TENANT` (recepção). Mock por padrão (`CALENDAR_OAUTH_MOCK`).
+
+Doc: [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md) · API: [`API_DOCS.md`](API_DOCS.md) §10.
+
+### Mês operacional no seed (v3.0.10)
+
+Camada densa de ~30 dias (29 passado + hoje + 5 futuro) aplicada em todo `db:seed` — agenda, PPU, PEP, estoque, faturas, timeline e CEDIG com datas relativas a “hoje”. Marcador idempotente `[seed-operation-month]`.
+
+| Peça | Arquivo |
+|------|---------|
+| Plano puro | `prisma/seed-data/operation-month-plan.ts` |
+| Aplicação | `prisma/seed-data/operation-month.ts` |
+| Testes | `tests/unit/operation-month-plan.test.ts`, `tests/lib/operation-month-consistency.test.ts` |
+
+Doc: [`MASSA_TESTES.md`](MASSA_TESTES.md) §Mês operacional · narrativa: [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
+
 ---
 
 ## 18. Tier 3 — B2B, RBAC, LGPD

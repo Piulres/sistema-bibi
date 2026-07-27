@@ -69,6 +69,7 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 4. **Pós-`npm test`:** dual-store pode quebrar login → `npm run setup`
 5. **E2E:** pare `npm run dev` antes de `test:e2e` (porta 3100)
 6. **Schema-sync operation.db:** Blob congela schema — ver `docs/plataforma/OPERACAO_DADOS.md` §Schema-sync
+7. **Calendário OAuth:** mock por padrão (`CALENDAR_OAUTH_MOCK`); push real exige credenciais — ver `docs/plataforma/CALENDAR_INTEGRATION.md`
 
 ## Índice de documentação
 
@@ -84,6 +85,9 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 | Env vars | `docs/plataforma/VARIAVEIS_AMBIENTE.md` |
 | Demo vs operação | `docs/plataforma/OPERACAO_DADOS.md` |
 | Deploy Netlify | `docs/plataforma/DEPLOY_NETLIFY.md` |
+| Calendário externo | `docs/plataforma/CALENDAR_INTEGRATION.md` |
+| Disponibilidade prestador | `docs/plataforma/PROVIDER_AVAILABILITY.md` |
+| Massa demo / mês operacional | `docs/plataforma/MASSA_TESTES.md` |
 | CEDIG (status) | `docs/clientes/cedig/STATUS.md` |
 | CEDIG (operação / reset Blob) | `docs/clientes/cedig/OPERACAO.md` · `docs/plataforma/OPERACAO_DADOS.md` §Limpeza |
 | Prompts | `docs/prompts/README.md` |

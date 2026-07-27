@@ -73,6 +73,10 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.10 calendário: `tests/lib/calendar-ics.test.ts` (ICS RFC 5545, links externos, duração de slot) · `tests/lib/calendar-oauth.test.ts` (cifra de tokens, state HMAC, adapters mock, sanitização `returnTo`) · doc [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md).
+
+Cobertura v3.0.10 mês operacional: `tests/unit/operation-month-plan.test.ts` (plano puro ~30 dias) · `tests/lib/operation-month-consistency.test.ts` (densidade seed, PPU↔fatura, timeline) · E2E `e2e/jornada-consultorio.spec.ts` · doc [`MASSA_TESTES.md`](MASSA_TESTES.md) §Mês operacional.
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).

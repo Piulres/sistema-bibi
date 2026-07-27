@@ -156,6 +156,8 @@ done
 | Beneficiário | `/beneficiario/login` | `joao.pereira@email.com` |
 | Beneficiário (particular) | `/beneficiario/login` | `pedro.almeida@email.com` |
 | VitaCare WL | `/interno/login` | `operacao@vitacare.demo` |
+| Calendário OAuth (mock) | `/prestador` → painel Conexão direta | `dra.helena@bibi.health` · `CALENDAR_OAUTH_MOCK=true` (padrão) |
+| Disponibilidade + slots | `/prestador/disponibilidade` + `/beneficiario/agendar` | Grade do prestador → slots visíveis ao beneficiário |
 
 **Tenants multi-nicho (v2.0)** — senha `bibi123`:
 
@@ -168,6 +170,8 @@ done
 | EDUCATION (EduPrime) | `operacao@eduprime.demo` |
 
 Evidências gravadas: [`evidencias/README.md`](../evidencias/README.md). Fluxos detalhados: [`FLUXOS.md`](../produto/FLUXOS.md).
+
+**Agenda/calendário (v3.0.10):** OAuth Google/Microsoft com mock por padrão — ver [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md). Disponibilidade do prestador: [`PROVIDER_AVAILABILITY.md`](PROVIDER_AVAILABILITY.md). Mês operacional no seed (timeline sempre atual): [`MASSA_TESTES.md`](MASSA_TESTES.md) §Mês operacional.
 
 ### 4.3 Banco de dados local e demo vs operação
 
