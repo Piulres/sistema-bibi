@@ -243,15 +243,18 @@ body {
   position: absolute;
   left: -9999px;
   top: auto;
-  z-index: 100;
+  z-index: 200;
   width: 1px;
   height: 1px;
   overflow: hidden;
 }
 
-.ds-skip-link:focus {
+.ds-skip-link:focus,
+.ds-skip-link:focus-visible {
+  position: fixed;
   left: 1rem;
   top: 1rem;
+  z-index: 200;
   width: auto;
   height: auto;
   overflow: visible;
@@ -262,6 +265,26 @@ body {
   font-size: 0.875rem;
   font-weight: 600;
   box-shadow: var(--shadow-card);
+  outline: 2px solid var(--ring-focus);
+  outline-offset: 2px;
+}
+
+/*
+ * Focus ring global — cobre links/botões/campos sem classe dedicada.
+ * Componentes com ring próprio (Button, Input) sobrescrevem via outline-none + ring Tailwind.
+ */
+:where(
+  a[href],
+  button,
+  input:not([type="hidden"]),
+  select,
+  textarea,
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
   outline: 2px solid var(--ring-focus);
   outline-offset: 2px;
 }

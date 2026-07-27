@@ -8,6 +8,7 @@ import AssistantMessageList from "@/components/assistant/AssistantMessageList";
 import AssistantActionCard from "@/components/assistant/AssistantActionCard";
 import AssistantComposer from "@/components/assistant/AssistantComposer";
 import { useLabels } from "@/hooks/useLabels";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import { buildPortalUiCopy } from "@/lib/assistant/portal-ui";
 import type { PortalKey } from "@/lib/roles";
 
@@ -19,9 +20,16 @@ export default function AssistantPanel({ portal }: Props) {
   const { open, setOpen, messages, actions, loading, error, resetConversation } = useAssistant();
   const { labels } = useLabels();
   const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const pathname = usePathname();
   const pathnameWhenOpened = useRef<string | null>(null);
+
+  useFocusTrap({
+    enabled: open,
+    containerRef: panelRef,
+    onEscape: () => setOpen(false),
+    initialFocusSelector: "textarea, input",
+  });
 
   useEffect(() => {
     if (!open) {
@@ -37,29 +45,20 @@ export default function AssistantPanel({ portal }: Props) {
     }
   }, [open, pathname, setOpen]);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, setOpen]);
-
   if (!open) return null;
 
   return (
     <>
-      <button
-        type="button"
+      <div
         className="fixed inset-0 z-40 bg-black/30 lg:bg-transparent"
-        aria-label="Fechar assistente"
+        aria-hidden="true"
         onClick={() => setOpen(false)}
       />
       <aside
-        ref={panelRef}
         id="assistant-panel"
+        ref={panelRef}
         role="dialog"
+        aria-modal="true"
         aria-label="Assistente ServiceOS"
         className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-[var(--border-muted)] bg-[var(--surface-card)] shadow-2xl"
       >
@@ -83,7 +82,7 @@ export default function AssistantPanel({ portal }: Props) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-lg px-2 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+              className="rounded-lg px-2 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
               aria-label="Fechar"
             >
               ✕

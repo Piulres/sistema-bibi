@@ -1,9 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import Alert from "@/components/ui/Alert";
 import LoadingState from "@/components/ui/LoadingState";
+import { useRovingTablistKeyDown } from "@/components/ui/RovingTablist";
 import { PIPELINE_STATUSES } from "@/lib/project/construction-modules";
 import { cn } from "@/lib/utils/cn";
 
@@ -95,12 +96,21 @@ export default function ConstructionPipelineView() {
     }
   }
 
-  if (loading) return <LoadingState message="Carregando pipeline comercial…" />;
-
+  const statusIds = useMemo(
+    () => data?.columns.map((c) => c.status) ?? [],
+    [data?.columns],
+  );
   const activeMobileStatus =
     data && mobileStatus && data.columns.some((c) => c.status === mobileStatus)
       ? mobileStatus
       : (data?.columns[0]?.status ?? "");
+  const { tabProps } = useRovingTablistKeyDown(
+    statusIds,
+    activeMobileStatus,
+    setMobileStatus,
+  );
+
+  if (loading) return <LoadingState message="Carregando pipeline comercial…" />;
 
   function renderEntry(e: Entry) {
     return (
@@ -200,11 +210,11 @@ export default function ConstructionPipelineView() {
                   <button
                     key={col.status}
                     type="button"
-                    role="tab"
-                    aria-selected={active}
+                    {...tabProps(col.status)}
                     onClick={() => setMobileStatus(col.status)}
                     className={cn(
                       "min-h-10 shrink-0 rounded-full border px-3 py-2 text-sm font-medium transition",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]",
                       active
                         ? "border-[var(--brand-accent)] bg-[var(--brand-accent)]/10 text-[var(--brand-accent)]"
                         : "border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)]",

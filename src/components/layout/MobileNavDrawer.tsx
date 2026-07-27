@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { cn } from "@/lib/utils/cn";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import type { NavTab } from "@/components/ui/NavTabs";
 
 type Props = {
@@ -51,24 +52,18 @@ export default function MobileNavDrawer({
   const showGroups = groups.length > 1;
   const canPortal = typeof document !== "undefined";
 
+  useFocusTrap({
+    enabled: open,
+    containerRef: panelRef,
+    restoreFocusRef: triggerRef,
+    onEscape: () => setOpen(false),
+    initialFocusSelector: "a[aria-current='page'], a, button",
+  });
+
   useEffect(() => {
     if (!open) return;
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-    requestAnimationFrame(() => {
-      panelRef.current?.querySelector<HTMLElement>("a[aria-current='page'], a")?.focus();
-    });
-
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
   }, [open]);
@@ -80,7 +75,7 @@ export default function MobileNavDrawer({
         type="button"
         data-tour-id="mobile-nav-trigger"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--surface-muted)]"
+        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
         aria-expanded={open}
         aria-controls="mobile-nav-drawer"
       >
@@ -104,10 +99,9 @@ export default function MobileNavDrawer({
       {open && canPortal
         ? createPortal(
             <>
-              <button
-                type="button"
+              <div
                 className="fixed inset-0 z-[60] bg-black/40"
-                aria-label="Fechar menu"
+                aria-hidden="true"
                 onClick={() => setOpen(false)}
               />
               <div
@@ -123,7 +117,7 @@ export default function MobileNavDrawer({
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                    className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                     aria-label="Fechar"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
