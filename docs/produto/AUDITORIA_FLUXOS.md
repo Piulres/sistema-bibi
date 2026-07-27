@@ -58,7 +58,7 @@ via API.
 | **P0 anteriores** | **Corrigidos** — RBAC de API interno (96/96 rotas com guard de módulo), bypass CRM fechado, MFA restrito a `seguranca`, proxy com HMAC |
 | **P1 negócio (3.1)** | **Corrigidos** — máquina de estados do agendamento (`canTransitionAppointmentStatus` → 409); bloqueio de procedimento em `CANCELADO`/`FALTOU` (`canRegisterProcedureForStatus` → 409) |
 | **P2 UX (3.1)** | **Corrigidos** — label de consumo PPU ("A faturar"/"Faturado"); mensagem quando `/providers` falha; `ClinicFinanceView` e `ClinicalCarePanel` com `res.ok` |
-| **Guards de escrita — PARCIAL** | **7** de ~65 rotas mutáveis do interno usam `requireInternoModuleWrite` (gestão clínica + ações destrutivas); risco prático baixo pela matriz atual, mas o padrão de defesa em profundidade não foi generalizado |
+| **Guards de escrita — COMPLETO** | Mutações (POST/PATCH/PUT/DELETE) do portal interno usam `requireInternoModuleWrite` (ou `requireInternoAdmin`); GET permanece em `requireInternoModule` |
 | **Isolamento cross-portal** | OK — APIs retornam 403 entre roles; assistente filtra tools por role |
 
 ```mermaid
@@ -175,7 +175,7 @@ Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 
 | Sev. | Área | Problema | Nota |
 |------|------|----------|------|
-| **Média** | Guards de escrita | ~58 rotas mutáveis (POST/PATCH/DELETE) usam só `requireInternoModule` (leitura+escrita no mesmo módulo); **7** rotas usam `requireInternoModuleWrite` (`clinic-finance/launches`, `clinic-finance/expenses`, `invoices/void`, `stock/reverse`, `webhooks/retry`, `change/revert-recent`, `procedure-usages/void`) | Risco prático baixo: na matriz atual, quem tem o módulo pode escrever e READONLY não tem módulos de escrita. Vira risco se algum perfil ganhar módulo só-leitura no futuro |
+| **Média** | Guards de escrita | ✅ Generalizado (Fase 5): mutações usam `requireInternoModuleWrite` / Admin; leitura permanece em `requireInternoModule` | Defesa em profundidade contra perfil só-leitura futuro |
 | ~~Média~~ ✅ | `ClinicFinanceView` | **Corrigido (3.1):** `loadAll()` seta `loadError` em 403 com retry | `src/components/ClinicFinanceView.tsx` |
 
 ---
@@ -262,7 +262,7 @@ Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 | **P3** | PJ + tenant scope | Aviso de conta PJ sem empresa; `tenantId` no GET/PATCH `prestador/appointments/[id]` | ✅ **Feito (3.1)** |
 | **P3** | Guards beneficiário | Padronizar `requireBeneficiary()` em todas as rotas de `src/app/api/beneficiario/*` | ✅ **Feito (3.2)** |
 | **P3** | Defesa em profundidade | `requireInternoModuleWrite` nas rotas **destrutivas** (`void`/`reverse`/`retry`/`revert-recent`) | ✅ **Feito (3.2)** |
-| **P3** | Defesa em profundidade | Generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis | ⏳ Aberto — **sem exposição na matriz atual** (READONLY não possui esses módulos; `audit/restore` já exige ADMIN). Conversão em massa evitada por ser no-op comportamental; ações destrutivas já endurecidas |
+| **P3** | Defesa em profundidade | Generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis | ✅ **Feito (Fase 5)** — inventário em `rbac-gaps.test.ts` |
 
 ---
 

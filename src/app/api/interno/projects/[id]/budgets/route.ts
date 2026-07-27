@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import {
   approveBudget,
   createBudgetVersion,
@@ -12,7 +12,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     const { id: projectId } = await params;
     const body = (await request.json()) as Record<string, unknown>;
 
@@ -54,7 +54,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
 
 export async function POST(request: Request, { params }: RouteParams) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     const { id: projectId } = await params;
     const body = (await request.json()) as Record<string, unknown>;
     const action = String(body.action ?? "");

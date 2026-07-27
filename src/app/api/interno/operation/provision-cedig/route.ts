@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { isInternoAdmin } from "@/lib/interno-permissions";
 import {
   isValidProvisionCedigConfirmation,
@@ -18,7 +18,7 @@ import {
  */
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("seguranca");
+    const user = await requireInternoModuleWrite("seguranca");
     if (!isInternoAdmin(user.role, user.internoProfile)) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }

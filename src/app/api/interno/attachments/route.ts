@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { deleteAttachment, uploadAttachment } from "@/lib/project/project-service";
 import { isAttachmentCategory, isAttachmentEntityType } from "@/lib/project/constants";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     const form = await request.formData();
     const file = form.get("file");
     const entityType = String(form.get("entityType") ?? "");
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     const { searchParams } = new URL(request.url);
     const attachmentId = searchParams.get("id");
     if (!attachmentId) {

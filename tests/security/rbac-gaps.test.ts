@@ -75,4 +75,34 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
     expect(INTERNO_MODULES.length).toBe(16);
     expect(guardedCount).toBe(routes.length);
   });
+
+  it("handlers mutáveis (POST/PATCH/PUT/DELETE) usam requireInternoModuleWrite ou Admin — Fase 5", () => {
+    const mutableMethods = ["POST", "PATCH", "PUT", "DELETE"] as const;
+    const gaps: string[] = [];
+
+    for (const file of routes) {
+      const src = readFileSync(file, "utf8");
+      for (const method of mutableMethods) {
+        const re = new RegExp(
+          `export async function ${method}\\b[\\s\\S]*?(?=export async function |$)`,
+        );
+        const match = src.match(re);
+        if (!match) continue;
+        const body = match[0];
+        const hasWrite = /requireInternoModuleWrite\s*\(/.test(body);
+        const hasAdmin = /requireInternoAdmin\s*\(/.test(body);
+        const hasModuleOnly =
+          /requireInternoModule\s*\(/.test(body) && !hasWrite && !hasAdmin;
+        if (hasModuleOnly) {
+          gaps.push(`${method} ${relativeApiPath(file)}`);
+        }
+        // Mutação deve ter algum guard de escrita/admin (não só ausência)
+        if (!hasWrite && !hasAdmin && !/requireUser\s*\(/.test(body)) {
+          // se não chama nenhum guard conhecido, já coberto por withoutModuleGuard
+        }
+      }
+    }
+
+    expect(gaps).toEqual([]);
+  });
 });

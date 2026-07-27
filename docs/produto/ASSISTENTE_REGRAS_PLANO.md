@@ -91,7 +91,7 @@ type TenantSettings = {
 | Item | Status | Próximo passo |
 |------|--------|---------------|
 | APIs internas com `requireInternoModule` | 96/96 ✅ | Manter inventário (`rbac-gaps.test.ts`) |
-| `requireInternoModuleWrite` generalizado | Parcial | Fechar ~58 rotas mutáveis |
+| `requireInternoModuleWrite` generalizado | ✅ Fase 5 — mutações internas | Manter inventário (`rbac-gaps.test.ts`) |
 | Tools assistente × perfil interno | ✅ | Estender quando regras forem configuráveis |
 | Confirmação JTI + RBAC | ✅ | Manter no modo IA |
 
@@ -151,7 +151,7 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
 | **3** | Painel CRUD regras + preview + templates por nicho | ✅ CRUD tenant + preview efetivo |
 | **4** | IA híbrida completa (LLM → regras → tools) | ✅ `refineHybridPlan` + allowlist |
-| **5** | RBAC write guards generalizados | ⏳ Paralelo |
+| **5** | RBAC write guards generalizados | ✅ POST/PATCH/PUT/DELETE → `requireInternoModuleWrite` |
 
 ---
 

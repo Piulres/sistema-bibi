@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import {
   buildImportTemplate,
   runImportBatch,
@@ -54,7 +54,7 @@ export async function GET(request: Request, { params }: Params) {
 /** Importa lote a partir de JSON ou CSV (dry-run opcional). */
 export async function POST(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const { entity: entityRaw } = await params;
 
     if (!isImportEntity(entityRaw)) {

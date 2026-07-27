@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { markInvoicePaid } from "@/lib/invoice-service";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function POST(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("billing");
+    const user = await requireInternoModuleWrite("billing");
     const { id } = await params;
     const body = (await request.json().catch(() => ({}))) as { method?: string };
 

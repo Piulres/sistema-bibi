@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import {
   companyStatusLabel,
   contractActiveFromStatus,
@@ -20,7 +20,7 @@ export async function PATCH(
 ) {
   const prisma = await getPrisma();
   try {
-    const user = await requireInternoModule("crm");
+    const user = await requireInternoModuleWrite("crm");
     const { id } = await ctx.params;
     const body = (await request.json()) as { status?: string };
 
