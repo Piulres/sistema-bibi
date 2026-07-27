@@ -1,21 +1,9 @@
-import { expect, test, type APIRequestContext, type Page } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+import { loginAs } from "./helpers/auth";
 
 /**
- * Smoke UI das fases de estoque (1–4): login API + abas Resumo/Produtos/Lotes/Movimentos.
- * Usa cookie de sessão (mesmo padrão de e2e/smoke) para evitar flakiness do formulário.
+ * Smoke UI das fases de estoque (1–4): abas Resumo/Produtos/Lotes/Movimentos.
  */
-
-const RECEPCAO = {
-  email: "recepcao@bibi.health",
-  password: "bibi123",
-  portal: "interno",
-  tenantSlug: "horizonte",
-};
-
-async function loginInternoViaApi(request: APIRequestContext) {
-  const res = await request.post("/api/auth/login", { data: RECEPCAO });
-  expect(res.ok(), `login API ${res.status()}: ${await res.text()}`).toBeTruthy();
-}
 
 async function openEstoque(page: Page) {
   await page.goto("/interno/estoque");
@@ -26,9 +14,9 @@ async function openEstoque(page: Page) {
   await expect(page.getByRole("tablist", { name: "Abas do estoque médico" })).toBeVisible();
 }
 
-test.describe("Estoque fases 1–4 — smoke UI após login API (valida abas e ações críticas na tela)", () => {
+test.describe("Estoque fases 1–4 — smoke UI (valida abas e ações críticas na tela)", () => {
   test.beforeEach(async ({ page }) => {
-    await loginInternoViaApi(page.request);
+    await loginAs(page, "interno", "recepcao@bibi.health");
   });
 
   test("Resumo e Produtos: lista produtos e cria produto com lote (Fase 2/3)", async ({
@@ -50,7 +38,6 @@ test.describe("Estoque fases 1–4 — smoke UI após login API (valida abas e a
     await page.getByLabel("Nome", { exact: true }).fill(name);
     await page.getByRole("button", { name: "Cadastrar" }).click();
 
-    // Desktop: tabela (md:block); mobile: lista md:hidden — exige o item visível.
     await expect(page.getByText(name).locator("visible=true").first()).toBeVisible({
       timeout: 15_000,
     });
@@ -62,17 +49,13 @@ test.describe("Estoque fases 1–4 — smoke UI após login API (valida abas e a
     await expect(page.getByRole("heading", { name: "Entrada de estoque" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Registrar entrada" })).toBeVisible();
 
-    const statusBadge = page.getByText(
-      /Disponível|Quarentena|Bloqueado|Esgotado|Vencido/,
-    );
+    const statusBadge = page.getByText(/Disponível|Quarentena|Bloqueado|Esgotado|Vencido/);
     if ((await statusBadge.count()) > 0) {
       await expect(statusBadge.first()).toBeVisible();
     }
   });
 
-  test("Movimentos: tipos manuais restritos e botão Reverter (Fase 1/4)", async ({
-    page,
-  }) => {
+  test("Movimentos: tipos manuais restritos e botão Reverter (Fase 1/4)", async ({ page }) => {
     await openEstoque(page);
     await page.getByRole("tab", { name: "Movimentos" }).click();
     await expect(page.getByText("Nova movimentação")).toBeVisible();
@@ -82,11 +65,7 @@ test.describe("Estoque fases 1–4 — smoke UI após login API (valida abas e a
     await expect(tipo).toBeVisible();
     const options = await tipo.locator("option").allTextContents();
     const normalized = options.map((o) => o.trim());
-    expect(normalized).toEqual([
-      "Saída",
-      "Ajuste de inventário (baixa)",
-      "Perda / avaria",
-    ]);
+    expect(normalized).toEqual(["Saída", "Ajuste de inventário (baixa)", "Perda / avaria"]);
     expect(normalized.join(" ")).not.toMatch(/Entrada|Dispensa|Transfer/i);
 
     const reverter = page.getByRole("button", { name: "Reverter" });
