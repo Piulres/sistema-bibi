@@ -41,6 +41,10 @@ export function runnerUnavailable(): string {
   return "O assistente ainda não está disponível para o seu perfil.";
 }
 
+export function rulesEngineDisabled(): string {
+  return "O motor de regras está desativado para este tenant. Peça ao administrador para reativar em Interno → Assistente.";
+}
+
 export function toolExecutionError(): string {
   return "Tive um problema ao consultar isso. Pode tentar de novo?";
 }

@@ -2,11 +2,8 @@ import "server-only";
 import type { AssistantPlan, AssistantToolCall } from "@/lib/assistant/types";
 import type { Role } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
-import {
-  MOCK_INTENTS,
-  SHARED,
-  type MockIntentDef,
-} from "@/lib/assistant/provider/mock-intents";
+import { SHARED, type MockIntentDef } from "@/lib/assistant/provider/mock-intents";
+import { resolveAssistantIntents } from "@/lib/assistant/rules/engine";
 import {
   dateRangeFromText,
   defaultDateArg,
@@ -193,7 +190,8 @@ function matchIntentOnSegment(
     }
   }
 
-  for (const intent of MOCK_INTENTS.filter((i) => i.special)) {
+  const intents = resolveAssistantIntents(user);
+  for (const intent of intents.filter((i) => i.special)) {
     if (!intentAllowed(intent, user.role, toolNames)) continue;
     if (!matchesAnyTrigger(text, intent.triggers)) continue;
     const args = matchSpecial(intent, rawSegment);
@@ -217,7 +215,7 @@ function matchIntentOnSegment(
   }
 
   let best: { intent: MockIntentDef; score: number } | null = null;
-  for (const intent of MOCK_INTENTS.filter((i) => !i.special)) {
+  for (const intent of intents.filter((i) => !i.special)) {
     if (!intentAllowed(intent, user.role, toolNames)) continue;
     const score = scoreTriggers(text, intent.triggers) + (intent.priority ?? 0);
     if (score <= (intent.priority ?? 0)) continue;

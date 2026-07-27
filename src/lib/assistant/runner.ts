@@ -14,6 +14,7 @@ import {
   runnerEmptyResult,
   runnerFallback,
   runnerUnavailable,
+  rulesEngineDisabled,
   toolExecutionError,
 } from "@/lib/assistant/humanize";
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
@@ -53,6 +54,9 @@ async function resolvePlan(
       console.error("[assistant] gateway fallback to mock:", error);
     }
   }
+  if (!settings.assistant.rulesEnabled) {
+    return { toolCalls: [], fallback: rulesEngineDisabled() };
+  }
   return planMockAssistant(messages, tools, user);
 }
 
@@ -64,6 +68,7 @@ export async function runAssistantChat(input: {
 }): Promise<AssistantChatResult> {
   const tools = getToolsForUser(input.user);
   const ctx = { user: input.user, labels: input.user.labels };
+  const settings = await getTenantSettings(input.user.tenantId);
 
   if (tools.length === 0) {
     return {
@@ -79,6 +84,13 @@ export async function runAssistantChat(input: {
       operationDraft: restored.operationDraft,
       pendingChoice: restored.pendingChoice,
     });
+  }
+
+  const mode = resolveAssistantMode(settings);
+  if (!settings.assistant.rulesEnabled && mode !== "ai") {
+    return {
+      message: { role: "assistant", content: rulesEngineDisabled() },
+    };
   }
 
   const systemPrompt = buildAssistantSystemPrompt(input.user, input.pageContext);
