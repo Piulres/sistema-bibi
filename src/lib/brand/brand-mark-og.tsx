@@ -1,28 +1,38 @@
 import type { BrandMarkInput } from "@/lib/brand/brand-mark";
-import { brandMarkFontSizePx, brandMarkMeshBackground, resolveBrandMarkLayout } from "@/lib/brand/brand-mark";
+import {
+  brandMarkFontSizePx,
+  brandMarkMeshStyle,
+  resolveBrandMarkLayout,
+} from "@/lib/brand/brand-mark";
 
 type OgBrandMarkProps = {
   input: BrandMarkInput;
   size: number;
+  /** Padding relativo para ícones maskable (ex.: 0.12 = 12% de margem). */
+  insetRatio?: number;
 };
 
 /** JSX para ImageResponse (icon.tsx, apple-icon, script de PNG). */
-export function OgBrandMark({ input, size }: OgBrandMarkProps) {
+export function OgBrandMark({ input, size, insetRatio = 0 }: OgBrandMarkProps) {
   const layout = resolveBrandMarkLayout(input, size);
-  const logoSize = Math.round(size * 0.58);
-  const initialSize = brandMarkFontSizePx(size, layout.initial);
+  const inset = Math.max(0, Math.min(insetRatio, 0.2));
+  const innerSize = Math.round(size * (1 - inset * 2));
+  const meshStyle = brandMarkMeshStyle(layout);
+  const logoSize = Math.round(innerSize * 0.58);
+  const initialSize = brandMarkFontSizePx(innerSize, layout.initial);
 
-  return (
+  const mark = (
     <div
       style={{
-        width: size,
-        height: size,
+        width: innerSize,
+        height: innerSize,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         borderRadius: "50%",
         overflow: "hidden",
-        background: brandMarkMeshBackground(layout),
+        backgroundColor: meshStyle.backgroundColor,
+        backgroundImage: meshStyle.backgroundImage,
       }}
     >
       {layout.logoUrl ? (
@@ -39,15 +49,32 @@ export function OgBrandMark({ input, size }: OgBrandMarkProps) {
           style={{
             color: "#ffffff",
             fontSize: initialSize,
-            fontWeight: 700,
+            fontWeight: 800,
             lineHeight: 1,
-            letterSpacing: layout.initial.length > 1 ? "-0.04em" : undefined,
-            fontFamily: "system-ui, sans-serif",
+            letterSpacing: layout.initial.length > 1 ? "-0.05em" : undefined,
+            fontFamily: "system-ui, -apple-system, sans-serif",
           }}
         >
           {layout.initial}
         </span>
       )}
+    </div>
+  );
+
+  if (inset <= 0) return mark;
+
+  return (
+    <div
+      style={{
+        width: size,
+        height: size,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: meshStyle.backgroundColor,
+      }}
+    >
+      {mark}
     </div>
   );
 }

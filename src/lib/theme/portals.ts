@@ -9,12 +9,12 @@ export const PORTAL_LABELS: Record<PortalKey, string> = {
   beneficiario: "Portal do Beneficiário",
 };
 
-/** Classes de navegação — acentos vêm do branding do tenant via CSS vars. */
+/** Classes de navegação — pills com acento do tenant via CSS vars. */
 export const PORTAL_NAV_ACTIVE_CLASS =
-  "border-[var(--brand-accent)] text-[var(--brand-accent)]";
+  "bg-[var(--brand-accent)] text-white shadow-sm";
 
 export const PORTAL_NAV_IDLE_CLASS =
-  "border-transparent text-[var(--text-muted)] hover:border-[var(--border-accent)] hover:text-[var(--brand-accent)]";
+  "text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]";
 
 export const PORTAL_MOBILE_ACTIVE_CLASS =
   "bg-[var(--surface-muted)] text-[var(--brand-accent)]";

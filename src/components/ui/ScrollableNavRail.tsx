@@ -79,17 +79,17 @@ export default function ScrollableNavRail({ children, className, activeKey }: Pr
   }
 
   return (
-    <div className={cn("relative min-w-0 max-w-full overflow-hidden", className)}>
+    <div className={cn("relative min-w-0 max-w-full overflow-hidden group/rail", className)}>
       {canScrollLeft && (
         <>
           <div
-            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-[var(--surface-page)] via-[var(--surface-page)]/80 to-transparent"
+            className="pointer-events-none absolute inset-y-0 left-0 z-10 w-8 bg-gradient-to-r from-[var(--surface-page)] to-transparent"
             aria-hidden
           />
           <button
             type="button"
             onClick={() => scrollByPage(-1)}
-            className="absolute left-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            className="absolute left-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--surface-card)]/90 text-[var(--text-muted)] opacity-0 shadow-sm ring-1 ring-[var(--border-default)] transition hover:text-[var(--text-primary)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] group-hover/rail:opacity-100"
             aria-label="Rolar navegação para a esquerda"
           >
             <ChevronIcon direction="left" />
@@ -100,13 +100,13 @@ export default function ScrollableNavRail({ children, className, activeKey }: Pr
       {canScrollRight && (
         <>
           <div
-            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-[var(--surface-page)] via-[var(--surface-page)]/80 to-transparent"
+            className="pointer-events-none absolute inset-y-0 right-0 z-10 w-8 bg-gradient-to-l from-[var(--surface-page)] to-transparent"
             aria-hidden
           />
           <button
             type="button"
             onClick={() => scrollByPage(1)}
-            className="absolute right-1 top-1/2 z-20 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full border border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)] shadow-sm transition hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            className="absolute right-0 top-1/2 z-20 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-full bg-[var(--surface-card)]/90 text-[var(--text-muted)] opacity-0 shadow-sm ring-1 ring-[var(--border-default)] transition hover:text-[var(--text-primary)] focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] group-hover/rail:opacity-100"
             aria-label="Rolar navegação para a direita"
           >
             <ChevronIcon direction="right" />
@@ -118,10 +118,8 @@ export default function ScrollableNavRail({ children, className, activeKey }: Pr
         ref={scrollRef}
         className={cn(
           "ds-scroll-x min-w-0 max-w-full scroll-smooth overflow-x-auto",
-          "snap-x snap-proximity scroll-px-4",
+          "snap-x snap-proximity scroll-px-2",
           "[-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          canScrollLeft && "pl-9",
-          canScrollRight && "pr-9",
         )}
       >
         {children}

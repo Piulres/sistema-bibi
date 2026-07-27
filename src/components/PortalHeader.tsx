@@ -39,9 +39,9 @@ export default function PortalHeader({
         <HomeBrandLink
           displayName={displayName}
           logoUrl={logoUrl}
-          logoSize="sm"
+          logoSize="md"
           showTitle={false}
-          className="min-w-0 flex-1"
+          className="min-w-0 flex-1 gap-2.5"
         >
           <p className="truncate text-[10px] font-semibold uppercase tracking-wider text-[var(--brand-accent)] sm:text-xs">
             {portalLabel}
