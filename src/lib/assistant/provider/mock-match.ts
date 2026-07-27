@@ -4,6 +4,7 @@ import type { Role } from "@/lib/roles";
 import type { SessionUser } from "@/lib/session";
 import { SHARED, type MockIntentDef } from "@/lib/assistant/provider/mock-intents";
 import { resolveAssistantIntents } from "@/lib/assistant/rules/engine";
+import type { TenantRuleOverride } from "@/lib/assistant/rules/types";
 import {
   dateRangeFromText,
   defaultDateArg,
@@ -170,6 +171,7 @@ function matchIntentOnSegment(
   user: SessionUser,
   toolNames: Set<string>,
   lastTool: string | null,
+  tenantOverrides?: readonly TenantRuleOverride[],
 ): AssistantToolCall | null {
   const text = normalizeMockText(segment);
 
@@ -190,7 +192,7 @@ function matchIntentOnSegment(
     }
   }
 
-  const intents = resolveAssistantIntents(user);
+  const intents = resolveAssistantIntents(user, tenantOverrides);
   for (const intent of intents.filter((i) => i.special)) {
     if (!intentAllowed(intent, user.role, toolNames)) continue;
     if (!matchesAnyTrigger(text, intent.triggers)) continue;
@@ -233,6 +235,7 @@ export function planMockFromIntents(
   raw: string,
   user: SessionUser,
   toolNames: Set<string>,
+  tenantOverrides?: readonly TenantRuleOverride[],
 ): AssistantPlan {
   if (!raw.trim()) {
     return {
@@ -250,7 +253,7 @@ export function planMockFromIntents(
   const seen = new Set<string>();
 
   for (const segment of segments) {
-    const match = matchIntentOnSegment(segment, raw, user, toolNames, lastTool);
+    const match = matchIntentOnSegment(segment, raw, user, toolNames, lastTool, tenantOverrides);
     if (match && !seen.has(match.name)) {
       calls.push(match);
       seen.add(match.name);
