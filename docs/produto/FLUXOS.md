@@ -446,17 +446,18 @@ Calendários externos (ICS / Google / Outlook): [`../plataforma/CALENDAR_INTEGRA
 
 Serviço: `src/lib/webhook-service.ts`
 
-### 4.8 Estoque médico (`StockView`) — v1.3
+### 4.8 Estoque médico (`StockView`) — v1.3 · Fase 2 UI
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) |
-| Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade e saldo |
-| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória |
+| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita |
+| Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade, saldo e status (DISPONIVEL/BLOQUEADO/VENCIDO/QUARENTENA) |
+| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória — UI com botão Reverter |
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
-Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).
+Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
+Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
@@ -475,7 +476,7 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sen
 | Segurança | completo | resumo | resumo | oculto |
 | Operacional | completo | completo | resumo | resumo |
 
-Restore administrativo permanece **ADMIN**. Atividade recente do dashboard e timeline do Cliente 360° usam a mesma política.
+Restore administrativo permanece **ADMIN**. Atividade recente do dashboard, timeline e export do Cliente 360° usam a mesma política. Busca por descrição (`?search=`) só cobre tipos com nível `full` — evita oráculo de existência em clínico/PII. Encaminhamento/receita (`ClinicalReferral`, `PrescriptionDocument`) são classe clínica.
 
 ### 4.10 Segurança e dual-store (`SecurityView`)
 

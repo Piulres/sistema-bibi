@@ -10,9 +10,12 @@ import TabBar from "@/components/ui/TabBar";
 import StatusBadge from "@/components/ui/StatusBadge";
 import {
   STOCK_CATEGORY_LABELS,
+  STOCK_LOT_STATUS_LABELS,
+  STOCK_LOT_STATUSES,
   STOCK_MOVEMENT_LABELS,
   STOCK_MOVEMENT_TYPES,
   STOCK_PRODUCT_CATEGORIES,
+  isStockReversibleType,
 } from "@/lib/stock-constants";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
@@ -50,6 +53,7 @@ type Lot = {
 
 type Movement = {
   id: string;
+  type: string;
   typeLabel: string;
   productName: string;
   productSku: string;
@@ -93,6 +97,22 @@ type TabKey = (typeof TABS)[number]["key"];
 const fieldClass =
   "w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
 
+const emptyProductForm = {
+  sku: "",
+  name: "",
+  category: "MATERIAL",
+  unit: "UN",
+  minStock: "10",
+  anvisaCode: "",
+};
+
+function canReverseMovement(m: Movement): boolean {
+  if (!m.lotNumber) return false;
+  if (!isStockReversibleType(m.type)) return false;
+  if (m.reason?.toLowerCase().includes("reversão")) return false;
+  return true;
+}
+
 export default function StockView() {
   const { isBusy, run, showToast } = useAsyncAction();
   const [tab, setTab] = useState<TabKey>("resumo");
@@ -102,15 +122,9 @@ export default function StockView() {
   const [kitItems, setKitItems] = useState<
     { id: string; productName: string; productSku: string; quantity: number; unit: string }[]
   >([]);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
-  const [productForm, setProductForm] = useState({
-    sku: "",
-    name: "",
-    category: "MATERIAL",
-    unit: "UN",
-    minStock: "10",
-    anvisaCode: "",
-  });
+  const [productForm, setProductForm] = useState(emptyProductForm);
 
   const [entryForm, setEntryForm] = useState({
     productId: "",
@@ -216,6 +230,23 @@ export default function StockView() {
     };
   }, [kitProcedureId]);
 
+  function startEditProduct(p: Product) {
+    setEditingProductId(p.id);
+    setProductForm({
+      sku: p.sku,
+      name: p.name,
+      category: p.category,
+      unit: p.unit,
+      minStock: String(p.minStock),
+      anvisaCode: p.anvisaCode ?? "",
+    });
+  }
+
+  function cancelEditProduct() {
+    setEditingProductId(null);
+    setProductForm(emptyProductForm);
+  }
+
   async function createProduct(e: React.FormEvent) {
     e.preventDefault();
     await run(
@@ -242,15 +273,93 @@ export default function StockView() {
             message: `Produto ${product?.sku ?? productForm.sku} cadastrado`,
             tone: "success",
           });
-          setProductForm({
-            sku: "",
-            name: "",
-            category: "MATERIAL",
-            unit: "UN",
-            minStock: "10",
-            anvisaCode: "",
-          });
+          setProductForm(emptyProductForm);
           await reload();
+        },
+      },
+    );
+  }
+
+  async function saveProductEdit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editingProductId) return;
+    await run(
+      "product-edit",
+      () =>
+        fetch(`/api/interno/stock/products/${editingProductId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: productForm.name,
+            minStock: Number(productForm.minStock),
+            anvisaCode: productForm.anvisaCode || null,
+          }),
+        }),
+      {
+        successMessage: "Produto atualizado",
+        onSuccess: async () => {
+          cancelEditProduct();
+          await reload();
+        },
+      },
+    );
+  }
+
+  async function toggleProductActive(p: Product) {
+    await run(
+      `product-active-${p.id}`,
+      () =>
+        fetch(`/api/interno/stock/products/${p.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ active: !p.active }),
+        }),
+      {
+        successMessage: p.active ? "Produto inativado" : "Produto reativado",
+        onSuccess: async () => {
+          if (editingProductId === p.id) cancelEditProduct();
+          await reload();
+        },
+      },
+    );
+  }
+
+  async function changeLotStatus(lotId: string, status: string) {
+    await run(
+      `lot-status-${lotId}`,
+      () =>
+        fetch(`/api/interno/stock/lots/${lotId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status }),
+        }),
+      {
+        successMessage: "Status do lote atualizado",
+        onSuccess: async () => {
+          await reload();
+          await loadLots();
+        },
+      },
+    );
+  }
+
+  async function reverseMovement(m: Movement) {
+    await run(
+      `reverse-${m.id}`,
+      () =>
+        fetch(`/api/interno/stock/movements/${m.id}/reverse`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            reason: `Reversão operacional — ${m.typeLabel} ${m.productSku}`,
+          }),
+        }),
+      {
+        successMessage: "Movimentação revertida",
+        onSuccess: async () => {
+          await reload();
+          await loadMovements();
+          await loadLots();
         },
       },
     );
@@ -436,6 +545,9 @@ export default function StockView() {
                               {p.lowStock && (
                                 <span className="ml-2 text-xs text-amber-600">baixo</span>
                               )}
+                              {!p.active && (
+                                <span className="ml-2 text-xs text-[var(--text-muted)]">inativo</span>
+                              )}
                             </p>
                             <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
                               {p.sku} · {p.categoryLabel}
@@ -446,18 +558,37 @@ export default function StockView() {
                             <p className="text-xs text-[var(--text-muted)]">mín. {p.minStock}</p>
                           </div>
                         </div>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => startEditProduct(p)}
+                            disabled={isBusy("product-edit")}
+                          >
+                            Editar
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => void toggleProductActive(p)}
+                            disabled={isBusy(`product-active-${p.id}`)}
+                          >
+                            {p.active ? "Inativar" : "Reativar"}
+                          </Button>
+                        </div>
                       </li>
                     ))}
                   </ul>
                   <div className="ds-scroll-x mt-4 hidden md:block">
-                    <table className="w-full min-w-[28rem] text-sm">
+                    <table className="w-full min-w-[36rem] text-sm">
                       <thead>
                         <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
                           <th className="py-2 pr-3">SKU</th>
                           <th className="py-2 pr-3">Nome</th>
                           <th className="py-2 pr-3">Categoria</th>
                           <th className="py-2 pr-3">Saldo</th>
-                          <th className="py-2">Mín.</th>
+                          <th className="py-2 pr-3">Mín.</th>
+                          <th className="py-2">Ações</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -469,10 +600,33 @@ export default function StockView() {
                               {p.lowStock && (
                                 <span className="ml-2 text-xs text-amber-600">baixo</span>
                               )}
+                              {!p.active && (
+                                <span className="ml-2 text-xs text-[var(--text-muted)]">inativo</span>
+                              )}
                             </td>
                             <td className="py-2 pr-3">{p.categoryLabel}</td>
                             <td className="py-2 pr-3">{p.stockLabel}</td>
-                            <td className="py-2">{p.minStock}</td>
+                            <td className="py-2 pr-3">{p.minStock}</td>
+                            <td className="py-2">
+                              <div className="flex flex-wrap gap-2">
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  onClick={() => startEditProduct(p)}
+                                  disabled={isBusy("product-edit")}
+                                >
+                                  Editar
+                                </Button>
+                                <Button
+                                  type="button"
+                                  variant="secondary"
+                                  onClick={() => void toggleProductActive(p)}
+                                  disabled={isBusy(`product-active-${p.id}`)}
+                                >
+                                  {p.active ? "Inativar" : "Reativar"}
+                                </Button>
+                              </div>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -483,33 +637,78 @@ export default function StockView() {
             </Card>
 
             <Card className="p-4">
-              <SectionHeader title="Novo produto" />
-              <form onSubmit={createProduct} className="mt-4 space-y-3">
+              <SectionHeader title={editingProductId ? "Editar produto" : "Novo produto"} />
+              <form
+                onSubmit={editingProductId ? saveProductEdit : createProduct}
+                className="mt-4 space-y-3"
+              >
                 <label className="block text-sm text-[var(--text-secondary)]">
                   SKU
-                  <input className={fieldClass} value={productForm.sku} onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })} required autoComplete="off" />
+                  <input
+                    className={fieldClass}
+                    value={productForm.sku}
+                    onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })}
+                    required
+                    disabled={Boolean(editingProductId)}
+                    autoComplete="off"
+                  />
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Nome
-                  <input className={fieldClass} value={productForm.name} onChange={(e) => setProductForm({ ...productForm, name: e.target.value })} required />
+                  <input
+                    className={fieldClass}
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    required
+                  />
                 </label>
-                <label className="block text-sm text-[var(--text-secondary)]">
-                  Categoria
-                  <select className={fieldClass} value={productForm.category} onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}>
-                    {STOCK_PRODUCT_CATEGORIES.map((c) => (
-                      <option key={c} value={c}>{STOCK_CATEGORY_LABELS[c]}</option>
-                    ))}
-                  </select>
-                </label>
+                {!editingProductId && (
+                  <label className="block text-sm text-[var(--text-secondary)]">
+                    Categoria
+                    <select
+                      className={fieldClass}
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    >
+                      {STOCK_PRODUCT_CATEGORIES.map((c) => (
+                        <option key={c} value={c}>
+                          {STOCK_CATEGORY_LABELS[c]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Estoque mínimo
-                  <input className={fieldClass} type="number" min="0" value={productForm.minStock} onChange={(e) => setProductForm({ ...productForm, minStock: e.target.value })} />
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0"
+                    value={productForm.minStock}
+                    onChange={(e) => setProductForm({ ...productForm, minStock: e.target.value })}
+                  />
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Registro ANVISA (opcional)
-                  <input className={fieldClass} value={productForm.anvisaCode} onChange={(e) => setProductForm({ ...productForm, anvisaCode: e.target.value })} />
+                  <input
+                    className={fieldClass}
+                    value={productForm.anvisaCode}
+                    onChange={(e) => setProductForm({ ...productForm, anvisaCode: e.target.value })}
+                  />
                 </label>
-                <Button type="submit" disabled={isBusy("product")}>Cadastrar</Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    type="submit"
+                    disabled={isBusy(editingProductId ? "product-edit" : "product")}
+                  >
+                    {editingProductId ? "Salvar" : "Cadastrar"}
+                  </Button>
+                  {editingProductId && (
+                    <Button type="button" variant="secondary" onClick={cancelEditProduct}>
+                      Cancelar
+                    </Button>
+                  )}
+                </div>
               </form>
             </Card>
           </div>
@@ -518,7 +717,10 @@ export default function StockView() {
         {tab === "lotes" && (
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <Card className="p-4">
-              <SectionHeader title="Lotes e validade" description="Rastreabilidade por lote — FIFO na dispensação." />
+              <SectionHeader
+                title="Lotes e validade"
+                description="Rastreabilidade por lote — FIFO na dispensação. Status bloqueia saldo disponível."
+              />
               {lots.length === 0 ? (
                 <EmptyState title="Sem lotes" message="Registre uma entrada de estoque." />
               ) : (
@@ -546,14 +748,26 @@ export default function StockView() {
                           </div>
                           <div className="shrink-0 text-right text-sm">
                             <p className="font-semibold text-[var(--text-primary)]">{lot.quantity}</p>
-                            <p className="text-xs text-[var(--text-muted)]">{lot.statusLabel}</p>
                           </div>
                         </div>
+                        <select
+                          className={`${fieldClass} mt-2`}
+                          aria-label={`Status do lote ${lot.lotNumber}`}
+                          value={lot.status}
+                          disabled={isBusy(`lot-status-${lot.id}`)}
+                          onChange={(e) => void changeLotStatus(lot.id, e.target.value)}
+                        >
+                          {STOCK_LOT_STATUSES.map((status) => (
+                            <option key={status} value={status}>
+                              {STOCK_LOT_STATUS_LABELS[status]}
+                            </option>
+                          ))}
+                        </select>
                       </li>
                     ))}
                   </ul>
                   <div className="ds-scroll-x mt-4 hidden md:block">
-                    <table className="w-full min-w-[28rem] text-sm">
+                    <table className="w-full min-w-[36rem] text-sm">
                       <thead>
                         <tr className="border-b border-[var(--border-muted)] text-left text-[var(--text-muted)]">
                           <th className="py-2 pr-3">Produto</th>
@@ -571,11 +785,27 @@ export default function StockView() {
                             <td className="py-2 pr-3">
                               {lot.expiryDateLabel}
                               {lot.expiringSoon && lot.daysToExpiry >= 0 && (
-                                <span className="ml-1 text-xs text-amber-600">({lot.daysToExpiry}d)</span>
+                                <span className="ml-1 text-xs text-amber-600">
+                                  ({lot.daysToExpiry}d)
+                                </span>
                               )}
                             </td>
                             <td className="py-2 pr-3">{lot.quantity}</td>
-                            <td className="py-2">{lot.statusLabel}</td>
+                            <td className="py-2">
+                              <select
+                                className={fieldClass}
+                                aria-label={`Status do lote ${lot.lotNumber}`}
+                                value={lot.status}
+                                disabled={isBusy(`lot-status-${lot.id}`)}
+                                onChange={(e) => void changeLotStatus(lot.id, e.target.value)}
+                              >
+                                {STOCK_LOT_STATUSES.map((status) => (
+                                  <option key={status} value={status}>
+                                    {STOCK_LOT_STATUS_LABELS[status]}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -590,30 +820,68 @@ export default function StockView() {
               <form onSubmit={receiveEntry} className="mt-4 space-y-3">
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Produto
-                  <select className={fieldClass} value={entryForm.productId} onChange={(e) => setEntryForm({ ...entryForm, productId: e.target.value })} required>
+                  <select
+                    className={fieldClass}
+                    value={entryForm.productId}
+                    onChange={(e) => setEntryForm({ ...entryForm, productId: e.target.value })}
+                    required
+                  >
                     <option value="">Selecione o produto</option>
-                    {products.filter((p) => p.active).map((p) => (
-                      <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>
-                    ))}
+                    {products
+                      .filter((p) => p.active)
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.sku} — {p.name}
+                        </option>
+                      ))}
                   </select>
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Nº do lote
-                  <input className={fieldClass} value={entryForm.lotNumber} onChange={(e) => setEntryForm({ ...entryForm, lotNumber: e.target.value })} required autoComplete="off" />
+                  <input
+                    className={fieldClass}
+                    value={entryForm.lotNumber}
+                    onChange={(e) => setEntryForm({ ...entryForm, lotNumber: e.target.value })}
+                    required
+                    autoComplete="off"
+                  />
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Validade
-                  <input className={fieldClass} type="date" value={entryForm.expiryDate} onChange={(e) => setEntryForm({ ...entryForm, expiryDate: e.target.value })} required />
+                  <input
+                    className={fieldClass}
+                    type="date"
+                    value={entryForm.expiryDate}
+                    onChange={(e) => setEntryForm({ ...entryForm, expiryDate: e.target.value })}
+                    required
+                  />
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Quantidade
-                  <input className={fieldClass} type="number" min="0.01" step="0.01" value={entryForm.quantity} onChange={(e) => setEntryForm({ ...entryForm, quantity: e.target.value })} required />
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={entryForm.quantity}
+                    onChange={(e) => setEntryForm({ ...entryForm, quantity: e.target.value })}
+                    required
+                  />
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Custo unitário (R$)
-                  <input className={fieldClass} type="number" min="0" step="0.01" value={entryForm.unitCost} onChange={(e) => setEntryForm({ ...entryForm, unitCost: e.target.value })} />
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={entryForm.unitCost}
+                    onChange={(e) => setEntryForm({ ...entryForm, unitCost: e.target.value })}
+                  />
                 </label>
-                <Button type="submit" disabled={isBusy("entry")}>Registrar entrada</Button>
+                <Button type="submit" disabled={isBusy("entry")}>
+                  Registrar entrada
+                </Button>
               </form>
             </Card>
           </div>
@@ -622,20 +890,44 @@ export default function StockView() {
         {tab === "movimentos" && (
           <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
             <Card className="p-4">
-              <SectionHeader title="Histórico de movimentações" />
+              <SectionHeader
+                title="Histórico de movimentações"
+                description="Reversão gera movimento compensatório no mesmo lote."
+              />
               {movements.length === 0 ? (
                 <EmptyState title="Sem movimentações" message="Nenhuma movimentação registrada ainda." />
               ) : (
                 <ul className="mt-4 space-y-2">
                   {movements.map((m) => (
-                    <li key={m.id} className="rounded-[var(--radius-card)] border border-[var(--border-muted)] px-3 py-2 text-sm">
+                    <li
+                      key={m.id}
+                      className="rounded-[var(--radius-card)] border border-[var(--border-muted)] px-3 py-2 text-sm"
+                    >
                       <div className="flex flex-wrap items-center justify-between gap-2">
                         <span className="font-medium">{m.typeLabel}</span>
                         <span className="text-[var(--text-muted)]">{m.createdAtLabel}</span>
                       </div>
-                      <p>{m.productName} ({m.productSku}) — {m.quantity} un.</p>
-                      {m.lotNumber && <p className="text-[var(--text-muted)]">Lote {m.lotNumber}</p>}
-                      {m.reason && <p className="text-[var(--text-secondary)]">{m.reason}</p>}
+                      <p>
+                        {m.productName} ({m.productSku}) — {m.quantity} un.
+                      </p>
+                      {m.lotNumber && (
+                        <p className="text-[var(--text-muted)]">Lote {m.lotNumber}</p>
+                      )}
+                      {m.reason && (
+                        <p className="text-[var(--text-secondary)]">{m.reason}</p>
+                      )}
+                      {canReverseMovement(m) && (
+                        <div className="mt-2">
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => void reverseMovement(m)}
+                            disabled={isBusy(`reverse-${m.id}`)}
+                          >
+                            Reverter
+                          </Button>
+                        </div>
+                      )}
                     </li>
                   ))}
                 </ul>
@@ -647,30 +939,61 @@ export default function StockView() {
               <form onSubmit={registerMovement} className="mt-4 space-y-3">
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Produto
-                  <select className={fieldClass} value={movementForm.productId} onChange={(e) => setMovementForm({ ...movementForm, productId: e.target.value })} required>
+                  <select
+                    className={fieldClass}
+                    value={movementForm.productId}
+                    onChange={(e) => setMovementForm({ ...movementForm, productId: e.target.value })}
+                    required
+                  >
                     <option value="">Selecione o produto</option>
-                    {products.filter((p) => p.active).map((p) => (
-                      <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>
-                    ))}
+                    {products
+                      .filter((p) => p.active)
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.sku} — {p.name}
+                        </option>
+                      ))}
                   </select>
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Tipo
-                  <select className={fieldClass} value={movementForm.type} onChange={(e) => setMovementForm({ ...movementForm, type: e.target.value })}>
-                    {STOCK_MOVEMENT_TYPES.filter((t) => t !== "ENTRADA" && t !== "DISPENSACAO").map((t) => (
-                      <option key={t} value={t}>{STOCK_MOVEMENT_LABELS[t]}</option>
+                  <select
+                    className={fieldClass}
+                    value={movementForm.type}
+                    onChange={(e) => setMovementForm({ ...movementForm, type: e.target.value })}
+                  >
+                    {STOCK_MOVEMENT_TYPES.filter(
+                      (t) => t !== "ENTRADA" && t !== "DISPENSACAO",
+                    ).map((t) => (
+                      <option key={t} value={t}>
+                        {STOCK_MOVEMENT_LABELS[t]}
+                      </option>
                     ))}
                   </select>
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Quantidade
-                  <input className={fieldClass} type="number" min="0.01" step="0.01" value={movementForm.quantity} onChange={(e) => setMovementForm({ ...movementForm, quantity: e.target.value })} required />
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={movementForm.quantity}
+                    onChange={(e) => setMovementForm({ ...movementForm, quantity: e.target.value })}
+                    required
+                  />
                 </label>
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Motivo
-                  <input className={fieldClass} value={movementForm.reason} onChange={(e) => setMovementForm({ ...movementForm, reason: e.target.value })} />
+                  <input
+                    className={fieldClass}
+                    value={movementForm.reason}
+                    onChange={(e) => setMovementForm({ ...movementForm, reason: e.target.value })}
+                  />
                 </label>
-                <Button type="submit" disabled={isBusy("movement")}>Registrar</Button>
+                <Button type="submit" disabled={isBusy("movement")}>
+                  Registrar
+                </Button>
               </form>
             </Card>
           </div>
@@ -695,17 +1018,26 @@ export default function StockView() {
                 >
                   <option value="">Selecione o procedimento</option>
                   {procedures.map((p) => (
-                    <option key={p.id} value={p.id}>{p.code} — {p.name}</option>
+                    <option key={p.id} value={p.id}>
+                      {p.code} — {p.name}
+                    </option>
                   ))}
                 </select>
               </label>
               {kitProcedureId && kitItems.length === 0 && (
-                <EmptyState className="mt-4" title="Kit vazio" message="Vincule materiais consumidos neste procedimento." />
+                <EmptyState
+                  className="mt-4"
+                  title="Kit vazio"
+                  message="Vincule materiais consumidos neste procedimento."
+                />
               )}
               {kitItems.length > 0 && (
                 <ul className="mt-4 space-y-2">
                   {kitItems.map((item) => (
-                    <li key={item.id} className="rounded-[var(--radius-card)] border border-[var(--border-muted)] px-3 py-2 text-sm">
+                    <li
+                      key={item.id}
+                      className="rounded-[var(--radius-card)] border border-[var(--border-muted)] px-3 py-2 text-sm"
+                    >
                       {item.productName} ({item.productSku}) — {item.quantity} {item.unit}
                     </li>
                   ))}
@@ -716,14 +1048,33 @@ export default function StockView() {
             <Card className="p-4">
               <SectionHeader title="Adicionar ao kit" />
               <form onSubmit={addKitItem} className="mt-4 space-y-3">
-                <select className={fieldClass} value={kitForm.productId} onChange={(e) => setKitForm({ ...kitForm, productId: e.target.value })} required>
+                <select
+                  className={fieldClass}
+                  value={kitForm.productId}
+                  onChange={(e) => setKitForm({ ...kitForm, productId: e.target.value })}
+                  required
+                >
                   <option value="">Material</option>
-                  {products.filter((p) => p.active).map((p) => (
-                    <option key={p.id} value={p.id}>{p.sku} — {p.name}</option>
-                  ))}
+                  {products
+                    .filter((p) => p.active)
+                    .map((p) => (
+                      <option key={p.id} value={p.id}>
+                        {p.sku} — {p.name}
+                      </option>
+                    ))}
                 </select>
-                <input className={fieldClass} type="number" min="0.01" step="0.01" value={kitForm.quantity} onChange={(e) => setKitForm({ ...kitForm, quantity: e.target.value })} required />
-                <Button type="submit" disabled={isBusy("kit") || !kitProcedureId}>Vincular</Button>
+                <input
+                  className={fieldClass}
+                  type="number"
+                  min="0.01"
+                  step="0.01"
+                  value={kitForm.quantity}
+                  onChange={(e) => setKitForm({ ...kitForm, quantity: e.target.value })}
+                  required
+                />
+                <Button type="submit" disabled={isBusy("kit") || !kitProcedureId}>
+                  Vincular
+                </Button>
               </form>
             </Card>
           </div>

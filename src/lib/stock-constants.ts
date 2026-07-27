@@ -5,11 +5,13 @@ export const STOCK_PRODUCT_CATEGORIES = [
   "MATERIAL",
   "OPME",
   "INSUMO",
+  "SERVICO",
 ] as const;
 
 export type StockProductCategory = (typeof STOCK_PRODUCT_CATEGORIES)[number];
 
-export const STOCK_UNITS = ["UN", "ML", "CX", "PC", "FR"] as const;
+/** UN/ML/CX/PC/FR = saúde; KIT/SC/M3 = multi-nicho (dental/obras). */
+export const STOCK_UNITS = ["UN", "ML", "CX", "PC", "FR", "KIT", "SC", "M3"] as const;
 
 export type StockUnit = (typeof STOCK_UNITS)[number];
 
@@ -40,7 +42,23 @@ export const STOCK_CATEGORY_LABELS: Record<StockProductCategory, string> = {
   MATERIAL: "Material médico",
   OPME: "OPME",
   INSUMO: "Insumo",
+  SERVICO: "Serviço / crédito",
 };
+
+/** Tipos que aceitam reversão compensatória automática (com lote). */
+export const STOCK_REVERSIBLE_TYPES = [
+  "ENTRADA",
+  "SAIDA",
+  "AJUSTE",
+  "DISPENSACAO",
+  "TRANSFERENCIA",
+  "PERDA",
+  "DEVOLUCAO",
+] as const;
+
+export function isStockReversibleType(type: string): boolean {
+  return (STOCK_REVERSIBLE_TYPES as readonly string[]).includes(type);
+}
 
 export const STOCK_MOVEMENT_LABELS: Record<StockMovementType, string> = {
   ENTRADA: "Entrada",

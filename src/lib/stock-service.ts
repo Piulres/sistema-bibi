@@ -128,7 +128,9 @@ function mapProduct(
         ? "Material médico"
         : p.category === "OPME"
           ? "OPME"
-          : "Insumo";
+          : p.category === "SERVICO"
+            ? "Serviço / crédito"
+            : "Insumo";
 
   return {
     id: p.id,

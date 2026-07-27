@@ -399,6 +399,28 @@ describe("Estoque clínico — catálogo, lotes, movimentos e alertas", () => {
     expect(data.product.sku).toBe(sku);
   });
 
+  it("aceita categoria SERVICO e unidade SC do catálogo multi-nicho", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const sku = `ENG-CIM-${Date.now().toString(36).toUpperCase()}`;
+    const res = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: {
+          sku,
+          name: "Cimento CP-II 50kg",
+          category: "SERVICO",
+          unit: "SC",
+          minStock: 8,
+        },
+      }),
+    );
+    expect(res.status, await res.clone().text()).toBe(200);
+    const data = await res.json();
+    expect(data.product.sku).toBe(sku);
+    expect(data.product.category).toBe("SERVICO");
+    expect(data.product.unit).toBe("SC");
+  });
+
   it("rejeita categoria inválida no cadastro de produto", async () => {
     await setSessionForEmail("recepcao@bibi.health");
     const res = await productsPost(
@@ -407,7 +429,7 @@ describe("Estoque clínico — catálogo, lotes, movimentos e alertas", () => {
         body: {
           sku: `INV-${Date.now().toString(36).toUpperCase()}`,
           name: "Item inválido",
-          category: "SERVICO",
+          category: "FOO_BAR",
         },
       }),
     );

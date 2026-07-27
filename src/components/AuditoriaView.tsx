@@ -15,6 +15,7 @@ import { RESTORE_CONFIRM_PHRASE } from "@/lib/change-management/policy";
 import { TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
 import ExportButtons from "@/components/ExportButtons";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
+import { useLabels } from "@/hooks/useLabels";
 import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 type AuditEvent = {
@@ -96,6 +97,7 @@ function AuditEventDiff({ metadata }: { metadata: TimelineEventMetadata }) {
 }
 
 export default function AuditoriaView() {
+  const { labels } = useLabels();
   const [data, setData] = useState<AuditResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -327,7 +329,7 @@ export default function AuditoriaView() {
                         <>
                           {" · "}
                           <Link href={href} className="ds-touch-link px-0">
-                            Ver beneficiário
+                            Ver {labels.patient.toLowerCase()}
                           </Link>
                         </>
                       )}
