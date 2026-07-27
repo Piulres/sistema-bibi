@@ -31,7 +31,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Beneficiário reagenda consulta sem cancelar+criar; Assistente Fase 0 (RBAC, inventário, painel) e chat com persistência.",
+      "Beneficiário reagenda consulta; Assistente Fase 0; auditoria sem oráculo de busca em conteúdo clínico/PII.",
     highlights: [
       {
         title: "Agenda do beneficiário",
@@ -47,9 +47,16 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Painel /interno/assistente + chat com persistência e auto-scroll",
         ],
       },
+      {
+        title: "Auditoria / RBAC",
+        items: [
+          "Busca por descrição só em tipos full — sem oráculo de existência clínica/PII",
+          "Encaminhamento e receita classificados como clínicos; export 360° respeita perfil",
+        ],
+      },
     ],
     testStats:
-      "CI unit+E2E #282/#286/#306 · scheduling-reschedule · assistant-* · docs:verify · pre-release OK",
+      "CI unit+E2E #282/#286/#304/#306 · scheduling-reschedule · assistant-* · audit-rbac-content · prod 6a66e07a",
   },
   {
     version: "3.0.15",

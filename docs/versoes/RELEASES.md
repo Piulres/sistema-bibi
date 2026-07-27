@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.16** — reagendar beneficiário + Assistente Fase 0 **pendente de deploy**.
+> Pacote **v3.0.16** — reagendar + Assistente Fase 0 + auditoria RBAC fase 2 **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.15** — deploy `6a66de5b` @ `4599bff` (`bibi-poc-2026-07-27f`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.16** — deploy `6a66e07a` @ `4a73aa7` (`bibi-poc-2026-07-27g`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.16** (preparado) · aguardando deploy |
+| **Release `main` / `dev`** | **v3.0.16** · sincronizados · artefato prod `@ 4a73aa7` |
 | **Pacote anterior em produção** | **3.0.15** — deploy `6a66de5b` @ `4599bff` (`bibi-poc-2026-07-27f`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,9 +25,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.16** (reagendar + assistente) |
+| **Integração** | `dev` | **v3.0.16** (reagendar + assistente + auditoria fase 2) |
 | **Release** | `main` | **v3.0.16** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.15** · deploy `6a66de5b` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.16** · deploy `6a66e07a` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.16
@@ -35,23 +35,23 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Beneficiário:** reagendar consulta (`benef-reschedule`) — mesmo registro, slot validado, timeline `RESCHEDULED`.
 - **Assistente Fase 0:** inventário, RBAC interno, `Tenant.settings`, painel `/interno/assistente`.
 - **Chat:** persistência local + auto-scroll + indicador de digitação.
-- **Qualidade:** `scheduling-reschedule` · `assistant-*` · CI #282/#286/#306 · pre-release OK.
+- **Auditoria RBAC fase 2:** busca sem oráculo de existência; `ClinicalReferral`/`PrescriptionDocument` clínicos; export 360° com perfil; `useLabels` na UI.
+- **Qualidade:** `scheduling-reschedule` · `assistant-*` · `audit-rbac-content` · CI #282/#286/#304/#306 · deploy `6a66e07a`.
+
+### Smoke (27/07/2026) — produção v3.0.16
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.16` · deploy `6a66e07a` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.15
 
 - **Gestão clínica (`/interno/gestao`):** faixa de KPIs do mês sempre visível; refresh soft ao trocar mês/salvar; extras clínicos recolhidos; `/kpis` sob demanda na aba Indicadores.
 - **Qualidade:** Vitest `clinic-finance-month-strip` · E2E `cedig-gestao` (assert KPI strip) · CI #290/#303 verdes · `docs:verify` · pre-release OK · deploy `6a66de5b`.
-
-### Smoke (27/07/2026) — produção v3.0.15
-
-| Check | Resultado |
-|-------|-----------|
-| Landing `/` | 200 · footer `v3.0.15` · deploy `6a66de5b` |
-| CSS `/_next/static/chunks/*.css` | 200 |
-| `/instalar` | 200 |
-| `/?tenant=cedig` | 200 |
-| `/interno/gestao` | 307 (auth) |
-| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.14
 
