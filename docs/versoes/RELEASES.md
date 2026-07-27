@@ -11,24 +11,29 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.10** — mês operacional + jornada/testes + agenda/calendário **publicado em produção**.
+> Pacote **v3.0.11** — hotfix marcar paga (persistência Blob pós-COMMIT) — **em publicação**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.10** — deploy `6a66a38b` @ `b9ff9cb` (`bibi-poc-2026-07-27a`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.11** — deploy pendente (`bibi-poc-2026-07-27b`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.10** · sincronizadas · artefato prod `@ b9ff9cb` |
-| **Pacote anterior em produção** | **3.0.9** — deploy `6a669510` @ `0bd89b2` (`bibi-poc-2026-07-26j`) |
+| **Release `main` / `dev`** | **v3.0.11** · sincronizadas |
+| **Pacote anterior em produção** | **3.0.10** — deploy `6a66a38b` @ `b9ff9cb` (`bibi-poc-2026-07-27a`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.10** |
-| **Release** | `main` | **v3.0.10** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.10** · deploy `6a66a38b` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.11** |
+| **Release** | `main` | **v3.0.11** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.11** · deploy em andamento · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.11
+
+- **Hotfix faturamento:** Marcar paga persiste no Blob só após COMMIT da `$transaction` (evita fatura voltar a `FECHADA`).
+- **Qualidade:** unit `sqlite-transaction-flush` + API MANUAL/idempotência + E2E Confirmar pagamento.
 
 ### Conteúdo do pacote v3.0.10
 

@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.10",
+    version: "3.0.11",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Hotfix do faturamento operacional: Marcar paga passa a persistir corretamente no Blob após o COMMIT.",
+    highlights: [
+      {
+        title: "Faturamento",
+        items: [
+          "Marcar paga (pagamento manual) deixa de reverter para FECHADA após reload em produção",
+          "Flush do operation.db no Netlify Blob só após o COMMIT da transação",
+          "Testes de regressão (unit + API + E2E) no fluxo Confirmar pagamento",
+        ],
+      },
+    ],
+    testStats: "CI unit+E2E · sqlite-transaction-flush · jornada marcar paga · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.10",
+    label: "Sistema Bibi - ServiceOS v3.0.10",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Mês operacional sempre atual na demo, suite completa da jornada do consultório e agenda sincronizada com Google/Outlook/Apple.",
     highlights: [
