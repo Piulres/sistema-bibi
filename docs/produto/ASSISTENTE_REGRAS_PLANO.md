@@ -171,6 +171,16 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 
 ---
 
+## Como validar Fase 4 (híbrido)
+
+```bash
+npx vitest run tests/unit/assistant-hybrid.test.ts
+npx vitest run tests/unit/assistant-rule-engine.test.ts
+npm run lint
+```
+
+Manual: ADMIN → `/interno/assistente` → ativar IA → configurar gateway no `.env` (`ASSISTANT_PROVIDER=gateway`, `OPENAI_BASE_URL`, `OPENAI_API_KEY`) → chat em qualquer portal; tool calls fora do allowlist devem cair em fallback ou plano de regras.
+
 ## Como validar Fase 0
 
 ```bash

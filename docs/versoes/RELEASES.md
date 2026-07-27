@@ -17,7 +17,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.20** preparado · produção ainda **v3.0.19** até deploy |
+| **Release `main` / `dev`** | **v3.0.20** @ `193207cd` (merge 27/07) · produção ainda **v3.0.19** até deploy |
 | **Pacote anterior em produção** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -26,7 +26,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B) |
-| **Release** | `main` | **v3.0.19** (até merge) |
+| **Release** | `main` | **v3.0.20** @ `193207cd` |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.19** · deploy `6a66f3a7` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 

@@ -33,6 +33,9 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |
 | Obras / Engenharia (`CONSTRUCTION`) | `segmentos/construction/README.md` · `API_DOCS.md` §5.1 (handlers sem OpenAPI) |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
+| Estoque / movimentações / reversão | `FLUXOS.md` §4.8 · `stock-service.ts` · `stock-reverse.ts` |
+| Assistente (chat, regras, IA híbrida) | `ASSISTENTE_SERVERLESS.md` · `ASSISTENTE_REGRAS_PLANO.md` · `FLUXOS.md` §4.12 |
+| Mobile Capacitor / PWA shell | `mobile/README.md` · `V3_0.md` §Fase B · `pwa-mobile-shell.test.ts` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |
 | CEDIG reset / `operation.db` Blob | `OPERACAO_DADOS.md` §Limpeza/Reset · `clientes/cedig/OPERACAO.md` · `scripts/reset-cedig-transactional.mjs` · `publish-operation-blob.mjs` |
 

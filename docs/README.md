@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.17** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27h` (`6a66e5f9` @ `c3eb563`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.19** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27j` (`6a66f3a7` @ `1fca530`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar) · mobile [`../mobile/README.md`](../mobile/README.md).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.17** (`bibi-poc-2026-07-27h` @ `c3eb563`): RBAC clínico + a11y + auto-confirm — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — produção **v3.0.19**; **`main` = v3.0.20** (estoque F4 + assistente híbrido + Capacitor B) — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -109,6 +109,8 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`produto/JORNADA_CLIENTE.md`](produto/JORNADA_CLIENTE.md) | Jornada UX por portal |
 | [`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md) | Atestado, receita comum/especial, protocolos de exames |
 | [`produto/AUDITORIA_FLUXOS.md`](produto/AUDITORIA_FLUXOS.md) | Gaps mapeados |
+| [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) | Chat serverless + pipeline híbrido |
+| [`produto/ASSISTENTE_REGRAS_PLANO.md`](produto/ASSISTENTE_REGRAS_PLANO.md) | Regras, IA e painel `/interno/assistente` |
 
 ---
 
@@ -133,8 +135,9 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.12 em produção** |
-| [`versoes/V3_0.md`](versoes/V3_0.md) | Changelog v3.0 — PWA / app shell mobile |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.19 em produção** |
+| [`versoes/V3_0.md`](versoes/V3_0.md) | Changelog v3.0 — PWA + Capacitor |
+| [`../mobile/README.md`](../mobile/README.md) | Shell nativo iOS/Android (Capacitor) |
 | [`versoes/V2_6.md`](versoes/V2_6.md) | Changelog v2.6 — CEDIG pontes PPU + export |
 | [`versoes/V2_5.md`](versoes/V2_5.md) | Changelog v2.5 — login tenant/portal |
 | [`versoes/V2_4.md`](versoes/V2_4.md) | Changelog v2.4 — CEDIG gestão clínica |

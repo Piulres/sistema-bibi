@@ -54,6 +54,30 @@ Cliente                          API (serverless)
 
 Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
 
+## Pipeline híbrido (Fase 4)
+
+Quando `Tenant.settings.assistant.aiEnabled` e `ASSISTANT_PROVIDER=gateway`, o `runner.ts` orquestra:
+
+```
+Mensagem → buildAssistantSystemPrompt (modo + allowlist)
+         → planGatewayAssistant (LLM)
+         → planMockAssistant (regras, se rulesEnabled)
+         → refineHybridPlan (hybrid.ts)
+         → assertToolPermission + execução
+         → draft / confirm (JTI) / actions
+```
+
+| Etapa | Módulo | Comportamento |
+|-------|--------|---------------|
+| Allowlist | `collectAllowedToolNames` | Regras ligadas → interseção `ruleToolNames` × tools RBAC; regras desligadas → só RBAC |
+| Validação | `refineHybridPlan` | Descarta tool calls do LLM fora do allowlist; mescla args (gateway prevalece, vazios cedem às regras) |
+| Fallback | `refineHybridPlan` | Sem calls válidas → plano de regras; senão → `fallback` textual (`hybridUnauthorizedTools` se tudo rejeitado) |
+| Erro gateway | `runner.ts` | Log + fallback automático para motor de regras/mock |
+
+`HybridPlan.source`: `gateway` | `rules` | `hybrid` | `fallback` — útil em logs e testes.
+
+Ativação manual: ADMIN em `/interno/assistente` → toggle IA + env vars `OPENAI_BASE_URL` / `OPENAI_API_KEY` no Netlify.
+
 ## UX do painel (v3.0.6)
 
 O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automático evita sobrepor a tela de destino após navegação.
@@ -76,7 +100,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 |------|------------|-------|
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
 | **Painel de regras** | — | ✅ Fase 3 — CRUD + preview em `/interno/assistente` |
-| **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` (LLM → allowlist regras → tools) |
+| **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` (LLM → allowlist regras → tools) — ver §Pipeline híbrido |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
@@ -87,6 +111,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 ## Testes
 
 - `tests/unit/assistant.test.ts` — multi-turno stateless
+- `tests/unit/assistant-hybrid.test.ts` — allowlist, merge de args, fallback Fase 4
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare

@@ -68,10 +68,12 @@ mobile/
   capacitor.config.json
 ```
 
-## Próximos passos (Fase B — contínuo)
+## Próximos passos (pós-scaffold)
 
 - [ ] TestFlight / Play Console (distribuição interna)
 - [ ] Deep links por portal (`/interno`, `/prestador`, …)
 - [ ] Push notifications (fase futura)
+
+**Fase B (v3.0.20):** scaffold iOS/Android concluído — projetos em `mobile/android` e `mobile/ios`, ícones via `npm run mobile:resources`, shell carrega PWA de produção (`capacitor.config.json` → `server.url`). Service worker precache em `public/sw.js` coberto por `tests/unit/pwa-mobile-shell.test.ts`.
 
 Escopo completo: [`docs/versoes/V3_0.md`](../docs/versoes/V3_0.md).

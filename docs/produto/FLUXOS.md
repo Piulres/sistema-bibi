@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> Versão em produção e pacote `main`: [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques recentes: estoque Fase 4 ([§4.8](#48-estoque-médico-stockview--v13--fase-24)), assistente híbrido ([§4.12](#412-assistente-operacional)), Capacitor B ([`../mobile/README.md`](../mobile/README.md)). Narrativa consultório: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -286,6 +286,7 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
+| `assistente` | `/interno/assistente` | `InternoAssistentePage` | Config regras, flag IA, preview efetivo (**ADMIN**) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
@@ -456,10 +457,20 @@ Serviço: `src/lib/webhook-service.ts`
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
-Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
+Serviço: `src/lib/stock-service.ts` · reversão: `src/lib/change-management/stock-reverse.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
 Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.  
-`requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).  
-**Fase 4:** `refreshExpiredLots` antes de baixas; FIFO ignora vencidos; reforço não reabre QUARENTENA/BLOQUEADO; segunda reversão → 400.
+`requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).
+
+**Fase 4 — integridade operacional**
+
+| Regra | Implementação |
+|-------|---------------|
+| Reversão idempotente | `POST .../movements/[id]/reverse` grava `reversesId` na timeline; segunda tentativa → **400**; listagem expõe `reversed` / `isReversal` |
+| FIFO sem vencidos | `refreshExpiredLots` roda antes de SAIDA/AJUSTE/dispensação; lotes `VENCIDO` não entram na fila de baixa |
+| Reforço de entrada | `receiveStockEntry` rejeita lote em `QUARENTENA` / `BLOQUEADO` / `VENCIDO` — não reabre status automaticamente |
+| UI manual | Formulário de movimentação manual limitado a **SAIDA**, **AJUSTE** e **PERDA**; botão **Reverter** oculto se `reversed` ou `isReversal` |
+
+Testes: `tests/api/stock.test.ts` (reversão, FIFO, quarentena, idempotência).
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
@@ -517,6 +528,29 @@ Motor unificado para relatórios e listagens nos portais.
 | Beneficiário | `GET /api/beneficiario/export?section=` | por seção |
 
 Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
+
+### 4.12 Assistente operacional
+
+Chat nos **4 portais** (drawer `AssistantPanel`) + painel de configuração no Interno.
+
+| Superfície | Rota / API | RBAC |
+|------------|------------|------|
+| Chat | `POST /api/assistant/chat`, `POST /api/assistant/confirm` | `requireUser()` + tools filtradas por role |
+| Painel | `/interno/assistente` | Módulo `assistente` — somente **ADMIN** |
+| Settings | `GET/PATCH /api/interno/assistant/settings` | Leitura ADMIN; escrita ADMIN |
+
+**Modos** (`Tenant.settings.assistant`):
+
+| Modo | Condição | Motor |
+|------|----------|-------|
+| Regras (padrão) | `rulesEnabled: true` | Gatilhos + condições + tools (`planMockAssistant`) |
+| IA híbrida | `aiEnabled: true` + `ASSISTANT_PROVIDER=gateway` | LLM → `refineHybridPlan` → tools |
+
+Pipeline híbrido (Fase 4): gateway propõe tool calls → allowlist = interseção regras × RBAC → args mesclados com match de regras → fallback para regras ou texto se tudo for rejeitado. A IA **não contorna** confirmação JTI nem RBAC.
+
+Docs: [`ASSISTENTE_SERVERLESS.md`](ASSISTENTE_SERVERLESS.md) · [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) · código: `src/lib/assistant/runner.ts`, `provider/hybrid.ts`.
+
+Testes: `tests/unit/assistant-hybrid.test.ts` · `tests/unit/assistant-rule-engine.test.ts` · `tests/api/assistant.test.ts` · `e2e/assistant.spec.ts`.
 
 ---
 
