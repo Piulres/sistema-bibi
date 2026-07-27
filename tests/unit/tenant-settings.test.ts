@@ -30,4 +30,19 @@ describe("tenant settings", () => {
     expect(merged.assistant.aiEnabled).toBe(true);
     expect(merged.assistant.rulesEnabled).toBe(true);
   });
+
+  it("merge de ruleOverrides substitui lista e limpa quando vazia — CRUD Fase 3", () => {
+    const withOverrides = mergeTenantSettings(DEFAULT_TENANT_SETTINGS, {
+      assistant: {
+        ruleOverrides: [{ tool: "count_appointments", addTriggers: ["custom"] }],
+      },
+    });
+    expect(withOverrides.assistant.ruleOverrides).toHaveLength(1);
+
+    const cleared = mergeTenantSettings(withOverrides, {
+      assistant: { ruleOverrides: [] },
+    });
+    expect(cleared.assistant.ruleOverrides).toBeUndefined();
+    expect(cleared.assistant.rulesEnabled).toBe(true);
+  });
 });

@@ -1,5 +1,10 @@
 import "server-only";
-import type { AssistantRuleDef, RuleResolutionContext, TenantRuleOverride } from "@/lib/assistant/rules/types";
+import type {
+  AssistantRuleDef,
+  RulePreviewRow,
+  RuleResolutionContext,
+  TenantRuleOverride,
+} from "@/lib/assistant/rules/types";
 import { globalRuleTemplates } from "@/lib/assistant/rules/templates";
 import { nicheRuleOverrides } from "@/lib/assistant/rules/niche-overrides";
 
@@ -92,4 +97,64 @@ export function countRuleTriggers(rules: readonly AssistantRuleDef[]): number {
     }
   }
   return set.size;
+}
+
+/**
+ * Preview agrupado por tool para o painel CRUD (inclui tools desabilitadas pelo tenant).
+ */
+export function buildRulesPreview(ctx: RuleResolutionContext): RulePreviewRow[] {
+  const base = resolveAssistantRules({ niche: ctx.niche });
+  const effective = resolveAssistantRules(ctx);
+  const overrideMap = new Map<string, TenantRuleOverride>();
+  for (const o of ctx.tenantOverrides ?? []) {
+    overrideMap.set(o.tool, o);
+  }
+
+  const baseByTool = new Map<string, { triggers: string[]; source: RulePreviewRow["source"] }>();
+  for (const rule of base) {
+    const prev = baseByTool.get(rule.tool);
+    if (!prev) {
+      baseByTool.set(rule.tool, { triggers: [...rule.triggers], source: rule.source });
+      continue;
+    }
+    prev.triggers = appendTriggers(prev.triggers, rule.triggers);
+    if (rule.source === "niche") prev.source = "niche";
+  }
+
+  const effectiveByTool = new Map<string, { triggers: string[]; source: RulePreviewRow["source"] }>();
+  for (const rule of effective) {
+    const prev = effectiveByTool.get(rule.tool);
+    if (!prev) {
+      effectiveByTool.set(rule.tool, { triggers: [...rule.triggers], source: rule.source });
+      continue;
+    }
+    prev.triggers = appendTriggers(prev.triggers, rule.triggers);
+    if (rule.source === "tenant") prev.source = "tenant";
+  }
+
+  const tools = new Set<string>([...baseByTool.keys(), ...overrideMap.keys()]);
+  const rows: RulePreviewRow[] = [];
+
+  for (const tool of tools) {
+    const override = overrideMap.get(tool);
+    const disabled = override?.disabled === true;
+    const baseRow = baseByTool.get(tool);
+    const effRow = effectiveByTool.get(tool);
+    const source: RulePreviewRow["source"] = disabled
+      ? "tenant"
+      : effRow?.source ?? baseRow?.source ?? "tenant";
+
+    rows.push({
+      tool,
+      triggers: disabled
+        ? (baseRow?.triggers ?? [])
+        : (effRow?.triggers ?? baseRow?.triggers ?? []),
+      source,
+      disabled,
+      addTriggers: override?.addTriggers ? [...override.addTriggers] : [],
+      removeTriggers: override?.removeTriggers ? [...override.removeTriggers] : [],
+    });
+  }
+
+  return rows.sort((a, b) => a.tool.localeCompare(b.tool));
 }

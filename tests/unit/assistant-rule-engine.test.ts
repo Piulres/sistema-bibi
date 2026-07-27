@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { resolveAssistantRules, countRuleTriggers } from "@/lib/assistant/rules/resolve";
+import { resolveAssistantRules, countRuleTriggers, buildRulesPreview } from "@/lib/assistant/rules/resolve";
 import { resolveAssistantIntents, buildRuleEngineStats } from "@/lib/assistant/rules/engine";
 import { globalRuleTemplates } from "@/lib/assistant/rules/templates";
 import { countMockTriggers } from "@/lib/assistant/provider/mock-intents";
-import { parseTenantRuleOverrides } from "@/lib/assistant/rules/tenant-overrides";
+import {
+  normalizeTenantRuleOverrides,
+  parseTenantRuleOverrides,
+} from "@/lib/assistant/rules/tenant-overrides";
 import type { SessionUser } from "@/lib/session";
 
 const mockUser = (niche: SessionUser["niche"] = "MEDICAL"): SessionUser =>
@@ -56,5 +59,44 @@ describe("assistant rule engine", () => {
     expect(stats.niche).toBe("LEGAL");
     expect(stats.globalRules).toBeGreaterThan(0);
     expect(stats.totalTriggers).toBeGreaterThan(countMockTriggers());
+  });
+
+  it("conta overrides do tenant pelo array persistido — não só rules com source tenant", () => {
+    const overrides = parseTenantRuleOverrides([
+      { tool: "count_appointments", disabled: true },
+      { tool: "list_debtors", addTriggers: ["quem deve"] },
+    ]);
+    const stats = buildRuleEngineStats("MEDICAL", overrides);
+    expect(stats.tenantOverrides).toBe(2);
+  });
+
+  it("preview inclui tools desabilitadas e gatilhos efetivos para CRUD Fase 3", () => {
+    const overrides = parseTenantRuleOverrides([
+      { tool: "count_appointments", addTriggers: ["agenda custom"] },
+      { tool: "list_debtors", disabled: true },
+    ]);
+    const preview = buildRulesPreview({ niche: "MEDICAL", tenantOverrides: overrides });
+    const count = preview.find((r) => r.tool === "count_appointments");
+    expect(count?.source).toBe("tenant");
+    expect(count?.triggers.some((t) => /agenda custom/i.test(t))).toBe(true);
+    const debtors = preview.find((r) => r.tool === "list_debtors");
+    expect(debtors?.disabled).toBe(true);
+    expect(debtors?.triggers.length).toBeGreaterThan(0);
+  });
+
+  it("normaliza overrides vazios e parse deduplica por tool", () => {
+    expect(
+      normalizeTenantRuleOverrides([
+        { tool: "count_appointments", addTriggers: ["A", "a"] },
+        { tool: "noop", addTriggers: [] },
+      ]),
+    ).toEqual([{ tool: "count_appointments", addTriggers: ["A", "a"] }]);
+
+    const parsed = parseTenantRuleOverrides([
+      { tool: "count_appointments", addTriggers: ["A"] },
+      { tool: "count_appointments", disabled: true },
+    ]);
+    expect(parsed).toHaveLength(1);
+    expect(parsed[0]?.disabled).toBe(true);
   });
 });

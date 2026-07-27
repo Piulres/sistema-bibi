@@ -3377,7 +3377,10 @@ paths:
     get:
       tags: &a2
         - Interno
-      summary: GET assistant settings
+      summary: Config do assistente (modo, stats, preview e overrides)
+      description: >
+        ADMIN (módulo assistente). Retorna flags ai/rules, estatísticas do motor,
+        ruleOverrides do tenant e previewRules efetivas (Fase 3).
       responses:
         "200":
           description: OK
@@ -3387,19 +3390,49 @@ paths:
           description: Acesso negado (role != INTERNO)
     patch:
       tags: *a2
-      summary: PATCH assistant settings
+      summary: Atualiza flags e/ou ruleOverrides do tenant
+      description: >
+        Patch parcial — aiEnabled, rulesEnabled e/ou ruleOverrides (lista completa).
+        Lista vazia remove todos os overrides.
       responses:
         "200":
           description: OK
+        "400":
+          description: Body inválido
         "401":
           description: Não autenticado
         "403":
           description: Acesso negado (role != INTERNO)
+        "422":
+          description: Gateway de IA ausente
       requestBody:
         content:
           application/json:
             schema:
               type: object
+              properties:
+                aiEnabled:
+                  type: boolean
+                rulesEnabled:
+                  type: boolean
+                ruleOverrides:
+                  type: array
+                  items:
+                    type: object
+                    required: [tool]
+                    properties:
+                      tool:
+                        type: string
+                      addTriggers:
+                        type: array
+                        items:
+                          type: string
+                      removeTriggers:
+                        type: array
+                        items:
+                          type: string
+                      disabled:
+                        type: boolean
   /api/interno/attachments/{id}/download:
     parameters:
       - name: id
