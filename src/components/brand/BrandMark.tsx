@@ -2,8 +2,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
 import {
   brandMarkFromBranding,
-  brandMarkInitial,
+  brandMarkFontSizePx,
   brandMarkMeshBackground,
+  BRAND_MARK_SIZE_PX,
   resolveBrandMarkLayout,
   type BrandMarkInput,
   type BrandMarkSize,
@@ -20,6 +21,7 @@ const SIZE_CLASS: Record<Exclude<BrandMarkSize, "pwa">, string> = {
 
 type Props = {
   displayName?: string;
+  markText?: string | null;
   logoUrl?: string | null;
   branding?: BrandingTokens;
   input?: BrandMarkInput;
@@ -36,6 +38,7 @@ type Props = {
  */
 export default function BrandMark({
   displayName,
+  markText,
   logoUrl,
   branding,
   input,
@@ -51,6 +54,7 @@ export default function BrandMark({
       : displayName
         ? {
             displayName,
+            markText,
             logoUrl,
             primaryColor: "#1e293b",
             accentColor: "#f97316",
@@ -62,8 +66,9 @@ export default function BrandMark({
   if (!resolvedInput) return null;
 
   const layout = resolveBrandMarkLayout(resolvedInput, 100);
-  const initial = brandMarkInitial(resolvedInput.displayName);
+  const markLabel = layout.initial;
   const label = title ?? resolvedInput.displayName;
+  const fontSizePx = brandMarkFontSizePx(BRAND_MARK_SIZE_PX[size], markLabel);
 
   const backgroundStyle = useThemeColors
     ? {
@@ -101,7 +106,12 @@ export default function BrandMark({
           unoptimized={resolvedInput.logoUrl!.startsWith("/api/")}
         />
       ) : (
-        <span className="font-bold leading-none text-white">{initial}</span>
+        <span
+          className="font-bold leading-none tracking-tight text-white"
+          style={{ fontSize: fontSizePx }}
+        >
+          {markLabel}
+        </span>
       )}
     </span>
   );

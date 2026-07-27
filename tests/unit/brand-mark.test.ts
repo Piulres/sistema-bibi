@@ -3,10 +3,23 @@ import {
   brandMarkFromBranding,
   brandMarkInitial,
   brandMarkMeshBackground,
+  brandMarkText,
   buildBrandMarkSvg,
   resolveBrandMarkLayout,
 } from "@/lib/brand/brand-mark";
 import { PLATFORM_BRANDING } from "@/lib/theme/tokens";
+
+describe("brandMarkText", () => {
+  it("uses markText override on platform home so circle shows Bibi instead of S", () => {
+    expect(
+      brandMarkText({ displayName: "Sistema Bibi", markText: "Bibi" }),
+    ).toBe("Bibi");
+  });
+
+  it("falls back to initial for tenant branding without markText", () => {
+    expect(brandMarkText({ displayName: "Clínica Horizonte" })).toBe("C");
+  });
+});
 
 describe("brandMarkInitial", () => {
   it("returns first letter uppercased so UI and PWA show a readable monogram", () => {
@@ -145,9 +158,16 @@ describe("brandMarkFromBranding", () => {
   it("adapts platform tokens so icon.tsx and scripts share one source of truth", () => {
     const input = brandMarkFromBranding(PLATFORM_BRANDING);
     expect(input.displayName).toBe(PLATFORM_BRANDING.displayName);
+    expect(input.markText).toBe(PLATFORM_BRANDING.markText);
     expect(input.primaryColor).toBe(PLATFORM_BRANDING.primaryColor);
     expect(input.accentColor).toBe(PLATFORM_BRANDING.accentColor);
     expect(input.heroFrom).toBe(PLATFORM_BRANDING.heroFrom);
     expect(input.heroTo).toBe(PLATFORM_BRANDING.heroTo);
+  });
+
+  it("renders Bibi in platform SVG while displayName stays Sistema Bibi", () => {
+    const svg = buildBrandMarkSvg(brandMarkFromBranding(PLATFORM_BRANDING), 192);
+    expect(svg).toContain(">Bibi<");
+    expect(svg).not.toContain(">S<");
   });
 });

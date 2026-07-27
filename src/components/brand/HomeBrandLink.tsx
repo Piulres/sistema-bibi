@@ -9,6 +9,7 @@ type LogoSize = "sm" | "md";
 
 type Props = {
   displayName: string;
+  markText?: string | null;
   logoUrl?: string | null;
   primaryColor?: string;
   accentColor?: string;
@@ -28,6 +29,7 @@ type Props = {
  */
 export default function HomeBrandLink({
   displayName,
+  markText,
   logoUrl,
   primaryColor,
   accentColor,
@@ -63,12 +65,14 @@ export default function HomeBrandLink({
     >
       <BrandMark
         displayName={displayName}
+        markText={markText}
         logoUrl={logoUrl}
         useThemeColors={themeMode}
         input={
           hasExplicitColors
             ? {
                 displayName,
+                markText,
                 logoUrl,
                 primaryColor: primaryColor!,
                 accentColor: accentColor!,

@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.25",
+    version: "3.0.26",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Marca da home da plataforma exibe Bibi no círculo; páginas internas dos clientes mantêm iniciais.",
+    highlights: [
+      {
+        title: "Identidade visual",
+        items: [
+          "PLATFORM.brandMark = Bibi — monograma na landing e ícones PWA",
+          "Tenants sem alteração — inicial do nome comercial no círculo",
+          "Tipografia escalonada para textos multi-caractere no BrandMark",
+        ],
+      },
+    ],
+    testStats: "CI #375 · brand-mark · pre-release OK",
+  },
+  {
+    version: "3.0.25",
+    label: "Sistema Bibi - ServiceOS v3.0.25",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Portal PJ: importação CSV em lote de colaboradores com validação dry-run; fix E2E estoque e CEDIG homologação.",
     highlights: [

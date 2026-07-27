@@ -28,6 +28,7 @@ describe("landing navigation (home)", () => {
 describe("landing header brand", () => {
   it("exibe apenas Sistema Bibi no header (sem sufixo ServiceOS)", () => {
     expect(PLATFORM.brandName).toBe("Sistema Bibi");
+    expect(PLATFORM.brandMark).toBe("Bibi");
     expect(PLATFORM_BRANDING.displayName).toBe("Sistema Bibi");
     expect(PLATFORM.name).toBe("Sistema Bibi - ServiceOS");
   });
