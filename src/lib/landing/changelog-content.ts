@@ -66,7 +66,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E · audit-access · audit-rbac-content · stock · cadastros-resolve-tab · documentos-saida · docs:verify · pre-release OK",
+      "CI unit+E2E · audit-access · audit-rbac-content · stock · cadastros-resolve-tab · documentos-saida · docs:verify · pre-release OK · prod 6a66dac3",
   },
   {
     version: "3.0.13",
