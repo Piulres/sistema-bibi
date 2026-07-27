@@ -45,6 +45,14 @@ export function rulesEngineDisabled(): string {
   return "O motor de regras está desativado para este tenant. Peça ao administrador para reativar em Interno → Assistente.";
 }
 
+/** IA propôs tool fora do allowlist de regras/RBAC — Fase 4. */
+export function hybridUnauthorizedTools(toolNames: string[]): string {
+  if (toolNames.length === 0) {
+    return "Não posso executar essa ação com as permissões e regras atuais.";
+  }
+  return `A interpretação da IA pediu ferramenta(s) não liberada(s) para este perfil/tenant: ${toolNames.join(", ")}. Reformule ou peça ao admin para ajustar as regras.`;
+}
+
 export function toolExecutionError(): string {
   return "Tive um problema ao consultar isso. Pode tentar de novo?";
 }
