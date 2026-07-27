@@ -131,7 +131,7 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     flow: "Navegação",
     title: "Nav portais — menu Mais + drawer mobile",
     description:
-      "NavTabs com split primary/secondary, ScrollableNavRail, drawer < lg e sticky wrapper nos 4 portais.",
+      "NavTabs com split primary/secondary, ScrollableNavRail, drawer < lg, menu Mais portaled (v3.0.24) e sticky wrapper nos 4 portais.",
     status: "implemented",
     ui: "Interno · Prestador · PJ · Beneficiário",
     docRef: "ARQUITETURA_PORTAIS.md §Navegação",
@@ -194,9 +194,9 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     flow: "Cadastros",
     title: "CRUD de colaboradores no portal PJ",
     description:
-      "RH inclui/exclui beneficiários da empresa sem depender da recepção; upload em lote opcional.",
+      "RH inclui/exclui beneficiários da empresa sem depender da recepção; importação CSV em lote.",
     status: "implemented",
-    api: "POST/PATCH/DELETE /api/pj/beneficiaries",
+    api: "POST/PATCH/DELETE /api/pj/beneficiaries · POST /api/pj/beneficiaries/import",
     docRef: "JORNADA_CLIENTE.md §4 · FLUXOS.md §5",
   },
 ];

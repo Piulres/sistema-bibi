@@ -56,9 +56,9 @@ Página comercial separada da demonstração por segmento: `/venda`
 - URLs canônicas por segmento: `/segmentos/[slug]`
 - Cookie `bibi_segment` persiste o tenant ao navegar entre páginas
 
-## Navegação dos portais autenticados (v3.0.7)
+## Navegação dos portais autenticados (v3.0.7 · Mais v3.0.24)
 
-Implementação compartilhada nos quatro portais (Interno, Prestador, PJ, Beneficiário). Desde **v3.0.7**, o drawer mobile abre pela **direita** (alinhado à landing) e o gatilho não exibe contagem de módulos.
+Implementação compartilhada nos quatro portais (Interno, Prestador, PJ, Beneficiário). Desde **v3.0.7**, o drawer mobile abre pela **direita** (alinhado à landing) e o gatilho não exibe contagem de módulos. Desde **v3.0.24**, o menu **Mais** (desktop) usa `NavOverflowMenu` portaled no `body` — evita overlay sobre o conteúdo da página.
 
 ```mermaid
 flowchart TB
@@ -80,7 +80,8 @@ flowchart TB
 
 | Componente | Arquivo | Papel |
 |------------|---------|-------|
-| Abas de rota | `NavTabs.tsx` | Split primary/secondary, menu **Mais**, `shortLabel` até `xl` |
+| Abas de rota | `NavTabs.tsx` | Split primary/secondary, gatilho **Mais** (pill separado), `shortLabel` até `xl` |
+| Menu Mais (desktop) | `NavOverflowMenu.tsx` | Dropdown portaled (`fixed` + backdrop) — v3.0.24 |
 | Faixa rolável | `ScrollableNavRail.tsx` | Scroll horizontal + centraliza aba ativa |
 | Drawer mobile | `MobileNavDrawer.tsx` / `MobileSectionDrawer.tsx` | Lista completa de módulos ou seções — **painel fixo à direita** (`right-0`, `z-[70]`), overlay `z-[60]` |
 | Wrapper sticky | `portal-nav.ts` | `PORTAL_NAV_STICKY_CLASS` + `data-tour-id="portal-nav"` |

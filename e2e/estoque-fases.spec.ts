@@ -49,9 +49,10 @@ test.describe("Estoque fases 1–4 — smoke UI (valida abas e ações críticas
     await expect(page.getByRole("heading", { name: "Entrada de estoque" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Registrar entrada" })).toBeVisible();
 
-    const statusBadge = page.getByText(/Disponível|Quarentena|Bloqueado|Esgotado|Vencido/);
-    if ((await statusBadge.count()) > 0) {
-      await expect(statusBadge.first()).toBeVisible();
+    const statusSelect = page.getByRole("combobox", { name: /Status do lote/i });
+    if ((await statusSelect.count()) > 0) {
+      await expect(statusSelect.first()).toBeVisible();
+      await expect(statusSelect.first()).toHaveValue(/DISPONIVEL|BLOQUEADO|VENCIDO|QUARENTENA/);
     }
   });
 

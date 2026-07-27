@@ -41,10 +41,10 @@ test.describe("Portal PJ — fluxo corporativo", () => {
   });
 
   test("botões de exportação PDF, CSV, JSON e TXT presentes", async ({ page }) => {
-    await expect(page.getByRole("button", { name: "PDF" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "CSV" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "JSON" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "TXT" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Baixar PDF" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Baixar CSV" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Baixar JSON" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Baixar TXT" })).toBeVisible();
   });
 });
 

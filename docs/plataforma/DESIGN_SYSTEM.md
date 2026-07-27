@@ -117,13 +117,13 @@ Fonte: `src/lib/landing/navigation.ts`.
 
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
 
-### Portal nav — abas de rota (v3.0.7)
+### Portal nav — abas de rota (v3.0.7 · Mais v3.0.24)
 
-Fonte: `src/components/ui/NavTabs.tsx` + `src/lib/navigation/portal-nav.ts` + `MobileNavDrawer.tsx`.
+Fonte: `src/components/ui/NavTabs.tsx` + `NavOverflowMenu.tsx` + `src/lib/navigation/portal-nav.ts` + `MobileNavDrawer.tsx`.
 
 | Breakpoint | Comportamento |
 |------------|---------------|
-| Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com abas primárias; módulos `priority: "secondary"` no menu **Mais** |
+| Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com abas primárias; módulos `priority: "secondary"` no menu **Mais** (`NavOverflowMenu` portaled — v3.0.24) |
 | Aba secundária ativa | Pinada na faixa principal (não some no dropdown) |
 | Mobile (`< lg`) | `MobileNavDrawer` portaled — **abre pela direita** (`right-0`, animação `ds-nav-drawer-enter`); gatilho mostra só o módulo ativo (sem contagem) |
 | Grupos no drawer | Tabs com `group` → cabeçalho com contraste + separador `border-t` entre categorias |

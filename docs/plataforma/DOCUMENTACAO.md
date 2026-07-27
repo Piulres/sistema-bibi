@@ -25,13 +25,14 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 |---------------------|-----------|
 | Prontuário / Care Chart / protocolos | `DOCUMENTOS_CLINICOS.md` · `FLUXOS.md` §3/§4.3 · `API_DOCS.md` §7 |
 | Jornada PPU / stepper / abas | `FLUXOS.md` §8.9 · `JORNADA_CLIENTE.md` · `JORNADA_CONSULTORIO.md` · `src/lib/flow-improvements-map.ts` |
-| Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
+| Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `BRANDING.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
+| BrandMark whitelabel (PWA, headers, OG) | `BRANDING.md` · `src/lib/brand/brand-mark.ts` · `npm run icons:generate` |
 | Portal nav (NavTabs, Mais, drawer) | `DESIGN_SYSTEM.md` · `ARQUITETURA_PORTAIS.md` §Navegação · `TESTES.md` (helpers E2E) |
 | RBAC interno / guards API | `TESTES.md` §RBAC · `AUDITORIA_FLUXOS.md` §5 · `tests/security/rbac-gaps.test.ts` |
 | Dashboard executivo (KPIs interno) | `FLUXOS.md` §4.0.1 · `ARQUITETURA.md` §15 · `ExecutiveDashboardView.tsx` |
 | Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |
 | Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |
-| Portal PJ — CRUD colaboradores | `FLUXOS.md` §5 · `JORNADA_CLIENTE.md` §3 · `API_DOCS.md` §10 · `pj-beneficiary-service.ts` |
+| Portal PJ — CRUD colaboradores + import CSV | `FLUXOS.md` §5 · `JORNADA_CLIENTE.md` §3 · `API_DOCS.md` §10 · `pj-beneficiary-service.ts` · `pj-beneficiary-import.ts` |
 | Obras / Engenharia (`CONSTRUCTION`) | `segmentos/construction/README.md` · `API_DOCS.md` §5.1 (handlers sem OpenAPI) |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |

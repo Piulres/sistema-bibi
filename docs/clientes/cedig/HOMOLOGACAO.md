@@ -10,6 +10,8 @@ Status geral: [`STATUS.md`](STATUS.md) · rotina: [`OPERACAO.md`](OPERACAO.md).
 
 ## Pré-condições
 
+Produção atual: **v3.0.24** @ https://sistema-bibi.netlify.app · tenant `cedig` · modo **operação**.
+
 ```bash
 npm run db:bootstrap:demo
 echo operation > prisma/.data-store-mode
@@ -36,6 +38,16 @@ NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true npm run dev
 | D2 | — | Despesa Pessoal `500` | lista |
 
 Médicos no select: Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Autran.
+
+### Treino Alana (15 min) — roteiro
+
+1. Login `alana@cedig.demo` / `bibi123` → confirmar **modo operação** em `/interno/seguranca`
+2. `/interno/gestao` → executar C1–C4 + D1–D2 (tabela acima)
+3. Verificar KPIs, labels **Exame** e coluna **SYNCED**
+4. `/login?tenant=cedig` com prestador de teste → fila no extrato
+5. Beneficiário demo → **Exames** + fatura
+
+> Marque os itens de aceite abaixo após sessão presencial. Atualize [`STATUS.md`](STATUS.md) na timeline.
 
 ### Aceite
 - [ ] Valor sugerido sem cálculo manual  

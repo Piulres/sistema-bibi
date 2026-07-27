@@ -27,7 +27,7 @@ Checklist de execução após merge na **`dev`**. Atualizar status manualmente.
 | 8 | Deploy produção `npx netlify deploy --prod` | Humano / agente | ✅ `6a6436ef` (`bibi-poc-2026-07-25a`) |
 | 9 | Atualizar `RELEASES.md` + `changelog-content.ts` | Humano / agente | ✅ (época v2.3.0; tip atual em RELEASES) |
 
-**Produção atual:** **v3.0.8** — ver [`RELEASES.md`](../versoes/RELEASES.md). Landing v5 (funil comercial), PWA `/instalar` e campanhas Q3 usam o site publicado.
+**Produção atual:** **v3.0.24** — ver [`RELEASES.md`](../versoes/RELEASES.md). Landing v5 (funil comercial), PWA `/instalar` e campanhas Q3 usam o site publicado.
 
 ---
 
