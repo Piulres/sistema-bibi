@@ -47,12 +47,32 @@ Cliente                          API (serverless)
 
 ## Provider de IA
 
-| Modo | Env | Comportamento |
-|------|-----|---------------|
-| **mock** (padrão) | `ASSISTANT_PROVIDER` ausente ou `mock` | 350+ gatilhos, extração regex, RAG local |
-| **gateway** | `ASSISTANT_PROVIDER=gateway` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` | Netlify AI Gateway / OpenAI-compatible; fallback automático para mock |
+| Modo efetivo | Ativação | Comportamento |
+|--------------|----------|---------------|
+| **Regras** (padrão) | `aiEnabled=false` ou gateway não configurado | Motor de regras (`planMockAssistant`) — 350+ gatilhos, regex, RAG local |
+| **IA híbrida** | `Tenant.settings.assistant.aiEnabled` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` | LLM (`planGatewayAssistant`) → validação via regras → tools; fallback para mock em erro |
 
-Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
+Resolução em `src/lib/assistant/plan-gateway.ts` → `shouldUseAssistantGateway(mode)`:
+
+1. Modo tenant deve ser `"ai"` (`resolveAssistantMode` em `mode.ts`).
+2. `OPENAI_BASE_URL` e `OPENAI_API_KEY` preenchidos (`isGatewayConfigured`).
+3. `ASSISTANT_PROVIDER=mock` **força** mock (útil em dev); qualquer outro valor ou ausência usa gateway quando (1)+(2) forem verdade.
+
+> **Hotfix v3.0.20 (#343/#348):** não é mais obrigatório `ASSISTANT_PROVIDER=gateway` — basta ligar IA no tenant com secrets do AI Gateway no Netlify.
+
+Produção hoje usa **mock** (sem secrets OpenAI no painel). Para IA híbrida: configurar env vars + toggle ADMIN em `/interno/assistente`.
+
+### `ruleOverrides` no runtime
+
+Overrides salvos em `Tenant.settings.assistant.ruleOverrides` (CRUD Fase 3 em `/interno/assistente`) **afetam o chat** desde o hotfix v3.0.20:
+
+| Caminho | Uso |
+|---------|-----|
+| `runner.ts` → `resolvePlan` | Lê overrides do tenant a cada turno |
+| `planMockAssistant` / `mock-match` | Gatilhos add/remove e tools desativadas |
+| `refineHybridPlan` (modo IA) | Plano de regras paralelo ao LLM para allowlist |
+
+Lib: `src/lib/assistant/rules/tenant-overrides.ts` · API: `GET/PATCH /api/interno/assistant/settings`.
 
 ## UX do painel (v3.0.6)
 
@@ -78,7 +98,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 | **Painel de regras** | — | ✅ Fase 3 — CRUD + preview em `/interno/assistente` |
 | **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` (LLM → allowlist regras → tools) |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
-| **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
+| **Gateway em produção** | Média | Secrets `OPENAI_*` no Netlify + toggle IA no tenant (sem `ASSISTANT_PROVIDER` obrigatório) |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
 | **OpenAPI assistente** | Baixa | Documentar `sessionState` no spec |
 | **Rate limit / abuse** | Média | Por usuário no chat (hoje só login/MFA) |
@@ -87,6 +107,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 ## Testes
 
 - `tests/unit/assistant.test.ts` — multi-turno stateless
+- `tests/unit/assistant-hybrid.test.ts` — pipeline híbrido, `shouldUseAssistantGateway`, overrides no runtime
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare

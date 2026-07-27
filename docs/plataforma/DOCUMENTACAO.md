@@ -32,6 +32,7 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |
 | Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |
 | Obras / Engenharia (`CONSTRUCTION`) | `segmentos/construction/README.md` · `API_DOCS.md` §5.1 (handlers sem OpenAPI) |
+| Assistente (regras, IA híbrida, `ruleOverrides`) | `produto/ASSISTENTE_SERVERLESS.md` · `produto/ASSISTENTE_REGRAS_PLANO.md` · `VARIAVEIS_AMBIENTE.md` §Assistente |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |
 | CEDIG reset / `operation.db` Blob | `OPERACAO_DADOS.md` §Limpeza/Reset · `clientes/cedig/OPERACAO.md` · `scripts/reset-cedig-transactional.mjs` · `publish-operation-blob.mjs` |

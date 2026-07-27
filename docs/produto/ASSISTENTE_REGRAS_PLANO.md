@@ -65,13 +65,22 @@ type TenantSettings = {
   assistant: {
     aiEnabled: boolean;      // add-on IA — default false
     rulesEnabled: boolean;   // motor regras — default true
+    ruleOverrides?: TenantRuleOverride[];  // CRUD Fase 3 — afeta runtime desde v3.0.20
   };
+};
+
+type TenantRuleOverride = {
+  tool: string;              // nome da tool no registry
+  disabled?: boolean;        // remove tool do motor
+  addTriggers?: string[];    // gatilhos extras (normalizados, dedup)
+  removeTriggers?: string[]; // remove gatilhos base
 };
 ```
 
 - **Campo Prisma:** `Tenant.settings` (JSON string)
-- **Lib:** `src/lib/tenant/settings.ts`
+- **Lib:** `src/lib/tenant/settings.ts` · `src/lib/assistant/rules/tenant-overrides.ts`
 - **Modo efetivo:** `src/lib/assistant/mode.ts` → `resolveAssistantMode(settings)`
+- **Gateway IA:** `src/lib/assistant/plan-gateway.ts` → `shouldUseAssistantGateway(mode)` — modo IA + `OPENAI_*`; `ASSISTANT_PROVIDER=mock` força mock
 - **API:** `GET/PATCH /api/interno/assistant/settings` (módulo `assistente`, write = ADMIN)
 
 ---
@@ -151,6 +160,7 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
 | **3** | Painel CRUD regras + preview + templates por nicho | ✅ CRUD tenant + preview efetivo |
 | **4** | IA híbrida completa (LLM → regras → tools) | ✅ `refineHybridPlan` + allowlist |
+| **4.1** | Hotfix runtime: `ruleOverrides` no chat + gateway sem `ASSISTANT_PROVIDER` | ✅ #343/#348 · `plan-gateway.ts` |
 | **5** | RBAC write guards generalizados | ⏳ Paralelo |
 
 ---
@@ -162,6 +172,8 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | `src/lib/assistant/inventory.ts` | Inventário tools + matriz |
 | `src/lib/assistant/scenarios.ts` | Cenários de rotina |
 | `src/lib/assistant/mode.ts` | Resolução rules vs IA |
+| `src/lib/assistant/plan-gateway.ts` | Gateway no modo IA (`shouldUseAssistantGateway`) |
+| `src/lib/assistant/rules/tenant-overrides.ts` | Parse/normalize `ruleOverrides` |
 | `src/lib/tenant/settings.ts` | Settings do realm |
 | `src/app/interno/assistente/page.tsx` | Painel ADMIN |
 | `src/app/api/interno/assistant/settings/route.ts` | API config |

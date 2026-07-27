@@ -53,6 +53,11 @@ Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp
 | `APP_MODE` | Não | `demo` | `demo` \| `operation` — massa vs dados reais |
 | `RUN_SEED_ON_BUILD` | Não | `true` em demo | Seed no build Netlify (`false` em operação) |
 | `ALLOW_DEMO_RESET` | Não | `true` | Botão restaurar demo na UI |
+| `ASSISTANT_ENABLED` | Não | ligado | UI + API do chat operacional |
+| `ASSISTANT_PROVIDER` | Não | — | `mock` força mock; ausente + modo IA usa gateway se `OPENAI_*` ok |
+| `ASSISTANT_MODEL` | Não | `gpt-4o-mini` | Modelo no AI Gateway / OpenAI-compatible |
+| `OPENAI_BASE_URL` | Para IA híbrida | — | URL do Netlify AI Gateway (auto no deploy) |
+| `OPENAI_API_KEY` | Para IA híbrida | — | Chave do AI Gateway |
 | `NETLIFY` | Auto | `true` no deploy | Detecção de ambiente Netlify |
 
 ---
@@ -97,6 +102,48 @@ SESSION_SECRET="string-longa-aleatoria-min-32-chars"
 | **Efeito** | Nível de log Prisma; em dev, mock/console são registrados se gateway/provider não estiver definido |
 
 Não precisa estar no `.env` local — o Next define automaticamente.
+
+### Assistente IA (chat operacional)
+
+Variáveis lidas por `src/lib/assistant/config.ts`, `plan-gateway.ts` e `mode.ts`.  
+Doc de arquitetura: [`produto/ASSISTENTE_SERVERLESS.md`](../produto/ASSISTENTE_SERVERLESS.md).
+
+#### `ASSISTANT_ENABLED`
+
+| | |
+|---|---|
+| **Padrão** | Ligado (qualquer valor exceto `false`) |
+| **Onde** | `src/lib/assistant/config.ts` → `isAssistantEnabled()` |
+| **Efeito** | `false` desliga UI do chat e bloqueia `/api/assistant/*` |
+
+#### `ASSISTANT_PROVIDER`
+
+| | |
+|---|---|
+| **Valores** | `mock` \| `gateway` \| `netlify-gateway` \| *(ausente)* |
+| **Onde** | `config.ts` (`resolveAssistantProvider`), `plan-gateway.ts` (`shouldUseAssistantGateway`) |
+| **Comportamento** | `mock` **força** motor local mesmo com `OPENAI_*` e `aiEnabled`. Ausente ou `gateway`/`netlify-gateway`: no modo IA do tenant, usa gateway se `OPENAI_BASE_URL` + `OPENAI_API_KEY` estiverem definidos. |
+
+```env
+# Dev local — sem custo de tokens
+ASSISTANT_PROVIDER=mock
+```
+
+#### `ASSISTANT_MODEL`
+
+| | |
+|---|---|
+| **Padrão** | `gpt-4o-mini` |
+| **Onde** | `src/lib/assistant/config.ts` → `getAssistantModel()` |
+
+#### `OPENAI_BASE_URL` / `OPENAI_API_KEY`
+
+| | |
+|---|---|
+| **Obrigatórias para IA** | Sim — sem elas o tenant fica em modo **Regras** mesmo com `aiEnabled` |
+| **Onde** | `isGatewayConfigured()` em `config.ts` |
+| **Produção** | Injetadas pelo Netlify após habilitar AI Gateway no painel do site |
+| **Toggle tenant** | `Tenant.settings.assistant.aiEnabled` via `/interno/assistente` (ADMIN) |
 
 ---
 
@@ -431,6 +478,10 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 |----------|---------------------------|
 | `DATABASE_URL` | `prisma/schema.prisma`, `src/lib/db.ts`, `scripts/netlify-build.mjs` |
 | `SESSION_SECRET` | `src/lib/session.ts`, `src/lib/mfa.ts` |
+| `ASSISTANT_ENABLED` | `src/lib/assistant/config.ts` |
+| `ASSISTANT_PROVIDER` | `src/lib/assistant/config.ts`, `src/lib/assistant/plan-gateway.ts` |
+| `ASSISTANT_MODEL` | `src/lib/assistant/config.ts`, `src/lib/assistant/provider/gateway.ts` |
+| `OPENAI_BASE_URL` / `OPENAI_API_KEY` | `src/lib/assistant/config.ts`, `src/lib/assistant/mode.ts` |
 | `PAYMENT_GATEWAY` | `src/lib/payments/bootstrap.ts`, `payment-gateway.ts` |
 | `COMMUNICATION_PROVIDER` | `src/lib/communications/bootstrap.ts`, `communication-gateway.ts`, `api/interno/messages` |
 | `CRON_SECRET` | `src/app/api/cron/reminders/route.ts`, `cron/webhooks/route.ts` |
