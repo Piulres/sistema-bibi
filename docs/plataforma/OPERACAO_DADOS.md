@@ -19,7 +19,7 @@ O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados �
 
 - Configuração persistida em **Netlify Blobs** (`bibi-config/data-store-mode`)
 - Banco de **operação** persistido em **Netlify Blobs** (`bibi-databases/operation.db`)
-- Escritas no modo operação são salvas automaticamente após mutações (debounce ~1,5s)
+- Escritas no modo operação são salvas no Blob após cada mutação (flush imediato; em `$transaction`, só após o COMMIT)
 
 **Sem Postgres:** a operação real usa SQLite + Blobs como armazenamento compartilhado entre instâncias Lambda.
 

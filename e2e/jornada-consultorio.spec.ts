@@ -7,7 +7,7 @@
  */
 import { expect, test } from "@playwright/test";
 import { dismissOnboardingIfVisible, expectInternoNavHref, loginAs } from "./helpers/auth";
-import { expectFeedbackMessage } from "./helpers/feedback";
+import { confirmDialog, expectFeedbackMessage } from "./helpers/feedback";
 
 function generateValidCpf(): string {
   const base = String(Date.now() % 1_000_000_000)
@@ -88,6 +88,28 @@ test.describe("Jornada consultório — módulos operacionais (Interno)", () => 
         .filter({ visible: true })
         .first(),
     ).toBeVisible();
+  });
+
+  test("faturamento: marcar paga confirma e atualiza status", async ({ page }) => {
+    await loginAs(page, "interno", "faturamento@bibi.health");
+    await dismissOnboardingIfVisible(page);
+
+    await page.goto("/interno/faturamento");
+    await expect(page.getByRole("heading", { name: "Faturamento", exact: true })).toBeVisible({
+      timeout: 15_000,
+    });
+
+    const markPaid = page.getByRole("button", { name: "Marcar paga" }).first();
+    await expect(markPaid).toBeVisible({ timeout: 15_000 });
+    await markPaid.click();
+
+    await confirmDialog(page, {
+      title: /Confirmar pagamento/i,
+      action: /Confirmar pagamento/i,
+    });
+    await expectFeedbackMessage(page, /Fatura marcada como paga/i);
+    // Lista recarrega com ao menos uma fatura PAGA (seed demo tem FECHADA + fluxo)
+    await expect(page.getByText("PAGA").first()).toBeVisible({ timeout: 15_000 });
   });
 });
 

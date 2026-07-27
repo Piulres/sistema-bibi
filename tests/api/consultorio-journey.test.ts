@@ -319,13 +319,35 @@ describe("Jornada consultório — Atos 1–4 (API)", () => {
     const payRes = await markPaidPost(
       jsonRequest(`http://localhost/api/interno/invoices/${invoiceId}/pay`, {
         method: "POST",
-        body: {},
+        body: { method: "MANUAL" },
       }),
       { params: Promise.resolve({ id: invoiceId }) },
     );
     expect(payRes.status, await payRes.clone().text()).toBe(200);
-    const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceId } });
+    const payBody = await payRes.json();
+    expect(payBody.payment?.status).toBe("CONFIRMED");
+    expect(payBody.payment?.method).toBe("MANUAL");
+
+    const invoice = await prisma.invoice.findUniqueOrThrow({
+      where: { id: invoiceId },
+      include: { payments: true },
+    });
     expect(invoice.status).toBe("PAGA");
+    expect(invoice.payments.some((p) => p.method === "MANUAL" && p.status === "CONFIRMED")).toBe(
+      true,
+    );
+
+    // Idempotência: segunda tentativa não deve reverter nem criar inconsistência
+    const payAgain = await markPaidPost(
+      jsonRequest(`http://localhost/api/interno/invoices/${invoiceId}/pay`, {
+        method: "POST",
+        body: { method: "MANUAL" },
+      }),
+      { params: Promise.resolve({ id: invoiceId }) },
+    );
+    expect(payAgain.status).toBe(400);
+    const again = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceId } });
+    expect(again.status).toBe("PAGA");
   });
 
   it("cadastros operacionais acessíveis na jornada (pacientes, procedimentos, estoque)", async () => {

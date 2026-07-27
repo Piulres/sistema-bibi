@@ -13,6 +13,10 @@ import {
   persistOperationDatabaseNow,
   syncOperationDatabaseFromBlob,
 } from "@/lib/sqlite-blob-persistence";
+import {
+  runWithSqliteTransactionTracking,
+  shouldFlushSqliteWriteAfterOperation,
+} from "@/lib/sqlite-transaction-flush";
 
 type PrismaCache = {
   mode: DataStoreMode | "postgres" | "sqlite-legacy";
@@ -35,6 +39,43 @@ function resolveLegacySqlitePath(configured: string): string {
   return `file:${join(process.cwd(), "prisma", relative)}`;
 }
 
+/**
+ * Em Lambda + operation: persiste o SQLite no Blob após writes.
+ * Nunca no meio de `$transaction` — só após COMMIT (settle).
+ */
+function withOperationBlobFlush(base: PrismaClient): PrismaClient {
+  const extended = base.$extends({
+    query: {
+      $allModels: {
+        async $allOperations({ operation, query, args }) {
+          const result = await query(args);
+          if (
+            shouldFlushSqliteWriteAfterOperation(operation, isSqliteWriteAction(operation))
+          ) {
+            // Flush imediato fora de tx: debounce perdia creates se a Lambda encerrasse cedo.
+            await flushOperationDatabasePersist();
+          }
+          return result;
+        },
+      },
+    },
+  }) as unknown as PrismaClient;
+
+  const originalTransaction = extended.$transaction.bind(extended) as (
+    ...args: unknown[]
+  ) => Promise<unknown>;
+
+  (extended as { $transaction: (...args: unknown[]) => Promise<unknown> }).$transaction = (
+    ...args: unknown[]
+  ) =>
+    runWithSqliteTransactionTracking(
+      () => originalTransaction(...args),
+      () => flushOperationDatabasePersist(),
+    );
+
+  return extended;
+}
+
 async function createPrismaClient(databaseUrl: string, modeKey: PrismaCache["mode"]): Promise<PrismaClient> {
   process.env.DATABASE_URL = databaseUrl;
 
@@ -44,20 +85,7 @@ async function createPrismaClient(databaseUrl: string, modeKey: PrismaCache["mod
   });
 
   if (modeKey === "operation" && isLambdaSqliteRuntime()) {
-    return base.$extends({
-      query: {
-        $allModels: {
-          async $allOperations({ operation, query, args }) {
-            const result = await query(args);
-            if (isSqliteWriteAction(operation)) {
-              // Flush imediato: debounce de 1,5s perdia creates se a Lambda encerrasse cedo.
-              await flushOperationDatabasePersist();
-            }
-            return result;
-          },
-        },
-      },
-    }) as unknown as PrismaClient;
+    return withOperationBlobFlush(base);
   }
 
   return base;
