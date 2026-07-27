@@ -3,7 +3,6 @@ import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import {
   getTenantAuditEvents,
   TIMELINE_ACTIONS,
-  TIMELINE_ENTITY_TYPES,
   TIMELINE_ENTITY_LABELS,
 } from "@/lib/timeline";
 import { endOfDayInAppTz, startOfDayInAppTz } from "@/lib/timezone";
@@ -23,20 +22,24 @@ export async function GET(request: Request) {
     const from = fromParam ? startOfDayInAppTz(fromParam) : undefined;
     const to = toParam ? endOfDayInAppTz(toParam) : undefined;
 
-    const result = await getTenantAuditEvents(user.tenantId, {
-      entityType,
-      action,
-      search,
-      from,
-      to,
-      page: Number.isFinite(page) ? page : 1,
-      limit: Number.isFinite(limit) ? limit : 50,
-    });
+    const result = await getTenantAuditEvents(
+      user.tenantId,
+      {
+        entityType,
+        action,
+        search,
+        from,
+        to,
+        page: Number.isFinite(page) ? page : 1,
+        limit: Number.isFinite(limit) ? limit : 50,
+      },
+      { role: user.role, internoProfile: user.internoProfile },
+    );
 
     return NextResponse.json({
       ...result,
       filters: {
-        entityTypes: Object.values(TIMELINE_ENTITY_TYPES).map((value) => ({
+        entityTypes: result.allowedEntityTypes.map((value) => ({
           value,
           label: TIMELINE_ENTITY_LABELS[value] ?? value,
         })),

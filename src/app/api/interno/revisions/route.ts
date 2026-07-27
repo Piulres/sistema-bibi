@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
 import { listEntityRevisions } from "@/lib/change-management/revisions";
+import {
+  auditDetailLevelForEntity,
+  redactSnapshotForLevel,
+  resolveAuditProfile,
+} from "@/lib/audit-access";
 
 export async function GET(request: Request) {
   try {
@@ -14,6 +19,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "entityType e entityId são obrigatórios" }, { status: 400 });
     }
 
+    const profile = resolveAuditProfile(user.internoProfile);
+    const level = auditDetailLevelForEntity(profile, entityType.trim());
+    if (level === "hidden") {
+      return NextResponse.json({ error: "Sem permissão para revisões desta entidade" }, { status: 403 });
+    }
+
     const prisma = await getPrisma();
     const revisions = await listEntityRevisions(
       user.tenantId,
@@ -22,7 +33,13 @@ export async function GET(request: Request) {
       prisma,
     );
 
-    return NextResponse.json({ revisions });
+    const maskFinancial = level !== "full";
+    return NextResponse.json({
+      revisions: revisions.map((revision) => ({
+        ...revision,
+        snapshot: redactSnapshotForLevel(revision.snapshot, level, { maskFinancial }),
+      })),
+    });
   } catch (error) {
     return authErrorResponse(error);
   }

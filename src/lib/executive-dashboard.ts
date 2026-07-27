@@ -11,6 +11,11 @@ import { getClinicFinanceKpis } from "@/lib/clinic-finance/service";
 import { summarizeInvoiceMoney } from "@/lib/executive-dashboard-kpis";
 import { formatBRL } from "@/lib/pricing";
 import { monthsForBillingCycle } from "@/lib/subscription";
+import {
+  allowedAuditEntityTypes,
+  redactTimelineEventForProfile,
+  resolveAuditProfile,
+} from "@/lib/audit-access";
 
 function startOfToday(): Date {
   return startOfDayInAppTz();
@@ -91,10 +96,13 @@ export type ExecutiveDashboardData = {
  */
 export async function getExecutiveDashboard(
   tenantId: string,
+  access: { internoProfile?: string | null } = {},
 ): Promise<ExecutiveDashboardData> {
   const prisma = await getPrisma();
   const todayStart = startOfToday();
   const todayEnd = endOfToday();
+  const auditProfile = resolveAuditProfile(access.internoProfile);
+  const activityEntityTypes = allowedAuditEntityTypes(auditProfile);
 
   const [
     totalPatients,
@@ -134,9 +142,13 @@ export async function getExecutiveDashboard(
     prisma.message.count({ where: { tenantId, status: "PENDENTE" } }),
     prisma.company.findMany({ where: { tenantId }, select: { status: true, contractActive: true } }),
     prisma.timelineEvent.findMany({
-      where: { tenantId },
+      where: {
+        tenantId,
+        entityType: { in: activityEntityTypes },
+      },
       orderBy: { createdAt: "desc" },
-      take: 10,
+      // Over-fetch: redação pós-consulta pode reduzir a lista visível.
+      take: 30,
     }),
   ]);
 
@@ -249,13 +261,38 @@ export async function getExecutiveDashboard(
       byStatus: crmByStatus,
     },
     topPendingBilling,
-    recentActivity: recentEvents.map((event) => ({
-      id: event.id,
-      action: event.action,
-      description: event.description,
-      createdAtLabel: dateTime(event.createdAt),
-      actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
-    })),
+    recentActivity: recentEvents
+      .map((event) => {
+        const view = redactTimelineEventForProfile(
+          {
+            id: event.id,
+            entityType: event.entityType,
+            entityId: event.entityId,
+            action: event.action,
+            description: event.description,
+            createdAt: event.createdAt.toISOString(),
+            createdAtLabel: dateTime(event.createdAt),
+            createdBy: event.createdBy,
+            actorName: event.createdBy ? (actorMap.get(event.createdBy) ?? null) : null,
+            metadata: null,
+            hasDiff: false,
+            correlationId: event.correlationId,
+            reversesId: event.reversesId,
+            reversible: event.reversible,
+          },
+          access.internoProfile,
+        );
+        if (!view) return null;
+        return {
+          id: view.id,
+          action: view.action,
+          description: view.description,
+          createdAtLabel: view.createdAtLabel,
+          actorName: view.actorName,
+        };
+      })
+      .filter((event): event is NonNullable<typeof event> => event !== null)
+      .slice(0, 10),
     clinicFinance,
   };
 }

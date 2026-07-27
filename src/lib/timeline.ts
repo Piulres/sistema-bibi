@@ -12,10 +12,19 @@ import {
   type TimelineAction,
   type TimelineEntityType,
 } from "@/lib/timeline-constants";
+import {
+  allowedAuditEntityTypes,
+  isAuditEntityAllowed,
+  redactTimelineEventsForProfile,
+  resolveAuditProfile,
+  resolveAuditViewerCapabilities,
+  type AuditViewerCapabilities,
+} from "@/lib/audit-access";
 
 export { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES, TIMELINE_ENTITY_LABELS } from "@/lib/timeline-constants";
 export type { TimelineAction, TimelineEntityType } from "@/lib/timeline-constants";
 export type { TimelineEventMetadata } from "@/lib/change-management";
+export type { AuditViewerCapabilities } from "@/lib/audit-access";
 
 export type RecordTimelineInput = {
   tenantId: string;
@@ -127,6 +136,7 @@ export async function getPatientTimelineEvents(
     subscriptionIds: string[];
     messageIds: string[];
   },
+  options?: { internoProfile?: string | null },
 ): Promise<TimelineEventView[]> {
   const prisma = await getPrisma();
   const orFilters: Prisma.TimelineEventWhereInput[] = [
@@ -185,7 +195,12 @@ export async function getPatientTimelineEvents(
       : [];
   const actorMap = new Map(actors.map((actor) => [actor.id, actor.name]));
 
-  return events.map((event) => mapTimelineEventView(event, actorMap));
+  const mapped = events.map((event) => mapTimelineEventView(event, actorMap));
+  // Sem contexto de perfil (prestador/beneficiário) mantém a timeline completa do vínculo.
+  if (!options || !("internoProfile" in options)) {
+    return mapped;
+  }
+  return redactTimelineEventsForProfile(mapped, options.internoProfile);
 }
 
 export type TenantAuditFilters = {
@@ -198,34 +213,57 @@ export type TenantAuditFilters = {
   limit?: number;
 };
 
+export type TenantAuditAccess = {
+  role?: string;
+  internoProfile?: string | null;
+};
+
 export type TenantAuditResult = {
   events: TimelineEventView[];
   total: number;
   page: number;
   limit: number;
   totalPages: number;
+  capabilities: AuditViewerCapabilities;
+  allowedEntityTypes: string[];
 };
 
-/** Auditoria tenant-wide com filtros e paginação. */
+/** Auditoria tenant-wide com filtros, paginação e redação RBAC. */
 export async function getTenantAuditEvents(
   tenantId: string,
   filters: TenantAuditFilters = {},
+  access: TenantAuditAccess = {},
 ): Promise<TenantAuditResult> {
   const prisma = await getPrisma();
   const page = Math.max(1, filters.page ?? 1);
   const limit = Math.min(100, Math.max(1, filters.limit ?? 50));
   const skip = (page - 1) * limit;
+  const profile = resolveAuditProfile(access.internoProfile);
+  const capabilities = resolveAuditViewerCapabilities(
+    access.role ?? "INTERNO",
+    access.internoProfile,
+  );
+  const allowedEntityTypes = allowedAuditEntityTypes(profile);
 
-  const where: {
-    tenantId: string;
-    entityType?: string;
-    action?: string;
-    description?: { contains: string };
-    createdAt?: { gte?: Date; lte?: Date };
-  } = { tenantId };
+  const where: Prisma.TimelineEventWhereInput = {
+    tenantId,
+    entityType: { in: allowedEntityTypes },
+  };
 
-  if (filters.entityType?.trim()) {
-    where.entityType = filters.entityType.trim();
+  const requestedType = filters.entityType?.trim();
+  if (requestedType) {
+    if (!isAuditEntityAllowed(profile, requestedType)) {
+      return {
+        events: [],
+        total: 0,
+        page,
+        limit,
+        totalPages: 1,
+        capabilities,
+        allowedEntityTypes,
+      };
+    }
+    where.entityType = requestedType;
   }
   if (filters.action?.trim()) {
     where.action = filters.action.trim();
@@ -259,11 +297,16 @@ export async function getTenantAuditEvents(
       : [];
   const actorMap = new Map(actors.map((actor) => [actor.id, actor.name]));
 
+  const mapped = events.map((event) => mapTimelineEventView(event, actorMap));
+  const redacted = redactTimelineEventsForProfile(mapped, access.internoProfile);
+
   return {
-    events: events.map((event) => mapTimelineEventView(event, actorMap)),
+    events: redacted,
     total,
     page,
     limit,
     totalPages: Math.max(1, Math.ceil(total / limit)),
+    capabilities,
+    allowedEntityTypes,
   };
 }

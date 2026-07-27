@@ -6,7 +6,9 @@ import { getExecutiveDashboard } from "@/lib/executive-dashboard";
 export async function GET() {
   try {
     const user = await requireInternoModule("dashboard");
-    const dashboard = await getExecutiveDashboard(user.tenantId);
+    const dashboard = await getExecutiveDashboard(user.tenantId, {
+      internoProfile: user.internoProfile,
+    });
     return NextResponse.json({ dashboard });
   } catch (error) {
     return authErrorResponse(error);

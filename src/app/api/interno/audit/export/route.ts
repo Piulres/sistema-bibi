@@ -14,13 +14,17 @@ export async function GET(request: Request) {
     const fromParam = url.searchParams.get("from");
     const toParam = url.searchParams.get("to");
 
-    const data = await buildAuditTabularExport(user.tenantId, {
-      entityType: url.searchParams.get("entityType") ?? undefined,
-      action: url.searchParams.get("action") ?? undefined,
-      search: url.searchParams.get("search") ?? undefined,
-      from: fromParam ? startOfDayInAppTz(fromParam) : undefined,
-      to: toParam ? endOfDayInAppTz(toParam) : undefined,
-    });
+    const data = await buildAuditTabularExport(
+      user.tenantId,
+      {
+        entityType: url.searchParams.get("entityType") ?? undefined,
+        action: url.searchParams.get("action") ?? undefined,
+        search: url.searchParams.get("search") ?? undefined,
+        from: fromParam ? startOfDayInAppTz(fromParam) : undefined,
+        to: toParam ? endOfDayInAppTz(toParam) : undefined,
+      },
+      { role: user.role, internoProfile: user.internoProfile },
+    );
 
     const branding = await getTenantBranding(user.tenantId);
     return serveTabularExport(format, "auditoria", data, {

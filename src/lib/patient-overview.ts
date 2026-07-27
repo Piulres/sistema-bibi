@@ -86,6 +86,7 @@ export type PatientOverviewData = {
 export async function getPatientOverview(
   patientId: string,
   tenantId: string,
+  options?: { internoProfile?: string | null },
 ): Promise<PatientOverviewData | null> {
   const prisma = await getPrisma();
   const patient = await prisma.patient.findFirst({
@@ -166,14 +167,21 @@ export async function getPatientOverview(
   const subscriptionIds = patient.subscriptions.map((sub) => sub.id);
   const messageIds = patient.messages.map((msg) => msg.id);
 
-  const timeline = await getPatientTimelineEvents(patientId, tenantId, {
-    appointmentIds,
-    usageIds,
-    recordIds,
-    invoiceIds,
-    subscriptionIds,
-    messageIds,
-  });
+  const timeline = await getPatientTimelineEvents(
+    patientId,
+    tenantId,
+    {
+      appointmentIds,
+      usageIds,
+      recordIds,
+      invoiceIds,
+      subscriptionIds,
+      messageIds,
+    },
+    options && "internoProfile" in options
+      ? { internoProfile: options.internoProfile }
+      : undefined,
+  );
 
   return {
     patient: {

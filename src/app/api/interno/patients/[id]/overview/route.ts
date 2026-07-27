@@ -11,7 +11,9 @@ export async function GET(
     const user = await requireInternoModule("cadastros");
     const { id } = await ctx.params;
 
-    const overview = await getPatientOverview(id, user.tenantId);
+    const overview = await getPatientOverview(id, user.tenantId, {
+      internoProfile: user.internoProfile,
+    });
     if (!overview) {
       return NextResponse.json({ error: "Beneficiário não encontrado" }, { status: 404 });
     }

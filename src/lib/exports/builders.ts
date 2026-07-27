@@ -18,6 +18,7 @@ import { listSubscriptions } from "@/lib/subscription-service";
 import {
   getTenantAuditEvents,
   TIMELINE_ENTITY_LABELS,
+  type TenantAuditAccess,
   type TenantAuditFilters,
 } from "@/lib/timeline";
 import type { TabularExport } from "@/lib/exports/tabular";
@@ -43,12 +44,17 @@ export type BeneficiaryExportSection =
 export async function buildAuditTabularExport(
   tenantId: string,
   filters: TenantAuditFilters,
+  access: TenantAuditAccess = {},
 ): Promise<TabularExport> {
-  const result = await getTenantAuditEvents(tenantId, {
-    ...filters,
-    page: 1,
-    limit: 10_000,
-  });
+  const result = await getTenantAuditEvents(
+    tenantId,
+    {
+      ...filters,
+      page: 1,
+      limit: 10_000,
+    },
+    access,
+  );
 
   return {
     title: "Auditoria do tenant",
