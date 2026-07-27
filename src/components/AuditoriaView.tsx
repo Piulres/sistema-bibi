@@ -97,7 +97,7 @@ function AuditEventDiff({ metadata }: { metadata: TimelineEventMetadata }) {
 }
 
 export default function AuditoriaView() {
-  const labels = useLabels();
+  const { labels } = useLabels();
   const [data, setData] = useState<AuditResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
