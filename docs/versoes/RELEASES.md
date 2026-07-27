@@ -11,14 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar **pendente de deploy**.
+> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.20** — deploy `6a66fe7f` @ `1132880` (`bibi-poc-2026-07-27k`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.20** preparado · produção ainda **v3.0.19** até deploy |
-| **Pacote anterior em produção** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
+| **Release `main` / `dev`** | **v3.0.20** · sincronizados @ `1132880` |
+| **Pacote anterior em produção** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B + PJ agendar) |
 | **Release** | `main` | **v3.0.20** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.19** · deploy `6a66f3a7` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.20** · deploy `6a66fe7f` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.20
@@ -36,7 +36,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Assistente Fase 4:** pipeline híbrido LLM → regras → tools com allowlist/fallback (#337).
 - **Mobile Capacitor B:** scaffold iOS/Android + service worker shell (#340).
 - **Portal PJ:** RH agenda consulta do colaborador (`pj-appointment-request` · #335).
-- **Qualidade:** `stock` · `assistant-hybrid` · `pwa-mobile-shell` · `pj-appointments` · CI #337/#338/#340/#335 · pre-release OK.
+- **Qualidade:** `stock` · `assistant-hybrid` · `pwa-mobile-shell` · `pj-appointments` · CI #337/#338/#340/#335 · pre-release OK · deploy `6a66fe7f`.
+
+### Smoke (27/07/2026) — produção v3.0.20
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.20` · deploy `6a66fe7f` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/estoque` | 307 (auth) |
+| `/pj/login` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.19
 
