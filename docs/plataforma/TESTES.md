@@ -73,6 +73,14 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.9 timezone: `tests/unit/timezone.test.ts` — `civilDateISO`, `parseAppDateTime`, `dayRangeInAppTz`, `formatDateTimeBR` (BRT vs UTC em Netlify).
+
+Cobertura v3.0.10 agenda/calendário:
+- `tests/lib/calendar-oauth.test.ts` — OAuth mock Google/Microsoft, state HMAC, tokens cifrados
+- `tests/lib/slot-grid.test.ts` — grade do prestador → slots de 30 min
+- `tests/lib/calendar-ics.test.ts` — feed ICS e links one-shot por agendamento
+- `tests/lib/scheduling-cancel.test.ts` — cancelamento dispara sync de calendário (sem Unhandled Rejection)
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).

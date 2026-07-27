@@ -876,7 +876,10 @@ Especificação completa: [`public/openapi.yaml`](../../public/openapi.yaml)
 4. **TISS** — XML simplificado com validação estrutural (422 `NO_ITEMS` / `NO_PATIENT_DOCUMENT`); XSD oficial ANS pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
 6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
-7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
+7. **Fuso operacional (v3.0.9+)** — agenda, slots e labels usam `America/Sao_Paulo` (`src/lib/timezone.ts`). Em Netlify (UTC), não formatar horários com `Date` nativo sem `timeZone` — ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md) §17.
+8. **Calendário externo** — OAuth Google/Microsoft em mock por padrão (`CALENDAR_OAUTH_MOCK=true`); push real exige credenciais — ver [`CALENDAR_INTEGRATION.md`](../plataforma/CALENDAR_INTEGRATION.md).
+9. **Disponibilidade do prestador** — grade em `/prestador/disponibilidade` filtra slots do beneficiário; sem grade salva → fallback 08–18h — ver [`PROVIDER_AVAILABILITY.md`](../plataforma/PROVIDER_AVAILABILITY.md).
+10. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
 
 ---
 

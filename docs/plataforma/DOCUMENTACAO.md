@@ -31,6 +31,10 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Dashboard executivo (KPIs interno) | `FLUXOS.md` §4.0.1 · `ARQUITETURA.md` §15 · `ExecutiveDashboardView.tsx` |
 | Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |
 | Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |
+| Agenda / slots / fuso BRT | `FLUXOS.md` §3/§6 · `src/lib/timezone.ts` · `scheduling-service.ts` |
+| Calendário externo (OAuth/ICS) | `CALENDAR_INTEGRATION.md` · `VARIAVEIS_AMBIENTE.md` · `calendar-sync-service.ts` |
+| Disponibilidade do prestador | `PROVIDER_AVAILABILITY.md` · `/prestador/disponibilidade` |
+| Mês operacional (seed demo) | `MASSA_TESTES.md` §Mês operacional · `operation-month-plan.ts` |
 | Obras / Engenharia (`CONSTRUCTION`) | `segmentos/construction/README.md` · `API_DOCS.md` §5.1 (handlers sem OpenAPI) |
 | Portal header / tour / badges | `DESIGN_SYSTEM.md` · `ONBOARDING_TOUR.md` |
 | Piloto CEDIG | `clientes/cedig/STATUS.md` |

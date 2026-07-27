@@ -764,6 +764,23 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 | `/interno/agenda` | `appointment-service` |
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
+| `/prestador/disponibilidade` | `provider-availability-service` + `slot-grid` |
+
+### Agenda, slots e fuso operacional (v3.0.9+)
+
+Netlify/Node rodam em **UTC**; agenda, labels e limites de dia usam `America/Sao_Paulo` via `src/lib/timezone.ts`.
+
+| Camada | Arquivo | Papel |
+|--------|---------|-------|
+| Fuso | `timezone.ts` | `civilDateISO`, `parseAppDateTime`, `dayRangeInAppTz`, `formatDateTimeBR` |
+| Slots | `availability/slot-grid.ts` | Grade do prestador → horários de 30 min |
+| Disponibilidade | `availability/provider-availability-service.ts` | Grade semanal + bloqueios |
+| Agendamento | `scheduling-service.ts` | `getAvailableSlots`, `bookBeneficiaryAppointment` |
+| Calendário externo | `calendar/calendar-sync-service.ts` | Push OAuth Google/Microsoft + feed ICS |
+
+**Pitfall:** usar `new Date().toLocaleString()` sem `timeZone` em labels de agenda → horários ~3h adiantados após 21h BRT. Sempre formatar via `timezone.ts` ou `formatDateTimeBR`.
+
+Docs: [`PROVIDER_AVAILABILITY.md`](PROVIDER_AVAILABILITY.md) · [`CALENDAR_INTEGRATION.md`](CALENDAR_INTEGRATION.md) · testes: `tests/unit/timezone.test.ts`, `tests/lib/slot-grid.test.ts`.
 
 ### Exports tabulares (v3.0.7)
 
