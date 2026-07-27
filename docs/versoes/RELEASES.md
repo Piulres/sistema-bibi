@@ -11,7 +11,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.14** — auditoria RBAC de conteúdo **pendente de deploy** (docs/versão no git; produção ainda em 3.0.13 até publicação).
+> Pacote **v3.0.14** — auditoria RBAC + estoque clínico **pendente de deploy** (docs/versão no git; produção ainda em 3.0.13 até publicação).
 
 | Item | Valor |
 |------|-------|
@@ -25,7 +25,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.14** (auditoria RBAC) |
+| **Integração** | `dev` | **v3.0.14** (auditoria RBAC + estoque) |
 | **Release** | `main` | **v3.0.14** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d114` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
@@ -35,7 +35,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Auditoria:** RBAC de conteúdo em `audit-access.ts` (clínico / financeiro / PII / segurança / operacional).
 - **Superfícies:** audit, export, revisões, atividade recente do dashboard e timeline Cliente 360°.
 - **Perfis:** ADMIN completo + restore; FATURAMENTO financeiro pleno com PII mascarado; READONLY em resumo; RECEPCAO sem clínico/segurança no dashboard.
-- **Qualidade:** `audit-access`, `audit-rbac-content` · CI #296 verde · pre-release OK.
+- **Estoque:** reversão completa (ENTRADA/SAIDA/DISPENSACAO/…); bloqueio de dispensação em CANCELADO/FALTOU; docs API alinhados.
+- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` (15 casos) · CI #293/#296 verdes · pre-release OK.
 
 ### Conteúdo do pacote v3.0.13
 

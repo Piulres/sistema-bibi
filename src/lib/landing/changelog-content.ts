@@ -31,7 +31,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Auditoria e atividade recente com RBAC de conteúdo: clínico, financeiro e PII filtrados por perfil interno.",
+      "Auditoria com RBAC de conteúdo e estoque clínico validado (reversão completa + guard de dispensação).",
     highlights: [
       {
         title: "Auditoria / RBAC",
@@ -41,9 +41,17 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Restore administrativo só para ADMIN; export e revisões já redigidos no servidor",
         ],
       },
+      {
+        title: "Estoque clínico",
+        items: [
+          "Reversão de movimentações com lote (incluindo ENTRADA e DISPENSACAO)",
+          "Dispensação bloqueada em agendamento cancelado ou faltoso",
+          "Cobertura Vitest ampliada do catálogo, FIFO, kits e atendimento",
+        ],
+      },
     ],
     testStats:
-      "CI unit+E2E · audit-access · audit-rbac-content · docs:verify · pre-release OK",
+      "CI unit+E2E · audit-access · audit-rbac-content · stock · docs:verify · pre-release OK",
   },
   {
     version: "3.0.13",
