@@ -32,7 +32,9 @@
     "db:migrate:deploy": "prisma migrate deploy",
     "db:reset": "prisma db push --force-reset && prisma db seed",
     "smoke:netlify-pwa": "node scripts/smoke-netlify-pwa.mjs",
-    "icons:generate": "npx tsx scripts/generate-brand-icons.mts"
+    "icons:generate": "npx tsx scripts/generate-brand-icons.mts",
+    "mobile:resources": "npm run icons:generate && node scripts/setup-mobile-resources.mjs",
+    "mobile:sync": "cd mobile && npx cap sync"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
