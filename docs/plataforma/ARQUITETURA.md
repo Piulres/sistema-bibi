@@ -541,7 +541,10 @@ flowchart LR
 **Arquivos:**
 - `prisma/schema.prisma` — model `TimelineEvent`
 - `src/lib/timeline.ts` — `recordTimelineEvent`, `getPatientTimelineEvents`
+- `src/lib/audit-access.ts` — RBAC de **conteúdo** por perfil (v3.0.14): classes de sensibilidade, redação de PII/financeiro, filtro em auditoria/export/dashboard/Cliente 360°
 - Hooks nos handlers de login, atendimento, procedimentos, PEP e faturas
+
+**RBAC de conteúdo (v3.0.14):** o módulo `auditoria` controla **acesso à rota**; `audit-access.ts` controla **o que cada perfil vê** dentro do feed. Níveis: `full` · `redacted` · `summary` · `hidden`. Restore (`reversible`) só com nível `full` + `capabilities.canRestore` (ADMIN). Matriz: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.9.
 
 ### Checklist de homologação (Épico 2)
 

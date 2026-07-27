@@ -153,6 +153,7 @@ O sync automático cobre **123 paths** de **163** Route Handlers — **40** aind
 | Domínio | Paths | Doc canônica |
 |---------|-------|--------------|
 | Gestão clínica CEDIG | `/api/interno/clinic-finance/*` (6 rotas) | §8 · [`FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 |
+| Estoque clínico | `/api/interno/stock/*`, `/api/prestador/appointments/{id}/materials` | §10 · [`FLUXOS.md`](../produto/FLUXOS.md) §4.8 |
 | Documentos clínicos | `/api/interno/exam-protocol-templates`, `.../{id}`, `/api/prestador/patients/{id}/exam-protocols`, `.../referrals`, `.../discharge-documents`, `/api/prestador/clinical-guides/export`, `/api/beneficiario/documents`, `/api/beneficiario/clinical-guides/export` | §7 · [`DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
 | Obras / Engenharia | `/api/interno/projects/*`, `/api/interno/construction/*`, `/api/pj/projects/*`, `/api/prestador/campo/projects`, `/api/prestador/field-reports/*`, `/api/beneficiario/projects/*` (26 rotas) | [`segmentos/construction/README.md`](../segmentos/construction/README.md) |
 | Anexos (upload/download) | `/api/interno/attachments`, `.../download`, `/api/pj/attachments/{id}/download`, `/api/interno/field-reports/attachments/{id}/download`, `/api/prestador/field-reports/attachments/*` | construction README · `src/lib/attachments/` |
@@ -245,7 +246,7 @@ Fluxo completo (emitir fatura → PIX → TISS): [`produto/FLUXOS.md`](../produt
 
 ## 7. Documentos clínicos (prestador + cadastros)
 
-Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer sessão **prestador** ou **interno** (`cadastros`), conforme a tabela.
+Endpoints de protocolos de exames, prescrições e **documentos de saída** (v3.0.5 + v3.0.14). Requer sessão **prestador** ou **interno** (`cadastros`), conforme a tabela.
 
 | Método | Path | Auth | Função |
 |--------|------|------|--------|
@@ -439,7 +440,51 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 10. Referências
+## 10. Estoque clínico (interno + prestador)
+
+APIs do módulo **Estoque** (`/interno/estoque` · `StockView`) e dispensação no atendimento prestador. Auth interno: módulo `estoque` (ADMIN e RECEPCAO). Reversão compensatória desde v3.0.14.
+
+| Método | Path | Auth | Função |
+|--------|------|------|--------|
+| `GET` | `/api/interno/stock/products` | `estoque` | Lista produtos |
+| `POST` | `/api/interno/stock/products` | `estoque` | Cria produto |
+| `PATCH` | `/api/interno/stock/products/{id}` | `estoque` | Edita produto (`active`) |
+| `GET` | `/api/interno/stock/lots` | `estoque` | Lista lotes |
+| `POST` | `/api/interno/stock/lots` | `estoque` | Cria lote |
+| `PATCH` | `/api/interno/stock/lots/{id}` | `estoque` | Ajusta lote |
+| `GET` | `/api/interno/stock/movements` | `estoque` | Lista movimentações |
+| `POST` | `/api/interno/stock/movements` | `estoque` | Registra movimento (`ENTRADA`, `SAIDA`, `DISPENSACAO`, …) |
+| `POST` | `/api/interno/stock/movements/{id}/reverse` | `estoque` | Reversão compensatória (v3.0.14) |
+| `GET` | `/api/interno/stock/alerts` | `estoque` | Alertas (estoque baixo, vencimento) |
+| `GET` | `/api/interno/stock/procedure-kits/{procedureId}` | `estoque` | Kit de insumos do procedimento |
+| `POST` | `/api/interno/stock/procedure-kits/{procedureId}` | `estoque` | Upsert do kit |
+| `GET` | `/api/prestador/appointments/{id}/materials` | prestador | Materiais dispensados no atendimento |
+| `POST` | `/api/prestador/appointments/{id}/materials` | prestador | Dispensação manual (bloqueada se `CANCELADO`/`FALTOU`) |
+
+### POST `/movements/{id}/reverse`
+
+Corpo opcional: `{ "reason": "Correção de lançamento" }`.
+
+| HTTP | Corpo | Causa |
+|------|-------|-------|
+| 200 | `{ "ok": true }` | Movimento compensatório criado; saldo do lote atualizado |
+| 400 | `{ "error": "..." }` | Tipo sem reversão automática, movimento sem lote ou saldo insuficiente |
+| 404 | `{ "error": "..." }` | Movimento ou lote inexistente |
+
+Serviço: `src/lib/change-management/stock-reverse.ts` · catálogo: `src/lib/stock-service.ts`.
+
+### Tipos de movimento e compensação
+
+| Original | Compensação |
+|----------|---------------|
+| `SAIDA`, `DISPENSACAO`, `PERDA`, `AJUSTE`, `TRANSFERENCIA` | `ENTRADA` |
+| `ENTRADA`, `DEVOLUCAO` | `SAIDA` |
+
+Fluxo de produto: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.8 · testes: `tests/api/stock.test.ts`.
+
+---
+
+## 11. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal

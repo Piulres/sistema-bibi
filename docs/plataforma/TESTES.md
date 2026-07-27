@@ -87,6 +87,14 @@ Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts
 
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
+Cobertura v3.0.14 auditoria RBAC de conteúdo: `tests/unit/audit-access.test.ts` (matriz perfil × classe, redação de campos) · `tests/api/audit-rbac-content.test.ts` (API audit/dashboard por perfil — PII mascarado, restore só ADMIN).
+
+Cobertura v3.0.14 estoque: `tests/api/stock.test.ts` — catálogo, lotes, movimentos, `POST .../movements/[id]/reverse`, kits, alertas; dispensação bloqueada em `CANCELADO`/`FALTOU`.
+
+Cobertura v3.0.14 cadastros: `tests/lib/cadastros-resolve-tab.test.ts` — `resolveCadastrosTab` (deep-link seguro por nicho).
+
+Cobertura v3.0.14 documentos de saída: `tests/unit/documentos-saida.test.ts` — hub de guias, PDF receita/exame/encaminhamento, portal beneficiário.
+
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
 **Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).

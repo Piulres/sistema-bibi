@@ -28,6 +28,10 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 | Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
 | Portal nav (NavTabs, Mais, drawer) | `DESIGN_SYSTEM.md` · `ARQUITETURA_PORTAIS.md` §Navegação · `TESTES.md` (helpers E2E) |
 | RBAC interno / guards API | `TESTES.md` §RBAC · `AUDITORIA_FLUXOS.md` §5 · `tests/security/rbac-gaps.test.ts` |
+| Auditoria RBAC de conteúdo | `FLUXOS.md` §4.9 · `audit-access.ts` · `tests/unit/audit-access.test.ts` · `tests/api/audit-rbac-content.test.ts` |
+| Estoque / reversão / dispensação | `FLUXOS.md` §4.8 · `API_DOCS.md` §10 · `stock-reverse.ts` · `tests/api/stock.test.ts` |
+| Cadastros (lazy-load por aba) | `FLUXOS.md` §4.3 · `CadastrosView.tsx` · `resolve-tab.ts` · `tests/lib/cadastros-resolve-tab.test.ts` |
+| Documentos de saída (guias PDF) | `DOCUMENTOS_CLINICOS.md` · `API_DOCS.md` §7 · `tests/unit/documentos-saida.test.ts` |
 | Dashboard executivo (KPIs interno) | `FLUXOS.md` §4.0.1 · `ARQUITETURA.md` §15 · `ExecutiveDashboardView.tsx` |
 | Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |
 | Exports tabulares / `ExportButtons` | `FLUXOS.md` §4.11 · `API_DOCS.md` §9 · `src/lib/exports/` |

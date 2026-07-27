@@ -396,6 +396,8 @@ Doc completa: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · [`
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
+**Carregamento por aba (v3.0.14):** cada aba é um chunk `next/dynamic` — só a aba ativa faz fetch e baixa JS. Deep-link `?tab=` passa por `resolveCadastrosTab()` (`src/lib/cadastros/resolve-tab.ts`): chaves inválidas para o nicho (ex.: `pets` fora de VET) caem em `patients`. Abas vêm de `buildCadastrosTabs(labels, niche)` — não há `Promise.all` das quatro listas no mount.
+
 ### 4.4 CRM (`CrmPipelineView`)
 
 | Ação | API | Efeito |
@@ -454,7 +456,18 @@ Serviço: `src/lib/webhook-service.ts`
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
-Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).
+**Reversão (v3.0.14):** `POST /api/interno/stock/movements/[id]/reverse` — serviço `src/lib/change-management/stock-reverse.ts`. Cria movimento compensatório com o mesmo lote e quantidade:
+
+| Tipo original | Compensação | Pré-requisito |
+|---------------|-------------|---------------|
+| `SAIDA`, `DISPENSACAO`, `PERDA`, `AJUSTE`, `TRANSFERENCIA` | `ENTRADA` | `lotId` no movimento original |
+| `ENTRADA`, `DEVOLUCAO` | `SAIDA` | Saldo do lote ≥ quantidade |
+
+Movimentos sem lote ou tipos não mapeados retornam `400`. O movimento de reversão registra `reversesId` na timeline e não é reversível de novo.
+
+**Dispensação no atendimento:** `POST /api/prestador/appointments/[id]/materials` e registro de procedimento com kit bloqueados quando o agendamento está `CANCELADO` ou `FALTOU` (`canRegisterProcedureForStatus` em `appointment-status.ts` — API + UI).
+
+Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`). Contrato HTTP: [`../plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §10.
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
@@ -463,7 +476,16 @@ Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`i
 | Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis + redação RBAC |
 | Export | `GET /api/interno/audit/export?format=` | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` (já redigido) |
 
-Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sensível é filtrado em `src/lib/audit-access.ts`:
+Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sensível é filtrado em `src/lib/audit-access.ts` — camada **além** do gate de módulo `auditoria` (§9):
+
+| Nível | O que o perfil vê |
+|-------|-------------------|
+| `full` | Descrição + metadata + diffs completos |
+| `redacted` | Evento visível; CPF/e-mail/telefone e valores financeiros mascarados nos diffs |
+| `summary` | Descrição sanitizada; sem metadata/diffs |
+| `hidden` | Evento omitido do feed |
+
+**Superfícies com a mesma política:** timeline `/interno/auditoria`, export da auditoria, revisões (`/api/interno/revisions`), atividade recente do dashboard e timeline do Cliente 360°.
 
 | Classe | ADMIN | FATURAMENTO | READONLY | RECEPCAO (dashboard/360°) |
 |--------|:-----:|:-----------:|:--------:|:-------------------------:|
@@ -473,7 +495,7 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sen
 | Segurança | completo | resumo | resumo | oculto |
 | Operacional | completo | completo | resumo | resumo |
 
-Restore administrativo permanece **ADMIN**. Atividade recente do dashboard e timeline do Cliente 360° usam a mesma política.
+Restore administrativo permanece **ADMIN** (`capabilities.canRestore`). Atividade recente do dashboard e timeline do Cliente 360° usam a mesma política. Testes: `tests/unit/audit-access.test.ts` · `tests/api/audit-rbac-content.test.ts`.
 
 ### 4.10 Segurança e dual-store (`SecurityView`)
 
@@ -763,6 +785,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
 | **APIs** | **96/96** rotas internas usam `requireInternoModule` / `requireInternoAdmin` — matriz UI = matriz API. Teste: `tests/security/rbac-gaps.test.ts` |
+| **Conteúdo da auditoria** | `audit-access.ts` — classes clínico/financeiro/PII/segurança/operacional e níveis full/redacted/summary/hidden (v3.0.14) — ver §4.9 |
 
 > **Gap remanescente (baixa prioridade):** apenas **7** rotas usam `requireInternoModuleWrite` (gestão clínica + ações destrutivas). Demais mutações confiam na matriz de módulos. Evidências: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §5.
 
