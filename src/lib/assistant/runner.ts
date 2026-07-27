@@ -20,6 +20,11 @@ import {
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
 import { planGatewayAssistant } from "@/lib/assistant/provider/gateway";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
+import {
+  allowedToolsAfterOverrides,
+  filterToolsForOverrides,
+  refineGatewayPlan,
+} from "@/lib/assistant/hybrid";
 import { findTool, getToolsForUser } from "@/lib/assistant/tools/registry";
 import {
   clearOperationDraft,
@@ -45,11 +50,23 @@ async function resolvePlan(
   systemPrompt: string,
 ) {
   const settings = await getTenantSettings(user.tenantId);
+  const overrides = settings.assistant.ruleOverrides;
   const mode = resolveAssistantMode(settings);
   const provider = resolveAssistantProvider();
+  const allowed = allowedToolsAfterOverrides(
+    tools.map((t) => t.name),
+    overrides,
+  );
+  const toolsForPlan = filterToolsForOverrides(tools, overrides);
+
   if (mode === "ai" && provider === "gateway") {
     try {
-      return await planGatewayAssistant(systemPrompt, messages, tools);
+      // Pipeline híbrido: LLM interpreta → regras validam/refinam → tools
+      const llmPlan = await planGatewayAssistant(systemPrompt, messages, toolsForPlan);
+      const { plan: refined } = refineGatewayPlan(llmPlan, allowed);
+      if (refined.toolCalls.length > 0) return refined;
+      // Plano vazio após refine: tenta motor de regras se habilitado
+      if (!settings.assistant.rulesEnabled) return refined;
     } catch (error) {
       console.error("[assistant] gateway fallback to mock:", error);
     }
@@ -57,7 +74,7 @@ async function resolvePlan(
   if (!settings.assistant.rulesEnabled) {
     return { toolCalls: [], fallback: rulesEngineDisabled() };
   }
-  return planMockAssistant(messages, tools, user);
+  return planMockAssistant(messages, tools, user, overrides);
 }
 
 export async function runAssistantChat(input: {
@@ -93,7 +110,12 @@ export async function runAssistantChat(input: {
     };
   }
 
-  const systemPrompt = buildAssistantSystemPrompt(input.user, input.pageContext);
+  const disabledTools = (settings.assistant.ruleOverrides ?? [])
+    .filter((o) => o.disabled)
+    .map((o) => o.tool);
+  const systemPrompt = buildAssistantSystemPrompt(input.user, input.pageContext, {
+    disabledTools,
+  });
   const plan = await resolvePlan(input.user, input.messages, tools, systemPrompt);
 
   if (plan.toolCalls.length === 0) {

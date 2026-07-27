@@ -49,10 +49,10 @@ Cliente                          API (serverless)
 
 | Modo | Env | Comportamento |
 |------|-----|---------------|
-| **mock** (padrão) | `ASSISTANT_PROVIDER` ausente ou `mock` | 350+ gatilhos, extração regex, RAG local |
-| **gateway** | `ASSISTANT_PROVIDER=gateway` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` | Netlify AI Gateway / OpenAI-compatible; fallback automático para mock |
+| **mock** (padrão) | `ASSISTANT_PROVIDER` ausente ou `mock` | 350+ gatilhos, extração regex, RAG local + `ruleOverrides` em runtime |
+| **gateway** (híbrido) | `ASSISTANT_PROVIDER=gateway` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` + `aiEnabled` | LLM interpreta → `refineGatewayPlan` (regras/overrides) → tools; fallback automático para mock |
 
-Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
+Produção hoje usa **mock** — gateway exige secrets no painel Netlify. Validação híbrida: `src/lib/assistant/hybrid.ts`.
 
 ## UX do painel (v3.0.6)
 

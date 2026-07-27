@@ -150,7 +150,7 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | **1** | Flag IA persistida + UI toggle (ADMIN) | ✅ Parcial (API + toggle) |
 | **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
 | **3** | Painel CRUD regras + preview + templates por nicho | ✅ CRUD tenant + preview efetivo |
-| **4** | IA híbrida completa (LLM → regras → tools) | ⏳ |
+| **4** | IA híbrida completa (LLM → regras → tools) | ✅ `hybrid.ts` + overrides em runtime |
 | **5** | RBAC write guards generalizados | ⏳ Paralelo |
 
 ---
@@ -162,6 +162,8 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | `src/lib/assistant/inventory.ts` | Inventário tools + matriz |
 | `src/lib/assistant/scenarios.ts` | Cenários de rotina |
 | `src/lib/assistant/mode.ts` | Resolução rules vs IA |
+| `src/lib/assistant/hybrid.ts` | Validação/refine do plano LLM (Fase 4) |
+| `src/lib/assistant/rules/*` | Engine + overrides tenant/nicho |
 | `src/lib/tenant/settings.ts` | Settings do realm |
 | `src/app/interno/assistente/page.tsx` | Painel ADMIN |
 | `src/app/api/interno/assistant/settings/route.ts` | API config |

@@ -5,12 +5,18 @@ import { formatDateLabel } from "@/lib/assistant/dates";
 import { formatTimeBR } from "@/lib/timezone";
 import { buildPortalPromptSection } from "@/lib/assistant/portal-concepts";
 
-export function buildAssistantSystemPrompt(user: SessionUser, pageContext?: string): string {
+export function buildAssistantSystemPrompt(
+  user: SessionUser,
+  pageContext?: string,
+  options?: { disabledTools?: readonly string[] },
+): string {
   const now = new Date();
   const permissions =
     user.role === "INTERNO"
       ? user.internoPermissions.join(", ")
       : user.role;
+
+  const disabled = options?.disabledTools?.filter(Boolean) ?? [];
 
   const lines = [
     `Você é o assistente operacional do Sistema Bibi - ServiceOS.`,
@@ -28,11 +34,15 @@ export function buildAssistantSystemPrompt(user: SessionUser, pageContext?: stri
     `Data/hora atual: ${formatDateLabel(now)} ${formatTimeBR(now)}`,
     `Permissões: ${permissions}`,
     pageContext ? `Página atual: ${pageContext}` : "",
+    disabled.length > 0
+      ? `Ferramentas desabilitadas neste tenant (não use): ${disabled.join(", ")}.`
+      : "",
     `Regras:`,
     `- Use ferramentas para obter dados reais; nunca invente números.`,
     `- Responda em português, de forma concisa e profissional.`,
     `- Respeite o escopo do portal — não sugira ações de outros perfis.`,
     `- Use a terminologia do tenant nas respostas.`,
+    `- Só chame ferramentas listadas no schema; o motor de regras valida o plano.`,
   ].filter(Boolean);
 
   return lines.join("\n");
