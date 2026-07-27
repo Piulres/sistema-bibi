@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import {
+  ApiAuthError,
+  requireInternoModule,
+  authErrorResponse,
+} from "@/lib/api-auth";
+import { canAccessPatientClinicalDetail } from "@/lib/audit-access";
 import { getPatientClinicalOverview } from "@/lib/clinical-overview";
 import { listPatientMedications } from "@/lib/medication-service";
 import { listPatientExamOrders } from "@/lib/exam-order-service";
@@ -11,6 +16,12 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function GET(_request: Request, { params }: RouteParams) {
   try {
     const user = await requireInternoModule("cadastros");
+    if (!canAccessPatientClinicalDetail(user.internoProfile)) {
+      throw new ApiAuthError(
+        403,
+        "Detalhe clínico restrito ao perfil administrador",
+      );
+    }
     const { id: patientId } = await params;
 
     const prisma = await getPrisma();

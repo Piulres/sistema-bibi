@@ -476,7 +476,7 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sen
 | Segurança | completo | resumo | resumo | oculto |
 | Operacional | completo | completo | resumo | resumo |
 
-Restore administrativo permanece **ADMIN**. Atividade recente do dashboard, timeline e export do Cliente 360° usam a mesma política. Busca por descrição (`?search=`) só cobre tipos com nível `full` — evita oráculo de existência em clínico/PII. Encaminhamento/receita (`ClinicalReferral`, `PrescriptionDocument`) são classe clínica.
+Restore administrativo permanece **ADMIN**. Atividade recente do dashboard, timeline e export do Cliente 360° usam a mesma política. Busca por descrição (`?search=`) só cobre tipos com nível `full` — evita oráculo de existência em clínico/PII. Encaminhamento/receita (`ClinicalReferral`, `PrescriptionDocument`) são classe clínica. Detalhe clínico (`GET …/clinical`, corpo de PEP no overview/export) só **ADMIN** — RECEPCAO não usa `cadastros` como backdoor.
 
 ### 4.10 Segurança e dual-store (`SecurityView`)
 
