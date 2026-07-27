@@ -3,7 +3,7 @@
 Mapa completo das camadas de teste, cobertura atual, lacunas de segurança e
 próximos passos. Este documento expõe o que **não aparece na UI** nem no README.
 
-**Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers sem YAML — ver `npm run openapi:verify`). Revalidar com `npx vitest run` e `npm run openapi:verify` após adicionar testes.
+**Ground truth (jul/2026):** **598+** casos Vitest (83+ arquivos) · **14** specs Playwright · **156+** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers sem YAML — ver `npm run openapi:verify`). Revalidar com `npx vitest run` e `npm run openapi:verify` após adicionar testes.
 
 ### Títulos e CI Summary (obrigatório)
 
@@ -54,7 +54,7 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 ```
                     ┌─────────────┐
-                    │  E2E        │  Playwright — 12 specs (desktop + mobile)
+                    │  E2E        │  Playwright — 14 specs (desktop + mobile)
                     ├─────────────┤
                     │ API         │  Handlers + auth/cron + exportações + cadastros
                     ├─────────────┤
@@ -84,6 +84,10 @@ Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
+
+Cobertura v3.0.23 portal PJ: `tests/api/pj-beneficiaries.test.ts` — CRUD colaboradores (`POST/PATCH/DELETE /api/pj/beneficiaries`) com anti-IDOR `companyId` · mapa `pj-beneficiary-crud` em `flow-improvements-map.ts` · doc [`FLUXOS.md`](../produto/FLUXOS.md) §5 · [`API_DOCS.md`](API_DOCS.md) §10.
+
+Cobertura v3.0.23 estoque UI: `e2e/estoque-fases.spec.ts` — smoke abas Resumo/Produtos/Lotes/Movimentos (fases 1–4): cria produto, valida tipos manuais restritos (SAIDA/AJUSTE/PERDA) e botão Reverter.
 
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
@@ -360,6 +364,7 @@ Senha única: `bibi123`
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 | `jornada-consultorio.spec.ts` | Jornada operacional UI — agenda/estoque/cadastros/faturamento + walk-in→check-in→atendimento (PEP/procedimentos/stepper) · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |
+| `estoque-fases.spec.ts` | Smoke UI estoque fases 1–4 — abas Resumo/Produtos/Lotes/Movimentos; tipos manuais SAIDA/AJUSTE/PERDA; Reverter (login `recepcao@bibi.health`) |
 | `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão, KPIs dashboard (`dashboard-billing-kpis`); **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
 | `assistant.spec.ts` | Assistente operacional serverless |
