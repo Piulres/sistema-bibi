@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.12** — Dashboard KPIs claros (cobrança vs produção clínica) **publicado em produção**.
+> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **pendente deploy**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.12** · sincronizadas · artefato prod `@ e5c1f50` |
+| **Release `main` / `dev`** | **v3.0.13** (preparado) · aguardando merge `dev` → `main` + deploy |
 | **Pacote anterior em produção** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +25,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.12** |
-| **Release** | `main` | **v3.0.12** |
+| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) |
+| **Release** | `main` | **v3.0.12** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.12** · deploy `6a66c080` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.13
+
+- **Exportações:** downloads autenticados via fetch+blob (`ExportButtons`, `DownloadLink`); Content-Disposition UTF-8; TISS XML, LGPD JSON, import/export e .ics corrigidos.
+- **Portal Prestador:** equipe no atendimento (papéis por nicho, custos PPU); receita multi-medicamento; aba Equipe.
+- **Qualidade:** `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
 
 ### Conteúdo do pacote v3.0.12
 

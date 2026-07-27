@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.12",
+    version: "3.0.13",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Exportações autenticadas corrigidas (fetch+blob) e equipe no atendimento com receita multi-item no Portal Prestador.",
+    highlights: [
+      {
+        title: "Exportações",
+        items: [
+          "PDF, Excel, CSV, JSON e XML TISS baixam via fetch autenticado — sem erro JSON salvo como .pdf",
+          "Content-Disposition UTF-8 para nomes com acentos",
+          "DownloadLink reutilizável para TISS, LGPD, import/export e .ics",
+        ],
+      },
+      {
+        title: "Portal Prestador",
+        items: [
+          "Equipe no atendimento (anestesista, técnicos) com custos PPU",
+          "Receita multi-medicamento com templates e histórico",
+          "Aba Equipe no atendimento com papéis por nicho",
+        ],
+      },
+    ],
+    testStats: "CI unit+E2E · exports-matrix · download-export · appointment-team · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.12",
+    label: "Sistema Bibi - ServiceOS v3.0.12",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Dashboard Executivo com KPIs claros: cobrança (a receber / recebido / a faturar) separada da produção clínica do mês.",
     highlights: [
