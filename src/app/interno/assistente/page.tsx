@@ -8,8 +8,8 @@ export default async function AssistentePage() {
   return (
     <>
       <PageHeader
-        title="Assistente"
-        description="Configurações do assistente operacional — regras por nicho, flag de IA e matriz de fluxos."
+        title="Regras do assistente"
+        description="Configurações do chat operacional — regras por nicho, flag de IA e inventário de ferramentas."
       />
       <AssistenteConfigView />
     </>

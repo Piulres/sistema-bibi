@@ -26,10 +26,35 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.23",
+    version: "3.0.24",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Marca circular com gradiente Energia Brasileira whitelabel; nav Mais refatorado; painel Regras do assistente humanizado.",
+    highlights: [
+      {
+        title: "Identidade visual",
+        items: [
+          "BrandMark — gradiente heroFrom→heroTo do tenant, formato iOS circular sem borda",
+          "SVG, PWA e OG alinhados; ícones regenerados",
+        ],
+      },
+      {
+        title: "UX interno / assistente",
+        items: [
+          "NavTabs — menu Mais portaled (sem overlay sobre conteúdo)",
+          "Assistente — labels legíveis de ferramentas e overrides por tenant",
+        ],
+      },
+    ],
+    testStats: "CI #371 · brand-mark · nav-overflow · pre-release OK",
+  },
+  {
+    version: "3.0.23",
+    label: "Sistema Bibi - ServiceOS v3.0.23",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Portal PJ: RH inclui, edita e desvincula colaboradores; E2E estoque fases 1–4; docs assistente alinhados.",
     highlights: [

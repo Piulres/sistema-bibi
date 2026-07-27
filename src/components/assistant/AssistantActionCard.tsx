@@ -6,6 +6,7 @@ import { useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { useAssistant } from "@/components/assistant/AssistantProvider";
+import { formatChoiceFieldTitle } from "@/lib/assistant/tool-labels";
 
 type Props = {
   actions: AssistantAction[];
@@ -14,19 +15,24 @@ type Props = {
 export default function AssistantActionCard({ actions }: Props) {
   const { confirmAction, sendMessage, loading, setOpen } = useAssistant();
   const [password, setPassword] = useState("");
+  const [dismissed, setDismissed] = useState<Set<number>>(new Set());
 
-  if (actions.length === 0) return null;
+  const visibleActions = actions.filter((_, index) => !dismissed.has(index));
+  if (visibleActions.length === 0) return null;
 
   const closeOnNavigate = () => setOpen(false);
+  const dismissAt = (index: number) => setDismissed((prev) => new Set(prev).add(index));
 
   return (
     <div className="space-y-2 border-t border-[var(--border-muted)] p-3">
       {actions.map((action, index) => {
+        if (dismissed.has(index)) return null;
+
         if (action.type === "confirm") {
           const needsPassword =
             action.title.toLowerCase().includes("usuário") ||
             action.title.toLowerCase().includes("usuario") ||
-            "Perfil" in action.summary;
+            "E-mail" in action.summary;
           return (
             <Card key={`confirm-${index}`} className="space-y-3 p-3">
               <p className="text-sm font-semibold text-[var(--text-primary)]">{action.title}</p>
@@ -73,23 +79,41 @@ export default function AssistantActionCard({ actions }: Props) {
 
         if (action.type === "link") {
           return (
-            <Link
-              key={`link-${index}`}
-              href={action.href}
-              onClick={closeOnNavigate}
-              className="block rounded-lg border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--portal-accent)] hover:bg-[var(--surface-muted)]"
-            >
-              {action.label} →
-            </Link>
+            <div key={`link-${index}`} className="flex items-stretch gap-2">
+              <Link
+                href={action.href}
+                onClick={closeOnNavigate}
+                className="block flex-1 rounded-lg border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--portal-accent)] hover:bg-[var(--surface-muted)]"
+              >
+                {action.label} →
+              </Link>
+              <button
+                type="button"
+                onClick={() => dismissAt(index)}
+                className="rounded-lg px-2 text-xs text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+                aria-label="Dispensar atalho"
+              >
+                ✕
+              </button>
+            </div>
           );
         }
 
         if (action.type === "choice") {
+          const choiceTitle = formatChoiceFieldTitle(action.title);
           return (
             <Card key={`choice-${index}`} className="space-y-2 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-                Escolha: {action.title}
-              </p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-sm font-medium text-[var(--text-primary)]">{choiceTitle}</p>
+                <button
+                  type="button"
+                  onClick={() => dismissAt(index)}
+                  className="rounded px-1 text-xs text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+                  aria-label="Fechar opções"
+                >
+                  ✕
+                </button>
+              </div>
               <div className="flex flex-col gap-2">
                 {action.options.map((option) => (
                   <Button
@@ -110,14 +134,23 @@ export default function AssistantActionCard({ actions }: Props) {
 
         if (action.type === "form_draft") {
           return (
-            <Link
-              key={`draft-${index}`}
-              href={action.href}
-              onClick={closeOnNavigate}
-              className="block rounded-lg border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--portal-accent)] hover:bg-[var(--surface-muted)]"
-            >
-              {action.label} →
-            </Link>
+            <div key={`draft-${index}`} className="flex items-stretch gap-2">
+              <Link
+                href={action.href}
+                onClick={closeOnNavigate}
+                className="block flex-1 rounded-lg border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm font-medium text-[var(--portal-accent)] hover:bg-[var(--surface-muted)]"
+              >
+                {action.label} →
+              </Link>
+              <button
+                type="button"
+                onClick={() => dismissAt(index)}
+                className="rounded-lg px-2 text-xs text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+                aria-label="Dispensar rascunho"
+              >
+                ✕
+              </button>
+            </div>
           );
         }
 
@@ -125,8 +158,18 @@ export default function AssistantActionCard({ actions }: Props) {
           if (!action.columns?.length) return null;
           return (
             <Card key={`table-${index}`} className="overflow-hidden p-0">
-              <div className="border-b border-[var(--border-muted)] px-3 py-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
-                {action.title}
+              <div className="flex items-center justify-between border-b border-[var(--border-muted)] px-3 py-2">
+                <span className="text-xs font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+                  {action.title}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => dismissAt(index)}
+                  className="rounded px-1 text-xs text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+                  aria-label="Fechar tabela"
+                >
+                  ✕
+                </button>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full text-left text-xs">

@@ -10,6 +10,7 @@ import {
   emptySearchResult,
   emptySlots,
 } from "@/lib/assistant/humanize";
+import { formatChoiceFieldTitle } from "@/lib/assistant/tool-labels";
 
 export function formatToolResult(
   toolName: string,
@@ -280,7 +281,7 @@ export function buildActions(
     return [
       {
         type: "choice",
-        title: result.fieldLabel,
+        title: formatChoiceFieldTitle(result.fieldLabel),
         field: result.field,
         options: result.options.map((option, index) => ({
           label: `${index + 1}. ${option.label}${option.detail ? ` (${option.detail})` : ""}`,

@@ -13,6 +13,10 @@ import {
 } from "@/lib/assistant/appointment-draft";
 import { buildIncompleteDraftResult } from "@/lib/assistant/draft-response";
 import { getMissingFieldsForTool } from "@/lib/assistant/provider/mock-draft-flow";
+import {
+  formatAssignableRoleLabel,
+  formatInternoProfileLabel,
+} from "@/lib/assistant/tool-labels";
 
 function draftResult(input: {
   userId: string;
@@ -80,12 +84,14 @@ export const internoWriteTools: AssistantToolDefinition[] = [
             internoProfile: data.internoProfile ?? null,
           },
         },
-        preview: `Criar usuário ${data.name.trim()} (${data.email.trim()}) como ${role}`,
+        preview: `Criar usuário ${data.name.trim()} (${data.email.trim()}) — ${formatAssignableRoleLabel(role)}`,
         summary: {
           Nome: data.name.trim(),
           "E-mail": data.email.trim(),
-          Perfil: role,
-          ...(data.internoProfile ? { "Perfil interno": data.internoProfile } : {}),
+          Portal: formatAssignableRoleLabel(role),
+          ...(data.internoProfile
+            ? { "Perfil interno": formatInternoProfileLabel(data.internoProfile) }
+            : {}),
         },
         href: "/interno/cadastros",
       });

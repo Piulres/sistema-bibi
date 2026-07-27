@@ -33,7 +33,7 @@ export function buildPortalUiCopy(portal: PortalKey, labels: NicheLabels): Porta
           "Quanto faturamos hoje?",
           "Quem está devendo?",
           "Resumo do dashboard",
-          `Buscar ${labels.patient.toLowerCase()} João`,
+          `Buscar ${labels.patient.toLowerCase()} por nome`,
           "Como faturar?",
           `Marcar ${labels.appointment.toLowerCase()}`,
           "Listar prestadores",
