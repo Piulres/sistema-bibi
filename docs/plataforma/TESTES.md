@@ -89,7 +89,7 @@ Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` 
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
-**Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).
+**Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado, equipe no atendimento, receita multi-item v3.0.13+).
 
 **Mapa completo da massa (perfis, portais, segmentos):** [`MASSA_TESTES.md`](MASSA_TESTES.md) — inclui perfil `operation-1y` (20 clientes, 3–9 usuários PJ, 1 ano).
 
@@ -399,7 +399,20 @@ Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 
 **Runtime CI:** Node **24** · `actions/checkout@v6` · `actions/setup-node@v6`.
 
-**Otimização `test.db`:** o job unitário usa `DATABASE_URL=file:./test.db`. O helper `tests/helpers/db.ts` grava `prisma/.test-db-ready` com fingerprint de schema + seed; nos workers, `ensureTestDatabase()` pula subprocessos `prisma db push` quando o marker é válido (suíte ~112s → ~30s em runners lentos). Invalida ao mudar `schema.prisma` ou arquivos em `prisma/seed-data/`.
+**Otimização `test.db`:** o job unitário usa `DATABASE_URL=file:./test.db`. O helper `tests/helpers/db.ts` grava `prisma/.test-db-ready` com fingerprint SHA-256 de `schema.prisma`, `seed.ts` e metadados de `prisma/seed-data/`; nos workers, `ensureTestDatabase()` pula subprocessos `prisma db push` quando o marker coincide (suíte ~112s → ~30s em runners lentos).
+
+**Re-seed obrigatório (v3.0.13+):** se o fingerprint diverge, o helper **sempre** executa `db push` + `prisma db seed` — nunca grava marker novo sobre `test.db` antigo (evita `pre-release`/`db:verify` com massa desatualizada após mudanças de seed). `isTestSeedStale()` complementa com probes de negócio (fixtures João/Maria/Pedro, equipe, `PrescriptionDocument`, obras build).
+
+**Pitfall local:** após mudar seed/schema, apague manualmente `prisma/test.db` e `prisma/.test-db-ready` se testes falharem com dados ausentes.
+
+**E2E faturamento (`e2e/jornada-consultorio.spec.ts`):** selecione a linha com status `FECHADA` antes de clicar **Marcar paga** — o primeiro botão visível pode ser de fatura `ABERTA` (API rejeita). Padrão:
+
+```ts
+page.locator("tr, li")
+  .filter({ has: page.getByText("FECHADA", { exact: true }) })
+  .getByRole("button", { name: "Marcar paga" })
+  .first();
+```
 
 **Variáveis globais do workflow** (obrigatórias — Prisma falha sem `DATABASE_URL`):
 

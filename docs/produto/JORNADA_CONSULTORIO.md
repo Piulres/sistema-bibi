@@ -175,7 +175,7 @@ Recepção **não** fecha fatura. Detalhe: [`FLUXOS.md`](FLUXOS.md) §4.1 · §7
 | Caminho | Quem | Como | Resultado |
 |---------|------|------|-----------|
 | PIX na recepção/caixa | Interno (billing) | Gerar PIX → Confirmar PIX | `Payment` PENDING→CONFIRMED; Invoice **`PAGA`** |
-| Marcar paga (manual) | Interno (billing) | Botão **Marcar paga** | Invoice **`PAGA`** direto |
+| Marcar paga (manual) | Interno (billing) | Botão **Marcar paga** (só em linha `FECHADA`) | Invoice **`PAGA`** direto |
 | Self-service | Beneficiário | `/beneficiario/faturas` → gerar PIX → confirmar | Idem |
 
 Só fatura **`FECHADA`** aceita pagamento. **`PAGA`** é terminal.

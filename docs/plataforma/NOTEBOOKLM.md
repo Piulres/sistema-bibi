@@ -454,7 +454,7 @@ src/
 → `/interno/assinaturas` → Ver cobranças → **Faturar** (Tier 1).
 
 **Como marcar fatura como paga ou gerar PIX?**
-→ `/interno` (Faturamento) → coluna **Ações** na tabela de faturas: botões **PIX** e **Marcar paga** (Tier 1). Beneficiário paga em `/beneficiario`.
+→ `/interno` (Faturamento) → coluna **Ações** na tabela de faturas: botões **PIX** e **Marcar paga** aparecem **somente em faturas `FECHADA`** (Tier 1). Beneficiário paga em `/beneficiario`.
 
 **Onde está o fluxo completo do sistema?**
 → [`../produto/FLUXOS.md`](../produto/FLUXOS.md) — diagramas Mermaid, RBAC, máquinas de estado e Pay Per Use E2E.

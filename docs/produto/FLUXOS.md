@@ -306,7 +306,8 @@ Serviço: `src/lib/executive-dashboard.ts` (`getExecutiveDashboard()`). KPIs de 
 ### 4.1 Faturamento (`BillingView`)
 
 **UI:** tabela de faturas emitidas com colunas Total, TISS (download XML) e **Ações**
-(botões **PIX** e **Marcar paga** quando `status ≠ PAGA` e gateway configurado).
+(botões **PIX** e **Marcar paga** somente quando `status === "FECHADA"`; PIX exige gateway configurado).
+Faturas **ABERTA** (usages ainda não faturados) e **PAGA** (terminal) não exibem essas ações — alinhado à API (`POST .../pay` rejeita não-FECHADA).
 
 | Ação | API | Transição de estado |
 |------|-----|---------------------|

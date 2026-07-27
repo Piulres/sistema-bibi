@@ -81,8 +81,10 @@ npm run dev
 `scripts/netlify-build.mjs` → `setup-database.ts`:
 
 1. `demo.db` — `db push` + seed
-2. `operation.db` — `db push` + bootstrap mínimo
+2. `operation.db` — `db push` + bootstrap mínimo (`runOperationBootstrap`)
 3. `dev.db` — cópia de `demo.db` (compatibilidade)
+
+**Gotcha (v3.0.13+):** o bootstrap de `operation.db` importa `PrismaClient` **dinamicamente** após o `db push` no mesmo processo — import estático no topo do script fica stale e quebra o seed mínimo no build.
 
 `DUAL_DATA_STORE=true` gravado no `.env` do build.
 
