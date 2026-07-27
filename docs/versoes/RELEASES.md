@@ -11,14 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.21** — Documentos de saída (melhores práticas) **pendente deploy**.
+> Pacote **v3.0.21** — Documentos de saída (melhores práticas) + fix assistente **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.20** — deploy `6a6702f7` @ `75d82eb` (`bibi-poc-2026-07-27l`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.21** — deploy `6a670ad1` @ `d9bd043` (`bibi-poc-2026-07-27m`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.21** preparado · produção ainda **v3.0.20** até deploy |
-| **Pacote anterior em produção** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
+| **Release `main` / `dev`** | **v3.0.21** · sincronizados @ `d9bd043` |
+| **Pacote anterior em produção** | **3.0.20** — deploy `6a6702f7` @ `75d82eb` (`bibi-poc-2026-07-27l`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
@@ -26,15 +26,26 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.21** (documentos saída + fix assistente runtime) |
-| **Release** | `main` | **v3.0.20** (até merge) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.20** · deploy `6a6702f7` · HTTP 200 · **Stop builds ON** |
+| **Release** | `main` | **v3.0.21** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.21** · deploy `6a670ad1` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.21
 
-- **Documentos de saída:** melhores práticas — guias clínicas PDF, filenames UTF-8, export autenticado (#342).
+- **Documentos de saída:** melhores práticas — guias clínicas PDF (atestado no pacote, assinatura, Imprimir), filenames UTF-8, `Cache-Control: no-store`, auditoria `DOCUMENT_EXPORTED` (#342).
 - **Assistente:** `ruleOverrides` conectados ao runtime + gateway no modo IA (#343).
-- **Qualidade:** `documentos-saida` · `clinical-discharge` · `assistant-hybrid` · pre-release OK.
+- **Qualidade:** `documentos-saida` · `clinical-discharge` · `assistant-hybrid` · CI #342/#352 · pre-release OK · deploy `6a670ad1`.
+
+### Smoke (27/07/2026) — produção v3.0.21
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.21` · deploy `6a670ad1` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/login` · `/interno/login` | 200 · title `v3.0.21` |
+| `/beneficiario/documentos` | 307 (auth) |
+| `/interno/assistente` | 307 (auth) |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.20
 
