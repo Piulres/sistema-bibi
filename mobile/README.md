@@ -68,7 +68,16 @@ mobile/
   capacitor.config.json
 ```
 
-## Próximos passos (Fase B — contínuo)
+## Fase B — scaffold nativo (v3.0.20) ✅
+
+Entregue no pacote v3.0.20 (#340):
+
+- [x] Projetos Gradle (`android/`) e Xcode (`ios/`)
+- [x] `capacitor.config.json` apontando para produção
+- [x] Ícones/splash via BrandMark (`npm run mobile:resources`)
+- [x] Service worker shell em `www/` (conteúdo real via `server.url`)
+
+## Próximos passos (Fase C)
 
 - [ ] TestFlight / Play Console (distribuição interna)
 - [ ] Deep links por portal (`/interno`, `/prestador`, …)

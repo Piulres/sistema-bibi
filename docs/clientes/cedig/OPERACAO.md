@@ -4,7 +4,7 @@ Rotina diária do piloto. Status e timeline: [`STATUS.md`](STATUS.md).
 Homologação de preços: [`HOMOLOGACAO.md`](HOMOLOGACAO.md). Cliente/preços: [`README.md`](README.md).
 
 > **Tenant:** `/?tenant=cedig` · **Store:** operação · **Senha:** `bibi123`  
-> **Produção:** ServiceOS **v3.0.8** · https://sistema-bibi.netlify.app
+> **Produção:** ServiceOS **v3.0.20** · https://sistema-bibi.netlify.app
 
 ---
 

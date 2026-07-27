@@ -588,4 +588,4 @@ Playbook: [`docs/plataforma/OPERACAO_DADOS.md`](docs/plataforma/OPERACAO_DADOS.m
 
 ---
 
-Construído como POC evoluindo para **Sistema Bibi - ServiceOS v3.0.7** — infraestrutura horizontal Pay Per Use multi-nicho com PWA mobile (piloto CEDIG).
+Construído como POC evoluindo para **Sistema Bibi - ServiceOS v3.0.20** — infraestrutura horizontal Pay Per Use multi-nicho com PWA mobile (piloto CEDIG).

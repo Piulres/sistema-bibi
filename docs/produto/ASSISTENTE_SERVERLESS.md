@@ -54,6 +54,42 @@ Cliente                          API (serverless)
 
 Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
 
+## Pipeline híbrido (Fase 4 — v3.0.20)
+
+Quando `Tenant.settings.assistant.aiEnabled` e `ASSISTANT_PROVIDER=gateway`, o runner orquestra **LLM → regras → tools** antes de executar qualquer ação:
+
+```
+Mensagem + sessionState
+    │
+    ├─► planGatewayAssistant (LLM propõe tool calls)
+    ├─► planMockAssistant (motor de regras extrai intenção)
+    └─► refineHybridPlan (allowlist ∩ RBAC)
+            │
+            ├─ gateway válido → mescla args (LLM prevalece; vazios cedem às regras)
+            ├─ gateway vazio + regras ativas → plano de regras
+            └─ ambos vazios → fallback textual
+```
+
+| Campo `source` | Significado |
+|----------------|-------------|
+| `gateway` | LLM propôs tools dentro do allowlist, sem refinamento de regras |
+| `hybrid` | LLM + regras mesclaram args ou alguma tool foi rejeitada |
+| `rules` | LLM não propôs nada válido; motor de regras assumiu |
+| `fallback` | Nenhum plano executável — resposta textual |
+
+**Allowlist:** interseção de tools RBAC do usuário × tools permitidas pelo motor de regras (`collectAllowedToolNames`). Tools rejeitadas aparecem em `rejectedTools`; se todas forem bloqueadas, o usuário recebe mensagem de permissão (`hybridUnauthorizedTools`).
+
+**Fallback em erro:** falha do gateway → log + retorno ao modo regras/mock (`runner.ts`).
+
+| Módulo | Função |
+|--------|--------|
+| `provider/hybrid.ts` | `refineHybridPlan`, `mergeArgsPreferGateway`, `collectAllowedToolNames` |
+| `provider/gateway.ts` | `planGatewayAssistant` |
+| `rules/engine.ts` | `resolveAssistantIntents` + overrides tenant/nicho |
+| `runner.ts` | `resolvePlan` — escolhe mock, regras ou híbrido |
+
+Testes: `tests/unit/assistant-hybrid.test.ts` · integração em `tests/integration/assistant-flow.test.ts`.
+
 ## UX do painel (v3.0.6)
 
 O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automático evita sobrepor a tela de destino após navegação.
