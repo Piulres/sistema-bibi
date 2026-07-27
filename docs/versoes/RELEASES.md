@@ -11,13 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar **em produção**.
+> Pacote **v3.0.21** — Assistente runtime fix + documentos de saída **preparado** (deploy pendente).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.20** — deploy `6a66fe7f` @ `1132880` (`bibi-poc-2026-07-27k`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.20** · sincronizados @ `1132880` |
+| **Release `dev`** | **v3.0.21** · @ `a368cee` + release docs |
+| **Release `main`** | **v3.0.20** · aguardando merge |
 | **Pacote anterior em produção** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +26,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B + PJ agendar) |
+| **Integração** | `dev` | **v3.0.21** (assistente runtime + documentos saída) |
 | **Release** | `main` | **v3.0.20** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.20** · deploy `6a66fe7f` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.21
+
+- **Assistente:** `ruleOverrides` conectados ao runtime do chat; gateway ativo no modo IA sem `ASSISTANT_PROVIDER=gateway` (#343).
+- **Documentos de saída:** melhores práticas clínicas — nomes de arquivo, download/export PDF (#342).
+- **Qualidade:** `assistant-hybrid` · `documentos-saida` · CI #342/#343 verdes · pre-release pendente.
 
 ### Conteúdo do pacote v3.0.20
 

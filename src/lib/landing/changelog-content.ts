@@ -26,10 +26,35 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.20",
+    version: "3.0.21",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Assistente: overrides do tenant passam a valer no chat. Documentos de saída com export PDF aprimorado.",
+    highlights: [
+      {
+        title: "Assistente",
+        items: [
+          "Gatilhos customizados e tools desabilitadas refletem no chat",
+          "Modo IA ativa gateway sem config extra de provider",
+        ],
+      },
+      {
+        title: "Documentos clínicos",
+        items: [
+          "Nomes de arquivo padronizados nos PDFs de saída",
+          "Download/export no atendimento e portal beneficiário",
+        ],
+      },
+    ],
+    testStats: "assistant-hybrid · documentos-saida · CI #342/#343",
+  },
+  {
+    version: "3.0.20",
+    label: "Sistema Bibi - ServiceOS v3.0.20",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Estoque Fase 4, Assistente híbrido, Capacitor iOS/Android e RH agenda consulta no portal PJ.",
     highlights: [
