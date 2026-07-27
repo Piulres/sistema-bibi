@@ -11,14 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.25** — Import CSV PJ + qualidade estoque/CEDIG **pendente deploy produção**.
+> Pacote **v3.0.25** — Import CSV PJ + qualidade estoque/CEDIG **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.24** — deploy `6a677dc5` @ `15275c0` (`v3.0.24 BrandMark gradiente + nav Mais + assistente`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.25** — deploy `6a678e1a` @ `368d83b` (`v3.0.25 import CSV PJ + qualidade estoque/CEDIG`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.25** pendente deploy · `dev` @ `5115e92` |
-| **Pacote anterior em produção** | **3.0.23** — deploy `6a677005` @ `9243c5d` (`bibi-poc-2026-07-27o`) |
+| **Release `main` / `dev`** | **v3.0.25** em produção @ `368d83b` |
+| **Pacote anterior em produção** | **3.0.24** — deploy `6a677dc5` @ `15275c0` (`v3.0.24 BrandMark gradiente + nav Mais + assistente`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
@@ -26,8 +26,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.25** (import CSV PJ + fix E2E estoque + CEDIG) |
-| **Release** | `main` | **v3.0.24** → merge v3.0.25 pendente |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.24** · deploy `6a677dc5` · HTTP 200 · **Stop builds ON** |
+| **Release** | `main` | **v3.0.25** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.25** · deploy `6a678e1a` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.25
@@ -35,7 +35,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Portal PJ:** import CSV colaboradores — `POST/GET /api/pj/beneficiaries/import` + UI `/pj` (#373).
 - **Qualidade:** fix E2E `estoque-fases` (combobox status lote); testes BrandMark multi-tenant.
 - **CEDIG:** STATUS + roteiro homologação Alana 15 min; docs sincronizadas v3.0.24.
-- **Qualidade:** CI #373 · pj-beneficiaries-import · pre-release OK.
+- **Qualidade:** CI #373/#374 · pj-beneficiaries-import · pre-release OK · deploy `6a678e1a`.
+
+### Smoke (27/07/2026) — produção v3.0.25
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.25` · deploy `6a678e1a` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
 
 ### Conteúdo do pacote v3.0.24
 
