@@ -54,6 +54,20 @@ Cliente                          API (serverless)
 
 Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
 
+## Motor de regras (Fase 2 — v3.0.18)
+
+O provider mock deixou de usar `MOCK_INTENTS` diretamente. O match passa por `resolveAssistantIntents(user)`:
+
+| Módulo | Função |
+|--------|--------|
+| `rules/templates.ts` | Converte `MOCK_INTENTS` em regras globais |
+| `rules/niche-overrides.ts` | Vocabulário extra por `NicheId` (VET, LEGAL, …) |
+| `rules/resolve.ts` | Merge global → nicho → tenant |
+| `rules/engine.ts` | Entrada do `mock-match` + stats para o painel |
+| `tenant/settings.ts` | `rulesEnabled` + `ruleOverrides` (parser pronto) |
+
+`rulesEnabled: false` no tenant retorna mensagem `rulesEngineDisabled()` sem executar tools. Overrides por tenant (`ruleOverrides`) são parseados e testados, mas **ainda não** alimentam o `mock-match` em runtime — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) §Fase 3.
+
 ## UX do painel (v3.0.6)
 
 O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automático evita sobrepor a tela de destino após navegação.
@@ -74,8 +88,9 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 
 | Item | Prioridade | Notas |
 |------|------------|-------|
+| **Overrides tenant em runtime** | Alta | Wire `ruleOverrides` no `mock-match` — parser já existe |
+| **Painel CRUD de regras** | Alta | Editar gatilhos em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
-| **Painel de regras** | Alta | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
@@ -86,6 +101,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 ## Testes
 
 - `tests/unit/assistant.test.ts` — multi-turno stateless
+- `tests/unit/assistant-rule-engine.test.ts` — merge global/nicho/tenant + stats
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare

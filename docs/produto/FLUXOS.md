@@ -450,15 +450,33 @@ Serviço: `src/lib/webhook-service.ts`
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita; `requiresLot` no POST |
+| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita; `requiresLot` no POST/PATCH |
 | Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade, saldo e status; se `requiresLot=false`, entrada sem nº/validade usa lote sintético `SEM-LOTE` |
 | Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória — UI com botão Reverter |
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
-| Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
+| Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento (lotes sintéticos **não** geram alerta de validade) |
 
-Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
-Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.  
-`requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).
+Serviço: `src/lib/stock-service.ts` · constantes: `src/lib/stock-constants.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
+Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.
+
+#### Produtos sem lote (`requiresLot=false`) — Fase 3
+
+Use para itens que **não exigem rastreio ANVISA** (ex.: créditos de serviço, insumos genéricos, materiais de obra com unidade `SC`/`M3`).
+
+| Campo / comportamento | Detalhe |
+|-----------------------|---------|
+| Default | `requiresLot: true` — medicamentos e materiais regulados continuam exigindo lote+validade |
+| Lote sintético | `STOCK_NO_LOT_NUMBER` = `SEM-LOTE` — um único lote por produto mantém saldo, FIFO e reversão |
+| Validade sintética | `2099-12-31` — evita alertas `EXPIRING`/`EXPIRED` em `GET /alerts` |
+| Primeira entrada | `POST /lots` com só `productId` + `quantity` (sem `lotNumber`/`expiryDate`) |
+| Saída sem `lotId` | `POST /movements` resolve automaticamente o lote `SEM-LOTE` se já houver saldo |
+| Erro comum | Saída antes da primeira entrada → `"Produto sem lote ainda não possui saldo — registre uma entrada"` |
+
+**UI (`StockView`):** checkbox “Exige lote / validade (ANVISA)” no formulário de produto; badge `sem lote` na listagem; coluna de lotes exibe **SEM LOTE**; campos de nº/validade ficam ocultos na entrada quando o produto não exige lote.
+
+**Invariantes preservados:** compensação em `stock-reverse.ts`, timeline `STOCK_*`, kits por procedimento e alerta de estoque mínimo funcionam igual — só o rastreio de lote/validade é opcional.
+
+**Testes:** `tests/api/stock.test.ts` (entrada/saída/FIFO) · `tests/unit/stock-constants.test.ts` (`isStockSyntheticLot`).
 
 ### 4.9 Auditoria (`AuditoriaView`)
 

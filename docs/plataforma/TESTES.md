@@ -203,6 +203,29 @@ Login com MFA retorna `mfaRequired` + token; rotas autenticadas não revalidam M
 | RECEPCAO | agenda, cadastros… | ✅ cadastros/agenda — ❌ billing (403) |
 | READONLY | dashboard, relatórios | ✅ só módulos da matriz — ❌ billing/cadastros (403) |
 
+### Estoque (v3.0.18 — Fase 3 sem lote)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| `requiresLot=false` entrada/saída/FIFO | `tests/api/stock.test.ts` | Lote sintético `SEM-LOTE`, movimentação sem `lotId` |
+| `requiresLot=true` rejeita entrada incompleta | idem | Lote+validade obrigatórios |
+| Constantes `SEM-LOTE` / `isStockSyntheticLot` | `tests/unit/stock-constants.test.ts` | Alertas de validade ignoram lote sintético |
+| Reversão compensatória | `tests/api/stock.test.ts` | `POST .../movements/[id]/reverse` |
+
+Doc: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.8 · histórico [`versoes/V1_3.md`](../versoes/V1_3.md).
+
+### Assistente — motor de regras (v3.0.18 — Fase 2)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Merge global + vocabulário VET | `tests/unit/assistant-rule-engine.test.ts` | `resolveAssistantRules` / `resolveAssistantIntents` |
+| Override tenant `disabled` / `addTriggers` | idem | Parser + merge (runtime wire = Fase 3) |
+| Stats no painel interno | `tests/api/interno-assistant-settings.test.ts` | `buildRuleEngineStats` via API |
+| Multi-turno serverless | `tests/unit/assistant.test.ts` | `sessionState` HMAC |
+| Fluxo agendamento + confirm | `tests/integration/assistant-flow.test.ts` | JTI one-time |
+
+Doc: [`produto/ASSISTENTE_REGRAS_PLANO.md`](../produto/ASSISTENTE_REGRAS_PLANO.md) · [`produto/ASSISTENTE_SERVERLESS.md`](../produto/ASSISTENTE_SERVERLESS.md).
+
 ### Portais B2B / beneficiário
 
 | Fluxo | Teste |

@@ -11,13 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.18** — Estoque Fase 3 (produtos sem lote) **pendente deploy**.
+> Pacote **v3.0.18** mergeado na **`main`** — **pendente deploy** Netlify.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.18** preparado · produção ainda **v3.0.17** até deploy |
+| **Release `main`** | **v3.0.18** @ `372b5ccd` — Estoque Fase 3 + Assistente regras |
+| **Integração `dev`** | **v3.0.18** (alinhada à `main`) |
 | **Pacote anterior em produção** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,15 +26,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.18** (Estoque Fase 3) |
-| **Release** | `main` | **v3.0.17** (até merge) |
+| **Release** | `main` | **v3.0.18** (Estoque Fase 3 + Assistente regras) |
+| **Integração** | `dev` | **v3.0.18** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.17** · deploy `6a66e5f9` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.18
 
-- **Estoque Fase 3:** `requiresLot=false` — lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade; UI com checkbox e badge SEM LOTE (#319).
-- **Assistente Fase 2:** motor de regras com overrides por nicho/tenant (#321).
+- **Estoque Fase 3:** `requiresLot=false` — lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade; UI com checkbox e badge SEM LOTE (#319). Doc: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.8.
+- **Assistente Fase 2:** motor de regras com merge global/nicho/tenant; stats no painel `/interno/assistente` (#321). Doc: [`produto/ASSISTENTE_REGRAS_PLANO.md`](../produto/ASSISTENTE_REGRAS_PLANO.md).
 - **Qualidade:** `stock` · `assistant-rule-engine` · CI #319/#321/#326 · pre-release OK.
 
 ### Conteúdo do pacote v3.0.17
@@ -56,9 +57,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
 
-### Pendente na integração (`dev`) — Estoque Fase 3
+### Pendente deploy Netlify — v3.0.18
 
-- Produtos `requiresLot=false` com lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade (#319).
+- Merge `dev` → `main` @ `372b5ccd` (27/07/2026). Produção permanece **v3.0.17** até deploy manual humano.
+- Validar pós-deploy: footer `v3.0.18`, estoque `requiresLot`, painel assistente com stats de regras.
 
 ### Conteúdo do pacote v3.0.16
 

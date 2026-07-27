@@ -65,14 +65,74 @@ type TenantSettings = {
   assistant: {
     aiEnabled: boolean;      // add-on IA — default false
     rulesEnabled: boolean;   // motor regras — default true
+    ruleOverrides?: TenantRuleOverride[];  // Fase 2 parse · Fase 3 UI/API
   };
+};
+
+type TenantRuleOverride = {
+  tool: string;
+  addTriggers?: string[];
+  removeTriggers?: string[];
+  disabled?: boolean;
 };
 ```
 
 - **Campo Prisma:** `Tenant.settings` (JSON string)
-- **Lib:** `src/lib/tenant/settings.ts`
+- **Lib:** `src/lib/tenant/settings.ts` · parser de overrides: `src/lib/assistant/rules/tenant-overrides.ts`
 - **Modo efetivo:** `src/lib/assistant/mode.ts` → `resolveAssistantMode(settings)`
 - **API:** `GET/PATCH /api/interno/assistant/settings` (módulo `assistente`, write = ADMIN)
+
+---
+
+## Motor de regras — Fase 2 (v3.0.18)
+
+O catálogo legado `MOCK_INTENTS` virou **templates globais** resolvidos em camadas antes do `mock-match`.
+
+### Fluxo em runtime
+
+```
+POST /api/assistant/chat
+  → runner.ts (rulesEnabled? mode ai?)
+  → planMockAssistant → mock-match.ts
+  → resolveAssistantIntents(user)     // niche do SessionUser
+  → resolveAssistantRules({ niche })
+  → rulesToMockIntents → match de gatilhos + tools
+```
+
+### Merge de camadas (`resolve.ts`)
+
+| Ordem | Fonte | Arquivo | Efeito |
+|-------|-------|---------|--------|
+| 1 | Global | `rules/templates.ts` ← `MOCK_INTENTS` | Base de tools/gatilhos/roles |
+| 2 | Nicho | `rules/niche-overrides.ts` | Acrescenta vocabulário do segmento (ex.: VET: `pet`, `banho`) |
+| 3 | Tenant | `Tenant.settings.assistant.ruleOverrides` | `addTriggers` / `removeTriggers` / `disabled` por tool |
+
+Normalização de gatilhos: lowercase + NFD (acentos removidos) — `"audiência"` e `"audiencia"` colidem.
+
+### O que já funciona vs. Fase 3
+
+| Capacidade | Status v3.0.18 |
+|------------|----------------|
+| Templates globais + merge por nicho | ✅ em todo chat mock |
+| Toggle `rulesEnabled` (desliga motor) | ✅ painel + runner |
+| Estatísticas no painel (`globalRules`, `nicheRules`, `totalTriggers`) | ✅ `GET /api/interno/assistant/settings` |
+| Overrides por tenant em runtime | ⏳ parser + testes; **mock-match ainda não carrega** `ruleOverrides` do tenant |
+| CRUD de regras no painel | ⏳ Fase 3 |
+
+### Painel `/interno/assistente`
+
+`AssistenteConfigView` exibe modo efetivo, toggles `aiEnabled`/`rulesEnabled`, inventário de tools/cenários e card **Motor de regras** com contagem por camada.
+
+### Como validar Fase 2
+
+```bash
+npx vitest run tests/unit/assistant-rule-engine.test.ts
+npx vitest run tests/unit/assistant-routine-matrix.test.ts
+npx vitest run tests/api/interno-assistant-settings.test.ts
+npm run lint
+```
+
+Manual: login ADMIN → `/interno/assistente` → conferir estatísticas; no chat VET, `"quantos pets hoje?"` deve acionar `count_appointments`.
 
 ---
 
@@ -148,8 +208,8 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 |------|--------|--------|
 | **0** | Inventário, matriz testes, `Tenant.settings`, RBAC `assistente`, stub `/interno/assistente` | ✅ Este pacote |
 | **1** | Flag IA persistida + UI toggle (ADMIN) | ✅ Parcial (API + toggle) |
-| **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
-| **3** | Painel CRUD regras + preview + templates por nicho | ⏳ Parcial (preview + toggle regras) |
+| **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ v3.0.18 — merge global/nicho/tenant (tenant em runtime = Fase 3) |
+| **3** | Painel CRUD regras + preview + templates por nicho | ⏳ Parcial (stats + toggle regras; sem CRUD de overrides) |
 | **4** | IA híbrida completa (LLM → regras → tools) | ⏳ |
 | **5** | RBAC write guards generalizados | ⏳ Paralelo |
 
@@ -162,9 +222,15 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | `src/lib/assistant/inventory.ts` | Inventário tools + matriz |
 | `src/lib/assistant/scenarios.ts` | Cenários de rotina |
 | `src/lib/assistant/mode.ts` | Resolução rules vs IA |
+| `src/lib/assistant/rules/engine.ts` | `resolveAssistantIntents` + stats do painel |
+| `src/lib/assistant/rules/resolve.ts` | Merge global → nicho → tenant |
+| `src/lib/assistant/rules/templates.ts` | `MOCK_INTENTS` → regras globais |
+| `src/lib/assistant/rules/niche-overrides.ts` | Vocabulário por segmento |
+| `src/lib/assistant/rules/tenant-overrides.ts` | Parser de `ruleOverrides` |
+| `src/lib/assistant/provider/mock-match.ts` | Match de gatilhos em runtime |
 | `src/lib/tenant/settings.ts` | Settings do realm |
 | `src/app/interno/assistente/page.tsx` | Painel ADMIN |
-| `src/app/api/interno/assistant/settings/route.ts` | API config |
+| `src/app/api/interno/assistant/settings/route.ts` | API config + stats |
 | `docs/produto/ASSISTENTE_SERVERLESS.md` | Arquitetura serverless |
 
 ---
