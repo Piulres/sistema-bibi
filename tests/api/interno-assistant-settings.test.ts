@@ -61,4 +61,52 @@ describe("API — /api/interno/assistant/settings", () => {
     );
     expect(res.status).toBe(422);
   });
+
+  it("ADMIN persiste ruleOverrides e devolve preview efetivo — CRUD Fase 3", async () => {
+    await setSessionForEmail("faturamento@bibi.health");
+
+    const patchRes = await PATCH(
+      jsonRequest("http://localhost/api/interno/assistant/settings", {
+        method: "PATCH",
+        body: {
+          ruleOverrides: [
+            { tool: "count_appointments", addTriggers: ["quantos exames hoje"] },
+            { tool: "list_debtors", disabled: true },
+          ],
+        },
+      }),
+    );
+    expect(patchRes.status).toBe(200);
+    const patched = await patchRes.json();
+    expect(patched.ruleOverrides).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ tool: "count_appointments" }),
+        expect.objectContaining({ tool: "list_debtors", disabled: true }),
+      ]),
+    );
+    expect(patched.rules.tenantOverrides).toBe(2);
+    const countPreview = patched.previewRules.find(
+      (r: { tool: string }) => r.tool === "count_appointments",
+    );
+    expect(countPreview?.triggers.some((t: string) => /quantos exames hoje/i.test(t))).toBe(true);
+    expect(countPreview?.source).toBe("tenant");
+    const debtors = patched.previewRules.find((r: { tool: string }) => r.tool === "list_debtors");
+    expect(debtors?.disabled).toBe(true);
+
+    const getRes = await GET();
+    expect(getRes.status).toBe(200);
+    const body = await getRes.json();
+    expect(body.ruleOverrides).toHaveLength(2);
+
+    const clearRes = await PATCH(
+      jsonRequest("http://localhost/api/interno/assistant/settings", {
+        method: "PATCH",
+        body: { ruleOverrides: [] },
+      }),
+    );
+    expect(clearRes.status).toBe(200);
+    const cleared = await clearRes.json();
+    expect(cleared.ruleOverrides).toEqual([]);
+    expect(cleared.rules.tenantOverrides).toBe(0);
+  });
 });

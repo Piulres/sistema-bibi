@@ -42,3 +42,13 @@ export type RuleEngineStats = {
   totalTriggers: number;
   niche: NicheId;
 };
+
+/** Linha de preview para CRUD de regras (Fase 3). */
+export type RulePreviewRow = {
+  tool: string;
+  triggers: string[];
+  source: "global" | "niche" | "tenant";
+  disabled: boolean;
+  addTriggers: string[];
+  removeTriggers: string[];
+};
