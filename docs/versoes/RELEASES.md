@@ -11,7 +11,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B **pendente deploy**.
+> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar **pendente de deploy**.
 
 | Item | Valor |
 |------|-------|
@@ -25,8 +25,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B) |
-| **Release** | `main` | **v3.0.19** (até merge) |
+| **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B + PJ agendar) |
+| **Release** | `main` | **v3.0.20** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.19** · deploy `6a66f3a7` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
@@ -35,7 +35,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Estoque Fase 4:** reversão idempotente (`reversed`/`isReversal`); FIFO sem lotes vencidos; reforço não reabre QUARENTENA/BLOQUEADO; UI manual só SAIDA/AJUSTE/PERDA (#338).
 - **Assistente Fase 4:** pipeline híbrido LLM → regras → tools com allowlist/fallback (#337).
 - **Mobile Capacitor B:** scaffold iOS/Android + service worker shell (#340).
-- **Qualidade:** `stock` · `assistant-hybrid` · `pwa-mobile-shell` · CI #337/#338/#340 · pre-release OK.
+- **Portal PJ:** RH agenda consulta do colaborador (`pj-appointment-request` · #335).
+- **Qualidade:** `stock` · `assistant-hybrid` · `pwa-mobile-shell` · `pj-appointments` · CI #337/#338/#340/#335 · pre-release OK.
 
 ### Conteúdo do pacote v3.0.19
 
@@ -581,7 +582,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.19` em produção** — Assistente Fase 3 + brand mark |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.20` preparado** — estoque + assistente + Capacitor + PJ agendar (prod ainda v3.0.19) |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

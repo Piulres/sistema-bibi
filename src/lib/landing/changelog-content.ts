@@ -31,7 +31,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Estoque Fase 4 (reversão idempotente + FIFO sem vencidos), Assistente híbrido e scaffold Capacitor iOS/Android.",
+      "Estoque Fase 4, Assistente híbrido, Capacitor iOS/Android e RH agenda consulta no portal PJ.",
     highlights: [
       {
         title: "Estoque clínico",
@@ -48,6 +48,12 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
       {
+        title: "Portal PJ",
+        items: [
+          "RH agenda consulta em nome do colaborador — CONFIRMADO + e-mail",
+        ],
+      },
+      {
         title: "Mobile",
         items: [
           "Capacitor Fase B — scaffold iOS/Android e service worker shell",
@@ -55,7 +61,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #337/#338/#340 · stock · assistant-hybrid · pwa-mobile-shell · docs:verify · pre-release OK",
+      "CI unit+E2E #337/#338/#340/#335 · stock · assistant-hybrid · pj-appointments · pwa-mobile-shell",
   },
   {
     version: "3.0.19",
