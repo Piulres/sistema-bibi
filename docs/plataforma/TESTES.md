@@ -73,6 +73,8 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.11 flush Blob: `tests/unit/sqlite-transaction-flush.test.ts` — suprime flush mid-`$transaction`, settle pós-COMMIT · variante API marcar paga MANUAL em `consultorio-journey.test.ts` · E2E modal em `e2e/jornada-consultorio.spec.ts` · doc [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Flush transacional.
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).

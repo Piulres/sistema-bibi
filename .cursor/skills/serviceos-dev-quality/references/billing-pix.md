@@ -7,6 +7,7 @@
 - Guia TISS: `src/lib/tiss-service.ts` · `GET /api/interno/invoices/[id]/tiss`
 - Jornada faturada (stepper prestador): `src/lib/care-journey.ts` · `invoiceStatus` em `GET /api/prestador/appointments/[id]`
 - Docs: `docs/plataforma/PAYMENTS.md` · fluxo TISS: `docs/produto/FLUXOS.md` §4.1 · stepper PPU: §8.9
+- Modo operação: flush Blob pós-COMMIT em `$transaction` — `src/lib/sqlite-transaction-flush.ts` · `docs/plataforma/OPERACAO_DADOS.md` §Flush transacional
 
 ## Padrão
 

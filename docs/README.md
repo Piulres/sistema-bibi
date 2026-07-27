@@ -4,7 +4,7 @@
 
 > **Produção:** **v3.0.11** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27b` (`6a66b107` @ `546f014`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.11** (`bibi-poc-2026-07-27b` @ `546f014`): hotfix marcar paga (Blob pós-COMMIT) — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — docs v3.0.11: flush transacional Blob (`OPERACAO_DADOS.md`) + persistência marcar paga (`PAYMENTS.md`) — produção @ [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 

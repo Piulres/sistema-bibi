@@ -54,6 +54,14 @@ PixProvider BoletoProvider CardProvider   (interfaces)
 4. Confirmação (interno ou beneficiário) → `Payment.status = CONFIRMED`, `Invoice.status = PAGA`.
 5. Timeline registra `INVOICE_PAID` e, quando aplicável, `CHARGE_SENT`.
 
+### Persistência no modo operação (v3.0.11)
+
+`markInvoicePaid` e `confirmPixPayment` executam `Payment` + `Invoice` + timeline
+dentro de `prisma.$transaction`. No Netlify (modo **operação**), o flush do
+`operation.db` para o Blob ocorre **somente após o COMMIT** — ver
+[`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Flush transacional. Sem isso, **Marcar
+paga** parecia OK na instância quente e revertia após cold start.
+
 ### Endpoints
 
 | Método | Endpoint | Descrição |

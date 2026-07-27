@@ -136,7 +136,7 @@ colunas novas (ex.: ponte v2.6 em `ClinicExamLaunch`) não chegavam ao Blob e
    no Blob. Sem isso, cada cold start re-migrava e o schema antigo voltava.
 
 Escritas de negócio continuam com `flushOperationDatabasePersist()` após mutações
-(`src/lib/db.ts`) — ver §Persistência acima.
+(`src/lib/db.ts`) — ver §Persistência e §Flush transacional abaixo.
 
 ### Sintomas e diagnóstico
 
@@ -151,6 +151,54 @@ Escritas de negócio continuam com `flushOperationDatabasePersist()` após muta�
 - Unitário: `tests/unit/operation-schema-sync.test.ts`
 - Incidente e correção: [`../versoes/V3_0.md`](../versoes/V3_0.md) (§v3.0.2 / §v3.0.3)
 - Timeline CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md)
+
+---
+
+## Flush transacional no Blob (v3.0.11)
+
+No modo **operação** em Lambda, cada write no SQLite dispara
+`flushOperationDatabasePersist()` para gravar `operation.db` no Netlify Blob.
+Antes do v3.0.11, o flush ocorria **no meio** de `prisma.$transaction` (via query
+extension em `src/lib/db.ts`) — o arquivo era copiado para o Blob **antes** do
+COMMIT. Na instância quente a UI mostrava sucesso; após cold start ou outra
+Lambda a fatura voltava a `FECHADA` (ex.: **Marcar paga** no faturamento CEDIG).
+
+### Como funciona
+
+1. **Rastreamento de transação** (`src/lib/sqlite-transaction-flush.ts`):
+   `AsyncLocalStorage` conta a profundidade de `$transaction` (interactive ou batch).
+2. **Writes fora de tx:** `shouldFlushSqliteWriteAfterOperation` → flush imediato
+   (comportamento anterior para creates isolados).
+3. **Writes dentro de tx:** flush **suprimido** até o `finally` do outermost
+   `runWithSqliteTransactionTracking` — ponto seguro após COMMIT ou rollback.
+4. **`markInvoicePaid`** (`src/lib/invoice-service.ts`) usa `$transaction` para
+   `Payment` + `Invoice` + timeline — o padrão vale para qualquer mutação transacional.
+
+```text
+$transaction abre
+  → create/update (flush suprimido)
+  → COMMIT
+  → onSettle → flushOperationDatabasePersist() → Blob atualizado
+```
+
+### Sintomas e diagnóstico
+
+| Sintoma | Causa provável | Ação |
+|---------|----------------|------|
+| Toast "Fatura marcada como paga" mas lista volta a FECHADA após refresh | Blob com snapshot pré-COMMIT | Deploy ≥ v3.0.11 |
+| Só em produção (operação); demo local OK | Demo não persiste no Blob entre Lambdas | Confirmar modo em `/interno/seguranca` |
+| Pagamento MANUAL some após cold start | Mesma race de flush mid-tx | Idem |
+
+### Testes e referências
+
+- Unitário: `tests/unit/sqlite-transaction-flush.test.ts`
+- API: `tests/api/consultorio-journey.test.ts` (variante marcar paga MANUAL + idempotência)
+- E2E: `e2e/jornada-consultorio.spec.ts` — modal Confirmar pagamento
+- Faturamento: [`PAYMENTS.md`](PAYMENTS.md) · incidente: [`../versoes/V3_0.md`](../versoes/V3_0.md) §v3.0.11
+
+**Desenvolvedores:** novas rotas que usam `$transaction` no modo operação não
+precisam chamar flush manual — o wrapper em `withOperationBlobFlush` já trata.
+Não reintroduzir flush na query extension sem passar pelo tracking.
 
 ---
 
@@ -207,6 +255,7 @@ Ver seção Postgres em [`DEPLOY_NETLIFY.md`](DEPLOY_NETLIFY.md).
 
 - Modo ativo: `src/lib/data-store-mode.ts`
 - Persistência SQLite: `src/lib/sqlite-blob-persistence.ts`
+- Flush transacional: `src/lib/sqlite-transaction-flush.ts` · wrapper: `src/lib/db.ts`
 - Schema-sync operação: `src/lib/operation/schema-sync.ts`
 - Bootstrap operação: `prisma/seed-data/operation-bootstrap.ts`
 - UI seletor: `src/components/DataStoreCard.tsx`

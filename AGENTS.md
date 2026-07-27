@@ -69,6 +69,7 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 4. **Pós-`npm test`:** dual-store pode quebrar login → `npm run setup`
 5. **E2E:** pare `npm run dev` antes de `test:e2e` (porta 3100)
 6. **Schema-sync operation.db:** Blob congela schema — ver `docs/plataforma/OPERACAO_DADOS.md` §Schema-sync
+7. **Flush transacional (operação):** writes em `$transaction` só vão ao Blob após COMMIT — ver `OPERACAO_DADOS.md` §Flush transacional (v3.0.11)
 
 ## Índice de documentação
 
