@@ -26,10 +26,44 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.15",
+    version: "3.0.16",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Documentos de saída fechados (seed/OpenAPI/testes), reagendamento no portal do beneficiário e Assistente Fase 0 com chat persistente.",
+    highlights: [
+      {
+        title: "Documentos de saída",
+        items: [
+          "Seed do João com encaminhamento e atestado — painel Documentos já tem guias",
+          "OpenAPI 100% alinhado aos Route Handlers (186/186) na v3.0.14+",
+          "Testes API de encaminhamento, hub e PDF tipográfico",
+        ],
+      },
+      {
+        title: "Beneficiário",
+        items: [
+          "Reagendar consulta sem cancelar e criar de novo",
+          "Fluxo de agenda mais curto na operação diária",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "Fase 0: inventário, RBAC, Tenant.settings e painel interno",
+          "Chat com persistência local e auto-scroll",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #307/#286/#282 · clinical-discharge · assistant · scheduling-reschedule · openapi 186/186 · docs:verify",
+  },
+  {
+    version: "3.0.15",
+    label: "Sistema Bibi - ServiceOS v3.0.15",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Gestão clínica mais rápida para a recepção: indicadores do mês no topo, refresh sem blank e extras clínicos recolhidos.",
     highlights: [
