@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.15",
+    version: "3.0.16",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Beneficiário reagenda consulta sem cancelar+criar; Assistente Fase 0 (RBAC, inventário, painel) e chat com persistência.",
+    highlights: [
+      {
+        title: "Agenda do beneficiário",
+        items: [
+          "Botão Reagendar na Minha agenda — troca horário no mesmo agendamento",
+          "API PATCH action=reschedule com validação de slot e timeline RESCHEDULED",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "Fase 0: inventário de rotinas, módulo RBAC e Tenant.settings",
+          "Painel /interno/assistente + chat com persistência e auto-scroll",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #282/#286/#306 · scheduling-reschedule · assistant-* · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.15",
+    label: "Sistema Bibi - ServiceOS v3.0.15",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Gestão clínica mais rápida para a recepção: indicadores do mês no topo, refresh sem blank e extras clínicos recolhidos.",
     highlights: [
