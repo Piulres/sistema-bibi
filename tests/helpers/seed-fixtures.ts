@@ -20,6 +20,10 @@ export const DEMO_EMAILS = {
   /** CEDIG — gestão clínica */
   cedigAdmin: "operacao@cedig.demo",
   cedigRecepcao: "alana@cedig.demo",
+  /** Equipe auxiliar — gastro/colonoscopia */
+  anestesista: "dr.anestesia@bibi.health",
+  enfermagem: "enf.renata@bibi.health",
+  cedigAnestesista: "dr.anestesia@cedig.demo",
 } as const;
 
 export const DEMO_CPFS = {

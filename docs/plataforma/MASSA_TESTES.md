@@ -126,6 +126,8 @@ Fonte: `src/constants/niches.ts`.
 |---------|-------|
 | Agenda do dia | Consultas João, Maria, Pedro |
 | Atendimento / PPU | Procedure usages com preço cobrado |
+| Equipe no atendimento | Anestesista + técnico enfermagem (Pedro gastro/colonoscopia) |
+| Receita multi-item | PrescriptionDocument — João (3 meds) e Pedro (preparo colonoscopia) |
 | Prontuário | Evolução + receita João |
 | Telemedicina | Maria modality=TELE |
 

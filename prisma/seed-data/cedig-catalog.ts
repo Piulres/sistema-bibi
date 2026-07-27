@@ -11,6 +11,7 @@ import type { CedigPriceTableId } from "../../src/lib/clinic-finance/cedig-prici
 import { bridgeExamLaunchToOperations } from "../../src/lib/clinic-finance/bridge";
 import { civilDateISO, parseAppDateTime, shiftCivilDate } from "../../src/lib/timezone";
 import { serializeTeamRoleRequirements } from "../../src/lib/clinical/team-roles";
+import { seedAppointmentTeamMass } from "./appointment-team-demo";
 
 const DEMO_PASSWORD = hashPassword("bibi123");
 
@@ -693,6 +694,69 @@ async function seedCedigOperationalHistory(
       },
     ],
   });
+
+  await seedCedigAppointmentTeamDemo(prisma, tenantId);
+}
+
+/** Massa demo: equipe + PPU no atendimento de colonoscopia realizado (Ana). */
+async function seedCedigAppointmentTeamDemo(
+  prisma: PrismaClient,
+  tenantId: string,
+): Promise<void> {
+  const anesthetist = await prisma.user.findUnique({
+    where: { email: "dr.anestesia@cedig.demo" },
+  });
+  const nursing = await prisma.user.findUnique({
+    where: { email: "marcia@cedig.demo" },
+  });
+  const alexandre = await prisma.user.findUnique({
+    where: { email: "alexandre.marcal@cedig.demo" },
+  });
+  const ana = await prisma.patient.findUnique({ where: { cpf: "901.333.444-55" } });
+  const anestProc = await prisma.procedure.findUnique({
+    where: { tenantId_code: { tenantId, code: "EQP-ANEST" } },
+  });
+  const enfProc = await prisma.procedure.findUnique({
+    where: { tenantId_code: { tenantId, code: "EQP-ENF-TEC" } },
+  });
+  const coloProc = await prisma.procedure.findUnique({
+    where: { tenantId_code: { tenantId, code: "CEDIG-COLO" } },
+  });
+
+  if (!anesthetist || !nursing || !alexandre || !ana || !anestProc || !enfProc || !coloProc) {
+    return;
+  }
+
+  const appointment = await prisma.appointment.findFirst({
+    where: {
+      tenantId,
+      patientId: ana.id,
+      providerId: alexandre.id,
+      status: "REALIZADO",
+      procedureId: coloProc.id,
+    },
+    orderBy: { scheduledAt: "desc" },
+  });
+  if (!appointment) return;
+
+  const existingTeam = await prisma.appointmentParticipant.count({
+    where: { appointmentId: appointment.id },
+  });
+  if (existingTeam > 0) return;
+
+  await seedAppointmentTeamMass(prisma, {
+    tenantId,
+    appointmentId: appointment.id,
+    patientId: ana.id,
+    patientName: ana.name,
+    providerId: alexandre.id,
+    anesthetistId: anesthetist.id,
+    nursingTechId: nursing.id,
+    procedures: {
+      anestFee: { id: anestProc.id, price: anestProc.basePrice },
+      enfFee: { id: enfProc.id, price: enfProc.basePrice },
+    },
+  });
 }
 
 export type EnsureCedigTenantOptions = {
@@ -740,6 +804,7 @@ export async function ensureCedigTenant(
     if (seedHistory) {
       await seedCedigOperationalHistory(prisma, existing.id);
     }
+    await seedCedigAppointmentTeamDemo(prisma, existing.id);
     return { tenantId: existing.id, created: false, procedures };
   }
 
@@ -775,6 +840,7 @@ export async function ensureCedigTenant(
   if (seedHistory) {
     await seedCedigOperationalHistory(prisma, tenant.id);
   }
+  await seedCedigAppointmentTeamDemo(prisma, tenant.id);
 
   return { tenantId: tenant.id, created: true, procedures };
 }
