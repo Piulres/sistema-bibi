@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import LandingSectionHeader from "@/components/landing/LandingSectionHeader";
 import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
+import { useRovingTablistKeyDown } from "@/components/ui/RovingTablist";
 import {
   ROI_SEGMENT_PRESETS,
   computeRoi,
@@ -70,7 +71,7 @@ export default function LandingRoiCalculator() {
     };
   }, [segment, eligible, utilizationPct, traditionalTicket, unitPrice, platformFee, trackCalculator]);
 
-  function applyPreset(key: RoiSegmentKey) {
+  const applyPreset = useCallback((key: RoiSegmentKey) => {
     const next = ROI_SEGMENT_PRESETS[key];
     setSegment(key);
     setEligible(next.defaultEligible);
@@ -78,7 +79,13 @@ export default function LandingRoiCalculator() {
     setTraditionalTicket(next.traditionalTicket);
     setUnitPrice(next.unitPrice);
     setPlatformFee(next.platformFee);
-  }
+  }, []);
+
+  const { tabProps } = useRovingTablistKeyDown(
+    SEGMENT_KEYS,
+    segment,
+    (id) => applyPreset(id as RoiSegmentKey),
+  );
 
   return (
     <section id="roi" aria-labelledby="roi-heading" className="mx-auto max-w-6xl px-6 py-24">
@@ -94,8 +101,7 @@ export default function LandingRoiCalculator() {
           <button
             key={key}
             type="button"
-            role="tab"
-            aria-selected={segment === key}
+            {...tabProps(key)}
             onClick={() => applyPreset(key)}
             className={`rounded-full px-4 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] ${
               segment === key

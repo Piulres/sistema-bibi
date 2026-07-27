@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import Button from "@/components/ui/Button";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import type { ConfirmTone } from "@/hooks/useConfirm";
 
 type Props = {
@@ -36,30 +37,44 @@ export default function ConfirmDialog({
   const titleId = useId();
   const descId = useId();
   const [phrase, setPhrase] = useState("");
+  const panelRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onCancel]);
+  useFocusTrap({
+    enabled: open,
+    containerRef: panelRef,
+    onEscape: () => {
+      setPhrase("");
+      onCancel();
+    },
+    initialFocusSelector: requiredPhrase
+      ? "input"
+      : 'button[data-confirm-cancel="true"]',
+  });
 
   if (!open) return null;
 
   const phraseOk =
     !requiredPhrase || phrase.trim().toUpperCase() === requiredPhrase.toUpperCase();
 
+  function handleCancel() {
+    setPhrase("");
+    onCancel();
+  }
+
+  function handleConfirm() {
+    setPhrase("");
+    onConfirm();
+  }
+
   return (
     <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
-      <button
-        type="button"
+      <div
         className="absolute inset-0 bg-black/40"
-        aria-label="Fechar diálogo"
-        onClick={onCancel}
+        aria-hidden="true"
+        onClick={handleCancel}
       />
       <div
+        ref={panelRef}
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={titleId}
@@ -80,17 +95,22 @@ export default function ConfirmDialog({
             </span>
             <input
               key={title}
-              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] px-3 py-2 text-sm"
-              defaultValue=""
+              className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]"
+              value={phrase}
               onChange={(e) => setPhrase(e.target.value)}
               autoComplete="off"
-              autoFocus
+              data-autofocus
             />
           </label>
         )}
 
         <div className="mt-5 flex flex-wrap justify-end gap-2">
-          <Button type="button" variant="secondary" autoFocus={!requiredPhrase} onClick={onCancel}>
+          <Button
+            type="button"
+            variant="secondary"
+            data-confirm-cancel="true"
+            onClick={handleCancel}
+          >
             {cancelLabel}
           </Button>
           <Button
@@ -98,7 +118,7 @@ export default function ConfirmDialog({
             variant={confirmVariant[tone]}
             className={tone === "danger" ? "bg-[var(--status-danger-text)] hover:opacity-90" : undefined}
             disabled={!phraseOk}
-            onClick={onConfirm}
+            onClick={handleConfirm}
           >
             {confirmLabel}
           </Button>

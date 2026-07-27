@@ -144,14 +144,20 @@ export default function AgendaView() {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-2">
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filtro da agenda"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => setView(tab.id)}
+              aria-pressed={view === tab.id}
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-medium transition",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2",
                 view === tab.id
                   ? "bg-[var(--portal-accent)] text-white"
                   : "bg-[var(--surface-muted)] text-[var(--text-muted)] hover:bg-[var(--surface-card)]",
@@ -183,7 +189,8 @@ export default function AgendaView() {
                 type="date"
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="ds-touch-select min-w-0 w-full"
+                aria-label="Data da agenda"
+                className="ds-touch-select min-w-0 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
               />
               <Button
                 variant="secondary"

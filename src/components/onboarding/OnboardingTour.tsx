@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import Button from "@/components/ui/Button";
 import { useOnboarding } from "@/components/onboarding/OnboardingProvider";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import type { OnboardingPlacement } from "@/lib/onboarding/types";
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -129,16 +130,22 @@ export default function OnboardingTour() {
     };
   }, [active, updatePosition]);
 
+  useFocusTrap({
+    enabled: Boolean(active && currentStep),
+    containerRef: tooltipRef,
+    onEscape: () => endTour(false),
+    initialFocusSelector: "[data-onboarding-primary], button",
+  });
+
   useEffect(() => {
     if (!active) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") endTour(false);
       if (e.key === "ArrowRight") nextStep();
       if (e.key === "ArrowLeft") prevStep();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [active, endTour, nextStep, prevStep]);
+  }, [active, nextStep, prevStep]);
 
   if (!mounted || !active || !currentStep) return null;
 
@@ -229,7 +236,7 @@ export default function OnboardingTour() {
               </Button>
             ) : null}
           </div>
-          <Button variant="portal" size="sm" onClick={nextStep}>
+          <Button variant="portal" size="sm" data-onboarding-primary onClick={nextStep}>
             {isLast ? "Concluir" : "Próximo"}
           </Button>
         </div>

@@ -153,11 +153,17 @@ export default function LoginForm({
           niche={segmentContext?.niche}
         />
       </Suspense>
-      <main className="flex flex-1 items-center justify-center px-6 py-12">
+      <a href="#login-main" className="ds-skip-link">
+        Ir para o formulário
+      </a>
+      <main
+        id="login-main"
+        className="flex flex-1 items-center justify-center px-6 py-12"
+      >
         <div className="w-full max-w-md">
           <Link
             href="/"
-            className="text-sm text-[var(--text-muted)] transition hover:text-[var(--text-primary)]"
+            className="text-sm text-[var(--text-muted)] transition hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
           >
             ← Voltar
           </Link>

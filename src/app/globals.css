@@ -266,6 +266,26 @@ body {
   outline-offset: 2px;
 }
 
+/*
+ * Focus ring global — cobre links/botões/campos sem classe dedicada.
+ * Componentes com ring próprio (Button, Input) sobrescrevem via outline-none + ring Tailwind.
+ */
+:where(
+  a[href],
+  button,
+  input:not([type="hidden"]),
+  select,
+  textarea,
+  summary,
+  [role="button"],
+  [role="tab"],
+  [role="menuitem"],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: 2px solid var(--ring-focus);
+  outline-offset: 2px;
+}
+
 /* Landing — animação sutil (respeita prefers-reduced-motion) */
 @media (prefers-reduced-motion: no-preference) {
   .landing-fade-in {
