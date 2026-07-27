@@ -175,6 +175,14 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
       group: "Administração",
       priority: "secondary",
     },
+    {
+      href: "/interno/assistente",
+      label: "Assistente",
+      shortLabel: "Assistente",
+      key: "assistente",
+      group: "Administração",
+      priority: "secondary",
+    },
   );
 
   return tabs;

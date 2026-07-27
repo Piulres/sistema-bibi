@@ -26,6 +26,8 @@ model Tenant {
   niche     String   @default("MEDICAL")
   /// JSON — dicionário de termos da UI (ex.: patient → "Pet" no nicho VET)
   labels    String?
+  /// JSON — configurações operacionais do realm (assistente, flags, etc.)
+  settings  String?
   createdAt DateTime @default(now())
 
   users        User[]

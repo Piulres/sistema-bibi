@@ -15,6 +15,7 @@ export const INTERNO_MODULES = [
   "branding",
   "integracoes",
   "seguranca",
+  "assistente",
 ] as const;
 
 export type InternoModule = (typeof INTERNO_MODULES)[number];
