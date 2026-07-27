@@ -26,10 +26,35 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.20",
+    version: "3.0.21",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Documentos de saída com melhores práticas e fix do assistente (ruleOverrides no runtime).",
+    highlights: [
+      {
+        title: "Documentos clínicos",
+        items: [
+          "Guias PDF refinadas — receita, exames, encaminhamento",
+          "Download autenticado com filenames UTF-8",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "ruleOverrides aplicados no runtime do chat",
+          "Gateway no modo IA sem ASSISTANT_PROVIDER explícito",
+        ],
+      },
+    ],
+    testStats: "863 testes Vitest · CI #342/#343",
+  },
+  {
+    version: "3.0.20",
+    label: "Sistema Bibi - ServiceOS v3.0.20",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Estoque Fase 4, Assistente híbrido, Capacitor iOS/Android e RH agenda consulta no portal PJ.",
     highlights: [
