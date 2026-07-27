@@ -6,6 +6,11 @@ import {
   buildClinicalGuideExport,
   type ClinicalGuideExportType,
 } from "@/lib/exports/clinical-guide-service";
+import {
+  recordTimelineEvent,
+  TIMELINE_ACTIONS,
+  TIMELINE_ENTITY_TYPES,
+} from "@/lib/timeline";
 
 const GUIDE_TYPES = new Set([
   "receita",
@@ -14,6 +19,21 @@ const GUIDE_TYPES = new Set([
   "atestado",
   "bundle",
 ]);
+
+function entityForGuideType(type: string): string {
+  switch (type) {
+    case "receita":
+      return TIMELINE_ENTITY_TYPES.PRESCRIPTION_DOCUMENT;
+    case "exame":
+      return TIMELINE_ENTITY_TYPES.EXAM_ORDER;
+    case "encaminhamento":
+      return TIMELINE_ENTITY_TYPES.CLINICAL_REFERRAL;
+    case "atestado":
+      return TIMELINE_ENTITY_TYPES.MEDICAL_RECORD;
+    default:
+      return TIMELINE_ENTITY_TYPES.APPOINTMENT;
+  }
+}
 
 export async function GET(request: Request) {
   try {
@@ -55,7 +75,24 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Documento não encontrado" }, { status: 404 });
     }
 
-    return serveBufferExport("pdf", result.filenameBase, result.buffer);
+    const entityId = id ?? appointmentId ?? patientId ?? "bundle";
+    await recordTimelineEvent({
+      tenantId: user.tenantId,
+      entityType: entityForGuideType(type),
+      entityId,
+      action: TIMELINE_ACTIONS.DOCUMENT_EXPORTED,
+      description: `PDF de guia clínica exportado (${type})`,
+      createdBy: user.id,
+      metadata: {
+        guideType: type,
+        appointmentId: appointmentId ?? null,
+        patientId: patientId ?? null,
+      },
+    });
+
+    return serveBufferExport("pdf", result.filenameBase, result.buffer, {
+      noStore: true,
+    });
   } catch (error) {
     return authErrorResponse(error);
   }

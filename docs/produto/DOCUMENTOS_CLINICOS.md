@@ -13,15 +13,25 @@ imprimir A4 → entregar em mãos **e** disponibilizar no painel do paciente.
 | Receita multi-item | Atendimento → Medicação | Guia tipográfica (+ 2 vias se controle especial) | **Documentos** |
 | Pedido de exames | Atendimento → Exames (avulso ou protocolo) | Guia agregada do atendimento | **Documentos** |
 | Encaminhamento | Atendimento → **Documentos** (templates) | Guia A4 | **Documentos** |
-| Atestado | Atendimento → Prontuário (tipo Atestado) | PDF PEP | **Documentos** + Prontuário |
+| Atestado | Atendimento → Prontuário (tipo Atestado) | Guia tipográfica (mesmo layout) | **Documentos** + Prontuário |
 | Protocolo de exames | Interno → Cadastros + aplicar no atendimento | Via pedido de exames | (status em Exames) |
 
 **Fluxo otimizado no prestador**
 
-1. Emitir receita / exames / encaminhamento durante o atendimento  
-2. Aba **Documentos** → revisar guias → **PDF** individual ou **pacote do atendimento**  
-3. Entregar impresso em mãos  
+1. Emitir receita / exames / encaminhamento / atestado durante o atendimento  
+2. Aba **Documentos** → filtrar por tipo → **Imprimir** ou **PDF** (individual ou pacote)  
+3. Entregar impresso em mãos (bloco de assinatura/carimbo na guia)  
 4. Paciente baixa de novo em `/beneficiario/documentos` se perder o papel  
+
+## Melhores práticas (implementadas)
+
+- Pacote do atendimento inclui receita, exames, encaminhamento **e atestado**
+- Nome de arquivo legível: `receita-joao-pereira-2026-07-27.pdf`
+- Cor tipográfica do tenant + label de nicho na identificação
+- Área de assinatura/carimbo + rodapé sem colidir com o corpo
+- `Cache-Control: no-store` e auditoria `DOCUMENT_EXPORTED` em todo download
+- Cancelar encaminhamento com confirmação; formulário com labels visíveis
+- Botão **Imprimir** ao lado do PDF (fluxo da recepção)
 
 ## Encaminhamento
 
