@@ -147,7 +147,7 @@ export const CRUD_COVERAGE_REGISTRY: CrudCoverageEntry[] = [
   },
   {
     entity: "Visão corporativa",
-    tests: ["tests/api/portal-flows.test.ts"],
+    tests: ["tests/api/portal-flows.test.ts", "tests/api/pj-appointments.test.ts"],
   },
   {
     entity: "Relatório corporativo",

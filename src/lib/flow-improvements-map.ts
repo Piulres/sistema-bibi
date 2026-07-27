@@ -163,8 +163,10 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     flow: "Agendamento",
     title: "Solicitação de consulta pelo RH",
     description: "RH agenda em nome de beneficiários da empresa.",
-    status: "planned",
-    ui: "/pj",
+    status: "implemented",
+    ui: "/pj → Agendar",
+    api: "POST /api/pj/appointments",
+    docRef: "FLUXOS.md §5",
   },
   {
     id: "benef-reschedule",
