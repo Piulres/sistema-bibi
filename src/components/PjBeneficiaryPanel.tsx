@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { PatientExtraFields, emptyPatientExtra } from "@/components/cadastros/CadastroExtraFields";
@@ -39,6 +39,16 @@ const emptyForm = (): FormState => ({
   extra: emptyPatientExtra(),
 });
 
+function formFromEditing(row: PjBeneficiaryRow): FormState {
+  return {
+    name: row.name,
+    cpf: row.cpf.replace(/\D/g, ""),
+    birthDate: "",
+    phone: "",
+    extra: emptyPatientExtra(),
+  };
+}
+
 export function usePjBeneficiaryDetach(onChanged: () => void) {
   const { labels } = useLabels();
   const { run } = useAsyncAction();
@@ -60,39 +70,18 @@ export function usePjBeneficiaryDetach(onChanged: () => void) {
   };
 }
 
-export default function PjBeneficiaryForm({ onChanged, editing, onCancelEdit }: Props) {
+type FormCardProps = {
+  editing: PjBeneficiaryRow | null;
+  initialForm: FormState;
+  onCancel: () => void;
+  onChanged: () => void;
+};
+
+function BeneficiaryFormCard({ editing, initialForm, onCancel, onChanged }: FormCardProps) {
   const { labels } = useLabels();
   const { run, isBusy } = useAsyncAction();
-  const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState<FormState>(emptyForm());
-
+  const [form, setForm] = useState(initialForm);
   const isEditing = Boolean(editing);
-  const visible = creating || isEditing;
-
-  useEffect(() => {
-    if (editing) {
-      setForm({
-        name: editing.name,
-        cpf: editing.cpf.replace(/\D/g, ""),
-        birthDate: "",
-        phone: "",
-        extra: emptyPatientExtra(),
-      });
-      setCreating(false);
-    }
-  }, [editing]);
-
-  function openCreate() {
-    setForm(emptyForm());
-    setCreating(true);
-    onCancelEdit();
-  }
-
-  function cancel() {
-    setCreating(false);
-    setForm(emptyForm());
-    onCancelEdit();
-  }
 
   async function submitForm(e: React.FormEvent) {
     e.preventDefault();
@@ -122,7 +111,7 @@ export default function PjBeneficiaryForm({ onChanged, editing, onCancelEdit }: 
           ),
         successMessage: `${labels.beneficiary} atualizado(a).`,
         onSuccess: () => {
-          cancel();
+          onCancel();
           onChanged();
         },
       });
@@ -144,11 +133,96 @@ export default function PjBeneficiaryForm({ onChanged, editing, onCancelEdit }: 
         ),
       successMessage: `${labels.beneficiary} incluído(a) no plano corporativo.`,
       onSuccess: () => {
-        cancel();
+        onCancel();
         onChanged();
       },
     });
   }
+
+  return (
+    <Card padding="md">
+      <form onSubmit={(e) => void submitForm(e)} className="space-y-4">
+        <p className="text-sm font-medium text-[var(--text-primary)]">
+          {isEditing ? "Editar dados" : `Novo ${labels.beneficiary.toLowerCase()}`}
+        </p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label className="block text-sm sm:col-span-2">
+            <span className="text-[var(--text-secondary)]">Nome</span>
+            <input
+              required
+              className={fieldClass}
+              value={form.name}
+              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+            />
+          </label>
+          <label className="block text-sm">
+            <span className="text-[var(--text-secondary)]">CPF</span>
+            <input
+              required
+              className={fieldClass}
+              value={form.cpf}
+              onChange={(e) => setForm((f) => ({ ...f, cpf: e.target.value }))}
+              disabled={isEditing}
+              readOnly={isEditing}
+            />
+          </label>
+          {!isEditing && (
+            <label className="block text-sm">
+              <span className="text-[var(--text-secondary)]">Data de nascimento</span>
+              <input
+                required
+                type="date"
+                className={fieldClass}
+                value={form.birthDate}
+                onChange={(e) => setForm((f) => ({ ...f, birthDate: e.target.value }))}
+              />
+            </label>
+          )}
+          <label className="block text-sm">
+            <span className="text-[var(--text-secondary)]">Telefone</span>
+            <input
+              className={fieldClass}
+              value={form.phone}
+              onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+            />
+          </label>
+        </div>
+        <PatientExtraFields
+          values={form.extra}
+          onChange={(patch) => setForm((f) => ({ ...f, extra: { ...f.extra, ...patch } }))}
+        />
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" size="sm" disabled={isBusy}>
+            {isEditing ? "Salvar" : "Incluir"}
+          </Button>
+          <Button type="button" size="sm" variant="secondary" onClick={onCancel}>
+            Cancelar
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+export default function PjBeneficiaryForm({ onChanged, editing, onCancelEdit }: Props) {
+  const { labels } = useLabels();
+  const [creating, setCreating] = useState(false);
+
+  const isEditing = Boolean(editing);
+  const visible = creating || isEditing;
+
+  function openCreate() {
+    setCreating(true);
+    onCancelEdit();
+  }
+
+  function cancel() {
+    setCreating(false);
+    onCancelEdit();
+  }
+
+  const formKey = editing ? `edit-${editing.id}` : creating ? "create" : "idle";
+  const initialForm = editing ? formFromEditing(editing) : emptyForm();
 
   return (
     <div className="mb-4 space-y-3">
@@ -164,67 +238,13 @@ export default function PjBeneficiaryForm({ onChanged, editing, onCancelEdit }: 
       )}
 
       {visible && (
-        <Card padding="md">
-          <form onSubmit={(e) => void submitForm(e)} className="space-y-4">
-            <p className="text-sm font-medium text-[var(--text-primary)]">
-              {isEditing ? "Editar dados" : `Novo ${labels.beneficiary.toLowerCase()}`}
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <label className="block text-sm sm:col-span-2">
-                <span className="text-[var(--text-secondary)]">Nome</span>
-                <input
-                  required
-                  className={fieldClass}
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                />
-              </label>
-              <label className="block text-sm">
-                <span className="text-[var(--text-secondary)]">CPF</span>
-                <input
-                  required
-                  className={fieldClass}
-                  value={form.cpf}
-                  onChange={(e) => setForm((f) => ({ ...f, cpf: e.target.value }))}
-                  disabled={isEditing}
-                  readOnly={isEditing}
-                />
-              </label>
-              {!isEditing && (
-                <label className="block text-sm">
-                  <span className="text-[var(--text-secondary)]">Data de nascimento</span>
-                  <input
-                    required
-                    type="date"
-                    className={fieldClass}
-                    value={form.birthDate}
-                    onChange={(e) => setForm((f) => ({ ...f, birthDate: e.target.value }))}
-                  />
-                </label>
-              )}
-              <label className="block text-sm">
-                <span className="text-[var(--text-secondary)]">Telefone</span>
-                <input
-                  className={fieldClass}
-                  value={form.phone}
-                  onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
-                />
-              </label>
-            </div>
-            <PatientExtraFields
-              values={form.extra}
-              onChange={(patch) => setForm((f) => ({ ...f, extra: { ...f.extra, ...patch } }))}
-            />
-            <div className="flex flex-wrap gap-2">
-              <Button type="submit" size="sm" disabled={isBusy}>
-                {isEditing ? "Salvar" : "Incluir"}
-              </Button>
-              <Button type="button" size="sm" variant="secondary" onClick={cancel}>
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        </Card>
+        <BeneficiaryFormCard
+          key={formKey}
+          editing={editing}
+          initialForm={initialForm}
+          onCancel={cancel}
+          onChanged={onChanged}
+        />
       )}
     </div>
   );
