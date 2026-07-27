@@ -14,6 +14,7 @@ import { SEGMENT_LANDING_PAGES } from "@/lib/platform/structure";
 import { getNicheConfig } from "@/lib/niche/defaults";
 import { segmentPillStyle } from "@/lib/theme/segment-colors";
 import { landingCtaClasses } from "@/components/landing/landing-cta";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 
 type Props = {
   context?: LandingNavContext;
@@ -30,31 +31,27 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
     ? pathname.replace("/segmentos/", "")
     : null;
 
+  useFocusTrap({
+    enabled: open,
+    containerRef: panelRef,
+    restoreFocusRef: triggerRef,
+    onEscape: () => setOpen(false),
+    initialFocusSelector: "a, button",
+  });
+
   useEffect(() => {
     if (!open) return;
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
   }, [open]);
 
   const drawer = open ? (
       <>
-        <button
-          type="button"
+        <div
           className="fixed inset-0 z-[60] bg-black/40"
-          aria-label="Fechar menu"
+          aria-hidden="true"
           onClick={() => setOpen(false)}
         />
         <div
@@ -70,7 +67,7 @@ export default function LandingMobileMenu({ context = "home" }: Props) {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+              className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
               aria-label="Fechar"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>

@@ -19,6 +19,41 @@ import {
   formatDateTimeBR,
   zonedDateTimeToUtc,
 } from "@/lib/timezone";
+import { buildTemplateBody } from "@/lib/message";
+import { queueMessage } from "@/lib/message-service";
+
+/** Status em que o beneficiário ainda pode cancelar/reagendar (futuros). */
+const BENEFICIARY_MANAGEABLE_STATUSES = new Set(["AGENDADO", "CONFIRMADO"]);
+
+async function queueAppointmentConfirmationMessage(input: {
+  tenantId: string;
+  patientId: string;
+  scheduledAt: Date;
+  createdBy: string;
+}) {
+  const prisma = await getPrisma();
+  const patient = await prisma.patient.findFirst({
+    where: { id: input.patientId, tenantId: input.tenantId },
+    select: { name: true },
+  });
+  if (!patient) return;
+
+  const { subject, body } = buildTemplateBody({
+    template: "APPOINTMENT_CONFIRMATION",
+    patientName: patient.name,
+    appointmentDateLabel: formatDateTimeBR(input.scheduledAt),
+  });
+
+  await queueMessage({
+    tenantId: input.tenantId,
+    patientId: input.patientId,
+    channel: "EMAIL",
+    template: "APPOINTMENT_CONFIRMATION",
+    subject,
+    body,
+    createdBy: input.createdBy,
+  });
+}
 
 export type AppointmentSlot = {
   start: string;
@@ -209,7 +244,8 @@ export async function bookBeneficiaryAppointment(input: {
     return { error: "Horário não disponível" as const };
   }
 
-  return createAppointment({
+  /** Self-service: confirma automaticamente (sem recepção) e enfileira notificação. */
+  const created = await createAppointment({
     tenantId: input.tenantId,
     patientId: input.patientId,
     petId: input.petId,
@@ -218,9 +254,20 @@ export async function bookBeneficiaryAppointment(input: {
     scheduledAt: input.scheduledAt,
     reason: input.reason,
     modality: input.modality,
-    status: "AGENDADO",
+    status: "CONFIRMADO",
     createdBy: input.createdBy,
   });
+
+  if ("error" in created) return created;
+
+  await queueAppointmentConfirmationMessage({
+    tenantId: input.tenantId,
+    patientId: input.patientId,
+    scheduledAt: input.scheduledAt,
+    createdBy: input.createdBy,
+  });
+
+  return created;
 }
 
 /** Cancela consulta self-service — somente AGENDADO e futura. */
@@ -244,8 +291,8 @@ export async function cancelBeneficiaryAppointment(input: {
     return { error: "Agendamento não encontrado" as const };
   }
 
-  if (appointment.status !== "AGENDADO") {
-    return { error: "Somente consultas agendadas podem ser canceladas" as const };
+  if (!BENEFICIARY_MANAGEABLE_STATUSES.has(appointment.status)) {
+    return { error: "Somente consultas futuras (agendadas ou confirmadas) podem ser canceladas" as const };
   }
 
   if (appointment.scheduledAt.getTime() <= Date.now()) {
@@ -313,8 +360,8 @@ export async function rescheduleBeneficiaryAppointment(input: {
     return { error: "Agendamento não encontrado" as const };
   }
 
-  if (appointment.status !== "AGENDADO") {
-    return { error: "Somente consultas agendadas podem ser reagendadas" as const };
+  if (!BENEFICIARY_MANAGEABLE_STATUSES.has(appointment.status)) {
+    return { error: "Somente consultas futuras (agendadas ou confirmadas) podem ser reagendadas" as const };
   }
 
   if (appointment.scheduledAt.getTime() <= Date.now()) {

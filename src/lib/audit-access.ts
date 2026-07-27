@@ -157,6 +157,20 @@ export function resolveAuditViewerCapabilities(
   };
 }
 
+/**
+ * Detalhe clínico (PEP, medicações, exames, protocolos) no portal interno.
+ * Alinhado ao nível `full` da classe clinical — só ADMIN.
+ * RECEPCAO/FATURAMENTO/READONLY usam agenda/cadastro/faturamento sem corpo clínico.
+ */
+export function canAccessPatientClinicalDetail(
+  internoProfile: string | null | undefined,
+): boolean {
+  return (
+    auditDetailLevelForEntity(resolveAuditProfile(internoProfile), "MedicalRecord") ===
+    "full"
+  );
+}
+
 /** Entity types visíveis (não `hidden`) para o perfil — usado em filtros SQL e UI. */
 export function allowedAuditEntityTypes(profile: InternoProfile): string[] {
   return Object.values(TIMELINE_ENTITY_TYPES).filter(

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Button from "@/components/ui/Button";
+import { useMenuKeyboard } from "@/hooks/useMenuKeyboard";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { downloadExportFile } from "@/lib/ui/download-export";
 
@@ -32,6 +33,15 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
   const [icsBusy, setIcsBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [links, setLinks] = useState<CalendarPayload["links"] | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useMenuKeyboard({
+    open,
+    menuRef,
+    triggerRef,
+    onClose: () => setOpen(false),
+  });
 
   async function ensureLinks() {
     if (links) return links;
@@ -63,6 +73,7 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
     const current = await ensureLinks();
     if (!current) return;
     window.open(pick(current), "_blank", "noopener,noreferrer");
+    setOpen(false);
   }
 
   async function downloadIcs() {
@@ -71,6 +82,7 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
     try {
       const result = await downloadExportFile(icsPath, "evento.ics");
       if (!result.ok) setError(result.error);
+      else setOpen(false);
     } finally {
       setIcsBusy(false);
     }
@@ -79,6 +91,7 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
   return (
     <div className={className ? `relative ${className}` : "relative"}>
       <Button
+        ref={triggerRef}
         type="button"
         variant="secondary"
         size="sm"
@@ -94,20 +107,24 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
       </Button>
       {open ? (
         <div
+          ref={menuRef}
           role="menu"
+          aria-label="Adicionar ao calendário"
           className="absolute right-0 z-20 mt-1 w-56 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] p-1 shadow-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {loading ? (
             <p className="px-3 py-2 text-xs text-[var(--text-muted)]">Carregando…</p>
           ) : error ? (
-            <p className="px-3 py-2 text-xs text-[var(--status-danger-text)]">{error}</p>
+            <p className="px-3 py-2 text-xs text-[var(--status-danger-text)]" role="alert">
+              {error}
+            </p>
           ) : (
             <>
               <button
                 type="button"
                 role="menuitem"
-                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                 onClick={() => void openExternal((l) => l.googleUrl)}
               >
                 Google Agenda
@@ -115,7 +132,7 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
               <button
                 type="button"
                 role="menuitem"
-                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                 onClick={() => void openExternal((l) => l.outlookUrl)}
               >
                 Outlook (pessoal)
@@ -123,7 +140,7 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
               <button
                 type="button"
                 role="menuitem"
-                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                 onClick={() => void openExternal((l) => l.office365Url)}
               >
                 Microsoft 365
@@ -132,7 +149,7 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
                 type="button"
                 role="menuitem"
                 disabled={icsBusy}
-                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] disabled:opacity-50"
+                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] disabled:opacity-50"
                 onClick={() => void downloadIcs()}
               >
                 {icsBusy ? "Baixando…" : "Baixar .ics (Apple e outros)"}

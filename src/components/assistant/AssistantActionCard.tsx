@@ -39,13 +39,16 @@ export default function AssistantActionCard({ actions }: Props) {
                 ))}
               </dl>
               {needsPassword && (
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Senha inicial do usuário"
-                  className="w-full rounded-lg border border-[var(--border-muted)] px-3 py-2 text-xs"
-                />
+                <label className="block text-xs text-[var(--text-secondary)]">
+                  Senha inicial do usuário
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="new-password"
+                    className="mt-1 w-full rounded-lg border border-[var(--border-muted)] px-3 py-2 text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+                  />
+                </label>
               )}
               <div className="flex gap-2">
                 <Button
