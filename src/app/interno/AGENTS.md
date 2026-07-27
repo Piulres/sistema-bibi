@@ -1,6 +1,6 @@
 # Portal interno — contexto para agentes
 
-**Layout:** `layout.tsx` · **Nav:** `InternoNav` (14 abas + gestão clínica MEDICAL/DENTAL)
+**Layout:** `layout.tsx` · **Nav:** `InternoNav` (15 abas + gestão clínica MEDICAL/DENTAL)
 
 ## Padrão de página
 

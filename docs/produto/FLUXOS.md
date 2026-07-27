@@ -286,9 +286,10 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
+| `assistente` | `/interno/assistente` | `AssistenteConfigView` | Inventário de tools, flag IA (`Tenant.settings`), matriz de rotinas (ADMIN) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
+Nav: **15 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.0.1 Dashboard executivo (v3.0.7)
 
@@ -516,6 +517,20 @@ Motor unificado para relatórios e listagens nos portais.
 
 Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
 
+### 4.12 Assistente operacional (`AssistenteConfigView`) — v3.0.16
+
+Painel ADMIN em `/interno/assistente` (módulo `assistente`). O chat nos 4 portais é independente — drawer global via `AssistantProvider`.
+
+| Ação | API / UI | Efeito |
+|------|----------|--------|
+| Ver inventário de tools | `/interno/assistente` | Matriz por portal + cenários de rotina (`inventory.ts`, `scenarios.ts`) |
+| Toggle IA / regras | `GET/PATCH /api/interno/assistant/settings` | Persiste em `Tenant.settings.assistant` — write = ADMIN |
+| Chat nos portais | `POST /api/assistant/chat`, `POST /api/assistant/confirm` | Motor mock ou gateway; confirmação JTI one-time |
+
+**UX do chat (v3.0.16):** histórico em `sessionStorage` por portal (`chat-storage.ts`); auto-scroll ao enviar/receber; indicador de digitação enquanto aguarda resposta.
+
+Docs: [`ASSISTENTE_SERVERLESS.md`](ASSISTENTE_SERVERLESS.md) · [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) · testes: `assistant-*`, `e2e/assistant.spec.ts`.
+
 ---
 
 ## 5. Portal PJ (Empresa)
@@ -571,6 +586,8 @@ flowchart LR
 | Prestadores | `GET /api/beneficiario/providers` | Users PRESTADOR |
 | Slots | `GET /api/beneficiario/slots?providerId&date` | `scheduling-service.ts` (8h–18h, 30 min) |
 | Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
+| Cancelar consulta | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` | `cancelBeneficiaryAppointment()` — somente `AGENDADO`, futuro |
+| Reagendar consulta | `PATCH …/appointments/[id]` `{ action: "reschedule", scheduledAt }` | `rescheduleBeneficiaryAppointment()` — mesmo registro, slot validado, timeline `RESCHEDULED` |
 | PIX | `POST /api/beneficiario/invoices/[id]/pay` | `createInvoicePixCharge()` |
 | Confirmar PIX | `PATCH .../pay` `{ paymentId }` | `confirmInvoicePixPayment()` |
 
@@ -759,6 +776,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
+| assistente | ✓ | ✗ | ✗ | ✗ |
 
 ### Onde é aplicado
 

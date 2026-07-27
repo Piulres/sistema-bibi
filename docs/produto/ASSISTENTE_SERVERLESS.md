@@ -66,6 +66,19 @@ O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automá
 
 Ações `confirm` e `choice` **não** fecham o painel — o usuário confirma ou escolhe in-place. Testes E2E do assistente: `e2e/assistant.spec.ts` (MEDICAL + VET).
 
+## Persistência e feedback (v3.0.16)
+
+O histórico do chat sobrevive a refresh da aba, mas **não** entre sessões do navegador (fecha o browser → limpa).
+
+| Recurso | Implementação | Restrição |
+|---------|---------------|-----------|
+| Histórico + `sessionState` | `sessionStorage` chave `bibi_assistant_chat:{portal}` (`chat-storage.ts`) | Por portal; falha silenciosa se storage cheio |
+| Auto-scroll | `AssistantMessageList` — `scrollIntoView` em cada mensagem/loading | Comportamento `smooth` |
+| Indicador de digitação | `AssistantTypingIndicator` enquanto `loading` | Label por portal via `buildPortalUiCopy` |
+| Limpar conversa | `resetConversation()` → `clearAssistantChat` | Remove storage + estado HMAC do turno |
+
+O `sessionState` HMAC (serverless) e o histórico visual (cliente) são camadas distintas — ambos precisam estar presentes para multi-turno após F5.
+
 ## Analytics
 
 Cada tool executada registra evento na timeline (`entityType: Assistant`, ações `ASSISTANT_TOOL_OK` / `ASSISTANT_TOOL_ERR`). Visível em `/interno/auditoria`.
@@ -74,7 +87,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 
 | Item | Prioridade | Notas |
 |------|------------|-------|
-| **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
+| **Streaming SSE** | Média | Respostas longas do gateway em tempo real (indicador de digitação ✅ desde v3.0.16) |
 | **Painel de regras** | Alta | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
@@ -94,4 +107,5 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 
 - `docs/versoes/V2_3.md` — changelog do pacote
 - `src/lib/assistant/runner.ts` — orquestração
+- `src/lib/assistant/chat-storage.ts` — persistência `sessionStorage` do histórico por portal
 - `docs/plataforma/VARIAVEIS_AMBIENTE.md` — `ASSISTANT_ENABLED`, `ASSISTANT_PROVIDER`

@@ -123,7 +123,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | Não pode cancelar nem reagendar consulta | Ações com regras de antecedência (ex.: até 24 h antes) |
+| Média | Regras de antecedência para cancelar/reagendar | Hoje: somente `AGENDADO` e consulta futura — sem janela mínima (ex.: 24 h) |
 | Alta | PIX em dois passos manuais (gerar + confirmar) | Webhook do gateway ou polling; exibir QR Code |
 | Média | Página única longa (scroll) | Abas: Agenda · Consumo · Faturas · Prontuário |
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
@@ -352,7 +352,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 
 | # | Melhoria | Portal(es) | Impacto | Tier sugerido |
 |---|----------|------------|---------|---------------|
-| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **Cancelar:** ✅ `PATCH …/beneficiario/appointments/[id]` · Reagendar: backlog |
+| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **Cancelar:** ✅ `PATCH …/beneficiario/appointments/[id]` `{ action: "cancel" }` · **Reagendar:** ✅ `{ action: "reschedule", scheduledAt }` — mesmo registro, timeline `RESCHEDULED` (v3.0.16) |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
 | 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 |

@@ -30,6 +30,17 @@ Regra Cursor: `.cursor/rules/tests.mdc` · checklist skill: `references/CHECKLIS
 
 Doc: [`produto/ONBOARDING_TOUR.md`](../produto/ONBOARDING_TOUR.md)
 
+### Pacote v3.0.16 (reagendar + assistente + estoque UI)
+
+| Caso | Arquivo | O que valida |
+|------|---------|--------------|
+| Reagendar beneficiário | `tests/lib/scheduling-reschedule.test.ts` | Mesmo registro, slot livre, timeline `RESCHEDULED`, rejeição de passado |
+| Inventário assistente | `tests/unit/assistant-routine-matrix.test.ts` | Matriz portal × nicho × perfil |
+| Chat storage | `tests/unit/assistant-chat-storage.test.ts` | Persistência `sessionStorage` por portal |
+| Settings do tenant | `tests/unit/tenant-settings.test.ts` · `assistant-mode.test.ts` | `Tenant.settings.assistant` e modo rules/IA |
+| Estoque Fase 2 | `tests/api/stock.test.ts` · `stock-constants.test.ts` | Reversão, status de lote, taxonomia `SERVICO`/`KIT` |
+| Auditoria RBAC fase 2 | `tests/api/audit-rbac-content.test.ts` | Busca sem oráculo; export 360° com perfil |
+
 ---
 
 ## Matriz CRUD (obrigatório)
