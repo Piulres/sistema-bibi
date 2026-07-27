@@ -95,7 +95,7 @@ Após deploy manual (`npx netlify deploy --prod`):
 ## 2. Arquitetura da documentação
 
 ```
-public/openapi.yaml          ← contrato (123 paths, v3.0.8)
+public/openapi.yaml          ← contrato (186 paths, v3.0.17)
 public/swagger-ui/           ← assets gerados (postinstall, gitignored)
 src/app/api/docs/page.tsx    ← URL canônica /api/docs
 src/components/api-docs/     ← cliente Swagger UI (CSP-safe)

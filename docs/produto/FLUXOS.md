@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.17** em produção (jul/2026): RBAC clínico no Cliente 360°, a11y de teclado/foco, confirmação automática no agendamento self-service — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -570,7 +570,7 @@ flowchart LR
 | Overview | `GET /api/beneficiario/overview` | `beneficiary-overview.ts` |
 | Prestadores | `GET /api/beneficiario/providers` | Users PRESTADOR |
 | Slots | `GET /api/beneficiario/slots?providerId&date` | `scheduling-service.ts` (8h–18h, 30 min) |
-| Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
+| Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` → status **`CONFIRMADO`** + e-mail `APPOINTMENT_CONFIRMATION` |
 | PIX | `POST /api/beneficiario/invoices/[id]/pay` | `createInvoicePixCharge()` |
 | Confirmar PIX | `PATCH .../pay` `{ paymentId }` | `confirmInvoicePixPayment()` |
 
@@ -890,8 +890,8 @@ Especificação completa: [`public/openapi.yaml`](../../public/openapi.yaml)
 3. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
 4. **TISS** — XML simplificado com validação estrutural (422 `NO_ITEMS` / `NO_PATIENT_DOCUMENT`); XSD oficial ANS pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
-6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
-7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
+6. **Cliente 360°** — rota `/interno/beneficiarios/[id]` sem módulo RBAC na nav, mas **detalhe clínico** (`GET …/clinical`, PEP no overview/export) só **ADMIN** (`canAccessPatientClinicalDetail` em `audit-access.ts`); RECEPCAO não usa `cadastros` como backdoor — ver §4.9 e §9.
+7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (rodada 3 + correções v3.0.17).
 
 ---
 

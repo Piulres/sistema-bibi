@@ -14,7 +14,7 @@ Complementa (não substitui):
 
 > **Labels:** em UI autenticada o vocabulário vem de `useLabels()` (paciente/cliente/pet/aluno conforme o nicho). Neste documento usamos linguagem de **consultório** (`MEDICAL`) por legibilidade operacional.
 
-**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.8 (§3–§10, §8.5, §8.9) e pacote v3.0.8.
+**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.17 (§3–§10, §8.5, §8.9) e pacote v3.0.17.
 
 ---
 
@@ -80,9 +80,10 @@ Detalhe: [`FLUXOS.md`](FLUXOS.md) §8.5.
 ### Opção C — Beneficiário agenda sozinho
 
 - **Tela:** `/beneficiario/agendar`
-- Escolhe prestador → slots (8h–18h, 30 min) → modalidade → cria `AGENDADO`
-- Também dispara `APPOINTMENT_CREATED`
-- Detalhe: [`FLUXOS.md`](FLUXOS.md) §6
+- Escolhe prestador → slots (8h–18h, 30 min) → modalidade
+- Cria **`CONFIRMADO`** (confirmação automática v3.0.17) e dispara e-mail `APPOINTMENT_CONFIRMATION`
+- Também dispara webhook `APPOINTMENT_CREATED`
+- Detalhe: [`FLUXOS.md`](FLUXOS.md) §6 · §8.9
 
 ### Opção D — Caminho CEDIG / gestão clínica (paralelo, MEDICAL/DENTAL)
 

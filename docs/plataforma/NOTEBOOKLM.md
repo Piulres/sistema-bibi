@@ -1,7 +1,7 @@
-# Sistema Bibi - ServiceOS v3.0.8 — Base de Conhecimento (NotebookLM)
+# Sistema Bibi - ServiceOS v3.0.17 — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
-Última atualização: reflete **ServiceOS v3.0.8** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, logos Blobs),
+Última atualização: reflete **ServiceOS v3.0.17** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, logos Blobs),
 jornada narrativa do consultório, reset operacional CEDIG, drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF,
 **design system semântico**, Tiers 1–4 e fluxos em [`../produto/FLUXOS.md`](../produto/FLUXOS.md).
 
@@ -395,9 +395,9 @@ src/
 - SQLite dual-store (demo + operação em Blobs) — Postgres (Netlify Database) = escala futura
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.8**:
+- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.17**:
   https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
-  Pacote v3.0.8: jornada consultório + reset CEDIG ops. Pacote v3.0.7: drawer mobile direita, dashboard executivo, gestão clínica responsiva, exports canônicos.
+  Pacote v3.0.17: RBAC clínico 360° + a11y + auto-confirm. Pacote v3.0.16: reagendar + assistente + estoque Fase 2.
   Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual; Stop builds ON).
   Se retornar **503 `usage_exceeded`**, é cota Netlify — não é bug de código.
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
@@ -544,4 +544,4 @@ src/
 
 ---
 
-*Fim do documento — Sistema Bibi - ServiceOS v3.0.8 (corpus RAG; base multi-nicho desde v2.0)*
+*Fim do documento — Sistema Bibi - ServiceOS v3.0.17 (corpus RAG; base multi-nicho desde v2.0)*

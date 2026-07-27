@@ -502,6 +502,8 @@ flowchart LR
 - `src/app/interno/beneficiarios/[id]/page.tsx` — página protegida
 - `src/components/PatientOverviewView.tsx` — UI Cliente 360°
 
+**RBAC (v3.0.17):** overview e export LGPD respeitam `audit-access.ts`; detalhe clínico (`GET …/clinical`, corpo de PEP) só **ADMIN** (`canAccessPatientClinicalDetail`). RECEPCAO acessa a página mas não obtém prontuário via API de cadastros.
+
 ### Checklist de homologação (Épico 1)
 
 - [x] Acessar overview a partir de paciente pendente em billing (link Cliente 360°)

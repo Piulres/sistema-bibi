@@ -17,6 +17,7 @@ via API.
 | 3 | 2026-07-26 | `fc9afa7` (v3.0.3) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente, schema-sync Blob) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **3.3 (RBAC clínico)** | **2026-07-27** | `e8acf56` (v3.0.17) | Fase 3: `canAccessPatientClinicalDetail` — detalhe clínico só ADMIN; overview/export sem PEP para RECEPCAO |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -28,6 +29,8 @@ via API.
 > passam a exigir `requireInternoModuleWrite` (bloqueio explícito de READONLY);
 > onboarding com `npm run setup` + gotchas de teste documentados
 > (`docs/plataforma/TESTES.md` §Setup e gotchas).
+
+> **Rodada 3.3 (v3.0.17):** backdoor clínico no Cliente 360° fechado — `GET /api/interno/patients/[id]/clinical` e corpo de PEP no overview/export retornam 403 para RECEPCAO/FATURAMENTO/READONLY; testes `patient-clinical-rbac` · `audit-access`.
 
 **Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](../plataforma/TESTES.md)
 
@@ -328,4 +331,4 @@ curl -s -b /tmp/ck.txt -o /dev/null -w "%{http_code}\n" \
 
 ---
 
-*Documento de auditoria — rodada 3 (2026-07-26). Atualizar após correções ou nova rodada de testes.*
+*Documento de auditoria — rodada 3 (2026-07-26) + RBAC clínico v3.0.17. Atualizar após correções ou nova rodada de testes.*

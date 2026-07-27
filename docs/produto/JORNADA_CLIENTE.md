@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.8** em produção — narrativa operacional do consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacote v3.0.7: drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.17** em produção — narrativa operacional em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); v3.0.17: RBAC clínico no Cliente 360°, a11y de teclado, auto-confirm no self-service; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
 
 ---
 
@@ -263,7 +263,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
 | Alta | ~~RBAC incompleto nas APIs~~ | **Corrigido (v3.0.3+)** — 96/96 rotas internas com `requireInternoModule`; ver `tests/security/rbac-gaps.test.ts` |
-| Alta | Cliente 360° sem RBAC de módulo | Restringir por perfil (ex.: ADMIN/RECEPCAO) |
+| Alta | ~~Cliente 360° sem RBAC de módulo~~ | **Corrigido (v3.0.17)** — detalhe clínico só ADMIN; RECEPCAO sem backdoor via `cadastros` · `patient-clinical-rbac` |
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |
