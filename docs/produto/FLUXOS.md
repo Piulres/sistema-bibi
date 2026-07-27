@@ -232,7 +232,7 @@ Quando `User.mfaEnabled = true`:
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, equipe, receita multi-item, marcar REALIZADO |
 
 ### APIs disparadas
 
@@ -247,6 +247,8 @@ Quando `User.mfaEnabled = true`:
 | Salvar PEP | `POST /api/prestador/records` | `MedicalRecord` + timeline (receita/atestado estruturados — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md)) |
 | Aplicar protocolo de exames | `POST .../patients/[id]/exam-protocols` | N× `ExamOrder` a partir do template |
 | Prescrever (comum / controle especial) | `POST .../medications` | `MedicationPrescription.prescriptionKind` + status ATIVA/SUSPENSA/ENCERRADA |
+| Receita multi-item (documento) | `GET/POST .../prescription-documents` | `PrescriptionDocument` + N itens; espelha em `MedicationPrescription` — v3.0.13 |
+| Equipe do atendimento | `GET/POST/DELETE .../participants` · `GET .../eligible` | `AppointmentParticipant`; taxa PPU opcional (`chargeFee`) — v3.0.13 |
 | Reativar / suspender prescrição | `PATCH /api/prestador/medications/[id]` `{ status }` | Transições ATIVA ↔ SUSPENSA ↔ ENCERRADA |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
@@ -255,9 +257,15 @@ flowchart LR
   A[Agenda do dia] --> B[Atendimento]
   B --> C[Registrar ProcedureUsage]
   B --> D[Salvar PEP]
-  B --> E[Marcar REALIZADO]
-  C --> F[(billed=false)]
+  B --> E[Equipe + taxa PPU]
+  B --> F[Receita multi-item]
+  B --> G[Marcar REALIZADO]
+  C --> H[(billed=false)]
 ```
+
+**Equipe (v3.0.13):** aba **Equipe** em `AtendimentoView` · `AppointmentTeamPanel` · papéis em `team-roles.ts` (rótulos por nicho). Procedimentos podem exigir papéis via `Procedure.requiredTeamRoles` (JSON). Com `chargeFee: true`, gera `ProcedureUsage` com código de taxa do papel.
+
+**Receita multi-item (v3.0.13):** `PrescriptionDocumentForm` na aba clínica · templates de medicamentos comuns (`COMMON_MEDICATIONS`) · detalhes em [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
 (ex.: TechCorp 0,85 → Consulta Clínica R$ 320 → **R$ 272** congelado em `priceCharged`).
@@ -475,13 +483,14 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 
-### 4.11 Exportações tabulares (v3.0.7)
+### 4.11 Exportações tabulares (v3.0.7) — download autenticado (v3.0.13)
 
-Motor unificado para relatórios e listagens nos portais.
+Motor unificado para relatórios e listagens nos portais. Desde v3.0.13, downloads em rotas autenticadas usam **`fetch` + blob** — não `<a download>`.
 
 | Camada | Arquivo | Papel |
 |--------|---------|-------|
-| UI | `ExportButtons.tsx` | Botões por formato; query `?format=` no `baseUrl` |
+| Cliente | `src/lib/ui/download-export.ts` | `downloadExportFile`, `buildExportUrl`, `parseContentDispositionFilename` |
+| UI | `ExportButtons.tsx`, `DownloadLink.tsx` | Botões multi-formato ou download único (TISS, LGPD, ICS, import/export) |
 | Tipos | `src/lib/exports/tabular-types.ts` | `TabularExport` / `TabularColumn` — contrato entre builders e servidor |
 | Formatos | `src/lib/exports/format.ts` | `EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, `REPORT_EXPORT_FORMATS` |
 | Builders | `src/lib/exports/builders.ts` | Monta `TabularExport` por domínio (PJ, auditoria, faturamento, …) |
@@ -501,7 +510,7 @@ Motor unificado para relatórios e listagens nos portais.
 | Prestador — extrato | `GET /api/prestador/extrato/export` | PDF, Excel, CSV, JSON |
 | Beneficiário | `GET /api/beneficiario/export?section=` | por seção |
 
-Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
+Testes: `tests/unit/download-export.test.ts` · `tests/api/exports-matrix.test.ts` · `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
 
 ---
 

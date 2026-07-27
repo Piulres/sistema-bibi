@@ -263,6 +263,12 @@ Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer
 | `GET` | `/api/prestador/patients/{id}/clinical-overview` | prestador | Visão agregada: medicações ativas, exames pendentes, protocolos |
 | `GET` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Perfil clínico estruturado (alergias, condições crônicas) |
 | `PUT` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Atualiza perfil clínico |
+| `GET` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Receitas multi-item (`?appointmentId=` opcional) — v3.0.13 |
+| `POST` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Cria receita com N itens + espelha em `MedicationPrescription` |
+| `GET` | `/api/prestador/appointments/{id}/participants` | prestador | Lista equipe do atendimento — v3.0.13 |
+| `POST` | `/api/prestador/appointments/{id}/participants` | prestador | Adiciona profissional (`userId`, `role`, `chargeFee?`) |
+| `DELETE` | `/api/prestador/appointments/{id}/participants` | prestador | Remove participante (`?participantId=`) |
+| `GET` | `/api/prestador/appointments/{id}/participants/eligible` | prestador | Profissionais elegíveis por papel (`?role=`) |
 
 Variantes **VET** (pet): `/api/prestador/pets/{id}/exam-orders`, `clinical-overview`, `clinical-profile` — mesmo contrato.
 
@@ -289,6 +295,46 @@ Campos obrigatórios: `medication`, `dosage`, `frequency`. Opcionais: `route`, `
 ```
 
 Reativar: `{ "status": "ATIVA" }`. Serviço: `src/lib/medication-service.ts` · `src/lib/exam-protocol-service.ts`.
+
+### Corpo — receita multi-item (v3.0.13)
+
+Endpoint: `POST /api/prestador/patients/{id}/prescription-documents`
+
+```json
+{
+  "appointmentId": "apt_optional",
+  "prescriptionKind": "COMUM",
+  "title": "Receita pós-consulta",
+  "notes": "Tomar após refeições",
+  "items": [
+    {
+      "medication": "Dipirona 500mg",
+      "dosage": "1 comprimido",
+      "frequency": "8/8h",
+      "route": "oral",
+      "durationDays": 5,
+      "quantity": "15 comprimidos"
+    }
+  ]
+}
+```
+
+Obrigatório por item: `medication`, `dosage`, `frequency`. A criação gera `PrescriptionDocument` + uma `MedicationPrescription` por item (compatível com Care Chart). Serviço: `src/lib/prescription-document-service.ts`.
+
+### Corpo — adicionar profissional à equipe (v3.0.13)
+
+Endpoint: `POST /api/prestador/appointments/{id}/participants`
+
+```json
+{
+  "userId": "usr_abc",
+  "role": "ANESTESISTA",
+  "notes": "Sedação consciente",
+  "chargeFee": true
+}
+```
+
+Papéis válidos: `ANESTESISTA`, `TECNICO_ENFERMAGEM`, `ASSISTENTE`, `PARALEGAL`, `OUTRO` (`src/lib/clinical/team-roles.ts`). Com `chargeFee: true`, cria `ProcedureUsage` com código de taxa do papel (`TEAM_ROLE_FEE_PROCEDURE_CODES`) se o agendamento permitir registro de procedimento. Serviço: `src/lib/appointment-team-service.ts`.
 
 ### Corpo — criar pedido de exame avulso
 
@@ -385,9 +431,15 @@ Fluxo de produto: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 · piloto:
 
 ---
 
-## 9. Exportações tabulares (v3.0.7)
+## 9. Exportações tabulares (v3.0.7) — download autenticado (v3.0.13)
 
-Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI monta links via `ExportButtons` (`src/components/ExportButtons.tsx`).
+Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI baixa via **`fetch` + blob** (`src/lib/ui/download-export.ts`), não `<a href download>` — sessão autenticada, erros JSON e `Content-Disposition` UTF-8 são tratados no cliente.
+
+| Componente | Uso |
+|------------|-----|
+| `ExportButtons` | Múltiplos formatos (`baseUrl` + `?format=`) |
+| `DownloadLink` | Download único (TISS XML, LGPD JSON, templates import/export) |
+| `AddToCalendarMenu` | `.ics` via `downloadExportFile` |
 
 ### Formatos suportados
 
@@ -413,7 +465,15 @@ Constantes: `src/lib/exports/format.ts` · servidor: `serveTabularExport()` em `
 | `GET` | `/api/prestador/extrato/export` | prestador | `format` |
 | `GET` | `/api/beneficiario/export` | beneficiário | `section`, `format` |
 
-Resposta: arquivo em anexo (`Content-Disposition: attachment`) ou JSON estruturado.
+Resposta: arquivo em anexo (`Content-Disposition: attachment`; suporte a `filename*=UTF-8''`) ou JSON de erro (`{ error }`).
+
+### Pitfalls (v3.0.13)
+
+| Sintoma | Causa | Correção |
+|---------|-------|----------|
+| Arquivo `.pdf` abre como texto JSON | `<a download>` sem sessão ou erro HTTP não tratado | Usar `ExportButtons` / `DownloadLink` |
+| Nome do arquivo sem acento | Header `filename` sem RFC 5987 | Servidor envia `filename*=UTF-8''`; cliente usa `parseContentDispositionFilename` |
+| Export “vazio” | Blob 0 bytes | `downloadExportFile` retorna erro explícito na UI |
 
 ### Exemplo curl (PJ)
 
@@ -426,7 +486,7 @@ curl -b cookies.txt -o relatorio.pdf \
   "http://localhost:3000/api/pj/reports?format=pdf"
 ```
 
-Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 · testes: `tests/api/exports.test.ts`.
+Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 · testes: `tests/unit/download-export.test.ts` · `tests/api/exports-matrix.test.ts`.
 
 ---
 

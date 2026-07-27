@@ -161,9 +161,17 @@ Conteúdo em `src/lib/landing/changelog-content.ts` — **atualizar sempre ao fe
 
 Instruções completas: [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md).
 
-### Exports tabulares (v3.0.7)
+### Exports tabulares (v3.0.7) — download autenticado (v3.0.13)
 
-Componente UI: `src/components/ExportButtons.tsx` — links `<a download>` com `?format=` na `baseUrl`.
+Rotas autenticadas **não** usam `<a download>` direto — o cookie de sessão e respostas JSON de erro quebravam o fluxo (arquivo `.pdf` com corpo de erro, navegação indesejada).
+
+| Componente | Arquivo | Papel |
+|------------|---------|-------|
+| Motor cliente | `src/lib/ui/download-export.ts` | `fetch` + `blob` + `URL.createObjectURL`; parse de `Content-Disposition` UTF-8 (`filename*=UTF-8''…`) |
+| Botões multi-formato | `ExportButtons.tsx` | `buildExportUrl(baseUrl, query, format)` → `downloadExportFile` |
+| Download único | `DownloadLink.tsx` | TISS XML, LGPD JSON, import/export, `.ics` (`AddToCalendarMenu`) |
+
+**Comportamento:** `credentials: "same-origin"` · erros HTTP/JSON exibidos em `Alert` · filename do header ou fallback (`export.pdf`, `tiss-guia-{id}.xml`).
 
 | Constante | Formatos | Uso típico |
 |-----------|----------|------------|
@@ -176,7 +184,7 @@ Servidor: `src/lib/exports/serve.ts` (`serveTabularExport`, `serveBufferExport`)
 
 **JSON:** payload com `title`, `columns[]`, `rows[]` (interchange). **TXT:** tabela pipe-delimited legível (`buildTxtFromTabular`).
 
-Testes: `tests/api/exports.test.ts` · `tests/unit/export-formats.test.ts` · E2E PJ em `e2e/interno-reports.spec.ts`.
+Testes: `tests/unit/download-export.test.ts` · `tests/api/exports.test.ts` · `tests/api/exports-matrix.test.ts` · `tests/unit/export-formats.test.ts` · E2E PJ em `e2e/interno-reports.spec.ts`.
 
 
 ## Uso em páginas
