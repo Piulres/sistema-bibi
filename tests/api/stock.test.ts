@@ -1,10 +1,17 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { GET as productsGet, POST as productsPost } from "@/app/api/interno/stock/products/route";
+import { PATCH as productPatch } from "@/app/api/interno/stock/products/[id]/route";
 import { POST as lotsPost } from "@/app/api/interno/stock/lots/route";
-import { POST as movementsPost } from "@/app/api/interno/stock/movements/route";
+import { PATCH as lotPatch } from "@/app/api/interno/stock/lots/[id]/route";
+import { GET as movementsGet, POST as movementsPost } from "@/app/api/interno/stock/movements/route";
+import { POST as reverseMovementPost } from "@/app/api/interno/stock/movements/[id]/reverse/route";
 import { GET as alertsGet } from "@/app/api/interno/stock/alerts/route";
-import { POST as kitPost } from "@/app/api/interno/stock/procedure-kits/[procedureId]/route";
+import { GET as kitGet, POST as kitPost } from "@/app/api/interno/stock/procedure-kits/[procedureId]/route";
 import { POST as registerProcedurePost } from "@/app/api/prestador/appointments/[id]/procedures/route";
+import {
+  GET as materialsGet,
+  POST as materialsPost,
+} from "@/app/api/prestador/appointments/[id]/materials/route";
 import { jsonRequest } from "../helpers/request";
 import { getTestPrisma } from "../helpers/db";
 import {
@@ -24,12 +31,56 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-describe("Estoque médico — APIs", () => {
+async function createUniqueAppointment(reason: string) {
+  const prisma = getTestPrisma();
+  const provider = await prisma.user.findUniqueOrThrow({
+    where: { email: "dra.helena@bibi.health" },
+  });
+  const patient = await prisma.patient.findFirst({ where: { cpf: "529.982.247-25" } });
+  expect(patient).toBeTruthy();
+
+  await setSessionForEmail("recepcao@bibi.health");
+  const { POST: createAppointmentPost } = await import("@/app/api/interno/appointments/route");
+
+  // Evita colisão de slot com seed/operacional e entre testes paralelos do arquivo.
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const slot = new Date();
+    const dayOffset = 260 + attempt * 3 + (Date.now() % 17);
+    const minuteSlot = (Date.now() + attempt * 13) % 48;
+    slot.setDate(slot.getDate() + dayOffset);
+    slot.setHours(6 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, attempt % 60, 0);
+
+    const apptRes = await createAppointmentPost(
+      jsonRequest("http://localhost/api/interno/appointments", {
+        method: "POST",
+        body: {
+          patientId: patient!.id,
+          providerId: provider.id,
+          scheduledAt: slot.toISOString(),
+          reason,
+          status: "CONFIRMADO",
+        },
+      }),
+    );
+    if (apptRes.status === 200) {
+      const apptBody = await apptRes.json();
+      return apptBody.appointment.id as string;
+    }
+    const text = await apptRes.text();
+    if (!/conflito|ocupado|indispon/i.test(text) && apptRes.status !== 400) {
+      expect.fail(`Falha ao criar agendamento (${apptRes.status}): ${text}`);
+    }
+  }
+
+  expect.fail("Não foi possível alocar slot único para o teste de estoque");
+}
+
+describe("Estoque clínico — catálogo, lotes, movimentos e alertas", () => {
   afterEach(() => {
     clearSessionMock();
   });
 
-  it("GET /api/interno/stock/products retorna catálogo do seed", async () => {
+  it("GET /api/interno/stock/products retorna catálogo do seed com overview financeiro", async () => {
     await setSessionForEmail("recepcao@bibi.health");
     const res = await productsGet();
     expect(res.status).toBe(200);
@@ -39,7 +90,7 @@ describe("Estoque médico — APIs", () => {
     expect(data.overview.inventoryValue).toBeGreaterThan(0);
   });
 
-  it("POST entrada de lote incrementa saldo", async () => {
+  it("POST entrada de lote incrementa saldo e aparece em movimentos", async () => {
     await setSessionForEmail("recepcao@bibi.health");
     const listRes = await productsGet();
     const listData = await listRes.json();
@@ -49,13 +100,14 @@ describe("Estoque médico — APIs", () => {
     const beforeQty = product.totalStock;
     const expiry = new Date();
     expiry.setFullYear(expiry.getFullYear() + 2);
+    const lotNumber = `GAZE-${Date.now().toString(36).toUpperCase()}`;
 
     const res = await lotsPost(
       jsonRequest("http://localhost/api/interno/stock/lots", {
         method: "POST",
         body: {
           productId: product.id,
-          lotNumber: "TEST-GAZE-001",
+          lotNumber,
           expiryDate: expiry.toISOString(),
           quantity: 10,
           unitCost: 0.3,
@@ -68,9 +120,21 @@ describe("Estoque médico — APIs", () => {
     const afterData = await afterRes.json();
     const updated = afterData.products.find((p: { id: string }) => p.id === product.id);
     expect(updated.totalStock).toBe(beforeQty + 10);
+
+    const movRes = await movementsGet(
+      new Request("http://localhost/api/interno/stock/movements?limit=20"),
+    );
+    expect(movRes.status).toBe(200);
+    const movData = await movRes.json();
+    expect(
+      movData.movements.some(
+        (m: { productSku: string; lotNumber: string | null; type: string }) =>
+          m.productSku === "MAT-GAZE" && m.lotNumber === lotNumber && m.type === "ENTRADA",
+      ),
+    ).toBe(true);
   });
 
-  it("POST movimentação SAIDA respeita saldo disponível", async () => {
+  it("POST movimentação SAIDA respeita saldo disponível e rejeita overdraw", async () => {
     await setSessionForEmail("recepcao@bibi.health");
     const listRes = await productsGet();
     const listData = await listRes.json();
@@ -80,7 +144,12 @@ describe("Estoque médico — APIs", () => {
     const okRes = await movementsPost(
       jsonRequest("http://localhost/api/interno/stock/movements", {
         method: "POST",
-        body: { productId: product.id, type: "SAIDA", quantity: 1, reason: "Teste unitário" },
+        body: {
+          productId: product.id,
+          type: "SAIDA",
+          quantity: 1,
+          reason: "Consumo em sala de procedimento",
+        },
       }),
     );
     expect(okRes.status).toBe(200);
@@ -96,7 +165,7 @@ describe("Estoque médico — APIs", () => {
     expect(failData.error).toMatch(/insuficiente/i);
   });
 
-  it("GET /api/interno/stock/alerts inclui alertas de validade", async () => {
+  it("GET /api/interno/stock/alerts inclui alertas de validade do seed operacional", async () => {
     await setSessionForEmail("recepcao@bibi.health");
     const res = await alertsGet();
     expect(res.status).toBe(200);
@@ -107,19 +176,257 @@ describe("Estoque médico — APIs", () => {
     );
   });
 
+  it("PATCH produto atualiza mínimo e nome sem alterar SKU", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const sku = `MAT-ALG-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: {
+          sku,
+          name: "Algodão hidrófilo 500g",
+          category: "INSUMO",
+          minStock: 5,
+        },
+      }),
+    );
+    expect(createRes.status, await createRes.clone().text()).toBe(200);
+    const created = await createRes.json();
+
+    const patchRes = await productPatch(
+      jsonRequest(`http://localhost/api/interno/stock/products/${created.product.id}`, {
+        method: "PATCH",
+        body: { name: "Algodão hidrófilo 500g — reforço", minStock: 12, active: true },
+      }),
+      { params: Promise.resolve({ id: created.product.id }) },
+    );
+    expect(patchRes.status).toBe(200);
+    const patched = await patchRes.json();
+    expect(patched.product.sku).toBe(sku);
+    expect(patched.product.minStock).toBe(12);
+    expect(patched.product.name).toContain("reforço");
+  });
+
+  it("lote em QUARENTENA não entra no saldo disponível para SAIDA FIFO", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const sku = `MAT-SER-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: { sku, name: "Seringa 5ml descartável", category: "MATERIAL", minStock: 1 },
+      }),
+    );
+    const created = await createRes.json();
+    const productId = created.product.id as string;
+
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    const lotNumber = `L-${Date.now().toString(36).toUpperCase()}`;
+    const lotRes = await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: {
+          productId,
+          lotNumber,
+          quantity: 4,
+          expiryDate: expiry.toISOString(),
+          unitCost: 0.8,
+        },
+      }),
+    );
+    expect(lotRes.status).toBe(200);
+
+    const lot = await prisma.stockLot.findFirstOrThrow({ where: { productId, lotNumber } });
+    const quarantine = await lotPatch(
+      jsonRequest(`http://localhost/api/interno/stock/lots/${lot.id}`, {
+        method: "PATCH",
+        body: { status: "QUARENTENA" },
+      }),
+      { params: Promise.resolve({ id: lot.id }) },
+    );
+    expect(quarantine.status).toBe(200);
+
+    const failRes = await movementsPost(
+      jsonRequest("http://localhost/api/interno/stock/movements", {
+        method: "POST",
+        body: { productId, type: "SAIDA", quantity: 1, reason: "Tentativa com lote em quarentena" },
+      }),
+    );
+    expect(failRes.status).toBe(400);
+    const failData = await failRes.json();
+    expect(failData.error).toMatch(/insuficiente/i);
+  });
+
+  it("reversão de SAIDA devolve saldo; reversão de ENTRADA reduz saldo do lote", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const sku = `MAT-REV-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: { sku, name: "Luva cirúrgica estéril 7.5", category: "MATERIAL", minStock: 2 },
+      }),
+    );
+    const productId = (await createRes.json()).product.id as string;
+
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    const lotNumber = `REV-${Date.now().toString(36).toUpperCase()}`;
+    await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: {
+          productId,
+          lotNumber,
+          quantity: 20,
+          expiryDate: expiry.toISOString(),
+          unitCost: 2.5,
+        },
+      }),
+    );
+
+    const entrada = await prisma.stockMovement.findFirstOrThrow({
+      where: { productId, type: "ENTRADA" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    await movementsPost(
+      jsonRequest("http://localhost/api/interno/stock/movements", {
+        method: "POST",
+        body: { productId, type: "SAIDA", quantity: 3, reason: "Consumo em curativo" },
+      }),
+    );
+    const saida = await prisma.stockMovement.findFirstOrThrow({
+      where: { productId, type: "SAIDA" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const reverseSaida = await reverseMovementPost(
+      jsonRequest(`http://localhost/api/interno/stock/movements/${saida.id}/reverse`, {
+        method: "POST",
+        body: { reason: "Estorno de saída indevida" },
+      }),
+      { params: Promise.resolve({ id: saida.id }) },
+    );
+    expect(reverseSaida.status, await reverseSaida.clone().text()).toBe(200);
+
+    const lotAfterSaidaReverse = await prisma.stockLot.findFirstOrThrow({
+      where: { productId, lotNumber },
+    });
+    expect(lotAfterSaidaReverse.quantity).toBe(20);
+
+    const reverseEntrada = await reverseMovementPost(
+      jsonRequest(`http://localhost/api/interno/stock/movements/${entrada.id}/reverse`, {
+        method: "POST",
+        body: { reason: "Estorno de entrada duplicada" },
+      }),
+      { params: Promise.resolve({ id: entrada.id }) },
+    );
+    expect(reverseEntrada.status, await reverseEntrada.clone().text()).toBe(200);
+
+    const lotAfterEntradaReverse = await prisma.stockLot.findFirstOrThrow({
+      where: { productId, lotNumber },
+    });
+    expect(lotAfterEntradaReverse.quantity).toBe(0);
+  });
+
+  it("reversão de DISPENSACAO restaura saldo do lote consumido no atendimento", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const product = await prisma.medicalProduct.findFirstOrThrow({ where: { sku: "MAT-SORO500" } });
+    const lotBefore = await prisma.stockLot.aggregate({
+      where: { productId: product.id, status: "DISPONIVEL" },
+      _sum: { quantity: true },
+    });
+    const stockBefore = lotBefore._sum.quantity ?? 0;
+
+    const appointmentId = await createUniqueAppointment("Avaliação clínica com soro");
+    await setSessionForEmail("dra.helena@bibi.health");
+    const dispense = await materialsPost(
+      jsonRequest(`http://localhost/api/prestador/appointments/${appointmentId}/materials`, {
+        method: "POST",
+        body: { productId: product.id, quantity: 1 },
+      }),
+      { params: Promise.resolve({ id: appointmentId }) },
+    );
+    expect(dispense.status, await dispense.clone().text()).toBe(200);
+
+    const movement = await prisma.stockMovement.findFirstOrThrow({
+      where: { appointmentId, productId: product.id, type: "DISPENSACAO" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    await setSessionForEmail("recepcao@bibi.health");
+    const reverseRes = await reverseMovementPost(
+      jsonRequest(`http://localhost/api/interno/stock/movements/${movement.id}/reverse`, {
+        method: "POST",
+        body: { reason: "Dispensação lançada no paciente errado" },
+      }),
+      { params: Promise.resolve({ id: movement.id }) },
+    );
+    expect(reverseRes.status, await reverseRes.clone().text()).toBe(200);
+
+    const lotAfter = await prisma.stockLot.aggregate({
+      where: { productId: product.id, status: "DISPONIVEL" },
+      _sum: { quantity: true },
+    });
+    expect(lotAfter._sum.quantity ?? 0).toBe(stockBefore);
+  });
+
+  it("RBAC — FATURAMENTO não acessa estoque", async () => {
+    await setSessionForEmail("financeiro@bibi.health");
+    const res = await productsGet();
+    expect(res.status).toBe(403);
+  });
+
+  it("cadastra produto novo via API com categoria e unidade válidas", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const sku = `MAT-COMP-${Date.now().toString(36).toUpperCase()}`;
+    const res = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: {
+          sku,
+          name: "Compressa estéril 10x10",
+          category: "INSUMO",
+          minStock: 5,
+        },
+      }),
+    );
+    expect(res.status, await res.clone().text()).toBe(200);
+    const data = await res.json();
+    expect(data.product.sku).toBe(sku);
+  });
+
+  it("rejeita categoria inválida no cadastro de produto", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const res = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: {
+          sku: `INV-${Date.now().toString(36).toUpperCase()}`,
+          name: "Item inválido",
+          category: "SERVICO",
+        },
+      }),
+    );
+    expect(res.status).toBe(400);
+    const data = await res.json();
+    expect(data.error).toMatch(/categoria/i);
+  });
+});
+
+describe("Estoque clínico — kits Pay Per Use e dispensação no atendimento", () => {
+  afterEach(() => {
+    clearSessionMock();
+  });
+
   it("kit de procedimento baixa estoque ao registrar Pay Per Use", async () => {
     const prisma = getTestPrisma();
-    const provider = await prisma.user.findUniqueOrThrow({
-      where: { email: "dra.helena@bibi.health" },
-    });
     const procedure = await prisma.procedure.findFirst({ where: { code: "CON-CLM" } });
-    const patient = await prisma.patient.findFirst({ where: { cpf: "529.982.247-25" } });
-    expect(procedure && patient).toBeTruthy();
-
-    const luva = await prisma.medicalProduct.findFirst({
-      where: { sku: "MAT-LUVA-M" },
-    });
-    expect(luva).toBeTruthy();
+    const luva = await prisma.medicalProduct.findFirst({ where: { sku: "MAT-LUVA-M" } });
+    expect(procedure && luva).toBeTruthy();
 
     const lotsBefore = await prisma.stockLot.aggregate({
       where: { productId: luva!.id, status: "DISPONIVEL" },
@@ -127,29 +434,7 @@ describe("Estoque médico — APIs", () => {
     });
     const stockBefore = lotsBefore._sum.quantity ?? 0;
 
-    const slot = new Date();
-    const dayOffset = 200 + (Date.now() % 40);
-    const minuteSlot = Math.floor(Date.now() / 100) % 48;
-    slot.setDate(slot.getDate() + dayOffset);
-    slot.setHours(7 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, 0, 0);
-
-    await setSessionForEmail("recepcao@bibi.health");
-    const { POST: createAppointmentPost } = await import("@/app/api/interno/appointments/route");
-    const apptRes = await createAppointmentPost(
-      jsonRequest("http://localhost/api/interno/appointments", {
-        method: "POST",
-        body: {
-          patientId: patient!.id,
-          providerId: provider.id,
-          scheduledAt: slot.toISOString(),
-          reason: "Teste estoque kit",
-          status: "CONFIRMADO",
-        },
-      }),
-    );
-    expect(apptRes.status, await apptRes.clone().text()).toBe(200);
-    const apptBody = await apptRes.json();
-    const appointmentId = apptBody.appointment.id as string;
+    const appointmentId = await createUniqueAppointment("Consulta clínica com kit de materiais");
 
     await setSessionForEmail("dra.helena@bibi.health");
     const procRes = await registerProcedurePost(
@@ -171,32 +456,7 @@ describe("Estoque médico — APIs", () => {
     expect(stockAfter).toBeLessThan(stockBefore);
   });
 
-  it("RBAC — FATURAMENTO não acessa estoque", async () => {
-    await setSessionForEmail("financeiro@bibi.health");
-    const res = await productsGet();
-    expect(res.status).toBe(403);
-  });
-
-  it("cadastra produto novo via API", async () => {
-    await setSessionForEmail("recepcao@bibi.health");
-    const sku = `TEST-PROD-${Date.now()}`;
-    const res = await productsPost(
-      jsonRequest("http://localhost/api/interno/stock/products", {
-        method: "POST",
-        body: {
-          sku,
-          name: "Produto teste automatizado",
-          category: "INSUMO",
-          minStock: 5,
-        },
-      }),
-    );
-    expect(res.status, await res.clone().text()).toBe(200);
-    const data = await res.json();
-    expect(data.product.sku).toBe(sku);
-  });
-
-  it("vincula item ao kit de procedimento", async () => {
+  it("vincula item ao kit de procedimento e lista via GET", async () => {
     const prisma = getTestPrisma();
     const procedure = await prisma.procedure.findFirst({ where: { code: "CON-PSI" } });
     const product = await prisma.medicalProduct.findFirst({ where: { sku: "MAT-SORO500" } });
@@ -211,5 +471,82 @@ describe("Estoque médico — APIs", () => {
       { params: Promise.resolve({ procedureId: procedure!.id }) },
     );
     expect(res.status).toBe(200);
+
+    const listRes = await kitGet(
+      new Request(`http://localhost/api/interno/stock/procedure-kits/${procedure!.id}`),
+      { params: Promise.resolve({ procedureId: procedure!.id }) },
+    );
+    expect(listRes.status).toBe(200);
+    const listData = await listRes.json();
+    expect(
+      listData.items.some((item: { productSku: string; quantity: number }) =>
+        item.productSku === "MAT-SORO500" && item.quantity === 0.5,
+      ),
+    ).toBe(true);
+  });
+
+  it("dispensação manual no atendimento reduz estoque e aparece no histórico", async () => {
+    const prisma = getTestPrisma();
+    const product = await prisma.medicalProduct.findFirstOrThrow({ where: { sku: "MAT-GAZE" } });
+    const before = await prisma.stockLot.aggregate({
+      where: { productId: product.id, status: "DISPONIVEL" },
+      _sum: { quantity: true },
+    });
+
+    const appointmentId = await createUniqueAppointment("Curativo ambulatorial");
+    await setSessionForEmail("dra.helena@bibi.health");
+
+    const listRes = await materialsGet(
+      new Request(`http://localhost/api/prestador/appointments/${appointmentId}/materials`),
+      { params: Promise.resolve({ id: appointmentId }) },
+    );
+    expect(listRes.status).toBe(200);
+    const listData = await listRes.json();
+    expect(listData.products.some((p: { sku: string }) => p.sku === "MAT-GAZE")).toBe(true);
+
+    const dispense = await materialsPost(
+      jsonRequest(`http://localhost/api/prestador/appointments/${appointmentId}/materials`, {
+        method: "POST",
+        body: { productId: product.id, quantity: 2 },
+      }),
+      { params: Promise.resolve({ id: appointmentId }) },
+    );
+    expect(dispense.status, await dispense.clone().text()).toBe(200);
+
+    const afterList = await materialsGet(
+      new Request(`http://localhost/api/prestador/appointments/${appointmentId}/materials`),
+      { params: Promise.resolve({ id: appointmentId }) },
+    );
+    const afterData = await afterList.json();
+    expect(afterData.dispensations.length).toBeGreaterThan(0);
+
+    const after = await prisma.stockLot.aggregate({
+      where: { productId: product.id, status: "DISPONIVEL" },
+      _sum: { quantity: true },
+    });
+    expect((after._sum.quantity ?? 0)).toBe((before._sum.quantity ?? 0) - 2);
+  });
+
+  it("bloqueia dispensação em agendamento CANCELADO para evitar baixa indevida", async () => {
+    const prisma = getTestPrisma();
+    const product = await prisma.medicalProduct.findFirstOrThrow({ where: { sku: "MAT-AGU25" } });
+    const appointmentId = await createUniqueAppointment("Retorno cancelado pela paciente");
+
+    await prisma.appointment.update({
+      where: { id: appointmentId },
+      data: { status: "CANCELADO" },
+    });
+
+    await setSessionForEmail("dra.helena@bibi.health");
+    const dispense = await materialsPost(
+      jsonRequest(`http://localhost/api/prestador/appointments/${appointmentId}/materials`, {
+        method: "POST",
+        body: { productId: product.id, quantity: 1 },
+      }),
+      { params: Promise.resolve({ id: appointmentId }) },
+    );
+    expect(dispense.status).toBe(409);
+    const body = await dispense.json();
+    expect(body.error).toMatch(/cancelado/i);
   });
 });
