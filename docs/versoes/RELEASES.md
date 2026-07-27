@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.17** — RBAC clínico 360° + a11y + auto-confirm **pendente de deploy**.
+> Pacote **v3.0.17** — RBAC clínico 360° + a11y + auto-confirm **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.17** (preparado) · prod ainda `@ 9e98494` |
+| **Release `main` / `dev`** | **v3.0.17** · sincronizados @ `c3eb563` |
 | **Pacote anterior em produção** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,9 +25,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.17** (RBAC clínico + a11y + auto-confirm) |
+| **Integração** | `dev` | **v3.0.17** + Estoque Fase 3 (#319) pendente de pacote |
 | **Release** | `main` | **v3.0.17** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.16** · deploy `6a66e115` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.17** · deploy `6a66e5f9` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.17
@@ -35,9 +35,24 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Auditoria RBAC fase 3:** detalhe clínico (`/clinical`, PEP no overview/export) só ADMIN; RECEPCAO sem backdoor via `cadastros`.
 - **OpenAPI:** `AuditViewerCapabilities` + contrato de `GET /api/interno/audit`.
 - **A11y:** focus trap, tab order, roving tabindex (#292).
-- **Agenda:** confirmação automática no self-service.
-- **Estoque Fase 3:** produtos `requiresLot=false` com lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade.
-- **Qualidade:** `patient-clinical-rbac` · `a11y-focus` · `stock` · CI #292/#317/#318/#319.
+- **Agenda:** confirmação automática no self-service (`cross-auto-confirm` · #318).
+- **Qualidade:** `patient-clinical-rbac` · `scheduling-auto-confirm` · `a11y-focus` · CI #292/#317/#318 · pre-release OK · deploy `6a66e5f9`.
+
+### Smoke (27/07/2026) — produção v3.0.17
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.17` · deploy `6a66e5f9` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
+| `/interno/cadastros` | 307 (auth) |
+| `/beneficiario` | 307 (auth) |
+| `/instalar` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
+
+### Pendente na integração (`dev`) — Estoque Fase 3
+
+- Produtos `requiresLot=false` com lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade (#319).
 
 ### Conteúdo do pacote v3.0.16
 
@@ -281,6 +296,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.17`** | `c3eb563` | RBAC clínico 360° + a11y + auto-confirm · deploy `6a66e5f9` · #292/#317/#318 |
 | **`v3.0.16`** | `9e98494` | Reagendar + Assistente Fase 0 + estoque UI · deploy `6a66e115` · #282/#286/#306/#308 |
 | **`v3.0.15`** | `4599bff` | Gestão clínica otimizada (KPI strip + soft refresh) · deploy `6a66de5b` · #290/#303 |
 | **`v3.0.14`** | `59700b5` | Auditoria RBAC + estoque + cadastros + documentos · deploy `6a66db43` |
@@ -528,7 +544,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.16` em produção** — reagendar + Assistente Fase 0 |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.17` em produção** — RBAC clínico + a11y + auto-confirm |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
