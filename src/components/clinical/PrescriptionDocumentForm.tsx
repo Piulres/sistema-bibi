@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import SectionHeader from "@/components/ui/SectionHeader";
+import ExportButtons from "@/components/ExportButtons";
 import { COMMON_MEDICATIONS } from "@/lib/clinical/prescription-medications";
 
 const fieldClass =
@@ -293,12 +294,22 @@ export default function PrescriptionDocumentForm({
           <ul className="divide-y divide-[var(--border-default)] rounded-md border border-[var(--border-muted)]">
             {documents.map((doc) => (
               <li key={doc.id} className="p-3">
-                <p className="font-medium">
-                  {doc.title ?? doc.prescriptionKindLabel} · {doc.createdAtLabel}
-                </p>
-                <p className="text-xs text-[var(--text-muted)]">
-                  {doc.providerName} · {doc.itemCount} item(ns)
-                </p>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <p className="font-medium">
+                      {doc.title ?? doc.prescriptionKindLabel} · {doc.createdAtLabel}
+                    </p>
+                    <p className="text-xs text-[var(--text-muted)]">
+                      {doc.providerName} · {doc.itemCount} item(ns)
+                    </p>
+                  </div>
+                  <ExportButtons
+                    baseUrl="/api/prestador/clinical-guides/export"
+                    query={{ type: "receita", id: doc.id, patientId }}
+                    formats={["pdf"]}
+                    size="sm"
+                  />
+                </div>
                 <ul className="mt-2 space-y-1 text-sm text-[var(--text-secondary)]">
                   {doc.items.map((item, i) => (
                     <li key={i}>

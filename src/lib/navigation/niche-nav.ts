@@ -331,6 +331,14 @@ export function buildBeneficiarioNavTabs(labels: NicheLabels, niche?: NicheId): 
       priority: "primary",
     },
     {
+      href: "/beneficiario/documentos",
+      label: "Documentos",
+      shortLabel: "Guias",
+      key: "documentos",
+      group: "Clínico",
+      priority: "primary",
+    },
+    {
       href: "/beneficiario/medicacoes",
       label: "Medicações",
       shortLabel: "Meds",

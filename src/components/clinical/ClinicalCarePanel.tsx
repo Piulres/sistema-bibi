@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
+import ExportButtons from "@/components/ExportButtons";
 import PrescriptionDocumentForm from "@/components/clinical/PrescriptionDocumentForm";
 
 const fieldClass =
@@ -558,13 +559,38 @@ export default function ClinicalCarePanel({
           <input className={fieldClass} placeholder="Nome do exame" value={examForm.examName} onChange={(e) => setExamForm({ ...examForm, examName: e.target.value })} />
           <input className={`sm:col-span-2 ${fieldClass}`} placeholder="Indicação clínica" value={examForm.clinicalIndication} onChange={(e) => setExamForm({ ...examForm, clinicalIndication: e.target.value })} />
         </div>
-        <Button onClick={addExamOrder} disabled={busy}>Solicitar exame</Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button onClick={addExamOrder} disabled={busy}>Solicitar exame</Button>
+          {examOrders.length > 0 && (
+            <ExportButtons
+              baseUrl="/api/prestador/clinical-guides/export"
+              query={{
+                type: "exame",
+                id: appointmentId ?? examOrders[0]?.id,
+                appointmentId,
+                patientId,
+              }}
+              formats={["pdf"]}
+              size="sm"
+            />
+          )}
+        </div>
         <ul className="space-y-3">
           {examOrders.map((e) => (
             <li key={e.id} className="rounded-[var(--radius-button)] border border-[var(--border-default)] p-3">
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                 <p className="min-w-0 font-medium">{e.examName}</p>
-                <StatusBadge value={e.status} label={e.statusLabel} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge value={e.status} label={e.statusLabel} />
+                  {!appointmentId && (
+                    <ExportButtons
+                      baseUrl="/api/prestador/clinical-guides/export"
+                      query={{ type: "exame", id: e.id, patientId }}
+                      formats={["pdf"]}
+                      size="sm"
+                    />
+                  )}
+                </div>
               </div>
               {e.clinicalIndication && <p className="mt-1 text-sm text-[var(--text-muted)]">{e.clinicalIndication}</p>}
               {e.resultSummary && <p className="mt-2 text-sm text-[var(--text-secondary)]">Laudo: {e.resultSummary}</p>}

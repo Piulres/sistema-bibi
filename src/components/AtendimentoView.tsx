@@ -40,6 +40,7 @@ import {
 import TabBar from "@/components/ui/TabBar";
 import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
+import ClinicalDischargePanel from "@/components/clinical/ClinicalDischargePanel";
 import AppointmentTeamPanel from "@/components/clinical/AppointmentTeamPanel";
 import { useDraftUndo } from "@/hooks/useDraftUndo";
 import VoaAssistantPanel from "@/components/voa/VoaAssistantPanel";
@@ -125,6 +126,7 @@ const CARE_TABS = [
   { key: "prontuario", label: "Prontuário", shortLabel: "PEP" },
   { key: "medicacao", label: "Medicação", shortLabel: "Meds" },
   { key: "exames", label: "Exames", shortLabel: "Exames" },
+  { key: "documentos", label: "Documentos", shortLabel: "Guias" },
   { key: "protocolos", label: "Protocolos", shortLabel: "Prot." },
   { key: "perfil", label: "Perfil clínico", shortLabel: "Perfil" },
 ] as const;
@@ -797,6 +799,17 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             ))}
           </ul>
         </Card>
+          )}
+
+          {careTab === "documentos" && (
+            <Card padding="lg">
+              <ClinicalDischargePanel
+                patientId={detail.patient.id}
+                petId={detail.pet?.id}
+                appointmentId={appointmentId}
+                onChanged={() => loadClinical(detail.pet?.id ?? detail.patient.id)}
+              />
+            </Card>
           )}
 
           {["medicacao", "exames", "protocolos", "perfil", "vacinas"].includes(careTab) && (

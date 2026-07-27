@@ -143,6 +143,7 @@ model User {
   providerBlockedTimes          ProviderBlockedTime[]
   appointmentParticipations     AppointmentParticipant[]
   prescriptionDocuments         PrescriptionDocument[] @relation("ProviderPrescriptionDocuments")
+  clinicalReferrals             ClinicalReferral[] @relation("ProviderClinicalReferrals")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -211,6 +212,7 @@ model Patient {
   medicationPrescriptions MedicationPrescription[]
   prescriptionDocuments PrescriptionDocument[]
   examOrders     ExamOrder[]
+  clinicalReferrals ClinicalReferral[]
   protocolEnrollments PatientProtocolEnrollment[]
   invoices       Invoice[]
   subscriptions  Subscription[]
@@ -248,6 +250,7 @@ model Pet {
   medicationPrescriptions MedicationPrescription[]
   prescriptionDocuments PrescriptionDocument[]
   examOrders     ExamOrder[]
+  clinicalReferrals ClinicalReferral[]
   vaccineRecords PetVaccineRecord[]
 
   @@index([tenantId, patientId])
@@ -578,6 +581,7 @@ model Appointment {
   externalCalendarEvents AppointmentExternalEvent[]
   participants       AppointmentParticipant[]
   prescriptionDocuments PrescriptionDocument[]
+  clinicalReferrals ClinicalReferral[]
 }
 
 /// Profissional auxiliar vinculado a um atendimento (anestesista, técnico de enfermagem, etc.).
@@ -733,6 +737,37 @@ model PrescriptionDocumentItem {
   document   PrescriptionDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId, sortOrder])
+}
+
+/// Encaminhamento clínico (documento de saída do atendimento).
+/// referralKind: ESPECIALIDADE | RETORNO | SERVICO
+/// urgency: ROTINA | BREVE | URGENTE
+/// status: ATIVO | CANCELADO
+model ClinicalReferral {
+  id                String   @id @default(cuid())
+  referralKind      String   @default("ESPECIALIDADE")
+  specialty         String
+  urgency           String   @default("ROTINA")
+  clinicalReason    String
+  historySummary    String?
+  requestedActions  String?
+  status            String   @default("ATIVO")
+  createdAt         DateTime @default(now())
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
+
+  providerId String
+  provider   User   @relation("ProviderClinicalReferrals", fields: [providerId], references: [id])
+
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+
+  @@index([patientId, status])
+  @@index([appointmentId])
 }
 
 /// Pedido de exame (workflow clínico).

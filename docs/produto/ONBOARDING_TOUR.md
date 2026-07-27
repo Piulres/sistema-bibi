@@ -48,7 +48,7 @@ Nav condensado lista todos os módulos via `buildInternoNavTabs()` — labels po
 | Escopo | Micro-tour |
 |--------|------------|
 | `dashboard` | Próximo atendimento, fila |
-| `atendimento` | PEP (`atendimento-pep`), Medicação, Exames, Protocolos; atestado CFM e receita estruturada — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
+| `atendimento` | PEP (`atendimento-pep`), Medicação, Exames, Documentos (guias), Protocolos; atestado/receita/encaminhamento — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
 | `campo` | Diário de obra (CONSTRUCTION) |
 
 ### Beneficiário
