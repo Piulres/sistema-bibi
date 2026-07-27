@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils/cn";
 import {
   brandMarkFromBranding,
   brandMarkFontSizePx,
-  brandMarkMeshBackground,
+  brandMarkMeshStyle,
+  brandMarkThemeMeshStyle,
   BRAND_MARK_SIZE_PX,
   resolveBrandMarkLayout,
   type BrandMarkInput,
@@ -68,18 +69,10 @@ export default function BrandMark({
   const layout = resolveBrandMarkLayout(resolvedInput, 100);
   const markLabel = layout.initial;
   const label = title ?? resolvedInput.displayName;
-  const fontSizePx = brandMarkFontSizePx(BRAND_MARK_SIZE_PX[size], markLabel);
+  const boxPx = BRAND_MARK_SIZE_PX[size];
+  const fontSizePx = brandMarkFontSizePx(boxPx, markLabel);
 
-  const backgroundStyle = useThemeColors
-    ? {
-        background: [
-          "radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--brand-accent) 35%, transparent), transparent)",
-          "radial-gradient(ellipse 60% 40% at 100% 0%, color-mix(in srgb, var(--brand-primary) 25%, transparent), transparent)",
-          "radial-gradient(ellipse 50% 30% at 0% 100%, color-mix(in srgb, var(--brand-accent) 15%, transparent), transparent)",
-          "linear-gradient(to bottom right, var(--brand-hero-from), var(--brand-hero-to))",
-        ].join(", "),
-      }
-    : { background: brandMarkMeshBackground(layout) };
+  const meshStyle = useThemeColors ? brandMarkThemeMeshStyle() : brandMarkMeshStyle(layout);
 
   const showLogo = Boolean(resolvedInput.logoUrl);
 
@@ -90,7 +83,14 @@ export default function BrandMark({
         SIZE_CLASS[size],
         className,
       )}
-      style={backgroundStyle}
+      style={{
+        width: boxPx,
+        height: boxPx,
+        minWidth: boxPx,
+        minHeight: boxPx,
+        backgroundColor: meshStyle.backgroundColor,
+        backgroundImage: meshStyle.backgroundImage,
+      }}
       title={label}
       aria-hidden={!title}
       role={title ? "img" : undefined}

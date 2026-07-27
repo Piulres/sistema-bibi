@@ -42,9 +42,44 @@ export function brandMarkText(input: Pick<BrandMarkInput, "displayName" | "markT
 export function brandMarkFontSizePx(containerSize: number, text: string): number {
   const len = [...text].length;
   if (len <= 1) return Math.round(containerSize * 0.42);
-  if (len <= 3) return Math.round(containerSize * 0.28);
-  if (len <= 5) return Math.round(containerSize * 0.22);
-  return Math.round(containerSize * 0.18);
+  if (len <= 3) return Math.max(Math.round(containerSize * 0.3), 10);
+  if (len <= 5) return Math.max(Math.round(containerSize * 0.24), 11);
+  return Math.max(Math.round(containerSize * 0.18), 10);
+}
+
+export type BrandMarkMeshStyle = {
+  backgroundColor: string;
+  backgroundImage: string;
+};
+
+/** Camadas do mesh — backgroundColor + backgroundImage evitam círculo “invisível” no header claro. */
+export function brandMarkMeshStyle(layout: BrandMarkLayout): BrandMarkMeshStyle {
+  const accentGlow = `${layout.accentColor}59`;
+  const primaryGlow = `${layout.primaryColor}40`;
+  return {
+    backgroundColor: layout.backgroundFrom,
+    backgroundImage: [
+      `radial-gradient(ellipse 80% 50% at 50% -20%, ${accentGlow}, transparent)`,
+      `radial-gradient(ellipse 60% 40% at 100% 0%, ${primaryGlow}, transparent)`,
+      `radial-gradient(ellipse 50% 30% at 0% 100%, ${accentGlow}26, transparent)`,
+      `linear-gradient(to bottom right, ${layout.backgroundFrom}, ${layout.backgroundTo})`,
+    ].join(", "),
+  };
+}
+
+const THEME_MESH_LAYERS = [
+  "radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--brand-accent) 35%, transparent), transparent)",
+  "radial-gradient(ellipse 60% 40% at 100% 0%, color-mix(in srgb, var(--brand-primary) 25%, transparent), transparent)",
+  "radial-gradient(ellipse 50% 30% at 0% 100%, color-mix(in srgb, var(--brand-accent) 15%, transparent), transparent)",
+  "linear-gradient(to bottom right, var(--brand-hero-from), var(--brand-hero-to))",
+] as const;
+
+/** Mesh via CSS vars do TenantTheme — mesmo caminho dos portais internos. */
+export function brandMarkThemeMeshStyle(): BrandMarkMeshStyle {
+  return {
+    backgroundColor: "var(--brand-hero-from)",
+    backgroundImage: THEME_MESH_LAYERS.join(", "),
+  };
 }
 
 /** Adapta tokens de branding para a marca. */
@@ -95,16 +130,9 @@ function escapeXml(value: string): string {
     .replaceAll("'", "&apos;");
 }
 
-/** CSS mesh hero equivalente — usado na UI React. */
+/** CSS mesh hero equivalente — string única para OgBrandMark e testes legados. */
 export function brandMarkMeshBackground(layout: BrandMarkLayout): string {
-  const accentGlow = `${layout.accentColor}59`;
-  const primaryGlow = `${layout.primaryColor}40`;
-  return [
-    `radial-gradient(ellipse 80% 50% at 50% -20%, ${accentGlow}, transparent)`,
-    `radial-gradient(ellipse 60% 40% at 100% 0%, ${primaryGlow}, transparent)`,
-    `radial-gradient(ellipse 50% 30% at 0% 100%, ${accentGlow}26, transparent)`,
-    `linear-gradient(to bottom right, ${layout.backgroundFrom}, ${layout.backgroundTo})`,
-  ].join(", ");
+  return brandMarkMeshStyle(layout).backgroundImage;
 }
 
 /** SVG estático da marca — usado em API, e-mails e geração de PNG. */
