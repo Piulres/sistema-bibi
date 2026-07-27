@@ -133,7 +133,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.12 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — ver produção em `RELEASES.md` |
 | [`versoes/V3_0.md`](versoes/V3_0.md) | Changelog v3.0 — PWA / app shell mobile |
 | [`versoes/V2_6.md`](versoes/V2_6.md) | Changelog v2.6 — CEDIG pontes PPU + export |
 | [`versoes/V2_5.md`](versoes/V2_5.md) | Changelog v2.5 — login tenant/portal |

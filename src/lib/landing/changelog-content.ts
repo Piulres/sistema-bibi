@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.21",
+    version: "3.0.22",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "RBAC Fase 5: mutações do portal interno exigem write-guard; READONLY só leitura.",
+    highlights: [
+      {
+        title: "Segurança / RBAC",
+        items: [
+          "POST/PATCH/PUT/DELETE em /api/interno com requireInternoModuleWrite",
+          "Inventário mutável e testes READONLY (rbac-gaps, write-guards)",
+        ],
+      },
+    ],
+    testStats:
+      "CI #354 · rbac-gaps · interno-write-guards · pre-release OK",
+  },
+  {
+    version: "3.0.21",
+    label: "Sistema Bibi - ServiceOS v3.0.21",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Documentos de saída com melhores práticas e fix do assistente (ruleOverrides no runtime).",
     highlights: [
@@ -49,7 +68,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #342/#343 · documentos-saida · clinical-discharge · pre-release OK · prod 6a6708db",
+      "CI unit+E2E #342/#343 · documentos-saida · clinical-discharge · pre-release OK · prod 6a670ad1",
   },
   {
     version: "3.0.20",
