@@ -35,7 +35,7 @@ Senha: **`bibi123`**
 
 ## Cliente piloto
 
-- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`) · labels **Exame** · produção **v3.0.24** (modo operação)
+- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`) · labels **Exame** · produção **v3.0.25** (modo operação)
 - [Playbook de ações CEDIG](../../clientes/cedig/OPERACAO.md)
 
 ## Código

@@ -10,7 +10,7 @@ Status geral: [`STATUS.md`](STATUS.md) · rotina: [`OPERACAO.md`](OPERACAO.md).
 
 ## Pré-condições
 
-Produção atual: **v3.0.24** @ https://sistema-bibi.netlify.app · tenant `cedig` · modo **operação**.
+Produção atual: **v3.0.25** @ https://sistema-bibi.netlify.app · tenant `cedig` · modo **operação**.
 
 ```bash
 npm run db:bootstrap:demo

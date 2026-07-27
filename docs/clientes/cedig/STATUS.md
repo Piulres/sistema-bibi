@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-27 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.24** · produção `6a677dc5` |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.25** · produção `6a678e1a` |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` (v3.0.7) |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.24** · BrandMark gradiente + nav Mais + assistente |
+| Pacote em produção | ✅ | **v3.0.25** · import CSV PJ + qualidade estoque/CEDIG |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 
@@ -92,6 +92,7 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
+| 2026-07-27 | Pacote **v3.0.25** em produção: import CSV PJ + qualidade estoque/CEDIG · deploy `6a678e1a` | ✅ |
 | 2026-07-27 | Pacote **v3.0.24** em produção: BrandMark Energia Brasileira circular, nav Mais portaled, assistente humanizado · deploy `6a677dc5` | ✅ |
 | 2026-07-27 | UX `/interno/gestao`: KPI strip + refresh soft + extras recolhidos + `/kpis` sob demanda | ✅ |
 | 2026-07-26 | Pacote **v3.0.8** em `main`: jornada narrativa do consultório (`JORNADA_CONSULTORIO.md`) + playbook reset CEDIG documentado | ✅ |

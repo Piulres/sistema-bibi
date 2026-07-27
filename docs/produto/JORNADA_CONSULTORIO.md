@@ -14,7 +14,7 @@ Complementa (não substitui):
 
 > **Labels:** em UI autenticada o vocabulário vem de `useLabels()` (paciente/cliente/pet/aluno conforme o nicho). Neste documento usamos linguagem de **consultório** (`MEDICAL`) por legibilidade operacional.
 
-**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` e produção **v3.0.24** ([`RELEASES.md`](../versoes/RELEASES.md)).
+**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` e produção **v3.0.25** ([`RELEASES.md`](../versoes/RELEASES.md)).
 
 ---
 

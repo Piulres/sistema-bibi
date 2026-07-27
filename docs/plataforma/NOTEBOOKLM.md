@@ -1,7 +1,7 @@
-# Sistema Bibi - ServiceOS v3.0.24 — Base de Conhecimento (NotebookLM)
+# Sistema Bibi - ServiceOS v3.0.25 — Base de Conhecimento (NotebookLM)
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
-Última atualização: reflete **ServiceOS v3.0.24** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, BrandMark gradiente, logos Blobs),
+Última atualização: reflete **ServiceOS v3.0.25** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, BrandMark gradiente, logos Blobs),
 jornada narrativa do consultório, nav Mais portaled, assistente humanizado, CRUD/import CSV PJ, drawer mobile, exports canônicos CSV/JSON/TXT/PDF,
 **design system semântico**, Tiers 1–4 e fluxos em [`../produto/FLUXOS.md`](../produto/FLUXOS.md).
 
@@ -395,9 +395,9 @@ src/
 - SQLite dual-store (demo + operação em Blobs) — Postgres (Netlify Database) = escala futura
 - Prisma fixado na v6 (v7 quebra schema atual)
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
-- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.24**:
+- Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.25**:
   https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
-  Pacote v3.0.24: BrandMark Energia Brasileira, nav Mais, assistente. v3.0.23: PJ CRUD. v3.0.8: jornada consultório + reset CEDIG.
+  Pacote v3.0.25: import CSV PJ. v3.0.24: BrandMark Energia Brasileira, nav Mais, assistente. v3.0.23: PJ CRUD. v3.0.8: jornada consultório + reset CEDIG.
   Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual; Stop builds ON).
   Se retornar **503 `usage_exceeded`**, é cota Netlify — não é bug de código.
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
@@ -544,4 +544,4 @@ src/
 
 ---
 
-*Fim do documento — Sistema Bibi - ServiceOS v3.0.24 (corpus RAG; base multi-nicho desde v2.0)*
+*Fim do documento — Sistema Bibi - ServiceOS v3.0.25 (corpus RAG; base multi-nicho desde v2.0)*

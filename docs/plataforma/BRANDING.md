@@ -1,6 +1,6 @@
 # Branding — Energia Brasileira
 
-Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.24**; white-label desde v2.0).
+Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.25**; white-label desde v2.0).
 
 ## Marca circular (`BrandMark`) — v3.0.24
 

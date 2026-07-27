@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.24** em produção (jul/2026) — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques recentes: **BrandMark** gradiente whitelabel (#371), **nav Mais** portaled (#370), assistente humanizado, CRUD/import CSV PJ (#365/#373). Histórico: jornada consultório (v3.0.8), drawer mobile (v3.0.7), exports canônicos — [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307), [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.25** em produção (jul/2026) — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques recentes: **import CSV PJ** em lote com dry-run (#373), **BrandMark** gradiente whitelabel (#371), **nav Mais** portaled (#370), CRUD colaboradores PJ (#365). Histórico: jornada consultório (v3.0.8), drawer mobile (v3.0.7), exports canônicos — [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307), [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -542,11 +542,15 @@ Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `t
 | Incluir colaborador | `POST /api/pj/beneficiaries` | `createPjBeneficiary` — vincula `Patient` à `companyId` do RH |
 | Editar colaborador | `PATCH /api/pj/beneficiaries/[id]` | `updatePjBeneficiary` — `assertCompanyPatient` bloqueia IDOR |
 | Desvincular colaborador | `DELETE /api/pj/beneficiaries/[id]` | `detachPjBeneficiary` — `companyId: null` (cadastro clínico permanece) |
+| Template import | `GET /api/pj/beneficiaries/import?format=csv\|json` | `buildPjBeneficiaryImportTemplate` — arquivo modelo para download |
+| Importar lote | `POST /api/pj/beneficiaries/import` | `runPjBeneficiaryImportBatch` — CSV/JSON, `dryRun` opcional |
 | Export | `GET /api/pj/reports?format=` | `buildPjTabularExport` + `serveTabularExport` (PDF/CSV/JSON/TXT) |
 
 **UI:** `PjBeneficiaryPanel` em `/pj` — formulário com `PatientExtraFields` (matrícula, vínculo, etc.). DELETE pede confirmação: remove só o vínculo corporativo.
 
-**Campos obrigatórios (POST):** `name`, `cpf`, `birthDate`. Opcionais: `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType`.
+**Import CSV (v3.0.25):** `PjBeneficiaryImportPanel` em `/pj` — download do template, upload de arquivo, **Validar** (`dryRun: true`) e **Importar**. Colunas obrigatórias: `nome`, `cpf`, `data_nascimento` (aceita `YYYY-MM-DD` ou `DD/MM/YYYY`). Opcionais: `telefone`, `email`, `genero`, `nome_mae`, `matricula`, `vinculo`. Regras por linha: CPF inválido → erro; já vinculado à mesma empresa → ignorado; CPF em outra empresa → erro.
+
+**Campos obrigatórios (POST unitário):** `name`, `cpf`, `birthDate`. Opcionais: `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType`.
 
 ```mermaid
 flowchart LR
@@ -554,14 +558,17 @@ flowchart LR
   V --> O[GET /api/pj/overview]
   V --> A[POST /api/pj/appointments]
   V --> C[POST/PATCH/DELETE /api/pj/beneficiaries]
+  V --> I[POST /api/pj/beneficiaries/import]
   O --> S[pj-portal-service]
   A --> B[bookPjAppointment]
   C --> P[pj-beneficiary-service]
+  I --> M[pj-beneficiary-import]
   B --> DB[(Company.patients + Appointment)]
   P --> DB
+  M --> DB
 ```
 
-Testes: `tests/api/pj-beneficiaries.test.ts` · mapa `pj-beneficiary-crud` em `flow-improvements-map.ts`.
+Testes: `tests/api/pj-beneficiaries.test.ts` · `tests/api/pj-beneficiaries-import.test.ts` · mapa `pj-beneficiary-crud` em `flow-improvements-map.ts`.
 
 ---
 

@@ -449,13 +449,14 @@ RH gerencia colaboradores vinculados à empresa sem passar pela recepção. Auth
 | `PATCH` | `/api/pj/beneficiaries/{id}` | Campos parciais (mesmos do POST) | `200` · `404` fora da empresa |
 | `DELETE` | `/api/pj/beneficiaries/{id}` | — | `200` desvincula (`companyId: null`) · `404` |
 | `GET` | `/api/pj/beneficiaries/import?format=csv` | — | Template CSV para importação em lote |
-| `POST` | `/api/pj/beneficiaries/import` | `content`, `format` (`csv`), `dryRun?` | `200` lote importado · `400` validação |
+| `GET` | `/api/pj/beneficiaries/import?format=json` | — | Template JSON (dataset canônico `pj-beneficiaries`) |
+| `POST` | `/api/pj/beneficiaries/import` | `content`, `format` (`csv`\|`json`), `dryRun?` | `200` lote importado · `400` validação |
 
 > **Semântica do DELETE:** remove o vínculo corporativo; o cadastro clínico (`Patient`) permanece no tenant.
 
-> **Import CSV:** colunas `nome`, `cpf`, `data_nascimento` (obrig.) · demais opcionais. Vincula automaticamente à empresa do RH logado.
+> **Import CSV/JSON:** colunas `nome`, `cpf`, `data_nascimento` (obrig.) · demais opcionais (`telefone`, `email`, `genero`, `nome_mae`, `matricula`, `vinculo`). Vincula automaticamente à empresa do RH logado. `dryRun: true` valida sem persistir. Aceita JSON (`application/json`) ou `multipart/form-data` (campo `file`).
 
-### Exemplo curl
+### Exemplo curl — CRUD unitário
 
 ```bash
 curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
@@ -476,7 +477,25 @@ curl -b cookies.txt -X PATCH http://localhost:3000/api/pj/beneficiaries/PATIENT_
 curl -b cookies.txt -X DELETE http://localhost:3000/api/pj/beneficiaries/PATIENT_ID
 ```
 
-Serviço: `src/lib/pj-beneficiary-service.ts` · UI: `PjBeneficiaryPanel` em `/pj` · testes: `tests/api/pj-beneficiaries.test.ts`.
+### Exemplo curl — import em lote
+
+```bash
+# Baixar template CSV
+curl -b cookies.txt -o template.csv \
+  "http://localhost:3000/api/pj/beneficiaries/import?format=csv"
+
+# Validar (dry-run) sem persistir
+curl -b cookies.txt -X POST http://localhost:3000/api/pj/beneficiaries/import \
+  -H "Content-Type: application/json" \
+  -d '{"content":"nome,cpf,data_nascimento\nLaura Dias,52998224725,1990-05-15","format":"csv","dryRun":true}'
+
+# Importar de fato
+curl -b cookies.txt -X POST http://localhost:3000/api/pj/beneficiaries/import \
+  -H "Content-Type: application/json" \
+  -d '{"content":"nome,cpf,data_nascimento\nLaura Dias,52998224725,1990-05-15","format":"csv"}'
+```
+
+Serviço CRUD: `src/lib/pj-beneficiary-service.ts` · import: `src/lib/pj-beneficiary-import.ts` · UI: `PjBeneficiaryPanel` + `PjBeneficiaryImportPanel` em `/pj` · testes: `tests/api/pj-beneficiaries.test.ts` · `tests/api/pj-beneficiaries-import.test.ts`.
 
 > **OpenAPI:** rotas `pj/beneficiaries/*` ainda não constam no YAML — use este §10 + `FLUXOS.md` §5 até `openapi:sync` cobrir o módulo.
 
