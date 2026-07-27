@@ -379,6 +379,8 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 
 **Mobile (v3.0.7):** abaixo de `md` (`< 768px`), a lista de lançamentos usa **cards** (`md:hidden`) em vez da tabela (`hidden md:block`); formulários e filtros empilham em coluna (`flex-col`). Em desktop, tabela completa com scroll horizontal (`ds-scroll-x`). Ver `ClinicFinanceView.tsx`.
 
+**UX (otimização):** faixa de KPIs do mês sempre visível (receita/exames/despesas/lucro a partir das listas); meta de menus carregada uma vez; troca de mês e pós-salvamento com refresh soft (sem blank da tela); extras clínicos recolhidos; KPIs detalhados (`/kpis`) só na aba Indicadores.
+
 **Ponte automática (v2.6):** ao registrar lançamento, `src/lib/clinic-finance/bridge.ts` cria ou vincula `Patient`, `Appointment`, `ProcedureUsage` e `Invoice`. Estados: `bridgeStatus` = `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`.
 
 Doc completa: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · [`../versoes/V2_6.md`](../versoes/V2_6.md) · contrato HTTP: [`../plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §8.

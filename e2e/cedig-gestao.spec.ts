@@ -26,6 +26,7 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
     await expect(page.locator('[data-cursor-id="clinic-finance-root"]')).toBeVisible({
       timeout: 20_000,
     });
+    await expect(page.locator('[data-cursor-id="clinic-finance-kpi-strip"]')).toBeVisible();
 
     const unique = `Sofia Mendes ${Date.now()}`;
     await page.getByLabel(/Nome do paciente/i).fill(unique);
