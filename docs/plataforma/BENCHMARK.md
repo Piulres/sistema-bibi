@@ -20,7 +20,7 @@ e **referências de mercado** citadas no projeto.
 | ❌ | Não implementado (roadmap) |
 | ⭐ | Diferencial do Bibi vs benchmark típico de clínica |
 
-Última revisão: **ServiceOS v3.0.24** — multi-nicho desde v2.0 (`useLabels()`, landing comercial, BrandMark whitelabel, nav Mais portaled, jornada consultório, drawer mobile, exports canônicos, 7 segmentos incl. CONSTRUCTION).
+Última revisão: **ServiceOS v3.0.27** — multi-nicho desde v2.0 (`useLabels()`, landing comercial, BrandMark mesh na home, nav Mais portaled, import CSV PJ, jornada consultório, drawer mobile, exports canônicos, 7 segmentos incl. CONSTRUCTION).
 
 ---
 

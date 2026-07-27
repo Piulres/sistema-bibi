@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.24** em produção — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). Pacotes recentes: BrandMark whitelabel, nav Mais portaled, CRUD/import CSV PJ, RBAC Fase 5, exports canônicos (v3.0.7+).
+Última revisão: **ServiceOS v3.0.27** em produção — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). Pacotes recentes: BrandMark mesh na home, import CSV PJ, nav Mais portaled, RBAC Fase 5, exports canônicos (v3.0.7+).
 
 ---
 

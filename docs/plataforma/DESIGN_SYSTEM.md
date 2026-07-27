@@ -115,7 +115,7 @@ Fonte: `src/lib/landing/navigation.ts`.
 
 **CTA "Acessar portais":** na home (`/`) o header e o drawer mobile levam a `/segmentos/saude` (`SEGMENT_ACCESS_HREF`); nas páginas de segmento o mesmo CTA rola para `#portais`. O item de menu **Portais** na home continua sendo âncora `#portais`.
 
-Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
+Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível. Círculo da marca: monograma **Bibi** (`PLATFORM.brandMark`) com mesh via `useThemeColors` em `LandingLogoLink` — ver [`BRANDING.md`](BRANDING.md).
 
 ### Portal nav — abas de rota (v3.0.7 · Mais v3.0.24)
 

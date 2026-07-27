@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (27/07/2026):** **v3.0.24** em Netlify (deploy `6a677dc5` @ `15275c0`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md).
+**Produção (27/07/2026):** **v3.0.27** em Netlify (deploy `6a679eaf` @ `01ca7eb`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md).
 
 ---
 
