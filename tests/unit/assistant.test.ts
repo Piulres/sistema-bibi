@@ -28,6 +28,11 @@ import { parseChoiceSelection, extractCreateAppointmentArgs } from "@/lib/assist
 import { filterAssistantActions, isAssistantAction } from "@/lib/assistant/types";
 import { DEMO_EMAILS } from "../helpers/seed-fixtures";
 import { getTestPrisma } from "../helpers/db";
+import {
+  parseTenantSettings,
+  serializeTenantSettings,
+  updateTenantSettings,
+} from "@/lib/tenant/settings";
 
 const baseUser = (overrides: Partial<SessionUser> = {}): SessionUser => ({
   id: "u1",
@@ -591,6 +596,80 @@ describe("assistant session state (serverless)", () => {
     const stuck = planMockFromIntents("oi", user, toolNames);
     expect(stuck.toolCalls).toHaveLength(0);
     expect(stuck.fallback).toMatch(/ainda estou montando|reformular/i);
+  });
+});
+
+describe("tenant ruleOverrides no runner (settings → chat)", () => {
+  it("aplica gatilho customizado persistido e bloqueia tool desabilitada", async () => {
+    const prisma = getTestPrisma();
+    const dbUser = await prisma.user.findFirst({
+      where: { email: DEMO_EMAILS.internoAdmin },
+      include: { tenant: { include: { branding: true } } },
+    });
+    expect(dbUser).toBeTruthy();
+
+    const tenantRow = await prisma.tenant.findUnique({
+      where: { id: dbUser!.tenantId },
+      select: { settings: true },
+    });
+    const originalSettings = tenantRow?.settings ?? null;
+
+    const niche = isNicheId(dbUser!.tenant!.niche) ? dbUser!.tenant!.niche : "MEDICAL";
+    const user: SessionUser = {
+      id: "rule-overrides-runner",
+      name: dbUser!.name,
+      email: dbUser!.email,
+      role: dbUser!.role,
+      tenantId: dbUser!.tenantId,
+      tenantSlug: dbUser!.tenant!.slug,
+      companyId: null,
+      patientId: null,
+      tenantName: dbUser!.tenant!.name,
+      companyName: null,
+      patientName: null,
+      internoProfile: dbUser!.internoProfile,
+      internoPermissions: resolveInternoPermissions(dbUser!.role, dbUser!.internoProfile),
+      branding: applyNicheBrandingDefaults(niche, CLINIC_BRANDING_DEFAULTS),
+      niche,
+      labels: mergeNicheLabels(niche, dbUser!.tenant!.labels),
+    };
+    clearMockContext(user.id);
+
+    try {
+      await updateTenantSettings(user.tenantId, {
+        assistant: {
+          ruleOverrides: [{ tool: "count_appointments", addTriggers: ["quantos exames hoje"] }],
+        },
+      });
+
+      const custom = await runAssistantChat({
+        user,
+        messages: [{ role: "user", content: "quantos exames hoje" }],
+      });
+      expect(custom.message.content).toMatch(/agendamento|consulta|hoje|\d+/i);
+
+      await updateTenantSettings(user.tenantId, {
+        assistant: {
+          ruleOverrides: [{ tool: "count_appointments", disabled: true }],
+        },
+      });
+      clearMockContext(user.id);
+
+      const blocked = await runAssistantChat({
+        user,
+        messages: [{ role: "user", content: "quantos agendamentos hoje" }],
+      });
+      expect(blocked.message.content).not.toMatch(/^Hoje temos \d+ agendamento/i);
+    } finally {
+      await prisma.tenant.update({
+        where: { id: user.tenantId },
+        data: {
+          settings: originalSettings
+            ? originalSettings
+            : serializeTenantSettings(parseTenantSettings(null)),
+        },
+      });
+    }
   });
 });
 
