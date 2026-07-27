@@ -67,6 +67,8 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 
 Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônicos, BOM UTF-8 via `arrayBuffer`, TXT pipe-delimited) · `tests/unit/interchange.test.ts` (dataset canônico CSV/JSON) · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ tabular).
 
+Cobertura v3.0.12 dashboard KPIs: `tests/unit/executive-dashboard-kpis.test.ts` (`summarizeInvoiceMoney` — a receber/recebido/emitido, ignora `ANULADA`) · E2E `interno-modules.spec.ts` (heading **Cobrança**, labels A receber/Recebido) · `cedig-gestao.spec.ts` (`dashboard-billing-kpis`, produção clínica CEDIG).
+
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
@@ -344,7 +346,7 @@ Senha única: `bibi123`
 |---------|-----------|
 | `smoke.spec.ts` | Landing, logins, credencial inválida |
 | `flows.spec.ts` | Proxy, PJ, beneficiário, prestador, logout |
-| `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao` |
+| `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao`; dashboard com bloco **Cobrança** (A receber / Recebido) |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
 | `jornada-consultorio.spec.ts` | Jornada operacional UI — agenda/estoque/cadastros/faturamento + walk-in→check-in→atendimento (PEP/procedimentos/stepper) · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |

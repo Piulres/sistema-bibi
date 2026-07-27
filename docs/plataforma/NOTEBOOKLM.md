@@ -2,7 +2,7 @@
 
 Documento consolidado para ingestão em ferramentas de RAG (NotebookLM, etc.).
 Última atualização: reflete **ServiceOS v3.0.8** (PWA + multi-nicho desde v2.0), **white label** (tema escuro, logos Blobs),
-jornada narrativa do consultório, reset operacional CEDIG, drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF,
+jornada narrativa do consultório, reset operacional CEDIG, drawer mobile pela direita, dashboard executivo com eixos Cobrança vs Produção clínica (v3.0.12), exports canônicos CSV/JSON/TXT/PDF,
 **design system semântico**, Tiers 1–4 e fluxos em [`../produto/FLUXOS.md`](../produto/FLUXOS.md).
 
 ---
@@ -283,15 +283,20 @@ Alinha com iClinic/Feegow no dia a dia:
 
 ## 12. KPIs do Dashboard Executivo
 
-| KPI | Fonte |
-|-----|-------|
-| Pendente Pay Per Use | `ProcedureUsage` com `billed=false` |
-| Total faturado | Soma de `Invoice.total` |
-| MRR estimado | Assinaturas ATIVA normalizadas para mensal |
-| Atendimentos hoje | `Appointment` do dia |
-| Pipeline CRM | Contagem de `Company` por status |
-| Mensagens na fila | `Message` com status PENDENTE |
-| Atividade recente | Últimos 10 `TimelineEvent` |
+**v3.0.12:** dois eixos — **Cobrança** (faturas) e **Produção clínica** (lançamentos do mês, BRT).
+
+| Eixo | KPI | Fonte |
+|------|-----|-------|
+| Cobrança | A receber | `Invoice` `FECHADA` / `ABERTA` via `summarizeInvoiceMoney` |
+| Cobrança | Recebido | `Invoice` `PAGA` |
+| Cobrança | A faturar | `ProcedureUsage` com `billed=false` |
+| Cobrança | Atendimentos hoje | `Appointment` do dia (BRT) |
+| Cobrança | MRR / recorrência / mensagens | `Subscription`, `SubscriptionCharge`, `Message` |
+| Produção clínica | Valor lançado / despesas / resultado | `getClinicFinanceKpis` (mês civil BRT) |
+| CRM | Pipeline por estágio | `Company` por status |
+| Atividade | Timeline recente | Últimos 10 `TimelineEvent` |
+
+**Não confundir:** “Recebido” (faturas pagas) ≠ “Valor lançado” (gestão clínica). Detalhe: [`FLUXOS.md`](../produto/FLUXOS.md) §4.0.1.
 
 ---
 
@@ -397,7 +402,7 @@ src/
 - Adapters reais (Asaas, SendGrid) não incluídos — POC usa `mock` e `console`
 - Deploy Netlify — **pacotes fechados** (não deploy a cada merge). Produção **v3.0.8**:
   https://sistema-bibi.netlify.app (`docs/plataforma/DEPLOY_NETLIFY.md`, `docs/versoes/RELEASES.md`, `docs/plataforma/OPERACOES.md`).
-  Pacote v3.0.8: jornada consultório + reset CEDIG ops. Pacote v3.0.7: drawer mobile direita, dashboard executivo, gestão clínica responsiva, exports canônicos.
+  Pacote v3.0.12: dashboard KPIs claros (Cobrança vs Produção clínica). Pacote v3.0.8: jornada consultório + reset CEDIG ops. Pacote v3.0.7: drawer mobile direita, gestão clínica responsiva, exports canônicos.
   Validar local: `npm run pre-release`. Publicar: `npx netlify deploy --prod` (manual; Stop builds ON).
   Se retornar **503 `usage_exceeded`**, é cota Netlify — não é bug de código.
 - SSO OAuth/SAML ainda não implementados (MFA TOTP disponível — Tier 4)
@@ -487,7 +492,7 @@ src/
 → Agendamento com `modality=TELE` gera link mock (`TELEMEDICINE_BASE_URL`) visível em prestador/beneficiário (Tier 4).
 
 **Qual a diferença entre faturamento e dashboard?**
-→ `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva (KPIs).
+→ `/interno` = operação (gerar faturas, PIX). `/interno/dashboard` = visão executiva — seção **Cobrança** (a receber, recebido, a faturar) + **Produção clínica** do mês (eixo distinto das faturas).
 
 **Como valido um pacote antes de publicar na Netlify?**
 → `npm run pre-release` (lint + build Netlify local, sem publicar). Ver `docs/plataforma/OPERACOES.md`.

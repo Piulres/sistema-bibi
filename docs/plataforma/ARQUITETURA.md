@@ -809,30 +809,34 @@ Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes
 Visão consolidada de KPIs do tenant no Portal Interno, agregando dados dos
 épicos anteriores sem duplicar entidades.
 
-**UX v3.0.7:** hierarquia em camadas — 4 KPIs principais (`StatCard`), barra secundária compacta, alerta com link para Gestão clínica (evita dupla contagem de receita operacional), atalhos rápidos e seções Receita/CRM em grid 2 colunas.
+**UX v3.0.12:** seção **Cobrança** (4 `StatCard` + faixa secundária + atalhos) separada da seção **Produção clínica · MM/AAAA** (condicional). Remove card “Receita” duplicado e o rótulo “Total faturado”. Mês clínico em BRT (`civilDateISO` / `timezone.ts`).
 
 
 ```mermaid
 flowchart LR
   Page["/interno/dashboard"] --> API["GET /api/interno/dashboard"]
   API --> Svc["getExecutiveDashboard()"]
-  Svc --> PP["Pay Per Use pendente"]
+  Svc --> Inv["summarizeInvoiceMoney()"]
+  Svc --> PP["PPU pendente (a faturar)"]
+  Svc --> Clinic["getClinicFinanceKpis()"]
   Svc --> CRM["Pipeline CRM"]
   Svc --> Sub["MRR / recorrência"]
   Svc --> Msg["Fila de comunicação"]
   Svc --> TL["Timeline recente"]
 ```
 
-| KPI | Fonte |
-|-----|-------|
-| Pendente Pay Per Use | `ProcedureUsage` não faturados |
-| Total faturado | `Invoice` |
-| MRR estimado | `Subscription` ATIVA (normalizado mensal) |
-| Pipeline CRM | `Company` por status |
-| Atividade recente | `TimelineEvent` (últimos 10) |
-| Gestão clínica (mês) | `clinicFinance` — exames, receita, despesas, lucro |
+| Eixo | KPI | Fonte |
+|------|-----|-------|
+| Cobrança | A receber | `Invoice` `FECHADA` / `ABERTA` |
+| Cobrança | Recebido | `Invoice` `PAGA` |
+| Cobrança | A faturar | `ProcedureUsage` com `billed=false` |
+| Cobrança | Atendimentos hoje | `Appointment` do dia (BRT) |
+| Cobrança | MRR / recorrência / mensagens | `Subscription`, `SubscriptionCharge`, `Message` |
+| Produção clínica | Valor lançado / despesas / resultado | `getClinicFinanceKpis` (mês civil BRT) |
+| CRM | Pipeline por estágio | `Company` por status |
+| Atividade | Timeline recente | `TimelineEvent` (últimos 10) |
 
-**Hierarquia UI (v3.0.7):** alerta de fonte dos números → 4 KPIs principais (`StatCard`) → faixa secundária → cards Receita/CRM/atividade. Ver `ExecutiveDashboardView.tsx`.
+**Hierarquia UI (v3.0.12):** Cobrança → (opcional) Produção clínica → CRM + pendências PPU + atividade. Ver `ExecutiveDashboardView.tsx` · helper puro `src/lib/executive-dashboard-kpis.ts`.
 
 ### Checklist de homologação (Épico 8)
 
