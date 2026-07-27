@@ -1,8 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
 import type { ExportFormat } from "@/lib/exports/format";
 import { LIST_EXPORT_FORMATS } from "@/lib/exports/format";
+import { buildExportUrl, downloadExportFile } from "@/lib/ui/download-export";
 
 const FORMAT_LABELS: Record<ExportFormat, string> = {
   pdf: "PDF",
@@ -18,6 +21,7 @@ type Props = {
   formats?: ExportFormat[];
   size?: "sm" | "md";
   variant?: "portal" | "secondary" | "ghost";
+  onError?: (message: string) => void;
 };
 
 export default function ExportButtons({
@@ -26,31 +30,48 @@ export default function ExportButtons({
   formats = LIST_EXPORT_FORMATS,
   size = "sm",
   variant = "secondary",
+  onError,
 }: Props) {
-  const buildUrl = (format: ExportFormat) => {
-    const params = new URLSearchParams();
-    for (const [key, value] of Object.entries(query)) {
-      if (value) params.set(key, value);
+  const [busyFormat, setBusyFormat] = useState<ExportFormat | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleDownload(format: ExportFormat) {
+    const url = buildExportUrl(baseUrl, query, format);
+    setBusyFormat(format);
+    setError(null);
+    try {
+      const result = await downloadExportFile(url, `export.${format}`);
+      if (!result.ok) {
+        const message = result.error;
+        setError(message);
+        onError?.(message);
+      }
+    } finally {
+      setBusyFormat(null);
     }
-    params.set("format", format);
-    const qs = params.toString();
-    return qs ? `${baseUrl}?${qs}` : `${baseUrl}?format=${format}`;
-  };
+  }
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
       {formats.map((format) => (
-        <a
+        <Button
           key={format}
-          href={buildUrl(format)}
-          download
-          className="inline-flex min-h-10"
+          variant={variant}
+          size={size}
+          type="button"
+          disabled={busyFormat !== null}
+          onClick={() => void handleDownload(format)}
         >
-          <Button variant={variant} size={size} type="button" className="w-full">
-            {FORMAT_LABELS[format]}
-          </Button>
-        </a>
+          {busyFormat === format ? "..." : FORMAT_LABELS[format]}
+        </Button>
       ))}
+      </div>
+      {error && (
+        <Alert tone="danger" className="text-xs">
+          {error}
+        </Alert>
+      )}
     </div>
   );
 }

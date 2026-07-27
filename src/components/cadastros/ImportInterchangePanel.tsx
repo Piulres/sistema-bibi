@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import DownloadLink from "@/components/DownloadLink";
 import Alert from "@/components/ui/Alert";
 import SectionHeader from "@/components/ui/SectionHeader";
 import type { ImportEntity } from "@/lib/imports/schemas";
@@ -133,16 +134,16 @@ export default function ImportInterchangePanel({
           </button>
         ))}
         <div className="ml-auto flex flex-wrap gap-2">
-          <a href={downloadUrl("template")} className="inline-flex">
-            <Button type="button" variant="secondary" size="sm">
-              Baixar modelo
-            </Button>
-          </a>
-          <a href={downloadUrl("export")} className="inline-flex">
-            <Button type="button" variant="secondary" size="sm">
-              Exportar atual ({format.toUpperCase()})
-            </Button>
-          </a>
+          <DownloadLink
+            href={downloadUrl("template")}
+            label="Baixar modelo"
+            filename={`${entity}-modelo.${format}`}
+          />
+          <DownloadLink
+            href={downloadUrl("export")}
+            label={`Exportar atual (${format.toUpperCase()})`}
+            filename={`${entity}-export.${format}`}
+          />
         </div>
       </div>
 

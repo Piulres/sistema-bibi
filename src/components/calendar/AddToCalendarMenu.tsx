@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Button from "@/components/ui/Button";
 import { fetchJson } from "@/lib/ui/api-feedback";
+import { downloadExportFile } from "@/lib/ui/download-export";
 
 type CalendarPayload = {
   links?: {
@@ -28,6 +29,7 @@ type Props = {
 export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [icsBusy, setIcsBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [links, setLinks] = useState<CalendarPayload["links"] | null>(null);
 
@@ -61,6 +63,17 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
     const current = await ensureLinks();
     if (!current) return;
     window.open(pick(current), "_blank", "noopener,noreferrer");
+  }
+
+  async function downloadIcs() {
+    setIcsBusy(true);
+    setError(null);
+    try {
+      const result = await downloadExportFile(icsPath, "evento.ics");
+      if (!result.ok) setError(result.error);
+    } finally {
+      setIcsBusy(false);
+    }
   }
 
   return (
@@ -115,14 +128,15 @@ export default function AddToCalendarMenu({ apiPath, icsPath, className }: Props
               >
                 Microsoft 365
               </button>
-              <a
+              <button
+                type="button"
                 role="menuitem"
-                href={icsPath}
-                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
-                download
+                disabled={icsBusy}
+                className="block w-full rounded px-3 py-2 text-left text-sm text-[var(--text-primary)] hover:bg-[var(--surface-muted)] disabled:opacity-50"
+                onClick={() => void downloadIcs()}
               >
-                Baixar .ics (Apple e outros)
-              </a>
+                {icsBusy ? "Baixando…" : "Baixar .ics (Apple e outros)"}
+              </button>
             </>
           )}
         </div>

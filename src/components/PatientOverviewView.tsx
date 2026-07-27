@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
+import DownloadLink from "@/components/DownloadLink";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
@@ -128,13 +129,12 @@ export default function PatientOverviewView({
           baseUrl={`/api/interno/patients/${patientId}/export`}
           query={{ section: "summary" }}
         />
-        <a
+        <DownloadLink
           href={`/api/interno/patients/${patientId}/export?format=json`}
-          download
-          className="ds-touch-link"
-        >
-          LGPD (JSON)
-        </a>
+          label="LGPD (JSON)"
+          filename={`bibi-lgpd-${patientId.slice(0, 8)}.json`}
+          variant="ghost"
+        />
       </div>
 
       <section className="rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] p-6 shadow-sm">
