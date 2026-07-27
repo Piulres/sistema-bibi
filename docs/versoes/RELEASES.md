@@ -11,7 +11,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.16** — reagendar beneficiário + Assistente Fase 0 **pendente de deploy**.
+> Pacote **v3.0.16** — reagendar + Assistente Fase 0 + auditoria/estoque fase 2 **pendente de deploy**.
 
 | Item | Valor |
 |------|-------|
@@ -25,7 +25,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.16** (reagendar + assistente) |
+| **Integração** | `dev` | **v3.0.16** (reagendar + assistente + auditoria/estoque fase 2) |
 | **Release** | `main` | **v3.0.16** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.15** · deploy `6a66de5b` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
@@ -35,7 +35,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Beneficiário:** reagendar consulta (`benef-reschedule`) — mesmo registro, slot validado, timeline `RESCHEDULED`.
 - **Assistente Fase 0:** inventário, RBAC interno, `Tenant.settings`, painel `/interno/assistente`.
 - **Chat:** persistência local + auto-scroll + indicador de digitação.
-- **Qualidade:** `scheduling-reschedule` · `assistant-*` · CI #282/#286/#306 · pre-release OK.
+- **Auditoria fase 2:** fecha vazamentos pós-RBAC — busca só em tipos `full`; encaminhamento/receita como `clinical`; export 360° com perfil; labels no link.
+- **Estoque fase 2:** UI editar/inativar produto, status de lote e Reverter em movimentações; taxonomia `SERVICO` + unidades.
+- **Documentos de saída:** fechamento seed/OpenAPI/testes API.
+- **Qualidade:** `scheduling-reschedule` · `assistant-*` · `audit-access` · `audit-rbac-content` · `stock` · CI #282/#286/#304/#306/#307/#308 · pre-release.
 
 ### Conteúdo do pacote v3.0.15
 
@@ -270,7 +273,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.16`** | _(pendente deploy)_ | Reagendar beneficiário + Assistente Fase 0 · #282/#286/#306 |
+| **`v3.0.16`** | _(pendente deploy)_ | Reagendar + Assistente + auditoria/estoque fase 2 · #282/#286/#304/#306/#307/#308 |
 | **`v3.0.15`** | `4599bff` | Gestão clínica otimizada (KPI strip + soft refresh) · deploy `6a66de5b` · #290/#303 |
 | **`v3.0.14`** | `59700b5` | Auditoria RBAC + estoque + cadastros + documentos · deploy `6a66db43` |
 | **`v3.0.13`** | `78b575f` | Exportações autenticadas + equipe + receita multi-item · deploy `6a66d114` |
@@ -517,7 +520,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.16` preparado** — reagendar + Assistente Fase 0 (prod ainda v3.0.15) |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.16` preparado** — reagendar + assistente + auditoria/estoque fase 2 (prod ainda v3.0.15) |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
