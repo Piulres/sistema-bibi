@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.13",
+    version: "3.0.14",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Hotfix dos downloads na Gestão clínica: JSON via fetch+blob e nomes de arquivo sem barra (Chrome).",
+    highlights: [
+      {
+        title: "Exportações",
+        items: [
+          "JSON tabular 200 não é mais tratado como erro (body consumido duas vezes)",
+          "Filename gestao-clinica-AAAA-MM sem `/` no Content-Disposition",
+          "Sanitização de nomes no client e no serveTabularExport",
+        ],
+      },
+    ],
+    testStats: "CI unit+E2E · download-export · exports-matrix clinic-finance · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.13",
+    label: "Sistema Bibi - ServiceOS v3.0.13",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Exportações autenticadas corrigidas (fetch+blob) e equipe no atendimento com receita multi-item no Portal Prestador.",
     highlights: [

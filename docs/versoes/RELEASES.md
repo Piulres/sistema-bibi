@@ -11,24 +11,29 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **em produção**.
+> Pacote **v3.0.14** — hotfix downloads Gestão clínica (JSON + filename) **pendente deploy**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.13** · sincronizados · artefato prod `@ 78b575f` |
-| **Pacote anterior em produção** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
+| **Release `main` / `dev`** | **v3.0.14** (preparado) · aguardando merge `dev` → `main` + deploy |
+| **Pacote anterior em produção** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) |
-| **Release** | `main` | **v3.0.13** |
+| **Integração** | `dev` | **v3.0.14** (hotfix exports Gestão clínica) |
+| **Release** | `main` | **v3.0.13** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d114` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.14
+
+- **Hotfix exports:** JSON tabular 200 não consome o body duas vezes; filename `gestao-clinica-AAAA-MM` sem `/` no Content-Disposition (Chrome “site indisponível”).
+- **Qualidade:** unit `download-export` + matrix clinic-finance · CI unit+E2E verdes · pre-release OK.
 
 ### Conteúdo do pacote v3.0.13
 
@@ -458,7 +463,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.13` em produção** — exportações + equipe + receita multi-item |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.13` em produção** · **v3.0.14** pendente deploy — hotfix downloads |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
