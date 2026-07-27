@@ -65,7 +65,9 @@ const FINANCIAL_FIELD_SET = new Set<string>(AUDIT_FINANCIAL_FIELDS);
 const ENTITY_SENSITIVITY: Record<string, AuditSensitivityClass> = {
   [TIMELINE_ENTITY_TYPES.MEDICAL_RECORD]: "clinical",
   [TIMELINE_ENTITY_TYPES.MEDICATION_PRESCRIPTION]: "clinical",
+  [TIMELINE_ENTITY_TYPES.PRESCRIPTION_DOCUMENT]: "clinical",
   [TIMELINE_ENTITY_TYPES.EXAM_ORDER]: "clinical",
+  [TIMELINE_ENTITY_TYPES.CLINICAL_REFERRAL]: "clinical",
   [TIMELINE_ENTITY_TYPES.CARE_PROTOCOL]: "clinical",
   [TIMELINE_ENTITY_TYPES.INVOICE]: "financial",
   [TIMELINE_ENTITY_TYPES.PROCEDURE_USAGE]: "financial",
@@ -159,6 +161,16 @@ export function resolveAuditViewerCapabilities(
 export function allowedAuditEntityTypes(profile: InternoProfile): string[] {
   return Object.values(TIMELINE_ENTITY_TYPES).filter(
     (entityType) => auditDetailLevelForEntity(profile, entityType) !== "hidden",
+  );
+}
+
+/**
+ * Tipos em que a descrição bruta pode ser buscada sem vazar conteúdo redigido.
+ * Buscar em tipos `summary`/`redacted` revelaria existência via total/hits.
+ */
+export function searchableAuditEntityTypes(profile: InternoProfile): string[] {
+  return allowedAuditEntityTypes(profile).filter(
+    (entityType) => auditDetailLevelForEntity(profile, entityType) === "full",
   );
 }
 

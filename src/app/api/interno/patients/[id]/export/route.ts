@@ -57,7 +57,9 @@ export async function GET(request: Request, { params }: Params) {
       return NextResponse.json({ error: "Seção inválida" }, { status: 400 });
     }
 
-    const data = await buildPatientOverviewTabularExport(id, user.tenantId, section);
+    const data = await buildPatientOverviewTabularExport(id, user.tenantId, section, {
+      internoProfile: user.internoProfile,
+    });
     if (!data) {
       return NextResponse.json({ error: "Beneficiário não encontrado" }, { status: 404 });
     }

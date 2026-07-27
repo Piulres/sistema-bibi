@@ -14,10 +14,12 @@ import {
 } from "@/lib/timeline-constants";
 import {
   allowedAuditEntityTypes,
+  auditDetailLevelForEntity,
   isAuditEntityAllowed,
   redactTimelineEventsForProfile,
   resolveAuditProfile,
   resolveAuditViewerCapabilities,
+  searchableAuditEntityTypes,
   type AuditViewerCapabilities,
 } from "@/lib/audit-access";
 
@@ -245,6 +247,16 @@ export async function getTenantAuditEvents(
   );
   const allowedEntityTypes = allowedAuditEntityTypes(profile);
 
+  const emptyResult = (): TenantAuditResult => ({
+    events: [],
+    total: 0,
+    page,
+    limit,
+    totalPages: 1,
+    capabilities,
+    allowedEntityTypes,
+  });
+
   const where: Prisma.TimelineEventWhereInput = {
     tenantId,
     entityType: { in: allowedEntityTypes },
@@ -253,23 +265,28 @@ export async function getTenantAuditEvents(
   const requestedType = filters.entityType?.trim();
   if (requestedType) {
     if (!isAuditEntityAllowed(profile, requestedType)) {
-      return {
-        events: [],
-        total: 0,
-        page,
-        limit,
-        totalPages: 1,
-        capabilities,
-        allowedEntityTypes,
-      };
+      return emptyResult();
     }
     where.entityType = requestedType;
   }
   if (filters.action?.trim()) {
     where.action = filters.action.trim();
   }
-  if (filters.search?.trim()) {
-    where.description = { contains: filters.search.trim() };
+  const search = filters.search?.trim();
+  if (search) {
+    // Só busca descrição em tipos com nível `full` — evita oráculo de existência
+    // (hit count) sobre conteúdo clínico/PII que depois seria redigido.
+    const searchableTypes = searchableAuditEntityTypes(profile);
+    if (requestedType) {
+      if (auditDetailLevelForEntity(profile, requestedType) !== "full") {
+        return emptyResult();
+      }
+    } else if (searchableTypes.length === 0) {
+      return emptyResult();
+    } else {
+      where.entityType = { in: searchableTypes };
+    }
+    where.description = { contains: search };
   }
   if (filters.from || filters.to) {
     where.createdAt = {};

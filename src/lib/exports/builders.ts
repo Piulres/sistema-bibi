@@ -346,8 +346,13 @@ export async function buildPatientOverviewTabularExport(
   patientId: string,
   tenantId: string,
   section: PatientExportSection,
+  access: { internoProfile?: string | null } = {},
 ): Promise<TabularExport | null> {
-  const overview = await getPatientOverview(patientId, tenantId);
+  const overview = await getPatientOverview(
+    patientId,
+    tenantId,
+    "internoProfile" in access ? { internoProfile: access.internoProfile } : undefined,
+  );
   if (!overview) return null;
   return buildPatientSectionTabularExport(overview, section);
 }
