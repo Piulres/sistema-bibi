@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.19",
+    version: "3.0.20",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Assistente Fase 4: IA híbrida — gateway validado pelo motor de regras antes de executar tools.",
+    highlights: [
+      {
+        title: "Assistente",
+        items: [
+          "Pipeline LLM → motor de regras → tools (Fase 4)",
+          "Tools desabilitadas pelo tenant bloqueadas mesmo em modo IA",
+          "Fallback híbrido: gateway sem tools → motor de regras no texto",
+        ],
+      },
+    ],
+    testStats: "836 testes Vitest",
+  },
+  {
+    version: "3.0.19",
+    label: "Sistema Bibi - ServiceOS v3.0.19",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Assistente Fase 3: CRUD de regras por tenant; marca circular whitelabel na PWA e UI.",
     highlights: [

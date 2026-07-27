@@ -150,7 +150,7 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | **1** | Flag IA persistida + UI toggle (ADMIN) | ✅ Parcial (API + toggle) |
 | **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
 | **3** | Painel CRUD regras + preview + templates por nicho | ✅ CRUD tenant + preview efetivo |
-| **4** | IA híbrida completa (LLM → regras → tools) | ⏳ |
+| **4** | IA híbrida completa (LLM → regras → tools) | ✅ v3.0.20 |
 | **5** | RBAC write guards generalizados | ⏳ Paralelo |
 
 ---

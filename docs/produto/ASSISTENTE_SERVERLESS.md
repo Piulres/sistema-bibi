@@ -75,7 +75,8 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 | Item | Prioridade | Notas |
 |------|------------|-------|
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
-| **Painel de regras** | Alta | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
+| **Painel de regras** | — | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) ✅ Fase 3 |
+| **IA híbrida** | Média | Gateway + validação pelo motor de regras — Fase 4 ✅ |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |

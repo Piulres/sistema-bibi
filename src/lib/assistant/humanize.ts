@@ -45,6 +45,10 @@ export function rulesEngineDisabled(): string {
   return "O motor de regras está desativado para este tenant. Peça ao administrador para reativar em Interno → Assistente.";
 }
 
+export function toolBlockedByRules(): string {
+  return "Essa ação não está disponível nas regras configuradas para o seu tenant. Peça ao administrador em Interno → Assistente.";
+}
+
 export function toolExecutionError(): string {
   return "Tive um problema ao consultar isso. Pode tentar de novo?";
 }

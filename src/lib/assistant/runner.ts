@@ -20,6 +20,7 @@ import {
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
 import { planGatewayAssistant } from "@/lib/assistant/provider/gateway";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
+import { refineAiPlan } from "@/lib/assistant/rules/refine";
 import { findTool, getToolsForUser } from "@/lib/assistant/tools/registry";
 import {
   clearOperationDraft,
@@ -47,9 +48,26 @@ async function resolvePlan(
   const settings = await getTenantSettings(user.tenantId);
   const mode = resolveAssistantMode(settings);
   const provider = resolveAssistantProvider();
+  const toolNames = new Set(tools.map((t) => t.name));
+
   if (mode === "ai" && provider === "gateway") {
     try {
-      return await planGatewayAssistant(systemPrompt, messages, tools);
+      const gatewayPlan = await planGatewayAssistant(systemPrompt, messages, tools);
+      const { plan: refinedPlan } = refineAiPlan({
+        gatewayPlan,
+        user,
+        tenantOverrides: settings.assistant.ruleOverrides,
+        allowedToolNames: toolNames,
+      });
+      if (refinedPlan.toolCalls.length > 0 || refinedPlan.fallback) {
+        return refinedPlan;
+      }
+      // Híbrido: gateway sem tools → motor de regras no texto do usuário
+      if (settings.assistant.rulesEnabled) {
+        const mockPlan = planMockAssistant(messages, tools, user);
+        if (mockPlan.toolCalls.length > 0) return mockPlan;
+      }
+      return gatewayPlan;
     } catch (error) {
       console.error("[assistant] gateway fallback to mock:", error);
     }
