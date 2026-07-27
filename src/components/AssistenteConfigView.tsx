@@ -363,9 +363,9 @@ export default function AssistenteConfigView() {
                 }
               />
               <span className="text-sm">
-                <span className="font-medium text-[var(--text-primary)]">Desativar tool neste tenant</span>
+                <span className="font-medium text-[var(--text-primary)]">Desativar ferramenta neste tenant</span>
                 <span className="block text-xs text-[var(--text-muted)]">
-                  Remove a tool do motor de regras para este realm.
+                  Remove a ferramenta do motor de regras para este realm.
                 </span>
               </span>
             </label>
@@ -530,11 +530,11 @@ export default function AssistenteConfigView() {
 
       <ConfigFold
         title="Inventário de ferramentas"
-        summary={`${ASSISTANT_TOOL_INVENTORY.length} tools mapeadas · ${scenarioCount()} cenários de rotina.`}
+        summary={`${ASSISTANT_TOOL_INVENTORY.length} ferramentas · ${scenarioCount()} cenários de rotina.`}
       >
         <dl className="grid gap-2 text-sm sm:grid-cols-2">
           <div>
-            <dt className="text-[var(--text-muted)]">Tools mapeadas</dt>
+            <dt className="text-[var(--text-muted)]">Ferramentas mapeadas</dt>
             <dd className="font-medium">{ASSISTANT_TOOL_INVENTORY.length}</dd>
           </div>
           <div>
