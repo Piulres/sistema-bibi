@@ -304,13 +304,14 @@ O seed inclui uma **camada de mês operacional** com datas relativas a “hoje�
 | Consistência seed | `tests/lib/operation-month-consistency.test.ts` | Densidade, descontos, PPU↔fatura, PEP, estoque, timeline |
 | API (Atos 1–4) | `tests/api/consultorio-journey.test.ts` | Walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX / marcar paga + RBAC cadastros/estoque |
 | Stepper | `tests/lib/care-journey.test.ts` | Agendado → … → Pago |
-| E2E UI | `e2e/jornada-consultorio.spec.ts` | Módulos operacionais + walk-in/check-in + superfície atendimento |
+| E2E UI | `e2e/jornada-consultorio.spec.ts` | Módulos operacionais + walk-in/check-in + superfície atendimento; **Marcar paga** valida badge `PAGA` (estado final — toast instável no mobile) |
 | Walk-in | `e2e/walkin-particular.spec.ts` | Cadastro walk-in + check-in |
 | Índice | [`../plataforma/TESTES.md`](../plataforma/TESTES.md) | Matriz completa |
 
 ```bash
 npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts tests/api/consultorio-journey.test.ts
 npx playwright test e2e/jornada-consultorio.spec.ts --project=chromium
+npx playwright test e2e/jornada-consultorio.spec.ts --project=mobile-chrome   # marcar paga: assert PAGA, não toast
 ```
 
 ---

@@ -306,6 +306,7 @@ Gotchas confirmados em runtime (jul/2026):
 | `npm run setup` falha com `unknown option: --skip-generate` | Versões recentes do Prisma CLI não aceitam `--skip-generate` em `db push` | Atualize o repo (`scripts/dev-setup.mjs` usa `npx prisma db push` sem flags extras) |
 | `/interno/gestao` 500 em produção (`no such column`) | Blob de operação com schema defasado vs artefato de build | Pacote ≥ v3.0.2 aplica `schema-sync` no boot; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Schema-sync |
 | RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
+| E2E **Marcar paga** falha só no `mobile-chrome` com timeout no toast | Lista recarrega após confirmar pagamento e o toast some antes do assert | Assert estado `PAGA` na tabela (timeout ≥ 20s); não depender de `expectFeedbackMessage` — ver `jornada-consultorio.spec.ts` |
 
 ### Variáveis em testes
 
@@ -359,7 +360,7 @@ Senha única: `bibi123`
 | `interno-modules.spec.ts` | Módulos interno via `expectInternoNavHref` (faixa + menu **Mais** + drawer) — **sem** `/interno/gestao` |
 | `rbac.spec.ts` | RECEPCAO e FATURAMENTO — presença/ocultação de módulos no nav (`expectInternoNavHref`) |
 | `walkin-particular.spec.ts` | Walk-in, check-in, mapa CRUD e filtro portal |
-| `jornada-consultorio.spec.ts` | Jornada operacional UI — agenda/estoque/cadastros/faturamento + walk-in→check-in→atendimento (PEP/procedimentos/stepper) · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |
+| `jornada-consultorio.spec.ts` | Jornada operacional UI — agenda/estoque/cadastros/faturamento + walk-in→check-in→atendimento (PEP/procedimentos/stepper); **Marcar paga** asserta `PAGA` (não toast — ver pitfall abaixo) · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |
 | `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão, KPIs dashboard (`dashboard-billing-kpis`); **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
 | `assistant.spec.ts` | Assistente operacional serverless |
@@ -383,6 +384,8 @@ Padrão para testar a nav redesenhada (v3.0.6) sem duplicar lógica do menu **Ma
 **Pitfall:** módulos `priority: "secondary"` não aparecem na faixa até serem abertos pelo menu **Mais**; após navegação, a aba ativa fica pinada na faixa (`mobile-nav.spec.ts`).
 
 **Pitfall (drawer prestador, v3.0.7):** categorias (`group`) usam `<p>` para o rótulo e `<a>` para o módulo — o mesmo texto (ex.: "Agenda") aparece duas vezes. Use `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para clicar; `getByText("Agenda")` falha em strict mode. Gatilho: `[data-tour-id="mobile-nav-trigger"]` (tour onboarding — **não** `data-cursor-id`); painel `role="dialog"` à direita (`boundingBox`). Ver `e2e/mobile-nav.spec.ts`.
+
+**Pitfall (toast vs estado, v3.0.13b):** após ações que recarregam a lista (ex.: **Marcar paga** em `/interno/faturamento`), o toast de sucesso pode sumir antes do assert no projeto `mobile-chrome`. Prefira **estado final na UI** (`getByText("PAGA")`) em vez de `expectFeedbackMessage` no toast. Helper: `confirmDialog` + assert de badge/linha. Ver `e2e/jornada-consultorio.spec.ts` e `e2e/helpers/feedback.ts`.
 
 **Contrato aria-label por portal** (Prestador, Beneficiário, PJ): [`produto/ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Navegação → Contrato a11y para E2E.
 

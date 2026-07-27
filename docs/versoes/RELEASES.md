@@ -11,13 +11,14 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **pendente deploy**.
+> Pacote **v3.0.13b** na `main` — exportações + equipe + prescrição + E2E mobile estável · **pendente deploy** (produção ainda **v3.0.12**).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.13** (preparado) · aguardando merge `dev` → `main` + deploy |
+| **Release `main`** | **v3.0.13b** @ `1bce427` — merge PR [#287](https://github.com/Piulres/sistema-bibi/pull/287) · aguardando deploy humano |
+| **Integração `dev`** | **v3.0.13** — alinhar com `main` após promoção |
 | **Pacote anterior em produção** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +26,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) |
-| **Release** | `main` | **v3.0.12** (até merge) |
+| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) — sincronizar com `main` |
+| **Release** | `main` | **v3.0.13b** (v3.0.13 + fix E2E mobile marcar paga) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.12** · deploy `6a66c080` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.13b
+
+Delta sobre v3.0.13 — hotfix de qualidade (sem mudança de produto):
+
+- **E2E mobile:** `jornada-consultorio.spec.ts` — fluxo **Marcar paga** asserta estado final `PAGA` (não toast), pois o toast some após reload da lista no viewport mobile (`mobile-chrome`).
+- **CI:** massas com nomes realistas + Job Summary Vitest (`scripts/ci-vitest-summary.mjs`).
 
 ### Conteúdo do pacote v3.0.13
 
