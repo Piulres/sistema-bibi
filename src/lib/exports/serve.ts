@@ -21,9 +21,19 @@ export type ExportBranding = {
   platformLabel?: string;
 };
 
+/** Nome seguro para Content-Disposition / atributo download (sem path separators). */
+export function sanitizeAttachmentFilename(filename: string): string {
+  return filename
+    .replace(/[/\\?%*:|"<>]/g, "-")
+    .replace(/[\r\n]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function attachmentHeaders(format: ExportFormat, filename: string): HeadersInit {
-  const asciiFallback = filename.replace(/[^\x20-\x7E]+/g, "_").replace(/["\\]/g, "_");
-  const encoded = encodeURIComponent(filename);
+  const safe = sanitizeAttachmentFilename(filename);
+  const asciiFallback = safe.replace(/[^\x20-\x7E]+/g, "_").replace(/["\\]/g, "_");
+  const encoded = encodeURIComponent(safe);
   return {
     "Content-Type": exportMimeType(format),
     "Content-Disposition": `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encoded}`,
@@ -31,7 +41,8 @@ function attachmentHeaders(format: ExportFormat, filename: string): HeadersInit 
 }
 
 export function exportFilename(base: string, format: ExportFormat): string {
-  return `${base}.${exportFileExtension(format)}`;
+  const safeBase = sanitizeAttachmentFilename(base);
+  return `${safeBase}.${exportFileExtension(format)}`;
 }
 
 /** Resposta de download para buffer binário (PDF/XLSX). */
