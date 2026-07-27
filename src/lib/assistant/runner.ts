@@ -11,6 +11,7 @@ import { getTenantSettings } from "@/lib/tenant/settings";
 import { buildAssistantSystemPrompt } from "@/lib/assistant/context";
 import { buildActions, formatToolResult } from "@/lib/assistant/format";
 import {
+  hybridUnauthorizedTools,
   runnerEmptyResult,
   runnerFallback,
   runnerUnavailable,
@@ -20,6 +21,11 @@ import {
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
 import { planGatewayAssistant } from "@/lib/assistant/provider/gateway";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
+import {
+  collectAllowedToolNames,
+  refineHybridPlan,
+} from "@/lib/assistant/provider/hybrid";
+import { resolveAssistantIntents } from "@/lib/assistant/rules/engine";
 import { findTool, getToolsForUser } from "@/lib/assistant/tools/registry";
 import {
   clearOperationDraft,
@@ -47,14 +53,43 @@ async function resolvePlan(
   const settings = await getTenantSettings(user.tenantId);
   const mode = resolveAssistantMode(settings);
   const provider = resolveAssistantProvider();
+  const rulesEnabled = settings.assistant.rulesEnabled !== false;
+  const ruleIntents = resolveAssistantIntents(user, settings.assistant.ruleOverrides);
+  const allowedToolNames = collectAllowedToolNames({
+    availableToolNames: tools.map((t) => t.name),
+    ruleToolNames: ruleIntents.map((i) => i.tool),
+    rulesEnabled,
+  });
+
   if (mode === "ai" && provider === "gateway") {
     try {
-      return await planGatewayAssistant(systemPrompt, messages, tools);
+      const gatewayPlan = await planGatewayAssistant(systemPrompt, messages, tools);
+      const rulesPlan = rulesEnabled
+        ? planMockAssistant(messages, tools, user)
+        : { toolCalls: [] };
+      const hybrid = refineHybridPlan({
+        gatewayPlan,
+        rulesPlan,
+        allowedToolNames,
+        rulesEnabled,
+      });
+
+      if (
+        hybrid.toolCalls.length === 0 &&
+        hybrid.rejectedTools?.length &&
+        !hybrid.fallback
+      ) {
+        return {
+          toolCalls: [],
+          fallback: hybridUnauthorizedTools(hybrid.rejectedTools),
+        };
+      }
+      return hybrid;
     } catch (error) {
-      console.error("[assistant] gateway fallback to mock:", error);
+      console.error("[assistant] gateway fallback to rules/mock:", error);
     }
   }
-  if (!settings.assistant.rulesEnabled) {
+  if (!rulesEnabled) {
     return { toolCalls: [], fallback: rulesEngineDisabled() };
   }
   return planMockAssistant(messages, tools, user);
@@ -93,7 +128,19 @@ export async function runAssistantChat(input: {
     };
   }
 
-  const systemPrompt = buildAssistantSystemPrompt(input.user, input.pageContext);
+  const ruleIntents = resolveAssistantIntents(input.user, settings.assistant.ruleOverrides);
+  const allowedToolNames = [
+    ...collectAllowedToolNames({
+      availableToolNames: tools.map((t) => t.name),
+      ruleToolNames: ruleIntents.map((i) => i.tool),
+      rulesEnabled: settings.assistant.rulesEnabled !== false,
+    }),
+  ];
+  const systemPrompt = buildAssistantSystemPrompt(input.user, {
+    pageContext: input.pageContext,
+    mode,
+    allowedToolNames: mode === "ai" ? allowedToolNames : undefined,
+  });
   const plan = await resolvePlan(input.user, input.messages, tools, systemPrompt);
 
   if (plan.toolCalls.length === 0) {

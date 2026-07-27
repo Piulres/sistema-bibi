@@ -5,7 +5,22 @@ import { formatDateLabel } from "@/lib/assistant/dates";
 import { formatTimeBR } from "@/lib/timezone";
 import { buildPortalPromptSection } from "@/lib/assistant/portal-concepts";
 
-export function buildAssistantSystemPrompt(user: SessionUser, pageContext?: string): string {
+export type AssistantSystemPromptOptions = {
+  pageContext?: string;
+  /** Modo híbrido (Fase 4): restringe tools que o LLM pode chamar. */
+  mode?: "rules" | "ai";
+  allowedToolNames?: readonly string[];
+};
+
+export function buildAssistantSystemPrompt(
+  user: SessionUser,
+  pageContextOrOptions?: string | AssistantSystemPromptOptions,
+): string {
+  const options: AssistantSystemPromptOptions =
+    typeof pageContextOrOptions === "string" || pageContextOrOptions === undefined
+      ? { pageContext: pageContextOrOptions }
+      : pageContextOrOptions;
+
   const now = new Date();
   const permissions =
     user.role === "INTERNO"
@@ -27,12 +42,17 @@ export function buildAssistantSystemPrompt(user: SessionUser, pageContext?: stri
     `Terminologia do tenant (use sempre estes termos): ${user.labels.patient}, ${user.labels.provider}, ${user.labels.appointment}, ${user.labels.procedure}, ${user.labels.beneficiary}.`,
     `Data/hora atual: ${formatDateLabel(now)} ${formatTimeBR(now)}`,
     `Permissões: ${permissions}`,
-    pageContext ? `Página atual: ${pageContext}` : "",
+    options.pageContext ? `Página atual: ${options.pageContext}` : "",
+    options.mode === "ai" ? `Modo: IA híbrida — suas tool calls serão validadas pelo motor de regras do tenant.` : "",
+    options.allowedToolNames?.length
+      ? `Ferramentas permitidas (somente estas): ${options.allowedToolNames.join(", ")}.`
+      : "",
     `Regras:`,
     `- Use ferramentas para obter dados reais; nunca invente números.`,
     `- Responda em português, de forma concisa e profissional.`,
     `- Respeite o escopo do portal — não sugira ações de outros perfis.`,
     `- Use a terminologia do tenant nas respostas.`,
+    `- Não chame ferramentas fora da lista permitida.`,
   ].filter(Boolean);
 
   return lines.join("\n");

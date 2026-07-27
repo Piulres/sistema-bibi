@@ -150,7 +150,7 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | **1** | Flag IA persistida + UI toggle (ADMIN) | ✅ Parcial (API + toggle) |
 | **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
 | **3** | Painel CRUD regras + preview + templates por nicho | ✅ CRUD tenant + preview efetivo |
-| **4** | IA híbrida completa (LLM → regras → tools) | ⏳ |
+| **4** | IA híbrida completa (LLM → regras → tools) | ✅ `refineHybridPlan` + allowlist |
 | **5** | RBAC write guards generalizados | ⏳ Paralelo |
 
 ---
@@ -165,6 +165,8 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | `src/lib/tenant/settings.ts` | Settings do realm |
 | `src/app/interno/assistente/page.tsx` | Painel ADMIN |
 | `src/app/api/interno/assistant/settings/route.ts` | API config |
+| `src/lib/assistant/provider/hybrid.ts` | Fase 4 — validação LLM × regras |
+| `src/lib/assistant/runner.ts` | Orquestração chat (modo rules/ai) |
 | `docs/produto/ASSISTENTE_SERVERLESS.md` | Arquitetura serverless |
 
 ---

@@ -234,7 +234,8 @@ export default function AssistenteConfigView() {
               Chat com IA (add-on)
             </span>
             <span className="block text-xs text-[var(--text-muted)]">
-              Quando ativo, o assistente usa o gateway configurado. Requer secrets no ambiente.
+              Quando ativo, o assistente usa o gateway (LLM → validação pelas regras → tools).
+              Requer secrets no ambiente.
             </span>
             {!data.gatewayConfigured && (
               <span className="mt-1 block text-xs text-amber-700">
