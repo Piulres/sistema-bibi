@@ -40,11 +40,13 @@ import {
 import TabBar from "@/components/ui/TabBar";
 import ClinicalSidebar, { type ClinicalSidebarData } from "@/components/clinical/ClinicalSidebar";
 import ClinicalCarePanel from "@/components/clinical/ClinicalCarePanel";
+import AppointmentTeamPanel from "@/components/clinical/AppointmentTeamPanel";
 import { useDraftUndo } from "@/hooks/useDraftUndo";
 import VoaAssistantPanel from "@/components/voa/VoaAssistantPanel";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useLabels } from "@/hooks/useLabels";
+import { teamRoleLabel } from "@/lib/clinical/team-roles";
 import { fetchJson } from "@/lib/ui/api-feedback";
 import { formatDateBR, formatDateTimeBR } from "@/lib/timezone";
 
@@ -57,6 +59,16 @@ type Usage = {
   billed: boolean;
   invoiceId?: string | null;
   invoiceStatus?: string | null;
+};
+type Participant = {
+  id: string;
+  role: string;
+  roleLabel: string;
+  userId: string;
+  userName: string;
+  userSpecialty: string | null;
+  notes: string | null;
+  feeLabel: string | null;
 };
 type RecordItem = {
   id: string;
@@ -71,12 +83,19 @@ type Detail = {
   pet?: { id: string; name: string; species: string; breed: string | null } | null;
   usages: Usage[];
   records: RecordItem[];
+  participants?: Participant[];
+  scheduledProcedure?: {
+    id: string;
+    name: string;
+    teamRequirements: { role: string; required: boolean; minCount?: number }[];
+  } | null;
 };
 type Procedure = {
   id: string;
   name: string;
   category: string;
   basePriceLabel: string;
+  teamRequirements?: { role: string; required: boolean; minCount?: number }[];
 };
 
 type StockProduct = {
@@ -100,6 +119,7 @@ const currency = (v: number) =>
 
 const CARE_TABS = [
   { key: "procedimentos", label: "Procedimentos", shortLabel: "Procs" },
+  { key: "equipe", label: "Equipe", shortLabel: "Equipe" },
   { key: "materiais", label: "Materiais", shortLabel: "Mats" },
   { key: "voa", label: "Assistente IA", shortLabel: "IA" },
   { key: "prontuario", label: "Prontuário", shortLabel: "PEP" },
@@ -115,7 +135,7 @@ const fieldClass =
   "w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
 
 export default function AtendimentoView({ appointmentId }: { appointmentId: string }) {
-  const { labels } = useLabels();
+  const { labels, niche } = useLabels();
   const { isBusy, run, showToast } = useAsyncAction();
   const [selectedProc, setSelectedProc] = useState("");
   const pepDraft = useDraftUndo({
@@ -490,7 +510,8 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
           />
 
           {canRegisterProcedureForStatus(detail.appointment.status) ? (
-            <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch">
+            <div className="mt-4 space-y-2">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
               <select
                 value={selectedProc}
                 onChange={(e) => setSelectedProc(e.target.value)}
@@ -506,6 +527,19 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               <Button onClick={addProcedure} disabled={isBusy("add-procedure") || !selectedProc}>
                 Registrar
               </Button>
+            </div>
+            {selectedProc && (() => {
+              const proc = procedures.find((p) => p.id === selectedProc);
+              const reqs = proc?.teamRequirements?.filter((r) => r.required) ?? [];
+              if (reqs.length === 0) return null;
+              return (
+                <p className="rounded-md bg-[var(--surface-muted)] p-2 text-xs text-[var(--text-muted)]">
+                  Este procedimento exige equipe:{" "}
+                  {reqs.map((r) => teamRoleLabel(r.role, niche)).join(", ")}.
+                  {" "}Configure na aba <strong>Equipe</strong>.
+                </p>
+              );
+            })()}
             </div>
           ) : (
             <p className="mt-4 rounded-md bg-[var(--surface-muted)] p-3 text-sm text-[var(--text-muted)]">
@@ -539,6 +573,19 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               <span className="text-lg font-bold text-[var(--brand-primary)]">{currency(total)}</span>
             </div>
           )}
+        </Card>
+          )}
+
+          {careTab === "equipe" && (
+        <Card padding="lg">
+          <AppointmentTeamPanel
+            appointmentId={appointmentId}
+            niche={niche}
+            participants={detail.participants ?? []}
+            scheduledProcedure={detail.scheduledProcedure ?? null}
+            canEdit={canRegisterProcedureForStatus(detail.appointment.status)}
+            onChanged={reloadDetail}
+          />
         </Card>
           )}
 

@@ -22,9 +22,11 @@ export type ExportBranding = {
 };
 
 function attachmentHeaders(format: ExportFormat, filename: string): HeadersInit {
+  const asciiFallback = filename.replace(/[^\x20-\x7E]+/g, "_").replace(/["\\]/g, "_");
+  const encoded = encodeURIComponent(filename);
   return {
     "Content-Type": exportMimeType(format),
-    "Content-Disposition": `attachment; filename="${filename}"`,
+    "Content-Disposition": `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encoded}`,
   };
 }
 

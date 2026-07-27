@@ -11,6 +11,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import StatusBadge from "@/components/ui/StatusBadge";
 import StatCard from "@/components/ui/StatCard";
 import ExportButtons from "@/components/ExportButtons";
+import DownloadLink from "@/components/DownloadLink";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useLabels } from "@/hooks/useLabels";
@@ -309,13 +310,12 @@ export default function BillingView() {
                       baseUrl={`/api/interno/invoices/${inv.id}/export`}
                       formats={["pdf", "xlsx"]}
                     />
-                    <a
+                    <DownloadLink
                       href={`/api/interno/invoices/${inv.id}/tiss`}
-                      download
-                      className="ds-touch-link"
-                    >
-                      XML
-                    </a>
+                      label="XML"
+                      filename={`tiss-guia-${inv.id}.xml`}
+                      variant="ghost"
+                    />
                   </div>
                   {inv.status !== "PAGA" && (
                     <div className="flex flex-wrap gap-2">
@@ -383,13 +383,12 @@ export default function BillingView() {
                           baseUrl={`/api/interno/invoices/${inv.id}/export`}
                           formats={["pdf", "xlsx"]}
                         />
-                        <a
+                        <DownloadLink
                           href={`/api/interno/invoices/${inv.id}/tiss`}
-                          download
-                          className="ds-touch-link"
-                        >
-                          XML
-                        </a>
+                          label="XML"
+                          filename={`tiss-guia-${inv.id}.xml`}
+                          variant="ghost"
+                        />
                       </div>
                     </td>
                     <td className="px-4 py-2 text-right">

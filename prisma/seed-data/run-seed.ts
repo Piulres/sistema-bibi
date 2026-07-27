@@ -40,6 +40,11 @@ import { seedConstructionRoadmap } from "./construction-roadmap";
 import { serializeTenantLabels } from "../../src/constants/niches";
 import { seedMonthlyRevenueBaseline } from "./monthly-baseline";
 import { seedClinicalDemo } from "./clinical-demo";
+import {
+  ensureTeamStaffUsers,
+  seedAppointmentTeamMass,
+  seedPrescriptionDocumentDemo,
+} from "./appointment-team-demo";
 import { seedMedicalStock } from "./stock-demo";
 import { seedClinicOperationMonth } from "./operation-month";
 import { currentTotpCode, DEMO_MFA_SECRET } from "./totp-demo";
@@ -400,6 +405,28 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     },
   });
 
+  const agPedroGastro = await prisma.appointment.create({
+    data: {
+      scheduledAt: todayAt(15, 30),
+      status: "CONFIRMADO",
+      reason: "Consulta gastro + colonoscopia",
+      tenantId: tenant.id,
+      patientId: pedroId,
+      providerId: prestador.id,
+      procedureId: procedures["EXA-COLO"]?.id ?? null,
+    },
+  });
+  await prisma.timelineEvent.create({
+    data: {
+      tenantId: tenant.id,
+      entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
+      entityId: agPedroGastro.id,
+      action: TIMELINE_ACTIONS.CREATED,
+      description: "Agendamento gastro/colonoscopia — Pedro Almeida",
+      createdBy: prestador.id,
+    },
+  });
+
   console.log("Registrando uso de procedimentos (Pay Per Use) e prontuario demo...");
   const joaoConsultaPrice = chargePrice(
     "CONSULTA",
@@ -495,6 +522,39 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     appointmentId: ag1.id,
     procedureHbA1cId: procedures["EXA-GLI"]?.id,
   });
+
+  await seedPrescriptionDocumentDemo(prisma, {
+    tenantId: tenant.id,
+    patientId: joaoId,
+    providerId: prestador.id,
+    appointmentId: ag1.id,
+    patientName: "João Pereira",
+  });
+
+  console.log("Criando massa equipe + gastro/colonoscopia (Pedro)...");
+  const teamStaff = await ensureTeamStaffUsers(prisma, tenant.id);
+  if (
+    procedures["CON-GAS"] &&
+    procedures["EXA-COLO"] &&
+    procedures["EQP-ANEST"] &&
+    procedures["EQP-ENF-TEC"]
+  ) {
+    await seedAppointmentTeamMass(prisma, {
+      tenantId: tenant.id,
+      appointmentId: agPedroGastro.id,
+      patientId: pedroId,
+      patientName: "Pedro Almeida",
+      providerId: prestador.id,
+      anesthetistId: teamStaff.anesthetistId,
+      nursingTechId: teamStaff.nursingTechId,
+      procedures: {
+        consulta: { id: procedures["CON-GAS"].id, price: procedures["CON-GAS"].basePrice },
+        exame: { id: procedures["EXA-COLO"].id, price: procedures["EXA-COLO"].basePrice },
+        anestFee: { id: procedures["EQP-ANEST"].id, price: procedures["EQP-ANEST"].basePrice },
+        enfFee: { id: procedures["EQP-ENF-TEC"].id, price: procedures["EQP-ENF-TEC"].basePrice },
+      },
+    });
+  }
 
   const usageMaria = await prisma.procedureUsage.create({
     data: {

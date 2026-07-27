@@ -79,6 +79,26 @@ describe("Massa demo — cobertura por portal", () => {
       });
       expect(usages).toBeGreaterThanOrEqual(5);
     });
+
+    it("equipe multidisciplinar e receitas multi-item na massa demo", async () => {
+      const horizonte = await prisma.tenant.findFirstOrThrow({ where: { slug: "horizonte" } });
+      const [participants, prescriptions, gastroUsages] = await Promise.all([
+        prisma.appointmentParticipant.count({
+          where: { appointment: { tenantId: horizonte.id } },
+        }),
+        prisma.prescriptionDocument.count({
+          where: { patient: { tenantId: horizonte.id } },
+        }),
+        prisma.procedureUsage.count({
+          where: {
+            appointment: { tenantId: horizonte.id, reason: { contains: "gastro" } },
+          },
+        }),
+      ]);
+      expect(participants).toBeGreaterThanOrEqual(2);
+      expect(prescriptions).toBeGreaterThanOrEqual(2);
+      expect(gastroUsages).toBeGreaterThanOrEqual(3);
+    });
   });
 
   describe("Empresa PJ (role PJ)", () => {

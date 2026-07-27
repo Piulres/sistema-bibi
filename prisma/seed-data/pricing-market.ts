@@ -1,4 +1,10 @@
 import type { SeedCompany } from "./companies";
+import { serializeTeamRoleRequirements } from "../../src/lib/clinical/team-roles";
+
+const COLO_TEAM_ROLES = serializeTeamRoleRequirements([
+  { role: "ANESTESISTA", required: true, minCount: 1 },
+  { role: "TECNICO_ENFERMAGEM", required: false, minCount: 1 },
+]);
 
 /** Catálogo base — referência mercado privado/corporativo BR (2026, faixa R$ 300–500 consultas). */
 export const BASE_PROCEDURES = [
@@ -22,7 +28,20 @@ export const OCCUPATIONAL_PROCEDURES = [
   { code: "OCC-AUD", name: "Audiometria Ocupacional", category: "OCUPACIONAL", basePrice: 65, tissCode: "40103047" },
 ] as const;
 
-export const ALL_SEED_PROCEDURES = [...BASE_PROCEDURES, ...OCCUPATIONAL_PROCEDURES] as const;
+/** Procedimentos de equipe e consultas especializadas. */
+export const TEAM_AND_SPECIALTY_PROCEDURES = [
+  { code: "CON-GAS", name: "Consulta Gastroenterologia", category: "CONSULTA", basePrice: 500, tissCode: "10101012" },
+  { code: "EXA-COLO", name: "Colonoscopia", category: "EXAME", basePrice: 1500, tissCode: null, requiredTeamRoles: COLO_TEAM_ROLES },
+  { code: "EQP-ANEST", name: "Honorários — Anestesia", category: "SERVICO", basePrice: 800, tissCode: null },
+  { code: "EQP-ENF-TEC", name: "Taxa — Técnico de Enfermagem", category: "SERVICO", basePrice: 150, tissCode: null },
+  { code: "EQP-ASSIST", name: "Taxa — Assistente", category: "SERVICO", basePrice: 100, tissCode: null },
+] as const;
+
+export const ALL_SEED_PROCEDURES = [
+  ...BASE_PROCEDURES,
+  ...OCCUPATIONAL_PROCEDURES,
+  ...TEAM_AND_SPECIALTY_PROCEDURES,
+] as const;
 
 export type ProcedureCode = (typeof ALL_SEED_PROCEDURES)[number]["code"];
 
