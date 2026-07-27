@@ -421,6 +421,84 @@ describe("Estoque clínico — catálogo, lotes, movimentos e alertas", () => {
     expect(data.product.unit).toBe("SC");
   });
 
+  it("produto requiresLot=false aceita entrada sem nº/validade e permite SAIDA/FIFO", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const sku = `SRV-CRED-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: {
+          sku,
+          name: "Crédito de digitalização processual",
+          category: "SERVICO",
+          unit: "UN",
+          minStock: 5,
+          requiresLot: false,
+        },
+      }),
+    );
+    expect(createRes.status, await createRes.clone().text()).toBe(200);
+    const productId = (await createRes.json()).product.id as string;
+
+    const entryRes = await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: { productId, quantity: 12, unitCost: 1.1 },
+      }),
+    );
+    expect(entryRes.status, await entryRes.clone().text()).toBe(200);
+
+    const synthetic = await prisma.stockLot.findFirstOrThrow({
+      where: { productId, lotNumber: "SEM-LOTE" },
+    });
+    expect(synthetic.quantity).toBe(12);
+
+    const saidaRes = await movementsPost(
+      jsonRequest("http://localhost/api/interno/stock/movements", {
+        method: "POST",
+        body: {
+          productId,
+          type: "SAIDA",
+          quantity: 3,
+          reason: "Consumo de crédito em protocolo",
+        },
+      }),
+    );
+    expect(saidaRes.status, await saidaRes.clone().text()).toBe(200);
+
+    const after = await prisma.stockLot.findFirstOrThrow({
+      where: { id: synthetic.id },
+    });
+    expect(after.quantity).toBe(9);
+
+    const listRes = await productsGet();
+    const listed = (await listRes.json()).products.find(
+      (p: { id: string }) => p.id === productId,
+    );
+    expect(listed.requiresLot).toBe(false);
+    expect(listed.totalStock).toBe(9);
+  });
+
+  it("produto com requiresLot=true rejeita entrada sem lote/validade", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const listRes = await productsGet();
+    const product = (await listRes.json()).products.find(
+      (p: { sku: string; requiresLot: boolean }) => p.sku === "MAT-GAZE" && p.requiresLot,
+    );
+    expect(product).toBeTruthy();
+
+    const failRes = await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: { productId: product.id, quantity: 2 },
+      }),
+    );
+    expect(failRes.status).toBe(400);
+    const body = await failRes.json();
+    expect(body.error).toMatch(/lote|validade/i);
+  });
+
   it("rejeita categoria inválida no cadastro de produto", async () => {
     await setSessionForEmail("recepcao@bibi.health");
     const res = await productsPost(

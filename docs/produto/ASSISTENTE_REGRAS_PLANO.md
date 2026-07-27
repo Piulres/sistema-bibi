@@ -148,8 +148,8 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 |------|--------|--------|
 | **0** | Inventário, matriz testes, `Tenant.settings`, RBAC `assistente`, stub `/interno/assistente` | ✅ Este pacote |
 | **1** | Flag IA persistida + UI toggle (ADMIN) | ✅ Parcial (API + toggle) |
-| **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ⏳ |
-| **3** | Painel CRUD regras + preview + templates por nicho | ⏳ |
+| **2** | Modelo de regras + engine substituindo/complementando `mock-intents` | ✅ Este pacote |
+| **3** | Painel CRUD regras + preview + templates por nicho | ⏳ Parcial (preview + toggle regras) |
 | **4** | IA híbrida completa (LLM → regras → tools) | ⏳ |
 | **5** | RBAC write guards generalizados | ⏳ Paralelo |
 

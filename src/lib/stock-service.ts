@@ -10,11 +10,14 @@ import {
 } from "@/lib/timeline";
 import {
   STOCK_EXPIRY_ALERT_DAYS,
+  STOCK_NO_LOT_EXPIRY_ISO,
+  STOCK_NO_LOT_NUMBER,
   isStockInbound,
   isStockLotStatus,
   isStockMovementType,
   isStockOutbound,
   isStockProductCategory,
+  isStockSyntheticLot,
   isStockUnit,
   type StockLotStatus,
   type StockMovementType,
@@ -301,8 +304,9 @@ export async function listStockLots(
 export async function receiveStockEntry(input: {
   tenantId: string;
   productId: string;
-  lotNumber: string;
-  expiryDate: Date;
+  /** Obrigatório quando o produto exige lote; ignorado/opcional se `requiresLot=false`. */
+  lotNumber?: string | null;
+  expiryDate?: Date | null;
   quantity: number;
   unitCost?: number;
   supplierRef?: string | null;
@@ -316,7 +320,22 @@ export async function receiveStockEntry(input: {
   });
   if (!product) return { error: "Produto não encontrado ou inativo" as const };
 
-  const lotNumber = input.lotNumber.trim().toUpperCase();
+  if (product.requiresLot) {
+    if (!input.lotNumber?.trim() || !input.expiryDate) {
+      return { error: "Informe lote e validade para este produto" as const };
+    }
+  }
+
+  const lotNumber = product.requiresLot
+    ? input.lotNumber!.trim().toUpperCase()
+    : input.lotNumber?.trim()
+      ? input.lotNumber.trim().toUpperCase()
+      : STOCK_NO_LOT_NUMBER;
+  const expiryDate =
+    product.requiresLot || input.expiryDate
+      ? (input.expiryDate as Date)
+      : new Date(STOCK_NO_LOT_EXPIRY_ISO);
+
   const existingLot = await prisma.stockLot.findFirst({
     where: { productId: product.id, lotNumber },
   });
@@ -340,7 +359,7 @@ export async function receiveStockEntry(input: {
           tenantId: input.tenantId,
           productId: product.id,
           lotNumber,
-          expiryDate: input.expiryDate,
+          expiryDate,
           quantity: input.quantity,
           unitCost: input.unitCost ?? 0,
           supplierRef: input.supplierRef?.trim() || null,
@@ -358,9 +377,13 @@ export async function receiveStockEntry(input: {
         type: "ENTRADA",
         quantity: input.quantity,
         unitCost: input.unitCost ?? null,
-        reason: existingLot
-          ? `Reforço do lote ${lotNumber}`
-          : `Entrada inicial do lote ${lotNumber}`,
+        reason: isStockSyntheticLot(lotNumber)
+          ? existingLot
+            ? "Reforço de estoque (sem lote)"
+            : "Entrada inicial (sem lote)"
+          : existingLot
+            ? `Reforço do lote ${lotNumber}`
+            : `Entrada inicial do lote ${lotNumber}`,
         createdBy: input.createdBy,
       },
     });
@@ -368,12 +391,13 @@ export async function receiveStockEntry(input: {
     return { lotId, movementId: movement.id };
   });
 
+  const lotLabel = isStockSyntheticLot(lotNumber) ? "sem lote" : `lote ${lotNumber}`;
   await recordTimelineEvent({
     tenantId: input.tenantId,
     entityType: TIMELINE_ENTITY_TYPES.STOCK_MOVEMENT,
     entityId: result.movementId,
     action: TIMELINE_ACTIONS.STOCK_ENTRY,
-    description: `Entrada de ${input.quantity} ${product.unit} — ${product.name} (lote ${lotNumber})`,
+    description: `Entrada de ${input.quantity} ${product.unit} — ${product.name} (${lotLabel})`,
     createdBy: input.createdBy,
   });
 
@@ -548,9 +572,23 @@ export async function registerStockMovement(input: {
   }
 
   if (isStockInbound(type)) {
-    if (!input.lotId) return { error: "Informe o lote para devolução" as const };
+    let lotId = input.lotId ?? null;
+    if (!lotId && !product.requiresLot) {
+      const synthetic = await prisma.stockLot.findFirst({
+        where: {
+          tenantId: input.tenantId,
+          productId: product.id,
+          lotNumber: STOCK_NO_LOT_NUMBER,
+        },
+      });
+      if (!synthetic) {
+        return { error: "Produto sem lote ainda não possui saldo — registre uma entrada" as const };
+      }
+      lotId = synthetic.id;
+    }
+    if (!lotId) return { error: "Informe o lote para devolução" as const };
     const lot = await prisma.stockLot.findFirst({
-      where: { id: input.lotId, tenantId: input.tenantId, productId: product.id },
+      where: { id: lotId, tenantId: input.tenantId, productId: product.id },
     });
     if (!lot) return { error: "Lote não encontrado" as const };
 
@@ -664,34 +702,38 @@ export async function getStockAlerts(tenantId: string): Promise<StockAlertView[]
   });
 
   for (const lot of lots) {
-    const days = daysBetween(now, lot.expiryDate);
-    if (days < 0) {
-      alerts.push({
-        kind: "EXPIRED",
-        productId: lot.productId,
-        productName: lot.product.name,
-        productSku: lot.product.sku,
-        lotId: lot.id,
-        lotNumber: lot.lotNumber,
-        expiryDateLabel: dateLabel(lot.expiryDate),
-        message: `Lote ${lot.lotNumber} vencido (${dateLabel(lot.expiryDate)})`,
-        severity: "danger",
-      });
-    } else if (days <= STOCK_EXPIRY_ALERT_DAYS) {
-      alerts.push({
-        kind: "EXPIRING",
-        productId: lot.productId,
-        productName: lot.product.name,
-        productSku: lot.product.sku,
-        lotId: lot.id,
-        lotNumber: lot.lotNumber,
-        expiryDateLabel: dateLabel(lot.expiryDate),
-        message: `Lote ${lot.lotNumber} vence em ${days} dias`,
-        severity: days <= 30 ? "warning" : "info",
-      });
+    const synthetic = isStockSyntheticLot(lot.lotNumber);
+    if (!synthetic) {
+      const days = daysBetween(now, lot.expiryDate);
+      if (days < 0) {
+        alerts.push({
+          kind: "EXPIRED",
+          productId: lot.productId,
+          productName: lot.product.name,
+          productSku: lot.product.sku,
+          lotId: lot.id,
+          lotNumber: lot.lotNumber,
+          expiryDateLabel: dateLabel(lot.expiryDate),
+          message: `Lote ${lot.lotNumber} vencido (${dateLabel(lot.expiryDate)})`,
+          severity: "danger",
+        });
+      } else if (days <= STOCK_EXPIRY_ALERT_DAYS) {
+        alerts.push({
+          kind: "EXPIRING",
+          productId: lot.productId,
+          productName: lot.product.name,
+          productSku: lot.product.sku,
+          lotId: lot.id,
+          lotNumber: lot.lotNumber,
+          expiryDateLabel: dateLabel(lot.expiryDate),
+          message: `Lote ${lot.lotNumber} vence em ${days} dias`,
+          severity: days <= 30 ? "warning" : "info",
+        });
+      }
     }
 
     if (lot.status === "BLOQUEADO" || lot.status === "QUARENTENA") {
+      const lotLabel = synthetic ? "controle sem lote" : `Lote ${lot.lotNumber}`;
       alerts.push({
         kind: "BLOCKED",
         productId: lot.productId,
@@ -699,7 +741,7 @@ export async function getStockAlerts(tenantId: string): Promise<StockAlertView[]
         productSku: lot.product.sku,
         lotId: lot.id,
         lotNumber: lot.lotNumber,
-        message: `Lote ${lot.lotNumber} em ${lot.status === "QUARENTENA" ? "quarentena" : "bloqueio"}`,
+        message: `${lotLabel} em ${lot.status === "QUARENTENA" ? "quarentena" : "bloqueio"}`,
         severity: "warning",
       });
     }

@@ -1,5 +1,7 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
+import type { TenantRuleOverride } from "@/lib/assistant/rules/types";
+import { parseTenantRuleOverrides } from "@/lib/assistant/rules/tenant-overrides";
 
 /** Configurações operacionais do tenant (realm). */
 export type TenantAssistantSettings = {
@@ -7,6 +9,8 @@ export type TenantAssistantSettings = {
   aiEnabled: boolean;
   /** Motor de regras configurável. Default true. */
   rulesEnabled: boolean;
+  /** Overrides de gatilhos por tool (Fase 3). */
+  ruleOverrides?: TenantRuleOverride[];
 };
 
 export type TenantSettings = {
@@ -35,6 +39,8 @@ export function parseTenantSettings(raw: string | null | undefined): TenantSetti
     if (isRecord(assistantRaw)) {
       if (typeof assistantRaw.aiEnabled === "boolean") assistant.aiEnabled = assistantRaw.aiEnabled;
       if (typeof assistantRaw.rulesEnabled === "boolean") assistant.rulesEnabled = assistantRaw.rulesEnabled;
+      const overrides = parseTenantRuleOverrides(assistantRaw.ruleOverrides);
+      if (overrides.length > 0) assistant.ruleOverrides = overrides;
     }
     return { assistant };
   } catch {
