@@ -11,11 +11,11 @@ import {
 import type { BrandingTokens } from "@/lib/theme/tokens";
 
 const SIZE_CLASS: Record<Exclude<BrandMarkSize, "pwa">, string> = {
-  xs: "h-6 w-6 text-[11px] rounded-md",
-  sm: "h-9 w-9 text-base rounded-lg",
-  md: "h-10 w-10 text-lg rounded-lg",
-  lg: "h-16 w-16 text-3xl rounded-xl",
-  xl: "h-24 w-24 text-5xl rounded-2xl",
+  xs: "h-6 w-6 text-[11px] rounded-full",
+  sm: "h-9 w-9 text-base rounded-full",
+  md: "h-10 w-10 text-lg rounded-full",
+  lg: "h-16 w-16 text-3xl rounded-full",
+  xl: "h-24 w-24 text-5xl rounded-full",
 };
 
 type Props = {
@@ -81,7 +81,7 @@ export default function BrandMark({
   return (
     <span
       className={cn(
-        "relative inline-flex shrink-0 items-center justify-center overflow-hidden shadow-sm",
+        "relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full",
         SIZE_CLASS[size],
         className,
       )}
@@ -92,18 +92,16 @@ export default function BrandMark({
       aria-label={title ? label : undefined}
     >
       {showLogo ? (
-        <span className="flex h-[56%] w-[56%] items-center justify-center overflow-hidden rounded-full bg-white/95 shadow-sm">
-          <Image
-            src={resolvedInput.logoUrl!}
-            alt=""
-            width={64}
-            height={64}
-            className="h-full w-full object-contain p-0.5"
-            unoptimized={resolvedInput.logoUrl!.startsWith("/api/")}
-          />
-        </span>
+        <Image
+          src={resolvedInput.logoUrl!}
+          alt=""
+          width={64}
+          height={64}
+          className="h-[62%] w-[62%] object-contain"
+          unoptimized={resolvedInput.logoUrl!.startsWith("/api/")}
+        />
       ) : (
-        <span className="font-bold leading-none text-white drop-shadow-sm">{initial}</span>
+        <span className="font-bold leading-none text-white">{initial}</span>
       )}
     </span>
   );

@@ -93,23 +93,18 @@ export function buildBrandMarkSvg(input: BrandMarkInput, size = 512): string {
   const layout = resolveBrandMarkLayout(input, size);
   const cx = size / 2;
   const cy = size / 2;
-  const logoDiscR = Math.round(size * 0.28);
-  const logoImgSize = Math.round(logoDiscR * 1.55);
+  const logoImgSize = Math.round(size * 0.58);
   const initialSize = Math.round(size * 0.42);
   const uid = `bm-${size}`;
+  const clipR = size / 2;
 
   const logoLayer = layout.logoUrl
-    ? `<circle cx="${cx}" cy="${cy}" r="${logoDiscR}" fill="rgba(255,255,255,0.94)" />
-      <clipPath id="logo-clip-${uid}">
-        <circle cx="${cx}" cy="${cy}" r="${Math.round(logoDiscR * 0.82)}" />
-      </clipPath>
-      <image
+    ? `<image
         href="${escapeXml(layout.logoUrl)}"
         x="${cx - Math.round(logoImgSize / 2)}"
         y="${cy - Math.round(logoImgSize / 2)}"
         width="${logoImgSize}"
         height="${logoImgSize}"
-        clip-path="url(#logo-clip-${uid})"
         preserveAspectRatio="xMidYMid meet"
       />`
     : `<text
@@ -143,11 +138,16 @@ export function buildBrandMarkSvg(input: BrandMarkInput, size = 512): string {
       <stop offset="0%" stop-color="${layout.accentColor}" stop-opacity="0.15" />
       <stop offset="100%" stop-color="${layout.accentColor}" stop-opacity="0" />
     </radialGradient>
+    <clipPath id="clip-${uid}">
+      <circle cx="${cx}" cy="${cy}" r="${clipR}" />
+    </clipPath>
   </defs>
-  <rect width="${size}" height="${size}" fill="url(#bg-${uid})" />
-  <rect width="${size}" height="${size}" fill="url(#glow-accent-${uid})" />
-  <rect width="${size}" height="${size}" fill="url(#glow-primary-${uid})" />
-  <rect width="${size}" height="${size}" fill="url(#glow-bottom-${uid})" />
-  ${logoLayer}
+  <g clip-path="url(#clip-${uid})">
+    <rect width="${size}" height="${size}" fill="url(#bg-${uid})" />
+    <rect width="${size}" height="${size}" fill="url(#glow-accent-${uid})" />
+    <rect width="${size}" height="${size}" fill="url(#glow-primary-${uid})" />
+    <rect width="${size}" height="${size}" fill="url(#glow-bottom-${uid})" />
+    ${logoLayer}
+  </g>
 </svg>`;
 }
