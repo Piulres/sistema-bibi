@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.8** em produção — narrativa operacional do consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacote v3.0.7: drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.16** em produção — reagendar/cancelar consulta no beneficiário, Assistente Fase 0, auditoria RBAC fase 2, estoque Fase 2 UI; narrativa operacional em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md).
 
 ---
 
@@ -123,13 +123,13 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | Não pode cancelar nem reagendar consulta | Ações com regras de antecedência (ex.: até 24 h antes) |
+| ~~Alta~~ | ~~Não pode cancelar nem reagendar consulta~~ | **✅ v3.0.16** — `PATCH /api/beneficiario/appointments/[id]` com `{ action: "cancel" }` ou `{ action: "reschedule", scheduledAt }`; somente `AGENDADO` e consulta futura — ver [`FLUXOS.md`](FLUXOS.md) §8.9 |
 | Alta | PIX em dois passos manuais (gerar + confirmar) | Webhook do gateway ou polling; exibir QR Code |
 | Média | Página única longa (scroll) | Abas: Agenda · Consumo · Faturas · Prontuário |
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
 | Média | Notificações mock (`COMMUNICATION_PROVIDER=console`) | Adapter real (e-mail/SMS/WhatsApp) |
 | Baixa | Sem carteirinha digital | Card com QR + dados do plano corporativo |
-| Baixa | Sem PWA / app nativo | PWA instalável com push de lembrete |
+| ~~Baixa~~ | ~~Sem PWA / app nativo~~ | **✅ v3.0.0+** — PWA instalável em `/instalar` |
 
 **Código:** `src/components/BeneficiarioView.tsx` · APIs em `src/app/api/beneficiario/`
 
@@ -352,7 +352,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 
 | # | Melhoria | Portal(es) | Impacto | Tier sugerido |
 |---|----------|------------|---------|---------------|
-| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **Cancelar:** ✅ `PATCH …/beneficiario/appointments/[id]` · Reagendar: backlog |
+| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **✅ v3.0.16** — `PATCH …/beneficiario/appointments/[id]` com `cancel` ou `reschedule` |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
 | 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 |

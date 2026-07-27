@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.16** em produção (27/07/2026): reagendar beneficiário, Assistente Fase 0 (`/interno/assistente`), auditoria RBAC fase 2, estoque Fase 2 UI — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa consultório: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md) · CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) · assistente: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -286,9 +286,10 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
+| `assistente` | `/interno/assistente` | `AssistenteView` | Inventário de rotinas, config `Tenant.settings`, painel ADMIN (Fase 0) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
-Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
+Nav: **15 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. **Assistente** só para perfil **ADMIN**. Sem permissão → redirect `/interno/dashboard`.
 
 ### 4.0.1 Dashboard executivo (v3.0.7)
 
@@ -488,7 +489,20 @@ Restore administrativo permanece **ADMIN**. Atividade recente do dashboard, time
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 
-### 4.11 Exportações tabulares (v3.0.7)
+### 4.11 Assistente operacional (`AssistenteView`) — Fase 0 (v3.0.16)
+
+Painel administrativo do assistente serverless. Chat nos 4 portais permanece em `/api/assistant/*`; o módulo interno cobre inventário, RBAC e configuração por tenant.
+
+| Ação | API / UI | Efeito |
+|------|----------|--------|
+| Ver painel | `/interno/assistente` | Somente **ADMIN** (`assistente` em `interno-permissions.ts`) |
+| Ler config | `GET /api/interno/assistant/settings` | `Tenant.settings.assistant` (modo rules vs IA) |
+| Salvar config | `PATCH /api/interno/assistant/settings` | Write = ADMIN |
+| Chat (portais) | `POST /api/assistant/chat`, `POST /api/assistant/confirm` | Tools + confirmação JTI — ver [`ASSISTENTE_SERVERLESS.md`](ASSISTENTE_SERVERLESS.md) |
+
+Serviços: `src/lib/assistant/inventory.ts` (tools), `src/lib/assistant/mode.ts` (resolução rules/IA), `src/lib/assistant/scenarios.ts` (rotinas). Plano de evolução: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md).
+
+### 4.12 Exportações tabulares (v3.0.7)
 
 Motor unificado para relatórios e listagens nos portais.
 
@@ -759,6 +773,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
+| assistente | ✓ | ✗ | ✗ | ✗ |
 
 ### Onde é aplicado
 
