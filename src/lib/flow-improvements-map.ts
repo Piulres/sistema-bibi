@@ -195,8 +195,8 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     title: "CRUD de colaboradores no portal PJ",
     description:
       "RH inclui/exclui beneficiários da empresa sem depender da recepção; upload em lote opcional.",
-    status: "planned",
-    ui: "/pj → Beneficiários",
+    status: "implemented",
+    api: "POST/PATCH/DELETE /api/pj/beneficiaries",
     docRef: "JORNADA_CLIENTE.md §4 · FLUXOS.md §5",
   },
 ];

@@ -171,6 +171,27 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 
 ---
 
+## Como validar (Fases 3–5)
+
+```bash
+npx vitest run tests/unit/assistant-rule-engine.test.ts
+npx vitest run tests/unit/assistant-hybrid.test.ts
+npx vitest run tests/api/interno-assistant-settings.test.ts
+npx vitest run tests/unit/assistant.test.ts -t "tenant ruleOverrides"
+npx vitest run tests/security/rbac-gaps.test.ts tests/api/interno-write-guards.test.ts
+npm run lint
+```
+
+| Cenário | Cobertura |
+|---------|-----------|
+| CRUD `ruleOverrides` + preview | `interno-assistant-settings.test.ts` |
+| Gatilho customizado no runtime | `assistant-hybrid.test.ts` · `assistant.test.ts` (runner + settings) |
+| Tool desabilitada | `assistant-hybrid.test.ts` · `assistant.test.ts` |
+| RBAC write guards Fase 5 | `rbac-gaps.test.ts` · `interno-write-guards.test.ts` |
+| E2E chat multi-portal | `e2e/assistant.spec.ts` |
+
+Manual (opcional): login ADMIN → `/interno/assistente` → salvar gatilho → testar no chat.
+
 ## Como validar Fase 0
 
 ```bash

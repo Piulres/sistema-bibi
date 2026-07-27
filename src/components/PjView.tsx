@@ -11,6 +11,10 @@ import Button from "@/components/ui/Button";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
 import PjScheduleForm from "@/components/PjScheduleForm";
+import PjBeneficiaryForm, {
+  usePjBeneficiaryDetach,
+  type PjBeneficiaryRow,
+} from "@/components/PjBeneficiaryPanel";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
@@ -74,12 +78,14 @@ const alertTone = {
 export default function PjView() {
   const { labels } = useLabels();
   const [schedulePatientId, setSchedulePatientId] = useState("");
+  const [editingBeneficiary, setEditingBeneficiary] = useState<PjBeneficiaryRow | null>(null);
   const loadOverview = useCallback(
     () => fetchJson<Overview>("/api/pj/overview", undefined, "Falha ao carregar dados da empresa"),
     [],
   );
 
   const { data, loading, error, reload } = useAsyncData(loadOverview, []);
+  const detachBeneficiary = usePjBeneficiaryDetach(() => void reload());
 
   function goSchedule(patientId?: string) {
     if (patientId) setSchedulePatientId(patientId);
@@ -164,6 +170,11 @@ export default function PjView() {
 
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title={labels.beneficiaries} />
+        <PjBeneficiaryForm
+          onChanged={() => void reload()}
+          editing={editingBeneficiary}
+          onCancelEdit={() => setEditingBeneficiary(null)}
+        />
         <ul className="mt-4 space-y-2 md:hidden">
           {beneficiaries.map((b) => (
             <li key={b.id}>
@@ -179,9 +190,25 @@ export default function PjView() {
                   {b.usageCount} procedimento{b.usageCount === 1 ? "" : "s"}
                   {b.pendingLabel ? ` · Pendente ${b.pendingLabel}` : ""}
                 </p>
-                <div className="mt-3">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Button type="button" size="sm" variant="secondary" onClick={() => goSchedule(b.id)}>
                     Agendar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="secondary"
+                    onClick={() => setEditingBeneficiary({ id: b.id, name: b.name, cpf: b.cpf })}
+                  >
+                    Editar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => void detachBeneficiary(b.id, b.name)}
+                  >
+                    Remover
                   </Button>
                 </div>
               </Card>
@@ -211,9 +238,29 @@ export default function PjView() {
                   </td>
                   <td className="px-4 py-2 text-right text-[var(--text-muted)]">{b.pendingLabel}</td>
                   <td className="px-4 py-2 text-right">
-                    <Button type="button" size="sm" variant="secondary" onClick={() => goSchedule(b.id)}>
-                      Agendar
-                    </Button>
+                    <div className="flex justify-end gap-2">
+                      <Button type="button" size="sm" variant="secondary" onClick={() => goSchedule(b.id)}>
+                        Agendar
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="secondary"
+                        onClick={() =>
+                          setEditingBeneficiary({ id: b.id, name: b.name, cpf: b.cpf })
+                        }
+                      >
+                        Editar
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => void detachBeneficiary(b.id, b.name)}
+                      >
+                        Remover
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))}
