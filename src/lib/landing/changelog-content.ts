@@ -26,10 +26,30 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.13",
+    version: "3.0.14",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Auditoria e atividade recente com RBAC de conteúdo: clínico, financeiro e PII filtrados por perfil interno.",
+    highlights: [
+      {
+        title: "Auditoria / RBAC",
+        items: [
+          "Política central de sensibilidade (clínico, financeiro, PII, segurança, operacional)",
+          "FATURAMENTO e READONLY recebem diffs/mascaramento adequados; RECEPCAO sem vazamento clínico no dashboard",
+          "Restore administrativo só para ADMIN; export e revisões já redigidos no servidor",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E · audit-access · audit-rbac-content · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.13",
+    label: "Sistema Bibi - ServiceOS v3.0.13",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Exportações autenticadas corrigidas (fetch+blob) e equipe no atendimento com receita multi-item no Portal Prestador.",
     highlights: [

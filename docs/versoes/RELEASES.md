@@ -11,24 +11,31 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **em produção**.
+> Pacote **v3.0.14** — auditoria RBAC de conteúdo **pendente de deploy** (docs/versão no git; produção ainda em 3.0.13 até publicação).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.13** · sincronizados · artefato prod `@ 78b575f` |
-| **Pacote anterior em produção** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
+| **Release `main` / `dev`** | **v3.0.14** · sincronizados (pós-merge) · prod ainda `@ 78b575f` |
+| **Pacote anterior em produção** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) |
-| **Release** | `main` | **v3.0.13** |
+| **Integração** | `dev` | **v3.0.14** (auditoria RBAC) |
+| **Release** | `main` | **v3.0.14** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d114` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.14
+
+- **Auditoria:** RBAC de conteúdo em `audit-access.ts` (clínico / financeiro / PII / segurança / operacional).
+- **Superfícies:** audit, export, revisões, atividade recente do dashboard e timeline Cliente 360°.
+- **Perfis:** ADMIN completo + restore; FATURAMENTO financeiro pleno com PII mascarado; READONLY em resumo; RECEPCAO sem clínico/segurança no dashboard.
+- **Qualidade:** `audit-access`, `audit-rbac-content` · CI #296 verde · pre-release OK.
 
 ### Conteúdo do pacote v3.0.13
 
