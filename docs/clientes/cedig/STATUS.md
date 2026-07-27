@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-27 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.8** |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.15** · produção `6a66de5b` |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` (v3.0.7) |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.8** |
+| Pacote em produção | ✅ | **v3.0.15** · gestão com KPI strip + soft refresh |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 

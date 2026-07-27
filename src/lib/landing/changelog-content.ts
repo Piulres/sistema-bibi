@@ -26,10 +26,31 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.14",
+    version: "3.0.15",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Gestão clínica mais rápida para a recepção: indicadores do mês no topo, refresh sem blank e extras clínicos recolhidos.",
+    highlights: [
+      {
+        title: "Gestão clínica",
+        items: [
+          "Faixa de KPIs (receita, exames, despesas, lucro) sempre visível em /interno/gestao",
+          "Troca de mês e salvamento com refresh soft — formulário permanece na tela",
+          "Extras clínicos (biópsia, polipectomia, clips) recolhidos no fluxo rápido",
+          "Indicadores detalhados carregam sob demanda na aba Indicadores",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #290/#303 · clinic-finance-month-strip · cedig-gestao · docs:verify · pre-release OK · prod 6a66de5b",
+  },
+  {
+    version: "3.0.14",
+    label: "Sistema Bibi - ServiceOS v3.0.14",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Auditoria com RBAC de conteúdo, estoque clínico, cadastros mais rápidos e documentos de saída (receita, exames, encaminhamento) com guias PDF.",
     highlights: [
