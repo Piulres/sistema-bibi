@@ -73,6 +73,8 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Persistência Blob pós-COMMIT (v3.0.11+): `tests/unit/sqlite-transaction-flush.test.ts` — garante que writes em `$transaction` não disparam flush antes do settle · doc [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Flush em transação.
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
@@ -293,6 +295,7 @@ Gotchas confirmados em runtime (jul/2026):
 | Login retorna **500 `The table main.User does not exist`** após `npm run test` | O teste de dual-store gravava `prisma/.data-store-mode=operation`, apontando o dev para `operation.db` (vazio) | Corrigido no `afterEach` do teste; se ainda ocorrer: `rm -f prisma/.data-store-mode prisma/operation.db` (ou `npm run setup`) |
 | `npm run setup` falha com `unknown option: --skip-generate` | Versões recentes do Prisma CLI não aceitam `--skip-generate` em `db push` | Atualize o repo (`scripts/dev-setup.mjs` usa `npx prisma db push` sem flags extras) |
 | `/interno/gestao` 500 em produção (`no such column`) | Blob de operação com schema defasado vs artefato de build | Pacote ≥ v3.0.2 aplica `schema-sync` no boot; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Schema-sync |
+| **Marcar paga** OK na UI mas fatura volta a `FECHADA` após cold start (só produção) | Flush do Blob antes do COMMIT em `$transaction` (corrigido v3.0.11) | Deploy ≥ v3.0.11; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Flush em transação · teste `tests/unit/sqlite-transaction-flush.test.ts` |
 | RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
 
 ### Variáveis em testes

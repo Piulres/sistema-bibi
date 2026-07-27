@@ -319,6 +319,9 @@ Serviço: `src/lib/executive-dashboard.ts` (`getExecutiveDashboard()`). KPIs de 
 
 Serviço: `src/lib/invoice-service.ts` · guia TISS: `src/lib/tiss-service.ts`
 
+**Modo operação (Netlify):** `markInvoicePaid` e confirmação PIX rodam em `$transaction`;
+o Blob só recebe o flush após COMMIT (v3.0.11+). Ver [`OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md) §Flush em transação.
+
 **Validação TISS (v3.0.4):** a rota retorna **422** com `code` quando a fatura existe mas
 não gera guia válida — evita XML semanticamente inválido para a operadora.
 
