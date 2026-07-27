@@ -44,23 +44,25 @@ describe("cancelBeneficiaryAppointment", () => {
     expect(result).toEqual({ error: "Agendamento não encontrado" });
   });
 
-  it("rejeita status diferente de AGENDADO", async () => {
+  it("rejeita status terminal (REALIZADO) — só futuros gerenciáveis", async () => {
+    findFirst.mockResolvedValue({
+      id: "a1",
+      status: "REALIZADO",
+      scheduledAt: new Date(Date.now() + 60_000),
+      patient: { name: "João Pereira" },
+    });
+    const result = await cancelBeneficiaryAppointment(baseInput);
+    expect(result).toEqual({
+      error: "Somente consultas futuras (agendadas ou confirmadas) podem ser canceladas",
+    });
+  });
+
+  it("cancela consulta futura em CONFIRMADO (pós auto-confirm self-service)", async () => {
     findFirst.mockResolvedValue({
       id: "a1",
       status: "CONFIRMADO",
       scheduledAt: new Date(Date.now() + 60_000),
-      patient: { name: "João" },
-    });
-    const result = await cancelBeneficiaryAppointment(baseInput);
-    expect(result).toEqual({ error: "Somente consultas agendadas podem ser canceladas" });
-  });
-
-  it("cancela consulta futura em AGENDADO", async () => {
-    findFirst.mockResolvedValue({
-      id: "a1",
-      status: "AGENDADO",
-      scheduledAt: new Date(Date.now() + 60_000),
-      patient: { name: "João" },
+      patient: { name: "João Pereira" },
     });
     update.mockResolvedValue({});
 

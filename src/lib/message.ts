@@ -7,6 +7,7 @@ export const COMMUNICATION_CHANNELS = [
 ] as const;
 
 export const MESSAGE_TEMPLATES = [
+  { value: "APPOINTMENT_CONFIRMATION", label: "Confirmação de consulta" },
   { value: "APPOINTMENT_REMINDER", label: "Lembrete de consulta" },
   { value: "INVOICE_DUE", label: "Fatura pendente" },
   { value: "SUBSCRIPTION_DUE", label: "Cobrança recorrente" },
@@ -56,19 +57,24 @@ export function buildTemplateBody(input: {
   appointmentDateLabel?: string;
 }): { subject: string | null; body: string } {
   switch (input.template) {
+    case "APPOINTMENT_CONFIRMATION":
+      return {
+        subject: "Consulta confirmada — Sistema Bibi",
+        body: `Olá ${input.patientName}, sua consulta foi confirmada para ${input.appointmentDateLabel ?? "em breve"}. Se precisar remarcar, use o portal do beneficiário.`,
+      };
     case "APPOINTMENT_REMINDER":
       return {
-        subject: "Lembrete de consulta — Bibi Saúde",
+        subject: "Lembrete de consulta — Sistema Bibi",
         body: `Olá ${input.patientName}, lembramos sua consulta agendada para ${input.appointmentDateLabel ?? "em breve"}. Em caso de impossibilidade, entre em contato conosco.`,
       };
     case "INVOICE_DUE":
       return {
-        subject: "Fatura pendente — Bibi Saúde",
+        subject: "Fatura pendente — Sistema Bibi",
         body: `Olá ${input.patientName}, você possui procedimentos pendentes de faturamento no valor de ${input.amountLabel ?? formatBRL(0)}. Acesse o portal do beneficiário para detalhes.`,
       };
     case "SUBSCRIPTION_DUE":
       return {
-        subject: "Cobrança recorrente — Bibi Saúde",
+        subject: "Cobrança recorrente — Sistema Bibi",
         body: `Olá ${input.patientName}, sua assinatura possui cobrança pendente de ${input.amountLabel ?? formatBRL(0)}. Regularize para manter o plano ativo.`,
       };
     default:

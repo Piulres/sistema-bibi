@@ -152,8 +152,10 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     flow: "Agendamento",
     title: "Confirmação automática pós-agendamento",
     description: "Notificação e confirmação automática sem intervenção da recepção.",
-    status: "planned",
-    docRef: "JORNADA_CLIENTE.md §8",
+    status: "implemented",
+    ui: "/beneficiario (agendar)",
+    api: "POST /api/beneficiario/appointments → status CONFIRMADO + Message APPOINTMENT_CONFIRMATION",
+    docRef: "FLUXOS.md §8.9 · JORNADA_CLIENTE.md §8",
   },
   {
     id: "pj-appointment-request",
