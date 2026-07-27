@@ -141,6 +141,8 @@ model User {
   calendarConnections          CalendarConnection[]
   providerAvailabilities        ProviderAvailability[]
   providerBlockedTimes          ProviderBlockedTime[]
+  appointmentParticipations     AppointmentParticipant[]
+  prescriptionDocuments         PrescriptionDocument[] @relation("ProviderPrescriptionDocuments")
 }
 
 /// Empresa contratante (Pessoa Juridica) - Portal PJ.
@@ -207,6 +209,7 @@ model Patient {
   medicalRecords MedicalRecord[]
   clinicalProfile PatientClinicalProfile?
   medicationPrescriptions MedicationPrescription[]
+  prescriptionDocuments PrescriptionDocument[]
   examOrders     ExamOrder[]
   protocolEnrollments PatientProtocolEnrollment[]
   invoices       Invoice[]
@@ -243,6 +246,7 @@ model Pet {
   medicalRecords MedicalRecord[]
   clinicalProfile PetClinicalProfile?
   medicationPrescriptions MedicationPrescription[]
+  prescriptionDocuments PrescriptionDocument[]
   examOrders     ExamOrder[]
   vaccineRecords PetVaccineRecord[]
 
@@ -296,6 +300,8 @@ model Procedure {
   basePrice   Float
   /// Código regulatório opcional (TUSS/ANS, OAB, etc.)
   tissCode    String?
+  /// JSON: [{ role, required, minCount? }] — papéis de equipe exigidos (ex.: anestesista em colonoscopia).
+  requiredTeamRoles String?
   createdAt   DateTime @default(now())
 
   tenantId String
@@ -570,6 +576,30 @@ model Appointment {
   protocolEnrollments PatientProtocolEnrollment[]
   clinicExamLaunch ClinicExamLaunch?
   externalCalendarEvents AppointmentExternalEvent[]
+  participants       AppointmentParticipant[]
+  prescriptionDocuments PrescriptionDocument[]
+}
+
+/// Profissional auxiliar vinculado a um atendimento (anestesista, técnico de enfermagem, etc.).
+/// role: ANESTESISTA | TECNICO_ENFERMAGEM | ASSISTENTE | PARALEGAL | OUTRO
+model AppointmentParticipant {
+  id        String   @id @default(cuid())
+  role      String
+  notes     String?
+  createdAt DateTime @default(now())
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  /// Cobrança PPU vinculada ao participante (honorários / taxa de equipe).
+  procedureUsageId String? @unique
+  procedureUsage   ProcedureUsage? @relation(fields: [procedureUsageId], references: [id])
+
+  @@unique([appointmentId, userId, role])
+  @@index([appointmentId])
 }
 
 /// Uso efetivo de procedimento (nucleo do Pay Per Use).
@@ -589,6 +619,7 @@ model ProcedureUsage {
 
   invoiceItem InvoiceItem?
   clinicExamLaunch ClinicExamLaunch?
+  participant AppointmentParticipant?
 }
 
 /// Prontuario Eletronico do Paciente (PEP).
@@ -655,6 +686,53 @@ model MedicationPrescription {
 
   @@index([patientId, status])
   @@index([petId, status])
+}
+
+/// Receita / prescrição estruturada multi-item (documento clínico).
+/// status: ATIVA | CANCELADA
+/// prescriptionKind: COMUM | CONTROLE_ESPECIAL
+model PrescriptionDocument {
+  id               String   @id @default(cuid())
+  prescriptionKind String   @default("COMUM")
+  title            String?
+  notes            String?
+  status           String   @default("ATIVA")
+  createdAt        DateTime @default(now())
+
+  patientId String
+  patient   Patient @relation(fields: [patientId], references: [id], onDelete: Cascade)
+
+  petId String?
+  pet   Pet?    @relation(fields: [petId], references: [id])
+
+  providerId String
+  provider   User   @relation("ProviderPrescriptionDocuments", fields: [providerId], references: [id])
+
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+
+  items PrescriptionDocumentItem[]
+
+  @@index([patientId, status])
+  @@index([appointmentId])
+}
+
+/// Item de uma prescrição multi-medicamento.
+model PrescriptionDocumentItem {
+  id           String @id @default(cuid())
+  sortOrder    Int    @default(0)
+  medication   String
+  dosage       String
+  frequency    String
+  route        String?
+  durationDays Int?
+  quantity     String?
+  notes        String?
+
+  documentId String
+  document   PrescriptionDocument @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  @@index([documentId, sortOrder])
 }
 
 /// Pedido de exame (workflow clínico).

@@ -6,6 +6,8 @@ import {
   canTransitionAppointmentStatus,
   isAppointmentStatus,
 } from "@/lib/appointment-status";
+import { listAppointmentParticipants } from "@/lib/appointment-team-service";
+import { parseTeamRoleRequirements } from "@/lib/clinical/team-roles";
 import {
   recordTimelineEvent,
   TIMELINE_ACTIONS,
@@ -29,6 +31,7 @@ export async function GET(
       include: {
         patient: { include: { company: true } },
         pet: { select: { id: true, name: true, species: true, breed: true } },
+        procedure: { select: { id: true, name: true, requiredTeamRoles: true } },
         usages: {
           include: {
             procedure: true,
@@ -43,6 +46,17 @@ export async function GET(
     if (!appointment) {
       return NextResponse.json({ error: "Agendamento não encontrado" }, { status: 404 });
     }
+
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: user.tenantId },
+      select: { niche: true },
+    });
+
+    const participants = await listAppointmentParticipants(
+      appointment.id,
+      user.tenantId,
+      (tenant?.niche as "MEDICAL") ?? "MEDICAL",
+    );
 
     return NextResponse.json({
       appointment: {
@@ -83,6 +97,14 @@ export async function GET(
         title: r.title,
         createdAt: r.createdAt,
       })),
+      participants,
+      scheduledProcedure: appointment.procedure
+        ? {
+            id: appointment.procedure.id,
+            name: appointment.procedure.name,
+            teamRequirements: parseTeamRoleRequirements(appointment.procedure.requiredTeamRoles),
+          }
+        : null,
     });
   } catch (error) {
     return authErrorResponse(error);

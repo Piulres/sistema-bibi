@@ -5,6 +5,7 @@ import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
+import PrescriptionDocumentForm from "@/components/clinical/PrescriptionDocumentForm";
 
 const fieldClass =
   "w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
@@ -505,6 +506,13 @@ export default function ClinicalCarePanel({
             </li>
           ))}
         </ul>
+
+        <PrescriptionDocumentForm
+          patientId={patientId}
+          appointmentId={appointmentId}
+          petId={petId}
+          onChanged={onChanged}
+        />
       </div>
     );
   }

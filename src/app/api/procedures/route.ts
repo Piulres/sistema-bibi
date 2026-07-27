@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
 import { requireUser, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
+import { parseTeamRoleRequirements } from "@/lib/clinical/team-roles";
 
 /** Catalogo de procedimentos do tenant (consultas e exames). */
 export async function GET() {
@@ -22,6 +23,7 @@ export async function GET() {
         category: p.category,
         basePrice: p.basePrice,
         basePriceLabel: formatBRL(p.basePrice),
+        teamRequirements: parseTeamRoleRequirements(p.requiredTeamRoles),
       })),
     });
   } catch (error) {
