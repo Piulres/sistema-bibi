@@ -15,9 +15,9 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.14** — deploy `6a66dac3` @ `6c1bba2` (`bibi-poc-2026-07-27e`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.14** — deploy `6a66db43` @ `59700b5` (`bibi-poc-2026-07-27e`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.14** · sincronizados · artefato prod `@ 6c1bba2` |
+| **Release `main` / `dev`** | **v3.0.14** · sincronizados @ `59700b5` |
 | **Pacote anterior em produção** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.14** (auditoria + estoque + cadastros + documentos de saída) |
 | **Release** | `main` | **v3.0.14** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.14** · deploy `6a66dac3` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.14** · deploy `6a66db43` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.14
@@ -38,16 +38,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Estoque:** reversão completa (ENTRADA/SAIDA/DISPENSACAO/…); bloqueio de dispensação em CANCELADO/FALTOU; docs API alinhados.
 - **Cadastros:** tela `/interno/cadastros` com fetch por aba + `next/dynamic` (sem bloquear UI no Promise.all das 4 listas).
 - **Documentos de saída:** encaminhamento (`ClinicalReferral`) + guias PDF (receita, pedido de exames, encaminhamento) + aba Documentos no atendimento + `/beneficiario/documentos`.
-- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` · `cadastros-resolve-tab` · `documentos-saida` · CI #291/#293/#296/#299 verdes · deploy `6a66dac3`.
+- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` · `cadastros-resolve-tab` · `documentos-saida` · CI #291/#293/#296/#299 verdes · pre-release OK · deploy `6a66db43`.
 
 ### Smoke (27/07/2026) — produção v3.0.14
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.14` · deploy `6a66dac3` |
+| Landing `/` | 200 · footer `v3.0.14` · deploy `6a66db43` |
 | CSS `/_next/static/chunks/*.css` | 200 |
-| `/instalar` | 200 |
-| `/?tenant=cedig` | 200 |
+| `/interno/login` | 200 |
+| `/interno/cadastros` | 307 (auth) |
+| `/beneficiario/documentos` | 307 (auth) |
 | Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.13
@@ -57,6 +58,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Faturamento:** PIX / Marcar paga só em faturas `FECHADA` (alinhado à API).
 - **Qualidade:** CI Job Summary (Vitest/Playwright) · massas com nomes realistas · reseed de `test.db` no fingerprint mismatch · `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
 
+### Smoke (27/07/2026) — produção v3.0.14
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.14` · deploy `6a66db43` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
+| `/interno/cadastros` | 307 (auth) |
+| `/beneficiario/documentos` | 307 (auth) |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (27/07/2026) — produção v3.0.13
 
@@ -236,7 +247,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.14`** | `10b3bc5` | Auditoria RBAC + estoque + cadastros otimizados · deploy `6a66da39` |
+| **`v3.0.14`** | `59700b5` | Auditoria RBAC + estoque + cadastros + documentos · deploy `6a66db43` |
 | **`v3.0.13`** | `78b575f` | Exportações autenticadas + equipe + receita multi-item · deploy `6a66d114` |
 | **`v3.0.10`** | `b9ff9cb` | Mês operacional + jornada/testes + agenda/calendário · deploy `6a66a38b` |
 | **`v3.0.9`** | `0bd89b2` | Hotfix timezone America/Sao_Paulo (#263) · deploy `6a669510` |
