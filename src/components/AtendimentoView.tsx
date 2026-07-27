@@ -595,6 +595,7 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
             title="Dispensação de materiais"
             description="Baixa de estoque vinculada ao paciente — rastreabilidade por lote (FIFO)."
           />
+          {canRegisterProcedureForStatus(detail.appointment.status) ? (
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-stretch">
             <select
               value={selectedMaterial}
@@ -621,6 +622,12 @@ export default function AtendimentoView({ appointmentId }: { appointmentId: stri
               Dispensar
             </Button>
           </div>
+          ) : (
+            <p className="mt-4 text-sm text-[var(--text-muted)]">
+              Este agendamento está <strong>{detail.appointment.status.toLowerCase()}</strong> e
+              não aceita nova dispensação de materiais.
+            </p>
+          )}
           <ul className="mt-4 divide-y divide-[var(--border-default)]">
             {dispensations.length === 0 && (
               <li className="py-3 text-sm text-[var(--text-muted)]">

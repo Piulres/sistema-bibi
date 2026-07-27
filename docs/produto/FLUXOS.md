@@ -448,10 +448,10 @@ Serviço: `src/lib/webhook-service.ts`
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Produtos | `GET/POST /api/interno/stock/products`, `PATCH/DELETE .../[id]` | CRUD catálogo |
+| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) |
 | Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade e saldo |
-| Movimentações | `POST /api/interno/stock/movements` | Entrada/saída/ajuste |
-| Kits por procedimento | `GET/PUT /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento |
+| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória |
+| Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
 Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).
