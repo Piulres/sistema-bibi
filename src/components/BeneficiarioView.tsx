@@ -312,7 +312,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
           }),
         }),
       {
-        successMessage: `${labels.appointment} agendado(a)! Aguarde confirmação da clínica.`,
+        successMessage: `${labels.appointment} confirmado(a)! Você receberá a confirmação por e-mail.`,
         onSuccess: async () => {
           await reloadOverview();
         },
@@ -675,7 +675,8 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
           <div className="mt-3 space-y-3">
             {overview.appointments.map((appointment) => {
               const time = formatTimeBR(new Date(appointment.scheduledAt));
-              const canManage = appointment.status === "AGENDADO";
+              const canManage =
+                appointment.status === "AGENDADO" || appointment.status === "CONFIRMADO";
               return (
                 <AppointmentCard
                   key={appointment.id}
