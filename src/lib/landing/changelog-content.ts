@@ -44,7 +44,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #290 · clinic-finance-month-strip · cedig-gestao · docs:verify · pre-release",
+      "CI unit+E2E #290/#303 · clinic-finance-month-strip · cedig-gestao · docs:verify · pre-release OK · prod 6a66de5b",
   },
   {
     version: "3.0.14",
