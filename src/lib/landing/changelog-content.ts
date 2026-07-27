@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.21",
+    version: "3.0.22",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "RBAC Fase 5: mutações do portal interno exigem requireInternoModuleWrite; mapa de fluxos alinhado.",
+    highlights: [
+      {
+        title: "Segurança / RBAC",
+        items: [
+          "POST/PATCH/PUT/DELETE internos usam requireInternoModuleWrite (ou Admin)",
+          "READONLY bloqueado em mutações mesmo com módulo de leitura",
+          "Inventário travado em rbac-gaps + interno-write-guards",
+        ],
+      },
+      {
+        title: "Mapa de fluxos",
+        items: [
+          "interno-rbac-hardening → implemented",
+          "Backlog: CRUD de colaboradores no portal PJ",
+        ],
+      },
+    ],
+    testStats: "CI #354 · rbac-gaps · interno-write-guards · flow-improvements-map",
+  },
+  {
+    version: "3.0.21",
+    label: "Sistema Bibi - ServiceOS v3.0.21",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Documentos de saída com melhores práticas e fix do assistente (ruleOverrides no runtime).",
     highlights: [
@@ -49,7 +75,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #342/#343 · documentos-saida · clinical-discharge · pre-release OK · prod 6a6708db",
+      "CI unit+E2E #342/#343 · documentos-saida · clinical-discharge · pre-release OK · prod 6a670ad1",
   },
   {
     version: "3.0.20",

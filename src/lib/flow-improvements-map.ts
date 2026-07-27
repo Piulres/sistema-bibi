@@ -182,9 +182,22 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     portal: "Interno",
     flow: "Segurança",
     title: "RBAC em todas as APIs internas",
-    description: "Alinhar requireInternoModule() em mutações além das páginas.",
-    status: "partial",
-    docRef: "AUDITORIA_FLUXOS.md §4",
+    description:
+      "Mutações POST/PATCH/PUT/DELETE usam requireInternoModuleWrite (ou Admin); GET permanece em requireInternoModule.",
+    status: "implemented",
+    api: "requireInternoModuleWrite · tests/security/rbac-gaps.test.ts",
+    docRef: "AUDITORIA_FLUXOS.md §5 · ASSISTENTE_REGRAS_PLANO.md Fase 5",
+  },
+  {
+    id: "pj-beneficiary-crud",
+    portal: "PJ",
+    flow: "Cadastros",
+    title: "CRUD de colaboradores no portal PJ",
+    description:
+      "RH inclui/exclui beneficiários da empresa sem depender da recepção; upload em lote opcional.",
+    status: "planned",
+    ui: "/pj → Beneficiários",
+    docRef: "JORNADA_CLIENTE.md §4 · FLUXOS.md §5",
   },
 ];
 

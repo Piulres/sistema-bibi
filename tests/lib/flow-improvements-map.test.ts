@@ -30,4 +30,15 @@ describe("flow-improvements-map", () => {
     expect(item?.status).toBe("implemented");
     expect(item?.api).toContain("POST /api/pj/appointments");
   });
+
+  it("marca interno-rbac-hardening como implementado após Fase 5 write guards — mapa acompanha inventário", () => {
+    const item = FLOW_IMPROVEMENTS_MAP.find((i) => i.id === "interno-rbac-hardening");
+    expect(item?.status).toBe("implemented");
+    expect(item?.api).toMatch(/requireInternoModuleWrite/);
+  });
+
+  it("mantém pj-beneficiary-crud no backlog — RH ainda depende da recepção para incluir colaborador", () => {
+    const item = FLOW_IMPROVEMENTS_MAP.find((i) => i.id === "pj-beneficiary-crud");
+    expect(item?.status).toBe("planned");
+  });
 });

@@ -11,24 +11,30 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.21** — Documentos de saída (melhores práticas) **em produção**.
+> Pacote **v3.0.22** — RBAC write guards Fase 5 **no tip** (produção ainda **v3.0.21** até deploy).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.21** — deploy `6a670ad1` @ `d9bd043` (`bibi-poc-2026-07-27m`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.21** em produção @ `d9bd043` · tip `eb9907f` (+ RBAC write-guards #354 na `main`, próximo pacote) |
-| **Pacote anterior em produção** | **3.0.20** — deploy `6a6702f7` @ `75d82eb` (`bibi-poc-2026-07-27l`) |
+| **Release `main` / `dev`** | tip **v3.0.22** (RBAC #354 + mapa) · produção **v3.0.21** @ `d9bd043` |
+| **Pacote anterior em produção** | **3.0.21** — deploy `6a670ad1` @ `d9bd043` (`bibi-poc-2026-07-27m`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.21** (documentos saída + fix assistente runtime) |
-| **Release** | `main` | **v3.0.21** |
+| **Integração** | `dev` | **v3.0.22** (RBAC write guards + mapa) |
+| **Release** | `main` | **v3.0.22** (pendente deploy) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.21** · deploy `6a670ad1` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.22 (tip — pré-deploy)
+
+- **RBAC Fase 5:** mutações internas → `requireInternoModuleWrite` / Admin (#354).
+- **Mapa:** `interno-rbac-hardening` implemented · backlog `pj-beneficiary-crud`.
+- **Docs:** FLUXOS §9 alinhado à Fase 5 · `V3_0` / changelog landing.
 
 ### Conteúdo do pacote v3.0.21
 
@@ -362,10 +368,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.22`** | _(tip)_ | RBAC write guards Fase 5 · #354 · mapa fluxos |
+| **`v3.0.21`** | `d9bd043` | Documentos de saída · deploy `6a670ad1` · #342/#343 |
 | **`v3.0.20`** | `75d82eb` | Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar · deploy `6a66fe7f` · #335/#337/#338/#340 |
 | **`v3.0.19`** | `1fca530` | Assistente Fase 3 CRUD + brand mark · deploy `6a66f3a7` · #325/#329/#330 |
 | **`v3.0.18`** | `372b5cc` | Estoque Fase 3 SEM-LOTE + Assistente regras · deploy `6a66e9d6` · #319/#321/#326 |
-| **`v3.0.21`** | `d9bd043` | Documentos de saída · deploy `6a670ad1` · #342/#343 |
 | **`v3.0.20`** | `75d82eb` | Estoque/assistente/Capacitor/PJ · tip `6a6702f7` |
 | **`v3.0.17`** | `c3eb563` | RBAC clínico 360° + a11y + auto-confirm · deploy `6a66e5f9` · #292/#317/#318 |
 | **`v3.0.16`** | `9e98494` | Reagendar + Assistente Fase 0 + estoque UI · deploy `6a66e115` · #282/#286/#306/#308 |
@@ -615,7 +622,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.21` em produção** — documentos de saída · deploy `6a670ad1` |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | tip **`v3.0.22`** (RBAC Fase 5) · produção **`v3.0.21`** · deploy `6a670ad1` |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
