@@ -286,7 +286,7 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
-| *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
+| *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD (detalhe clínico só ADMIN — v3.0.17) |
 
 Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
 
@@ -781,7 +781,8 @@ Valores: `AGENDADO | CONFIRMADO | REALIZADO | FALTOU | CANCELADO`
 
 ```mermaid
 stateDiagram-v2
-  [*] --> AGENDADO: beneficiário / recepção
+  [*] --> AGENDADO: recepção / walk-in
+  [*] --> CONFIRMADO: beneficiário self-service (v3.0.17)
   [*] --> CONFIRMADO: recepção (form default)
   AGENDADO --> CONFIRMADO: PATCH interno
   AGENDADO --> CANCELADO: PATCH
@@ -890,7 +891,7 @@ Especificação completa: [`public/openapi.yaml`](../../public/openapi.yaml)
 3. **Adapters mock** — `PAYMENT_GATEWAY=mock`, `COMMUNICATION_PROVIDER=console`.
 4. **TISS** — XML simplificado com validação estrutural (422 `NO_ITEMS` / `NO_PATIENT_DOCUMENT`); XSD oficial ANS pendente (Tier 5).
 5. **Domínio custom** — verificação manual; sem challenge DNS automático.
-6. **Cliente 360°** — acessível a qualquer INTERNO autenticado (sem módulo RBAC na página).
+6. **Cliente 360°** — qualquer `INTERNO` autenticado acessa a página; **corpo clínico** (`GET …/clinical`, `medicalRecords` no overview/export PEP) só **ADMIN** via `canAccessPatientClinicalDetail` — RECEPCAO não usa `cadastros` como backdoor (v3.0.17).
 7. **Auditoria de fluxos** — mapa completo de falhas por portal em [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) (2026-06-22).
 
 ---

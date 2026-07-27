@@ -97,10 +97,11 @@ Localizados em `src/components/ui/`:
 | Peça | Uso |
 |------|-----|
 | Skip link | `.ds-skip-link` → `#portal-main` (portais) / `#conteudo-principal` (landing) / `#login-main` |
-| Focus trap | `useFocusTrap` — dialogs, drawers, assistente, onboarding |
+| Focus trap | `useFocusTrap` — `ConfirmDialog`, drawers (`MobileNavDrawer`, `MobileSectionDrawer`, landing), assistente, onboarding |
 | Menus | `useMenuKeyboard` — menu **Mais** (`NavTabs`) e “Adicionar ao calendário” |
+| Tablists | `TabBar`, `RovingTablist`, filtros de estoque (`StockView`) — roving tabindex + setas/Home/End |
 | Focus ring | `--ring-focus` + regra global `:focus-visible` em `globals.css` |
-| Helpers | `src/lib/a11y/focus.ts` (roving index, trap Tab) |
+| Helpers | `src/lib/a11y/focus.ts` (`getNextRovingIndex`, `resolveRovingKey`, trap Tab) |
 
 Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário, prestador e walk-in da agenda.
 

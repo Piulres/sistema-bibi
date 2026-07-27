@@ -17,6 +17,7 @@ via API.
 | 3 | 2026-07-26 | `fc9afa7` (v3.0.3) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente, schema-sync Blob) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **3.3 (RBAC clínico)** | **2026-07-27** | branch `cursor/auditoria-rbac-fase3-e47e` | Fecha backdoor de PEP no Cliente 360° — detalhe clínico só ADMIN |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -28,6 +29,11 @@ via API.
 > passam a exigir `requireInternoModuleWrite` (bloqueio explícito de READONLY);
 > onboarding com `npm run setup` + gotchas de teste documentados
 > (`docs/plataforma/TESTES.md` §Setup e gotchas).
+
+> **Rodada 3.3:** `canAccessPatientClinicalDetail` em `audit-access.ts` bloqueia
+> `GET /api/interno/patients/[id]/clinical`, corpo de PEP no overview/export e PDF
+> de registro para perfis que não são ADMIN. RECEPCAO com `cadastros` deixa de
+> ler prontuário via Cliente 360°. Teste: `tests/api/patient-clinical-rbac.test.ts`.
 
 **Relacionado:** [`FLUXOS.md`](FLUXOS.md) · [`JORNADA_CLIENTE.md`](JORNADA_CLIENTE.md) · [`TESTES.md`](../plataforma/TESTES.md)
 
@@ -170,6 +176,16 @@ Comportamento **observado** hoje (era o P0 crítico na rodada 1):
 
 Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` /
 `requireInternoAdmin`. Teste `tests/security/rbac-gaps.test.ts` trava a regressão.
+
+### RBAC clínico Cliente 360° — rodada 3.3 (v3.0.17)
+
+| Perfil | `GET …/overview` (PEP) | `GET …/clinical` | Export PEP (`?recordId=&format=pdf`) |
+|--------|------------------------|------------------|--------------------------------------|
+| ADMIN | `medicalRecords` com `content` | **200** | **200** |
+| RECEPCAO | resumo sem corpo clínico | **403** | **403** |
+| FATURAMENTO / READONLY | resumo sem corpo clínico | **403** | **403** |
+
+Gate: `canAccessPatientClinicalDetail()` em `src/lib/audit-access.ts` — alinhado ao nível `full` da classe `clinical` na matriz de auditoria. Teste: `tests/api/patient-clinical-rbac.test.ts`.
 
 ### Falha remanescente (média — defesa em profundidade)
 

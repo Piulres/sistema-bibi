@@ -439,7 +439,51 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 10. Referências
+## 10. Cliente 360° — RBAC clínico (v3.0.17)
+
+Rotas do beneficiário no portal interno. A página `/interno/beneficiarios/[id]` não exige módulo RBAC, mas o **conteúdo clínico** é filtrado por perfil.
+
+| Método | Path | Auth | Comportamento |
+|--------|------|------|---------------|
+| `GET` | `/api/interno/patients/{id}/overview` | `INTERNO` (qualquer perfil) | Resumo operacional; `medicalRecords` com corpo só se `canAccessPatientClinicalDetail` |
+| `GET` | `/api/interno/patients/{id}/clinical` | `INTERNO` **ADMIN** | PEP, medicações, exames, protocolos — **403** para RECEPCAO/FATURAMENTO/READONLY |
+| `GET` | `/api/interno/patients/{id}/export` | interno `cadastros` | LGPD JSON ou seções tabulares; PDF de registro (`?recordId=&format=pdf`) só ADMIN |
+
+Gate: `canAccessPatientClinicalDetail()` em `src/lib/audit-access.ts` — alinhado à matriz de auditoria (classe `clinical` = nível `full` só ADMIN).
+
+```bash
+# RECEPCAO — overview sem corpo de PEP (200, medicalRecords vazio)
+curl -b cookies-recepcao.txt \
+  "http://localhost:3000/api/interno/patients/PATIENT_ID/overview"
+
+# RECEPCAO — detalhe clínico bloqueado (403)
+curl -b cookies-recepcao.txt \
+  "http://localhost:3000/api/interno/patients/PATIENT_ID/clinical"
+```
+
+Testes: `tests/api/patient-clinical-rbac.test.ts` · produto: [`FLUXOS.md`](../produto/FLUXOS.md) §4.9 · [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
+
+---
+
+## 11. Auditoria — capabilities (v3.0.17)
+
+`GET /api/interno/audit` retorna eventos redigidos por perfil **e** metadados de capacidade do viewer:
+
+| Campo | Tipo | Descrição |
+|-------|------|-----------|
+| `capabilities.profile` | `InternoProfile` | Perfil resolvido (`ADMIN`, `FATURAMENTO`, …) |
+| `capabilities.canRestore` | `boolean` | Restore de revisão — só ADMIN |
+| `capabilities.canExport` | `boolean` | Export da timeline — RECEPCAO excluída |
+| `capabilities.canViewFullDiff` | `boolean` | Diffs completos — ADMIN e FATURAMENTO |
+| `allowedEntityTypes` | `string[]` | Tipos visíveis (clínico oculto para RECEPCAO) |
+
+Schema OpenAPI: `AuditViewerCapabilities` em `public/openapi.yaml`. Serviço: `resolveAuditViewerCapabilities()` em `src/lib/audit-access.ts`.
+
+Busca `?search=` só cobre entity types com nível `full` — evita oráculo de existência em eventos clínicos/PII redigidos.
+
+---
+
+## 12. Referências
 
 - [`ARQUITETURA.md`](ARQUITETURA.md) §20 — visão geral da API
 - [`FLUXOS.md`](../produto/FLUXOS.md) §11 — mapa de APIs por portal

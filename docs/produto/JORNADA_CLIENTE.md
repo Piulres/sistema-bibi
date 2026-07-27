@@ -106,7 +106,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Etapa | Ação do usuário | Onde na UI | Efeito no sistema |
 |-------|-----------------|------------|-------------------|
 | 1. Entrada | Login com e-mail + senha | `/beneficiario/login` | Sessão escopada ao `patientId` |
-| 2. Agendar | Escolhe prestador, data, slot, modalidade | Card “Agendar consulta” | `Appointment` AGENDADO; webhook `APPOINTMENT_CREATED` |
+| 2. Agendar | Escolhe prestador, data, slot, modalidade | Card “Agendar consulta” | `Appointment` **CONFIRMADO** + e-mail `APPOINTMENT_CONFIRMATION`; webhook `APPOINTMENT_CREATED` |
 | 3. Consulta | Acessa link telemedicina (TELE) ou comparece presencial | Tabela “Minha agenda” | — |
 | 4. Pós-atendimento | Consulta consumo Pay Per Use | Seção “Consumo Pay Per Use” | Vê procedimentos `billed` / não `billed` |
 | 5. Faturamento | Aguarda fatura emitida pelo interno | KPI “Total faturado” | — |

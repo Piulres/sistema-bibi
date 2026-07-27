@@ -57,7 +57,12 @@ Complementa (não substitui):
 
 ## 1. Ato 1 — Marcar a consulta
 
-Qualquer caminho termina em um `Appointment`. Status inicial costuma ser **`AGENDADO`** (ou já **`CONFIRMADO`** se a recepção usar o default do formulário).
+Qualquer caminho termina em um `Appointment`. O status inicial depende do canal:
+
+| Canal | Status inicial |
+|-------|----------------|
+| Recepção / walk-in interno | **`AGENDADO`** (ou **`CONFIRMADO`** se o formulário usar esse default) |
+| Self-service beneficiário (`/beneficiario/agendar`) | **`CONFIRMADO`** — confirmação automática + e-mail `APPOINTMENT_CONFIRMATION` |
 
 ### Opção A — Recepção agenda paciente já cadastrado
 
@@ -80,9 +85,10 @@ Detalhe: [`FLUXOS.md`](FLUXOS.md) §8.5.
 ### Opção C — Beneficiário agenda sozinho
 
 - **Tela:** `/beneficiario/agendar`
-- Escolhe prestador → slots (8h–18h, 30 min) → modalidade → cria `AGENDADO`
-- Também dispara `APPOINTMENT_CREATED`
-- Detalhe: [`FLUXOS.md`](FLUXOS.md) §6
+- Escolhe prestador → slots (8h–18h, 30 min) → modalidade
+- `bookBeneficiaryAppointment` (`scheduling-service.ts`) cria em **`CONFIRMADO`** e enfileira `APPOINTMENT_CONFIRMATION` (canal `EMAIL`, mock/console na POC)
+- Também dispara webhook `APPOINTMENT_CREATED`
+- Detalhe: [`FLUXOS.md`](FLUXOS.md) §6 · teste: `tests/lib/scheduling-auto-confirm.test.ts`
 
 ### Opção D — Caminho CEDIG / gestão clínica (paralelo, MEDICAL/DENTAL)
 
@@ -98,21 +104,22 @@ Detalhe: [`FLUXOS.md`](FLUXOS.md) §8.5.
 |------|------|--------|
 | Lembrete 24h | Comunicação / cron | Template `APPOINTMENT_REMINDER` (mock/console na POC) |
 | Mensagem manual | `/interno/comunicacao` | Fila `PENDENTE` → despacho |
-| Cancelar (beneficiário) | Minha agenda | Só se `AGENDADO` e consulta futura; libera slot |
+| Cancelar / reagendar (beneficiário) | Minha agenda | `AGENDADO` ou `CONFIRMADO` futuros; libera slot ao cancelar |
 | Cancelar / faltou (interno) | `/interno/agenda` | `CANCELADO` ou `FALTOU`; libera slot |
 
 ---
 
 ## 2. Ato 2 — Chegada e confirmação
 
-Antes do médico atender de fato, o status costuma ir para **`CONFIRMADO`**.
+Antes do médico atender de fato, o status precisa estar em **`CONFIRMADO`**.
 
-### Quem pode confirmar
+### Caminhos para `CONFIRMADO`
 
-| Quem | Onde | Como |
-|------|------|------|
-| Recepção | `/interno/agenda` | Check-in “confirmar chegada” |
-| Prestador | `/prestador/atendimento/[id]` | “Paciente presente” |
+| Origem | Quem | Onde | Como |
+|--------|------|------|------|
+| Self-service | Beneficiário | `/beneficiario/agendar` | Já nasce `CONFIRMADO` (v3.0.17) — recepção não precisa confirmar de novo |
+| Recepção | Operador interno | `/interno/agenda` | Check-in “confirmar chegada” (`AGENDADO` → `CONFIRMADO`) |
+| Prestador | Médico | `/prestador/atendimento/[id]` | “Paciente presente” (`AGENDADO` → `CONFIRMADO`) |
 
 ### Modalidade no dia
 
@@ -125,7 +132,8 @@ Antes do médico atender de fato, o status costuma ir para **`CONFIRMADO`**.
 |----------|--------|
 | Não veio | `FALTOU` |
 | Desistiu | `CANCELADO` |
-| Ainda não chegou | permanece `AGENDADO` (stepper: Agendado) |
+| Ainda não chegou (agendado pela recepção) | permanece `AGENDADO` (stepper: Agendado) |
+| Já confirmou pelo portal | permanece `CONFIRMADO` até o atendimento |
 
 ---
 
@@ -215,8 +223,9 @@ CLIENTE
  └─ (MEDICAL/DENTAL) ──► opcional: Gestão CEDIG (ponte)
 
 APPOINTMENT
+ ├─ self-service beneficiário ──► CONFIRMADO (+ e-mail)
  ├─ AGENDADO ──► cancelar / faltou / check-in
- ├─ CONFIRMADO ──► (recepção OU médico)
+ ├─ CONFIRMADO ──► (recepção OU médico OU já veio do portal)
  │     modalidade: PRESENCIAL | TELE
  └─ REALIZADO ──► médico + ProcedureUsage (+ PEP/receita/exames/protocolos)
 
@@ -246,8 +255,8 @@ Cenário: *cliente particular ou beneficiário já registrado chega, marca consu
 | # | Quem | Ação | Tela / resultado |
 |---|------|------|------------------|
 | 1 | Cliente | Chega (ou já tinha agendado self-service) | — |
-| 2 | Operador interno (recepção) | Walk-in: cadastra + agenda · Já cadastrado: só agenda · Já agendado: só confere | `/interno/agenda` → `AGENDADO` |
-| 3 | Operador interno (recepção) | Check-in de chegada | mesma agenda → `CONFIRMADO` |
+| 2 | Operador interno (recepção) | Walk-in: cadastra + agenda · Já cadastrado: só agenda · Self-service: só confere (já `CONFIRMADO`) | `/interno/agenda` → `AGENDADO` ou conferência |
+| 3 | Operador interno (recepção) | Check-in de chegada (só se ainda `AGENDADO`) | mesma agenda → `CONFIRMADO` |
 | 4 | Médico | Abre atendimento, lança procedimento(s), opcional PEP/receita/exames/protocolos | `/prestador/atendimento/[id]` → `REALIZADO` |
 | 5 | Operador interno (faturamento) | Emite fatura | `/interno` (Billing) → Invoice `FECHADA` |
 | 6 | Caixa / beneficiário | PIX interno, marcar paga, ou PIX no portal do cliente | Invoice `PAGA` |

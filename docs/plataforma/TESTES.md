@@ -85,6 +85,16 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.17 (RBAC clínico + agenda + a11y):
+
+| Área | Arquivo | O que valida |
+|------|---------|--------------|
+| Cliente 360° — PEP só ADMIN | `tests/api/patient-clinical-rbac.test.ts` | RECEPCAO sem `medicalRecords.content`; `GET …/clinical` → 403 |
+| Auto-confirm self-service | `tests/lib/scheduling-auto-confirm.test.ts` | `bookBeneficiaryAppointment` → `CONFIRMADO` + `APPOINTMENT_CONFIRMATION` |
+| Cancel/reagendar pós-confirm | `tests/lib/scheduling-cancel.test.ts` | Cancela consulta futura em `CONFIRMADO` |
+| Roving tabindex / setas | `tests/unit/a11y-focus.test.ts` | `getNextRovingIndex`, `resolveRovingKey` (TabBar, menus) |
+| Matriz audit-access | `tests/unit/audit-access.test.ts` | `canAccessPatientClinicalDetail` por perfil |
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
