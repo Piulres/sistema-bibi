@@ -161,7 +161,6 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
 
   const selectedProcedure = procedures.find((p) => p.id === form.procedureId);
   const extrasActive = hasClinicalExtras(form);
-  const [extrasOpen, setExtrasOpen] = useState(false);
 
   const suggestion = useMemo(() => {
     if (!selectedProcedure) return null;
@@ -837,12 +836,6 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
             {/* Extras clínicos recolhidos — fluxo rápido sem biópsia/pólipo */}
             <details
               className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--surface-muted)]/40 open:bg-transparent"
-              open={extrasOpen || extrasActive}
-              onToggle={(e) => {
-                const next = (e.currentTarget as HTMLDetailsElement).open;
-                // Evita loop: extrasActive força aberto; só sincroniza o toggle manual
-                if (!extrasActive) setExtrasOpen(next);
-              }}
               data-cursor-id="clinic-finance-extras"
             >
               <summary className="cursor-pointer list-none px-3 py-3 text-sm font-medium text-[var(--text-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
