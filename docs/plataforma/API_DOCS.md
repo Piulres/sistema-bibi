@@ -152,6 +152,7 @@ O sync automático cobre **123 paths** de **163** Route Handlers — **40** aind
 
 | Domínio | Paths | Doc canônica |
 |---------|-------|--------------|
+| Portal PJ — colaboradores | `POST /api/pj/beneficiaries`, `PATCH/DELETE .../[id]` | §9.1 · [`FLUXOS.md`](../produto/FLUXOS.md) §5 |
 | Gestão clínica CEDIG | `/api/interno/clinic-finance/*` (6 rotas) | §8 · [`FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 |
 | Documentos clínicos | `/api/interno/exam-protocol-templates`, `.../{id}`, `/api/prestador/patients/{id}/exam-protocols`, `.../referrals`, `.../discharge-documents`, `/api/prestador/clinical-guides/export`, `/api/beneficiario/documents`, `/api/beneficiario/clinical-guides/export` | §7 · [`DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
 | Obras / Engenharia | `/api/interno/projects/*`, `/api/interno/construction/*`, `/api/pj/projects/*`, `/api/prestador/campo/projects`, `/api/prestador/field-reports/*`, `/api/beneficiario/projects/*` (26 rotas) | [`segmentos/construction/README.md`](../segmentos/construction/README.md) |
@@ -436,6 +437,34 @@ curl -b cookies.txt -o relatorio.pdf \
 ```
 
 Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 · testes: `tests/api/exports.test.ts`.
+
+---
+
+## 9.1 Portal PJ — colaboradores (v3.0.23)
+
+RH inclui, edita e desvincula colaboradores da empresa logada. Auth: `requirePj()` (`role === PJ`). Escopo fixo em `user.companyId` — anti-IDOR B2B via `assertCompanyPatient` antes de PATCH/DELETE.
+
+| Método | Path | Body (JSON) | Respostas |
+|--------|------|-------------|-----------|
+| `POST` | `/api/pj/beneficiaries` | `name`, `cpf`, `birthDate` (obrigatórios); `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType` (opcionais) | `200` paciente criado · `400` validação |
+| `PATCH` | `/api/pj/beneficiaries/{id}` | Campos parciais do POST | `200` · `400` · `404` se não pertence à empresa |
+| `DELETE` | `/api/pj/beneficiaries/{id}` | — | `200` — zera `companyId` sem excluir o registro clínico · `404` |
+
+Serviço: `src/lib/pj-beneficiary-service.ts` · UI: `PjBeneficiaryPanel` em `/pj` → Beneficiários. Ainda **fora** do `openapi.yaml` — rode `npm run openapi:sync` ao enriquecer o contrato.
+
+### Exemplo curl (incluir colaborador)
+
+```bash
+curl -c cookies.txt -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"rh@techcorp.com","password":"bibi123","portal":"pj"}'
+
+curl -b cookies.txt -X POST http://localhost:3000/api/pj/beneficiaries \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Ana Souza","cpf":"39053344705","birthDate":"1992-03-15","employeeId":"TC-9001","bondType":"TITULAR"}'
+```
+
+Testes: `tests/api/pj-beneficiaries.test.ts` · fluxo: [`FLUXOS.md`](../produto/FLUXOS.md) §5.
 
 ---
 

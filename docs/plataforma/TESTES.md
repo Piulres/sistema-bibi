@@ -85,6 +85,10 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.23 Portal PJ: `tests/api/pj-beneficiaries.test.ts` — POST/PATCH/DELETE colaboradores com anti-IDOR B2B (`requirePj`, `companyId` fixo, DELETE desvincula sem apagar cadastro).
+
+Cobertura v3.0.23 estoque UI: `e2e/estoque-fases.spec.ts` — smoke abas Resumo/Produtos/Lotes/Movimentos; cria produto; valida tipos manuais restritos e botão Reverter · login `recepcao@bibi.health`.
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
@@ -246,8 +250,8 @@ Legenda: 🔒 = `requireInternoModule` | 🔑 = `requireUser` | 🌐 = público 
 ### Interno (96 rotas) — 🔑 INTERNO + 🔒 `requireInternoModule` em todas
 - Ver `tests/security/rbac-gaps.test.ts` para inventário dinâmico
 
-### PJ (7 rotas) — 🔑 PJ
-- overview, reports, construction, projects
+### PJ (12 rotas) — 🔑 PJ
+- overview, reports, providers, slots, appointments, **beneficiaries** (CRUD colaboradores v3.0.23), construction, projects
 
 ### Beneficiário (14 rotas) — 🔑 BENEFICIARIO
 - overview, booking, invoices/PIX, export, projects (construction)
@@ -362,6 +366,7 @@ Senha única: `bibi123`
 | `jornada-consultorio.spec.ts` | Jornada operacional UI — agenda/estoque/cadastros/faturamento + walk-in→check-in→atendimento (PEP/procedimentos/stepper) · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md) |
 | `cedig-gestao.spec.ts` | Piloto CEDIG — gestão clínica, lançamentos, ponte PPU, prefill agenda→gestão, KPIs dashboard (`dashboard-billing-kpis`); **mobile** (390×844) sem overflow horizontal (`clinic-finance-root`) |
 | `cadastros-crud.spec.ts` | Smoke UI CRUD cadastros |
+| `estoque-fases.spec.ts` | Estoque fases 1–4 — abas Resumo/Produtos/Lotes/Movimentos; cria produto; tipos manuais restritos + Reverter (`recepcao@bibi.health`) |
 | `assistant.spec.ts` | Assistente operacional serverless |
 | `api-docs.spec.ts` | Swagger UI `/api-docs` |
 | `flow-improvements.spec.ts` | Melhorias de fluxo multi-portal |

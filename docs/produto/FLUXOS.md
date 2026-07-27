@@ -459,7 +459,8 @@ Serviço: `src/lib/webhook-service.ts`
 Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
 Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.  
 `requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).  
-**Fase 4:** `refreshExpiredLots` antes de baixas; FIFO ignora vencidos; reforço não reabre QUARENTENA/BLOQUEADO; segunda reversão → 400.
+**Fase 4:** `refreshExpiredLots` antes de baixas; FIFO ignora vencidos; reforço não reabre QUARENTENA/BLOQUEADO; segunda reversão → 400.  
+**Smoke UI (v3.0.23):** `e2e/estoque-fases.spec.ts` — abas Resumo/Produtos/Lotes/Movimentos; cria produto; valida tipos manuais restritos na aba Movimentos.
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
@@ -522,14 +523,14 @@ Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `t
 
 ## 5. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **Leitura + export + agendamento RH**
+**Role:** `PJ` · **Escopo:** `user.companyId` · **Leitura + export + agendamento RH + CRUD colaboradores (v3.0.23)**
 
 | Seção (`PjView`) | Dados |
 |------------------|-------|
 | Alertas | INADIMPLENTE, negociação, faturas abertas, cobranças vencidas |
 | KPIs | Contrato, beneficiários, consumo PPU, MRR |
 | Agendar | RH escolhe colaborador + slot → `CONFIRMADO` + e-mail |
-| Beneficiários | Consumo por colaborador · CTA Agendar |
+| Beneficiários | Consumo por colaborador · CTA Agendar · **incluir/editar/desvincular** (`PjBeneficiaryPanel`) |
 | Assinaturas | Planos e cobranças pendentes |
 | Faturas | Histórico corporativo |
 
@@ -539,16 +540,24 @@ Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `t
 | Prestadores | `GET /api/pj/providers` | `listProviders` |
 | Slots | `GET /api/pj/slots?providerId&date` | `scheduling-service.ts` |
 | Agendar colaborador | `POST /api/pj/appointments` | `bookPjAppointment` → `bookBeneficiaryAppointment` (anti-IDOR `companyId`) |
+| Incluir colaborador | `POST /api/pj/beneficiaries` | `createPjBeneficiary` → `createPatient` (fixa `companyId` da sessão) |
+| Editar colaborador | `PATCH /api/pj/beneficiaries/[id]` | `updatePjBeneficiary` — `assertCompanyPatient` antes de `updatePatient` |
+| Desvincular colaborador | `DELETE /api/pj/beneficiaries/[id]` | `detachPjBeneficiary` — zera `companyId`; **não** apaga o cadastro clínico |
 | Export | `GET /api/pj/reports?format=` | `buildPjTabularExport` + `serveTabularExport` (PDF/CSV/JSON/TXT) |
+
+**CRUD colaboradores (v3.0.23):** UI em `/pj` → aba **Beneficiários** (`PjBeneficiaryPanel`). Campos obrigatórios no POST: `name`, `cpf`, `birthDate`. Opcionais: `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType`. Labels de nicho via `useLabels()` — não hardcodar "Paciente"/"Beneficiário". Auth: `requirePj()` em todos os handlers; PATCH/DELETE em paciente de outra empresa → **404** (anti-IDOR B2B). Testes: `tests/api/pj-beneficiaries.test.ts`.
 
 ```mermaid
 flowchart LR
   RH[Usuário PJ] --> V[PjView]
   V --> O[GET /api/pj/overview]
   V --> A[POST /api/pj/appointments]
+  V --> C[POST/PATCH/DELETE /api/pj/beneficiaries]
   O --> S[pj-portal-service]
   A --> B[bookPjAppointment]
+  C --> P[pj-beneficiary-service]
   B --> DB[(Company.patients + Appointment)]
+  P --> DB
 ```
 
 ---
@@ -877,7 +886,9 @@ Detalhe por portal: [`TESTES.md`](../plataforma/TESTES.md) §Mapa de rotas.
 `POST|PATCH /api/beneficiario/invoices/[id]/pay`
 
 ### PJ
-`GET /api/pj/overview` · `GET /api/pj/reports`
+`GET /api/pj/overview` · `GET /api/pj/providers` · `GET /api/pj/slots` ·
+`POST /api/pj/appointments` · `POST/PATCH/DELETE /api/pj/beneficiaries` ·
+`GET /api/pj/reports` · `GET /api/pj/projects/*` (CONSTRUCTION)
 
 ### Interno (principais grupos)
 `dashboard` · `billing` · `invoices/*` · `appointments/*` · `patients/*` ·
