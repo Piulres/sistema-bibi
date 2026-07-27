@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.8** em produção — narrativa operacional do consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacote v3.0.7: drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **produção v3.0.19** · **main/dev v3.0.20** (pendente deploy) — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques v3.0.20: RH agenda colaborador no portal PJ (`POST /api/pj/appointments`); narrativa consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md).
 
 ---
 
@@ -76,19 +76,20 @@ flowchart TB
   end
 
   BE --> AG
+  PJ --> AG
   IN --> AG
   PR --> AT
   IN --> FAT
   BE --> PAY
   IN --> PAY
-  PJ -.->|somente leitura| FAT
+  PJ -.->|leitura + export| FAT
   BE -.->|visibilidade| AT
 ```
 
 | Portal | Público | Login | Destino pós-login | Papel na jornada |
 |--------|---------|-------|-------------------|------------------|
 | **Beneficiário** | Paciente / colaborador | `/beneficiario/login` | `/beneficiario` | Cliente final — agenda, paga, acompanha |
-| **PJ** | RH / gestor corporativo | `/pj/login` | `/pj` | Cliente B2B — monitora consumo e alertas |
+| **PJ** | RH / gestor corporativo | `/pj/login` | `/pj` | Cliente B2B — monitora consumo, alertas e agenda colaboradores |
 | **Prestador** | Médico / profissional | `/login` | `/prestador` | Entrega o serviço clínico |
 | **Interno** | Equipe administrativa | `/interno/login` | `/interno/dashboard` | Operação, faturamento e backoffice |
 
@@ -336,7 +337,7 @@ Escala por dimensão de jornada (não cobertura de código).
 | Dimensão | Beneficiário | PJ | Prestador | Interno |
 |----------|:------------:|:--:|:---------:|:-------:|
 | Onboarding / login | ✅ | ✅ | ✅ | ✅ (+ MFA) |
-| Self-service | ✅ agendar + pagar | ❌ só leitura | 🟡 só atendimento | ✅ CRUD completo |
+| Self-service | ✅ agendar + pagar | 🟡 agendar colaborador + export | 🟡 só atendimento | ✅ CRUD completo |
 | Transparência financeira | ⭐ ✅ | ⭐ ✅ | 🟡 vê preço no ato | ✅ |
 | Comunicação proativa | 🟡 mock | 🟡 alertas passivos | ❌ | 🟡 fila mock |
 | Mobile / PWA | ✅ drawer direita (v3.0.7) | 🟡 drawer seções | ✅ drawer + abas `shortLabel` | ✅ drawer + menu Mais |

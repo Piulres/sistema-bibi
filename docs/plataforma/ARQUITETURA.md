@@ -844,6 +844,37 @@ flowchart LR
 
 ---
 
+## 21. PWA e shell mobile (v3.0)
+
+Experiência instalável no celular — PWA web + scaffold nativo Capacitor.
+
+```mermaid
+flowchart LR
+  Browser["Safari/Chrome"] --> Instalar["/instalar"]
+  Instalar --> SW["public/sw.js"]
+  SW --> Cache["bibi-shell-v1"]
+  Cap["mobile/ Capacitor"] --> WebView["server.url → Netlify"]
+  WebView --> Portais["4 portais autenticados"]
+```
+
+| Camada | Arquivos | Função |
+|--------|----------|--------|
+| Manifest | `src/app/manifest.ts` · `/instalar` | `display: standalone`, ícones whitelabel |
+| Service worker | `public/sw.js` · `ServiceWorkerRegister.tsx` | Cache offline de shell (`/instalar`, ícones) |
+| Ícones | `public/icons/` · `npm run icons:generate` | PWA + Apple touch |
+| Capacitor | `mobile/` · `capacitor.config.json` | WebView iOS/Android → URL de produção |
+| Recursos nativos | `npm run mobile:resources` | BrandMark → splash/launcher |
+
+**Restrições:**
+
+- SW **não** cacheia rotas autenticadas — login e sessão exigem rede.
+- `mobile/` é isolado do build Next.js (`mobile/node_modules` próprio).
+- URLs locais em `capacitor.config.json` são só para dev — não commitar.
+
+Setup e troubleshooting: [`../../mobile/README.md`](../../mobile/README.md) · changelog: [`../versoes/V3_0.md`](../versoes/V3_0.md).
+
+---
+
 ## 20. Documentação da API
 
 A especificação **OpenAPI 3.0** está em [`public/openapi.yaml`](../../public/openapi.yaml).

@@ -85,6 +85,15 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.20 (pacote `main`/`dev`):
+
+| Suíte | Arquivo | O que valida |
+|-------|---------|--------------|
+| Estoque F4 | `tests/api/stock.test.ts` | Reversão idempotente, FIFO sem vencidos, reforço não reabre QUARENTENA |
+| Assistente híbrido | `tests/unit/assistant-hybrid.test.ts` | `refineHybridPlan` — sources gateway/hybrid/rules/fallback |
+| PJ agendar | `tests/api/pj-appointments.test.ts` · `tests/lib/pj-appointment-scoping.test.ts` | `POST /api/pj/appointments`, anti-IDOR `companyId` |
+| PWA shell | `tests/unit/pwa-mobile-shell.test.ts` | Precache SW, registro em `/instalar` |
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).

@@ -68,10 +68,25 @@ mobile/
   capacitor.config.json
 ```
 
-## Próximos passos (Fase B — contínuo)
+## Próximos passos (pós Fase B)
 
+- [x] Scaffold `mobile/` (iOS + Android) — v3.0.20
+- [x] Service worker shell (`public/sw.js` + `ServiceWorkerRegister`)
 - [ ] TestFlight / Play Console (distribuição interna)
 - [ ] Deep links por portal (`/interno`, `/prestador`, …)
 - [ ] Push notifications (fase futura)
+
+## Service worker (PWA shell)
+
+O app web registra `public/sw.js` via `ServiceWorkerRegister` (montado em `/instalar`).
+
+| Comportamento | Detalhe |
+|---------------|---------|
+| Cache | `bibi-shell-v1` — precache de `/instalar`, manifest e ícones |
+| Estratégia | Cache-first só para shell assets (`/instalar`, `/icons/*`, manifest) |
+| Escopo | **Não** cacheia portais autenticados — sessão continua online |
+| Testes | `tests/unit/pwa-mobile-shell.test.ts` |
+
+Para regenerar ícones após mudança de marca: `npm run icons:generate` → `npm run mobile:resources`.
 
 Escopo completo: [`docs/versoes/V3_0.md`](../docs/versoes/V3_0.md).

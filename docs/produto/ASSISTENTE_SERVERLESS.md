@@ -77,6 +77,28 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
 | **Painel de regras** | — | ✅ Fase 3 — CRUD + preview em `/interno/assistente` |
 | **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` (LLM → allowlist regras → tools) |
+
+### Pipeline híbrido (Fase 4)
+
+Quando `Tenant.settings.assistant.aiEnabled` e `ASSISTANT_PROVIDER=gateway`:
+
+```
+Mensagem → runner.ts
+         → gatewayPlan (LLM) + rulesPlan (mock-intents/regras)
+         → refineHybridPlan (hybrid.ts)
+         → tools → draft → confirm (JTI)
+```
+
+| `source` retornado | Quando |
+|--------------------|--------|
+| `gateway` | LLM propôs tools válidas no allowlist, sem refinamento de regras |
+| `hybrid` | LLM + regras mesclaram args (`mergeArgsPreferGateway`) |
+| `rules` | Gateway sem tool válida; motor de regras assume |
+| `fallback` | Nenhum plano executável — resposta textual |
+
+Allowlist: interseção **tools RBAC do usuário** × **tools do motor de regras** (quando `rulesEnabled`). Tools rejeitadas aparecem em `rejectedTools` (telemetria).
+
+Testes: `tests/unit/assistant-hybrid.test.ts` · doc mestre: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) §Fase 4.
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
@@ -86,6 +108,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 
 ## Testes
 
+- `tests/unit/assistant-hybrid.test.ts` — pipeline híbrido Fase 4
 - `tests/unit/assistant.test.ts` — multi-turno stateless
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento

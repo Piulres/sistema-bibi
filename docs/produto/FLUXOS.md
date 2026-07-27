@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **Produção v3.0.19** · **main/dev v3.0.20** (pendente deploy) — fonte: [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques v3.0.20: estoque F4 (reversão idempotente, FIFO sem vencidos) · assistente híbrido · Capacitor B + service worker · PJ agendar colaborador — ver [§4.8](#48-estoque-médico-stockview--v13--fase-24), [§5](#5-portal-pj-empresa). Narrativa consultório: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -460,6 +460,17 @@ Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`i
 Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.  
 `requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).  
 **Fase 4:** `refreshExpiredLots` antes de baixas; FIFO ignora vencidos; reforço não reabre QUARENTENA/BLOQUEADO; segunda reversão → 400.
+
+**Armadilhas comuns (Fase 4):**
+
+| Sintoma | Causa | Ação |
+|---------|-------|------|
+| Botão Reverter desabilitado | `reversed: true` na listagem | Movimento já compensado — idempotente por design |
+| 400 ao reverter | Movimento é compensatório (`isReversal`) | Só o movimento original pode ser revertido |
+| FIFO não usa lote esperado | Lote vencido ou em quarentena | `refreshExpiredLots` marca VENCIDO; FIFO só `DISPONIVEL` |
+| Reforço não libera lote | Status QUARENTENA/BLOQUEADO/VENCIDO | Entrada manual não reabre — liberar lote antes |
+
+Serviço: `src/lib/change-management/stock-reverse.ts` · testes: `tests/api/stock.test.ts`.
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
