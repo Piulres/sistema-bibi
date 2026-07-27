@@ -218,15 +218,19 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     });
   }
 
-  async function loadMeta() {
+  async function loadMeta(): Promise<{ ok: true } | { ok: false; error: string }> {
     const metaRes = await fetch("/api/interno/clinic-finance/meta");
     if (metaRes.status === 403) {
-      return { error: "Sem permissão para acessar a gestão clínico-financeira." } as const;
+      return {
+        ok: false,
+        error: "Sem permissão para acessar a gestão clínico-financeira.",
+      };
     }
     if (!metaRes.ok) {
       return {
+        ok: false,
         error: "Não foi possível carregar menus da gestão clínica. Tente novamente.",
-      } as const;
+      };
     }
     const meta = await metaRes.json();
     setProviders(meta.providers ?? []);
@@ -257,7 +261,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       };
     });
     metaReadyRef.current = true;
-    return { ok: true } as const;
+    return { ok: true };
   }
 
   async function loadPeriod(opts?: { soft?: boolean; includeKpis?: boolean }) {
@@ -325,7 +329,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     setBootLoading(true);
     setLoadError(null);
     const meta = await loadMeta();
-    if ("error" in meta) {
+    if (!meta.ok) {
       setLoadError(meta.error);
       setBootLoading(false);
       return;
