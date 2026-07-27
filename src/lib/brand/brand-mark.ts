@@ -3,6 +3,8 @@ import type { BrandingTokens } from "@/lib/theme/tokens";
 /** Entrada mínima para renderizar a marca (UI, PWA, exports, OG). */
 export type BrandMarkInput = {
   displayName: string;
+  /** Sobrescreve monograma derivado de displayName — ex.: "Bibi" na home da plataforma. */
+  markText?: string | null;
   logoUrl?: string | null;
   primaryColor: string;
   accentColor: string;
@@ -29,10 +31,27 @@ export function brandMarkInitial(displayName: string): string {
   return (match?.[0] ?? "B").toUpperCase();
 }
 
+/** Texto renderizado no círculo — markText explícito ou inicial do displayName. */
+export function brandMarkText(input: Pick<BrandMarkInput, "displayName" | "markText">): string {
+  const override = input.markText?.trim();
+  if (override) return override;
+  return brandMarkInitial(input.displayName);
+}
+
+/** Escala da tipografia do monograma conforme comprimento do texto. */
+export function brandMarkFontSizePx(containerSize: number, text: string): number {
+  const len = [...text].length;
+  if (len <= 1) return Math.round(containerSize * 0.42);
+  if (len <= 3) return Math.round(containerSize * 0.28);
+  if (len <= 5) return Math.round(containerSize * 0.22);
+  return Math.round(containerSize * 0.18);
+}
+
 /** Adapta tokens de branding para a marca. */
 export function brandMarkFromBranding(branding: BrandingTokens): BrandMarkInput {
   return {
     displayName: branding.displayName,
+    markText: branding.markText,
     logoUrl: branding.logoUrl,
     primaryColor: branding.primaryColor,
     accentColor: branding.accentColor,
@@ -62,7 +81,7 @@ export function resolveBrandMarkLayout(
     backgroundTo: input.heroTo ?? input.accentColor,
     primaryColor: input.primaryColor,
     accentColor: input.accentColor,
-    initial: brandMarkInitial(input.displayName),
+    initial: brandMarkText(input),
     logoUrl: input.logoUrl ?? null,
   };
 }
@@ -94,7 +113,7 @@ export function buildBrandMarkSvg(input: BrandMarkInput, size = 512): string {
   const cx = size / 2;
   const cy = size / 2;
   const logoImgSize = Math.round(size * 0.58);
-  const initialSize = Math.round(size * 0.42);
+  const initialSize = brandMarkFontSizePx(size, layout.initial);
   const uid = `bm-${size}`;
   const clipR = size / 2;
 

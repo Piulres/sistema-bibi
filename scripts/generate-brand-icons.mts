@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 import { ImageResponse } from "next/og";
 import React from "react";
 import { OgBrandMark } from "../src/lib/brand/brand-mark-og.tsx";
+import { brandMarkFromBranding } from "../src/lib/brand/brand-mark.ts";
 import { PLATFORM_BRANDING } from "../src/lib/theme/tokens.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -26,13 +27,7 @@ const SIZES = [
 async function renderPng(size: number): Promise<Buffer> {
   const response = new ImageResponse(
     React.createElement(OgBrandMark, {
-      input: {
-        displayName: PLATFORM_BRANDING.displayName,
-        primaryColor: PLATFORM_BRANDING.primaryColor,
-        accentColor: PLATFORM_BRANDING.accentColor,
-        heroFrom: PLATFORM_BRANDING.heroFrom,
-        heroTo: PLATFORM_BRANDING.heroTo,
-      },
+      input: brandMarkFromBranding(PLATFORM_BRANDING),
       size,
     }),
     { width: size, height: size },
