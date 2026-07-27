@@ -35,7 +35,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Mês operacional:** seed denso ~30 dias (timeline sempre atual) + suite de consistência.
 - **Jornada consultório:** testes API Atos 1–4 + E2E UI.
 - **Agenda/calendário:** ICS, OAuth Google/Microsoft, disponibilidade do prestador.
-- **Qualidade:** fix flaky assistente (`HH:MM`).
+- **Qualidade:** fix flaky assistente (`HH:MM`); mês operacional seed/testes em dia civil BRT (CI UTC).
 
 ### Conteúdo do pacote v3.0.9
 

@@ -31,6 +31,22 @@ Além do histórico esparso de `seedOperationalMass`, o seed aplica uma **camada
 
 Marcador idempotente: `[seed-operation-month]` · código: `prisma/seed-data/operation-month.ts` · plano puro: `operation-month-plan.ts`.
 
+#### Fuso operacional (BRT)
+
+**“Hoje”** nesta camada é o **dia civil em `America/Sao_Paulo`**, não o relógio UTC do runner (GitHub Actions, Netlify, VM local).
+
+| Conceito | Implementação |
+|----------|----------------|
+| Dia civil “hoje” | `civilDateISO()` em `src/lib/timezone.ts` |
+| Offset ±N dias | `shiftCivilDate(iso, n)` + `parseAppDateTime` (horários dos slots) |
+| Janela do plano | 29 dias atrás → hoje → 5 à frente (`OPERATION_MONTH_PAST_DAYS` / `FUTURE_DAYS`) |
+| Limites para queries de teste | `operationMonthWindow()` → `startOfDayInAppTz` / `endOfDayInAppTz` |
+| Fim de semana no plano | `dayOfWeek()` usa calendário BRT (domingo sem slots) |
+
+**Por quê:** slots de **hoje** com status `REALIZADO` (ex.: 08:00 BRT) podem ter `scheduledAt` **à frente** de `new Date()` quando o CI roda em UTC à noite — asserts que comparam com `new Date()` ou `setHours()` local falhavam com falso “REALIZADO no futuro”. Seed e `tests/lib/operation-month-consistency.test.ts` comparam passado/futuro pelo **fim/início do dia civil BRT**.
+
+Helpers genéricos do seed (`daysAgo`, `daysFromNow`, `todayAt`) em `prisma/seed-data/helpers.ts` já delegam ao mesmo módulo. Novas massas com datas relativas devem seguir esse padrão — ver também hotfix v3.0.9 em [`versoes/V3_0.md`](../versoes/V3_0.md).
+
 ```bash
 npm run db:seed
 npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts

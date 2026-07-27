@@ -85,7 +85,7 @@ Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `n
 
 **Massa rica multi-nicho:** todos os 5 tenants nicho recebem RBAC interno (3 usuários), estoque, perfil clínico, pricing B2B, baseline, webhooks e 3 personas estrela (PPU/PIX/particular). PetCare: label `Banho/Tosa`.
 
-**Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts` · mês operacional (~30 dias, timeline sempre atual): `tests/unit/operation-month-plan.test.ts` + `tests/lib/operation-month-consistency.test.ts` · doc [`MASSA_TESTES.md`](MASSA_TESTES.md)
+**Testes da massa por portal:** `tests/lib/seed-mass-portal.test.ts` · perfil `operation-1y`: `tests/unit/seed-profile.test.ts` · mês operacional (~30 dias, timeline sempre atual, **dia civil BRT**): `tests/unit/operation-month-plan.test.ts` + `tests/lib/operation-month-consistency.test.ts` · doc [`MASSA_TESTES.md`](MASSA_TESTES.md) §Fuso operacional
 
 | Fixture | E-mail / CPF | Uso típico |
 |---------|----------------|------------|
@@ -294,6 +294,7 @@ Gotchas confirmados em runtime (jul/2026):
 | `npm run setup` falha com `unknown option: --skip-generate` | Versões recentes do Prisma CLI não aceitam `--skip-generate` em `db push` | Atualize o repo (`scripts/dev-setup.mjs` usa `npx prisma db push` sem flags extras) |
 | `/interno/gestao` 500 em produção (`no such column`) | Blob de operação com schema defasado vs artefato de build | Pacote ≥ v3.0.2 aplica `schema-sync` no boot; ver [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Schema-sync |
 | RBAC/regras via `curl` retornam 401 mesmo com login | Cookie de sessão não salvo — resposta de login pode ser 500 se o banco não estiver populado | Rode `npm run setup`; use `-c/-b` do curl no mesmo arquivo de cookies |
+| `operation-month-consistency` falha com “REALIZADO no futuro” só no CI | Runner UTC vs. slots de hoje em BRT — `new Date()` não define “hoje” nem passado/futuro | Use `startOfDayInAppTz` / `endOfDayInAppTz` / `dayRangeInAppTz` (`src/lib/timezone.ts`); ver [`MASSA_TESTES.md`](MASSA_TESTES.md) §Fuso operacional |
 
 ### Variáveis em testes
 

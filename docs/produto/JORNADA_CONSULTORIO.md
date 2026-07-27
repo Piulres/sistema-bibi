@@ -296,7 +296,7 @@ Lista completa: [`README.md`](../../README.md) · [`AGENTS.md`](../../AGENTS.md)
 
 ## 9. Massa e testes automatizados
 
-O seed inclui uma **camada de mês operacional** com datas relativas a “hoje” (agenda, PPU, PEP, estoque, faturas, timeline e launches CEDIG). Marcador `[seed-operation-month]` — ver [`../plataforma/MASSA_TESTES.md`](../plataforma/MASSA_TESTES.md).
+O seed inclui uma **camada de mês operacional** com datas relativas ao **dia civil de hoje em `America/Sao_Paulo`** (agenda, PPU, PEP, estoque, faturas, timeline e launches CEDIG) — alinhado ao fuso da UI e estável no CI (UTC). Marcador `[seed-operation-month]` — ver [`../plataforma/MASSA_TESTES.md`](../plataforma/MASSA_TESTES.md) §Fuso operacional.
 
 | Camada | Arquivo | O que cobre |
 |--------|---------|-------------|
