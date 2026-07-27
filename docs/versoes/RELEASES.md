@@ -36,7 +36,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **OpenAPI:** `AuditViewerCapabilities` + contrato de `GET /api/interno/audit`.
 - **A11y:** focus trap, tab order, roving tabindex (#292).
 - **Agenda:** confirmação automática no self-service.
-- **Qualidade:** `patient-clinical-rbac` · `a11y-focus` · CI #292/#317.
+- **Qualidade:** `patient-clinical-rbac` · `scheduling-auto-confirm` · `a11y-focus` · CI #292/#317/#318.
 
 ### Conteúdo do pacote v3.0.16
 
