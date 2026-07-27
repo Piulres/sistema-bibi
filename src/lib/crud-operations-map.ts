@@ -329,6 +329,8 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     read: [
       ui("Configuração atual", "/interno/branding", "GET /api/interno/branding"),
       apiOnly("Logo público", "GET /api/branding/logo/[tenantId]"),
+      apiOnly("Marca circular plataforma", "GET /api/brand/mark"),
+      apiOnly("Marca circular tenant", "GET /api/brand/mark/[tenantId]"),
     ],
     update: [
       ui("Salvar identidade visual", "/interno/branding", "PUT /api/interno/branding"),
