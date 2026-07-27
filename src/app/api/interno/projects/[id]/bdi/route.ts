@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { getBdiBreakdown, upsertBdiBreakdown } from "@/lib/project/bdi-service";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -19,7 +19,7 @@ export async function GET(request: Request, { params }: RouteParams) {
 
 export async function PUT(request: Request, { params }: RouteParams) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     await params;
     const body = (await request.json()) as Record<string, unknown>;
     const budgetId = String(body.budgetId ?? "");

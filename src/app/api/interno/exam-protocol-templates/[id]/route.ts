@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { updateExamProtocolTemplate } from "@/lib/exam-protocol-service";
 import type { ExamProtocolItem } from "@/lib/clinical/constants";
 
@@ -7,7 +7,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const { id } = await params;
     const body = (await request.json()) as {
       name?: string;

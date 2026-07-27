@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import {
   createMedicalProduct,
   getStockOverview,
@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("estoque");
+    const user = await requireInternoModuleWrite("estoque");
     const body = (await request.json()) as {
       sku?: string;
       name?: string;

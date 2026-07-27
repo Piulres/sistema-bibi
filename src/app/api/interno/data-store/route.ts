@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma, invalidatePrismaCache } from "@/lib/db";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import {
   getDataStoreStatus,
   parseDataStoreMode,
@@ -38,7 +38,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("seguranca");
+    const user = await requireInternoModuleWrite("seguranca");
     if (!isInternoAdmin(user.role, user.internoProfile)) {
       return NextResponse.json({ error: "Acesso negado" }, { status: 403 });
     }

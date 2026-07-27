@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { formatBRL } from "@/lib/pricing";
 import {
   recordTimelineEvent,
@@ -19,7 +19,7 @@ import { dispatchWebhooks } from "@/lib/webhook-service";
 export async function POST(request: Request) {
   const prisma = await getPrisma();
   try {
-    const user = await requireInternoModule("billing");
+    const user = await requireInternoModuleWrite("billing");
     const body = (await request.json()) as { patientId?: string };
 
     if (!body.patientId) {

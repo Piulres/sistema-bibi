@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { listProcedureKit, setProcedureKitItem } from "@/lib/stock-service";
 
 export async function GET(
@@ -21,7 +21,7 @@ export async function POST(
   ctx: RouteContext<"/api/interno/stock/procedure-kits/[procedureId]">,
 ) {
   try {
-    const user = await requireInternoModule("estoque");
+    const user = await requireInternoModuleWrite("estoque");
     const { procedureId } = await ctx.params;
     const body = (await request.json()) as { productId?: string; quantity?: number };
 

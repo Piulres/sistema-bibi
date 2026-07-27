@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { isCommunicationProviderConfigured } from "@/lib/communications/notification-service";
 import {
   listMessages,
@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("comunicacao");
+    const user = await requireInternoModuleWrite("comunicacao");
     const body = (await request.json()) as {
       patientId?: string;
       channel?: string;

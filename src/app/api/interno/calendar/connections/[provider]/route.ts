@@ -1,8 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  requireInternoModuleWrite,
-  authErrorResponse,
-} from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { revokeCalendarConnection } from "@/lib/calendar/calendar-connection-service";
 import {
   isCalendarProviderId,

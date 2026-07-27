@@ -91,7 +91,7 @@ type TenantSettings = {
 | Item | Status | Próximo passo |
 |------|--------|---------------|
 | APIs internas com `requireInternoModule` | 96/96 ✅ | Manter inventário (`rbac-gaps.test.ts`) |
-| `requireInternoModuleWrite` generalizado | Parcial | Fechar ~58 rotas mutáveis |
+| `requireInternoModuleWrite` generalizado | ✅ | ~60 rotas mutáveis (Fase 5 · `rbac-gaps.test.ts`) |
 | Tools assistente × perfil interno | ✅ | Estender quando regras forem configuráveis |
 | Confirmação JTI + RBAC | ✅ | Manter no modo IA |
 

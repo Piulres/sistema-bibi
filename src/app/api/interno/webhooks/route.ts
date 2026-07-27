@@ -5,7 +5,7 @@ import {
   WEBHOOK_EVENTS,
   isWebhookEvent,
 } from "@/lib/webhook-service";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 
 export async function GET() {
   try {
@@ -19,7 +19,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("integracoes");
+    const user = await requireInternoModuleWrite("integracoes");
     const body = (await request.json()) as {
       label?: string;
       url?: string;

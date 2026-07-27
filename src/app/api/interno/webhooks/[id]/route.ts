@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { deleteWebhook, toggleWebhook } from "@/lib/webhook-service";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("integracoes");
+    const user = await requireInternoModuleWrite("integracoes");
     const { id } = await params;
     const body = (await request.json()) as { active?: boolean };
 
@@ -27,7 +27,7 @@ export async function PATCH(request: Request, { params }: Params) {
 
 export async function DELETE(_request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("integracoes");
+    const user = await requireInternoModuleWrite("integracoes");
     const { id } = await params;
 
     const result = await deleteWebhook(user.tenantId, id, user.id);

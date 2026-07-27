@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import {
   approveAndBillFieldReport,
   listFieldReportsForProject,
@@ -20,7 +20,7 @@ export async function GET(_request: Request, { params }: RouteParams) {
 
 export async function POST(request: Request, { params }: RouteParams) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     const { id: projectId } = await params;
     const body = (await request.json()) as Record<string, unknown>;
     const action = String(body.action ?? "");

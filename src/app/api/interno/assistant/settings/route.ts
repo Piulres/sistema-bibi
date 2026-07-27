@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { isGatewayConfigured } from "@/lib/assistant/config";
 import { resolveAssistantMode, assistantModeLabel } from "@/lib/assistant/mode";
 import { scenarioCount } from "@/lib/assistant/scenarios";
@@ -36,7 +36,7 @@ function settingsPayload(
 /** Configurações do assistente do realm (ADMIN · módulo assistente). */
 export async function GET() {
   try {
-    const user = await requireInternoModuleWrite("assistente");
+    const user = await requireInternoModule("assistente");
     const settings = await getTenantSettings(user.tenantId);
     return NextResponse.json(settingsPayload(settings, user.niche));
   } catch (error) {

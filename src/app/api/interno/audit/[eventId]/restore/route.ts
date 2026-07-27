@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModuleWrite, authErrorResponse } from "@/lib/api-auth";
 import { isInternoAdmin } from "@/lib/interno-permissions";
 import { RestoreError, restoreFromTimelineEvent } from "@/lib/change-management/restore";
 
@@ -7,7 +7,7 @@ type Params = { params: Promise<{ eventId: string }> };
 
 export async function POST(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("auditoria");
+    const user = await requireInternoModuleWrite("auditoria");
     if (!isInternoAdmin(user.role, user.internoProfile)) {
       return NextResponse.json({ error: "Somente administrador pode restaurar" }, { status: 403 });
     }
