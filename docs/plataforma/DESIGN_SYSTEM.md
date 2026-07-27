@@ -253,6 +253,8 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 | `/api/brand/mark` | GET | Marca circular da plataforma (SVG) |
 | `/api/brand/mark/[tenantId]` | GET | Marca circular whitelabel do tenant (SVG) |
 
+**Componente UI:** `<BrandMark />` (`src/components/brand/BrandMark.tsx`) — tamanhos `xs`–`xl`, `useThemeColors` nos portais. Geração de PNG PWA: `npm run icons:generate`. Detalhe: [`BRANDING.md`](BRANDING.md).
+
 **Presets** disponíveis em `src/lib/theme/presets.ts` (Bibi, VitaCare, Amethyst, Forest).
 
 **Storage de logo** (`src/lib/storage/tenant-logo.ts`):

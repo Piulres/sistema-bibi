@@ -83,7 +83,11 @@ Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
-Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
+Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md). **v3.0.19:** helper `uniqueSlot()` evita colisão de horário (400) entre casos — ver §9 do doc.
+
+Cobertura assistente regras (v3.0.18–3.0.19): `tests/unit/assistant-rule-engine.test.ts` (merge global/nicho/tenant, preview) · `tests/api/interno-assistant-settings.test.ts` (CRUD `ruleOverrides`, RBAC ADMIN) · doc [`ASSISTENTE_REGRAS_PLANO.md`](../produto/ASSISTENTE_REGRAS_PLANO.md).
+
+Cobertura marca whitelabel (v3.0.19): `tests/unit/brand-mark.test.ts` (`buildBrandMarkSvg`, `resolveBrandMarkLayout`) · doc [`BRANDING.md`](BRANDING.md).
 
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 

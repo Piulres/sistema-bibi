@@ -65,7 +65,15 @@ type TenantSettings = {
   assistant: {
     aiEnabled: boolean;      // add-on IA — default false
     rulesEnabled: boolean;   // motor regras — default true
+    ruleOverrides?: TenantRuleOverride[]; // Fase 3 — overrides por tool
   };
+};
+
+type TenantRuleOverride = {
+  tool: string;
+  addTriggers?: string[];
+  removeTriggers?: string[];
+  disabled?: boolean;
 };
 ```
 
@@ -83,7 +91,7 @@ type TenantSettings = {
 | Ação | Perfil |
 |------|--------|
 | Ver `/interno/assistente` | **ADMIN** |
-| Editar flag IA / regras (futuro) | **ADMIN** |
+| Editar flag IA / regras / `ruleOverrides` | **ADMIN** |
 | Usar chat nos portais | Todos (com tools filtradas por perfil) |
 
 ### Revisão RBAC global (paralelo)
@@ -92,7 +100,7 @@ type TenantSettings = {
 |------|--------|---------------|
 | APIs internas com `requireInternoModule` | 96/96 ✅ | Manter inventário (`rbac-gaps.test.ts`) |
 | `requireInternoModuleWrite` generalizado | Parcial | Fechar ~58 rotas mutáveis |
-| Tools assistente × perfil interno | ✅ | Estender quando regras forem configuráveis |
+| Tools assistente × perfil interno | ✅ | Estender quando novas tools forem adicionadas |
 | Confirmação JTI + RBAC | ✅ | Manter no modo IA |
 
 ---
@@ -164,6 +172,9 @@ Helper: `buildRoutineMatrix()` em `inventory.ts`
 | `src/lib/assistant/mode.ts` | Resolução rules vs IA |
 | `src/lib/tenant/settings.ts` | Settings do realm |
 | `src/app/interno/assistente/page.tsx` | Painel ADMIN |
+| `src/components/AssistenteConfigView.tsx` | UI CRUD regras + preview (Fase 3) |
+| `src/lib/assistant/rules/engine.ts` | Motor + `buildRulesPreview` |
+| `src/lib/assistant/rules/tenant-overrides.ts` | Normalização de `ruleOverrides` |
 | `src/app/api/interno/assistant/settings/route.ts` | API config |
 | `docs/produto/ASSISTENTE_SERVERLESS.md` | Arquitetura serverless |
 
@@ -180,3 +191,25 @@ npm run lint
 ```
 
 Manual: login ADMIN interno → `/interno/assistente` → ver inventário e toggle IA (se gateway configurado).
+
+## Como validar Fase 3 (CRUD de regras)
+
+```bash
+npx vitest run tests/unit/assistant-rule-engine.test.ts
+npx vitest run tests/api/interno-assistant-settings.test.ts
+npm run lint
+```
+
+Manual:
+
+1. Login `faturamento@bibi.health` (ADMIN) → `/interno/assistente`
+2. Aba **Regras** — lista `previewRules` (global → nicho → tenant)
+3. Selecionar tool → adicionar gatilho customizado ou desativar tool
+4. **Salvar** — `PATCH` persiste em `Tenant.settings.assistant.ruleOverrides`
+5. Enviar gatilho no chat do portal — motor usa regras efetivas pós-merge
+
+**Restrições:**
+
+- `aiEnabled: true` exige gateway configurado (`ASSISTANT_PROVIDER=gateway` + secrets) — API retorna 422 caso contrário
+- Lista vazia de overrides remove a chave do JSON (não persiste `[]`)
+- `removeTriggers` só afeta gatilhos herdados de global/nicho; gatilhos `addTriggers` são removidos editando o override

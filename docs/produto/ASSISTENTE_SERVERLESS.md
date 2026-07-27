@@ -70,12 +70,35 @@ Ações `confirm` e `choice` **não** fecham o painel — o usuário confirma ou
 
 Cada tool executada registra evento na timeline (`entityType: Assistant`, ações `ASSISTANT_TOOL_OK` / `ASSISTANT_TOOL_ERR`). Visível em `/interno/auditoria`.
 
+## Painel de regras (v3.0.19 — Fase 3)
+
+ADMIN interno configura overrides por tenant em **`/interno/assistente`** (módulo `assistente`).
+
+| Recurso | Detalhe |
+|---------|---------|
+| **Persistência** | `Tenant.settings.assistant.ruleOverrides[]` (JSON em `Tenant.settings`) |
+| **API** | `GET/PATCH /api/interno/assistant/settings` — retorna `previewRules`, `rules` (stats) e `ruleOverrides` |
+| **RBAC** | `requireInternoModuleWrite("assistente")` — somente **ADMIN** |
+| **Preview** | Merge efetivo global → nicho → tenant antes de salvar |
+
+Cada override por tool:
+
+```typescript
+type TenantRuleOverride = {
+  tool: string;
+  addTriggers?: string[];    // gatilhos extras (uma linha ou vírgula na UI)
+  removeTriggers?: string[]; // remove gatilhos herdados
+  disabled?: boolean;        // desativa a tool no tenant
+};
+```
+
+O motor (`src/lib/assistant/rules/engine.ts`) aplica overrides **sem contornar** RBAC nem confirmação JTI. Doc mestre: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md).
+
 ## O que ainda falta (backlog)
 
 | Item | Prioridade | Notas |
 |------|------------|-------|
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
-| **Painel de regras** | Alta | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
@@ -86,6 +109,8 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 ## Testes
 
 - `tests/unit/assistant.test.ts` — multi-turno stateless
+- `tests/unit/assistant-rule-engine.test.ts` — merge global/nicho/tenant + preview
+- `tests/api/interno-assistant-settings.test.ts` — CRUD `ruleOverrides` (RBAC ADMIN)
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare

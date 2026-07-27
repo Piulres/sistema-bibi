@@ -14,7 +14,7 @@ Complementa (não substitui):
 
 > **Labels:** em UI autenticada o vocabulário vem de `useLabels()` (paciente/cliente/pet/aluno conforme o nicho). Neste documento usamos linguagem de **consultório** (`MEDICAL`) por legibilidade operacional.
 
-**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.8 (§3–§10, §8.5, §8.9) e pacote v3.0.8.
+**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.19 e pacote v3.0.19 (fix `uniqueSlot` em testes API).
 
 ---
 
@@ -307,6 +307,10 @@ O seed inclui uma **camada de mês operacional** com datas relativas a “hoje�
 | E2E UI | `e2e/jornada-consultorio.spec.ts` | Módulos operacionais + walk-in/check-in + superfície atendimento |
 | Walk-in | `e2e/walkin-particular.spec.ts` | Cadastro walk-in + check-in |
 | Índice | [`../plataforma/TESTES.md`](../plataforma/TESTES.md) | Matriz completa |
+
+### Pitfall — colisão de horário nos testes API (v3.0.19)
+
+`tests/api/consultorio-journey.test.ts` usa `uniqueSlot()` com contador monotônico + offset de dias — evita HTTP 400 por slot já ocupado no seed quando vários casos rodam no mesmo arquivo ou em paralelo com a massa operacional. Ao adicionar novos casos de agendamento na API, **não** reutilize `Date.now()` fixo nem o mesmo `scheduledAt` entre `it()`.
 
 ```bash
 npx vitest run tests/unit/operation-month-plan.test.ts tests/lib/operation-month-consistency.test.ts tests/api/consultorio-journey.test.ts
