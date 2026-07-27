@@ -1,5 +1,5 @@
 import type { BrandMarkInput } from "@/lib/brand/brand-mark";
-import { resolveBrandMarkLayout } from "@/lib/brand/brand-mark";
+import { brandMarkMeshBackground, resolveBrandMarkLayout } from "@/lib/brand/brand-mark";
 
 type OgBrandMarkProps = {
   input: BrandMarkInput;
@@ -9,13 +9,11 @@ type OgBrandMarkProps = {
 /** JSX para ImageResponse (icon.tsx, apple-icon, script de PNG). */
 export function OgBrandMark({ input, size }: OgBrandMarkProps) {
   const layout = resolveBrandMarkLayout(input, size);
-  const inset = Math.round(size * 0.0625);
-  const inner = size - inset * 2;
   const cx = size / 2;
-  const cy = layout.circleCenterY;
-  const r = layout.circleRadius;
-  const logoPad = Math.round(r * 0.78);
-  const logoSize = Math.round(r * 1.24);
+  const cy = size / 2;
+  const logoDiscR = Math.round(size * 0.28);
+  const logoSize = Math.round(logoDiscR * 1.55);
+  const initialSize = Math.round(size * 0.42);
 
   return (
     <div
@@ -23,70 +21,53 @@ export function OgBrandMark({ input, size }: OgBrandMarkProps) {
         width: size,
         height: size,
         display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
         position: "relative",
-        backgroundColor: layout.frameColor,
+        background: brandMarkMeshBackground(layout),
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          left: inset,
-          top: inset,
-          width: inner,
-          height: inner,
-          backgroundColor: layout.canvasColor,
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          left: cx - r,
-          top: cy - r,
-          width: r * 2,
-          height: r * 2,
-          borderRadius: "50%",
-          background: `linear-gradient(135deg, ${layout.gradientFrom} 0%, ${layout.gradientTo} 100%)`,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {layout.logoUrl ? (
-          <div
-            style={{
-              width: logoPad * 2,
-              height: logoPad * 2,
-              borderRadius: "50%",
-              backgroundColor: "rgba(255,255,255,0.92)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              overflow: "hidden",
-            }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={layout.logoUrl}
-              alt=""
-              width={logoSize}
-              height={logoSize}
-              style={{ objectFit: "contain" }}
-            />
-          </div>
-        ) : (
-          <span
-            style={{
-              color: "#ffffff",
-              fontSize: Math.round(r * 0.92),
-              fontWeight: 700,
-              lineHeight: 1,
-              fontFamily: "system-ui, sans-serif",
-            }}
-          >
-            {layout.initial}
-          </span>
-        )}
-      </div>
+      {layout.logoUrl ? (
+        <div
+          style={{
+            width: logoDiscR * 2,
+            height: logoDiscR * 2,
+            borderRadius: "50%",
+            backgroundColor: "rgba(255,255,255,0.94)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            overflow: "hidden",
+            boxShadow: "0 1px 3px rgba(0,0,0,0.12)",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={layout.logoUrl}
+            alt=""
+            width={logoSize}
+            height={logoSize}
+            style={{ objectFit: "contain" }}
+          />
+        </div>
+      ) : (
+        <span
+          style={{
+            color: "#ffffff",
+            fontSize: initialSize,
+            fontWeight: 700,
+            lineHeight: 1,
+            fontFamily: "system-ui, sans-serif",
+            textShadow: "0 1px 2px rgba(0,0,0,0.15)",
+            position: "absolute",
+            left: cx,
+            top: cy,
+            transform: "translate(-50%, -50%)",
+          }}
+        >
+          {layout.initial}
+        </span>
+      )}
     </div>
   );
 }

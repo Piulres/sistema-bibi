@@ -30,6 +30,7 @@ async function renderPng(size: number): Promise<Buffer> {
         displayName: PLATFORM_BRANDING.displayName,
         primaryColor: PLATFORM_BRANDING.primaryColor,
         accentColor: PLATFORM_BRANDING.accentColor,
+        heroFrom: PLATFORM_BRANDING.heroFrom,
         heroTo: PLATFORM_BRANDING.heroTo,
       },
       size,

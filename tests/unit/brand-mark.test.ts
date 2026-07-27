@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   brandMarkFromBranding,
   brandMarkInitial,
+  brandMarkMeshBackground,
   buildBrandMarkSvg,
   resolveBrandMarkLayout,
 } from "@/lib/brand/brand-mark";
@@ -20,32 +21,66 @@ describe("brandMarkInitial", () => {
 });
 
 describe("resolveBrandMarkLayout", () => {
-  it("maps tenant colors into circle gradient so whitelabel icons match branding", () => {
+  it("maps tenant hero gradient so whitelabel icons match energia brasileira branding", () => {
     const layout = resolveBrandMarkLayout(
       {
         displayName: "VitaCare",
         primaryColor: "#1d4ed8",
         accentColor: "#22d3ee",
+        heroFrom: "#1e3a8a",
         heroTo: "#38bdf8",
       },
       512,
     );
 
-    expect(layout.canvasColor).toBe("#1d4ed8");
-    expect(layout.gradientFrom).toBe("#22d3ee");
-    expect(layout.gradientTo).toBe("#38bdf8");
+    expect(layout.backgroundFrom).toBe("#1e3a8a");
+    expect(layout.backgroundTo).toBe("#38bdf8");
+    expect(layout.primaryColor).toBe("#1d4ed8");
+    expect(layout.accentColor).toBe("#22d3ee");
     expect(layout.initial).toBe("V");
-    expect(layout.circleRadius).toBeGreaterThan(0);
+  });
+
+  it("falls back to primary and accent when hero tokens are absent", () => {
+    const layout = resolveBrandMarkLayout({
+      displayName: "Demo",
+      primaryColor: "#1e293b",
+      accentColor: "#f97316",
+    });
+
+    expect(layout.backgroundFrom).toBe("#1e293b");
+    expect(layout.backgroundTo).toBe("#f97316");
+  });
+});
+
+describe("brandMarkMeshBackground", () => {
+  it("layers radial glows over hero gradient so mark matches landing mesh hero", () => {
+    const layout = resolveBrandMarkLayout(
+      {
+        displayName: "Bibi",
+        primaryColor: "#1e293b",
+        accentColor: "#f97316",
+        heroFrom: "#1e293b",
+        heroTo: "#f59e0b",
+      },
+      512,
+    );
+
+    const css = brandMarkMeshBackground(layout);
+    expect(css).toContain("#1e293b");
+    expect(css).toContain("#f59e0b");
+    expect(css).toContain("radial-gradient");
+    expect(css).toContain("linear-gradient");
   });
 });
 
 describe("buildBrandMarkSvg", () => {
-  it("embeds tenant initial in SVG so API consumers get a self-contained mark", () => {
+  it("embeds tenant initial on energia gradient so API consumers get a self-contained mark", () => {
     const svg = buildBrandMarkSvg(
       {
         displayName: "Horizonte",
         primaryColor: "#1e293b",
         accentColor: "#f97316",
+        heroFrom: "#1e293b",
         heroTo: "#f59e0b",
       },
       192,
@@ -54,16 +89,19 @@ describe("buildBrandMarkSvg", () => {
     expect(svg).toContain('<?xml version="1.0"');
     expect(svg).toContain('viewBox="0 0 192 192"');
     expect(svg).toContain(">H<");
-    expect(svg).toContain("#f97316");
+    expect(svg).toContain("#1e293b");
+    expect(svg).toContain("#f59e0b");
+    expect(svg).not.toContain("#0a1018");
   });
 
-  it("references logo URL when provided so tenants with upload keep mark in circle", () => {
+  it("references logo URL when provided so tenants with upload keep mark centered", () => {
     const svg = buildBrandMarkSvg(
       {
         displayName: "CEDIG",
         logoUrl: "https://cdn.example/logo.png",
         primaryColor: "#0f172a",
         accentColor: "#f97316",
+        heroFrom: "#0f172a",
         heroTo: "#f59e0b",
       },
       512,
@@ -80,5 +118,7 @@ describe("brandMarkFromBranding", () => {
     expect(input.displayName).toBe(PLATFORM_BRANDING.displayName);
     expect(input.primaryColor).toBe(PLATFORM_BRANDING.primaryColor);
     expect(input.accentColor).toBe(PLATFORM_BRANDING.accentColor);
+    expect(input.heroFrom).toBe(PLATFORM_BRANDING.heroFrom);
+    expect(input.heroTo).toBe(PLATFORM_BRANDING.heroTo);
   });
 });
