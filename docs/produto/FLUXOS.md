@@ -446,17 +446,18 @@ Calendários externos (ICS / Google / Outlook): [`../plataforma/CALENDAR_INTEGRA
 
 Serviço: `src/lib/webhook-service.ts`
 
-### 4.8 Estoque médico (`StockView`) — v1.3
+### 4.8 Estoque médico (`StockView`) — v1.3 · Fase 2 UI
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) |
-| Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade e saldo |
-| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória |
+| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita |
+| Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade, saldo e status (DISPONIVEL/BLOQUEADO/VENCIDO/QUARENTENA) |
+| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória — UI com botão Reverter |
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
-Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).
+Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
+Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
