@@ -49,7 +49,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "CI #354 · rbac-gaps · interno-write-guards · flow-improvements-map",
+    testStats: "CI #354 · rbac-gaps · interno-write-guards · pre-release OK · prod 6a670e42",
   },
   {
     version: "3.0.21",
