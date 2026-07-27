@@ -190,6 +190,20 @@ export async function isTestSeedStale(databaseUrl: string): Promise<boolean> {
     });
     if (pedroPaid < 1) return true;
 
+    const horizonteTenant = await prisma.tenant.findFirst({
+      where: { slug: "horizonte" },
+      select: { id: true },
+    });
+    if (!horizonteTenant) return true;
+    const teamParticipants = await prisma.appointmentParticipant.count({
+      where: { appointment: { tenantId: horizonteTenant.id } },
+    });
+    if (teamParticipants < 2) return true;
+    const prescriptionDocs = await prisma.prescriptionDocument.count({
+      where: { patient: { tenantId: horizonteTenant.id } },
+    });
+    if (prescriptionDocs < 2) return true;
+
     return false;
   } finally {
     await prisma.$disconnect();

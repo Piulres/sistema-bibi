@@ -46,9 +46,10 @@ export async function ensureTestDatabase(): Promise<void> {
   process.env.DATABASE_URL = TEST_DATABASE_URL;
   process.env.DUAL_DATA_STORE = "false";
 
+  const fingerprint = testDbFingerprint();
   if (existsSync(TEST_DB_PATH) && existsSync(READY_MARKER_PATH)) {
     try {
-      if (readFileSync(READY_MARKER_PATH, "utf8") === testDbFingerprint()) {
+      if (readFileSync(READY_MARKER_PATH, "utf8") === fingerprint) {
         return;
       }
     } catch {
@@ -56,6 +57,8 @@ export async function ensureTestDatabase(): Promise<void> {
     }
   }
 
+  // Fingerprint divergente: a massa pode estar desatualizada mesmo com tenants.
+  // Sempre re-seed neste caminho (evitar marker novo + test.db antigo).
   const firstCreate = !existsSync(TEST_DB_PATH);
 
   execSync("npx prisma db push --skip-generate", {
@@ -71,7 +74,7 @@ export async function ensureTestDatabase(): Promise<void> {
   await prisma.$disconnect();
 
   const stale = !firstCreate && tenantCount > 0 && (await isTestSeedStale(TEST_DATABASE_URL));
-  if (stale && existsSync(TEST_DB_PATH)) {
+  if ((stale || !firstCreate) && existsSync(TEST_DB_PATH)) {
     unlinkSync(TEST_DB_PATH);
     execSync("npx prisma db push --skip-generate", {
       cwd: process.cwd(),
@@ -80,16 +83,13 @@ export async function ensureTestDatabase(): Promise<void> {
     });
   }
 
-  const needsSeed = firstCreate || stale || tenantCount === 0;
-  if (needsSeed) {
-    execSync("npx prisma db seed", {
-      cwd: process.cwd(),
-      env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL, SEED_SCALE: "small" },
-      stdio: "pipe",
-    });
-  }
+  execSync("npx prisma db seed", {
+    cwd: process.cwd(),
+    env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL, SEED_SCALE: "small" },
+    stdio: "pipe",
+  });
 
-  writeFileSync(READY_MARKER_PATH, testDbFingerprint(), "utf8");
+  writeFileSync(READY_MARKER_PATH, fingerprint, "utf8");
 }
 
 export function getTestPrisma(): PrismaClient {
