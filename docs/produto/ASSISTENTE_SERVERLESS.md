@@ -54,7 +54,7 @@ Cliente                          API (serverless)
 
 Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
 
-## UX do painel (v3.0.6)
+## UX do painel (v3.0.6+)
 
 O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automático evita sobrepor a tela de destino após navegação.
 
@@ -65,6 +65,19 @@ O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automá
 | Escape / backdrop / botão ✕ | Handlers explícitos em `AssistantPanel` |
 
 Ações `confirm` e `choice` **não** fecham o painel — o usuário confirma ou escolhe in-place. Testes E2E do assistente: `e2e/assistant.spec.ts` (MEDICAL + VET).
+
+### Rótulos legíveis (v3.0.24)
+
+O painel admin (`/interno/assistente`) e os cards do chat usam rótulos em português — não expõem nomes internos das tools (`count_appointments`).
+
+| Módulo | Função |
+|--------|--------|
+| `src/lib/assistant/tool-labels.ts` | `getAssistantToolLabel()` — descrição do inventário ou `humanizeToolName` |
+| `src/lib/assistant/inventory.ts` | `ASSISTANT_TOOL_INVENTORY` — fonte das descrições |
+| `AssistenteConfigView.tsx` | Lista de tools, `ruleOverrides` e preview com labels legíveis |
+| Cards de escolha | `formatChoiceFieldTitle()` — capitaliza rótulos de campo |
+
+Copy do painel admin evita anglicismos técnicos (ex.: "ferramenta" em vez de "tool"). Overrides por tenant (`ruleOverrides`) continuam em `GET/PATCH /api/interno/assistant/settings`.
 
 ## Analytics
 

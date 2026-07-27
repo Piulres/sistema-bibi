@@ -81,10 +81,13 @@ flowchart TB
 | Componente | Arquivo | Papel |
 |------------|---------|-------|
 | Abas de rota | `NavTabs.tsx` | Split primary/secondary, menu **Mais**, `shortLabel` até `xl` |
+| Menu **Mais** | `NavOverflowMenu.tsx` | Dropdown portaled (`createPortal` → `document.body`) — overlay `z-[45]`, menu `z-[50]`; ancorado ao gatilho; fecha em click-outside |
 | Faixa rolável | `ScrollableNavRail.tsx` | Scroll horizontal + centraliza aba ativa |
 | Drawer mobile | `MobileNavDrawer.tsx` / `MobileSectionDrawer.tsx` | Lista completa de módulos ou seções — **painel fixo à direita** (`right-0`, `z-[70]`), overlay `z-[60]` |
 | Wrapper sticky | `portal-nav.ts` | `PORTAL_NAV_STICKY_CLASS` + `data-tour-id="portal-nav"` |
 | Nav por portal | `InternoNav.tsx`, `PrestadorNav.tsx`, `BeneficiarioNav.tsx`, `SectionNav.tsx` (PJ) | Montam tabs a partir de `src/lib/navigation/` |
+
+**v3.0.24:** o menu **Mais** deixou de renderizar dentro do `ScrollableNavRail` (clip/overlay na página). O portal usa `role="menu"` / `aria-label="Mais módulos"` e `useMenuKeyboard` — mesmo contrato a11y dos testes E2E.
 
 **Regra para novos módulos:** declarar `priority: "secondary"` quando o portal tiver muitas abas (ex.: interno com 14 módulos). Tour onboarding referencia `data-tour-id="portal-nav"` — ver [`ONBOARDING_TOUR.md`](ONBOARDING_TOUR.md).
 

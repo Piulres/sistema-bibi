@@ -25,8 +25,10 @@ Evite arquivos com nome de fase, data ou número de entrega (`FASE_2`, `GO_LIVE_
 |---------------------|-----------|
 | Prontuário / Care Chart / protocolos | `DOCUMENTOS_CLINICOS.md` · `FLUXOS.md` §3/§4.3 · `API_DOCS.md` §7 |
 | Jornada PPU / stepper / abas | `FLUXOS.md` §8.9 · `JORNADA_CLIENTE.md` · `JORNADA_CONSULTORIO.md` · `src/lib/flow-improvements-map.ts` |
-| Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
+| Landing nav / marca / changelog home | `DESIGN_SYSTEM.md` · `BRANDING.md` · `LANDING_CHANGELOG.md` · `src/lib/landing/navigation.ts` |
+| BrandMark / ícones PWA / OG | `BRANDING.md` · `src/lib/brand/brand-mark.ts` · `npm run icons:generate` |
 | Portal nav (NavTabs, Mais, drawer) | `DESIGN_SYSTEM.md` · `ARQUITETURA_PORTAIS.md` §Navegação · `TESTES.md` (helpers E2E) |
+| Assistente — labels / painel admin | `ASSISTENTE_SERVERLESS.md` · `ASSISTENTE_REGRAS_PLANO.md` · `tool-labels.ts` |
 | RBAC interno / guards API | `TESTES.md` §RBAC · `AUDITORIA_FLUXOS.md` §5 · `tests/security/rbac-gaps.test.ts` |
 | Dashboard executivo (KPIs interno) | `FLUXOS.md` §4.0.1 · `ARQUITETURA.md` §15 · `ExecutiveDashboardView.tsx` |
 | Gestão clínica mobile | `FLUXOS.md` §4.2.1 · `clientes/cedig/STATUS.md` · `API_DOCS.md` §8 · `ClinicFinanceView.tsx` |

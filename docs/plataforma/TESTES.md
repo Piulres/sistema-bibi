@@ -81,6 +81,10 @@ Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônic
 
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
 
+Cobertura v3.0.24 BrandMark: `tests/unit/brand-mark.test.ts` — `resolveBrandMarkLayout`, mesh `heroFrom`→`heroTo`, SVG circular sem borda · doc [`BRANDING.md`](BRANDING.md).
+
+Cobertura v3.0.24 nav **Mais** portaled: `e2e/mobile-nav.spec.ts` (interno desktop) + pitfall menu portaled em §Helpers E2E abaixo · `NavOverflowMenu.tsx`.
+
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
@@ -386,6 +390,8 @@ Padrão para testar a nav redesenhada (v3.0.6) sem duplicar lógica do menu **Ma
 | `portalMain(page)` | Escopo `.portal-page-content` — evita asserts em header/nav ocultos |
 
 **Pitfall:** módulos `priority: "secondary"` não aparecem na faixa até serem abertos pelo menu **Mais**; após navegação, a aba ativa fica pinada na faixa (`mobile-nav.spec.ts`).
+
+**Pitfall (menu Mais v3.0.24):** o dropdown é **portaled** em `document.body` (`NavOverflowMenu`) — não está dentro da faixa `ScrollableNavRail`. Use `getByRole('menu', { name: 'Mais módulos' })` após clicar no botão **Mais**; overlay de fundo é `aria-hidden` e fecha o menu em click.
 
 **Pitfall (drawer prestador, v3.0.7):** categorias (`group`) usam `<p>` para o rótulo e `<a>` para o módulo — o mesmo texto (ex.: "Agenda") aparece duas vezes. Use `getByRole("paragraph").filter({ hasText: /^Agenda$/ })` para o cabeçalho e `getByRole("link", { name: "Agenda" })` para clicar; `getByText("Agenda")` falha em strict mode. Gatilho: `[data-tour-id="mobile-nav-trigger"]` (tour onboarding — **não** `data-cursor-id`); painel `role="dialog"` à direita (`boundingBox`). Ver `e2e/mobile-nav.spec.ts`.
 
