@@ -3,6 +3,7 @@ import {
   buildExportUrl,
   downloadExportFile,
   parseContentDispositionFilename,
+  sanitizeDownloadFilename,
 } from "@/lib/ui/download-export";
 
 describe("buildExportUrl", () => {
@@ -15,6 +16,18 @@ describe("buildExportUrl", () => {
   it("ignora valores vazios e omite query quando vazia", () => {
     expect(buildExportUrl("/api/export", { section: undefined, q: "" })).toBe("/api/export");
     expect(buildExportUrl("/api/export", {}, "csv")).toBe("/api/export?format=csv");
+  });
+});
+
+describe("sanitizeDownloadFilename — evita path separators que quebram o download no Chrome", () => {
+  it("substitui barra de mês (07/2026) por hífen", () => {
+    expect(sanitizeDownloadFilename("gestao-clinica-07/2026.pdf", "export.pdf")).toBe(
+      "gestao-clinica-07-2026.pdf",
+    );
+  });
+
+  it("retorna fallback quando nome fica vazio", () => {
+    expect(sanitizeDownloadFilename("///", "export.pdf")).toBe("export.pdf");
   });
 });
 
@@ -36,6 +49,14 @@ describe("parseContentDispositionFilename", () => {
   it("retorna fallback quando header ausente ou inválido", () => {
     expect(parseContentDispositionFilename(null, "export.pdf")).toBe("export.pdf");
     expect(parseContentDispositionFilename("inline", "export.pdf")).toBe("export.pdf");
+  });
+
+  it("sanitiza filename com barra (Content-Disposition de gestão clínica)", () => {
+    const header =
+      'attachment; filename="gestao-clinica-07/2026.pdf"; filename*=UTF-8\'\'gestao-clinica-07%2F2026.pdf';
+    expect(parseContentDispositionFilename(header, "export.pdf")).toBe(
+      "gestao-clinica-07-2026.pdf",
+    );
   });
 });
 
@@ -106,6 +127,26 @@ describe("downloadExportFile", () => {
       status: 403,
     });
     expect(click).not.toHaveBeenCalled();
+  });
+
+  it("baixa JSON tabular 200 (application/json) sem consumir o body duas vezes", async () => {
+    const payload = JSON.stringify({ title: "Gestão clínica", rows: [{ a: 1 }] });
+    vi.mocked(fetch).mockResolvedValue(
+      new Response(payload, {
+        status: 200,
+        headers: {
+          "content-type": "application/json; charset=utf-8",
+          "content-disposition":
+            'attachment; filename="gestao-clinica-2026-07.json"; filename*=UTF-8\'\'gestao-clinica-2026-07.json',
+        },
+      }),
+    );
+
+    const result = await downloadExportFile("/api/export?format=json", "export.json");
+
+    expect(result).toEqual({ ok: true, filename: "gestao-clinica-2026-07.json" });
+    expect(createObjectURL).toHaveBeenCalled();
+    expect(click).toHaveBeenCalled();
   });
 
   it("rejeita blob vazio", async () => {

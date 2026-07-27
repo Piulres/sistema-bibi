@@ -15,7 +15,11 @@ export async function GET(request: Request) {
       Number.isFinite(year) ? year : undefined,
       Number.isFinite(month) ? month : undefined,
     );
-    const stamp = `${data.title.replace(/\s+/g, "-").toLowerCase()}`;
+    // Stamp só com dígitos — title tem "07/2026" e `/` quebra Content-Disposition/download.
+    const stampMatch = data.title.match(/(\d{2})\/(\d{4})$/);
+    const stamp = stampMatch
+      ? `${stampMatch[2]}-${stampMatch[1]}`
+      : `${year || "export"}-${month || "mes"}`;
     return serveTabularExport(format, `gestao-clinica-${stamp}`, data, {
       clinicName: "Gestão clínica",
     });

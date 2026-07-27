@@ -31,6 +31,8 @@ export default function DownloadLink({
     try {
       const result = await downloadExportFile(href, filename ?? label.toLowerCase());
       if (!result.ok) onError?.(result.error);
+    } catch {
+      onError?.("Falha inesperada ao baixar o arquivo.");
     } finally {
       setBusy(false);
     }

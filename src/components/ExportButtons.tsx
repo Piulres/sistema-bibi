@@ -46,6 +46,10 @@ export default function ExportButtons({
         setError(message);
         onError?.(message);
       }
+    } catch {
+      const message = "Falha inesperada ao exportar.";
+      setError(message);
+      onError?.(message);
     } finally {
       setBusyFormat(null);
     }

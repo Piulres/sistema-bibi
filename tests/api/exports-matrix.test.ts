@@ -85,6 +85,21 @@ describe("API — matriz completa de exportações", () => {
       await expectOk(res, `clinic-finance/${format}`);
     });
 
+    it("clinic-finance: Content-Disposition sem barra (evita Chrome 'site indisponível')", async () => {
+      const res = await clinicFinanceExportGet(
+        new Request(
+          "http://localhost/api/interno/clinic-finance/export?year=2026&month=7&format=pdf",
+        ),
+      );
+      await expectOk(res, "clinic-finance/pdf-filename");
+      const disposition = res.headers.get("content-disposition") ?? "";
+      expect(disposition).toMatch(/attachment/i);
+      expect(disposition).not.toMatch(/07\/2026/);
+      expect(disposition).toMatch(/gestao-clinica-2026-07\.pdf/);
+      const buf = Buffer.from(await res.arrayBuffer());
+      expect(buf.byteLength).toBeGreaterThan(100);
+    });
+
     it.each([
       "timeline",
       "appointments",
