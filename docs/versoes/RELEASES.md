@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.23** — Portal PJ CRUD colaboradores + E2E estoque **em produção**.
+> Pacote **v3.0.24** — Marca Energia Brasileira + nav Mais + assistente **pendente deploy produção**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.23** — deploy `6a677005` @ `9243c5d` (`bibi-poc-2026-07-27o`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.23** em produção @ `9243c5d` |
+| **Release `main` / `dev`** | **v3.0.24** pendente deploy · `dev` @ `d68d5e2` |
 | **Pacote anterior em produção** | **3.0.22** — deploy `6a670e42` @ `9466c1c` (`bibi-poc-2026-07-27n`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +25,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.23** (PJ CRUD + E2E estoque + docs assistente) |
-| **Release** | `main` | **v3.0.23** |
+| **Integração** | `dev` | **v3.0.24** (BrandMark gradiente + nav Mais + assistente) |
+| **Release** | `main` | **v3.0.23** → merge v3.0.24 pendente |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.23** · deploy `6a677005` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.24
+
+- **BrandMark:** gradiente Energia Brasileira whitelabel, circular estilo iOS, sem borda (#371).
+- **Nav interno:** menu Mais portaled — sem overlay sobre conteúdo (#370).
+- **Assistente:** labels legíveis de ferramentas, overrides por tenant, copy PT (#370).
+- **Qualidade:** CI #371 · brand-mark · nav-overflow · pre-release OK.
 
 ### Conteúdo do pacote v3.0.23
 
