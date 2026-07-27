@@ -19,7 +19,7 @@ export function getPageContextSuggestions(
     }
     if (path.includes("/cadastros")) {
       return [
-        `Buscar ${labels.patient.toLowerCase()} João`,
+        `Buscar ${labels.patient.toLowerCase()} por nome`,
         `Cadastrar ${labels.patient.toLowerCase()}`,
         "Listar usuários",
       ];

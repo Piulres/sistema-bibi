@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { scenarioCount } from "@/lib/assistant/scenarios";
 import { ASSISTANT_TOOL_INVENTORY } from "@/lib/assistant/inventory";
+import { getAssistantToolLabel } from "@/lib/assistant/tool-labels";
 
 type RuleEngineStats = {
   globalRules: number;
@@ -65,6 +66,43 @@ const SOURCE_LABEL: Record<RulePreviewRow["source"], string> = {
   niche: "Nicho",
   tenant: "Tenant",
 };
+
+function ConfigFold({
+  title,
+  summary,
+  children,
+  defaultOpen = false,
+}: {
+  title: string;
+  summary?: string;
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+}) {
+  return (
+    <details
+      className="group rounded-[var(--radius-card)] border border-[var(--border-muted)] bg-[var(--surface-card)]"
+      {...(defaultOpen ? { open: true } : {})}
+    >
+      <summary className="cursor-pointer list-none px-5 py-4 marker:content-none [&::-webkit-details-marker]:hidden">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-[var(--text-primary)]">{title}</h2>
+            {summary ? (
+              <p className="mt-1 text-sm text-[var(--text-muted)]">{summary}</p>
+            ) : null}
+          </div>
+          <span
+            className="mt-1 text-xs text-[var(--text-muted)] transition group-open:rotate-180"
+            aria-hidden
+          >
+            ▾
+          </span>
+        </div>
+      </summary>
+      <div className="space-y-4 border-t border-[var(--border-muted)] px-5 py-4">{children}</div>
+    </details>
+  );
+}
 
 export default function AssistenteConfigView() {
   const [data, setData] = useState<SettingsResponse | null>(null);
@@ -279,7 +317,7 @@ export default function AssistenteConfigView() {
       <Card className="space-y-4 p-5">
         <div>
           <h2 className="text-base font-semibold text-[var(--text-primary)]">
-            Regras do tenant (Fase 3)
+            Overrides por tenant
           </h2>
           <p className="mt-1 text-sm text-[var(--text-muted)]">
             Adicione gatilhos, remova frases do template ou desative uma tool só neste realm. Preview
@@ -288,20 +326,23 @@ export default function AssistenteConfigView() {
         </div>
 
         <label className="block text-sm sm:max-w-md">
-          <span className="mb-1 block text-[var(--text-muted)]">Tool</span>
+          <span className="mb-1 block text-[var(--text-muted)]">Ferramenta</span>
           <select
             className="w-full rounded-md border border-[var(--border-muted)] bg-[var(--surface)] px-3 py-2"
             value={selectedTool}
             onChange={(e) => setSelectedTool(e.target.value)}
-            aria-label="Selecionar tool da regra"
+            aria-label="Selecionar ferramenta da regra"
           >
             <option value="">Selecione…</option>
             {toolOptions.map((tool) => (
               <option key={tool} value={tool}>
-                {tool}
+                {getAssistantToolLabel(tool)}
               </option>
             ))}
           </select>
+          {selectedTool ? (
+            <p className="mt-1 font-mono text-[11px] text-[var(--text-muted)]">{selectedTool}</p>
+          ) : null}
         </label>
 
         {selectedTool && (
@@ -389,14 +430,17 @@ export default function AssistenteConfigView() {
           ) : (
             <ul className="divide-y divide-[var(--border-muted)] rounded-lg border border-[var(--border-muted)]">
               {draftOverrides.map((o) => (
-                <li key={o.tool} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2 text-sm">
-                  <button
-                    type="button"
-                    className="text-left font-medium text-[var(--text-primary)] underline-offset-2 hover:underline"
-                    onClick={() => setSelectedTool(o.tool)}
-                  >
-                    {o.tool}
-                  </button>
+                <li key={o.tool} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 px-3 py-2 text-sm">
+                  <div className="min-w-0">
+                    <button
+                      type="button"
+                      className="text-left font-medium text-[var(--text-primary)] underline-offset-2 hover:underline"
+                      onClick={() => setSelectedTool(o.tool)}
+                    >
+                      {getAssistantToolLabel(o.tool)}
+                    </button>
+                    <p className="font-mono text-[10px] text-[var(--text-muted)]">{o.tool}</p>
+                  </div>
                   <span className="text-xs text-[var(--text-muted)]">
                     {o.disabled
                       ? "desativada"
@@ -435,30 +479,25 @@ export default function AssistenteConfigView() {
         </div>
       </Card>
 
-      <Card className="space-y-3 p-5">
-        <div className="flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="text-base font-semibold text-[var(--text-primary)]">Preview efetivo</h2>
-            <p className="mt-1 text-sm text-[var(--text-muted)]">
-              Tools e gatilhos após merge global → nicho → tenant.
-            </p>
-          </div>
-          <label className="block text-sm">
-            <span className="sr-only">Filtrar preview</span>
-            <input
-              type="search"
-              placeholder="Filtrar tool ou gatilho…"
-              className="w-56 rounded-md border border-[var(--border-muted)] bg-[var(--surface)] px-3 py-2 text-sm"
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-            />
-          </label>
-        </div>
+      <ConfigFold
+        title="Preview efetivo"
+        summary="Ferramentas e gatilhos após merge global → nicho → tenant."
+      >
+        <label className="block text-sm">
+          <span className="sr-only">Filtrar preview</span>
+          <input
+            type="search"
+            placeholder="Filtrar ferramenta ou gatilho…"
+            className="w-full max-w-xs rounded-md border border-[var(--border-muted)] bg-[var(--surface)] px-3 py-2 text-sm sm:w-56"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          />
+        </label>
         <div className="max-h-80 overflow-auto rounded-lg border border-[var(--border-muted)]">
           <table className="w-full text-left text-xs">
             <thead className="sticky top-0 bg-[var(--surface)] text-[var(--text-muted)]">
               <tr>
-                <th className="px-3 py-2 font-medium">Tool</th>
+                <th className="px-3 py-2 font-medium">Ferramenta</th>
                 <th className="px-3 py-2 font-medium">Origem</th>
                 <th className="px-3 py-2 font-medium">Gatilhos</th>
               </tr>
@@ -470,10 +509,11 @@ export default function AssistenteConfigView() {
                   className="cursor-pointer border-t border-[var(--border-muted)] hover:bg-[var(--surface-muted,transparent)]"
                   onClick={() => setSelectedTool(row.tool)}
                 >
-                  <td className="px-3 py-2 font-medium text-[var(--text-primary)]">
-                    {row.tool}
+                  <td className="px-3 py-2 text-[var(--text-primary)]">
+                    <span className="block font-medium">{getAssistantToolLabel(row.tool)}</span>
+                    <span className="font-mono text-[10px] text-[var(--text-muted)]">{row.tool}</span>
                     {row.disabled ? (
-                      <span className="ml-2 text-amber-700">(off)</span>
+                      <span className="ml-2 text-amber-700">(desativada)</span>
                     ) : null}
                   </td>
                   <td className="px-3 py-2">{SOURCE_LABEL[row.source]}</td>
@@ -486,10 +526,12 @@ export default function AssistenteConfigView() {
             </tbody>
           </table>
         </div>
-      </Card>
+      </ConfigFold>
 
-      <Card className="space-y-3 p-5">
-        <h2 className="text-base font-semibold text-[var(--text-primary)]">Inventário (Fase 0)</h2>
+      <ConfigFold
+        title="Inventário de ferramentas"
+        summary={`${ASSISTANT_TOOL_INVENTORY.length} tools mapeadas · ${scenarioCount()} cenários de rotina.`}
+      >
         <dl className="grid gap-2 text-sm sm:grid-cols-2">
           <div>
             <dt className="text-[var(--text-muted)]">Tools mapeadas</dt>
@@ -508,10 +550,18 @@ export default function AssistenteConfigView() {
             <dd className="font-medium">7 segmentos (templates + overrides)</dd>
           </div>
         </dl>
+        <ul className="max-h-48 space-y-1 overflow-y-auto rounded-lg border border-[var(--border-muted)] p-3 text-xs">
+          {ASSISTANT_TOOL_INVENTORY.map((tool) => (
+            <li key={tool.name} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:justify-between">
+              <span className="font-medium text-[var(--text-primary)]">{tool.description}</span>
+              <span className="font-mono text-[10px] text-[var(--text-muted)]">{tool.name}</span>
+            </li>
+          ))}
+        </ul>
         <p className="text-xs text-[var(--text-muted)]">
           Documentação: <code>docs/produto/ASSISTENTE_REGRAS_PLANO.md</code>
         </p>
-      </Card>
+      </ConfigFold>
 
       <div className="flex gap-2">
         <Button variant="secondary" size="sm" disabled={saving} onClick={() => void load()}>

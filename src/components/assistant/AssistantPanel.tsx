@@ -97,7 +97,7 @@ export default function AssistantPanel({ portal }: Props) {
         )}
 
         <AssistantMessageList portal={portal} messages={messages} loading={loading} />
-        <AssistantActionCard actions={actions} />
+        <AssistantActionCard key={actions.length} actions={actions} />
         <AssistantComposer portal={portal} />
       </aside>
     </>

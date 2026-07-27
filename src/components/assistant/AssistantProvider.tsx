@@ -38,11 +38,15 @@ type Props = {
 };
 
 export default function AssistantProvider({ portal, pageContext, children }: Props) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpenState] = useState(false);
   const [messages, setMessages] = useState<AssistantMessage[]>(
     () => loadAssistantChat(portal)?.messages ?? [],
   );
   const [actions, setActions] = useState<AssistantAction[]>([]);
+  const setOpen = useCallback((next: boolean) => {
+    setOpenState(next);
+    if (!next) setActions([]);
+  }, []);
   const [sessionState, setSessionState] = useState<string | undefined>(
     () => loadAssistantChat(portal)?.sessionState,
   );
