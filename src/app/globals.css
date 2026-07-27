@@ -243,15 +243,18 @@ body {
   position: absolute;
   left: -9999px;
   top: auto;
-  z-index: 100;
+  z-index: 200;
   width: 1px;
   height: 1px;
   overflow: hidden;
 }
 
-.ds-skip-link:focus {
+.ds-skip-link:focus,
+.ds-skip-link:focus-visible {
+  position: fixed;
   left: 1rem;
   top: 1rem;
+  z-index: 200;
   width: auto;
   height: auto;
   overflow: visible;
