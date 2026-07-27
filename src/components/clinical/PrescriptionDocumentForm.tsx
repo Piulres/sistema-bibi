@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import SectionHeader from "@/components/ui/SectionHeader";
-import { COMMON_MEDICATIONS } from "@/lib/prescription-document-service";
+import { COMMON_MEDICATIONS } from "@/lib/clinical/prescription-medications";
 
 const fieldClass =
   "w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
