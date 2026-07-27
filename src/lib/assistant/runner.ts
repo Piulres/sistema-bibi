@@ -5,9 +5,9 @@ import type {
 } from "@/lib/assistant/types";
 import { isDraftToolResult } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
-import { resolveAssistantProvider } from "@/lib/assistant/config";
 import { resolveAssistantMode } from "@/lib/assistant/mode";
 import { getTenantSettings } from "@/lib/tenant/settings";
+import { shouldUseAssistantGateway } from "@/lib/assistant/plan-gateway";
 import { buildAssistantSystemPrompt } from "@/lib/assistant/context";
 import { buildActions, formatToolResult } from "@/lib/assistant/format";
 import {
@@ -52,20 +52,20 @@ async function resolvePlan(
 ) {
   const settings = await getTenantSettings(user.tenantId);
   const mode = resolveAssistantMode(settings);
-  const provider = resolveAssistantProvider();
   const rulesEnabled = settings.assistant.rulesEnabled !== false;
-  const ruleIntents = resolveAssistantIntents(user, settings.assistant.ruleOverrides);
+  const ruleOverrides = settings.assistant.ruleOverrides;
+  const ruleIntents = resolveAssistantIntents(user, ruleOverrides);
   const allowedToolNames = collectAllowedToolNames({
     availableToolNames: tools.map((t) => t.name),
     ruleToolNames: ruleIntents.map((i) => i.tool),
     rulesEnabled,
   });
 
-  if (mode === "ai" && provider === "gateway") {
+  if (shouldUseAssistantGateway(mode)) {
     try {
       const gatewayPlan = await planGatewayAssistant(systemPrompt, messages, tools);
       const rulesPlan = rulesEnabled
-        ? planMockAssistant(messages, tools, user)
+        ? planMockAssistant(messages, tools, user, ruleOverrides)
         : { toolCalls: [] };
       const hybrid = refineHybridPlan({
         gatewayPlan,
@@ -92,7 +92,7 @@ async function resolvePlan(
   if (!rulesEnabled) {
     return { toolCalls: [], fallback: rulesEngineDisabled() };
   }
-  return planMockAssistant(messages, tools, user);
+  return planMockAssistant(messages, tools, user, ruleOverrides);
 }
 
 export async function runAssistantChat(input: {
