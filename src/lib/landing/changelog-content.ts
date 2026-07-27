@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.26",
+    version: "3.0.27",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Círculo gradiente da marca visível na home — Bibi legível sobre fundo Energia Brasileira.",
+    highlights: [
+      {
+        title: "Identidade visual",
+        items: [
+          "Landing usa TenantTheme mesh (mesmo caminho dos portais internos)",
+          "backgroundColor + backgroundImage explícitos no BrandMark",
+          "Logo landing maior (lg) com tipografia Bibi legível",
+        ],
+      },
+    ],
+    testStats: "CI #377 · brand-mark · pre-release OK",
+  },
+  {
+    version: "3.0.26",
+    label: "Sistema Bibi - ServiceOS v3.0.26",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Marca da home da plataforma exibe Bibi no círculo; páginas internas dos clientes mantêm iniciais.",
     highlights: [

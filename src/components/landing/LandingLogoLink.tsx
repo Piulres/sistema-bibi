@@ -5,17 +5,15 @@ type Props = {
   branding: BrandingTokens;
 };
 
-/** @deprecated Prefer `HomeBrandLink` — mantido para imports da landing. */
+/** Marca da landing — herda mesh do TenantTheme (mesmo caminho dos portais). */
 export default function LandingLogoLink({ branding }: Props) {
   return (
     <HomeBrandLink
       displayName={branding.displayName}
       markText={branding.markText}
       logoUrl={branding.logoUrl}
-      primaryColor={branding.primaryColor}
-      accentColor={branding.accentColor}
-      heroTo={branding.heroTo}
-      logoSize="md"
+      useThemeColors
+      logoSize="lg"
     />
   );
 }

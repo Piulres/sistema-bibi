@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.26** — Monograma Bibi na home da plataforma **em produção**.
+> Pacote **v3.0.27** — Círculo da marca visível na home **pendente deploy produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.26** — deploy `6a679550` @ `822b65e` (`v3.0.26 monograma Bibi na home`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.26** — deploy `6a679550` @ `822b65e` |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.26** em produção @ `822b65e` |
+| **Release `main` / `dev`** | **v3.0.27** pendente deploy · `dev` @ `c2dd4eb` |
 | **Pacote anterior em produção** | **3.0.25** — deploy `6a678e1a` @ `368d83b` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +25,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.26** |
-| **Release** | `main` | **v3.0.26** |
+| **Integração** | `dev` | **v3.0.27** (fix círculo marca home) |
+| **Release** | `main` | **v3.0.26** → merge v3.0.27 pendente |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.26** · deploy `6a679550` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.27
+
+- **BrandMark home:** círculo gradiente visível — `useThemeColors` + `backgroundColor` fallback (#377).
+- **Landing:** logo `lg` (64px); "Bibi" legível no círculo.
+- **Qualidade:** CI #377 · brand-mark · pre-release OK.
 
 ### Conteúdo do pacote v3.0.26
 
