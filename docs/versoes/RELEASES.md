@@ -11,7 +11,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido **pendente deploy**.
+> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B **pendente deploy**.
 
 | Item | Valor |
 |------|-------|
@@ -25,7 +25,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.20** (Estoque Fase 4 + Assistente híbrido) |
+| **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B) |
 | **Release** | `main` | **v3.0.19** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.19** · deploy `6a66f3a7` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
@@ -34,7 +34,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 - **Estoque Fase 4:** reversão idempotente (`reversed`/`isReversal`); FIFO sem lotes vencidos; reforço não reabre QUARENTENA/BLOQUEADO; UI manual só SAIDA/AJUSTE/PERDA (#338).
 - **Assistente Fase 4:** pipeline híbrido LLM → regras → tools com allowlist/fallback (#337).
-- **Qualidade:** `stock` · `assistant-hybrid` · CI #337/#338 · pre-release OK.
+- **Mobile Capacitor B:** scaffold iOS/Android + service worker shell (#340).
+- **Qualidade:** `stock` · `assistant-hybrid` · `pwa-mobile-shell` · CI #337/#338/#340 · pre-release OK.
 
 ### Conteúdo do pacote v3.0.19
 

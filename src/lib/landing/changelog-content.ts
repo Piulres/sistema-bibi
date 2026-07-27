@@ -31,7 +31,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Estoque Fase 4 (reversão idempotente + FIFO sem vencidos) e Assistente com pipeline híbrido LLM→regras→tools.",
+      "Estoque Fase 4 (reversão idempotente + FIFO sem vencidos), Assistente híbrido e scaffold Capacitor iOS/Android.",
     highlights: [
       {
         title: "Estoque clínico",
@@ -47,9 +47,15 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Pipeline híbrido LLM → regras → tools com allowlist e fallback seguro",
         ],
       },
+      {
+        title: "Mobile",
+        items: [
+          "Capacitor Fase B — scaffold iOS/Android e service worker shell",
+        ],
+      },
     ],
     testStats:
-      "CI unit+E2E #337/#338 · stock · assistant-hybrid · docs:verify · pre-release OK",
+      "CI unit+E2E #337/#338/#340 · stock · assistant-hybrid · pwa-mobile-shell · docs:verify · pre-release OK",
   },
   {
     version: "3.0.19",
