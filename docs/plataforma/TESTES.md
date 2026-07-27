@@ -85,9 +85,11 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
-Cobertura v3.0.24 brand/nav: `tests/unit/brand-mark.test.ts` — gradiente whitelabel, mesh hero, SVG circular · `NavOverflowMenu` portaled (#370) · doc [`BRANDING.md`](BRANDING.md).
+Cobertura v3.0.26 brand: `tests/unit/brand-mark.test.ts` — `markText` / `PLATFORM.brandMark` ("Bibi" no círculo, `displayName` "Sistema Bibi"), gradiente whitelabel, mesh hero, SVG circular · doc [`BRANDING.md`](BRANDING.md).
 
-Cobertura v3.0.24 portal PJ import: `tests/api/pj-beneficiaries-import.test.ts` — template CSV + dry-run + import na empresa logada · `POST /api/pj/beneficiaries/import`.
+Cobertura v3.0.24 nav: `NavOverflowMenu` portaled (#370).
+
+Cobertura v3.0.25 portal PJ import: `tests/api/pj-beneficiaries-import.test.ts` — template CSV + dry-run + import na empresa logada · `POST /api/pj/beneficiaries/import`.
 
 Cobertura v3.0.23 portal PJ: `tests/api/pj-beneficiaries.test.ts` — CRUD colaboradores (`POST/PATCH/DELETE /api/pj/beneficiaries`) com anti-IDOR `companyId` · mapa `pj-beneficiary-crud` em `flow-improvements-map.ts` · doc [`FLUXOS.md`](../produto/FLUXOS.md) §5 · [`API_DOCS.md`](API_DOCS.md) §10.
 

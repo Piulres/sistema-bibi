@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.24** em produção (jul/2026) — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques recentes: **BrandMark** gradiente whitelabel (#371), **nav Mais** portaled (#370), assistente humanizado, CRUD/import CSV PJ (#365/#373). Histórico: jornada consultório (v3.0.8), drawer mobile (v3.0.7), exports canônicos — [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307), [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.26** em produção (jul/2026) — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Destaques recentes: **BrandMark** monograma **Bibi** na home (#375), import CSV PJ (#373), gradiente whitelabel (#371), **nav Mais** portaled (#370), CRUD colaboradores PJ (#365). Histórico: jornada consultório (v3.0.8), drawer mobile (v3.0.7), exports canônicos — [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307), [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),

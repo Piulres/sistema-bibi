@@ -1,13 +1,37 @@
 # Branding — Energia Brasileira
 
-Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.24**; white-label desde v2.0).
+Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.26**; white-label desde v2.0).
 
-## Marca circular (`BrandMark`) — v3.0.24
+## Marca circular (`BrandMark`)
+
+### Visual (v3.0.24+)
 
 - Gradiente **Energia Brasileira** whitelabel (`heroFrom` → `heroTo`) com glows em `primary`/`accent`
 - Formato **circular estilo iOS**, sem borda — monograma ou logo centralizado
 - SVG, PWA (`npm run icons:generate`) e UI React compartilham `src/lib/brand/brand-mark.ts`
 - Preview em `/interno/branding` · API `GET /api/brand/mark` e `/api/brand/mark/[tenantId]`
+
+### Monograma vs nome comercial (v3.0.26)
+
+O círculo pode exibir texto diferente do `displayName` ao lado:
+
+| Contexto | `displayName` (título) | Texto no círculo | Fonte |
+|----------|------------------------|------------------|-------|
+| **Home da plataforma** (`/`) | `Sistema Bibi` | **Bibi** | `PLATFORM.brandMark` → `PLATFORM_BRANDING.markText` |
+| **Tenant whitelabel** (portais, login tenant) | Nome comercial do tenant | Inicial do `displayName` | `brandMarkInitial()` — ex.: Horizonte → **H** |
+| **Tenant com logo** | Nome comercial | Imagem centralizada | `logoUrl` em `TenantBranding` |
+
+**API:** `BrandMarkInput.markText` (opcional) sobrescreve o monograma derivado. Tenants **não** usam `markText` no banco — só a plataforma na landing.
+
+```ts
+// src/lib/platform.ts + src/lib/theme/tokens.ts
+PLATFORM.brandMark === "Bibi";
+PLATFORM_BRANDING.displayName === "Sistema Bibi"; // header ao lado do círculo
+```
+
+**Componentes:** `BrandMark` aceita `markText`; `HomeBrandLink` / `LandingLogoLink` propagam de `BrandingTokens`. Após alterar monograma da plataforma, rodar `npm run icons:generate` (PWA e `icon.tsx` usam `PLATFORM_BRANDING`).
+
+**Escala tipográfica:** `brandMarkFontSizePx()` reduz fonte para textos longos (1 letra → ~42% do diâmetro; 4+ caracteres → ~18%).
 
 ## Cores principais
 
@@ -49,5 +73,8 @@ Cada nicho tem cor primária customizada em `src/lib/theme/presets-energia-brasi
 
 - Tokens CSS: `src/app/globals.css`
 - Tokens TypeScript: `src/lib/theme/tokens.ts`
+- Lógica monograma: `src/lib/brand/brand-mark.ts`
+- Identidade plataforma: `src/lib/platform.ts` (`brandName`, `brandMark`)
 - Presets nicho: `src/lib/theme/presets-energia-brasileira.ts`
 - Design system: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md)
+- Testes: `tests/unit/brand-mark.test.ts`
