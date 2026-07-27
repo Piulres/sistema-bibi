@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.19",
+    version: "3.0.20",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Estoque Fase 4 (reversão idempotente + FIFO sem vencidos) e Assistente com pipeline híbrido LLM→regras→tools.",
+    highlights: [
+      {
+        title: "Estoque clínico",
+        items: [
+          "Segunda reversão bloqueada; listagem com reversed/isReversal",
+          "Baixas atualizam lotes vencidos; reforço não reabre quarentena",
+          "Formulário manual só SAIDA, AJUSTE e PERDA",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "Pipeline híbrido LLM → regras → tools com allowlist e fallback seguro",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #337/#338 · stock · assistant-hybrid · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.19",
+    label: "Sistema Bibi - ServiceOS v3.0.19",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Assistente Fase 3: CRUD de regras por tenant; marca circular whitelabel na PWA e UI.",
     highlights: [
