@@ -3,7 +3,9 @@ import {
   brandMarkFromBranding,
   brandMarkInitial,
   brandMarkMeshBackground,
+  brandMarkMeshStyle,
   brandMarkText,
+  brandMarkThemeMeshStyle,
   buildBrandMarkSvg,
   resolveBrandMarkLayout,
 } from "@/lib/brand/brand-mark";
@@ -62,6 +64,31 @@ describe("resolveBrandMarkLayout", () => {
 
     expect(layout.backgroundFrom).toBe("#1e293b");
     expect(layout.backgroundTo).toBe("#f97316");
+  });
+});
+
+describe("brandMarkMeshStyle", () => {
+  it("sets backgroundColor fallback so circle stays visible on light headers", () => {
+    const layout = resolveBrandMarkLayout(
+      {
+        displayName: "Bibi",
+        primaryColor: "#1e293b",
+        accentColor: "#f97316",
+        heroFrom: "#1e293b",
+        heroTo: "#f59e0b",
+      },
+      512,
+    );
+    const style = brandMarkMeshStyle(layout);
+    expect(style.backgroundColor).toBe("#1e293b");
+    expect(style.backgroundImage).toContain("linear-gradient");
+    expect(style.backgroundImage).toContain("#f59e0b");
+  });
+
+  it("theme mesh uses CSS vars for landing inside TenantTheme", () => {
+    const style = brandMarkThemeMeshStyle();
+    expect(style.backgroundColor).toBe("var(--brand-hero-from)");
+    expect(style.backgroundImage).toContain("var(--brand-hero-to)");
   });
 });
 

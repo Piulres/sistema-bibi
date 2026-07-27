@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import BrandMark from "@/components/brand/BrandMark";
 import { cn } from "@/lib/utils/cn";
 
-type LogoSize = "sm" | "md";
+type LogoSize = "sm" | "md" | "lg";
 
 type Props = {
   displayName: string;
@@ -76,6 +76,7 @@ export default function HomeBrandLink({
                 logoUrl,
                 primaryColor: primaryColor!,
                 accentColor: accentColor!,
+                heroFrom: primaryColor!,
                 heroTo,
               }
             : undefined
@@ -88,7 +89,7 @@ export default function HomeBrandLink({
             <span
               className={cn(
                 "block truncate font-semibold tracking-tight text-[var(--text-primary)]",
-                logoSize === "sm" ? "text-sm" : "text-base",
+                logoSize === "sm" ? "text-sm" : logoSize === "lg" ? "text-lg" : "text-base",
                 titleClassName,
               )}
             >
