@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.17",
+    version: "3.0.18",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Estoque Fase 3: produtos sem controle de lote (serviços, kits) com movimentação direta por quantidade.",
+    highlights: [
+      {
+        title: "Estoque clínico",
+        items: [
+          "Campo requiresLot no produto — desliga rastreio por lote quando não aplicável",
+          "Entrada/saída/dispensação sem lote para SERVICO e insumos genéricos",
+          "UI de estoque adaptada: oculta lotes quando produto não exige",
+        ],
+      },
+    ],
+    testStats: "CI unit+E2E · stock Fase 3 · requiresLot · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.17",
+    label: "Sistema Bibi - ServiceOS v3.0.17",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Cliente 360° sem backdoor clínico para RECEPCAO; a11y de teclado; confirmação automática de agenda self-service.",
     highlights: [
