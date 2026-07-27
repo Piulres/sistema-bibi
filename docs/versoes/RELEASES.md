@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.10** — mês operacional + jornada/testes + agenda/calendário · **em publicação**.
+> Pacote **v3.0.10** — mês operacional + jornada/testes + agenda/calendário **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.9** — deploy `6a669510` @ `0bd89b2` (`bibi-poc-2026-07-26j`) → **3.0.10** (`bibi-poc-2026-07-27a`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.10** — deploy `6a66a38b` @ `b9ff9cb` (`bibi-poc-2026-07-27a`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.10** · sincronizadas |
+| **Release `main` / `dev`** | **v3.0.10** · sincronizadas · artefato prod `@ b9ff9cb` |
 | **Pacote anterior em produção** | **3.0.9** — deploy `6a669510` @ `0bd89b2` (`bibi-poc-2026-07-26j`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.10** |
 | **Release** | `main` | **v3.0.10** |
-| **Netlify** | **sistema-bibi.netlify.app** | deploy **v3.0.10** (`bibi-poc-2026-07-27a`) · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.10** · deploy `6a66a38b` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.10
@@ -60,11 +60,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | _(preencher pós-deploy)_ |
-| CSS `/_next/static/chunks/*.css` | _(preencher pós-deploy)_ |
-| `/instalar` | _(preencher pós-deploy)_ |
-| `/?tenant=cedig` | _(preencher pós-deploy)_ |
-| Cota Netlify | _(preencher pós-deploy)_ |
+| Landing `/` | 200 · footer `v3.0.10` · deploy `6a66a38b` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (26/07/2026) — produção v3.0.9
 
@@ -167,7 +167,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.10`** | _(pós-deploy)_ | Mês operacional + jornada/testes + agenda/calendário |
+| **`v3.0.10`** | `b9ff9cb` | Mês operacional + jornada/testes + agenda/calendário · deploy `6a66a38b` |
 | **`v3.0.9`** | `0bd89b2` | Hotfix timezone America/Sao_Paulo (#263) · deploy `6a669510` |
 | **`v3.0.8`** | `5c94251` | Jornada consultório + reset operacional CEDIG + docs sync |
 | **`v3.0.7`** | `25385b2` | Drawer mobile direita + dashboard + gestão mobile + exports + E2E/docs sync |
@@ -410,7 +410,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.10` em publicação** — mês operacional + agenda/calendário |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.10` em produção** — mês operacional + agenda/calendário |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

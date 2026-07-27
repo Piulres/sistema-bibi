@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.10** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27a` · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.10** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27a` (`6a66a38b` @ `b9ff9cb`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.10** (`bibi-poc-2026-07-27a`): mês operacional + jornada/testes + agenda/calendário — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — produção **v3.0.10** (`bibi-poc-2026-07-27a` @ `b9ff9cb`): mês operacional + jornada/testes + agenda/calendário — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
