@@ -1,7 +1,14 @@
 /**
  * Plano puro (sem Prisma) do mês operacional do consultório.
- * Datas relativas a "hoje" — a timeline permanece sempre atual a cada seed.
+ * Datas relativas a "hoje" civil em America/Sao_Paulo — consistente com CI UTC.
  */
+
+import {
+  civilDateISO,
+  endOfDayInAppTz,
+  shiftCivilDate,
+  startOfDayInAppTz,
+} from "../../src/lib/timezone";
 
 export const OPERATION_MONTH_MARKER = "[seed-operation-month]";
 
@@ -96,10 +103,10 @@ const SOURCE_ROTATION: OperationMonthSource[] = [
 
 const HOURS = [8, 9, 10, 11, 14, 15, 16, 17] as const;
 
+/** Dia da semana (0=domingo) no calendário civil BRT. */
 function dayOfWeek(dayOffset: number, now = new Date()): number {
-  const d = new Date(now);
-  d.setDate(d.getDate() + dayOffset);
-  return d.getDay();
+  const iso = shiftCivilDate(civilDateISO(now), dayOffset);
+  return new Date(`${iso}T12:00:00-03:00`).getUTCDay();
 }
 
 function isWeekend(dayOffset: number, now = new Date()): boolean {
@@ -271,13 +278,13 @@ export function buildOperationMonthPlan(now = new Date()): OperationMonthPlan {
   };
 }
 
-/** Limites da janela em Date (útil para queries de teste). */
+/** Limites da janela em Date (útil para queries de teste) — dia civil BRT. */
 export function operationMonthWindow(now = new Date()): { from: Date; to: Date } {
-  const from = new Date(now);
-  from.setDate(from.getDate() - OPERATION_MONTH_PAST_DAYS);
-  from.setHours(0, 0, 0, 0);
-  const to = new Date(now);
-  to.setDate(to.getDate() + OPERATION_MONTH_FUTURE_DAYS);
-  to.setHours(23, 59, 59, 999);
-  return { from, to };
+  const today = civilDateISO(now);
+  const fromISO = shiftCivilDate(today, -OPERATION_MONTH_PAST_DAYS);
+  const toISO = shiftCivilDate(today, OPERATION_MONTH_FUTURE_DAYS);
+  return {
+    from: startOfDayInAppTz(fromISO),
+    to: endOfDayInAppTz(toISO),
+  };
 }

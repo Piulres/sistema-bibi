@@ -8,15 +8,13 @@ import {
   TIMELINE_ACTIONS,
   TIMELINE_ENTITY_TYPES,
 } from "../../src/lib/timeline";
-import { chargePrice } from "./pricing-market";
 import {
-  daysAgo,
-  daysFromNow,
-  pick,
-  demoCpf,
-  phoneForIndex,
-  birthDateForAge,
-} from "./helpers";
+  civilDateISO,
+  parseAppDateTime,
+  shiftCivilDate,
+} from "../../src/lib/timezone";
+import { chargePrice } from "./pricing-market";
+import { pick, demoCpf, phoneForIndex, birthDateForAge } from "./helpers";
 import { MEDICAL_RECORD_SNIPPETS } from "./catalog";
 import {
   OPERATION_MONTH_MARKER,
@@ -81,12 +79,12 @@ export type SeedClinicOperationMonthContext = {
   includeCedig?: boolean;
 };
 
+/** Instante UTC correspondente a dayOffset + HH:mm no calendário civil BRT. */
 function atOffset(dayOffset: number, hour: number, minute: number): Date {
-  if (dayOffset < 0) return daysAgo(-dayOffset, hour, minute);
-  if (dayOffset > 0) return daysFromNow(dayOffset, hour, minute);
-  const d = new Date();
-  d.setHours(hour, minute, 0, 0);
-  return d;
+  const dateISO = shiftCivilDate(civilDateISO(), dayOffset);
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(minute).padStart(2, "0");
+  return parseAppDateTime(dateISO, `${hh}:${mm}`);
 }
 
 function pickPatient(

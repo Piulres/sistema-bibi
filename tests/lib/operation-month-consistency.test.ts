@@ -7,6 +7,13 @@ import {
   operationMonthWindow,
 } from "../../prisma/seed-data/operation-month";
 import { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline-constants";
+import {
+  civilDateISO,
+  dayRangeInAppTz,
+  endOfDayInAppTz,
+  shiftCivilDate,
+  startOfDayInAppTz,
+} from "@/lib/timezone";
 
 /**
  * Consistência do mês operacional semeado em `runDatabaseSeed`.
@@ -36,13 +43,16 @@ describe("Mês operacional — consistência da timeline e do dia a dia", () => 
 
   it("status: passado tem REALIZADO/FALTOU/CANCELADO; futuro só AGENDADO/CONFIRMADO", async () => {
     const tenant = await horizonte();
-    const now = new Date();
+    // "Futuro" = após o fim do dia civil BRT — evita falso positivo em CI UTC
+    // quando slots de hoje (REALIZADO) ainda estão à frente de `new Date()`.
+    const startToday = startOfDayInAppTz();
+    const endToday = endOfDayInAppTz();
 
     const futureRealizado = await prisma.appointment.count({
       where: {
         tenantId: tenant.id,
         reason: { contains: OPERATION_MONTH_MARKER },
-        scheduledAt: { gt: now },
+        scheduledAt: { gt: endToday },
         status: "REALIZADO",
       },
     });
@@ -53,7 +63,7 @@ describe("Mês operacional — consistência da timeline e do dia a dia", () => 
       where: {
         tenantId: tenant.id,
         reason: { contains: OPERATION_MONTH_MARKER },
-        scheduledAt: { gte: from, lt: now },
+        scheduledAt: { gte: from, lt: startToday },
       },
       _count: true,
     });
@@ -97,19 +107,14 @@ describe("Mês operacional — consistência da timeline e do dia a dia", () => 
 
   it("agenda de hoje tem slots do mês operacional (timeline sempre atual)", async () => {
     const tenant = await horizonte();
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date();
-    end.setHours(23, 59, 59, 999);
-
-    // Domingo o plano não gera slots; nesses dias valida a janela ±1 dia útil.
-    const dow = start.getDay();
-    const dayStart = new Date(start);
-    const dayEnd = new Date(end);
-    if (dow === 0) {
-      dayStart.setDate(dayStart.getDate() - 1);
-      dayStart.setHours(0, 0, 0, 0);
-    }
+    const todayISO = civilDateISO();
+    // Domingo BRT o plano não gera slots — valida o sábado anterior.
+    const probeISO =
+      new Date(`${todayISO}T12:00:00-03:00`).getUTCDay() === 0
+        ? shiftCivilDate(todayISO, -1)
+        : todayISO;
+    const { from: dayStart, to: dayEnd } = dayRangeInAppTz(probeISO);
+    const isSundayFallback = probeISO !== todayISO;
 
     const todayCount = await prisma.appointment.count({
       where: {
@@ -118,7 +123,7 @@ describe("Mês operacional — consistência da timeline e do dia a dia", () => 
         scheduledAt: { gte: dayStart, lte: dayEnd },
       },
     });
-    expect(todayCount).toBeGreaterThanOrEqual(dow === 0 ? 1 : 2);
+    expect(todayCount).toBeGreaterThanOrEqual(isSundayFallback ? 1 : 2);
 
     const timelineToday = await prisma.timelineEvent.count({
       where: {
