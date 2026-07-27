@@ -66,6 +66,29 @@ O assistente é um drawer fixo à direita (`AssistantPanel`). Fechamento automá
 
 Ações `confirm` e `choice` **não** fecham o painel — o usuário confirma ou escolhe in-place. Testes E2E do assistente: `e2e/assistant.spec.ts` (MEDICAL + VET).
 
+## Painel de configuração (v3.0.16 · Fase 0)
+
+Módulo interno **`/interno/assistente`** (somente ADMIN) — complementa o drawer de chat:
+
+| Recurso | Implementação |
+|---------|---------------|
+| Inventário de tools | `ASSISTANT_TOOL_INVENTORY` em `inventory.ts` — leitura/escrita por portal |
+| Cenários de rotina | `scenarios.ts` (70+) — matriz WHAT+WHY em `assistant-routine-matrix.test.ts` |
+| Flag IA por tenant | `Tenant.settings.assistant.aiEnabled` via `GET/PATCH /api/interno/assistant/settings` |
+| Modo efetivo | `resolveAssistantMode()` em `mode.ts` — `rules` (padrão) ou `ai` (gateway + flag) |
+
+Doc de roadmap: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md).
+
+## UX do chat (v3.0.16)
+
+| Recurso | Implementação |
+|---------|---------------|
+| Persistência local | `chat-storage.ts` — `sessionStorage` por portal (`bibi_assistant_chat:{portal}`) |
+| Auto-scroll | `AssistantMessageList` — rola ao fim em novas mensagens |
+| Indicador de digitação | `AssistantPanel` — estado `isTyping` durante fetch do turno |
+
+A persistência é **por aba/navegador** — não substitui `sessionState` HMAC no servidor (draft multi-turno).
+
 ## Analytics
 
 Cada tool executada registra evento na timeline (`entityType: Assistant`, ações `ASSISTANT_TOOL_OK` / `ASSISTANT_TOOL_ERR`). Visível em `/interno/auditoria`.
@@ -74,8 +97,8 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 
 | Item | Prioridade | Notas |
 |------|------------|-------|
-| **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
-| **Painel de regras** | Alta | CRUD em `/interno/assistente` — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
+| **Painel de regras (CRUD)** | Alta | Fase 2–3 — ver [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md) |
+| **Streaming SSE** | Média | Respostas longas do gateway; parcialmente coberto por indicador de digitação (v3.0.16) |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
 | **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
@@ -93,5 +116,7 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 ## Referências
 
 - `docs/versoes/V2_3.md` — changelog do pacote
+- `docs/versoes/V3_0.md` — v3.0.16 (Fase 0 + UX chat)
+- `docs/produto/ASSISTENTE_REGRAS_PLANO.md` — inventário, RBAC, fases
 - `src/lib/assistant/runner.ts` — orquestração
 - `docs/plataforma/VARIAVEIS_AMBIENTE.md` — `ASSISTANT_ENABLED`, `ASSISTANT_PROVIDER`

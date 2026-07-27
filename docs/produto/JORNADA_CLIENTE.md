@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.8** em produção — narrativa operacional do consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacote v3.0.7: drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.16** em produção — reagendar/cancelar consulta no portal Beneficiário (v3.0.16); Assistente Fase 0 (`/interno/assistente`); narrativa operacional em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md).
 
 ---
 
@@ -108,6 +108,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | 1. Entrada | Login com e-mail + senha | `/beneficiario/login` | Sessão escopada ao `patientId` |
 | 2. Agendar | Escolhe prestador, data, slot, modalidade | Card “Agendar consulta” | `Appointment` AGENDADO; webhook `APPOINTMENT_CREATED` |
 | 3. Consulta | Acessa link telemedicina (TELE) ou comparece presencial | Tabela “Minha agenda” | — |
+| 3b. Reagendar / cancelar | Troca horário ou cancela consulta futura | Minha agenda → **Reagendar** / **Cancelar** | `PATCH …/appointments/[id]` `{ action: "reschedule" \| "cancel" }` — mesmo registro, timeline `RESCHEDULED` |
 | 4. Pós-atendimento | Consulta consumo Pay Per Use | Seção “Consumo Pay Per Use” | Vê procedimentos `billed` / não `billed` |
 | 5. Faturamento | Aguarda fatura emitida pelo interno | KPI “Total faturado” | — |
 | 6. Pagamento | Gera PIX → confirma pagamento | Seção “Faturas” | `Invoice` PAGA |
@@ -123,7 +124,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | Não pode cancelar nem reagendar consulta | Ações com regras de antecedência (ex.: até 24 h antes) |
+| Média | Sem regra de antecedência mínima (ex.: 24 h) | Política configurável por tenant — hoje: qualquer `AGENDADO` futuro |
 | Alta | PIX em dois passos manuais (gerar + confirmar) | Webhook do gateway ou polling; exibir QR Code |
 | Média | Página única longa (scroll) | Abas: Agenda · Consumo · Faturas · Prontuário |
 | Média | Slots fixos (8h–18h, 30 min) | Grade configurável por prestador (`scheduling-service.ts`) |
@@ -352,7 +353,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 
 | # | Melhoria | Portal(es) | Impacto | Tier sugerido |
 |---|----------|------------|---------|---------------|
-| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **Cancelar:** ✅ `PATCH …/beneficiario/appointments/[id]` · Reagendar: backlog |
+| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | ✅ v3.0.16 — `PATCH …/beneficiario/appointments/[id]` `{ action: "cancel" \| "reschedule" }` · ver [`FLUXOS.md`](FLUXOS.md) §8.9 |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
 | 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 |

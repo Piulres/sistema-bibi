@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.15** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27f` (`6a66de5b` @ `4599bff`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.16** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27g` (`6a66e01e` @ `cbec2c7`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.15** (`bibi-poc-2026-07-27f` @ `4599bff`): gestão clínica otimizada — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — produção **v3.0.16** (`bibi-poc-2026-07-27g` @ `cbec2c7`): reagendar beneficiário, Assistente Fase 0, estoque Fase 2 UI — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -109,6 +109,8 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`produto/JORNADA_CLIENTE.md`](produto/JORNADA_CLIENTE.md) | Jornada UX por portal |
 | [`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md) | Atestado, receita comum/especial, protocolos de exames |
 | [`produto/AUDITORIA_FLUXOS.md`](produto/AUDITORIA_FLUXOS.md) | Gaps mapeados |
+| [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) | Chat stateless (HMAC/JTI) nos 4 portais |
+| [`produto/ASSISTENTE_REGRAS_PLANO.md`](produto/ASSISTENTE_REGRAS_PLANO.md) | Fase 0+ — inventário, RBAC, painel `/interno/assistente` |
 
 ---
 
