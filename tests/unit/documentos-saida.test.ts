@@ -7,7 +7,13 @@ import {
   referralUrgencyLabel,
 } from "@/lib/clinical/encaminhamento";
 import { buildClinicalGuidePdfBuffer } from "@/lib/exports/clinical-guide-pdf";
+import {
+  clinicalGuideFilenameBase,
+  slugifyFilenamePart,
+} from "@/lib/exports/clinical-guide-filename";
 import { formatPrescriptionDocumentText } from "@/lib/prescription-document-service";
+import { confirmPresets } from "@/lib/ui/confirm-presets";
+import { TIMELINE_ACTIONS, TIMELINE_ENTITY_TYPES } from "@/lib/timeline-constants";
 
 describe("Encaminhamento — templates aceleram saída do consultório", () => {
   it("expõe templates de especialidade usados no mercado (Cardiologia, Ortopedia…)", () => {
@@ -116,6 +122,27 @@ describe("Guias clínicas PDF — prestador imprime e paciente baixa no painel",
     // Duas páginas → arquivo maior que uma guia simples
     expect(buffer.length).toBeGreaterThan(800);
     expect(buffer.subarray(0, 4).toString("utf8")).toBe("%PDF");
+  });
+});
+
+describe("Nome de arquivo e confirmação — recepção acha o PDF e evita cancel acidental", () => {
+  it("gera filename legível com paciente e data — evita receita-<8chars>.pdf opaco", () => {
+    expect(slugifyFilenamePart("João Pereira")).toBe("joao-pereira");
+    expect(
+      clinicalGuideFilenameBase("receita", "João Pereira", new Date("2026-07-27T12:00:00Z")),
+    ).toBe("receita-joao-pereira-2026-07-27");
+  });
+
+  it("preset de cancelar encaminhamento pede confirmação com especialidade", () => {
+    const preset = confirmPresets.cancelReferral("Cardiologia");
+    expect(preset.title).toMatch(/cancelar/i);
+    expect(preset.message).toContain("Cardiologia");
+    expect(preset.tone).toBe("warning");
+  });
+
+  it("auditoria tipada cobre export de guia e entidade PrescriptionDocument", () => {
+    expect(TIMELINE_ACTIONS.DOCUMENT_EXPORTED).toBe("DOCUMENT_EXPORTED");
+    expect(TIMELINE_ENTITY_TYPES.PRESCRIPTION_DOCUMENT).toBe("PrescriptionDocument");
   });
 });
 

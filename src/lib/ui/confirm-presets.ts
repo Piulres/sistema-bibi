@@ -108,4 +108,12 @@ export const confirmPresets = {
     cancelLabel: "Voltar",
     tone: "danger",
   }),
+
+  cancelReferral: (specialty: string): ConfirmOptions => ({
+    title: "Cancelar encaminhamento",
+    message: `Cancelar o encaminhamento para ${specialty}? A guia deixa de aparecer como ativa para impressão e no painel.`,
+    confirmLabel: "Cancelar encaminhamento",
+    cancelLabel: "Voltar",
+    tone: "warning",
+  }),
 } as const;

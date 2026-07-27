@@ -1016,6 +1016,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                     }}
                     formats={["pdf"]}
                     size="sm"
+                    ariaLabel={doc.title}
                   />
                 </div>
               </article>

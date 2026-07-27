@@ -162,3 +162,93 @@ export async function downloadExportFile(
 
   return { ok: true, filename };
 }
+
+/**
+ * Abre o PDF autenticado em nova janela e dispara impressão (recepção).
+ * Mesmo fetch/blob do download — evita JSON de erro virar “PDF”.
+ */
+export async function printExportFile(
+  url: string,
+): Promise<DownloadExportResult> {
+  let response: Response;
+  try {
+    response = await fetch(url, { credentials: "same-origin" });
+  } catch {
+    return { ok: false, error: "Falha de rede ao carregar para impressão.", status: 0 };
+  }
+
+  const contentType = response.headers.get("content-type");
+
+  if (!response.ok) {
+    if (isJsonContentType(contentType)) {
+      const body = (await response.json().catch(() => null)) as { error?: string } | null;
+      return {
+        ok: false,
+        error: body?.error ?? `Impressão falhou (HTTP ${response.status}).`,
+        status: response.status,
+      };
+    }
+    return {
+      ok: false,
+      error: `Impressão falhou (HTTP ${response.status}).`,
+      status: response.status,
+    };
+  }
+
+  let blob: Blob;
+  try {
+    blob = await response.blob();
+  } catch {
+    return {
+      ok: false,
+      error: "Não foi possível ler o arquivo para impressão.",
+      status: response.status,
+    };
+  }
+
+  if (blob.size === 0) {
+    return { ok: false, error: "Arquivo de impressão vazio.", status: response.status };
+  }
+
+  const filename = parseContentDispositionFilename(
+    response.headers.get("content-disposition"),
+    "guia.pdf",
+  );
+
+  try {
+    const objectUrl = URL.createObjectURL(blob);
+    const printWindow = window.open(objectUrl, "_blank", "noopener,noreferrer");
+    if (!printWindow) {
+      URL.revokeObjectURL(objectUrl);
+      return {
+        ok: false,
+        error: "Pop-up bloqueado — permita janelas para imprimir a guia.",
+        status: response.status,
+      };
+    }
+    const triggerPrint = () => {
+      try {
+        printWindow.focus();
+        printWindow.print();
+      } catch {
+        // Navegador pode bloquear print automático; usuário ainda vê o PDF.
+      } finally {
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60_000);
+      }
+    };
+    if (printWindow.document.readyState === "complete") {
+      triggerPrint();
+    } else {
+      printWindow.addEventListener("load", triggerPrint, { once: true });
+      window.setTimeout(triggerPrint, 800);
+    }
+  } catch {
+    return {
+      ok: false,
+      error: "Navegador bloqueou a impressão do arquivo.",
+      status: response.status,
+    };
+  }
+
+  return { ok: true, filename };
+}

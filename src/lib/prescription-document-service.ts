@@ -226,7 +226,7 @@ export async function createPrescriptionDocument(input: {
 
   await recordTimelineEvent({
     tenantId: input.tenantId,
-    entityType: TIMELINE_ENTITY_TYPES.MEDICATION_PRESCRIPTION,
+    entityType: TIMELINE_ENTITY_TYPES.PRESCRIPTION_DOCUMENT,
     entityId: row.id,
     action: TIMELINE_ACTIONS.MEDICATION_PRESCRIBED,
     description: `Receita (${prescriptionKindLabel(kind)}) com ${validItems.length} item(ns) — ${input.patientName}`,

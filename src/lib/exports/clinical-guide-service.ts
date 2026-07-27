@@ -2,6 +2,7 @@ import "server-only";
 import { formatDateTimeBR as dateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { getTenantBranding } from "@/lib/theme/branding";
+import { getTenantLabelsById } from "@/lib/niche/tenant-labels";
 import {
   buildClinicalGuidePdfBuffer,
   type ClinicalGuideContext,
@@ -9,12 +10,12 @@ import {
   type ClinicalGuidePatient,
   type ClinicalGuideProvider,
 } from "@/lib/exports/clinical-guide-pdf";
+import { clinicalGuideFilenameBase } from "@/lib/exports/clinical-guide-filename";
 import { prescriptionKindLabel } from "@/lib/clinical/receita";
 import {
   referralKindLabel,
   referralUrgencyLabel,
 } from "@/lib/clinical/encaminhamento";
-import { buildPepRecordPdf } from "@/lib/exports/pep-service";
 
 const dateOnly = (value: Date) =>
   value.toLocaleDateString("pt-BR", {
@@ -35,8 +36,9 @@ async function loadPartyBundle(
   providerId: string,
 ): Promise<PartyBundle | null> {
   const prisma = await getPrisma();
-  const [branding, patient, provider] = await Promise.all([
+  const [branding, labels, patient, provider] = await Promise.all([
     getTenantBranding(tenantId),
+    getTenantLabelsById(tenantId),
     prisma.patient.findFirst({
       where: { id: patientId, tenantId },
       include: { company: { select: { name: true } } },
@@ -60,6 +62,7 @@ async function loadPartyBundle(
       displayName: branding.displayName,
       tagline: branding.tagline,
       platformLabel: branding.platformLabel,
+      primaryColor: branding.primaryColor,
     },
     patient: {
       name: patient.name,
@@ -67,6 +70,7 @@ async function loadPartyBundle(
       birthDateLabel: dateOnly(patient.birthDate),
       phone: patient.phone,
       companyName: patient.company?.name ?? null,
+      roleLabel: labels.patient,
     },
     provider: {
       name: provider.name,
@@ -78,11 +82,115 @@ async function loadPartyBundle(
   };
 }
 
+function prescriptionContext(
+  parties: PartyBundle,
+  rx: {
+    prescriptionKind: string;
+    title: string | null;
+    notes: string | null;
+    createdAt: Date;
+    appointment: { scheduledAt: Date } | null;
+    items: Array<{
+      medication: string;
+      dosage: string;
+      frequency: string;
+      route: string | null;
+      durationDays: number | null;
+      quantity: string | null;
+      notes: string | null;
+    }>;
+  },
+): ClinicalGuideContext {
+  const kindLabel = prescriptionKindLabel(rx.prescriptionKind);
+  const itemLines = rx.items
+    .map((item, index) => {
+      const parts = [
+        `${index + 1}. ${item.medication}`,
+        `   Dose: ${item.dosage} · ${item.frequency}${item.route ? ` · Via ${item.route}` : ""}`,
+      ];
+      if (item.durationDays) parts.push(`   Duração: ${item.durationDays} dia(s)`);
+      if (item.quantity) parts.push(`   Quantidade: ${item.quantity}`);
+      if (item.notes) parts.push(`   Obs.: ${item.notes}`);
+      return parts.join("\n");
+    })
+    .join("\n\n");
+  const isControlled = rx.prescriptionKind === "CONTROLE_ESPECIAL";
+
+  return {
+    ...parties,
+    page: {
+      docTypeLabel: kindLabel,
+      title: rx.title?.trim() || kindLabel,
+      subtitle: isControlled
+        ? "Receita de Controle Especial — Portaria SVS/MS 344/1998 / RDC 1000/2025 · 1ª VIA — Retenção da farmácia"
+        : "Receituário simples",
+      issuedAtLabel: dateTime(rx.createdAt),
+      appointmentDateLabel: rx.appointment
+        ? dateTime(rx.appointment.scheduledAt)
+        : null,
+      sections: [
+        { heading: "Prescrição", body: itemLines || "—" },
+        ...(rx.notes ? [{ heading: "Observações", body: rx.notes }] : []),
+      ],
+      footerNote: isControlled
+        ? "1ª via — retenção da farmácia · 2ª via — orientação ao paciente. Validade típica: 30 dias."
+        : null,
+      duplicateViaLabel: isControlled ? "2ª VIA — Orientação ao paciente" : null,
+    },
+  };
+}
+
+function referralContext(
+  parties: PartyBundle,
+  referral: {
+    specialty: string;
+    referralKind: string;
+    urgency: string;
+    clinicalReason: string;
+    historySummary: string | null;
+    requestedActions: string | null;
+    createdAt: Date;
+    appointment: { scheduledAt: Date } | null;
+  },
+): ClinicalGuideContext {
+  const sections = [
+    {
+      heading: "Destino",
+      body: `${referral.specialty}\nTipo: ${referralKindLabel(referral.referralKind)}\nUrgência: ${referralUrgencyLabel(referral.urgency)}`,
+    },
+    { heading: "Motivo clínico", body: referral.clinicalReason },
+  ];
+  if (referral.historySummary) {
+    sections.push({ heading: "Histórico relevante", body: referral.historySummary });
+  }
+  if (referral.requestedActions) {
+    sections.push({
+      heading: "Condutas / exames solicitados ao especialista",
+      body: referral.requestedActions,
+    });
+  }
+
+  return {
+    ...parties,
+    page: {
+      docTypeLabel: "Encaminhamento clínico",
+      title: `Encaminhamento — ${referral.specialty}`,
+      subtitle: `${referralUrgencyLabel(referral.urgency)} · ${referralKindLabel(referral.referralKind)}`,
+      issuedAtLabel: dateTime(referral.createdAt),
+      appointmentDateLabel: referral.appointment
+        ? dateTime(referral.appointment.scheduledAt)
+        : null,
+      sections,
+      footerNote: "Apresentar esta guia no serviço / especialidade de destino.",
+    },
+  };
+}
+
 export async function buildPrescriptionGuidePdf(
   tenantId: string,
   documentId: string,
   options?: { patientId?: string; providerId?: string },
-): Promise<Buffer | null> {
+): Promise<{ buffer: Buffer; patientName: string; issuedAt: Date } | null> {
   const prisma = await getPrisma();
   const doc = await prisma.prescriptionDocument.findFirst({
     where: {
@@ -94,7 +202,7 @@ export async function buildPrescriptionGuidePdf(
     include: {
       items: { orderBy: { sortOrder: "asc" } },
       appointment: { select: { scheduledAt: true } },
-      patient: { select: { id: true } },
+      patient: { select: { id: true, name: true } },
       provider: { select: { id: true } },
     },
   });
@@ -103,51 +211,10 @@ export async function buildPrescriptionGuidePdf(
   const parties = await loadPartyBundle(tenantId, doc.patient.id, doc.provider.id);
   if (!parties) return null;
 
-  const kindLabel = prescriptionKindLabel(doc.prescriptionKind);
-  const itemLines = doc.items.map((item, index) => {
-    const parts = [
-      `${index + 1}. ${item.medication}`,
-      `   Dose: ${item.dosage} · ${item.frequency}${item.route ? ` · Via ${item.route}` : ""}`,
-    ];
-    if (item.durationDays) parts.push(`   Duração: ${item.durationDays} dia(s)`);
-    if (item.quantity) parts.push(`   Quantidade: ${item.quantity}`);
-    if (item.notes) parts.push(`   Obs.: ${item.notes}`);
-    return parts.join("\n");
-  });
-
-  const isControlled = doc.prescriptionKind === "CONTROLE_ESPECIAL";
-  const ctx: ClinicalGuideContext = {
-    ...parties,
-    page: {
-      docTypeLabel: kindLabel,
-      title: doc.title?.trim() || kindLabel,
-      subtitle: isControlled
-        ? "Receita de Controle Especial — Portaria SVS/MS 344/1998 / RDC 1000/2025"
-        : "Receituário simples",
-      issuedAtLabel: dateTime(doc.createdAt),
-      appointmentDateLabel: doc.appointment
-        ? dateTime(doc.appointment.scheduledAt)
-        : null,
-      sections: [
-        { heading: "Prescrição", body: itemLines.join("\n\n") || "—" },
-        ...(doc.notes
-          ? [{ heading: "Observações", body: doc.notes }]
-          : []),
-      ],
-      footerNote: isControlled
-        ? "1ª via — retenção da farmácia · 2ª via — orientação ao paciente. Validade típica: 30 dias."
-        : null,
-      duplicateViaLabel: isControlled ? "2ª VIA — Orientação ao paciente" : null,
-    },
-  };
-
-  // Via 1 label for controlled: first page without via label is "1ª via" implied by footer;
-  // set first page subtitle to include 1ª via when controlled.
-  if (isControlled) {
-    ctx.page.subtitle = `${ctx.page.subtitle} · 1ª VIA — Retenção da farmácia`;
-  }
-
-  return buildClinicalGuidePdfBuffer([ctx]);
+  const buffer = await buildClinicalGuidePdfBuffer([
+    prescriptionContext(parties, doc),
+  ]);
+  return { buffer, patientName: doc.patient.name, issuedAt: doc.createdAt };
 }
 
 export async function buildExamRequestGuidePdf(
@@ -158,7 +225,7 @@ export async function buildExamRequestGuidePdf(
     patientId?: string;
     providerId?: string;
   },
-): Promise<Buffer | null> {
+): Promise<{ buffer: Buffer; patientName: string; issuedAt: Date } | null> {
   const prisma = await getPrisma();
 
   const orders = await prisma.examOrder.findMany({
@@ -172,7 +239,7 @@ export async function buildExamRequestGuidePdf(
     },
     include: {
       appointment: { select: { scheduledAt: true } },
-      patient: { select: { id: true } },
+      patient: { select: { id: true, name: true } },
       provider: { select: { id: true } },
     },
     orderBy: { createdAt: "asc" },
@@ -220,14 +287,15 @@ export async function buildExamRequestGuidePdf(
     },
   };
 
-  return buildClinicalGuidePdfBuffer([ctx]);
+  const buffer = await buildClinicalGuidePdfBuffer([ctx]);
+  return { buffer, patientName: head.patient.name, issuedAt: head.createdAt };
 }
 
 export async function buildReferralGuidePdf(
   tenantId: string,
   referralId: string,
   options?: { patientId?: string; providerId?: string },
-): Promise<Buffer | null> {
+): Promise<{ buffer: Buffer; patientName: string; issuedAt: Date } | null> {
   const prisma = await getPrisma();
   const referral = await prisma.clinicalReferral.findFirst({
     where: {
@@ -238,7 +306,7 @@ export async function buildReferralGuidePdf(
     },
     include: {
       appointment: { select: { scheduledAt: true } },
-      patient: { select: { id: true } },
+      patient: { select: { id: true, name: true } },
       provider: { select: { id: true } },
     },
   });
@@ -247,39 +315,64 @@ export async function buildReferralGuidePdf(
   const parties = await loadPartyBundle(tenantId, referral.patient.id, referral.provider.id);
   if (!parties) return null;
 
-  const sections = [
-    {
-      heading: "Destino",
-      body: `${referral.specialty}\nTipo: ${referralKindLabel(referral.referralKind)}\nUrgência: ${referralUrgencyLabel(referral.urgency)}`,
+  const buffer = await buildClinicalGuidePdfBuffer([
+    referralContext(parties, referral),
+  ]);
+  return {
+    buffer,
+    patientName: referral.patient.name,
+    issuedAt: referral.createdAt,
+  };
+}
+
+/** Atestado no mesmo layout tipográfico das demais guias (não PEP genérico). */
+export async function buildAtestadoGuidePdf(
+  tenantId: string,
+  recordId: string,
+  options?: { patientId?: string; providerId?: string },
+): Promise<{ buffer: Buffer; patientName: string; issuedAt: Date } | null> {
+  const prisma = await getPrisma();
+  const record = await prisma.medicalRecord.findFirst({
+    where: {
+      id: recordId,
+      recordType: "ATESTADO",
+      patient: { tenantId },
+      ...(options?.patientId ? { patientId: options.patientId } : {}),
+      ...(options?.providerId ? { providerId: options.providerId } : {}),
     },
-    { heading: "Motivo clínico", body: referral.clinicalReason },
-  ];
-  if (referral.historySummary) {
-    sections.push({ heading: "Histórico relevante", body: referral.historySummary });
-  }
-  if (referral.requestedActions) {
-    sections.push({
-      heading: "Condutas / exames solicitados ao especialista",
-      body: referral.requestedActions,
-    });
-  }
+    include: {
+      appointment: { select: { scheduledAt: true } },
+      patient: { select: { id: true, name: true } },
+      provider: { select: { id: true } },
+    },
+  });
+  if (!record) return null;
+
+  const parties = await loadPartyBundle(tenantId, record.patient.id, record.provider.id);
+  if (!parties) return null;
 
   const ctx: ClinicalGuideContext = {
     ...parties,
     page: {
-      docTypeLabel: "Encaminhamento clínico",
-      title: `Encaminhamento — ${referral.specialty}`,
-      subtitle: `${referralUrgencyLabel(referral.urgency)} · ${referralKindLabel(referral.referralKind)}`,
-      issuedAtLabel: dateTime(referral.createdAt),
-      appointmentDateLabel: referral.appointment
-        ? dateTime(referral.appointment.scheduledAt)
+      docTypeLabel: "Atestado médico",
+      title: record.title?.trim() || "Atestado médico",
+      subtitle: "Resolução CFM nº 2.381/2024 — documento assistencial",
+      issuedAtLabel: dateTime(record.createdAt),
+      appointmentDateLabel: record.appointment
+        ? dateTime(record.appointment.scheduledAt)
         : null,
-      sections,
-      footerNote: "Apresentar esta guia no serviço / especialidade de destino.",
+      sections: [{ heading: "Texto do atestado", body: record.content }],
+      footerNote:
+        "Em produção nacional, preferir emissão via Atesta CFM ou sistema integrado (Res. CFM 2.382/2024).",
     },
   };
 
-  return buildClinicalGuidePdfBuffer([ctx]);
+  const buffer = await buildClinicalGuidePdfBuffer([ctx]);
+  return {
+    buffer,
+    patientName: record.patient.name,
+    issuedAt: record.createdAt,
+  };
 }
 
 export type ClinicalGuideExportType =
@@ -305,34 +398,63 @@ export async function buildClinicalGuideExport(input: {
 
   if (input.type === "receita") {
     if (!input.id) return null;
-    const buffer = await buildPrescriptionGuidePdf(input.tenantId, input.id, scope);
-    return buffer ? { buffer, filenameBase: `receita-${input.id.slice(0, 8)}` } : null;
+    const result = await buildPrescriptionGuidePdf(input.tenantId, input.id, scope);
+    if (!result) return null;
+    return {
+      buffer: result.buffer,
+      filenameBase: clinicalGuideFilenameBase(
+        "receita",
+        result.patientName,
+        result.issuedAt,
+      ),
+    };
   }
 
   if (input.type === "exame") {
     const appointmentId = input.appointmentId ?? undefined;
     const examOrderId = !appointmentId ? input.id ?? undefined : undefined;
-    const buffer = await buildExamRequestGuidePdf(input.tenantId, {
+    const result = await buildExamRequestGuidePdf(input.tenantId, {
       appointmentId,
       examOrderId,
       ...scope,
     });
-    const base = appointmentId ?? input.id ?? "exames";
-    return buffer ? { buffer, filenameBase: `pedido-exames-${base.slice(0, 8)}` } : null;
+    if (!result) return null;
+    return {
+      buffer: result.buffer,
+      filenameBase: clinicalGuideFilenameBase(
+        "pedido-exames",
+        result.patientName,
+        result.issuedAt,
+      ),
+    };
   }
 
   if (input.type === "encaminhamento") {
     if (!input.id) return null;
-    const buffer = await buildReferralGuidePdf(input.tenantId, input.id, scope);
-    return buffer
-      ? { buffer, filenameBase: `encaminhamento-${input.id.slice(0, 8)}` }
-      : null;
+    const result = await buildReferralGuidePdf(input.tenantId, input.id, scope);
+    if (!result) return null;
+    return {
+      buffer: result.buffer,
+      filenameBase: clinicalGuideFilenameBase(
+        "encaminhamento",
+        result.patientName,
+        result.issuedAt,
+      ),
+    };
   }
 
   if (input.type === "atestado") {
     if (!input.id) return null;
-    const buffer = await buildPepRecordPdf(input.tenantId, [input.id], scope);
-    return buffer ? { buffer, filenameBase: `atestado-${input.id.slice(0, 8)}` } : null;
+    const result = await buildAtestadoGuidePdf(input.tenantId, input.id, scope);
+    if (!result) return null;
+    return {
+      buffer: result.buffer,
+      filenameBase: clinicalGuideFilenameBase(
+        "atestado",
+        result.patientName,
+        result.issuedAt,
+      ),
+    };
   }
 
   if (input.type === "bundle") {
@@ -340,7 +462,7 @@ export async function buildClinicalGuideExport(input: {
 
     const contexts: ClinicalGuideContext[] = [];
     const prisma = await getPrisma();
-    const [prescriptions, exams, referrals] = await Promise.all([
+    const [prescriptions, exams, referrals, atestados, patient] = await Promise.all([
       prisma.prescriptionDocument.findMany({
         where: {
           patientId: input.patientId,
@@ -384,47 +506,30 @@ export async function buildClinicalGuideExport(input: {
         },
         orderBy: { createdAt: "asc" },
       }),
+      prisma.medicalRecord.findMany({
+        where: {
+          patientId: input.patientId,
+          appointmentId: input.appointmentId,
+          recordType: "ATESTADO",
+          patient: { tenantId: input.tenantId },
+        },
+        include: {
+          appointment: { select: { scheduledAt: true } },
+          patient: { select: { id: true } },
+          provider: { select: { id: true } },
+        },
+        orderBy: { createdAt: "asc" },
+      }),
+      prisma.patient.findFirst({
+        where: { id: input.patientId, tenantId: input.tenantId },
+        select: { name: true },
+      }),
     ]);
 
     for (const rx of prescriptions) {
       const parties = await loadPartyBundle(input.tenantId, rx.patient.id, rx.provider.id);
       if (!parties) continue;
-      const kindLabel = prescriptionKindLabel(rx.prescriptionKind);
-      const itemLines = rx.items
-        .map((item, index) => {
-          const parts = [
-            `${index + 1}. ${item.medication}`,
-            `   Dose: ${item.dosage} · ${item.frequency}${item.route ? ` · Via ${item.route}` : ""}`,
-          ];
-          if (item.durationDays) parts.push(`   Duração: ${item.durationDays} dia(s)`);
-          if (item.quantity) parts.push(`   Quantidade: ${item.quantity}`);
-          if (item.notes) parts.push(`   Obs.: ${item.notes}`);
-          return parts.join("\n");
-        })
-        .join("\n\n");
-      const isControlled = rx.prescriptionKind === "CONTROLE_ESPECIAL";
-      contexts.push({
-        ...parties,
-        page: {
-          docTypeLabel: kindLabel,
-          title: rx.title?.trim() || kindLabel,
-          subtitle: isControlled
-            ? "Receita de Controle Especial · 1ª VIA — Retenção da farmácia"
-            : "Receituário simples",
-          issuedAtLabel: dateTime(rx.createdAt),
-          appointmentDateLabel: rx.appointment
-            ? dateTime(rx.appointment.scheduledAt)
-            : null,
-          sections: [
-            { heading: "Prescrição", body: itemLines || "—" },
-            ...(rx.notes ? [{ heading: "Observações", body: rx.notes }] : []),
-          ],
-          footerNote: isControlled
-            ? "1ª via — farmácia · 2ª via — paciente. Validade típica: 30 dias."
-            : null,
-          duplicateViaLabel: isControlled ? "2ª VIA — Orientação ao paciente" : null,
-        },
-      });
+      contexts.push(prescriptionContext(parties, rx));
     }
 
     if (exams.length > 0) {
@@ -468,34 +573,29 @@ export async function buildClinicalGuideExport(input: {
         referral.provider.id,
       );
       if (!parties) continue;
-      const sections = [
-        {
-          heading: "Destino",
-          body: `${referral.specialty}\nTipo: ${referralKindLabel(referral.referralKind)}\nUrgência: ${referralUrgencyLabel(referral.urgency)}`,
-        },
-        { heading: "Motivo clínico", body: referral.clinicalReason },
-      ];
-      if (referral.historySummary) {
-        sections.push({ heading: "Histórico relevante", body: referral.historySummary });
-      }
-      if (referral.requestedActions) {
-        sections.push({
-          heading: "Condutas / exames solicitados ao especialista",
-          body: referral.requestedActions,
-        });
-      }
+      contexts.push(referralContext(parties, referral));
+    }
+
+    for (const atestado of atestados) {
+      const parties = await loadPartyBundle(
+        input.tenantId,
+        atestado.patient.id,
+        atestado.provider.id,
+      );
+      if (!parties) continue;
       contexts.push({
         ...parties,
         page: {
-          docTypeLabel: "Encaminhamento clínico",
-          title: `Encaminhamento — ${referral.specialty}`,
-          subtitle: `${referralUrgencyLabel(referral.urgency)} · ${referralKindLabel(referral.referralKind)}`,
-          issuedAtLabel: dateTime(referral.createdAt),
-          appointmentDateLabel: referral.appointment
-            ? dateTime(referral.appointment.scheduledAt)
+          docTypeLabel: "Atestado médico",
+          title: atestado.title?.trim() || "Atestado médico",
+          subtitle: "Resolução CFM nº 2.381/2024 — documento assistencial",
+          issuedAtLabel: dateTime(atestado.createdAt),
+          appointmentDateLabel: atestado.appointment
+            ? dateTime(atestado.appointment.scheduledAt)
             : null,
-          sections,
-          footerNote: "Apresentar esta guia no serviço / especialidade de destino.",
+          sections: [{ heading: "Texto do atestado", body: atestado.content }],
+          footerNote:
+            "Em produção nacional, preferir emissão via Atesta CFM ou sistema integrado (Res. CFM 2.382/2024).",
         },
       });
     }
@@ -504,7 +604,11 @@ export async function buildClinicalGuideExport(input: {
     const buffer = await buildClinicalGuidePdfBuffer(contexts);
     return {
       buffer,
-      filenameBase: `guias-atendimento-${input.appointmentId.slice(0, 8)}`,
+      filenameBase: clinicalGuideFilenameBase(
+        "guias-atendimento",
+        patient?.name ?? "paciente",
+        new Date(),
+      ),
     };
   }
 

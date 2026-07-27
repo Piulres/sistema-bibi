@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Button from "@/components/ui/Button";
 import Alert from "@/components/ui/Alert";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -8,6 +8,8 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
 import { REFERRAL_TEMPLATES, type ReferralTemplate } from "@/lib/clinical/encaminhamento";
 import { useLabels } from "@/hooks/useLabels";
+import { useConfirm } from "@/hooks/useConfirm";
+import { confirmPresets } from "@/lib/ui/confirm-presets";
 
 const fieldClass =
   "w-full min-w-0 rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2.5 text-[var(--text-primary)] focus:border-[var(--brand-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring-focus)]";
@@ -29,6 +31,16 @@ type DischargeDocument = {
   };
 };
 
+type KindFilter = "ALL" | "RECEITA" | "PEDIDO_EXAME" | "ENCAMINHAMENTO" | "ATESTADO";
+
+const KIND_FILTERS: { id: KindFilter; label: string }[] = [
+  { id: "ALL", label: "Todas" },
+  { id: "RECEITA", label: "Receitas" },
+  { id: "PEDIDO_EXAME", label: "Exames" },
+  { id: "ENCAMINHAMENTO", label: "Encaminhamentos" },
+  { id: "ATESTADO", label: "Atestados" },
+];
+
 type Props = {
   patientId: string;
   appointmentId?: string;
@@ -43,11 +55,15 @@ export default function ClinicalDischargePanel({
   onChanged,
 }: Props) {
   const { labels } = useLabels();
+  const { confirm } = useConfirm();
   const [documents, setDocuments] = useState<DischargeDocument[]>([]);
   const [templates, setTemplates] = useState<ReferralTemplate[]>(REFERRAL_TEMPLATES);
   const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [kindFilter, setKindFilter] = useState<KindFilter>("ALL");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   const [form, setForm] = useState({
     referralKind: "ESPECIALIDADE",
@@ -58,7 +74,10 @@ export default function ClinicalDischargePanel({
     requestedActions: "",
   });
 
-  const loadDocuments = useCallback(async () => {
+  const fetchDocuments = useCallback(async (): Promise<{
+    documents: DischargeDocument[];
+    referralTemplates?: ReferralTemplate[];
+  }> => {
     const params = new URLSearchParams();
     if (appointmentId) params.set("appointmentId", appointmentId);
     if (petId) params.set("petId", petId);
@@ -66,39 +85,68 @@ export default function ClinicalDischargePanel({
     const res = await fetch(
       `/api/prestador/patients/${patientId}/discharge-documents${qs}`,
     );
-    const data = await res.json();
-    if (res.ok) {
-      setDocuments(data.documents ?? []);
-      if (Array.isArray(data.referralTemplates) && data.referralTemplates.length > 0) {
-        setTemplates(data.referralTemplates);
-      }
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      throw new Error(
+        (data as { error?: string } | null)?.error ??
+          "Não foi possível carregar as guias deste atendimento.",
+      );
     }
+    return {
+      documents: (data as { documents?: DischargeDocument[] }).documents ?? [],
+      referralTemplates: (data as { referralTemplates?: ReferralTemplate[] })
+        .referralTemplates,
+    };
   }, [patientId, appointmentId, petId]);
+
+  const applyDocumentsPayload = useCallback(
+    (payload: {
+      documents: DischargeDocument[];
+      referralTemplates?: ReferralTemplate[];
+    }) => {
+      setDocuments(payload.documents);
+      if (
+        Array.isArray(payload.referralTemplates) &&
+        payload.referralTemplates.length > 0
+      ) {
+        setTemplates(payload.referralTemplates);
+      }
+    },
+    [],
+  );
+
+  const loadDocuments = useCallback(async () => {
+    const payload = await fetchDocuments();
+    applyDocumentsPayload(payload);
+  }, [fetchDocuments, applyDocumentsPayload]);
 
   useEffect(() => {
     let active = true;
     (async () => {
-      const params = new URLSearchParams();
-      if (appointmentId) params.set("appointmentId", appointmentId);
-      if (petId) params.set("petId", petId);
-      const qs = params.toString() ? `?${params}` : "";
-      const res = await fetch(
-        `/api/prestador/patients/${patientId}/discharge-documents${qs}`,
-      );
-      if (!active) return;
-      const data = await res.json();
-      if (!active || !res.ok) return;
-      setDocuments(data.documents ?? []);
-      if (Array.isArray(data.referralTemplates) && data.referralTemplates.length > 0) {
-        setTemplates(data.referralTemplates);
+      try {
+        const payload = await fetchDocuments();
+        if (!active) return;
+        applyDocumentsPayload(payload);
+        setError(null);
+      } catch (err) {
+        if (!active) return;
+        setError(err instanceof Error ? err.message : "Erro ao carregar guias");
+      } finally {
+        if (active) setLoading(false);
       }
     })();
     return () => {
       active = false;
     };
-  }, [patientId, appointmentId, petId]);
+  }, [fetchDocuments, applyDocumentsPayload]);
+
+  const filteredDocuments = useMemo(() => {
+    if (kindFilter === "ALL") return documents;
+    return documents.filter((doc) => doc.kind === kindFilter);
+  }, [documents, kindFilter]);
 
   function applyTemplate(template: ReferralTemplate) {
+    setSelectedTemplateId(template.id);
     setForm({
       referralKind: template.referralKind,
       specialty: template.specialty,
@@ -128,7 +176,10 @@ export default function ClinicalDischargePanel({
         setError(data.error ?? "Erro ao emitir encaminhamento");
         return;
       }
-      setMsg("Encaminhamento emitido. Imprima a guia e entregue em mãos ou oriente o acesso no painel.");
+      setMsg(
+        "Encaminhamento emitido. Imprima a guia e entregue em mãos ou oriente o acesso no painel.",
+      );
+      setSelectedTemplateId(null);
       setForm({
         referralKind: "ESPECIALIDADE",
         specialty: "",
@@ -144,7 +195,10 @@ export default function ClinicalDischargePanel({
     }
   }
 
-  async function cancelReferral(id: string) {
+  async function cancelReferral(id: string, specialty: string) {
+    const ok = await confirm(confirmPresets.cancelReferral(specialty));
+    if (!ok) return;
+
     setBusy(true);
     setError(null);
     try {
@@ -158,6 +212,7 @@ export default function ClinicalDischargePanel({
         setError((data as { error?: string } | null)?.error ?? "Erro ao cancelar");
         return;
       }
+      setMsg("Encaminhamento cancelado.");
       await loadDocuments();
       onChanged?.();
     } finally {
@@ -169,16 +224,44 @@ export default function ClinicalDischargePanel({
     <div className="space-y-6">
       <SectionHeader
         title="Documentos de saída"
-        description={`Receitas, pedidos de exame e encaminhamentos para entregar ao ${labels.patient.toLowerCase()} (impresso ou no painel).`}
+        description={`Receitas, pedidos de exame, encaminhamentos e atestados para entregar ao ${labels.patient.toLowerCase()} (impresso ou no painel).`}
       />
 
-      {msg && <Alert tone="success">{msg}</Alert>}
-      {error && <Alert tone="danger">{error}</Alert>}
+      {msg && (
+        <Alert tone="success" role="status">
+          {msg}
+        </Alert>
+      )}
+      {error && (
+        <Alert tone="danger" role="alert">
+          {error}
+          {!loading && (
+            <button
+              type="button"
+              className="ml-2 underline"
+              onClick={() => {
+                setLoading(true);
+                setError(null);
+                void loadDocuments()
+                  .catch((err) =>
+                    setError(
+                      err instanceof Error ? err.message : "Erro ao carregar guias",
+                    ),
+                  )
+                  .finally(() => setLoading(false));
+              }}
+            >
+              Tentar novamente
+            </button>
+          )}
+        </Alert>
+      )}
 
       {appointmentId && documents.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-muted)] p-3">
           <p className="text-sm text-[var(--text-secondary)]">
             {documents.length} guia(s) deste atendimento — imprimir pacote completo
+            (inclui atestado)
           </p>
           <ExportButtons
             baseUrl="/api/prestador/clinical-guides/export"
@@ -189,20 +272,49 @@ export default function ClinicalDischargePanel({
             }}
             formats={["pdf"]}
             variant="portal"
+            showPrint
+            ariaLabel="pacote do atendimento"
           />
         </div>
       )}
 
       <div className="space-y-3">
-        <p className="text-sm font-medium text-[var(--text-secondary)]">Guias emitidas</p>
-        {documents.length === 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-sm font-medium text-[var(--text-secondary)]">Guias emitidas</p>
+          {documents.length > 0 && (
+            <div className="flex flex-wrap gap-1" role="group" aria-label="Filtrar por tipo">
+              {KIND_FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  type="button"
+                  aria-pressed={kindFilter === filter.id}
+                  onClick={() => setKindFilter(filter.id)}
+                  className={`rounded-full border px-2.5 py-1 text-xs ${
+                    kindFilter === filter.id
+                      ? "border-[var(--brand-primary)] bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]"
+                      : "border-[var(--border-muted)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {loading ? (
           <p className="rounded-[var(--radius-button)] bg-[var(--surface-muted)] p-4 text-sm text-[var(--text-muted)]">
-            Nenhuma guia ainda. Emita receita (aba Medicação), solicite exames (aba Exames) ou
-            crie um encaminhamento abaixo.
+            Carregando guias…
+          </p>
+        ) : filteredDocuments.length === 0 ? (
+          <p className="rounded-[var(--radius-button)] bg-[var(--surface-muted)] p-4 text-sm text-[var(--text-muted)]">
+            {documents.length === 0
+              ? "Nenhuma guia ainda. Emita receita (aba Medicação), solicite exames (aba Exames), atestado (Prontuário) ou crie um encaminhamento abaixo."
+              : "Nenhuma guia neste filtro."}
           </p>
         ) : (
           <ul className="divide-y divide-[var(--border-default)] rounded-[var(--radius-button)] border border-[var(--border-muted)]">
-            {documents.map((doc) => (
+            {filteredDocuments.map((doc) => (
               <li
                 key={doc.id}
                 className="flex flex-col gap-3 p-3 sm:flex-row sm:items-start sm:justify-between"
@@ -229,13 +341,18 @@ export default function ClinicalDischargePanel({
                     }}
                     formats={["pdf"]}
                     size="sm"
+                    showPrint
+                    ariaLabel={doc.title}
                   />
                   {doc.kind === "ENCAMINHAMENTO" && doc.status === "ATIVO" && (
                     <Button
                       size="sm"
                       variant="secondary"
                       disabled={busy}
-                      onClick={() => void cancelReferral(doc.exportParams.id)}
+                      aria-label={`Cancelar encaminhamento ${doc.title}`}
+                      onClick={() =>
+                        void cancelReferral(doc.exportParams.id, doc.title)
+                      }
                     >
                       Cancelar
                     </Button>
@@ -253,13 +370,18 @@ export default function ClinicalDischargePanel({
           description="Templates por especialidade — emita, imprima e entregue em mãos."
         />
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Templates de encaminhamento">
           {templates.map((template) => (
             <button
               key={template.id}
               type="button"
+              aria-pressed={selectedTemplateId === template.id}
               onClick={() => applyTemplate(template)}
-              className="rounded-full border border-[var(--border-muted)] px-3 py-1 text-xs text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+              className={`rounded-full border px-3 py-1 text-xs ${
+                selectedTemplateId === template.id
+                  ? "border-[var(--brand-primary)] bg-[var(--brand-primary)]/10 text-[var(--brand-primary)]"
+                  : "border-[var(--border-muted)] text-[var(--text-secondary)] hover:bg-[var(--surface-muted)]"
+              }`}
             >
               {template.label}
             </button>
@@ -267,56 +389,70 @@ export default function ClinicalDischargePanel({
         </div>
 
         <div className="grid gap-2 sm:grid-cols-2">
-          <select
-            className={fieldClass}
-            value={form.referralKind}
-            onChange={(e) => setForm({ ...form, referralKind: e.target.value })}
-            aria-label="Tipo de encaminhamento"
-          >
-            <option value="ESPECIALIDADE">Para especialidade</option>
-            <option value="RETORNO">Retorno</option>
-            <option value="SERVICO">Para serviço</option>
-          </select>
-          <select
-            className={fieldClass}
-            value={form.urgency}
-            onChange={(e) => setForm({ ...form, urgency: e.target.value })}
-            aria-label="Urgência"
-          >
-            <option value="ROTINA">Rotina</option>
-            <option value="BREVE">Breve</option>
-            <option value="URGENTE">Urgente</option>
-          </select>
-          <input
-            className={`sm:col-span-2 ${fieldClass}`}
-            placeholder="Especialidade / serviço de destino"
-            value={form.specialty}
-            onChange={(e) => setForm({ ...form, specialty: e.target.value })}
-          />
-          <textarea
-            className={`sm:col-span-2 ${fieldClass}`}
-            rows={3}
-            placeholder="Motivo clínico"
-            value={form.clinicalReason}
-            onChange={(e) => setForm({ ...form, clinicalReason: e.target.value })}
-          />
-          <textarea
-            className={`sm:col-span-2 ${fieldClass}`}
-            rows={2}
-            placeholder="Histórico relevante (opcional)"
-            value={form.historySummary}
-            onChange={(e) => setForm({ ...form, historySummary: e.target.value })}
-          />
-          <textarea
-            className={`sm:col-span-2 ${fieldClass}`}
-            rows={2}
-            placeholder="Condutas / exames solicitados ao especialista (opcional)"
-            value={form.requestedActions}
-            onChange={(e) => setForm({ ...form, requestedActions: e.target.value })}
-          />
+          <label className="block space-y-1 text-sm">
+            <span className="text-[var(--text-secondary)]">Tipo</span>
+            <select
+              className={fieldClass}
+              value={form.referralKind}
+              onChange={(e) => setForm({ ...form, referralKind: e.target.value })}
+            >
+              <option value="ESPECIALIDADE">Para especialidade</option>
+              <option value="RETORNO">Retorno</option>
+              <option value="SERVICO">Para serviço</option>
+            </select>
+          </label>
+          <label className="block space-y-1 text-sm">
+            <span className="text-[var(--text-secondary)]">Urgência</span>
+            <select
+              className={fieldClass}
+              value={form.urgency}
+              onChange={(e) => setForm({ ...form, urgency: e.target.value })}
+            >
+              <option value="ROTINA">Rotina</option>
+              <option value="BREVE">Breve</option>
+              <option value="URGENTE">Urgente</option>
+            </select>
+          </label>
+          <label className="block space-y-1 text-sm sm:col-span-2">
+            <span className="text-[var(--text-secondary)]">Especialidade / serviço</span>
+            <input
+              className={fieldClass}
+              value={form.specialty}
+              onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+            />
+          </label>
+          <label className="block space-y-1 text-sm sm:col-span-2">
+            <span className="text-[var(--text-secondary)]">Motivo clínico</span>
+            <textarea
+              className={fieldClass}
+              rows={3}
+              value={form.clinicalReason}
+              onChange={(e) => setForm({ ...form, clinicalReason: e.target.value })}
+            />
+          </label>
+          <label className="block space-y-1 text-sm sm:col-span-2">
+            <span className="text-[var(--text-secondary)]">Histórico relevante (opcional)</span>
+            <textarea
+              className={fieldClass}
+              rows={2}
+              value={form.historySummary}
+              onChange={(e) => setForm({ ...form, historySummary: e.target.value })}
+            />
+          </label>
+          <label className="block space-y-1 text-sm sm:col-span-2">
+            <span className="text-[var(--text-secondary)]">
+              Condutas / exames solicitados (opcional)
+            </span>
+            <textarea
+              className={fieldClass}
+              rows={2}
+              value={form.requestedActions}
+              onChange={(e) => setForm({ ...form, requestedActions: e.target.value })}
+            />
+          </label>
         </div>
 
-        <Button onClick={() => void submitReferral()} disabled={busy}>
+        <Button onClick={() => void submitReferral()} disabled={busy} aria-busy={busy}>
           Emitir encaminhamento
         </Button>
       </div>

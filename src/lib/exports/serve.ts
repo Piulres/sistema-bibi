@@ -45,16 +45,27 @@ export function exportFilename(base: string, format: ExportFormat): string {
   return `${safeBase}.${exportFileExtension(format)}`;
 }
 
+export type ServeBufferExportOptions = {
+  /** PHI / documentos clínicos — evita cache em browser/proxy. */
+  noStore?: boolean;
+};
+
 /** Resposta de download para buffer binário (PDF/XLSX). */
 export function serveBufferExport(
   format: ExportFormat,
   filenameBase: string,
   buffer: Buffer,
+  options?: ServeBufferExportOptions,
 ): NextResponse {
   const filename = exportFilename(filenameBase, format);
-  return new NextResponse(new Uint8Array(buffer), {
-    headers: attachmentHeaders(format, filename),
-  });
+  const headers: Record<string, string> = {
+    ...(attachmentHeaders(format, filename) as Record<string, string>),
+  };
+  if (options?.noStore) {
+    headers["Cache-Control"] = "no-store, private";
+    headers.Pragma = "no-cache";
+  }
+  return new NextResponse(new Uint8Array(buffer), { headers });
 }
 
 /** Converte TabularExport para CSV, XLSX, PDF tabular, JSON ou TXT. */

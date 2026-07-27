@@ -3326,14 +3326,21 @@ paths:
     get:
       tags: &a1
         - Beneficiário
-      summary: GET clinical-guides export
+      summary: Baixa guia clínica PDF do próprio paciente
+      description: >
+        PDF tipográfico escopado ao patientId da sessão.
+        Cache-Control no-store; auditoria DOCUMENT_EXPORTED.
       responses:
         "200":
-          description: Arquivo exportado
+          description: PDF da guia (attachment, no-store)
+        "400":
+          description: type/format inválido
         "401":
           description: Não autenticado
         "403":
           description: Acesso negado (role != BENEFICIARIO)
+        "404":
+          description: Documento não encontrado
       parameters:
         - name: format
           in: query
@@ -3341,9 +3348,24 @@ paths:
             type: string
             enum:
               - pdf
-              - xlsx
-              - csv
-              - json
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - receita
+              - exame
+              - encaminhamento
+              - atestado
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: appointmentId
+          in: query
+          schema:
+            type: string
   /api/beneficiario/documents:
     get:
       tags: *a1
@@ -4294,14 +4316,22 @@ paths:
   /api/prestador/clinical-guides/export:
     get:
       tags: *a3
-      summary: GET clinical-guides export
+      summary: Exporta guia clínica PDF (receita, exame, encaminhamento, atestado ou pacote)
+      description: >
+        PDF tipográfico A4. Query `type` obrigatória.
+        Pacote (`bundle`) exige `patientId` + `appointmentId` e inclui atestado.
+        Resposta com Cache-Control no-store; auditoria DOCUMENT_EXPORTED.
       responses:
         "200":
-          description: Arquivo exportado
+          description: PDF da guia (attachment, no-store)
+        "400":
+          description: type/format inválido
         "401":
           description: Não autenticado
         "403":
           description: Acesso negado (role != PRESTADOR)
+        "404":
+          description: Documento não encontrado
       parameters:
         - name: format
           in: query
@@ -4309,9 +4339,29 @@ paths:
             type: string
             enum:
               - pdf
-              - xlsx
-              - csv
-              - json
+        - name: type
+          in: query
+          required: true
+          schema:
+            type: string
+            enum:
+              - receita
+              - exame
+              - encaminhamento
+              - atestado
+              - bundle
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: appointmentId
+          in: query
+          schema:
+            type: string
+        - name: patientId
+          in: query
+          schema:
+            type: string
   /api/prestador/field-reports/attachments/{id}/download:
     parameters:
       - name: id
