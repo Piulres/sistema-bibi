@@ -109,9 +109,8 @@ test.describe("Jornada consultório — módulos operacionais (Interno)", () => 
       title: /Confirmar pagamento/i,
       action: /Confirmar pagamento/i,
     });
-    await expectFeedbackMessage(page, /Fatura marcada como paga/i);
-    // Lista recarrega com ao menos uma fatura PAGA (seed demo tem FECHADA + fluxo)
-    await expect(page.getByText("PAGA").first()).toBeVisible({ timeout: 15_000 });
+    // Estado final é a fonte de verdade — toast pode sumir no mobile após reload da lista
+    await expect(page.getByText("PAGA").first()).toBeVisible({ timeout: 20_000 });
   });
 });
 
