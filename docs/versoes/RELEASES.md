@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.19** — Assistente Fase 3 + marca whitelabel **pendente de deploy**.
+> Pacote **v3.0.19** — Assistente Fase 3 + marca whitelabel **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.19** (preparado) · prod ainda `@ 372b5cc` |
+| **Release `main` / `dev`** | **v3.0.19** · sincronizados @ `1fca530` |
 | **Pacote anterior em produção** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -26,15 +26,25 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.19** (Assistente Fase 3 + brand mark) |
-| **Release** | `main` | **v3.0.19** (preparado) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.18** · deploy `6a66e9d6` · HTTP 200 · **Stop builds ON** |
+| **Release** | `main` | **v3.0.19** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.19** · deploy `6a66f3a7` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.19
 
 - **Assistente Fase 3:** CRUD de `ruleOverrides` no painel + preview efetivo (#330).
 - **Marca / PWA:** brand mark circular whitelabel + ícones (#325).
-- **Qualidade:** fix jornada consultório uniqueSlot/400 (#329) · `assistant-rule-engine` · `brand-mark` · CI #325/#329/#330.
+- **Qualidade:** fix jornada consultório uniqueSlot/400 (#329) · `assistant-rule-engine` · `brand-mark` · CI #325/#329/#330 · pre-release OK · deploy `6a66f3a7`.
+
+### Smoke (27/07/2026) — produção v3.0.19
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.19` · deploy `6a66f3a7` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/login` · `/interno/login` | 200 |
+| `/interno/assistente` | 307 (auth) |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.18
 
@@ -314,7 +324,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.19`** | _(pendente deploy)_ | Assistente Fase 3 CRUD + brand mark · #325/#329/#330 |
+| **`v3.0.19`** | `1fca530` | Assistente Fase 3 CRUD + brand mark · deploy `6a66f3a7` · #325/#329/#330 |
 | **`v3.0.18`** | `372b5cc` | Estoque Fase 3 SEM-LOTE + Assistente regras · deploy `6a66e9d6` · #319/#321/#326 |
 | **`v3.0.17`** | `c3eb563` | RBAC clínico 360° + a11y + auto-confirm · deploy `6a66e5f9` · #292/#317/#318 |
 | **`v3.0.16`** | `9e98494` | Reagendar + Assistente Fase 0 + estoque UI · deploy `6a66e115` · #282/#286/#306/#308 |
@@ -564,7 +574,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.18` em produção** · **`v3.0.19` preparado** — Assistente Fase 3 + brand |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.19` em produção** — Assistente Fase 3 + brand mark |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

@@ -49,7 +49,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #325/#329/#330 · assistant-rule-engine · brand-mark · docs:verify · pre-release",
+      "CI unit+E2E #325/#329/#330 · assistant-rule-engine · brand-mark · pre-release OK · prod 6a66f3a7",
   },
   {
     version: "3.0.18",
