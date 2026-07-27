@@ -61,6 +61,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
 
+### Smoke (27/07/2026) — produção v3.0.11
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | pendente pós-deploy |
+| CSS `/_next/static/chunks/*.css` | pendente |
+| `/instalar` | pendente |
+| `/?tenant=cedig` | pendente |
+| Cota Netlify | verificar antes do deploy |
+
 ### Smoke (27/07/2026) — produção v3.0.10
 
 | Check | Resultado |
