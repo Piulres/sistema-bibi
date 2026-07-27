@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.17** — RBAC clínico 360° + a11y + auto-confirm **em produção**.
+> Pacote **v3.0.18** — Estoque Fase 3 (produtos sem lote) **pendente deploy**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.17** · sincronizados @ `c3eb563` |
+| **Release `main` / `dev`** | **v3.0.18** preparado · produção ainda **v3.0.17** até deploy |
 | **Pacote anterior em produção** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +25,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.17** (RBAC clínico + a11y + auto-confirm) |
-| **Release** | `main` | **v3.0.17** |
+| **Integração** | `dev` | **v3.0.18** (Estoque Fase 3) |
+| **Release** | `main` | **v3.0.17** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.17** · deploy `6a66e5f9` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.18
+
+- **Estoque Fase 3:** `requiresLot=false` — produtos sem lote (SERVICO, kits); movimentação direta por quantidade; UI oculta gestão de lotes quando desnecessária.
+- **Qualidade:** `stock` API + unit · CI #319 · pre-release OK.
 
 ### Conteúdo do pacote v3.0.17
 
@@ -49,6 +54,10 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | `/beneficiario` | 307 (auth) |
 | `/instalar` | 200 |
 | Cota Netlify | sem `503 usage_exceeded` |
+
+### Pendente na integração (`dev`) — Estoque Fase 3
+
+- Produtos `requiresLot=false` com lote sintético `SEM-LOTE`; entrada/devolução sem lote+validade (#319).
 
 ### Conteúdo do pacote v3.0.16
 

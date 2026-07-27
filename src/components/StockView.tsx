@@ -16,6 +16,7 @@ import {
   STOCK_MOVEMENT_TYPES,
   STOCK_PRODUCT_CATEGORIES,
   isStockReversibleType,
+  isStockSyntheticLot,
 } from "@/lib/stock-constants";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
@@ -34,6 +35,7 @@ type Product = {
   lowStock: boolean;
   active: boolean;
   anvisaCode: string | null;
+  requiresLot: boolean;
 };
 
 type Lot = {
@@ -104,6 +106,7 @@ const emptyProductForm = {
   unit: "UN",
   minStock: "10",
   anvisaCode: "",
+  requiresLot: true,
 };
 
 function canReverseMovement(m: Movement): boolean {
@@ -239,8 +242,12 @@ export default function StockView() {
       unit: p.unit,
       minStock: String(p.minStock),
       anvisaCode: p.anvisaCode ?? "",
+      requiresLot: p.requiresLot,
     });
   }
+
+  const entryProduct = products.find((p) => p.id === entryForm.productId);
+  const entryRequiresLot = entryProduct?.requiresLot !== false;
 
   function cancelEditProduct() {
     setEditingProductId(null);
@@ -262,6 +269,7 @@ export default function StockView() {
             unit: productForm.unit,
             minStock: Number(productForm.minStock),
             anvisaCode: productForm.anvisaCode || null,
+            requiresLot: productForm.requiresLot,
           }),
         }),
       {
@@ -367,20 +375,26 @@ export default function StockView() {
 
   async function receiveEntry(e: React.FormEvent) {
     e.preventDefault();
+    const payload: Record<string, unknown> = {
+      productId: entryForm.productId,
+      quantity: Number(entryForm.quantity),
+      unitCost: entryForm.unitCost ? Number(entryForm.unitCost) : undefined,
+      supplierRef: entryForm.supplierRef || null,
+    };
+    if (entryRequiresLot) {
+      payload.lotNumber = entryForm.lotNumber;
+      payload.expiryDate = entryForm.expiryDate;
+    } else {
+      if (entryForm.lotNumber.trim()) payload.lotNumber = entryForm.lotNumber;
+      if (entryForm.expiryDate) payload.expiryDate = entryForm.expiryDate;
+    }
     await run(
       "entry",
       () =>
         fetch("/api/interno/stock/lots", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            productId: entryForm.productId,
-            lotNumber: entryForm.lotNumber,
-            expiryDate: entryForm.expiryDate,
-            quantity: Number(entryForm.quantity),
-            unitCost: entryForm.unitCost ? Number(entryForm.unitCost) : undefined,
-            supplierRef: entryForm.supplierRef || null,
-          }),
+          body: JSON.stringify(payload),
         }),
       {
         successMessage: "Entrada registrada com sucesso",
@@ -551,6 +565,11 @@ export default function StockView() {
                             </p>
                             <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
                               {p.sku} · {p.categoryLabel}
+                              {!p.requiresLot && (
+                                <span className="ml-2 text-xs text-[var(--text-muted)]">
+                                  sem lote
+                                </span>
+                              )}
                             </p>
                           </div>
                           <div className="shrink-0 text-right text-sm">
@@ -604,7 +623,14 @@ export default function StockView() {
                                 <span className="ml-2 text-xs text-[var(--text-muted)]">inativo</span>
                               )}
                             </td>
-                            <td className="py-2 pr-3">{p.categoryLabel}</td>
+                            <td className="py-2 pr-3">
+                              {p.categoryLabel}
+                              {!p.requiresLot && (
+                                <span className="ml-2 text-xs text-[var(--text-muted)]">
+                                  sem lote
+                                </span>
+                              )}
+                            </td>
                             <td className="py-2 pr-3">{p.stockLabel}</td>
                             <td className="py-2 pr-3">{p.minStock}</td>
                             <td className="py-2">
@@ -696,6 +722,18 @@ export default function StockView() {
                     onChange={(e) => setProductForm({ ...productForm, anvisaCode: e.target.value })}
                   />
                 </label>
+                {!editingProductId && (
+                  <label className="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
+                    <input
+                      type="checkbox"
+                      checked={productForm.requiresLot}
+                      onChange={(e) =>
+                        setProductForm({ ...productForm, requiresLot: e.target.checked })
+                      }
+                    />
+                    Exige lote / validade (ANVISA)
+                  </label>
+                )}
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="submit"
@@ -737,7 +775,9 @@ export default function StockView() {
                               {lot.productName}
                             </p>
                             <p className="mt-0.5 font-mono text-xs text-[var(--text-muted)]">
-                              Lote {lot.lotNumber}
+                              {isStockSyntheticLot(lot.lotNumber)
+                                ? "Controle sem lote"
+                                : `Lote ${lot.lotNumber}`}
                             </p>
                             <p className="mt-0.5 text-xs text-[var(--text-muted)]">
                               Val. {lot.expiryDateLabel}
@@ -781,7 +821,9 @@ export default function StockView() {
                         {lots.map((lot) => (
                           <tr key={lot.id} className="border-b border-[var(--border-muted)]/60">
                             <td className="py-2 pr-3">{lot.productName}</td>
-                            <td className="py-2 pr-3 font-mono text-xs">{lot.lotNumber}</td>
+                            <td className="py-2 pr-3 font-mono text-xs">
+                              {isStockSyntheticLot(lot.lotNumber) ? "SEM LOTE" : lot.lotNumber}
+                            </td>
                             <td className="py-2 pr-3">
                               {lot.expiryDateLabel}
                               {lot.expiringSoon && lot.daysToExpiry >= 0 && (
@@ -832,30 +874,40 @@ export default function StockView() {
                       .map((p) => (
                         <option key={p.id} value={p.id}>
                           {p.sku} — {p.name}
+                          {!p.requiresLot ? " (sem lote)" : ""}
                         </option>
                       ))}
                   </select>
                 </label>
-                <label className="block text-sm text-[var(--text-secondary)]">
-                  Nº do lote
-                  <input
-                    className={fieldClass}
-                    value={entryForm.lotNumber}
-                    onChange={(e) => setEntryForm({ ...entryForm, lotNumber: e.target.value })}
-                    required
-                    autoComplete="off"
-                  />
-                </label>
-                <label className="block text-sm text-[var(--text-secondary)]">
-                  Validade
-                  <input
-                    className={fieldClass}
-                    type="date"
-                    value={entryForm.expiryDate}
-                    onChange={(e) => setEntryForm({ ...entryForm, expiryDate: e.target.value })}
-                    required
-                  />
-                </label>
+                {entryRequiresLot ? (
+                  <>
+                    <label className="block text-sm text-[var(--text-secondary)]">
+                      Nº do lote
+                      <input
+                        className={fieldClass}
+                        value={entryForm.lotNumber}
+                        onChange={(e) => setEntryForm({ ...entryForm, lotNumber: e.target.value })}
+                        required
+                        autoComplete="off"
+                      />
+                    </label>
+                    <label className="block text-sm text-[var(--text-secondary)]">
+                      Validade
+                      <input
+                        className={fieldClass}
+                        type="date"
+                        value={entryForm.expiryDate}
+                        onChange={(e) => setEntryForm({ ...entryForm, expiryDate: e.target.value })}
+                        required
+                      />
+                    </label>
+                  </>
+                ) : (
+                  <p className="text-sm text-[var(--text-muted)]">
+                    Este produto não exige lote — a entrada atualiza o saldo sem rastreio de
+                    validade.
+                  </p>
+                )}
                 <label className="block text-sm text-[var(--text-secondary)]">
                   Quantidade
                   <input
@@ -911,7 +963,11 @@ export default function StockView() {
                         {m.productName} ({m.productSku}) — {m.quantity} un.
                       </p>
                       {m.lotNumber && (
-                        <p className="text-[var(--text-muted)]">Lote {m.lotNumber}</p>
+                        <p className="text-[var(--text-muted)]">
+                          {isStockSyntheticLot(m.lotNumber)
+                            ? "Controle sem lote"
+                            : `Lote ${m.lotNumber}`}
+                        </p>
                       )}
                       {m.reason && (
                         <p className="text-[var(--text-secondary)]">{m.reason}</p>
