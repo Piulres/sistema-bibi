@@ -31,7 +31,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
     date: "27/07/2026",
     status: "current",
     summary:
-      "Auditoria com RBAC de conteúdo e estoque clínico validado (reversão completa + guard de dispensação).",
+      "Auditoria com RBAC de conteúdo, estoque clínico validado e cadastros mais rápidos (fetch + code-split por aba).",
     highlights: [
       {
         title: "Auditoria / RBAC",
@@ -49,9 +49,16 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Cobertura Vitest ampliada do catálogo, FIFO, kits e atendimento",
         ],
       },
+      {
+        title: "Cadastros",
+        items: [
+          "Cada aba busca só os dados necessários — sem bloquear a tela no carregamento das quatro listas",
+          "Abas secundárias em code-split (next/dynamic); Beneficiários permanece no bundle inicial",
+        ],
+      },
     ],
     testStats:
-      "CI unit+E2E · audit-access · audit-rbac-content · stock · docs:verify · pre-release OK",
+      "CI unit+E2E · audit-access · audit-rbac-content · stock · cadastros-resolve-tab · docs:verify · pre-release OK",
   },
   {
     version: "3.0.13",

@@ -36,7 +36,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Superfícies:** audit, export, revisões, atividade recente do dashboard e timeline Cliente 360°.
 - **Perfis:** ADMIN completo + restore; FATURAMENTO financeiro pleno com PII mascarado; READONLY em resumo; RECEPCAO sem clínico/segurança no dashboard.
 - **Estoque:** reversão completa (ENTRADA/SAIDA/DISPENSACAO/…); bloqueio de dispensação em CANCELADO/FALTOU; docs API alinhados.
-- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` (15 casos) · CI #293/#296 verdes · pre-release OK.
+- **Cadastros:** tela `/interno/cadastros` com fetch por aba + `next/dynamic` (sem bloquear UI no Promise.all das 4 listas).
+- **Qualidade:** `audit-access`, `audit-rbac-content`, `stock` · `cadastros-resolve-tab` · CI #291/#293/#296 verdes · pre-release OK.
 
 ### Conteúdo do pacote v3.0.13
 
