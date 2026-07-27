@@ -30,7 +30,7 @@ Desenvolver → testar local → PR → dev → (fechar pacote) → main → dep
 | `dev` | Integração — **base padrão de PRs** |
 | `main` | Release estável — deploy e produção |
 
-**Produção (26/07/2026):** **v3.0.8** em Netlify (`bibi-poc-2026-07-26i` @ `5c94251`, deploy `6a668d13`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
+**Produção (27/07/2026):** **v3.0.14** em Netlify (`bibi-poc-2026-07-27e` @ `59700b5`, deploy `6a66db43`) · ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Escopo: [`../versoes/V3_0.md`](../versoes/V3_0.md) · CEDIG/pontes: [`../versoes/V2_6.md`](../versoes/V2_6.md) · login: [`../versoes/V2_5.md`](../versoes/V2_5.md).
 
 ---
 

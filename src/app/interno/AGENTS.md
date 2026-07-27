@@ -11,14 +11,17 @@ Só `PageHeader` + view — shell em `layout.tsx` (não repetir `PortalShell`/`I
 - Perfis: `ADMIN`, `FATURAMENTO`, `RECEPCAO`, `READONLY` (`User.internoProfile`)
 - APIs: `requireInternoModule` / `requireInternoModuleWrite`
 - Nav filtrada: `interno-permissions.ts` · `interno-guard.ts`
+- **Conteúdo sensível (v3.0.14):** `audit-access.ts` redige timeline, export, dashboard e Cliente 360° por classe (clínico/financeiro/PII/segurança/operacional) — matriz em `FLUXOS.md` §4.9
 
 ## Módulos principais
 
 | Rota | Notas |
 |------|-------|
-| `/interno/dashboard` | KPIs operação |
+| `/interno/dashboard` | KPIs operação · atividade recente com mesma política de `audit-access` |
 | `/interno/agenda` | Walk-in em `AppointmentsView` |
-| `/interno/cadastros` | CRUD + mapa em `?tab=operations` |
+| `/interno/cadastros` | CRUD + mapa em `?tab=operations` · abas em `next/dynamic` + `resolveCadastrosTab` |
+| `/interno/estoque` | Produtos, lotes, movimentações, reversão (`stock-reverse.ts`) |
+| `/interno/auditoria` | Timeline universal · export já redigido |
 | `/interno/gestao` | Gestão clínica (MEDICAL/DENTAL) |
 | `/interno/seguranca` | Demo reset, dual-store (ADMIN) |
 
@@ -28,4 +31,4 @@ Só `PageHeader` + view — shell em `layout.tsx` (não repetir `PortalShell`/`I
 - Breadcrumbs Cliente 360°: `buildPatientBreadcrumbs`
 - E2E: `getByRole('navigation', { name: 'Navegação por abas' })`
 
-Docs: `docs/produto/FLUXOS.md` · CRUD: `src/lib/crud-operations-map.ts`
+Docs: `docs/produto/FLUXOS.md` · `docs/produto/DOCUMENTOS_CLINICOS.md` · CRUD: `src/lib/crud-operations-map.ts`

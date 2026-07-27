@@ -58,17 +58,6 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Faturamento:** PIX / Marcar paga só em faturas `FECHADA` (alinhado à API).
 - **Qualidade:** CI Job Summary (Vitest/Playwright) · massas com nomes realistas · reseed de `test.db` no fingerprint mismatch · `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
 
-### Smoke (27/07/2026) — produção v3.0.14
-
-| Check | Resultado |
-|-------|-----------|
-| Landing `/` | 200 · footer `v3.0.14` · deploy `6a66db43` |
-| CSS `/_next/static/chunks/*.css` | 200 |
-| `/interno/login` | 200 |
-| `/interno/cadastros` | 307 (auth) |
-| `/beneficiario/documentos` | 307 (auth) |
-| Cota Netlify | sem `503 usage_exceeded` |
-
 ### Smoke (27/07/2026) — produção v3.0.13
 
 | Check | Resultado |

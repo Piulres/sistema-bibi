@@ -248,6 +248,10 @@ Quando `User.mfaEnabled = true`:
 | Aplicar protocolo de exames | `POST .../patients/[id]/exam-protocols` | N× `ExamOrder` a partir do template |
 | Prescrever (comum / controle especial) | `POST .../medications` | `MedicationPrescription.prescriptionKind` + status ATIVA/SUSPENSA/ENCERRADA |
 | Reativar / suspender prescrição | `PATCH /api/prestador/medications/[id]` `{ status }` | Transições ATIVA ↔ SUSPENSA ↔ ENCERRADA |
+| Dispensar material | `GET/POST .../appointments/[id]/materials` | `DISPENSACAO` via `stock-service.ts`; bloqueado em `CANCELADO`/`FALTOU` (`canRegisterProcedureForStatus`) |
+| Equipe no atendimento | `GET/POST/PATCH .../appointments/[id]/participants` | `AppointmentParticipant` + custos PPU |
+| Encaminhamento | `GET/POST .../patients/[id]/referrals` · `PATCH .../referrals/[id]` | `ClinicalReferral` + templates |
+| Guias de saída | `GET .../discharge-documents` · `GET .../clinical-guides/export?type=` | Hub PDF (receita, exame, encaminhamento, atestado, bundle) — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
 ```mermaid
@@ -396,6 +400,8 @@ Doc completa: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · [`
 
 Export LGPD: `GET /api/interno/patients/[id]/export` → `patient-export.ts`
 
+**Carregamento por aba (v3.0.14):** `CadastrosView` usa `next/dynamic` — cada aba baixa o chunk só quando selecionada (evita `Promise.all` das 4+ listas no mount). Deep-link `?tab=` validado por `resolveCadastrosTab()` (`src/lib/cadastros/resolve-tab.ts`) contra `buildCadastrosTabs(labels, niche)` — chave inválida para o nicho cai em `patients`.
+
 ### 4.4 CRM (`CrmPipelineView`)
 
 | Ação | API | Efeito |
@@ -455,6 +461,17 @@ Serviço: `src/lib/webhook-service.ts`
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
 Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).
+
+**Reversão (v3.0.14):** `reverseStockMovement()` em `src/lib/change-management/stock-reverse.ts` cria movimento compensatório com lote obrigatório:
+
+| Tipo original | Compensação | Observação |
+|---------------|-------------|------------|
+| `SAIDA`, `PERDA`, `AJUSTE`, `DISPENSACAO`, `TRANSFERENCIA` | `ENTRADA` | Devolve saldo ao lote |
+| `ENTRADA`, `DEVOLUCAO` | `SAIDA` | Falha se saldo insuficiente |
+
+Rota destrutiva: `POST .../movements/[id]/reverse` com `requireInternoModuleWrite("estoque")`. Timeline registra `reversesId` do movimento original.
+
+**Dispensação no prestador:** `POST /api/prestador/appointments/[id]/materials` retorna **409** quando o agendamento está `CANCELADO` ou `FALTOU` (mesma regra de `canRegisterProcedureForStatus` usada para PPU e equipe).
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
@@ -546,7 +563,7 @@ flowchart LR
 
 **Role:** `BENEFICIARIO` · **Escopo:** `user.patientId` (anti-IDOR)
 
-**Nav:** 11 abas em `BENEFICIARIO_NAV_TABS` (`routes.ts`) + **Obras** (`/beneficiario/obras`) condicional para nicho `CONSTRUCTION` (não listada nas tabs estáticas).
+**Nav:** 12 abas em `BENEFICIARIO_NAV_TABS` (`niche-nav.ts`) + **Obras** (`/beneficiario/obras`) condicional para nicho `CONSTRUCTION` (não listada nas tabs estáticas).
 
 | Aba | Rota | Função |
 |-----|------|--------|
@@ -555,6 +572,7 @@ flowchart LR
 | Agenda | `/beneficiario/agenda` | Lista + link telemedicina |
 | Consumo | `/beneficiario/consumo` | Procedimentos billed/não billed |
 | Faturas | `/beneficiario/faturas` | PIX mock para faturas FECHADA |
+| Documentos | `/beneficiario/documentos` | Guias PDF emitidas no atendimento (receita, exames, encaminhamento, atestado) |
 | Medicações | `/beneficiario/medicacoes` | Care Chart — prescrições ativas |
 | Exames | `/beneficiario/exames` | Pedidos de exame |
 | Plano | `/beneficiario/plano` | Benefícios corporativos |
@@ -568,6 +586,8 @@ flowchart LR
 | Prestadores | `GET /api/beneficiario/providers` | Users PRESTADOR |
 | Slots | `GET /api/beneficiario/slots?providerId&date` | `scheduling-service.ts` (8h–18h, 30 min) |
 | Agendar | `POST /api/beneficiario/appointments` | `bookBeneficiaryAppointment()` |
+| Listar documentos | `GET /api/beneficiario/documents` | Hub de guias de saída |
+| Baixar guia PDF | `GET /api/beneficiario/clinical-guides/export?type=&id=` | `clinical-guide-service.ts` |
 | PIX | `POST /api/beneficiario/invoices/[id]/pay` | `createInvoicePixCharge()` |
 | Confirmar PIX | `PATCH .../pay` `{ paymentId }` | `confirmInvoicePixPayment()` |
 
@@ -728,7 +748,7 @@ Módulo: `src/lib/care-journey.ts` · testes: `tests/lib/care-journey.test.ts`.
 3. `resolveCareJourneyStep()` prioriza `pago` → `faturado` → `realizado` → `confirmado` → `agendado` (pagamento vence `REALIZADO` no prestador).
 4. `AtendimentoView` e `BeneficiarioView` passam as flags ao `FlowStepper`.
 
-Documentos clínicos no atendimento (atestado, receita, protocolos): [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+Documentos clínicos no atendimento (receita, pedido de exames, encaminhamento, atestado) e painel do beneficiário: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
 

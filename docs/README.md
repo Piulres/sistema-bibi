@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.14** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27e` (`6a66dac3` @ `6c1bba2`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.14** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27e` (`6a66db43` @ `59700b5`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.14** (`bibi-poc-2026-07-27e` @ `6c1bba2`): auditoria RBAC + estoque + cadastros + documentos de saída — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — produção **v3.0.14** (`bibi-poc-2026-07-27e` @ `59700b5`): auditoria RBAC + estoque + cadastros + documentos de saída — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -133,7 +133,7 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.12 em produção** |
+| [`versoes/RELEASES.md`](versoes/RELEASES.md) | Pacotes fechados — **v3.0.14 em produção** |
 | [`versoes/V3_0.md`](versoes/V3_0.md) | Changelog v3.0 — PWA / app shell mobile |
 | [`versoes/V2_6.md`](versoes/V2_6.md) | Changelog v2.6 — CEDIG pontes PPU + export |
 | [`versoes/V2_5.md`](versoes/V2_5.md) | Changelog v2.5 — login tenant/portal |
