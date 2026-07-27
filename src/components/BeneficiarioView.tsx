@@ -62,6 +62,7 @@ type Overview = {
     modality: string;
     telemedicineUrl: string | null;
     reason: string | null;
+    providerId: string;
     providerName: string;
     usagesCount: number;
   }[];
@@ -189,6 +190,11 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
   const show = (id: BeneficiarioSection) => !section || section === id;
   const { isBusy, run, showToast } = useAsyncAction();
   const [pixState, setPixState] = useState<PixState | null>(null);
+  const [rescheduleTarget, setRescheduleTarget] = useState<{
+    id: string;
+    scheduledAtLabel: string;
+    providerId: string;
+  } | null>(null);
   const [slots, setSlots] = useState<
     { start: string; label: string; providerId?: string; providerName?: string }[]
   >([]);
@@ -327,6 +333,54 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
         confirm: confirmPresets.cancelAppointment(whenLabel),
         successMessage: `${labels.appointment} cancelado(a) com sucesso.`,
         onSuccess: async () => {
+          if (rescheduleTarget?.id === id) setRescheduleTarget(null);
+          await reloadOverview();
+        },
+      },
+    );
+  }
+
+  function beginReschedule(appointment: {
+    id: string;
+    scheduledAtLabel: string;
+    providerId: string;
+  }) {
+    setRescheduleTarget(appointment);
+    setScheduleForm((prev) => ({
+      ...prev,
+      providerId: appointment.providerId,
+      noProviderPreference: false,
+      date: civilDateISO(),
+      slot: "",
+    }));
+    if (typeof document !== "undefined") {
+      document.getElementById("reagendar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }
+
+  async function confirmReschedule(e: React.FormEvent) {
+    e.preventDefault();
+    if (!rescheduleTarget || !scheduleForm.slot) return;
+    const selectedSlot = slots.find((s) => s.start === scheduleForm.slot);
+    const newLabel = selectedSlot?.label ?? scheduleForm.slot;
+    await run(
+      `reschedule-${rescheduleTarget.id}`,
+      () =>
+        fetch(`/api/beneficiario/appointments/${rescheduleTarget.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "reschedule",
+            scheduledAt: scheduleForm.slot,
+            providerId: scheduleForm.providerId || null,
+          }),
+        }),
+      {
+        confirm: confirmPresets.rescheduleAppointment(rescheduleTarget.scheduledAtLabel, newLabel),
+        successMessage: `${labels.appointment} reagendado(a) com sucesso.`,
+        onSuccess: async () => {
+          setRescheduleTarget(null);
+          setScheduleForm((prev) => ({ ...prev, slot: "" }));
           await reloadOverview();
         },
       },
@@ -621,7 +675,7 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
           <div className="mt-3 space-y-3">
             {overview.appointments.map((appointment) => {
               const time = formatTimeBR(new Date(appointment.scheduledAt));
-              const canCancel = appointment.status === "AGENDADO";
+              const canManage = appointment.status === "AGENDADO";
               return (
                 <AppointmentCard
                   key={appointment.id}
@@ -644,15 +698,31 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
                     ) : null
                   }
                   actions={
-                    canCancel ? (
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        disabled={isBusy(`cancel-${appointment.id}`)}
-                        onClick={() => cancelAppointment(appointment.id, appointment.scheduledAtLabel)}
-                      >
-                        {isBusy(`cancel-${appointment.id}`) ? "Cancelando..." : "Cancelar"}
-                      </Button>
+                    canManage ? (
+                      <div className="flex flex-wrap gap-2">
+                        <Button
+                          variant="portal"
+                          size="sm"
+                          disabled={isBusy(`reschedule-${appointment.id}`)}
+                          onClick={() =>
+                            beginReschedule({
+                              id: appointment.id,
+                              scheduledAtLabel: appointment.scheduledAtLabel,
+                              providerId: appointment.providerId,
+                            })
+                          }
+                        >
+                          Reagendar
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          disabled={isBusy(`cancel-${appointment.id}`)}
+                          onClick={() => cancelAppointment(appointment.id, appointment.scheduledAtLabel)}
+                        >
+                          {isBusy(`cancel-${appointment.id}`) ? "Cancelando..." : "Cancelar"}
+                        </Button>
+                      </div>
                     ) : null
                   }
                 />
@@ -660,6 +730,60 @@ export default function BeneficiarioView({ section }: { section?: BeneficiarioSe
             })}
           </div>
         )}
+
+        {rescheduleTarget ? (
+          <Card id="reagendar" className="mt-4" padding="md">
+            <SectionHeader
+              title="Reagendar consulta"
+              description={`Atual: ${rescheduleTarget.scheduledAtLabel}. Escolha um novo horário — o agendamento é mantido (sem cancelar e criar outro).`}
+            />
+            <form onSubmit={confirmReschedule} className="mt-4 space-y-3">
+              <label className="block text-sm">
+                <span className="text-[var(--text-secondary)]">Data</span>
+                <input
+                  type="date"
+                  required
+                  className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm"
+                  value={scheduleForm.date}
+                  onChange={(e) => setScheduleForm((prev) => ({ ...prev, date: e.target.value, slot: "" }))}
+                />
+              </label>
+              <label className="block text-sm">
+                <span className="text-[var(--text-secondary)]">Horário</span>
+                <select
+                  required
+                  className="mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm"
+                  value={scheduleForm.slot}
+                  onChange={(e) => setScheduleForm((prev) => ({ ...prev, slot: e.target.value }))}
+                >
+                  <option value="">Selecione...</option>
+                  {slots.map((slot) => (
+                    <option key={slot.start} value={slot.start}>
+                      {slot.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {slots.length === 0 ? (
+                <p className="text-sm text-[var(--text-muted)]">
+                  Nenhum horário livre neste dia para o prestador atual.
+                </p>
+              ) : null}
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  type="submit"
+                  variant="portal"
+                  disabled={!scheduleForm.slot || isBusy(`reschedule-${rescheduleTarget.id}`)}
+                >
+                  {isBusy(`reschedule-${rescheduleTarget.id}`) ? "Reagendando..." : "Confirmar novo horário"}
+                </Button>
+                <Button type="button" variant="secondary" onClick={() => setRescheduleTarget(null)}>
+                  Voltar
+                </Button>
+              </div>
+            </form>
+          </Card>
+        ) : null}
       </section>
       )}
 

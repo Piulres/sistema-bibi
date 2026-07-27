@@ -46,6 +46,8 @@ export async function getAvailableSlots(input: {
   tenantId: string;
   providerId: string;
   date: Date;
+  /** Ignora o próprio agendamento ao reagendar (libera o slot atual). */
+  excludeAppointmentId?: string;
 }): Promise<{ slots: AppointmentSlot[]; usingDefault: boolean }> {
   const prisma = await getPrisma();
   const dateISO = civilDateISO(input.date);
@@ -70,6 +72,7 @@ export async function getAvailableSlots(input: {
         providerId: input.providerId,
         scheduledAt: { gte: dayStart, lte: dayEnd },
         status: { notIn: ["CANCELADO", "FALTOU"] },
+        ...(input.excludeAppointmentId ? { id: { not: input.excludeAppointmentId } } : {}),
       },
       select: { scheduledAt: true },
     }),
@@ -282,4 +285,107 @@ export async function cancelBeneficiaryAppointment(input: {
   queueAppointmentCalendarSync(appointment.id);
 
   return { ok: true as const, status: "CANCELADO" as const };
+}
+
+/**
+ * Reagenda consulta self-service — mantém o mesmo registro (sem cancelar + criar).
+ * Somente AGENDADO e futuro; valida slot livre excluindo o próprio agendamento.
+ */
+export async function rescheduleBeneficiaryAppointment(input: {
+  tenantId: string;
+  patientId: string;
+  appointmentId: string;
+  scheduledAt: Date;
+  providerId?: string | null;
+  createdBy: string;
+}) {
+  const prisma = await getPrisma();
+  const appointment = await prisma.appointment.findFirst({
+    where: {
+      id: input.appointmentId,
+      tenantId: input.tenantId,
+      patientId: input.patientId,
+    },
+    include: { patient: { select: { name: true } } },
+  });
+
+  if (!appointment) {
+    return { error: "Agendamento não encontrado" as const };
+  }
+
+  if (appointment.status !== "AGENDADO") {
+    return { error: "Somente consultas agendadas podem ser reagendadas" as const };
+  }
+
+  if (appointment.scheduledAt.getTime() <= Date.now()) {
+    return { error: "Não é possível reagendar consultas passadas ou em andamento" as const };
+  }
+
+  if (Number.isNaN(input.scheduledAt.getTime())) {
+    return { error: "Horário inválido" as const };
+  }
+
+  if (input.scheduledAt.getTime() <= Date.now()) {
+    return { error: "Escolha um horário futuro" as const };
+  }
+
+  const providerId = input.providerId || appointment.providerId;
+  if (!providerId) {
+    return { error: "Prestador não definido para reagendamento" as const };
+  }
+
+  const { slots } = await getAvailableSlots({
+    tenantId: input.tenantId,
+    providerId,
+    date: input.scheduledAt,
+    excludeAppointmentId: appointment.id,
+  });
+
+  const available = slots.some((s) => s.start === input.scheduledAt.toISOString());
+  if (!available) {
+    return { error: "Horário não disponível" as const };
+  }
+
+  const previousScheduledAt = appointment.scheduledAt;
+
+  await prisma.appointment.update({
+    where: { id: appointment.id },
+    data: {
+      scheduledAt: input.scheduledAt,
+      providerId,
+    },
+  });
+
+  await recordTimelineEvent({
+    tenantId: input.tenantId,
+    entityType: TIMELINE_ENTITY_TYPES.APPOINTMENT,
+    entityId: appointment.id,
+    action: TIMELINE_ACTIONS.RESCHEDULED,
+    description: `${appointment.patient.name} reagendou consulta de ${formatDateTimeBR(previousScheduledAt)} para ${formatDateTimeBR(input.scheduledAt)}`,
+    createdBy: input.createdBy,
+    reversible: false,
+  });
+
+  void dispatchWebhooks({
+    tenantId: input.tenantId,
+    event: "APPOINTMENT_UPDATED",
+    data: {
+      appointmentId: appointment.id,
+      patientId: appointment.patientId,
+      providerId,
+      status: appointment.status,
+      modality: appointment.modality,
+      telemedicineUrl: appointment.telemedicineUrl,
+      scheduledAt: input.scheduledAt.toISOString(),
+      previousScheduledAt: previousScheduledAt.toISOString(),
+    },
+  });
+
+  queueAppointmentCalendarSync(appointment.id);
+
+  return {
+    ok: true as const,
+    status: "AGENDADO" as const,
+    scheduledAt: input.scheduledAt.toISOString(),
+  };
 }
