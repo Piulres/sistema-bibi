@@ -17,7 +17,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.13** · sincronizados |
+| **Release `main` / `dev`** | **v3.0.13** · sincronizados · artefato prod `@ 78b575f` |
 | **Pacote anterior em produção** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -36,6 +36,16 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Portal Prestador:** equipe no atendimento (papéis por nicho, custos PPU); receita multi-medicamento; aba Equipe.
 - **Faturamento:** PIX / Marcar paga só em faturas `FECHADA` (alinhado à API).
 - **Qualidade:** CI Job Summary (Vitest/Playwright) · massas com nomes realistas · reseed de `test.db` no fingerprint mismatch · `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
+
+### Smoke (27/07/2026) — produção v3.0.13
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.13` · deploy `6a66d114` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.12
 
@@ -73,15 +83,6 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
 
-### Smoke (27/07/2026) — produção v3.0.13
-
-| Check | Resultado |
-|-------|-----------|
-| Landing `/` | 200 · footer `v3.0.13` · deploy `6a66d114` |
-| CSS `/_next/static/chunks/*.css` | 200 |
-| `/instalar` | 200 |
-| `/?tenant=cedig` | 200 |
-| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (27/07/2026) — produção v3.0.12
 
