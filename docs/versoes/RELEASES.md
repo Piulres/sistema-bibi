@@ -11,24 +11,31 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.27** — Círculo da marca visível na home **em produção**.
+> Pacote **v3.0.28** — Nav moderna + ícone PWA laranja + word mark BIBI **pendente deploy produção**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.27** — deploy `6a679eaf` @ `01ca7eb` |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.27** em produção @ `01ca7eb` |
-| **Pacote anterior em produção** | **3.0.26** — deploy `6a679550` @ `822b65e` |
+| **Release `main` / `dev`** | **v3.0.28** pendente deploy |
+| **Pacote anterior em produção** | **3.0.27** — deploy `6a679eaf` @ `01ca7eb` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.27** |
-| **Release** | `main` | **v3.0.27** |
+| **Integração** | `dev` | **v3.0.28** (nav pills, PWA laranja, BIBI tipografia) |
+| **Release** | `main` | **v3.0.27** → merge v3.0.28 pendente |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.27** · deploy `6a679eaf` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.28
+
+- **Nav interno:** abas pills com ícones; menu Mais agrupado (Operação / Financeiro / Administração).
+- **PWA iPhone:** ícone laranja/âmbar com BIBI — fim do círculo azul genérico; maskable 512.
+- **BrandMark home:** word mark **BIBI** caixa alta, 12px, margin-top 2px.
+- **Qualidade:** brand-mark · icons:generate · pre-release OK.
 
 ### Conteúdo do pacote v3.0.27
 
@@ -710,7 +717,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.24` em produção** — BrandMark + nav Mais + assistente · deploy `6a677dc5` |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.28`** — nav pills + PWA laranja + BIBI tipografia · ver [`RELEASES.md`](RELEASES.md) |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

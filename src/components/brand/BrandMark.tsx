@@ -3,9 +3,11 @@ import { cn } from "@/lib/utils/cn";
 import {
   brandMarkFromBranding,
   brandMarkFontSizePx,
+  brandMarkIsWordMark,
   brandMarkMeshStyle,
   brandMarkThemeMeshStyle,
   BRAND_MARK_SIZE_PX,
+  BRAND_MARK_WORD_MARK_STYLE,
   resolveBrandMarkLayout,
   type BrandMarkInput,
   type BrandMarkSize,
@@ -67,7 +69,8 @@ export default function BrandMark({
   if (!resolvedInput) return null;
 
   const layout = resolveBrandMarkLayout(resolvedInput, 100);
-  const markLabel = layout.initial;
+  const isWordMark = brandMarkIsWordMark(resolvedInput);
+  const markLabel = isWordMark ? layout.initial.toUpperCase() : layout.initial;
   const label = title ?? resolvedInput.displayName;
   const boxPx = BRAND_MARK_SIZE_PX[size];
   const fontSizePx = brandMarkFontSizePx(boxPx, markLabel);
@@ -108,7 +111,14 @@ export default function BrandMark({
       ) : (
         <span
           className="font-bold leading-none tracking-tight text-white"
-          style={{ fontSize: fontSizePx }}
+          style={
+            isWordMark
+              ? {
+                  fontSize: BRAND_MARK_WORD_MARK_STYLE.fontSizePx,
+                  marginTop: BRAND_MARK_WORD_MARK_STYLE.marginTopPx,
+                }
+              : { fontSize: fontSizePx }
+          }
         >
           {markLabel}
         </span>

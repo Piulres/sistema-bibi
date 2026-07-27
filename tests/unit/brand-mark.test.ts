@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   brandMarkFromBranding,
   brandMarkInitial,
+  brandMarkIsWordMark,
   brandMarkMeshBackground,
   brandMarkMeshStyle,
   brandMarkText,
@@ -20,6 +21,14 @@ describe("brandMarkText", () => {
 
   it("falls back to initial for tenant branding without markText", () => {
     expect(brandMarkText({ displayName: "Clínica Horizonte" })).toBe("C");
+  });
+});
+
+describe("brandMarkIsWordMark", () => {
+  it("detects platform markText so UI applies fixed 12px uppercase typography", () => {
+    expect(brandMarkIsWordMark({ markText: "Bibi" })).toBe(true);
+    expect(brandMarkIsWordMark({ markText: undefined })).toBe(false);
+    expect(brandMarkIsWordMark({ markText: "C" })).toBe(false);
   });
 });
 

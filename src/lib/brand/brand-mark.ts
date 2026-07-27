@@ -1,4 +1,5 @@
 import type { BrandingTokens } from "@/lib/theme/tokens";
+import { PLATFORM_BRANDING } from "@/lib/theme/tokens";
 
 /** Entrada mínima para renderizar a marca (UI, PWA, exports, OG). */
 export type BrandMarkInput = {
@@ -37,6 +38,18 @@ export function brandMarkText(input: Pick<BrandMarkInput, "displayName" | "markT
   if (override) return override;
   return brandMarkInitial(input.displayName);
 }
+
+/** markText explícito (ex.: "Bibi" na home da plataforma) — não confundir com monograma de tenant. */
+export function brandMarkIsWordMark(input: Pick<BrandMarkInput, "markText">): boolean {
+  const text = input.markText?.trim();
+  return Boolean(text && text.length > 1);
+}
+
+/** Tipografia fixa do word mark nas homes — caixa alta, 12px, leve descida óptica. */
+export const BRAND_MARK_WORD_MARK_STYLE = {
+  fontSizePx: 12,
+  marginTopPx: 2,
+} as const;
 
 /** Escala da tipografia do monograma conforme comprimento do texto. */
 export function brandMarkFontSizePx(containerSize: number, text: string): number {
@@ -79,6 +92,18 @@ export function brandMarkThemeMeshStyle(): BrandMarkMeshStyle {
   return {
     backgroundColor: "var(--brand-hero-from)",
     backgroundImage: THEME_MESH_LAYERS.join(", "),
+  };
+}
+
+/** Entrada PWA — gradiente laranja/âmbar (evita “círculo azul” genérico no iPhone). */
+export function brandMarkPwaInput(): BrandMarkInput {
+  const base = brandMarkFromBranding(PLATFORM_BRANDING);
+  return {
+    ...base,
+    primaryColor: "#ea580c",
+    accentColor: "#f97316",
+    heroFrom: "#f97316",
+    heroTo: "#fbbf24",
   };
 }
 

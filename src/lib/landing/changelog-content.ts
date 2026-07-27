@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.27",
+    version: "3.0.28",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Nav interna moderna (pills + ícones), ícone PWA laranja no iPhone e word mark BIBI tipografado.",
+    highlights: [
+      {
+        title: "Navegação",
+        items: [
+          "NavTabs em pills com ícones por módulo",
+          "Menu Mais agrupado: Operação, Financeiro, Administração",
+          "Scroll horizontal discreto na faixa de abas",
+        ],
+      },
+      {
+        title: "Marca e PWA",
+        items: [
+          "Word mark BIBI em caixa alta (12px) no círculo da home",
+          "Ícone PWA laranja/âmbar — fim do círculo azul genérico no iPhone",
+          "apple-touch-icon + maskable 512 regenerados (`npm run icons:generate`)",
+        ],
+      },
+    ],
+    testStats: "brand-mark · nav · icons:generate · pre-release OK",
+  },
+  {
+    version: "3.0.27",
+    label: "Sistema Bibi - ServiceOS v3.0.27",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Círculo gradiente da marca visível na home — Bibi legível sobre fundo Energia Brasileira.",
     highlights: [

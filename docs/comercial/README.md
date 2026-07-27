@@ -1,6 +1,6 @@
 # Comercial e captação — Sistema Bibi - ServiceOS
 
-> Produção atual **v3.0.24** · posicionamento multi-segmento desde v2.0.
+> Produção atual **v3.0.28** · posicionamento multi-segmento desde v2.0.
 
 Documentação de **vendas, marketing e posicionamento por segmento**. Complementa [`pesquisa/`](../pesquisa/README.md) (dados de mercado) e [`produto/`](../produto/FLUXOS.md) (fluxos técnicos).
 
