@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  // ServiceOS v3.0 — PWA / Add to Home Screen (não altera PLATFORM.release)
+  // ServiceOS v3.0 — PWA / Add to Home Screen (ícones gerados por npm run icons:generate)
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,

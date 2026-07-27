@@ -250,6 +250,8 @@ Rota: **`/interno/branding`** (aba **White Label** na navegação interna).
 | `/api/interno/branding` | PUT | Upsert de identidade visual |
 | `/api/interno/branding/logo` | POST | Upload de logo (Netlify Blobs ou disco local em dev) |
 | `/api/branding/logo/[tenantId]` | GET | Serve logo público do tenant |
+| `/api/brand/mark` | GET | Marca circular da plataforma (SVG) |
+| `/api/brand/mark/[tenantId]` | GET | Marca circular whitelabel do tenant (SVG) |
 
 **Presets** disponíveis em `src/lib/theme/presets.ts` (Bibi, VitaCare, Amethyst, Forest).
 

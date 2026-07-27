@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import BrandMark from "@/components/brand/BrandMark";
 import { cn } from "@/lib/utils/cn";
 
 type LogoSize = "sm" | "md";
@@ -10,21 +10,16 @@ type LogoSize = "sm" | "md";
 type Props = {
   displayName: string;
   logoUrl?: string | null;
+  primaryColor?: string;
+  accentColor?: string;
+  heroTo?: string;
+  /** Herda cores do TenantTheme quando cores explícitas não são passadas. */
+  useThemeColors?: boolean;
   logoSize?: LogoSize;
   showTitle?: boolean;
   titleClassName?: string;
   className?: string;
   children?: React.ReactNode;
-};
-
-const LOGO_BOX: Record<LogoSize, string> = {
-  sm: "h-9 w-9 rounded-lg text-sm",
-  md: "h-10 w-10 rounded-xl text-sm",
-};
-
-const LOGO_IMAGE: Record<LogoSize, string> = {
-  sm: "h-9 w-9 rounded-lg",
-  md: "h-10 w-10 rounded-xl",
 };
 
 /**
@@ -34,6 +29,10 @@ const LOGO_IMAGE: Record<LogoSize, string> = {
 export default function HomeBrandLink({
   displayName,
   logoUrl,
+  primaryColor,
+  accentColor,
+  heroTo,
+  useThemeColors,
   logoSize = "md",
   showTitle = true,
   titleClassName,
@@ -49,6 +48,9 @@ export default function HomeBrandLink({
     }
   };
 
+  const hasExplicitColors = Boolean(primaryColor && accentColor);
+  const themeMode = useThemeColors ?? !hasExplicitColors;
+
   return (
     <Link
       href="/"
@@ -59,26 +61,23 @@ export default function HomeBrandLink({
       )}
       aria-label={`${displayName} — início do site`}
     >
-      {logoUrl ? (
-        <Image
-          src={logoUrl}
-          alt=""
-          width={logoSize === "sm" ? 36 : 40}
-          height={logoSize === "sm" ? 36 : 40}
-          className={cn("shrink-0 object-contain", LOGO_IMAGE[logoSize])}
-          priority={logoSize === "md"}
-        />
-      ) : (
-        <span
-          className={cn(
-            "ds-logo-mark flex shrink-0 items-center justify-center font-bold text-[var(--text-inverse)] shadow-sm",
-            LOGO_BOX[logoSize],
-          )}
-          aria-hidden
-        >
-          {displayName.charAt(0)}
-        </span>
-      )}
+      <BrandMark
+        displayName={displayName}
+        logoUrl={logoUrl}
+        useThemeColors={themeMode}
+        input={
+          hasExplicitColors
+            ? {
+                displayName,
+                logoUrl,
+                primaryColor: primaryColor!,
+                accentColor: accentColor!,
+                heroTo,
+              }
+            : undefined
+        }
+        size={logoSize}
+      />
       {(showTitle || children) && (
         <div className="min-w-0">
           {showTitle && (

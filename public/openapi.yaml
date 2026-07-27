@@ -879,6 +879,33 @@ paths:
               schema: { type: string, format: binary }
         '404': { description: Logo não encontrado }
 
+  /api/brand/mark:
+    get:
+      tags: [Interno]
+      summary: Marca circular da plataforma (SVG)
+      responses:
+        '200':
+          description: SVG da marca Sistema Bibi
+          content:
+            image/svg+xml:
+              schema: { type: string }
+
+  /api/brand/mark/{tenantId}:
+    get:
+      tags: [Interno]
+      summary: Marca circular whitelabel do tenant (SVG)
+      parameters:
+        - name: tenantId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: SVG da marca do tenant
+          content:
+            image/svg+xml:
+              schema: { type: string }
+
   /api/interno/dashboard:
     get:
       tags: [Interno]

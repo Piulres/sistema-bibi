@@ -43,5 +43,6 @@ const run = (cmd) => {
 };
 
 run("node scripts/copy-swagger-ui.mjs");
+run("npm run icons:generate");
 run("npx tsx scripts/setup-database.ts");
 run("npm run build");

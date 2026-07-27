@@ -11,6 +11,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import SectionHeader from "@/components/ui/SectionHeader";
+import BrandMark from "@/components/brand/BrandMark";
 import { customDomainSetupHint } from "@/lib/custom-domain-hint";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
@@ -362,17 +363,17 @@ export default function BrandingView() {
                 }}
               >
                 <div className="flex items-center gap-2">
-                  {form.logoUrl ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={form.logoUrl} alt="" className="h-8 w-8 rounded object-contain" />
-                  ) : (
-                    <div
-                      className="flex h-8 w-8 items-center justify-center rounded text-xs font-bold"
-                      style={{ backgroundColor: form.primaryColor }}
-                    >
-                      {form.displayName.charAt(0)}
-                    </div>
-                  )}
+                  <BrandMark
+                    input={{
+                      displayName: form.displayName,
+                      logoUrl: form.logoUrl,
+                      primaryColor: form.primaryColor,
+                      accentColor: form.accentColor,
+                      heroFrom: form.heroFrom,
+                      heroTo: form.heroTo,
+                    }}
+                    size="sm"
+                  />
                   <div>
                     <p className="text-sm font-semibold">{form.displayName}</p>
                     <p className="text-xs text-white/70">{form.tagline ?? "Tagline do tenant"}</p>
@@ -399,6 +400,27 @@ export default function BrandingView() {
                 {form.platformLabel}
               </p>
             </div>
+          </div>
+        </Card>
+        <Card padding="sm">
+          <p className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+            Ícone do app (PWA)
+          </p>
+          <p className="mt-1 text-xs text-[var(--text-secondary)]">
+            Marca circular usada no atalho do celular e favicon quando o tenant tem domínio próprio.
+          </p>
+          <div className="mt-4 flex justify-center">
+            <BrandMark
+              input={{
+                displayName: form.displayName,
+                logoUrl: form.logoUrl,
+                primaryColor: form.primaryColor,
+                accentColor: form.accentColor,
+                heroFrom: form.heroFrom,
+                heroTo: form.heroTo,
+              }}
+              size="xl"
+            />
           </div>
         </Card>
       </aside>
