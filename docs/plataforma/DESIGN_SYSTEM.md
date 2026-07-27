@@ -117,16 +117,16 @@ Fonte: `src/lib/landing/navigation.ts`.
 
 Marca no header da landing: `PLATFORM.brandName` (**Sistema Bibi**) via `getPlatformBranding()` — sem sufixo ServiceOS no título visível.
 
-### Portal nav — abas de rota (v3.0.7 · Mais v3.0.24)
+### Portal nav — abas de rota (v3.0.28)
 
-Fonte: `src/components/ui/NavTabs.tsx` + `NavOverflowMenu.tsx` + `src/lib/navigation/portal-nav.ts` + `MobileNavDrawer.tsx`.
+Fonte: `src/components/ui/NavTabs.tsx` + `NavOverflowMenu.tsx` + `src/lib/navigation/nav-icons.tsx` + `portal-nav.ts` + `MobileNavDrawer.tsx`.
 
 | Breakpoint | Comportamento |
 |------------|---------------|
-| Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com abas primárias; módulos `priority: "secondary"` no menu **Mais** (`NavOverflowMenu` portaled — v3.0.24) |
+| Desktop (`lg+`) | Faixa rolável (`ScrollableNavRail`) com **pills** e ícones SVG; módulos `priority: "secondary"` no menu **Mais** agrupado (Operação / Financeiro / Administração) |
+| Aba ativa | Pill sólida `bg-[var(--brand-accent)]` + texto branco |
 | Aba secundária ativa | Pinada na faixa principal (não some no dropdown) |
-| Mobile (`< lg`) | `MobileNavDrawer` portaled — **abre pela direita** (`right-0`, animação `ds-nav-drawer-enter`); gatilho mostra só o módulo ativo (sem contagem) |
-| Grupos no drawer | Tabs com `group` → cabeçalho com contraste + separador `border-t` entre categorias |
+| Mobile (`< lg`) | `MobileNavDrawer` portaled — **abre pela direita**; gatilho mostra só o módulo ativo |
 | Sticky | `PORTAL_NAV_STICKY_CLASS` em `data-tour-id="portal-nav"` nos 4 portais |
 
 Definição das abas: `buildInternoNavTabs()`, `buildPrestadorNavTabs()`, etc. em `src/lib/navigation/`. E2E: `e2e/mobile-nav.spec.ts`.
