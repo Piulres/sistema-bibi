@@ -26,10 +26,29 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.20",
+    version: "3.0.21",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Documentos clínicos de saída alinhados à recepção — bundle com atestado, PDF e download autenticado.",
+    highlights: [
+      {
+        title: "Documentos de saída",
+        items: [
+          "Bundle com atestado no mesmo layout tipográfico",
+          "PDF com assinatura/carimbo e download autenticado",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #342 · documentos-saida · clinical-discharge · docs:verify",
+  },
+  {
+    version: "3.0.20",
+    label: "Sistema Bibi - ServiceOS v3.0.20",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Estoque Fase 4, Assistente híbrido, Capacitor iOS/Android e RH agenda consulta no portal PJ.",
     highlights: [

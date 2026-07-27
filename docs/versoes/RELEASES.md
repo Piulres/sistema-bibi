@@ -11,24 +11,30 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.20** — Estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar **em produção**.
+> Pacote **v3.0.21** — Documentos de saída **pendente de deploy** (assistente hotfix já em tip `6a6702f7`).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.20** — deploy `6a6702f7` @ `75d82eb` (`bibi-poc-2026-07-27l`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.20** · sincronizados @ `75d82eb` |
-| **Pacote anterior em produção** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
+| **Release `main` / `dev`** | **v3.0.21** (preparado) · prod ainda **v3.0.20** |
+| **Pacote anterior em produção** | **3.0.20** — deploy `6a6702f7` @ `75d82eb` (`bibi-poc-2026-07-27l`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.20** (estoque + assistente + Capacitor B + PJ agendar) |
-| **Release** | `main` | **v3.0.20** |
+| **Integração** | `dev` | **v3.0.21** (documentos de saída + tip assistente) |
+| **Release** | `main` | **v3.0.20** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.20** · deploy `6a6702f7` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.21
+
+- **Documentos de saída:** bundle com atestado, assinatura/carimbo PDF, download/confirm alinhados à recepção (#342).
+- **Qualidade:** `documentos-saida` · `clinical-discharge` · CI #342 · docs:verify.
+- *(Assistente ruleOverrides hotfix #343/#348 já publicado no tip `6a6702f7` de v3.0.20.)*
 
 ### Conteúdo do pacote v3.0.20
 
@@ -596,7 +602,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.20` em produção** — estoque + assistente + Capacitor + PJ agendar |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.20` em produção** · **v3.0.21** preparado (documentos de saída) |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
