@@ -37,6 +37,7 @@ Documento de validação dos pacotes A–F de reversibilidade e auditoria acion�
 | Company UPDATE grava diff | `PATCH /api/interno/companies/[id]` | idem |
 | Pricing UPDATE grava diff | `PUT /api/interno/pricing-rules/[id]` | idem |
 | Audit expõe `hasDiff` | `GET /api/interno/audit` | `metadata` parseado |
+| RBAC de conteúdo por perfil | `GET /api/interno/audit`, `GET /api/interno/dashboard` | CPF mascarado para FATURAMENTO; clínico oculto para RECEPCAO; `capabilities.canRestore` só ADMIN — ver `tests/api/audit-rbac-content.test.ts` |
 
 ### API — change management (Pacotes B–D)
 

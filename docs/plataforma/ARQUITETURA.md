@@ -526,8 +526,12 @@ flowchart LR
   API["Route Handlers<br/>(mutações)"] --> Svc["recordTimelineEvent()"]
   Svc --> TE[("TimelineEvent")]
   Overview["getPatientOverview()"] --> Query["getPatientTimelineEvents()"]
-  Query --> TE
-  View["PatientOverviewView"] --> TimelineUI["Timeline visual"]
+  Query --> RBAC["audit-access.ts<br/>redactTimelineEventsForProfile"]
+  RBAC --> TE
+  AuditAPI["GET /api/interno/audit"] --> Tenant["getTenantAuditEvents()"]
+  Tenant --> RBAC
+  Dash["getExecutiveDashboard()"] --> RBAC
+  View["PatientOverviewView / AuditoriaView"] --> TimelineUI["Timeline visual"]
 ```
 
 **Eventos registrados automaticamente:**
@@ -538,9 +542,15 @@ flowchart LR
 - `INVOICE_ISSUED` — faturamento
 - `CREATED` — seed e futuros cadastros
 
+**RBAC em duas camadas (PR #296, jul/2026):**
+1. **Módulo** — `requireInternoModule("auditoria")` na rota; RECEPCAO não entra em `/interno/auditoria`.
+2. **Conteúdo** — `src/lib/audit-access.ts` classifica cada `entityType` (clínico, financeiro, PII, segurança, operacional) e expõe níveis `full` / `redacted` / `summary` / `hidden` por `internoProfile`. Aplicado em auditoria global, export, atividade recente do dashboard, Cliente 360° e revisões. Restore permanece **ADMIN** apenas.
+
 **Arquivos:**
 - `prisma/schema.prisma` — model `TimelineEvent`
-- `src/lib/timeline.ts` — `recordTimelineEvent`, `getPatientTimelineEvents`
+- `src/lib/timeline.ts` — `recordTimelineEvent`, `getPatientTimelineEvents`, `getTenantAuditEvents`
+- `src/lib/audit-access.ts` — matriz perfil × sensibilidade, mascaramento de PII/financeiro
+- `src/lib/executive-dashboard.ts` — `recentActivity` redigida
 - Hooks nos handlers de login, atendimento, procedimentos, PEP e faturas
 
 ### Checklist de homologação (Épico 2)

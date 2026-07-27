@@ -256,14 +256,14 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 
 - Cobertura operacional ampla (table stakes + B2B).
 - RBAC na navegação e em parte das APIs.
-- Cliente 360° com timeline universal de auditoria.
+- Cliente 360° com timeline universal de auditoria e **redação por perfil** (`audit-access.ts` — clínico oculto para RECEPCAO, PII mascarado para FATURAMENTO/READONLY).
 
 ### 5.3 Gaps e melhorias
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
 | Alta | ~~RBAC incompleto nas APIs~~ | **Corrigido (v3.0.3+)** — 96/96 rotas internas com `requireInternoModule`; ver `tests/security/rbac-gaps.test.ts` |
-| Alta | Cliente 360° sem RBAC de módulo | Restringir por perfil (ex.: ADMIN/RECEPCAO) |
+| Alta | Cliente 360° sem RBAC de módulo | Restringir por perfil (ex.: ADMIN/RECEPCAO) — **conteúdo** da timeline já redigido por perfil (PR #296) |
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
 | Média | TISS simplificado | Validação XSD + campos ANS completos |

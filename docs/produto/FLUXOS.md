@@ -458,12 +458,28 @@ Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`i
 
 ### 4.9 Auditoria (`AuditoriaView`)
 
-| Ação | API | Efeito |
-|------|-----|--------|
-| Timeline | `GET /api/interno/audit` | Eventos `TimelineEvent` filtráveis + redação RBAC |
-| Export | `GET /api/interno/audit/export?format=` | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` (já redigido) |
+O módulo `auditoria` (matriz §9) é o **gate de rota**; a política de **conteúdo** vive em `src/lib/audit-access.ts` e é aplicada em todas as superfícies que exibem `TimelineEvent` para perfis internos.
 
-Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sensível é filtrado em `src/lib/audit-access.ts`:
+| Superfície | API / serviço | Redação |
+|------------|---------------|---------|
+| Timeline global | `GET /api/interno/audit` | `getTenantAuditEvents()` |
+| Export tabular | `GET /api/interno/audit/export?format=` | `buildAuditTabularExport()` (mesmos filtros) |
+| Atividade recente | `GET /api/interno/dashboard` | `getExecutiveDashboard()` → `recentActivity` |
+| Cliente 360° | `GET /api/interno/patients/[id]/overview` | `getPatientTimelineEvents(..., { internoProfile })` |
+| Revisões | `GET /api/interno/revisions` | snapshots redigidos por perfil |
+| Restore | `POST /api/interno/audit/[eventId]/restore` | somente `ADMIN` (`isInternoAdmin`) |
+
+Resposta de `GET /api/interno/audit` inclui `capabilities`:
+
+| Campo | Quem recebe `true` |
+|-------|-------------------|
+| `canRestore` | `ADMIN` |
+| `canExport` | `ADMIN`, `FATURAMENTO`, `READONLY` (não `RECEPCAO`) |
+| `canViewFullDiff` | `ADMIN`, `FATURAMENTO` |
+
+**Níveis de detalhe** (`AuditDetailLevel`): `full` (descrição + metadata/diffs) · `redacted` (evento visível, PII/financeiro mascarado nos diffs) · `summary` (descrição sanitizada, sem metadata) · `hidden` (evento omitido).
+
+Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura ao módulo. **RECEPCAO** não acessa `/interno/auditoria`, mas vê atividade recente e timeline do Cliente 360° com a mesma política de conteúdo.
 
 | Classe | ADMIN | FATURAMENTO | READONLY | RECEPCAO (dashboard/360°) |
 |--------|:-----:|:-----------:|:--------:|:-------------------------:|
@@ -473,7 +489,9 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sen
 | Segurança | completo | resumo | resumo | oculto |
 | Operacional | completo | completo | resumo | resumo |
 
-Restore administrativo permanece **ADMIN**. Atividade recente do dashboard e timeline do Cliente 360° usam a mesma política.
+Mapeamento `entityType` → classe: `MedicalRecord`/`MedicationPrescription`/`ExamOrder`/`CareProtocol` = clínico; `Invoice`/`ProcedureUsage`/`PricingRule`/… = financeiro; `Patient`/`Company` = PII; `User`/`Security` = segurança; demais = operacional. Campos mascarados: `AUDIT_SENSITIVE_FIELDS` e `AUDIT_FINANCIAL_FIELDS` em `audit-access.ts`.
+
+Restore administrativo permanece **ADMIN**; eventos com `reversible: false` após redação não exibem ação de restaurar na UI.
 
 ### 4.10 Segurança e dual-store (`SecurityView`)
 
@@ -763,6 +781,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
 | **APIs** | **96/96** rotas internas usam `requireInternoModule` / `requireInternoAdmin` — matriz UI = matriz API. Teste: `tests/security/rbac-gaps.test.ts` |
+| **Conteúdo (auditoria)** | `src/lib/audit-access.ts` — redação por perfil em timeline, dashboard, Cliente 360°, export e revisões (§4.9). Independente do módulo: RECEPCAO vê feed redigido sem ter `auditoria`. Testes: `tests/unit/audit-access.test.ts`, `tests/api/audit-rbac-content.test.ts` |
 
 > **Gap remanescente (baixa prioridade):** apenas **7** rotas usam `requireInternoModuleWrite` (gestão clínica + ações destrutivas). Demais mutações confiam na matriz de módulos. Evidências: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §5.
 

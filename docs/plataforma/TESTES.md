@@ -140,6 +140,17 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 
 **Guards de escrita (parcial):** **7** rotas usam `requireInternoModuleWrite` (gestão clínica `launches`/`expenses` + ações destrutivas: `void`, `reverse`, `retry`, `revert-recent`). Demais mutações ainda usam só `requireInternoModule` — risco prático baixo na matriz atual (READONLY não possui módulos de escrita). Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
 
+### 1b. RBAC de conteúdo na auditoria (PR #296)
+
+Além do guard de módulo `auditoria`, a camada `src/lib/audit-access.ts` redige PII, dados clínicos e financeiros conforme `internoProfile`. Cobre timeline global, export, atividade recente do dashboard, Cliente 360° e revisões.
+
+| Arquivo | O que valida |
+|---------|--------------|
+| `tests/unit/audit-access.test.ts` | Matriz perfil × classe, mascaramento de CPF/telefone, ocultação clínica para RECEPCAO, `capabilities` |
+| `tests/api/audit-rbac-content.test.ts` | `GET /api/interno/audit` e `GET /api/interno/dashboard` — ADMIN vê CPF; FATURAMENTO mascara; RECEPCAO não vê eventos clínicos |
+
+Doc de produto: [`FLUXOS.md`](../produto/FLUXOS.md) §4.9 e §9.
+
 **Exceção documentada:** `GET /api/procedures` — catálogo compartilhado (`requireUser` sem módulo interno; impacto baixo).
 
 ### 2. Proxy valida presença e assinatura HMAC do cookie
