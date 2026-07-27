@@ -39,8 +39,9 @@ export async function PATCH(request: Request, { params }: Params) {
     });
 
     if ("error" in result) {
-      const status = result.error.includes("não encontrado") ? 404 : 400;
-      return NextResponse.json({ error: result.error }, { status });
+      const message = result.error ?? "Não foi possível atualizar";
+      const status = message.includes("não encontrado") ? 404 : 400;
+      return NextResponse.json({ error: message }, { status });
     }
 
     return NextResponse.json(result);
@@ -63,7 +64,10 @@ export async function DELETE(_request: Request, { params }: Params) {
     });
 
     if ("error" in result) {
-      return NextResponse.json({ error: result.error }, { status: 404 });
+      return NextResponse.json(
+        { error: result.error ?? "Beneficiário não encontrado na empresa" },
+        { status: 404 },
+      );
     }
 
     return NextResponse.json(result);
