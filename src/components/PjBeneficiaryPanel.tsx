@@ -6,7 +6,6 @@ import Card from "@/components/ui/Card";
 import { PatientExtraFields, emptyPatientExtra } from "@/components/cadastros/CadastroExtraFields";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { useLabels } from "@/hooks/useLabels";
-import { fetchJson } from "@/lib/ui/api-feedback";
 
 const fieldClass =
   "mt-1 w-full rounded-[var(--radius-button)] border border-[var(--border-muted)] bg-[var(--surface-card)] px-3 py-2 text-sm";
@@ -61,12 +60,15 @@ export function usePjBeneficiaryDetach(onChanged: () => void) {
     ) {
       return;
     }
-    await run({
-      action: () =>
-        fetchJson(`/api/pj/beneficiaries/${id}`, { method: "DELETE" }, "Não foi possível remover"),
-      successMessage: `${labels.beneficiary} desvinculado(a) da empresa.`,
-      onSuccess: onChanged,
-    });
+    await run(
+      "detach-beneficiary",
+      () => fetch(`/api/pj/beneficiaries/${id}`, { method: "DELETE" }),
+      {
+        successMessage: `${labels.beneficiary} desvinculado(a) da empresa.`,
+        errorMessage: "Não foi possível remover",
+        onSuccess: onChanged,
+      },
+    );
   };
 }
 
@@ -98,45 +100,45 @@ function BeneficiaryFormCard({ editing, initialForm, onCancel, onChanged }: Form
     };
 
     if (isEditing && editing) {
-      await run({
-        action: () =>
-          fetchJson(
-            `/api/pj/beneficiaries/${editing.id}`,
-            {
-              method: "PATCH",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload),
-            },
-            "Não foi possível atualizar",
-          ),
-        successMessage: `${labels.beneficiary} atualizado(a).`,
-        onSuccess: () => {
-          onCancel();
-          onChanged();
+      await run(
+        "save-beneficiary",
+        () =>
+          fetch(`/api/pj/beneficiaries/${editing.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }),
+        {
+          successMessage: `${labels.beneficiary} atualizado(a).`,
+          errorMessage: "Não foi possível atualizar",
+          onSuccess: () => {
+            onCancel();
+            onChanged();
+          },
         },
-      });
+      );
       return;
     }
 
     if (!payload.birthDate) return;
 
-    await run({
-      action: () =>
-        fetchJson(
-          "/api/pj/beneficiaries",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          },
-          "Não foi possível incluir",
-        ),
-      successMessage: `${labels.beneficiary} incluído(a) no plano corporativo.`,
-      onSuccess: () => {
-        onCancel();
-        onChanged();
+    await run(
+      "save-beneficiary",
+      () =>
+        fetch("/api/pj/beneficiaries", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }),
+      {
+        successMessage: `${labels.beneficiary} incluído(a) no plano corporativo.`,
+        errorMessage: "Não foi possível incluir",
+        onSuccess: () => {
+          onCancel();
+          onChanged();
+        },
       },
-    });
+    );
   }
 
   return (
@@ -192,7 +194,7 @@ function BeneficiaryFormCard({ editing, initialForm, onCancel, onChanged }: Form
           onChange={(patch) => setForm((f) => ({ ...f, extra: { ...f.extra, ...patch } }))}
         />
         <div className="flex flex-wrap gap-2">
-          <Button type="submit" size="sm" disabled={isBusy}>
+          <Button type="submit" size="sm" disabled={isBusy("save-beneficiary")}>
             {isEditing ? "Salvar" : "Incluir"}
           </Button>
           <Button type="button" size="sm" variant="secondary" onClick={onCancel}>
