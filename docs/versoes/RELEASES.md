@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.19** — Assistente Fase 3 + marca whitelabel **em produção**.
+> Pacote **v3.0.20** — Assistente Fase 4 + Estoque Fase 4 + Capacitor Fase B **pendente deploy**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.19** — deploy `6a66f3a7` @ `1fca530` (`bibi-poc-2026-07-27j`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.19** · sincronizados @ `1fca530` |
+| **Release `main` / `dev`** | **v3.0.20** preparado · produção ainda **v3.0.19** até deploy |
 | **Pacote anterior em produção** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +25,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.19** (Assistente Fase 3 + brand mark) |
-| **Release** | `main` | **v3.0.19** |
+| **Integração** | `dev` | **v3.0.20** (Fase 4 assistente + estoque + Capacitor) |
+| **Release** | `main` | **v3.0.19** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.19** · deploy `6a66f3a7` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.20
+
+- **Assistente Fase 4:** pipeline híbrido `refineHybridPlan` — LLM → allowlist regras → tools (#337).
+- **Estoque Fase 4:** reversão idempotente e integridade de lote (#338).
+- **Capacitor Fase B:** scaffold iOS/Android + service worker shell (#340).
+- **Qualidade:** `assistant-hybrid` · `stock` · `pwa-mobile-shell` · CI #337/#338/#340 · pre-release OK.
 
 ### Conteúdo do pacote v3.0.19
 

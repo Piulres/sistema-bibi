@@ -26,10 +26,42 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.19",
+    version: "3.0.20",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Assistente Fase 4 (IA híbrida), Estoque Fase 4 (integridade de lote) e Capacitor Fase B (shell nativo).",
+    highlights: [
+      {
+        title: "Assistente",
+        items: [
+          "Pipeline LLM → regras → tools (`refineHybridPlan`)",
+          "Tools fora do allowlist bloqueadas mesmo com gateway ativo",
+        ],
+      },
+      {
+        title: "Estoque",
+        items: [
+          "Reversão idempotente de movimentações",
+          "Integridade de lote e validação reforçada",
+        ],
+      },
+      {
+        title: "Mobile / PWA",
+        items: [
+          "Scaffold Capacitor iOS/Android em `mobile/`",
+          "Service worker shell (`public/sw.js`)",
+        ],
+      },
+    ],
+    testStats: "CI #337/#338/#340 · assistant-hybrid · stock · pwa-mobile-shell",
+  },
+  {
+    version: "3.0.19",
+    label: "Sistema Bibi - ServiceOS v3.0.19",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Assistente Fase 3: CRUD de regras por tenant; marca circular whitelabel na PWA e UI.",
     highlights: [
