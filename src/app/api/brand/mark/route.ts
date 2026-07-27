@@ -9,6 +9,7 @@ export async function GET() {
       displayName: branding.displayName,
       primaryColor: branding.primaryColor,
       accentColor: branding.accentColor,
+      heroFrom: branding.heroFrom,
       heroTo: branding.heroTo,
     },
     512,

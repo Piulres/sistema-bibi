@@ -13,6 +13,7 @@ export default function AppleIcon() {
         displayName: branding.displayName,
         primaryColor: branding.primaryColor,
         accentColor: branding.accentColor,
+        heroFrom: branding.heroFrom,
         heroTo: branding.heroTo,
       }}
       size={180}
