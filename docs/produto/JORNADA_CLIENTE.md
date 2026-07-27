@@ -257,7 +257,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 ### 5.2 Pontos fortes
 
 - Cobertura operacional ampla (table stakes + B2B).
-- RBAC na navegação e em parte das APIs.
+- RBAC na navegação e nas APIs internas (módulo + write guard na Fase 5).
 - Cliente 360° com timeline universal de auditoria.
 
 ### 5.3 Gaps e melhorias
@@ -265,6 +265,7 @@ Matriz completa perfil × módulo: [`FLUXOS.md`](FLUXOS.md) §9.
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
 | Alta | ~~RBAC incompleto nas APIs~~ | **Corrigido (v3.0.3+)** — 96/96 rotas internas com `requireInternoModule`; ver `tests/security/rbac-gaps.test.ts` |
+| Alta | ~~Write guard não generalizado~~ | **Corrigido (Fase 5, #354)** — mutações usam `requireInternoModuleWrite`; ver `tests/api/interno-write-guards.test.ts` |
 | Alta | Cliente 360° sem RBAC de módulo | Restringir por perfil (ex.: ADMIN/RECEPCAO) |
 | Média | Faturamento em `/interno` (rota não óbvia) | Alias `/interno/faturamento` já redireciona — destacar na nav |
 | Média | Sem workflow guiado de faturamento em lote | Wizard: pendências → selecionar pacientes → gerar lote |
@@ -356,7 +357,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 |---|----------|------------|---------|---------------|
 | 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | ✅ Cancelar + Reagendar (`benef-reschedule`) |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
-| 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
+| 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 | ✅ Módulo (v3.0.3+) + write guard (Fase 5) |
 | 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 | **Agendar:** ✅ `pj-appointment-request` · CRUD colaboradores: backlog |
 | 5 | Agenda semanal do prestador | Prestador | Operação clínica madura | 5 |
 | 6 | Navegação por abas no portal Beneficiário | Beneficiário | UX mobile | 5 | **Drawer mobile:** ✅ `MobileNavDrawer` em `BeneficiarioNav.tsx` (v3.0.6) — ver `e2e/mobile-nav.spec.ts` |

@@ -53,6 +53,17 @@ Você deve ver o cabeçalho do ServiceOS e a árvore de tags (Auth, Prestador, I
 3. Execute — resposta `200` define o cookie `bibi_session` (o Swagger usa `withCredentials: true`)
 4. Teste `GET /api/auth/me` ou `GET /api/prestador/agenda`
 
+### RBAC no portal interno (leitura vs escrita)
+
+Rotas `/api/interno/*` aplicam dois níveis de guard (`src/lib/api-auth.ts`):
+
+| Operação | Guard | Efeito típico |
+|----------|-------|---------------|
+| `GET` | `requireInternoModule("…")` | Perfil sem o módulo → **403** |
+| `POST`/`PATCH`/`PUT`/`DELETE` | `requireInternoModuleWrite("…")` | `READONLY` → **403** mesmo com módulo de leitura (ex.: `gestao`) |
+
+Matriz perfil × módulo: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §9. Testes: `tests/security/rbac-gaps.test.ts` · `tests/api/interno-write-guards.test.ts`.
+
 **Outros portais (mesma senha `bibi123`):**
 
 | Portal | `portal` no body | E-mail demo |

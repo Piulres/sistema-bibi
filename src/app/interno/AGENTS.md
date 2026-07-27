@@ -9,8 +9,12 @@ Só `PageHeader` + view — shell em `layout.tsx` (não repetir `PortalShell`/`I
 ## RBAC
 
 - Perfis: `ADMIN`, `FATURAMENTO`, `RECEPCAO`, `READONLY` (`User.internoProfile`)
-- APIs: `requireInternoModule` / `requireInternoModuleWrite`
+- **Leitura:** `requireInternoModule(module)` — matriz em `interno-permissions.ts`
+- **Escrita:** `requireInternoModuleWrite(module)` — bloqueia `READONLY` (Fase 5, #354)
+- **Admin-only:** `requireInternoAdmin()` — demo reset, dual-store, assistente settings
 - Nav filtrada: `interno-permissions.ts` · `interno-guard.ts`
+
+Padrão em Route Handlers internos: `GET` → `requireInternoModule`; `POST`/`PATCH`/`PUT`/`DELETE` → `requireInternoModuleWrite`. Testes: `tests/security/rbac-gaps.test.ts`.
 
 ## Módulos principais
 

@@ -775,9 +775,19 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 |--------|---------------|
 | **Páginas** | `requireInternoPage(module)` — sem permissão → `/interno/dashboard` |
 | **Nav** | `InternoNav` filtra tabs |
-| **APIs** | **96/96** rotas internas usam `requireInternoModule` / `requireInternoAdmin` — matriz UI = matriz API. Teste: `tests/security/rbac-gaps.test.ts` |
+| **APIs (leitura)** | **96/96** rotas internas usam `requireInternoModule` ou `requireInternoAdmin` — matriz UI = matriz API |
+| **APIs (escrita)** | Todo handler `POST`/`PATCH`/`PUT`/`DELETE` usa `requireInternoModuleWrite` ou `requireInternoAdmin` — bloqueia `READONLY` mesmo com módulo de leitura (ex.: `gestao`) |
 
-> **Gap remanescente (baixa prioridade):** apenas **7** rotas usam `requireInternoModuleWrite` (gestão clínica + ações destrutivas). Demais mutações confiam na matriz de módulos. Evidências: [`AUDITORIA_FLUXOS.md`](AUDITORIA_FLUXOS.md) §5.
+Implementação: `src/lib/api-auth.ts` · `canInternoWrite()` em `interno-permissions.ts`.
+
+**Testes de regressão:**
+
+| Arquivo | O que trava |
+|---------|-------------|
+| `tests/security/rbac-gaps.test.ts` | Rota sem guard de módulo; mutação sem write guard |
+| `tests/api/interno-write-guards.test.ts` | READONLY lê mas não cria; RECEPCAO com `cadastros` muta |
+
+**Exemplo:** perfil `READONLY` com módulo `gestao` — `GET /api/interno/clinic-finance/launches` → **200**; `POST` no mesmo path → **403** (`Perfil somente leitura — alteração não permitida`).
 
 ---
 

@@ -17,6 +17,7 @@ via API.
 | 3 | 2026-07-26 | `fc9afa7` (v3.0.3) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente, schema-sync Blob) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **Fase 5 (RBAC)** | **2026-07-27** | PR [#354](https://github.com/Piulres/sistema-bibi/pull/354) | `requireInternoModuleWrite` generalizado em todas as mutações internas |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -63,7 +64,7 @@ via API.
 
 ```mermaid
 flowchart LR
-  subgraph OK["Corrigido (rodadas 1–3.2)"]
+  subgraph OK["Corrigido (rodadas 1–3.2 + Fase 5)"]
     R[RBAC API interno 96/96]
     C[CRM bypass]
     M[MFA restrito]
@@ -72,9 +73,7 @@ flowchart LR
     P[Procedimento em terminal]
     B[Label consumo beneficiário]
     U[UX res.ok + guards beneficiário]
-  end
-  subgraph GAP["Gap remanescente"]
-    W[Write guard não generalizado]
+    W[Write guard generalizado]
   end
 ```
 
@@ -121,7 +120,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 17 | TISS XML sem XSD | **PARCIAL (3.3)** | Validação estrutural adicionada: guia sem procedimentos ou sem documento → 422 `TissBuildError`; `escapeXml` cobre os 5 reservados. XSD oficial ANS segue fora do POC |
 | 18 | `rbac-gaps.test.ts` documenta lacuna | **MUDOU** | agora **afirma cobertura** (`withoutModuleGuard === []`, 15 módulos) |
 
-Resumo: **14 corrigidas**, **1 parcial** (`SESSION_SECRET` fallback dev), **1 endurecido** (TISS estrutural), **1 gap aberto** (write guard não generalizado — ver §11).
+Resumo: **15 corrigidas**, **1 parcial** (`SESSION_SECRET` fallback dev), **1 endurecido** (TISS estrutural). Write guards generalizados na Fase 5 (#354).
 
 ---
 
@@ -167,11 +166,15 @@ Comportamento **observado** hoje (era o P0 crítico na rodada 1):
 | RECEPCAO | `GET /api/interno/crm/pipeline` | **403** | Corrigido (era 200) |
 | RECEPCAO | `GET /api/interno/patients` | **200** | Correto (RECEPCAO tem `cadastros`) |
 | FATURAMENTO | `GET /api/interno/patients` | **403** | Correto (FATURAMENTO não tem `cadastros`) |
+| READONLY | `GET /api/interno/clinic-finance/launches` | **200** | Correto (`gestao` na matriz de leitura) |
+| READONLY | `POST /api/interno/clinic-finance/launches` | **403** | Correto (Fase 5 — `requireInternoModuleWrite`) |
+| READONLY | `POST /api/interno/patients` | **403** | Correto (sem módulo `cadastros` + write guard) |
 
 Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` /
-`requireInternoAdmin`. Teste `tests/security/rbac-gaps.test.ts` trava a regressão.
+`requireInternoAdmin` na leitura e `requireInternoModuleWrite` / Admin nas mutações.
+Testes `tests/security/rbac-gaps.test.ts` e `tests/api/interno-write-guards.test.ts` travam regressão.
 
-### Falha remanescente (média — defesa em profundidade)
+### Guards de escrita — Fase 5 (concluído)
 
 | Sev. | Área | Problema | Nota |
 |------|------|----------|------|

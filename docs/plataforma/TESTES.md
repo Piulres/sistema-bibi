@@ -135,10 +135,11 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 | Onde | Comportamento |
 |------|---------------|
 | **UI** (`interno-permissions.ts`) | Nav filtrada por perfil (READONLY só vê dashboard + relatórios) |
-| **API** (`/api/interno/*`) | **96/96** Route Handlers usam `requireInternoModule` ou `requireInternoAdmin` — perfil sem módulo → **403** |
-| **Teste** | `tests/security/rbac-gaps.test.ts` falha se alguma rota interna ficar sem guard de módulo |
+| **API leitura** (`GET` em `/api/interno/*`) | **96/96** Route Handlers usam `requireInternoModule` ou `requireInternoAdmin` — perfil sem módulo → **403** |
+| **API escrita** (`POST`/`PATCH`/`PUT`/`DELETE`) | Todos os handlers mutáveis usam `requireInternoModuleWrite` ou `requireInternoAdmin` — `READONLY` → **403** mesmo com módulo de leitura |
+| **Testes** | `tests/security/rbac-gaps.test.ts` (módulo + write em mutações) · `tests/api/interno-write-guards.test.ts` (cenários READONLY) |
 
-**Guards de escrita (parcial):** **7** rotas usam `requireInternoModuleWrite` (gestão clínica `launches`/`expenses` + ações destrutivas: `void`, `reverse`, `retry`, `revert-recent`). Demais mutações ainda usam só `requireInternoModule` — risco prático baixo na matriz atual (READONLY não possui módulos de escrita). Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
+Matriz e exemplos: [`FLUXOS.md`](../produto/FLUXOS.md) §9 · auditoria: [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
 
 **Exceção documentada:** `GET /api/procedures` — catálogo compartilhado (`requireUser` sem módulo interno; impacto baixo).
 
@@ -324,13 +325,12 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 
 ## Roadmap sugerido (prioridade)
 
-1. **P0 — Segurança:** generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis (RBAC read guard já cobre 96/96 — ver `rbac-gaps.test.ts`)
-2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
-3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
-4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
-5. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
-6. **P2 — Webhooks:** integração com fila de retry
-7. **P3 — Performance:** smoke de carga em `computePrice` e dashboard KPIs
+1. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
+2. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
+3. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)
+4. **P2 — Componentes:** Testing Library para `BillingView`, `AtendimentoView`
+5. **P2 — Webhooks:** integração com fila de retry
+6. **P3 — Performance:** smoke de carga em `computePrice` e dashboard KPIs
 
 ---
 
