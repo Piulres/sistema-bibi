@@ -4,6 +4,7 @@ import { isGatewayConfigured } from "@/lib/assistant/config";
 import { resolveAssistantMode, assistantModeLabel } from "@/lib/assistant/mode";
 import { scenarioCount } from "@/lib/assistant/scenarios";
 import { ASSISTANT_TOOL_INVENTORY } from "@/lib/assistant/inventory";
+import { buildRuleEngineStats } from "@/lib/assistant/rules/engine";
 import {
   getTenantSettings,
   updateTenantSettings,
@@ -15,6 +16,7 @@ export async function GET() {
     const user = await requireInternoModuleWrite("assistente");
     const settings = await getTenantSettings(user.tenantId);
     const mode = resolveAssistantMode(settings);
+    const rules = buildRuleEngineStats(user.niche, settings.assistant.ruleOverrides);
 
     return NextResponse.json({
       settings: settings.assistant,
@@ -25,6 +27,7 @@ export async function GET() {
         tools: ASSISTANT_TOOL_INVENTORY.length,
         scenarios: scenarioCount(),
       },
+      rules,
     });
   } catch (error) {
     return authErrorResponse(error);
@@ -63,11 +66,13 @@ export async function PATCH(request: Request) {
 
     const updated = await updateTenantSettings(user.tenantId, { assistant: patch });
     const mode = resolveAssistantMode(updated);
+    const rules = buildRuleEngineStats(user.niche, updated.assistant.ruleOverrides);
 
     return NextResponse.json({
       settings: updated.assistant,
       mode,
       modeLabel: assistantModeLabel(mode),
+      rules,
     });
   } catch (error) {
     return authErrorResponse(error);
