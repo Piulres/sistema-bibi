@@ -71,6 +71,35 @@ describe("brandMarkMeshBackground", () => {
     expect(css).toContain("radial-gradient");
     expect(css).toContain("linear-gradient");
   });
+
+  it("uses segment whitelabel colors so each niche mark reflects tenant branding", () => {
+    const vet = resolveBrandMarkLayout(
+      {
+        displayName: "PetCare",
+        primaryColor: "#059669",
+        accentColor: "#34d399",
+        heroFrom: "#047857",
+        heroTo: "#34d399",
+      },
+      512,
+    );
+    const svg = buildBrandMarkSvg(
+      {
+        displayName: "PetCare",
+        primaryColor: vet.primaryColor,
+        accentColor: vet.accentColor,
+        heroFrom: vet.backgroundFrom,
+        heroTo: vet.backgroundTo,
+      },
+      192,
+    );
+
+    expect(vet.backgroundFrom).toBe("#047857");
+    expect(vet.backgroundTo).toBe("#34d399");
+    expect(svg).toContain("#047857");
+    expect(svg).toContain("#34d399");
+    expect(svg).toContain(">P<");
+  });
 });
 
 describe("buildBrandMarkSvg", () => {

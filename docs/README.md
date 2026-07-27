@@ -1,4 +1,4 @@
-# Documentação Sistema Bibi - ServiceOS v3.0
+# Documentação Sistema Bibi - ServiceOS v3.0.24
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 

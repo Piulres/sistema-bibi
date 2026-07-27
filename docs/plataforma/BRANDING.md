@@ -1,6 +1,13 @@
 # Branding — Energia Brasileira
 
-Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.8**; white-label desde v2.0).
+Identidade visual padrão do **Sistema Bibi - ServiceOS** (produção **v3.0.24**; white-label desde v2.0).
+
+## Marca circular (`BrandMark`) — v3.0.24
+
+- Gradiente **Energia Brasileira** whitelabel (`heroFrom` → `heroTo`) com glows em `primary`/`accent`
+- Formato **circular estilo iOS**, sem borda — monograma ou logo centralizado
+- SVG, PWA (`npm run icons:generate`) e UI React compartilham `src/lib/brand/brand-mark.ts`
+- Preview em `/interno/branding` · API `GET /api/brand/mark` e `/api/brand/mark/[tenantId]`
 
 ## Cores principais
 

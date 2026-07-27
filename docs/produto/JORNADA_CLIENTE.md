@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.8** em produção — narrativa operacional do consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacote v3.0.7: drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.24** em produção — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). Pacotes recentes: BrandMark whitelabel, nav Mais portaled, CRUD/import CSV PJ, RBAC Fase 5, exports canônicos (v3.0.7+).
 
 ---
 
@@ -137,7 +137,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 ## 3. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** leitura + export + agendamento RH + CRUD colaboradores (v3.0.23)
+**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** leitura + export + agendamento RH + CRUD colaboradores + import CSV
 
 ### 3.1 Jornada típica
 
@@ -359,7 +359,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 | 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | ✅ Cancelar + Reagendar (`benef-reschedule`) |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
-| 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 | ✅ `pj-beneficiary-crud` (CRUD colaboradores v3.0.23) · upload em lote: backlog |
+| 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 | ✅ `pj-beneficiary-crud` (CRUD + import CSV) |
 | 5 | Agenda semanal do prestador | Prestador | Operação clínica madura | 5 |
 | 6 | Navegação por abas no portal Beneficiário | Beneficiário | UX mobile | 5 | **Drawer mobile:** ✅ `MobileNavDrawer` em `BeneficiarioNav.tsx` (v3.0.6) — ver `e2e/mobile-nav.spec.ts` |
 | 7 | Notificações reais (e-mail/SMS) | Todos | Lembretes e confirmações | 5 |

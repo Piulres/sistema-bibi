@@ -439,7 +439,7 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 10. Portal PJ — CRUD colaboradores (v3.0.23)
+## 10. Portal PJ — CRUD colaboradores + import CSV (v3.0.23+)
 
 RH gerencia colaboradores vinculados à empresa sem passar pela recepção. Auth: `requirePj()` — escopo fixo em `user.companyId` (anti-IDOR B2B via `assertCompanyPatient`).
 
@@ -448,8 +448,12 @@ RH gerencia colaboradores vinculados à empresa sem passar pela recepção. Auth
 | `POST` | `/api/pj/beneficiaries` | `name`, `cpf`, `birthDate` (obrig.) · `phone`, `email`, `gender`, `motherName`, `employeeId`, `bondType` (opc.) | `200` paciente criado · `400` validação |
 | `PATCH` | `/api/pj/beneficiaries/{id}` | Campos parciais (mesmos do POST) | `200` · `404` fora da empresa |
 | `DELETE` | `/api/pj/beneficiaries/{id}` | — | `200` desvincula (`companyId: null`) · `404` |
+| `GET` | `/api/pj/beneficiaries/import?format=csv` | — | Template CSV para importação em lote |
+| `POST` | `/api/pj/beneficiaries/import` | `content`, `format` (`csv`), `dryRun?` | `200` lote importado · `400` validação |
 
 > **Semântica do DELETE:** remove o vínculo corporativo; o cadastro clínico (`Patient`) permanece no tenant.
+
+> **Import CSV:** colunas `nome`, `cpf`, `data_nascimento` (obrig.) · demais opcionais. Vincula automaticamente à empresa do RH logado.
 
 ### Exemplo curl
 

@@ -26,10 +26,35 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.24",
+    version: "3.0.25",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Portal PJ: importação CSV em lote de colaboradores com validação dry-run; fix E2E estoque e CEDIG homologação.",
+    highlights: [
+      {
+        title: "Portal PJ",
+        items: [
+          "Import CSV — POST/GET /api/pj/beneficiaries/import com dry-run e modelo para download",
+          "UI em /pj — upload, validar e importar colaboradores vinculados à empresa",
+        ],
+      },
+      {
+        title: "Qualidade / CEDIG",
+        items: [
+          "E2E estoque-fases — combobox status de lote (sem flaky getByText)",
+          "BrandMark multi-tenant (PetCare/VET); roteiro homologação CEDIG Alana 15 min",
+        ],
+      },
+    ],
+    testStats: "CI #373 · pj-beneficiaries-import · estoque-fases · pre-release OK",
+  },
+  {
+    version: "3.0.24",
+    label: "Sistema Bibi - ServiceOS v3.0.24",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Marca circular com gradiente Energia Brasileira whitelabel; nav Mais refatorado; painel Regras do assistente humanizado.",
     highlights: [
@@ -48,7 +73,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "CI #371 · brand-mark · nav-overflow · pre-release OK",
+    testStats: "CI #371/#372 · brand-mark · nav-overflow · pre-release OK · prod 6a677dc5",
   },
   {
     version: "3.0.23",

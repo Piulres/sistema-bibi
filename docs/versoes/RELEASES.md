@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.24** — BrandMark Energia Brasileira + nav Mais + assistente **em produção**.
+> Pacote **v3.0.25** — Import CSV PJ + qualidade estoque/CEDIG **pendente deploy produção**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.24** — deploy `6a677dc5` @ `15275c0` (`v3.0.24 BrandMark gradiente + nav Mais + assistente`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.24** em produção @ `15275c0` |
+| **Release `main` / `dev`** | **v3.0.25** pendente deploy · `dev` @ `5115e92` |
 | **Pacote anterior em produção** | **3.0.23** — deploy `6a677005` @ `9243c5d` (`bibi-poc-2026-07-27o`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,10 +25,17 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.24** (BrandMark gradiente + nav Mais + assistente) |
-| **Release** | `main` | **v3.0.24** |
+| **Integração** | `dev` | **v3.0.25** (import CSV PJ + fix E2E estoque + CEDIG) |
+| **Release** | `main` | **v3.0.24** → merge v3.0.25 pendente |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.24** · deploy `6a677dc5` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.25
+
+- **Portal PJ:** import CSV colaboradores — `POST/GET /api/pj/beneficiaries/import` + UI `/pj` (#373).
+- **Qualidade:** fix E2E `estoque-fases` (combobox status lote); testes BrandMark multi-tenant.
+- **CEDIG:** STATUS + roteiro homologação Alana 15 min; docs sincronizadas v3.0.24.
+- **Qualidade:** CI #373 · pj-beneficiaries-import · pre-release OK.
 
 ### Conteúdo do pacote v3.0.24
 
@@ -44,7 +51,6 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Landing `/` | 200 · footer `v3.0.24` · deploy `6a677dc5` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/interno/login` | 200 |
-
 ### Conteúdo do pacote v3.0.23
 
 - **Portal PJ:** CRUD colaboradores — `POST/PATCH/DELETE /api/pj/beneficiaries` + UI `/pj` (#365).
@@ -668,7 +674,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.22` em produção** — RBAC Fase 5 · deploy `6a670e42` |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.24` em produção** — BrandMark + nav Mais + assistente · deploy `6a677dc5` |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
