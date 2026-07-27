@@ -70,11 +70,11 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | pendente pós-deploy |
-| CSS `/_next/static/chunks/*.css` | pendente |
-| `/instalar` | pendente |
-| `/?tenant=cedig` | pendente |
-| Cota Netlify | verificar antes do deploy |
+| Landing `/` | 200 · footer `v3.0.12` · deploy `6a66c080` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Smoke (27/07/2026) — produção v3.0.11
 
