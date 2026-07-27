@@ -72,6 +72,10 @@ export type StockMovementView = {
   appointmentId: string | null;
   createdAt: string;
   createdAtLabel: string;
+  /** Já existe timeline com reversesId apontando para este movimento. */
+  reversed: boolean;
+  /** Este movimento é o compensatório de outra movimentação. */
+  isReversal: boolean;
 };
 
 export type StockAlertView = {
@@ -340,6 +344,17 @@ export async function receiveStockEntry(input: {
     where: { productId: product.id, lotNumber },
   });
 
+  if (
+    existingLot &&
+    (existingLot.status === "QUARENTENA" ||
+      existingLot.status === "BLOQUEADO" ||
+      existingLot.status === "VENCIDO")
+  ) {
+    return {
+      error: `Lote ${lotNumber} está ${existingLot.status} — liberar antes de reforçar a entrada` as const,
+    };
+  }
+
   const result = await prisma.$transaction(async (tx) => {
     let lotId: string;
     if (existingLot) {
@@ -349,7 +364,8 @@ export async function receiveStockEntry(input: {
           quantity: { increment: input.quantity },
           unitCost: input.unitCost ?? existingLot.unitCost,
           supplierRef: input.supplierRef ?? existingLot.supplierRef,
-          status: "DISPONIVEL",
+          // Mantém status atual (já validado como DISPONIVEL acima).
+          status: existingLot.status,
         },
       });
       lotId = updated.id;
@@ -424,12 +440,17 @@ async function deductStockFifo(
   }
 
   let remaining = input.quantity;
+  const now = new Date();
   const lots = await tx.stockLot.findMany({
     where: {
       tenantId: input.tenantId,
       productId: input.productId,
       status: "DISPONIVEL",
       quantity: { gt: 0 },
+      OR: [
+        { lotNumber: STOCK_NO_LOT_NUMBER },
+        { expiryDate: { gte: now } },
+      ],
     },
     orderBy: { expiryDate: "asc" },
   });
@@ -495,11 +516,16 @@ export async function registerStockMovement(input: {
   const type = input.type as StockMovementType;
 
   if (isStockOutbound(type) || type === "AJUSTE") {
+    await refreshExpiredLots(input.tenantId);
+
     if (type === "AJUSTE" && input.lotId) {
       const lot = await prisma.stockLot.findFirst({
         where: { id: input.lotId, tenantId: input.tenantId, productId: product.id },
       });
       if (!lot) return { error: "Lote não encontrado" as const };
+      if (lot.status !== "DISPONIVEL") {
+        return { error: `Lote não disponível (${lot.status})` as const };
+      }
       if (lot.quantity < input.quantity) {
         return { error: `Saldo do lote insuficiente (${lot.quantity})` as const };
       }
@@ -641,6 +667,31 @@ export async function listStockMovements(
     take: limit,
   });
 
+  const movementIds = rows.map((m) => m.id);
+  const [reversedOf, asReversal] =
+    movementIds.length === 0
+      ? [[], []]
+      : await Promise.all([
+          prisma.timelineEvent.findMany({
+            where: { tenantId, reversesId: { in: movementIds } },
+            select: { reversesId: true },
+          }),
+          prisma.timelineEvent.findMany({
+            where: {
+              tenantId,
+              entityType: TIMELINE_ENTITY_TYPES.STOCK_MOVEMENT,
+              entityId: { in: movementIds },
+              reversesId: { not: null },
+            },
+            select: { entityId: true },
+          }),
+        ]);
+
+  const reversedIds = new Set(
+    reversedOf.map((e) => e.reversesId).filter((id): id is string => Boolean(id)),
+  );
+  const reversalIds = new Set(asReversal.map((e) => e.entityId));
+
   return rows.map((m) => ({
     id: m.id,
     type: m.type,
@@ -667,6 +718,8 @@ export async function listStockMovements(
     appointmentId: m.appointmentId,
     createdAt: m.createdAt.toISOString(),
     createdAtLabel: dateTimeLabel(m.createdAt),
+    reversed: reversedIds.has(m.id),
+    isReversal: reversalIds.has(m.id),
   }));
 }
 
@@ -792,6 +845,8 @@ export async function consumeProcedureKit(input: {
   createdBy: string;
 }): Promise<{ consumed: { productName: string; quantity: number }[]; warnings: string[] }> {
   const prisma = await getPrisma();
+  await refreshExpiredLots(input.tenantId);
+
   const kit = await prisma.procedureMaterialKit.findMany({
     where: { tenantId: input.tenantId, procedureId: input.procedureId },
     include: { product: true },
@@ -909,6 +964,8 @@ export async function refreshExpiredLots(tenantId: string) {
       tenantId,
       expiryDate: { lt: now },
       status: "DISPONIVEL",
+      // Lote sintético usa validade sentinela — nunca marcar VENCIDO por engano.
+      lotNumber: { not: STOCK_NO_LOT_NUMBER },
     },
     data: { status: "VENCIDO" },
   });

@@ -42,11 +42,38 @@ export async function reverseStockMovement(input: {
     return { error: "Reversão requer lote vinculado ao movimento original" as const };
   }
 
+  const alreadyReversed = await prisma.timelineEvent.findFirst({
+    where: { tenantId: input.tenantId, reversesId: input.movementId },
+    select: { id: true },
+  });
+  if (alreadyReversed) {
+    return { error: "Movimentação já foi revertida" as const };
+  }
+
+  const isItselfReversal = await prisma.timelineEvent.findFirst({
+    where: {
+      tenantId: input.tenantId,
+      entityType: TIMELINE_ENTITY_TYPES.STOCK_MOVEMENT,
+      entityId: input.movementId,
+      reversesId: { not: null },
+    },
+    select: { id: true },
+  });
+  if (isItselfReversal) {
+    return { error: "Movimento compensatório não pode ser revertido novamente" as const };
+  }
+
   const lot = await prisma.stockLot.findFirst({
     where: { id: movement.lotId, tenantId: input.tenantId },
   });
   if (!lot) {
     return { error: "Lote vinculado à movimentação não encontrado" as const };
+  }
+
+  if (compensatingType === "ENTRADA" && lot.status !== "DISPONIVEL") {
+    return {
+      error: `Lote está ${lot.status} — liberar o lote antes de reverter a baixa` as const,
+    };
   }
 
   if (compensatingType === "SAIDA" && lot.quantity < movement.quantity) {

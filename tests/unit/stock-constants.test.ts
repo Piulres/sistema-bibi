@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import {
   isStockProductCategory,
   isStockReversibleType,
@@ -6,6 +5,7 @@ import {
   isStockUnit,
   STOCK_NO_LOT_NUMBER,
   STOCK_PRODUCT_CATEGORIES,
+  STOCK_UI_MANUAL_MOVEMENT_TYPES,
   STOCK_UNITS,
 } from "@/lib/stock-constants";
 
@@ -33,5 +33,9 @@ describe("Constantes de estoque — taxonomia multi-nicho e reversão", () => {
     expect(isStockSyntheticLot("SEM-LOTE")).toBe(true);
     expect(isStockSyntheticLot("sem-lote")).toBe(true);
     expect(isStockSyntheticLot("LOT-001")).toBe(false);
+  });
+
+  it("formulario manual só oferece SAIDA/AJUSTE/PERDA — evita DEVOLUCAO/TRANSFERENCIA sem UX", () => {
+    expect([...STOCK_UI_MANUAL_MOVEMENT_TYPES]).toEqual(["SAIDA", "AJUSTE", "PERDA"]);
   });
 });
