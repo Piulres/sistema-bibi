@@ -9,7 +9,13 @@ export default defineConfig({
   forbidOnly: Boolean(process.env.CI),
   retries: process.env.CI ? 1 : 0,
   workers: 1,
-  reporter: process.env.CI ? "github" : "list",
+  reporter: process.env.CI
+    ? [
+        ["github"],
+        ["html", { open: "never" }],
+        ["junit", { outputFile: "reports/playwright-junit.xml" }],
+      ]
+    : [["list"]],
   timeout: 60_000,
   use: {
     baseURL,

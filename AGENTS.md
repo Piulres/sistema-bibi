@@ -61,6 +61,12 @@ Mais logins: `README.md` · `SEED_SCALE=small|medium|large` no `.env`
 **Proibido (agente):** `netlify deploy`, `db:reset`, PR feature → `main`, loops em produção.  
 **503 `usage_exceeded`:** cota Netlify — não é bug.
 
+## Testes e massas (obrigatório)
+
+1. **Títulos WHAT + WHY** em todo `describe`/`it`/`test` — o Job Summary do CI é a primeira leitura do revisor (`.cursor/rules/tests.mdc`)
+2. **CI útil:** reporters Vitest (`github-actions` + junit) + `$GITHUB_STEP_SUMMARY`; Playwright com html/junit e artefatos em falha
+3. **Massas realistas:** nomes de pessoas/empresas com cara de operação real — sem `Demo`/`E2E`/`Teste`/`Cedig` no display; e-mails demo são contrato (`faturamento@…`)
+
 ## Gotchas não óbvios
 
 1. **Proxy Next 16:** `src/proxy.ts` (não `middleware.ts`) — auth real em `src/lib/session.ts`

@@ -121,7 +121,7 @@ describe("Change management — pacotes B–D", () => {
       jsonRequest("http://localhost/api/interno/appointments/walk-in", {
         method: "POST",
         body: {
-          name: "Walk-in Teste CM",
+          name: "Bruno Carvalho",
           cpf,
           birthDate: "1990-01-15",
           providerId: provider.id,

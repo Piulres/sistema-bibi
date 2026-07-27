@@ -2,8 +2,9 @@
  * Jornada no consultório — cobertura API alinhada a
  * docs/produto/JORNADA_CONSULTORIO.md (Atos 1–4).
  *
- * Cobre: walk-in → check-in → PEP → procedimento (+estoque) → REALIZADO →
- * fatura → PIX → pago; variante marcar paga; cadastros (pacientes/procedimentos/estoque).
+ * Valida o fluxo de negócio ponta a ponta: walk-in → check-in → PEP →
+ * procedimento (+estoque) → REALIZADO → fatura → PIX ou Marcar paga;
+ * e RBAC de cadastros/estoque. Títulos dos casos descrevem o invariante.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { POST as walkInPost } from "@/app/api/interno/appointments/walk-in/route";
@@ -70,7 +71,7 @@ function uniqueSlot(): Date {
   return slot;
 }
 
-describe("Jornada consultório — Atos 1–4 (API)", () => {
+describe("Jornada consultório (API) — walk-in até pagamento e cadastros operacionais", () => {
   afterEach(() => {
     clearSessionMock();
   });
@@ -98,7 +99,7 @@ describe("Jornada consultório — Atos 1–4 (API)", () => {
 
     // Ato 1 — Walk-in (recepção)
     await setSessionForEmail("recepcao@bibi.health");
-    const walkInName = `Jornada Walk-in ${Date.now()}`;
+    const walkInName = `Mariana Freitas ${Date.now()}`;
     const walkRes = await walkInPost(
       jsonRequest("http://localhost/api/interno/appointments/walk-in", {
         method: "POST",
@@ -251,7 +252,7 @@ describe("Jornada consultório — Atos 1–4 (API)", () => {
     expect(records).toBeGreaterThanOrEqual(1);
   });
 
-  it("variante fechamento: marcar paga manual (sem PIX)", async () => {
+  it("fechamento sem PIX: Marcar paga MANUAL deixa Invoice PAGA e Payment CONFIRMED", async () => {
     const prisma = getTestPrisma();
     const provider = await prisma.user.findUniqueOrThrow({
       where: { email: "dra.helena@bibi.health" },
@@ -263,7 +264,7 @@ describe("Jornada consultório — Atos 1–4 (API)", () => {
 
     const patient = await prisma.patient.create({
       data: {
-        name: `Particular Manual ${Date.now()}`,
+        name: `Lucas Barbosa ${Date.now()}`,
         cpf: generateValidCpf(),
         birthDate: new Date("1988-08-08"),
         tenantId: horizonte.id,

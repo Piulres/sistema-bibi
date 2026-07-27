@@ -1,22 +1,69 @@
 ---
-description: Convenções de testes Vitest e Playwright no ServiceOS — dual-store, E2E, matriz CRUD, sem Jest.
+description: Convenções de testes Vitest e Playwright no ServiceOS — títulos informativos, CI com summary, massas realistas, dual-store, sem Jest.
 globs:
   - "tests/**"
   - "e2e/**"
   - "vitest.config.*"
   - "playwright.config.*"
+  - ".github/workflows/**"
 alwaysApply: false
 ---
 
 # Testes — ServiceOS
 
-Referências: `docs/plataforma/TESTES.md` · skill `references/CHECKLIST.md`
+Referências: `docs/plataforma/TESTES.md` · skill `references/CHECKLIST.md` · massa: `docs/plataforma/MASSA_TESTES.md`
 
 ## Stack
 
 - **Unitário / integração:** Vitest (`tests/unit/`, `tests/api/`, `tests/lib/`)
 - **E2E:** Playwright (`e2e/*.spec.ts`) — **não** usar Jest
 - Nova entidade CRUD: ver `references/crud-entity.md` no skill de qualidade
+
+## Regra crítica — títulos informativos (WHAT + WHY)
+
+Todo `describe` / `it` / `test` deve explicar **o que** valida e **por que** importa para o produto. O log do CI e o Job Summary são a primeira leitura do revisor.
+
+| Evitar | Preferir |
+|--------|----------|
+| `it("works")` | `it("marca fatura FECHADA como PAGA e grava Payment MANUAL")` |
+| `describe("helpers")` | `describe("Flush operation.db — evita perda pós-COMMIT no Blob")` |
+| `cenário TZ Final` | `duas faturas PAGA somam só em Recebido (não em A receber)` |
+| Nome de bug interno sem contexto | Sintoma + invariante de negócio |
+
+Padrão:
+
+```ts
+describe("Marcar fatura paga — persistência no Blob após COMMIT", () => {
+  it("não faz flush mid-transaction (evita fatura voltar a FECHADA no sync)", () => {
+    // ...
+  });
+});
+```
+
+E2E: `test.describe("Portal Interno — cobrança")` + `test("dashboard mostra A receber / Recebido / A faturar")`.
+
+## CI útil (obrigatório manter)
+
+- Vitest no CI: reporters `default` + `github-actions` + `junit` → `reports/vitest-junit.xml`
+- Step Summary: `node scripts/ci-vitest-summary.mjs` escreve em `$GITHUB_STEP_SUMMARY`
+- Playwright no CI: `github` + `html` + `junit`; upload de `playwright-report/` e `test-results/` em falha
+- Steps do workflow com nomes de intenção (não só `npm run test`)
+
+Se alterar reporters/workflow, rode `npm run cursor:verify` e valide um Job Summary localmente (`VITEST_JUNIT_PATH=... node scripts/ci-vitest-summary.mjs`).
+
+## Massas de dados — sensação de realidade
+
+Nomes de pessoas/empresas em seed **e** em fixtures de teste devem parecer operação real.
+
+| Evitar | Preferir |
+|--------|----------|
+| `Carlos Faturamento`, `Jornada E2E 123` | `Carlos Mendes`, `Camila Rocha 1732…` |
+| Sufixo `Demo` / `Cedig` / `Teste` no display | Nome brasileiro comum; papel fica no e-mail/`internoProfile` |
+| `Import Paciente x` | `Paciente Importado` só se inevitável; preferir `Laura Dias ${id}` |
+
+- **E-mails demo são contrato** (`faturamento@bibi.health`, `alana@cedig.demo`) — não renomear sem migrar docs/testes.
+- Display name ≠ cargo. O papel aparece no perfil RBAC / e-mail, não como sobrenome.
+- Efêmeros: nome real + sufixo opaco (`Date.now()`), sem tokens `E2E`/`Teste`/`Demo` no nome visível.
 
 ## Comandos
 

@@ -28,7 +28,7 @@ async function ensureTodayAgendadoForHelena(page: Page): Promise<void> {
       providerId: helena!.id,
       scheduledAt: slot.toISOString(),
       status: "AGENDADO",
-      reason: `E2E confirmar presença ${Date.now()}`,
+      reason: `Confirmação de presença ${Date.now()}`,
     },
   });
   expect(createRes.ok(), await createRes.text()).toBeTruthy();

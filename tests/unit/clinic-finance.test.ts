@@ -53,17 +53,18 @@ describe("cedig catalog", () => {
     expect(CEDIG_LABEL_OVERRIDES.procedures).toBe("Exames");
   });
 
-  it("cadastra equipe médica e operacional sem aliases duplicados", () => {
+  it("equipe CEDIG usa nomes realistas e não reintroduz aliases legados bruno@/luiza@", () => {
     const names = CEDIG_STAFF.map((u) => u.name);
     const emails = CEDIG_STAFF.map((u) => u.email);
     expect(names.some((n) => n.includes("Alexandre Marçal"))).toBe(true);
     expect(names.some((n) => n.includes("Bruno Dias"))).toBe(true);
     expect(names.some((n) => n.includes("Luiza Lage"))).toBe(true);
     expect(names.some((n) => n.includes("Luiza Zeraik"))).toBe(true);
-    expect(names.some((n) => n.includes("Fernanda Auto"))).toBe(true);
-    expect(names).toContain("Alana");
+    expect(names.some((n) => n.includes("Fernanda Autran"))).toBe(true);
+    expect(names).toContain("Alana Ferreira");
+    expect(names).toContain("Renata Oliveira");
     expect(names).toContain("João Marcos");
-    expect(names).toContain("Márcia");
+    expect(names).toContain("Márcia Souza");
     expect(emails).not.toContain("bruno@cedig.demo");
     expect(emails).not.toContain("luiza@cedig.demo");
     expect(new Set(names.filter((n) => n.startsWith("Dr"))).size).toBe(

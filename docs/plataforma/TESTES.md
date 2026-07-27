@@ -5,6 +5,18 @@ próximos passos. Este documento expõe o que **não aparece na UI** nem no READ
 
 **Ground truth (jul/2026):** **598** casos Vitest (83 arquivos) · **12** specs Playwright · **156** casos E2E (chromium + mobile) · **163** Route Handlers · **123** paths no OpenAPI (40 handlers sem YAML — ver `npm run openapi:verify`). Revalidar com `npx vitest run` e `npm run openapi:verify` após adicionar testes.
 
+### Títulos e CI Summary (obrigatório)
+
+Todo teste novo ou alterado deve ter título **WHAT + WHY** — o Job Summary do GitHub Actions é a primeira leitura do revisor.
+
+| Camada | Onde | O que aparece no CI |
+|--------|------|---------------------|
+| Vitest | `vitest.config.ts` | reporters `default` + `github-actions` + `junit` → `reports/vitest-junit.xml` |
+| Summary | `scripts/ci-vitest-summary.mjs` | tabela passou/falhou + suites no `$GITHUB_STEP_SUMMARY` |
+| Playwright | `playwright.config.ts` | `github` + `html` + `junit`; artefatos em falha |
+
+Regra Cursor: `.cursor/rules/tests.mdc` · checklist skill: `references/CHECKLIST.md`.
+
 ### Onboarding tour (v3)
 
 | Caso | Arquivo | O que valida |

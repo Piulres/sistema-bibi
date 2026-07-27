@@ -15,6 +15,8 @@ alwaysApply: true
 - `503 usage_exceeded` = cota Netlify, não bug
 - UI autenticada: `useLabels()` — nunca "Paciente"/"Beneficiário" fixos
 - Prisma **6** · proxy em `src/proxy.ts` · `await params`/`searchParams`/`cookies()`
+- **Testes:** títulos WHAT+WHY · CI com Job Summary legível (`.cursor/rules/tests.mdc`)
+- **Massas:** nomes realistas (sem `Demo`/`E2E`/`Teste` no display) · e-mails demo são contrato
 
 ## Qual recurso carregar
 

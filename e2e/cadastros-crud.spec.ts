@@ -93,7 +93,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   });
 
   test("CREATE + READ + UPDATE beneficiário", async ({ page }) => {
-    const name = `E2E Benef ${suffix()}`;
+    const name = `Laura Dias ${suffix()}`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Novo beneficiário" }) }).first();
     const form = card.locator("form");
     await form.locator("label").filter({ hasText: /^Nome$/ }).locator("input").fill(name);
@@ -116,7 +116,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
 
   test("CREATE + UPDATE empresa", async ({ page }) => {
     await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Empresas" }).click();
-    const name = `E2E Empresa ${suffix()} LTDA`;
+    const name = `Horizonte Saúde ${suffix()} LTDA`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Nova empresa" }) }).first();
     const form = card.locator("form");
     await form.locator("label").filter({ hasText: /Razão social/ }).locator("input").fill(name);
@@ -138,7 +138,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   test("CREATE + UPDATE + DELETE procedimento", async ({ page }) => {
     await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Procedimentos" }).click();
     const code = `E2E${suffix()}`;
-    const procName = `Procedimento E2E ${suffix()}`;
+    const procName = `Consulta Clínica ${suffix()}`;
     const editedName = `${procName} Editado`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Novo procedimento" }) }).first();
     const form = card.locator("form");
@@ -168,8 +168,8 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   test("CREATE + UPDATE usuário prestador", async ({ page }) => {
     await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Usuários" }).click();
     const id = suffix();
-    const name = `Dr E2E ${id}`;
-    const email = `dr.e2e.${id}@bibi.health`;
+    const name = `Dr. Rafael Souza ${id}`;
+    const email = `dr.rafael.${id}@bibi.health`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Novo usuário" }) }).first();
     const form = card.locator("form");
     await form.locator("label").filter({ hasText: /^Nome$/ }).locator("input").fill(name);

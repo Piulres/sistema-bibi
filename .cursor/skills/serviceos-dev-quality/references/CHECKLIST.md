@@ -20,6 +20,8 @@ Use antes do commit / PR.
 
 - [ ] Causa raiz explicada (bugs)
 - [ ] Teste Vitest para lógica pura / serviço crítico
+- [ ] Títulos WHAT+WHY (`describe`/`it`/`test`) — legíveis no CI Summary
+- [ ] Nomes de massa/fixture realistas (sem `Demo`/`E2E`/`Teste` no display)
 - [ ] `npm run lint` OK nos arquivos tocados
 - [ ] `npm run docs:verify` se mexeu em versão/changelog/docs estruturados
 - [ ] `npm run cursor:verify` se mexeu em `.cursor/` ou `AGENTS.md`

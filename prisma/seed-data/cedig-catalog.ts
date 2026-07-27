@@ -69,21 +69,21 @@ export const CEDIG_LABEL_OVERRIDES = {
 export const CEDIG_STAFF = [
   {
     email: "operacao@cedig.demo",
-    name: "Operação CEDIG",
+    name: "Renata Oliveira",
     role: "INTERNO",
     internoProfile: "ADMIN",
     specialty: null as string | null,
   },
   {
     email: "alana@cedig.demo",
-    name: "Alana",
+    name: "Alana Ferreira",
     role: "INTERNO",
     internoProfile: "RECEPCAO",
     specialty: "Secretária",
   },
   {
     email: "recepcao@cedig.demo",
-    name: "Alana (Recepção CEDIG)",
+    name: "Alana Ferreira",
     role: "INTERNO",
     internoProfile: "RECEPCAO",
     specialty: "Secretária",
@@ -97,7 +97,7 @@ export const CEDIG_STAFF = [
   },
   {
     email: "marcia@cedig.demo",
-    name: "Márcia",
+    name: "Márcia Souza",
     role: "INTERNO",
     internoProfile: "RECEPCAO",
     specialty: "Técnica de enfermagem",
@@ -132,7 +132,7 @@ export const CEDIG_STAFF = [
   },
   {
     email: "fernanda.auto@cedig.demo",
-    name: "Dra. Fernanda Auto",
+    name: "Dra. Fernanda Autran",
     role: "PRESTADOR",
     internoProfile: null,
     specialty: "Endoscopia digestiva",
@@ -375,7 +375,7 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
 
   const patients = [
     {
-      name: "Maria Silva Cedig",
+      name: "Maria Silva",
       cpf: "901.111.222-33",
       email: "maria.cedig@email.com",
       phone: "(12) 98888-1001",
@@ -384,7 +384,7 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
       bondType: "TITULAR",
     },
     {
-      name: "José Santos Cedig",
+      name: "José Santos",
       cpf: "901.222.333-44",
       email: "jose.cedig@email.com",
       phone: "(12) 98888-1002",
@@ -393,7 +393,7 @@ async function upsertCedigPortalMass(prisma: PrismaClient, tenantId: string) {
       bondType: "TITULAR",
     },
     {
-      name: "Ana Particular Cedig",
+      name: "Ana Paula Rocha",
       cpf: "901.333.444-55",
       email: "ana.cedig@email.com",
       phone: "(12) 98888-1003",

@@ -270,7 +270,7 @@ Regras obrigatórias para Cursor, Cloud Agent e assistentes. Implementadas em:
 | `.cursor/rules/operacoes-bibi.mdc` | Inteligente | Operações core, token budget, matriz de decisão |
 | `.cursor/rules/serviceos-dev.mdc` | Globs `src/**`, `docs/**` | Labels, segmentos, nomenclatura v3 |
 | `.cursor/rules/stack-nextjs.mdc` | Globs `src/**`, `prisma/**` | Next 16, Prisma 6, ESLint, UI |
-| `.cursor/rules/tests.mdc` | Globs `tests/**`, `e2e/**` | Vitest, Playwright, gotchas dual-store |
+| `.cursor/rules/tests.mdc` | Globs `tests/**`, `e2e/**`, workflows | Títulos WHAT+WHY, CI Summary, massas realistas |
 | `.cursor/rules/docs-release.mdc` | Globs versão/changelog | RELEASES, changelog landing, platform.ts |
 | `.cursor/rules/interno-portal.mdc` | Globs `src/app/interno/**` | RBAC, InternoNav, gestão clínica |
 | `.cursor/rules/netlify-release.mdc` | Globs `netlify.toml`, scripts | Deploy, cota, checklist publicação |
