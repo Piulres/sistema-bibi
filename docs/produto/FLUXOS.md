@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **Versão em produção:** ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md) (fonte única). Pacote **v3.0.15** em `main`: gestão clínica otimizada (KPI strip + soft refresh) — [§4.2.1](#421-gestão-clínica-cedig-clinicfinanceview--v24--v26). Pacote **v3.0.14**: auditoria RBAC, estoque, cadastros, documentos de saída. Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -379,7 +379,18 @@ Serviço: `src/lib/appointment-service.ts` · Telemedicina: `src/lib/telemedicin
 
 **Mobile (v3.0.7):** abaixo de `md` (`< 768px`), a lista de lançamentos usa **cards** (`md:hidden`) em vez da tabela (`hidden md:block`); formulários e filtros empilham em coluna (`flex-col`). Em desktop, tabela completa com scroll horizontal (`ds-scroll-x`). Ver `ClinicFinanceView.tsx`.
 
-**UX (otimização):** faixa de KPIs do mês sempre visível (receita/exames/despesas/lucro a partir das listas); meta de menus carregada uma vez; troca de mês e pós-salvamento com refresh soft (sem blank da tela); extras clínicos recolhidos; KPIs detalhados (`/kpis`) só na aba Indicadores.
+**UX (v3.0.15 — otimização recepção):**
+
+| Padrão | Implementação | Por quê |
+|--------|---------------|---------|
+| **KPI strip** | `summarizeClinicMonthStrip()` em `src/lib/clinic-finance/month-strip.ts` — deriva receita/exames/despesas/lucro das listas `launches` + `expenses` já em memória | Evita round-trip em `/kpis` só para a faixa superior; atualiza ao salvar lançamento/despesa |
+| **Soft refresh** | `loadPeriod({ soft: true })` em troca de mês e pós-salvamento — `refreshing` + `aria-busy` na strip, sem `bootLoading` | Lista e formulário permanecem visíveis durante o fetch |
+| **Meta uma vez** | `loadMeta()` no boot (`/api/interno/clinic-finance/meta`) — `metaReadyRef` bloqueia reload até menus prontos | Selects de médico/exame/tabela não refetcham a cada mês |
+| **KPIs detalhados sob demanda** | `GET /kpis` só quando `tab === "indicadores"`; `kpisKeyRef` invalida cache ao mudar mês | Frascos, produção por médico e breakdown por categoria são pesados — não bloqueiam Lançamentos |
+| **Extras clínicos recolhidos** | Biópsia/polipectomia/clips em `<details>` uncontrolled (sem `defaultOpen`) | Formulário mais curto no dia a dia; CTA sticky com total sugerido |
+| **Atalho na strip** | Clicar em Receita/Exames/Despesas/Lucro → aba **Indicadores** | Descobre KPIs detalhados sem procurar aba |
+
+Seletor de teste E2E: `[data-cursor-id="clinic-finance-kpi-strip"]` · unit: `tests/unit/clinic-finance-month-strip.test.ts`.
 
 **Ponte automática (v2.6):** ao registrar lançamento, `src/lib/clinic-finance/bridge.ts` cria ou vincula `Patient`, `Appointment`, `ProcedureUsage` e `Invoice`. Estados: `bridgeStatus` = `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`.
 
@@ -717,6 +728,7 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 | Abas sem corte (v3.0.5) | Prestador | `TabBar` com `shortLabel` + `ScrollableNavRail` | `AtendimentoView.tsx` |
 | QR PIX mock | Beneficiário | `/beneficiario` → Faturas | `POST …/invoices/[id]/pay` |
 | Walk-in + check-in | Interno | `/interno/agenda` | §8.5 |
+| Gestão clínica UX (v3.0.15) | Interno | `/interno/gestao` — KPI strip + soft refresh + extras recolhidos | `ClinicFinanceView.tsx` · `month-strip.ts` · §4.2.1 |
 
 #### Stepper PPU — faturamento (v3.0.5)
 

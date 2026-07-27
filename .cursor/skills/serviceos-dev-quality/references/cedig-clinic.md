@@ -10,6 +10,8 @@
 ## Código canônico
 
 - `src/lib/clinic-finance/bridge.ts` — ponte clínica ↔ faturamento
+- `src/lib/clinic-finance/month-strip.ts` — KPIs leves da faixa superior (receita/exames/despesas/lucro a partir das listas)
+- `src/components/ClinicFinanceView.tsx` — UI `/interno/gestao` (soft refresh, meta uma vez, `/kpis` sob demanda)
 - `src/lib/care-journey.ts` — stepper Agendado → Pago no prestador/beneficiário
 - `src/lib/exam-protocol-service.ts` — templates e aplicação em lote de protocolos de exames
 - `src/lib/clinical/atestado.ts` · `src/lib/clinical/receita.ts` — documentos estruturados CFM
@@ -21,6 +23,8 @@
 - Atualizar `STATUS.md` ao fechar entrega CEDIG — não criar `FASE_N` / `GO_LIVE_*`
 - Modo operação: ver `docs/plataforma/OPERACAO_DADOS.md`
 - Reset de fluxos em produção: **não** usar `db:reset` nem “Restaurar demo” — ver `OPERACAO.md` §Limpar fluxos
+- **KPI strip (v3.0.15):** não chamar `/kpis` no boot — usar `summarizeClinicMonthStrip()`; `/kpis` só na aba Indicadores
+- **Soft refresh:** trocar mês ou salvar lançamento usa `loadPeriod({ soft: true })` — não resetar `bootLoading`
 
 ## Scripts operacionais
 

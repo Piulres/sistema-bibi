@@ -14,7 +14,7 @@ Complementa (não substitui):
 
 > **Labels:** em UI autenticada o vocabulário vem de `useLabels()` (paciente/cliente/pet/aluno conforme o nicho). Neste documento usamos linguagem de **consultório** (`MEDICAL`) por legibilidade operacional.
 
-**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.8 (§3–§10, §8.5, §8.9) e pacote v3.0.8.
+**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` (§3–§10, §4.2.1 gestão v3.0.15, §8.5, §8.9) e pacote v3.0.15 em `main`.
 
 ---
 
@@ -90,6 +90,7 @@ Detalhe: [`FLUXOS.md`](FLUXOS.md) §8.5.
 - Lançamento de exame/procedimento pode **pontar** automaticamente `Patient` + `Appointment` + `ProcedureUsage` + `Invoice`
 - `bridgeStatus`: `SYNCED` | `PARTIAL` | `FAILED` | `SKIPPED`
 - Da agenda, dá para **“Lançar na gestão”** com prefill
+- **UX v3.0.15:** faixa de KPIs do mês sempre visível; troca de mês sem blank; extras clínicos recolhidos; indicadores detalhados só na aba Indicadores
 - Detalhe: [`FLUXOS.md`](FLUXOS.md) §4.2.1 · [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md)
 
 ### Depois de agendar (opcionais laterais)

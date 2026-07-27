@@ -43,6 +43,8 @@ Médicos no select: Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zerai
 - [ ] 4 lançamentos + 2 despesas no mês  
 - [ ] KPIs coerentes · labels **Exame**  
 - [ ] Ponte **SYNCED** nos lançamentos
+- [ ] Faixa de KPIs visível no topo (Receita/Exames/Despesas/Lucro) — atualiza ao salvar sem blank da tela (v3.0.15)
+- [ ] Extras clínicos recolhidos por padrão; abre `<details>` só quando preencher biópsia/polipectomia
 
 ### Último resultado
 | Data | Ambiente | Resultado |

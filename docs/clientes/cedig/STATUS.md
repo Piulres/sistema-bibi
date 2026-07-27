@@ -20,7 +20,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 
 | Capacidade | Estado | Nota |
 |------------|--------|------|
-| Gestão clínica (lançamentos, despesas, KPIs) | ✅ | `/interno/gestao` · cards no mobile + tabela desktop (v3.0.7) · schema-sync + flush Blob |
+| Gestão clínica (lançamentos, despesas, KPIs) | ✅ | `/interno/gestao` · KPI strip v3.0.15 · cards mobile + tabela desktop (v3.0.7) · schema-sync + flush Blob |
 | Agenda + walk-in (modo operação) | ✅ | Persiste com Blobs |
 | Ponte PPU (lançamento → Appointment + Usage + Invoice) | ✅ | `bridge.ts` · coluna **SYNCED** |
 | Prestador (fila / extrato) | ✅ | Ex.: `bruno.dias@cedig.demo` · `gabriela@cedig.demo` |
@@ -28,7 +28,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Beneficiário labels **Exame** | ✅ | `useLabels()` |
 | Export Excel mensal | ✅ | CSV/JSON/TXT/PDF/XLSX via `serveTabularExport` (v3.0.7) |
 | E2E `e2e/cedig-gestao.spec.ts` | ✅ | |
-| Pacote em produção | ✅ | **v3.0.8** |
+| Pacote em produção | ⏳ | Ver [`RELEASES.md`](../../versoes/RELEASES.md) — **v3.0.15** em `main`, deploy pendente |
 | Homologação humana in loco | ⏳ | Pendente |
 | Treino Alana (15 min) | ⏳ | Usar [`HOMOLOGACAO.md`](HOMOLOGACAO.md) |
 

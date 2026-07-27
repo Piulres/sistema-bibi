@@ -4,7 +4,7 @@ Rotina diária do piloto. Status e timeline: [`STATUS.md`](STATUS.md).
 Homologação de preços: [`HOMOLOGACAO.md`](HOMOLOGACAO.md). Cliente/preços: [`README.md`](README.md).
 
 > **Tenant:** `/?tenant=cedig` · **Store:** operação · **Senha:** `bibi123`  
-> **Produção:** ServiceOS **v3.0.8** · https://sistema-bibi.netlify.app
+> **Produção:** ver [`../../versoes/RELEASES.md`](../../versoes/RELEASES.md) · https://sistema-bibi.netlify.app
 
 ---
 
@@ -28,6 +28,8 @@ Homologação de preços: [`HOMOLOGACAO.md`](HOMOLOGACAO.md). Cliente/preços: [
 2. **Agenda** — exames do dia; confirmar chegadas
 3. **Walk-in** — particular sem hora (topo da agenda)
 4. Após exames → **Gestão** → **Lançamentos** (valor sugerido → Registrar → Ponte **SYNCED**)
+
+> **UX v3.0.15:** faixa de KPIs (Receita / Exames / Despesas / Lucro) fica sempre visível no topo — atualiza ao salvar sem recarregar a tela inteira. Extras clínicos (biópsia, polipectomia, clips) ficam recolhidos em "Extras clínicos"; abra só quando necessário. Clique em um KPI da faixa para ir à aba **Indicadores** (frascos, produção por médico).
 
 > **Mobile (v3.0.7):** no celular, lançamentos aparecem em cards legíveis; use o drawer de navegação (ícone do módulo ativo, abre pela direita) para trocar de módulo. Doc: [`../../produto/FLUXOS.md`](../../produto/FLUXOS.md) §4.2.1.
 

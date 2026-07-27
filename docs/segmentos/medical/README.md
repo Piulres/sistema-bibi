@@ -35,11 +35,11 @@ Senha: **`bibi123`**
 
 ## Cliente piloto
 
-- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`) · labels **Exame** · produção **v3.0.8** (modo operação)
+- [CEDIG Cruzeiro](../../clientes/cedig/README.md) — endoscopia/colonoscopia · gestão clínica (`/interno/gestao`) · labels **Exame** · ver produção em [`RELEASES.md`](../../versoes/RELEASES.md)
 - [Playbook de ações CEDIG](../../clientes/cedig/OPERACAO.md)
 
 ## Código
 
 - Labels: `NICHE_MASTER_LABELS.MEDICAL` em `src/constants/niches.ts`
 - Landing: `/?niche=MEDICAL` ou `/` (padrão)
-- Gestão clínica: `src/lib/clinic-finance/` · `/interno/gestao`
+- Gestão clínica: `src/lib/clinic-finance/` (`bridge.ts`, `month-strip.ts`, `cedig-pricing.ts`) · `/interno/gestao`
