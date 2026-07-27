@@ -7,6 +7,7 @@ import {
   redactTimelineEventForProfile,
   resolveAuditViewerCapabilities,
   sanitizeAuditDescription,
+  canAccessPatientClinicalDetail,
   searchableAuditEntityTypes,
 } from "@/lib/audit-access";
 import type { TimelineEventMetadata } from "@/lib/change-management/types";
@@ -97,6 +98,14 @@ describe("RBAC de auditoria — quem pode ver conteúdo sensível e por quê", (
     expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("Security");
     expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("ClinicalReferral");
     expect(allowedAuditEntityTypes("RECEPCAO")).not.toContain("PrescriptionDocument");
+  });
+
+  it("detalhe clínico do Cliente 360° só ADMIN — RECEPCAO/FATURAMENTO não veem PEP", () => {
+    expect(canAccessPatientClinicalDetail("ADMIN")).toBe(true);
+    expect(canAccessPatientClinicalDetail("FATURAMENTO")).toBe(false);
+    expect(canAccessPatientClinicalDetail("RECEPCAO")).toBe(false);
+    expect(canAccessPatientClinicalDetail("READONLY")).toBe(false);
+    expect(canAccessPatientClinicalDetail(null)).toBe(false);
   });
 
   it("busca por descrição só cobre tipos full — evita oráculo de existência clínica/PII", () => {
