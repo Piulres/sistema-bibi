@@ -138,7 +138,7 @@ Arquivos: `tests/unit/project.test.ts`, `tests/api/construction-projects.test.ts
 | **API** (`/api/interno/*`) | **96/96** Route Handlers usam `requireInternoModule` ou `requireInternoAdmin` — perfil sem módulo → **403** |
 | **Teste** | `tests/security/rbac-gaps.test.ts` falha se alguma rota interna ficar sem guard de módulo |
 
-**Guards de escrita (parcial):** **7** rotas usam `requireInternoModuleWrite` (gestão clínica `launches`/`expenses` + ações destrutivas: `void`, `reverse`, `retry`, `revert-recent`). Demais mutações ainda usam só `requireInternoModule` — risco prático baixo na matriz atual (READONLY não possui módulos de escrita). Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
+**Guards de escrita (Fase 5 — completo):** todos os handlers mutáveis (POST/PATCH/PUT/DELETE) em `/api/interno/*` usam `requireInternoModuleWrite` ou `requireInternoAdmin`; GET permanece em `requireInternoModule`. Inventário estático: `tests/security/rbac-gaps.test.ts` · comportamento READONLY: `tests/api/interno-write-guards.test.ts`. Ver [`AUDITORIA_FLUXOS.md`](../produto/AUDITORIA_FLUXOS.md) §5.
 
 **Exceção documentada:** `GET /api/procedures` — catálogo compartilhado (`requireUser` sem módulo interno; impacto baixo).
 
@@ -324,7 +324,7 @@ Mapa completo: [`VARIAVEIS_AMBIENTE.md`](VARIAVEIS_AMBIENTE.md) (seções CI, Vi
 
 ## Roadmap sugerido (prioridade)
 
-1. **P0 — Segurança:** generalizar `requireInternoModuleWrite` nas demais ~58 rotas mutáveis (RBAC read guard já cobre 96/96 — ver `rbac-gaps.test.ts`)
+1. ~~**P0 — Segurança:** generalizar `requireInternoModuleWrite` nas rotas mutáveis~~ ✅ **Feito (Fase 5 / v3.0.22)** — ver `rbac-gaps.test.ts` + `interno-write-guards.test.ts`
 2. **P0 — Multi-tenant:** testes cross-tenant em appointments, patients, invoices
 3. **P1 — Receita:** fluxo E2E completo procedimento → fatura → PIX → confirm
 4. **P1 — Contrato:** validar respostas contra `openapi.yaml` (ex.: `@apidevtools/swagger-parser`)

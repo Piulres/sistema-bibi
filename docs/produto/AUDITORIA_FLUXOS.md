@@ -17,6 +17,7 @@ via API.
 | 3 | 2026-07-26 | `fc9afa7` (v3.0.3) | Reverificação item a item + novas áreas (gestão clínica, dual-store, assistente, schema-sync Blob) |
 | **3.1 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Correção dos P1–P3 abertos (ver §11) |
 | **3.2 (correções)** | **2026-07-26** | branch `cursor/auditoria-falhas-rodada3` | Guards do beneficiário, hardening de rotas destrutivas + onboarding (`npm run setup`) |
+| **3.3 (Fase 5)** | **2026-07-27** | `v3.0.22` · PR #354 | Write guards generalizados: POST/PATCH/PUT/DELETE → `requireInternoModuleWrite` / Admin |
 
 > **Correções aplicadas na rodada 3.1:** máquina de estados do agendamento
 > (P1), higiene do teste de dual-store (P1), label de consumo do beneficiário e
@@ -63,8 +64,9 @@ via API.
 
 ```mermaid
 flowchart LR
-  subgraph OK["Corrigido (rodadas 1–3.2)"]
+  subgraph OK["Corrigido (rodadas 1–3.3)"]
     R[RBAC API interno 96/96]
+    W[Write guards Fase 5]
     C[CRM bypass]
     M[MFA restrito]
     X[Proxy HMAC]
@@ -72,9 +74,6 @@ flowchart LR
     P[Procedimento em terminal]
     B[Label consumo beneficiário]
     U[UX res.ok + guards beneficiário]
-  end
-  subgraph GAP["Gap remanescente"]
-    W[Write guard não generalizado]
   end
 ```
 
@@ -121,7 +120,7 @@ Reverificação item a item das falhas mapeadas em junho/2026. Legenda:
 | 17 | TISS XML sem XSD | **PARCIAL (3.3)** | Validação estrutural adicionada: guia sem procedimentos ou sem documento → 422 `TissBuildError`; `escapeXml` cobre os 5 reservados. XSD oficial ANS segue fora do POC |
 | 18 | `rbac-gaps.test.ts` documenta lacuna | **MUDOU** | agora **afirma cobertura** (`withoutModuleGuard === []`, 15 módulos) |
 
-Resumo: **14 corrigidas**, **1 parcial** (`SESSION_SECRET` fallback dev), **1 endurecido** (TISS estrutural), **1 gap aberto** (write guard não generalizado — ver §11).
+Resumo: **15 corrigidas** (incl. write guards Fase 5), **1 parcial** (`SESSION_SECRET` fallback dev), **1 endurecido** (TISS estrutural). Sem gaps P0/P1 de segurança RBAC abertos — ver §11.
 
 ---
 
@@ -171,11 +170,14 @@ Comportamento **observado** hoje (era o P0 crítico na rodada 1):
 Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` /
 `requireInternoAdmin`. Teste `tests/security/rbac-gaps.test.ts` trava a regressão.
 
-### Falha remanescente (média — defesa em profundidade)
+### Guards de escrita — Fase 5 (concluído)
 
-| Sev. | Área | Problema | Nota |
-|------|------|----------|------|
-| **Média** | Guards de escrita | ✅ Generalizado (Fase 5): mutações usam `requireInternoModuleWrite` / Admin; leitura permanece em `requireInternoModule` | Defesa em profundidade contra perfil só-leitura futuro |
+| Camada | Comportamento | Evidência |
+|--------|---------------|-----------|
+| **Leitura** | GET/HEAD → `requireInternoModule` (matriz perfil × módulo) | `tests/security/rbac-gaps.test.ts` — 96/96 rotas |
+| **Escrita** | POST/PATCH/PUT/DELETE → `requireInternoModuleWrite` ou `requireInternoAdmin` | Mesmo inventário estático + `tests/api/interno-write-guards.test.ts` |
+| **READONLY** | `canInternoWrite()` retorna `false` → **403** com mensagem "somente leitura" | Perfil com módulo de leitura (ex.: `gestao`) pode GET mas não POST |
+
 | ~~Média~~ ✅ | `ClinicFinanceView` | **Corrigido (3.1):** `loadAll()` seta `loadError` em 403 com retry | `src/components/ClinicFinanceView.tsx` |
 
 ---
@@ -230,7 +232,7 @@ Todas as 96 rotas `src/app/api/interno/**/route.ts` usam `requireInternoModule` 
 | **Alta (DX)** | Dual-store demo/operação | `tests/lib/data-store-mode.test.ts` | O teste grava `prisma/.data-store-mode=operation` e não restaura; em VM de dev o servidor passa a apontar para `operation.db` (vazio) → login retorna 500 `The table main.User does not exist`. Reproduzido nesta rodada; contornado apagando `prisma/.data-store-mode` + `prisma/operation.db`. Não afeta produção (Blobs), mas quebra o dev local após rodar a suíte |
 | ~~Média~~ ✅ | `ClinicalCarePanel` | `src/components/clinical/ClinicalCarePanel.tsx` | **Corrigido (3.1):** PATCH verificam `res.ok` com toast de erro |
 | **Média** | Labels hardcoded | `src/lib/navigation/routes.ts`, `ClinicFinanceView.tsx` | Strings fixas "Pacientes"/"Beneficiários"/"Paciente" em nav e gestão clínica — deveriam usar `useLabels()`/`getTenantLabelsById` (backlog v2.0 §7) |
-| **Baixa** | Assistente | `src/app/api/assistant/chat/route.ts` | Auth = `requireUser()` (qualquer role); tools filtradas por role no registry. `confirm/route.ts` faz RBAC por ação mas não chama `canInternoWrite` — bypass só se a matriz der módulo de escrita a perfil read-only no futuro |
+| **Baixa** | Assistente | `src/app/api/assistant/chat/route.ts` | Auth = `requireUser()` (qualquer role); tools filtradas por role no registry. `confirm/route.ts` faz RBAC por ação; mutações internas já passam por `requireInternoModuleWrite` nas APIs de destino (Fase 5) |
 | **Baixa** | Segmento público | `src/app/api/segment/persist/route.ts` | POST **sem autenticação** grava cookie de segmento e pode acionar `ensureDataStoreForSegmentAccess`. Intencional para landing multi-nicho, mas sem rate-limit |
 | ~~Baixa~~ ✅ | Ponte clinic-finance | `src/lib/clinic-finance/bridge.ts` | **Verificado (rodada 3.2):** a UI já trata `bridgeStatus` — toast com mensagem por status (SYNCED/PARTIAL/FAILED + `bridgeNote`) e coluna "Ponte" na lista de lançamentos. Retry automático de ponte parcial fica como feature futura |
 | **Baixa** | Procedures compartilhada | `src/app/api/procedures/route.ts` | `requireUser(["PRESTADOR","INTERNO","BENEFICIARIO"])` — INTERNO sem guard de módulo (leitura de catálogo; impacto baixo) |

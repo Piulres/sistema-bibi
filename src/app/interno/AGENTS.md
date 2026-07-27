@@ -9,8 +9,12 @@ Só `PageHeader` + view — shell em `layout.tsx` (não repetir `PortalShell`/`I
 ## RBAC
 
 - Perfis: `ADMIN`, `FATURAMENTO`, `RECEPCAO`, `READONLY` (`User.internoProfile`)
-- APIs: `requireInternoModule` / `requireInternoModuleWrite`
+- **Leitura:** `requireInternoModule(module)` — GET/HEAD nas APIs; `requireInternoPage` nas páginas
+- **Escrita (Fase 5):** `requireInternoModuleWrite(module)` — POST/PATCH/PUT/DELETE; bloqueia `READONLY` via `canInternoWrite()`
+- **Admin-only:** `requireInternoAdmin()` — demo reset, dual-store, usuários sensíveis
 - Nav filtrada: `interno-permissions.ts` · `interno-guard.ts`
+- Matriz completa: `docs/produto/FLUXOS.md` §9
+- Testes: `tests/security/rbac-gaps.test.ts` (inventário estático) · `tests/api/interno-write-guards.test.ts` (READONLY não muta)
 
 ## Módulos principais
 

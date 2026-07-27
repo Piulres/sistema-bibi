@@ -115,7 +115,8 @@ flowchart LR
 |--------|-----------|---------|
 | **Edge/Proxy** | Validação HMAC do cookie antes do App Router | `src/proxy.ts` (`verifySessionToken`) |
 | **Servidor** | Validação HMAC-SHA256 + `role` + RBAC interno | `src/lib/session.ts`, `interno-guard.ts` |
-| **API** | `requireUser()` / `requireInternoModule()` em cada handler | `src/lib/api-auth.ts` |
+| **API (leitura)** | `requireInternoModule()` em GET/HEAD | `src/lib/api-auth.ts` |
+| **API (escrita)** | `requireInternoModuleWrite()` em POST/PATCH/PUT/DELETE — Fase 5 | `src/lib/api-auth.ts`, `canInternoWrite()` em `interno-permissions.ts` |
 
 O `proxy.ts` é o substituto do middleware no **Next.js 16** — exclusivo desta versão do framework. A validação real da sessão **nunca** confia apenas no proxy; Server Components e Route Handlers revalidam assinatura e perfil.
 
