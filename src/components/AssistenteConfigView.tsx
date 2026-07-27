@@ -7,6 +7,14 @@ import Card from "@/components/ui/Card";
 import { scenarioCount } from "@/lib/assistant/scenarios";
 import { ASSISTANT_TOOL_INVENTORY } from "@/lib/assistant/inventory";
 
+type RuleEngineStats = {
+  globalRules: number;
+  nicheRules: number;
+  tenantOverrides: number;
+  totalTriggers: number;
+  niche: string;
+};
+
 type SettingsResponse = {
   settings: {
     aiEnabled: boolean;
@@ -19,6 +27,7 @@ type SettingsResponse = {
     tools: number;
     scenarios: number;
   };
+  rules?: RuleEngineStats;
 };
 
 export default function AssistenteConfigView() {
@@ -52,7 +61,7 @@ export default function AssistenteConfigView() {
     })();
   }, [load]);
 
-  async function toggleAi(enabled: boolean) {
+  async function patchSettings(patch: { aiEnabled?: boolean; rulesEnabled?: boolean }) {
     if (!data) return;
     setSaving(true);
     setError(null);
@@ -61,7 +70,7 @@ export default function AssistenteConfigView() {
       const res = await fetch("/api/interno/assistant/settings", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ aiEnabled: enabled }),
+        body: JSON.stringify(patch),
       });
       const json = await res.json();
       if (!res.ok) {
@@ -69,7 +78,15 @@ export default function AssistenteConfigView() {
         return;
       }
       setData(json as SettingsResponse);
-      setMessage(enabled ? "IA ativada para este tenant." : "IA desativada — modo regras operacionais.");
+      if (patch.aiEnabled !== undefined) {
+        setMessage(patch.aiEnabled ? "IA ativada para este tenant." : "IA desativada — modo regras operacionais.");
+      } else if (patch.rulesEnabled !== undefined) {
+        setMessage(
+          patch.rulesEnabled
+            ? "Motor de regras reativado."
+            : "Motor de regras desativado — chat operacional indisponível (IA ainda funciona se ativa).",
+        );
+      }
     } catch {
       setError("Falha de conexão ao salvar.");
     } finally {
@@ -103,9 +120,28 @@ export default function AssistenteConfigView() {
         <label className="flex items-start gap-3 rounded-lg border border-[var(--border-muted)] p-4">
           <input
             type="checkbox"
+            checked={data.settings.rulesEnabled}
+            disabled={saving}
+            onChange={(e) => void patchSettings({ rulesEnabled: e.target.checked })}
+            className="mt-1"
+          />
+          <span>
+            <span className="block text-sm font-medium text-[var(--text-primary)]">
+              Motor de regras operacionais
+            </span>
+            <span className="block text-xs text-[var(--text-muted)]">
+              Quando ativo, o chat usa gatilhos configuráveis por nicho. Desativar bloqueia o modo regras
+              (IA continua disponível se o add-on estiver ligado).
+            </span>
+          </span>
+        </label>
+
+        <label className="flex items-start gap-3 rounded-lg border border-[var(--border-muted)] p-4">
+          <input
+            type="checkbox"
             checked={data.settings.aiEnabled}
             disabled={saving || !data.gatewayConfigured}
-            onChange={(e) => void toggleAi(e.target.checked)}
+            onChange={(e) => void patchSettings({ aiEnabled: e.target.checked })}
             className="mt-1"
           />
           <span>
@@ -113,8 +149,7 @@ export default function AssistenteConfigView() {
               Chat com IA (add-on)
             </span>
             <span className="block text-xs text-[var(--text-muted)]">
-              Quando ativo, o assistente usa o gateway configurado e passa pelo motor de regras
-              existente na tomada de decisão. Requer secrets no ambiente.
+              Quando ativo, o assistente usa o gateway configurado. Requer secrets no ambiente.
             </span>
             {!data.gatewayConfigured && (
               <span className="mt-1 block text-xs text-amber-700">
@@ -123,12 +158,39 @@ export default function AssistenteConfigView() {
             )}
           </span>
         </label>
-
-        <p className="text-xs text-[var(--text-muted)]">
-          Motor de regras: {data.settings.rulesEnabled ? "ativo" : "desativado"} (padrão: ativo).
-          Painel de edição de regras por nicho — Fase 2.
-        </p>
       </Card>
+
+      {data.rules && (
+        <Card className="space-y-3 p-5">
+          <h2 className="text-base font-semibold text-[var(--text-primary)]">
+            Motor de regras (Fase 2)
+          </h2>
+          <p className="text-sm text-[var(--text-muted)]">
+            Nicho ativo: <strong>{data.rules.niche}</strong> — templates globais + vocabulário do segmento.
+          </p>
+          <dl className="grid gap-2 text-sm sm:grid-cols-2">
+            <div>
+              <dt className="text-[var(--text-muted)]">Regras globais</dt>
+              <dd className="font-medium">{data.rules.globalRules}</dd>
+            </div>
+            <div>
+              <dt className="text-[var(--text-muted)]">Com override de nicho</dt>
+              <dd className="font-medium">{data.rules.nicheRules}</dd>
+            </div>
+            <div>
+              <dt className="text-[var(--text-muted)]">Gatilhos efetivos</dt>
+              <dd className="font-medium">{data.rules.totalTriggers}</dd>
+            </div>
+            <div>
+              <dt className="text-[var(--text-muted)]">Overrides tenant</dt>
+              <dd className="font-medium">{data.rules.tenantOverrides}</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-[var(--text-muted)]">
+            Edição CRUD de regras por tenant — Fase 3.
+          </p>
+        </Card>
+      )}
 
       <Card className="space-y-3 p-5">
         <h2 className="text-base font-semibold text-[var(--text-primary)]">Inventário (Fase 0)</h2>

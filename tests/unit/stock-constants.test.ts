@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   isStockProductCategory,
   isStockReversibleType,
+  isStockSyntheticLot,
   isStockUnit,
+  STOCK_NO_LOT_NUMBER,
   STOCK_PRODUCT_CATEGORIES,
   STOCK_UNITS,
 } from "@/lib/stock-constants";
@@ -24,5 +26,12 @@ describe("Constantes de estoque — taxonomia multi-nicho e reversão", () => {
     expect(isStockReversibleType("ENTRADA")).toBe(true);
     expect(isStockReversibleType("DISPENSACAO")).toBe(true);
     expect(isStockReversibleType("FOO")).toBe(false);
+  });
+
+  it("identifica lote sintético SEM-LOTE usado quando requiresLot=false", () => {
+    expect(STOCK_NO_LOT_NUMBER).toBe("SEM-LOTE");
+    expect(isStockSyntheticLot("SEM-LOTE")).toBe(true);
+    expect(isStockSyntheticLot("sem-lote")).toBe(true);
+    expect(isStockSyntheticLot("LOT-001")).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { getPrisma } from "@/lib/db";
 import { listStockLots, receiveStockEntry } from "@/lib/stock-service";
 
 export async function GET(request: Request) {
@@ -27,16 +28,32 @@ export async function POST(request: Request) {
       supplierRef?: string | null;
     };
 
-    if (!body.productId || !body.lotNumber?.trim() || !body.expiryDate || !body.quantity) {
+    if (!body.productId || !body.quantity) {
+      return NextResponse.json({ error: "Informe produto e quantidade" }, { status: 400 });
+    }
+
+    const prisma = await getPrisma();
+    const product = await prisma.medicalProduct.findFirst({
+      where: { id: body.productId, tenantId: user.tenantId },
+      select: { requiresLot: true },
+    });
+    if (!product) {
+      return NextResponse.json({ error: "Produto não encontrado" }, { status: 404 });
+    }
+
+    if (product.requiresLot && (!body.lotNumber?.trim() || !body.expiryDate)) {
       return NextResponse.json(
         { error: "Informe produto, lote, validade e quantidade" },
         { status: 400 },
       );
     }
 
-    const expiryDate = new Date(body.expiryDate);
-    if (Number.isNaN(expiryDate.getTime())) {
-      return NextResponse.json({ error: "Data de validade inválida" }, { status: 400 });
+    let expiryDate: Date | null = null;
+    if (body.expiryDate) {
+      expiryDate = new Date(body.expiryDate);
+      if (Number.isNaN(expiryDate.getTime())) {
+        return NextResponse.json({ error: "Data de validade inválida" }, { status: 400 });
+      }
     }
 
     const result = await receiveStockEntry({

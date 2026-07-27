@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.17",
+    version: "3.0.18",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Estoque Fase 3: produtos sem lote (SEM-LOTE); Assistente com motor de regras e overrides por nicho.",
+    highlights: [
+      {
+        title: "Estoque clínico",
+        items: [
+          "Campo requiresLot — produto pode dispensar rastreio ANVISA de lote/validade",
+          "Entrada sem lote cria SEM-LOTE; UI mostra badge e omite campos de validade",
+          "Alertas de validade ignoram lotes sintéticos",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "Motor de regras Fase 2 com overrides por nicho e tenant",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #319/#321/#326 · stock · assistant-rule-engine · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.17",
+    label: "Sistema Bibi - ServiceOS v3.0.17",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Cliente 360° sem backdoor clínico para RECEPCAO; a11y de teclado; confirmação automática de agenda self-service.",
     highlights: [

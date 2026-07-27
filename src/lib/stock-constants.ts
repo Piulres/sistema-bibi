@@ -80,6 +80,19 @@ export const STOCK_LOT_STATUS_LABELS: Record<StockLotStatus, string> = {
 /** Dias antes do vencimento para alerta preventivo. */
 export const STOCK_EXPIRY_ALERT_DAYS = 90;
 
+/**
+ * Lote sintético para produtos com `requiresLot=false`.
+ * Mantém saldo/FIFO/reversão no modelo atual sem exigir rastreio ANVISA.
+ */
+export const STOCK_NO_LOT_NUMBER = "SEM-LOTE";
+
+/** Validade longe o suficiente para o lote sintético não virar alerta/VENCIDO. */
+export const STOCK_NO_LOT_EXPIRY_ISO = "2099-12-31T00:00:00.000Z";
+
+export function isStockSyntheticLot(lotNumber: string | null | undefined): boolean {
+  return (lotNumber ?? "").trim().toUpperCase() === STOCK_NO_LOT_NUMBER;
+}
+
 export function isStockProductCategory(value: string): value is StockProductCategory {
   return (STOCK_PRODUCT_CATEGORIES as readonly string[]).includes(value);
 }
