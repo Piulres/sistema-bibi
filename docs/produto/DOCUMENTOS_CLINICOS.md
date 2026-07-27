@@ -9,7 +9,8 @@ protocolos de exames, atestado, receita comum/especial e usabilidade mobile/desk
 |-----------|------|--------|
 | Protocolo de cuidado | `/interno/cadastros?tab=protocols` + aba Protocolos no atendimento | Editável + ativar/desativar |
 | Protocolo de exames | mesma aba Cadastros + aba Exames (aplicar em lote) | Editável + ativar/desativar |
-| Receita comum / controle especial | Care Chart (Medicação) + template PEP | Estruturada + reativar |
+| Receita comum / controle especial | Care Chart (Medicação) + template PEP | Estruturada + reativar (`MedicationPrescription`) |
+| Receita multi-medicamento | Care Chart → Receita documento (`PrescriptionDocumentForm`) | N itens por documento (`PrescriptionDocument` + `PrescriptionDocumentItem`) |
 | Atestado (afastamento / acompanhamento / comparecimento) | PEP → tipo Atestado | Texto estruturado CFM |
 | Assinatura digital / Atesta CFM / SNCR | — | Fora do escopo POC |
 
@@ -45,6 +46,20 @@ Base: **Portaria SVS/MS 344/1998**, atualizações **RDC 1000/2025** e prazos SN
 **Não coberto:** Notificações de Receita A/B (amarela/azul), numeração SNCR, retenção
 eletrônica Anvisa, modelos oficiais PDF tipográficos.
 
+## Receita multi-medicamento (`PrescriptionDocument`, v3.0.13)
+
+Documento clínico com **vários itens** em um único registro — distinto de `MedicationPrescription` (prescrição unitária com ciclo de vida ATIVA/SUSPENSA/ENCERRADA).
+
+| Aspecto | Detalhe |
+|---------|---------|
+| Modelo | `PrescriptionDocument` + `PrescriptionDocumentItem` (ordenados por `sortOrder`) |
+| UI | `PrescriptionDocumentForm` em `ClinicalCarePanel` — templates de medicamentos comuns |
+| API | `GET/POST /api/prestador/patients/{id}/prescription-documents` (`?appointmentId=` opcional) |
+| Corpo POST | `prescriptionKind`, `title?`, `notes?`, `items[]` (`medication`, `dosage`, `frequency` obrigatórios) |
+| Serviço | `src/lib/prescription-document-service.ts` · templates: `src/lib/clinical/prescription-medications.ts` |
+
+Use `MedicationPrescription` para prescrição contínua com status; use `PrescriptionDocument` para receita impressa/exportável com múltiplos medicamentos no mesmo ato.
+
 ## Protocolos de exames
 
 Modelo `ExamProtocolTemplate` — lista de nomes de exames + indicação clínica padrão.
@@ -62,7 +77,7 @@ No atendimento, **Aplicar protocolo** gera um `ExamOrder` por item. Pedidos avul
 - `src/lib/clinical/atestado.ts` · `src/lib/clinical/receita.ts`
 - `src/lib/exam-protocol-service.ts` · `src/lib/pep-templates.ts`
 - `src/components/ExamProtocolTemplatesPanel.tsx` · `ProtocolTemplatesPanel.tsx`
-- `src/components/clinical/ClinicalCarePanel.tsx` · `AtendimentoView.tsx`
+- `src/components/clinical/ClinicalCarePanel.tsx` · `PrescriptionDocumentForm.tsx` · `AtendimentoView.tsx`
 
 **Contrato HTTP:** [`plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §7 (protocolos de exames e prescrições).
 

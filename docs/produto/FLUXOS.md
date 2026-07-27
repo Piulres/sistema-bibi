@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.13** em produção (jul/2026): exportações autenticadas (fetch+blob), equipe no atendimento, receita multi-item — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.8): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG. CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -232,7 +232,7 @@ Quando `User.mfaEnabled = true`:
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, equipe, receita multi-item, marcar REALIZADO |
 
 ### APIs disparadas
 
@@ -248,6 +248,9 @@ Quando `User.mfaEnabled = true`:
 | Aplicar protocolo de exames | `POST .../patients/[id]/exam-protocols` | N× `ExamOrder` a partir do template |
 | Prescrever (comum / controle especial) | `POST .../medications` | `MedicationPrescription.prescriptionKind` + status ATIVA/SUSPENSA/ENCERRADA |
 | Reativar / suspender prescrição | `PATCH /api/prestador/medications/[id]` `{ status }` | Transições ATIVA ↔ SUSPENSA ↔ ENCERRADA |
+| Receita multi-medicamento | `GET/POST .../prescription-documents` | `PrescriptionDocument` + N itens (`PrescriptionDocumentItem`) — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
+| Equipe no atendimento | `GET/POST/DELETE .../appointments/[id]/participants` | `AppointmentParticipant` + taxa PPU opcional — ver [§3.1](#31-equipe-no-atendimento-v3013) |
+| Listar elegíveis | `GET .../participants/eligible?role=` | Prestadores/internos do tenant filtrados por papel |
 | Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
 
 ```mermaid
@@ -261,6 +264,20 @@ flowchart LR
 
 **Precificação dinâmica:** `src/lib/pricing.ts` — `PricingRule.multiplier` por empresa
 (ex.: TechCorp 0,85 → Consulta Clínica R$ 320 → **R$ 272** congelado em `priceCharged`).
+
+### 3.1 Equipe no atendimento (v3.0.13)
+
+Aba **Equipe** em `AtendimentoView` (`AppointmentTeamPanel`).
+
+| Conceito | Implementação |
+|----------|-----------------|
+| Papéis | `TEAM_ROLES` em `src/lib/clinical/team-roles.ts` — rótulos por nicho (`teamRoleLabel`) |
+| Requisitos por procedimento | Campo `teamRequirements` (JSON) no catálogo — aviso na UI ao registrar procedimento |
+| Participante | `AppointmentParticipant` — profissional (`PRESTADOR` ou `INTERNO`) + papel + notas |
+| Taxa PPU | `chargeFee: true` no POST → `ProcedureUsage` com código `TEAM_ROLE_FEE_PROCEDURE_CODES[role]` |
+| Elegíveis | `GET .../participants/eligible?role=ANESTESISTA` — filtra por especialidade/papel |
+
+Serviço: `src/lib/appointment-team-service.ts` · massa demo: `prisma/seed-data/appointment-team-demo.ts` (colonoscopia com anestesista + técnico).
 
 ---
 
@@ -306,7 +323,9 @@ Serviço: `src/lib/executive-dashboard.ts` (`getExecutiveDashboard()`). KPIs de 
 ### 4.1 Faturamento (`BillingView`)
 
 **UI:** tabela de faturas emitidas com colunas Total, TISS (download XML) e **Ações**
-(botões **PIX** e **Marcar paga** quando `status ≠ PAGA` e gateway configurado).
+(botões **PIX** e **Marcar paga** somente quando `status === FECHADA` e gateway configurado).
+
+**Regra de estado (v3.0.13):** faturas PPU nascem **`FECHADA`** ao emitir; só esse status aceita PIX ou marcar paga. `PAGA` é terminal. Tentativa em outro status retorna `400` com `"Somente faturas FECHADA podem ser pagas"` (`invoice-service.ts`).
 
 | Ação | API | Transição de estado |
 |------|-----|---------------------|
@@ -502,6 +521,28 @@ Motor unificado para relatórios e listagens nos portais.
 | Beneficiário | `GET /api/beneficiario/export?section=` | por seção |
 
 Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
+
+### 4.12 Downloads autenticados (v3.0.13)
+
+Rotas com sessão não usam mais `<a download>` direto — erros JSON eram salvos como `.pdf`/`.xml`.
+
+| Camada | Arquivo | Papel |
+|--------|---------|-------|
+| Core | `src/lib/ui/download-export.ts` | `downloadExportFile()` — `fetch` + `credentials: "same-origin"` + `blob` + anchor programático |
+| Filename | `parseContentDispositionFilename()` | RFC 5987 `filename*=UTF-8''` |
+| Tabular | `ExportButtons.tsx` | Botões por `?format=`; chama `downloadExportFile` |
+| Arquivo único | `DownloadLink.tsx` | TISS XML, LGPD JSON, CSV/JSON interchange, `.ics` |
+
+**Erros:** resposta JSON com `error` exibida na UI (não download silencioso).
+
+| Superfície | Rota típica | Componente |
+|------------|-------------|------------|
+| TISS | `GET /api/interno/invoices/[id]/tiss` | `DownloadLink` em `BillingView` |
+| LGPD | `GET /api/interno/patients/[id]/export` | `PatientOverviewView` |
+| Intercâmbio | export CSV/JSON cadastros | `ImportInterchangePanel` |
+| Calendário | `GET .../appointments/[id]/calendar` | `AddToCalendarMenu` |
+
+Testes: `tests/unit/download-export.test.ts` · `tests/api/exports-matrix.test.ts` (matriz completa por portal).
 
 ---
 

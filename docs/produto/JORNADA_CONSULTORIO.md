@@ -14,7 +14,7 @@ Complementa (não substitui):
 
 > **Labels:** em UI autenticada o vocabulário vem de `useLabels()` (paciente/cliente/pet/aluno conforme o nicho). Neste documento usamos linguagem de **consultório** (`MEDICAL`) por legibilidade operacional.
 
-**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.8 (§3–§10, §8.5, §8.9) e pacote v3.0.8.
+**Última revisão:** julho/2026 — alinhado a `FLUXOS.md` v3.0.13 (equipe no atendimento, receita multi-item, downloads autenticados).
 
 ---
 
@@ -148,6 +148,8 @@ Detalhe técnico: [`FLUXOS.md`](FLUXOS.md) §3 · documentos: [`DOCUMENTOS_CLINI
 |------|--------|
 | **PEP** | Evolução / templates; atestado (afastamento, acompanhamento, comparecimento + CID com autorização); receita no texto |
 | **Medicação** | Receita `COMUM` ou `CONTROLE_ESPECIAL`; status `ATIVA` / `SUSPENSA` / `ENCERRADA` + reativar |
+| **Receita multi-item** | `PrescriptionDocument` com N medicamentos — formulário em Care Chart (`PrescriptionDocumentForm`) |
+| **Equipe** | Aba **Equipe** — anestesista, técnico, assistente etc.; taxa PPU opcional por participante |
 | **Exames** | Pedido avulso; aplicar **protocolo de exames** (gera N `ExamOrder`); laudo |
 | **Protocolos de cuidado** | Templates cadastrados no interno (`/interno/cadastros?tab=protocols`) |
 | **Estoque** (lado interno) | Kits por procedimento, lotes, movimentações — apoio operacional |

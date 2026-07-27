@@ -79,6 +79,10 @@ Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `merg
 
 Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônicos, BOM UTF-8 via `arrayBuffer`, TXT pipe-delimited) · `tests/unit/interchange.test.ts` (dataset canônico CSV/JSON) · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ tabular).
 
+Cobertura v3.0.13: `tests/unit/download-export.test.ts` (Content-Disposition UTF-8, erros JSON) · `tests/api/exports-matrix.test.ts` (matriz completa interno/prestador/PJ/beneficiário) · `tests/unit/appointment-team.test.ts` (participantes + taxas PPU) · `tests/unit/prescription-document.test.ts` (multi-item + `formatPrescriptionDocumentText`).
+
+**Massas realistas (v3.0.13):** títulos de teste com WHAT+WHY; display names sem `Demo`/`E2E`/`Teste` — regra em `.cursor/rules/tests.mdc` e `OPERACOES.md`.
+
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
 
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
@@ -89,7 +93,7 @@ Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` 
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).
 
-**Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa muda (ex.: conselho profissional, PEP tipado).
+**Massa demo em testes:** `SEED_SCALE=small` via `tests/helpers/db.ts`. Fixtures estáveis em `tests/helpers/seed-fixtures.ts` (João, Maria, Pedro, prestador com CRM). O helper `isTestSeedStale()` re-seeda `test.db` quando a massa semântica muda (ex.: conselho profissional, PEP tipado). O marker `prisma/.test-db-ready` (fingerprint de schema + seed) pula `db push` quando válido — ver § abaixo.
 
 **Mapa completo da massa (perfis, portais, segmentos):** [`MASSA_TESTES.md`](MASSA_TESTES.md) — inclui perfil `operation-1y` (20 clientes, 3–9 usuários PJ, 1 ano).
 

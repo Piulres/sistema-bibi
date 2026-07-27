@@ -54,6 +54,18 @@ PixProvider BoletoProvider CardProvider   (interfaces)
 4. Confirmação (interno ou beneficiário) → `Payment.status = CONFIRMED`, `Invoice.status = PAGA`.
 5. Timeline registra `INVOICE_PAID` e, quando aplicável, `CHARGE_SENT`.
 
+### Regra de estado da fatura (v3.0.13)
+
+| Status | Pode receber PIX / marcar paga? |
+|--------|--------------------------------|
+| `FECHADA` | Sim — estado esperado após emitir fatura PPU |
+| `PAGA` | Não — terminal |
+| `ABERTA` | Não — usada em outros fluxos; PPU nasce `FECHADA` |
+
+`markInvoicePaid()` e `createInvoicePixCharge()` retornam erro `"Somente faturas FECHADA podem ser pagas"` se o status for outro. A UI (`BillingView`) só exibe botões quando `inv.status === "FECHADA"`.
+
+Persistência em modo operação (Blob): transação SQLite deve fazer COMMIT antes do flush — ver v3.0.11 (`sqlite-transaction-flush.ts`).
+
 ### Endpoints
 
 | Método | Endpoint | Descrição |

@@ -245,7 +245,7 @@ Fluxo completo (emitir fatura → PIX → TISS): [`produto/FLUXOS.md`](../produt
 
 ## 7. Documentos clínicos (prestador + cadastros)
 
-Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer sessão **prestador** ou **interno** (`cadastros`), conforme a tabela.
+Endpoints do pacote **v3.0.5+** para protocolos de exames e prescrições. Requer sessão **prestador** ou **interno** (`cadastros`), conforme a tabela. Equipe e receita multi-item desde **v3.0.13**.
 
 | Método | Path | Auth | Função |
 |--------|------|------|--------|
@@ -263,6 +263,12 @@ Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer
 | `GET` | `/api/prestador/patients/{id}/clinical-overview` | prestador | Visão agregada: medicações ativas, exames pendentes, protocolos |
 | `GET` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Perfil clínico estruturado (alergias, condições crônicas) |
 | `PUT` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Atualiza perfil clínico |
+| `GET` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Lista receitas multi-item (`?appointmentId=` opcional) |
+| `POST` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Nova receita multi-item (`items[]`, `prescriptionKind`) |
+| `GET` | `/api/prestador/appointments/{id}/participants` | prestador | Lista equipe do atendimento |
+| `POST` | `/api/prestador/appointments/{id}/participants` | prestador | Adiciona participante (`userId`, `role`, `chargeFee?`) |
+| `DELETE` | `/api/prestador/appointments/{id}/participants` | prestador | Remove participante (`?participantId=`) |
+| `GET` | `/api/prestador/appointments/{id}/participants/eligible` | prestador | Profissionais elegíveis (`?role=ANESTESISTA`) |
 
 Variantes **VET** (pet): `/api/prestador/pets/{id}/exam-orders`, `clinical-overview`, `clinical-profile` — mesmo contrato.
 
@@ -289,6 +295,39 @@ Campos obrigatórios: `medication`, `dosage`, `frequency`. Opcionais: `route`, `
 ```
 
 Reativar: `{ "status": "ATIVA" }`. Serviço: `src/lib/medication-service.ts` · `src/lib/exam-protocol-service.ts`.
+
+### Corpo — receita multi-medicamento (v3.0.13)
+
+```json
+{
+  "appointmentId": "apt_optional",
+  "prescriptionKind": "COMUM",
+  "title": "Receita pós-consulta",
+  "items": [
+    {
+      "medication": "Dipirona 500mg",
+      "dosage": "1 comprimido",
+      "frequency": "8/8h",
+      "durationDays": 3
+    }
+  ]
+}
+```
+
+Resposta `200`: `{ document }` com `items[]` ordenados. Serviço: `src/lib/prescription-document-service.ts`.
+
+### Corpo — adicionar participante à equipe (v3.0.13)
+
+```json
+{
+  "userId": "usr_abc",
+  "role": "ANESTESISTA",
+  "notes": "Sedação consciente",
+  "chargeFee": true
+}
+```
+
+Papéis válidos: `ANESTESISTA`, `TECNICO_ENFERMAGEM`, `ASSISTENTE`, `PARALEGAL`, `OUTRO`. Com `chargeFee: true`, gera `ProcedureUsage` de taxa PPU se o catálogo tiver o código configurado. Serviço: `src/lib/appointment-team-service.ts`.
 
 ### Corpo — criar pedido de exame avulso
 
@@ -385,9 +424,17 @@ Fluxo de produto: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 · piloto:
 
 ---
 
-## 9. Exportações tabulares (v3.0.7)
+## 9. Exportações tabulares (v3.0.7+) e downloads autenticados (v3.0.13)
 
-Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI monta links via `ExportButtons` (`src/components/ExportButtons.tsx`).
+Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI usa `ExportButtons` e `DownloadLink`, que chamam `downloadExportFile()` (`src/lib/ui/download-export.ts`) — **fetch + blob** com `credentials: "same-origin"`, não `<a download>` direto (evita salvar JSON de erro como arquivo).
+
+### Download autenticado
+
+| Função | Comportamento |
+|--------|---------------|
+| `downloadExportFile(url)` | `fetch` → `blob` → anchor programático |
+| `parseContentDispositionFilename()` | Extrai nome de `Content-Disposition` (RFC 5987 UTF-8) |
+| Erro | Corpo JSON `{ error }` exibido na UI |
 
 ### Formatos suportados
 

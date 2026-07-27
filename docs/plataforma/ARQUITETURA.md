@@ -765,11 +765,13 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 | `/interno/relatorios` | `exports/builders.ts` + `serveTabularExport` |
 | `/beneficiario` (agendar) | `scheduling-service` |
 
-### Exports tabulares (v3.0.7)
+### Exports tabulares (v3.0.7+) e downloads autenticados (v3.0.13)
 
 | Camada | Arquivo | Papel |
 |--------|---------|-------|
-| UI | `ExportButtons.tsx` | Links `?format=` por portal |
+| Download | `ui/download-export.ts` | `downloadExportFile()` — fetch+blob autenticado |
+| UI tabular | `ExportButtons.tsx` | Botões `?format=` por portal |
+| UI arquivo | `DownloadLink.tsx` | TISS, LGPD, interchange, `.ics` |
 | Tipos | `exports/tabular-types.ts` | `TabularExport`, `TabularColumn` — contrato entre builders e `serveTabularExport` |
 | Formatos | `exports/format.ts` | `REPORT_EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, MIME types |
 | Servidor | `exports/serve.ts` | `serveTabularExport`, `serveBufferExport` |
@@ -777,7 +779,7 @@ CRUD admin, agenda interna, agendamento self-service, relatórios multi-formato,
 | CSV | `imports/interchange.ts` | BOM UTF-8 + colunas canônicas |
 | Builders | `exports/builders.ts` | Datasets por domínio (billing, CRM, auditoria…) |
 
-Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes: `tests/api/exports.test.ts`.
+Doc de uso: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) §Exports tabulares · testes: `tests/api/exports.test.ts` · `tests/api/exports-matrix.test.ts` · `tests/unit/download-export.test.ts`.
 
 ---
 

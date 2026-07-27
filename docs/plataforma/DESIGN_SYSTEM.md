@@ -161,9 +161,9 @@ Conteúdo em `src/lib/landing/changelog-content.ts` — **atualizar sempre ao fe
 
 Instruções completas: [`LANDING_CHANGELOG.md`](LANDING_CHANGELOG.md).
 
-### Exports tabulares (v3.0.7)
+### Exports tabulares (v3.0.7+) e downloads autenticados (v3.0.13)
 
-Componente UI: `src/components/ExportButtons.tsx` — links `<a download>` com `?format=` na `baseUrl`.
+Componentes UI: `ExportButtons.tsx` (tabular `?format=`) e `DownloadLink.tsx` (arquivo único) — ambos usam `downloadExportFile()` com fetch+blob, não `<a download>` direto.
 
 | Constante | Formatos | Uso típico |
 |-----------|----------|------------|
