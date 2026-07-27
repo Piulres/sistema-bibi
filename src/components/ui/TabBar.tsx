@@ -74,6 +74,7 @@ export default function TabBar({
               id={panelIdPrefix ? `${panelIdPrefix}-tab-${tab.key}` : undefined}
               aria-selected={selected}
               aria-controls={panelId}
+              aria-label={tab.label}
               tabIndex={selected ? 0 : -1}
               onClick={() => onSelect(tab.key)}
               onKeyDown={(event) => onTabKeyDown(event, tab.key)}

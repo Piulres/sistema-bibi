@@ -63,16 +63,17 @@ test.describe("Cadastros — existência das abas CRUD", () => {
   });
 
   test("exibe abas Beneficiários, Empresas, Procedimentos e Usuários", async ({ page }) => {
-    const tabs = page.getByRole("navigation", { name: "Abas da página" });
-    await expect(tabs.getByRole("button", { name: "Beneficiários" })).toBeVisible();
-    await expect(tabs.getByRole("button", { name: "Empresas" })).toBeVisible();
-    await expect(tabs.getByRole("button", { name: "Procedimentos" })).toBeVisible();
-    await expect(tabs.getByRole("button", { name: "Usuários" })).toBeVisible();
+    // TabBar a11y: role=tablist / tab (não navigation/button)
+    const tabs = page.getByRole("tablist", { name: "Abas da página" });
+    await expect(tabs.getByRole("tab", { name: "Beneficiários" })).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Empresas" })).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Procedimentos" })).toBeVisible();
+    await expect(tabs.getByRole("tab", { name: "Usuários" })).toBeVisible();
   });
 
   for (const tab of ["Empresas", "Procedimentos", "Usuários"] as const) {
     test(`aba ${tab} carrega listagem sem erro`, async ({ page }) => {
-      await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: tab }).click();
+      await page.getByRole("tablist", { name: "Abas da página" }).getByRole("tab", { name: tab }).click();
       await expect(page.getByText(/Sem permissão|Falha ao carregar/i)).toHaveCount(0);
       await expect(
         page
@@ -115,7 +116,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   });
 
   test("CREATE + UPDATE empresa", async ({ page }) => {
-    await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Empresas" }).click();
+    await page.getByRole("tablist", { name: "Abas da página" }).getByRole("tab", { name: "Empresas" }).click();
     const name = `Horizonte Saúde ${suffix()} LTDA`;
     const card = page.locator("section, div").filter({ has: page.getByRole("heading", { name: "Nova empresa" }) }).first();
     const form = card.locator("form");
@@ -136,7 +137,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   });
 
   test("CREATE + UPDATE + DELETE procedimento", async ({ page }) => {
-    await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Procedimentos" }).click();
+    await page.getByRole("tablist", { name: "Abas da página" }).getByRole("tab", { name: "Procedimentos" }).click();
     const code = `E2E${suffix()}`;
     const procName = `Consulta Clínica ${suffix()}`;
     const editedName = `${procName} Editado`;
@@ -166,7 +167,7 @@ test.describe("Cadastros — execução CRUD (ADMIN)", () => {
   });
 
   test("CREATE + UPDATE usuário prestador", async ({ page }) => {
-    await page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Usuários" }).click();
+    await page.getByRole("tablist", { name: "Abas da página" }).getByRole("tab", { name: "Usuários" }).click();
     const id = suffix();
     const name = `Dr. Rafael Souza ${id}`;
     const email = `dr.rafael.${id}@bibi.health`;
@@ -202,6 +203,6 @@ test.describe("Cadastros — RBAC recepção", () => {
     await page.goto("/interno/cadastros");
     await expect(page.getByText(/Carregando cadastros/i)).toHaveCount(0, { timeout: 15_000 });
     await expect(page.getByText(/Sem permissão/i)).toHaveCount(0);
-    await expect(page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", { name: "Beneficiários" })).toBeVisible();
+    await expect(page.getByRole("tablist", { name: "Abas da página" }).getByRole("tab", { name: "Beneficiários" })).toBeVisible();
   });
 });
