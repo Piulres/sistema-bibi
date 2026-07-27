@@ -101,7 +101,12 @@ test.describe("Jornada consultório — módulos operacionais (Interno)", () => 
       timeout: 15_000,
     });
 
-    const markPaid = page.getByRole("button", { name: "Marcar paga" }).first();
+    // Somente FECHADA pode ser paga — não usar o primeiro "Marcar paga" (pode ser ABERTA).
+    const markPaid = page
+      .locator("tr, li")
+      .filter({ has: page.getByText("FECHADA", { exact: true }) })
+      .getByRole("button", { name: "Marcar paga" })
+      .first();
     await expect(markPaid).toBeVisible({ timeout: 15_000 });
     await markPaid.click();
 

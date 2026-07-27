@@ -9,7 +9,6 @@
 import { execSync } from "node:child_process";
 import { copyFileSync, existsSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { PrismaClient } from "@prisma/client";
 import {
   databaseEnvSummary,
   isPostgresDatabaseUrl,
@@ -40,6 +39,9 @@ function removeSqliteFiles() {
 }
 
 async function bootstrapOperationDb() {
+  // Import dinâmico: o client precisa refletir o schema após `db push` + generate
+  // neste mesmo processo (import estático no topo fica stale).
+  const { PrismaClient } = await import("@prisma/client");
   const prisma = new PrismaClient({
     datasources: { db: { url: `file:${operationDb}` } },
   });

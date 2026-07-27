@@ -317,7 +317,7 @@ export default function BillingView() {
                       variant="ghost"
                     />
                   </div>
-                  {inv.status !== "PAGA" && (
+                  {inv.status === "FECHADA" && (
                     <div className="flex flex-wrap gap-2">
                       {gatewayConfigured && (
                         <Button
@@ -392,7 +392,7 @@ export default function BillingView() {
                       </div>
                     </td>
                     <td className="px-4 py-2 text-right">
-                      {inv.status !== "PAGA" && (
+                      {inv.status === "FECHADA" && (
                         <div className="flex flex-wrap justify-end gap-2">
                           {gatewayConfigured && (
                             <Button
