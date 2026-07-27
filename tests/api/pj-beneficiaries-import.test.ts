@@ -36,7 +36,10 @@ describe("GET/POST /api/pj/beneficiaries/import — upload CSV colaboradores", (
   });
 
   it("POST dry-run validates rows without persisting so RH previews errors", async () => {
-    const cpf = "390.533.447-05";
+    const prisma = getTestPrisma();
+    const cpf = "453.178.287-91";
+    await prisma.patient.deleteMany({ where: { cpf: cpf.replace(/\D/g, "") } }).catch(() => {});
+
     const csv = buildPjBeneficiaryImportTemplate("csv").replace(
       "529.982.247-25",
       cpf,

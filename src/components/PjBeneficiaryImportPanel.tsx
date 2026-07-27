@@ -92,9 +92,12 @@ export default function PjBeneficiaryImportPanel({ onImported }: Props) {
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <DownloadLink href="/api/pj/beneficiaries/import?format=csv" className="text-sm">
-          Baixar modelo CSV
-        </DownloadLink>
+        <DownloadLink
+          href="/api/pj/beneficiaries/import?format=csv"
+          label="Baixar modelo CSV"
+          filename="colaboradores-modelo.csv"
+          className="text-sm"
+        />
       </div>
 
       <div className="mt-3">
