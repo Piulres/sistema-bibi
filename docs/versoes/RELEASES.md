@@ -11,24 +11,32 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.16** — reagendar + Assistente Fase 0 + estoque Fase 2 UI **em produção**.
+> Pacote **v3.0.17** — RBAC clínico 360° + a11y + auto-confirm **pendente de deploy**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.16** · sincronizados @ `9e98494` |
-| **Pacote anterior em produção** | **3.0.15** — deploy `6a66de5b` @ `4599bff` (`bibi-poc-2026-07-27f`) |
+| **Release `main` / `dev`** | **v3.0.17** (preparado) · prod ainda `@ 9e98494` |
+| **Pacote anterior em produção** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.16** (reagendar + assistente + estoque UI) |
-| **Release** | `main` | **v3.0.16** |
+| **Integração** | `dev` | **v3.0.17** (RBAC clínico + a11y + auto-confirm) |
+| **Release** | `main` | **v3.0.17** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.16** · deploy `6a66e115` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.17
+
+- **Auditoria RBAC fase 3:** detalhe clínico (`/clinical`, PEP no overview/export) só ADMIN; RECEPCAO sem backdoor via `cadastros`.
+- **OpenAPI:** `AuditViewerCapabilities` + contrato de `GET /api/interno/audit`.
+- **A11y:** focus trap, tab order, roving tabindex (#292).
+- **Agenda:** confirmação automática no self-service.
+- **Qualidade:** `patient-clinical-rbac` · `a11y-focus` · CI #292/#317.
 
 ### Conteúdo do pacote v3.0.16
 
@@ -38,17 +46,6 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Auditoria RBAC fase 2:** busca sem oráculo de existência; encaminhamento/receita clínicos; export 360° com perfil.
 - **Estoque Fase 2 UI:** editar/inativar produto, status de lote, Reverter movimentação; taxonomia `SERVICO` + `KIT/SC/M3`.
 - **Qualidade:** `scheduling-reschedule` · `assistant-*` · `stock` · CI #282/#286/#306/#308 · pre-release OK · deploy `6a66e115`.
-
-### Smoke (27/07/2026) — produção v3.0.16
-
-| Check | Resultado |
-|-------|-----------|
-| Landing `/` | 200 · footer `v3.0.16` · deploy `6a66e115` |
-| CSS `/_next/static/chunks/*.css` | 200 |
-| `/interno/login` | 200 |
-| `/interno/assistente` | 307 (auth) |
-| `/beneficiario` | 307 (auth) |
-| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.15
 
