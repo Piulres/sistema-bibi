@@ -11,30 +11,38 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.26** — Monograma Bibi na home da plataforma **pendente deploy produção**.
+> Pacote **v3.0.26** — Monograma Bibi na home da plataforma **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.25** — deploy `6a678e1a` @ `368d83b` (`v3.0.25 import CSV PJ + qualidade estoque/CEDIG`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.26** — deploy `6a679550` @ `822b65e` (`v3.0.26 monograma Bibi na home`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.26** pendente deploy · `dev` @ `d520ac6` |
-| **Pacote anterior em produção** | **3.0.24** — deploy `6a677dc5` @ `15275c0` |
+| **Release `main` / `dev`** | **v3.0.26** em produção @ `822b65e` |
+| **Pacote anterior em produção** | **3.0.25** — deploy `6a678e1a` @ `368d83b` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.26** (monograma Bibi na home) |
-| **Release** | `main` | **v3.0.25** → merge v3.0.26 pendente |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.25** · deploy `6a678e1a` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.26** |
+| **Release** | `main` | **v3.0.26** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.26** · deploy `6a679550` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.26
 
 - **BrandMark:** círculo da home exibe **Bibi** (`PLATFORM.brandMark`); header mantém "Sistema Bibi" (#375).
 - **Tenants:** iniciais inalteradas (CEDIG, Horizonte, etc.).
-- **Qualidade:** CI #375 · brand-mark · ícones PWA regenerados · pre-release OK.
+- **Qualidade:** CI #375/#376 · brand-mark · ícones PWA regenerados · pre-release OK · deploy `6a679550`.
+
+### Smoke (27/07/2026) — produção v3.0.26
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.26` · deploy `6a679550` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/interno/login` | 200 |
 
 ### Conteúdo do pacote v3.0.25
 
