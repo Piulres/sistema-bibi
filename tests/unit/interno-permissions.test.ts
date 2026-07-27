@@ -36,6 +36,13 @@ describe("interno-permissions (RBAC)", () => {
     expect(hasInternoPermission("INTERNO", "READONLY", "relatorios")).toBe(true);
     expect(hasInternoPermission("INTERNO", "READONLY", "billing")).toBe(false);
     expect(hasInternoPermission("INTERNO", "READONLY", "integracoes")).toBe(false);
+    expect(hasInternoPermission("INTERNO", "READONLY", "assistente")).toBe(false);
+  });
+
+  it("módulo assistente — exclusivo ADMIN", () => {
+    expect(hasInternoPermission("INTERNO", "ADMIN", "assistente")).toBe(true);
+    expect(hasInternoPermission("INTERNO", "FATURAMENTO", "assistente")).toBe(false);
+    expect(hasInternoPermission("INTERNO", "RECEPCAO", "assistente")).toBe(false);
   });
 
   it("isInternoAdmin exige perfil ADMIN explícito", () => {

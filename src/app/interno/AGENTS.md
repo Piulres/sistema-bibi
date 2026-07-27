@@ -21,6 +21,7 @@ Só `PageHeader` + view — shell em `layout.tsx` (não repetir `PortalShell`/`I
 | `/interno/cadastros` | CRUD + mapa em `?tab=operations` |
 | `/interno/gestao` | Gestão clínica (MEDICAL/DENTAL) |
 | `/interno/seguranca` | Demo reset, dual-store (ADMIN) |
+| `/interno/assistente` | Config assistente — regras, flag IA (ADMIN) |
 
 ## UI
 

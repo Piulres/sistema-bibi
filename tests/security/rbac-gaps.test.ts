@@ -31,7 +31,11 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
 
   const withoutModuleGuard = routes.filter((file) => {
     const src = readFileSync(file, "utf8");
-    return !src.includes("requireInternoModule") && !src.includes("requireInternoAdmin");
+    return (
+      !src.includes("requireInternoModule") &&
+      !src.includes("requireInternoAdmin") &&
+      !src.includes("requireInternoModuleWrite")
+    );
   });
 
   it("todas as rotas internas usam guard de módulo", () => {
@@ -68,7 +72,7 @@ describe("RBAC — APIs internas com requireInternoModule", () => {
 
   it("cobertura: todas as rotas com guard", () => {
     const guardedCount = routes.length - withoutModuleGuard.length;
-    expect(INTERNO_MODULES.length).toBe(15);
+    expect(INTERNO_MODULES.length).toBe(16);
     expect(guardedCount).toBe(routes.length);
   });
 });

@@ -125,6 +125,15 @@ export const ASSISTANT_SCENARIOS: AssistantScenario[] = [
   { id: "ben-pix", role: "BENEFICIARIO", category: "help", phrase: "Como pagar PIX?", expectedTool: "explain_capability" },
   { id: "ben-debt", role: "BENEFICIARIO", category: "read", phrase: "O que devo?", expectedTool: "list_my_invoices" },
   { id: "ben-procedure", role: "BENEFICIARIO", category: "draft", phrase: "Quero marcar eletrocardiograma amanhã às 9h", expectedTool: "draft_book_appointment" },
+
+  // ── Nichos — paridade estrutural ─────────────────────────────────────
+  { id: "construction-int-dashboard", role: "INTERNO", category: "niche", niche: "CONSTRUCTION", phrase: "Resumo executivo", expectedTool: "get_dashboard_kpis" },
+  { id: "construction-int-agenda", role: "INTERNO", category: "niche", niche: "CONSTRUCTION", phrase: "Quantos agendamentos temos hoje?", expectedTool: "count_appointments", internoProfile: "RECEPCAO" },
+  { id: "legal-int-debtors", role: "INTERNO", category: "niche", niche: "LEGAL", phrase: "Quem está devendo?", expectedTool: "list_debtors", internoProfile: "ADMIN" },
+  { id: "dental-ben-resumo", role: "BENEFICIARIO", category: "niche", niche: "DENTAL", phrase: "Meu resumo", expectedTool: "get_my_overview" },
+  { id: "spa-pj-overview", role: "PJ", category: "niche", niche: "SPA", phrase: "Visão geral", expectedTool: "get_pj_overview" },
+  { id: "edu-ben-agenda", role: "BENEFICIARIO", category: "niche", niche: "EDUCATION", phrase: "Próximos agendamentos", expectedTool: "list_my_appointments" },
+  { id: "vet-prest-pets", role: "PRESTADOR", category: "niche", niche: "VET", phrase: "Meus pacientes", expectedTool: "list_my_patients" },
 ];
 
 export function scenariosByCategory(category: ScenarioCategory): AssistantScenario[] {

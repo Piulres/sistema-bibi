@@ -6,6 +6,8 @@ import type {
 import { isDraftToolResult } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
 import { resolveAssistantProvider } from "@/lib/assistant/config";
+import { resolveAssistantMode } from "@/lib/assistant/mode";
+import { getTenantSettings } from "@/lib/tenant/settings";
 import { buildAssistantSystemPrompt } from "@/lib/assistant/context";
 import { buildActions, formatToolResult } from "@/lib/assistant/format";
 import {
@@ -41,8 +43,10 @@ async function resolvePlan(
   tools: ReturnType<typeof getToolsForUser>,
   systemPrompt: string,
 ) {
+  const settings = await getTenantSettings(user.tenantId);
+  const mode = resolveAssistantMode(settings);
   const provider = resolveAssistantProvider();
-  if (provider === "gateway") {
+  if (mode === "ai" && provider === "gateway") {
     try {
       return await planGatewayAssistant(systemPrompt, messages, tools);
     } catch (error) {
