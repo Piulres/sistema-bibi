@@ -90,7 +90,9 @@ test.describe("Jornada consultório — módulos operacionais (Interno)", () => 
     ).toBeVisible();
   });
 
-  test("faturamento: marcar paga confirma e atualiza status", async ({ page }) => {
+  test("faturamento: Confirmar pagamento marca FECHADA como PAGA e atualiza a lista", async ({
+    page,
+  }) => {
     await loginAs(page, "interno", "faturamento@bibi.health");
     await dismissOnboardingIfVisible(page);
 
@@ -119,7 +121,7 @@ test.describe("Jornada consultório — walk-in → check-in → atendimento", (
     await page.setViewportSize({ width: 1280, height: 800 });
 
     const unique = Date.now();
-    const walkInName = `Jornada E2E ${unique}`;
+    const walkInName = `Camila Rocha ${unique}`;
     const cpf = generateValidCpf();
     const { date: slotDate, time: slotTime } = uniqueWalkInSlot();
 

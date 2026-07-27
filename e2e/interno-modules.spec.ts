@@ -61,7 +61,9 @@ test.describe("Portal Interno — módulos (ADMIN)", () => {
     ).toBeVisible({ timeout: 15_000 });
   });
 
-  test("dashboard exibe bloco de cobrança", async ({ page }) => {
+  test("dashboard separa cobrança: A receber, Recebido e A faturar (não mistura com clínica)", async ({
+    page,
+  }) => {
     await page.goto("/interno/dashboard");
     await expect(page.getByRole("heading", { name: "Cobrança", exact: true })).toBeVisible();
     await expect(page.getByText("A receber", { exact: true }).first()).toBeVisible();

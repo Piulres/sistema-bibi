@@ -17,6 +17,7 @@ env:
 
 jobs:
   unit-integration-api:
+    name: Unit + API (Vitest)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -44,15 +45,29 @@ jobs:
       - name: Database verify
         run: npm run db:verify
 
-      - name: Unit + integration + API tests
+      - name: Vitest — unit, integration e API
         run: npm run test
         env:
           DATABASE_URL: file:./test.db
+          CI: true
+
+      - name: Job Summary — Vitest
+        if: always()
+        run: node scripts/ci-vitest-summary.mjs
+
+      - name: Upload Vitest JUnit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vitest-junit
+          path: reports/vitest-junit.xml
+          if-no-files-found: ignore
 
       - name: Build
         run: npm run build
 
   e2e:
+    name: E2E (Playwright)
     runs-on: ubuntu-latest
     needs: unit-integration-api
     steps:
@@ -72,8 +87,47 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
-      - name: E2E tests
+      - name: Playwright — chromium e mobile
         run: npm run test:e2e
         env:
           CI: true
           PLAYWRIGHT_PORT: "3100"
+
+      - name: Job Summary — Playwright
+        if: always()
+        run: |
+          {
+            echo "## Playwright — resumo"
+            echo ""
+            if [ -f reports/playwright-junit.xml ]; then
+              tests=$(grep -o 'tests="[0-9]*"' reports/playwright-junit.xml | head -1 | tr -dc '0-9')
+              failures=$(grep -o 'failures="[0-9]*"' reports/playwright-junit.xml | head -1 | tr -dc '0-9')
+              skipped=$(grep -o 'skipped="[0-9]*"' reports/playwright-junit.xml | head -1 | tr -dc '0-9')
+              echo "| Métrica | Valor |"
+              echo "|---|---:|"
+              echo "| Casos (attr suite) | ${tests:-?} |"
+              echo "| Falhas | ${failures:-?} |"
+              echo "| Pulados | ${skipped:-?} |"
+              echo ""
+              if [ "${failures:-0}" != "0" ]; then
+                echo "### Casos com falha (amostra)"
+                echo ""
+                grep -E 'testcase |failure ' reports/playwright-junit.xml | head -40 | sed 's/^/    /'
+              else
+                echo "> E2E verde. Títulos dos testes devem descrever o fluxo de negócio (WHAT+WHY)."
+              fi
+            else
+              echo "JUnit Playwright não encontrado (\`reports/playwright-junit.xml\`)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+            reports/playwright-junit.xml
+          if-no-files-found: ignore

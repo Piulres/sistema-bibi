@@ -69,7 +69,7 @@ export async function runOperationBootstrap(
     },
     {
       email: "faturamento@bibi.health",
-      name: "Carlos Faturamento",
+      name: "Carlos Mendes",
       role: "INTERNO",
       internoProfile: "ADMIN",
       mfaEnabled: false,
@@ -77,7 +77,7 @@ export async function runOperationBootstrap(
     },
     {
       email: "recepcao@bibi.health",
-      name: "Paula Recepção",
+      name: "Paula Nogueira",
       role: "INTERNO",
       internoProfile: "RECEPCAO",
       mfaEnabled: false,
@@ -85,7 +85,7 @@ export async function runOperationBootstrap(
     },
     {
       email: "financeiro@bibi.health",
-      name: "Fernanda Financeiro",
+      name: "Fernanda Azevedo",
       role: "INTERNO",
       internoProfile: "FATURAMENTO",
       mfaEnabled: false,
@@ -93,7 +93,7 @@ export async function runOperationBootstrap(
     },
     {
       email: "seguranca@bibi.health",
-      name: "Admin Segurança (MFA)",
+      name: "André Campos",
       role: "INTERNO",
       internoProfile: "ADMIN",
       mfaEnabled: true,

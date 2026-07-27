@@ -24,10 +24,10 @@ import {
 } from "./operation-month-plan";
 
 const OPERATION_MONTH_PARTICULARS = [
-  { name: "Carla Encaixe Demo", salt: 901 },
-  { name: "Roberto Walk-in Demo", salt: 902 },
-  { name: "Helena Particular Demo", salt: 903 },
-  { name: "Tiago Autosserviço Demo", salt: 904 },
+  { name: "Carla Ribeiro", salt: 901 },
+  { name: "Roberto Almeida", salt: 902 },
+  { name: "Helena Costa", salt: 903 },
+  { name: "Tiago Nunes", salt: 904 },
 ] as const;
 
 export type { OperationMonthPlan } from "./operation-month-plan";

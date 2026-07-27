@@ -102,6 +102,35 @@ Fonte: `src/constants/niches.ts`.
 
 ---
 
+## Nomes realistas (obrigatório)
+
+Toda massa (seed demo, operation bootstrap, CEDIG, fixtures de teste/E2E) deve transmitir
+**sensação de operação real**. O revisor e o usuário demo leem nomes na UI — não jargão de teste.
+
+| Evitar no display | Preferir |
+|-------------------|----------|
+| `Carlos Faturamento`, `Paula Recepção` | `Carlos Mendes`, `Paula Nogueira` (papel no e-mail/perfil) |
+| `Maria Silva Cedig`, `Carla Encaixe Demo` | `Maria Silva`, `Carla Ribeiro` |
+| `Jornada E2E 1732…`, `Walk-in Teste` | `Camila Rocha 1732…`, `Pedro Henrique 1732…` |
+
+- **E-mails são contrato** (`faturamento@bibi.health`, `alana@cedig.demo`) — docs/testes de login usam e-mail.
+- Papel RBAC (`FATURAMENTO`, `RECEPCAO`) não vira sobrenome.
+- Efêmeros: nome brasileiro + sufixo opaco (`Date.now()`), sem tokens `E2E`/`Demo`/`Teste`/`Cedig`.
+
+Regra Cursor: `.cursor/rules/tests.mdc` · `AGENTS.md` § Testes e massas.
+
+### Interno Horizonte — nomes exibidos (e-mail inalterado)
+
+| E-mail | Nome exibido |
+|--------|----------------|
+| `faturamento@bibi.health` | Carlos Mendes |
+| `recepcao@bibi.health` | Paula Nogueira |
+| `financeiro@bibi.health` | Fernanda Azevedo |
+| `seguranca@bibi.health` | André Campos |
+| `dra.helena@bibi.health` | Dra. Helena Martins |
+
+---
+
 ## Massa por portal
 
 ### Interno (`/interno`)

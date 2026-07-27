@@ -6,8 +6,8 @@ import {
 } from "@/lib/sqlite-transaction-flush";
 import { isSqliteWriteAction } from "@/lib/sqlite-blob-persistence";
 
-describe("sqlite-transaction-flush", () => {
-  it("não faz flush de write no meio da transação", async () => {
+describe("Flush operation.db — evita perda de Marcar paga após COMMIT no Blob", () => {
+  it("não faz flush mid-transaction (gravação prematura no Blob reverte FECHADA→PAGA)", async () => {
     const flushes: string[] = [];
 
     await runWithSqliteTransactionTracking(
@@ -32,13 +32,13 @@ describe("sqlite-transaction-flush", () => {
     expect(isInsideSqliteTransaction()).toBe(false);
   });
 
-  it("fora de transação, write deve flushar imediatamente", () => {
+  it("fora de transação, write faz flush imediato (Lambda pode encerrar antes do debounce)", () => {
     expect(isInsideSqliteTransaction()).toBe(false);
     expect(shouldFlushSqliteWriteAfterOperation("create", true)).toBe(true);
     expect(shouldFlushSqliteWriteAfterOperation("findMany", false)).toBe(false);
   });
 
-  it("settle roda mesmo quando a transação falha (rollback local)", async () => {
+  it("settle roda no finally mesmo com erro (Blob reflete rollback local)", async () => {
     const onSettle = vi.fn();
     await expect(
       runWithSqliteTransactionTracking(async () => {
@@ -48,7 +48,7 @@ describe("sqlite-transaction-flush", () => {
     expect(onSettle).toHaveBeenCalledOnce();
   });
 
-  it("nested tracking só faz settle no outermost", async () => {
+  it("transação aninhada só faz settle no outermost (um flush por COMMIT real)", async () => {
     const settles: number[] = [];
 
     await runWithSqliteTransactionTracking(
@@ -69,7 +69,7 @@ describe("sqlite-transaction-flush", () => {
     expect(settles).toEqual([1]);
   });
 
-  it("isSqliteWriteAction cobre mutações Prisma usadas no faturamento", () => {
+  it("isSqliteWriteAction reconhece create/update usados em Payment e Invoice", () => {
     expect(isSqliteWriteAction("create")).toBe(true);
     expect(isSqliteWriteAction("update")).toBe(true);
     expect(isSqliteWriteAction("findFirst")).toBe(false);

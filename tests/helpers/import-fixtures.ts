@@ -55,7 +55,7 @@ export function buildImportContent(
 export function buildPatientImportRow(overrides: Partial<Record<string, string>> = {}) {
   const suffix = unique();
   return {
-    name: `Import Paciente ${suffix}`,
+    name: `Beatriz Lima ${suffix}`,
     cpf: generateValidCpf(),
     birthDate: "1992-08-20",
     phone: "11999990000",

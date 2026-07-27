@@ -55,6 +55,12 @@ Early return · sem `any` desnecessário · ESLint (`set-state-in-effect` = IIFE
 
 Vitest (não Jest) · E2E Playwright · CRUD → ver [crud-entity.md](references/crud-entity.md)
 
+**Obrigatório:**
+
+- Títulos `describe`/`it`/`test` com **WHAT + WHY** (úteis no Job Summary do CI)
+- Massas/fixtures com **nomes realistas** (e-mail demo pode ficar; display name ≠ cargo)
+- Detalhe: `.cursor/rules/tests.mdc` · `docs/plataforma/TESTES.md` · `MASSA_TESTES.md`
+
 ```bash
 npm run lint
 npx vitest run path/to/test.ts
@@ -72,6 +78,7 @@ npm run docs:verify   # se versão/changelog/docs
 | Evitar | Fazer |
 |--------|-------|
 | HealthOS em copy nova | ServiceOS + segmento |
-| Refatoração sem teste | Teste de regressão |
+| Refatoração sem teste | Teste de regressão com título WHAT+WHY |
+| `it("works")` / nomes `E2E Demo` | Título informativo · massa com cara de operação |
 | Deploy para validar | `npm run dev` / `pre-release` |
 | Duplicar docs no chat | Referenciar `docs/` |

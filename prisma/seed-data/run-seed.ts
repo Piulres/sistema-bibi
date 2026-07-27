@@ -196,7 +196,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     data: {
       email: "faturamento@bibi.health",
       password: DEMO_PASSWORD,
-      name: "Carlos Faturamento",
+      name: "Carlos Mendes",
       role: "INTERNO",
       internoProfile: "ADMIN",
       tenantId: tenant.id,
@@ -206,7 +206,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     data: {
       email: "recepcao@bibi.health",
       password: DEMO_PASSWORD,
-      name: "Paula Recepção",
+      name: "Paula Nogueira",
       role: "INTERNO",
       internoProfile: "RECEPCAO",
       tenantId: tenant.id,
@@ -216,7 +216,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     data: {
       email: "financeiro@bibi.health",
       password: DEMO_PASSWORD,
-      name: "Fernanda Financeiro",
+      name: "Fernanda Azevedo",
       role: "INTERNO",
       internoProfile: "FATURAMENTO",
       tenantId: tenant.id,
@@ -226,7 +226,7 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     data: {
       email: "seguranca@bibi.health",
       password: DEMO_PASSWORD,
-      name: "Admin Segurança (MFA)",
+      name: "André Campos",
       role: "INTERNO",
       internoProfile: "ADMIN",
       mfaEnabled: true,

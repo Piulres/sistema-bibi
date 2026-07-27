@@ -17,6 +17,14 @@ export default defineConfig({
     testTimeout: 30_000,
     hookTimeout: 60_000,
     fileParallelism: false,
+    // CI: anotações no PR + JUnit para Job Summary (scripts/ci-vitest-summary.mjs)
+    reporters: process.env.CI
+      ? [
+          "default",
+          "github-actions",
+          ["junit", { outputFile: "reports/vitest-junit.xml" }],
+        ]
+      : ["default"],
     env: {
       NODE_ENV: "test",
       SESSION_SECRET: "test-session-secret-32-chars-min",

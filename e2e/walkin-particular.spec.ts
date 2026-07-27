@@ -65,7 +65,7 @@ test.describe("Portal Interno — walk-in particular", () => {
   test("cadastra walk-in particular e confirma chegada", async ({ page }) => {
     const unique = Date.now();
     const cpf = generateValidCpf();
-    const walkInName = `Walk-in Teste ${unique}`;
+    const walkInName = `Pedro Henrique ${unique}`;
 
     const { date: slotDate, time: slotTime } = uniqueWalkInSlot();
 

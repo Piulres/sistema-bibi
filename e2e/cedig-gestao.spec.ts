@@ -27,7 +27,7 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
       timeout: 20_000,
     });
 
-    const unique = `E2E Cedig ${Date.now()}`;
+    const unique = `Sofia Mendes ${Date.now()}`;
     await page.getByLabel(/Nome do paciente/i).fill(unique);
     await page.getByLabel(/^Médico/i).selectOption({ index: 1 });
     await page.getByLabel(/Tabela de preço/i).selectOption("PARTICULAR");
@@ -91,7 +91,9 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
     });
   });
 
-  test("dashboard interno separa cobrança e produção clínica", async ({ page }) => {
+  test("dashboard CEDIG mostra Cobrança (A receber/Recebido) sem confusão com Produção clínica", async ({
+    page,
+  }) => {
     await loginAs(page, "interno", "operacao@cedig.demo", "bibi123", "cedig");
     await page.goto("/interno/dashboard");
     await expect(page.locator('[data-cursor-id="dashboard-billing-kpis"]')).toBeVisible({

@@ -35,7 +35,7 @@ NEXT_PUBLIC_DISABLE_ONBOARDING_AUTO=true npm run dev
 | D1 | — | Despesa Lab `300` | lista |
 | D2 | — | Despesa Pessoal `500` | lista |
 
-Médicos no select: Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Auto.
+Médicos no select: Alexandre Marçal · Luiza Lage · Bruno Dias · Luiza Zeraik · Fernanda Autran.
 
 ### Aceite
 - [ ] Valor sugerido sem cálculo manual  
