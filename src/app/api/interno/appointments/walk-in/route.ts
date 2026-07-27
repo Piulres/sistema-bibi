@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { walkInAndSchedule } from "@/lib/change-management/appointment-cancel";
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("agenda");
+    const user = await requireInternoModuleWrite("agenda");
     const body = (await request.json()) as {
       name: string;
       cpf: string;

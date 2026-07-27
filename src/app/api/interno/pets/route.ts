@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { createPet, listPets } from "@/lib/pet-service";
 import { requiresPet } from "@/lib/vet-niche";
 import { getPrisma } from "@/lib/db";
@@ -29,7 +29,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const prisma = await getPrisma();
     const tenant = await prisma.tenant.findFirst({
       where: { id: user.tenantId },

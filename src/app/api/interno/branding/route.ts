@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getPrisma } from "@/lib/db";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { getTenantBranding } from "@/lib/theme/branding";
 import {
   TIMELINE_ACTIONS,
@@ -56,7 +56,7 @@ export async function GET() {
 export async function PUT(request: Request) {
   const prisma = await getPrisma();
   try {
-    const user = await requireInternoModule("branding");
+    const user = await requireInternoModuleWrite("branding");
     const body = (await request.json()) as BrandingInput;
 
     const validationError = validateBrandingInput(body);

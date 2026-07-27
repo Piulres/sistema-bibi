@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { listStockMovements, registerStockMovement } from "@/lib/stock-service";
 
 export async function GET(request: Request) {
@@ -16,7 +16,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("estoque");
+    const user = await requireInternoModuleWrite("estoque");
     const body = (await request.json()) as {
       productId?: string;
       type?: string;

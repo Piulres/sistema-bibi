@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import {
   createAppointment,
   isAppointmentStatus,
@@ -64,7 +64,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("agenda");
+    const user = await requireInternoModuleWrite("agenda");
     const body = (await request.json()) as {
       patientId?: string;
       petId?: string | null;

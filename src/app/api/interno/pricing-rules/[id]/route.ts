@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { deletePricingRule, updatePricingRule } from "@/lib/pricing-rule-service";
 
 export async function PUT(
@@ -7,7 +7,7 @@ export async function PUT(
   ctx: RouteContext<"/api/interno/pricing-rules/[id]">,
 ) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const { id } = await ctx.params;
     const body = (await request.json()) as {
       multiplier?: number;
@@ -40,7 +40,7 @@ export async function DELETE(
   ctx: RouteContext<"/api/interno/pricing-rules/[id]">,
 ) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const { id } = await ctx.params;
 
     const result = await deletePricingRule({

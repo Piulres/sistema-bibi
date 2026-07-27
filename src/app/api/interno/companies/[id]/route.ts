@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { updateCompany } from "@/lib/company-service";
 
 type Params = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Params) {
   try {
-    const user = await requireInternoModule("cadastros");
+    const user = await requireInternoModuleWrite("cadastros");
     const { id } = await params;
     const body = (await request.json()) as Record<string, unknown>;
 

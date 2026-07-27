@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import {
   createProject,
   listProjectPipeline,
@@ -23,7 +23,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("projetos");
+    const user = await requireInternoModuleWrite("projetos");
     const body = (await request.json()) as Record<string, unknown>;
 
     const result = await createProject({

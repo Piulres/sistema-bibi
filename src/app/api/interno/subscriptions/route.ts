@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { requireInternoModule, authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import {
   createSubscription,
   listSubscriptions,
@@ -20,7 +20,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const user = await requireInternoModule("subscriptions");
+    const user = await requireInternoModuleWrite("subscriptions");
     const body = (await request.json()) as {
       patientId?: string;
       companyId?: string | null;

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import { authErrorResponse, requireInternoModuleWrite } from "@/lib/api-auth";
 import { updateLotStatus } from "@/lib/stock-service";
 
 export async function PATCH(
@@ -7,7 +7,7 @@ export async function PATCH(
   ctx: RouteContext<"/api/interno/stock/lots/[id]">,
 ) {
   try {
-    const user = await requireInternoModule("estoque");
+    const user = await requireInternoModuleWrite("estoque");
     const { id } = await ctx.params;
     const body = (await request.json()) as { status?: string };
 
