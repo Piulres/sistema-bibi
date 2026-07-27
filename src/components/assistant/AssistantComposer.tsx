@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import { useAssistant } from "@/components/assistant/AssistantProvider";
 import { useLabels } from "@/hooks/useLabels";
 import { buildPortalUiCopy } from "@/lib/assistant/portal-ui";
+import { mergeAssistantSuggestions } from "@/lib/assistant/suggestion-merge";
 import { getPageContextSuggestions } from "@/lib/assistant/page-suggestions";
 import type { PortalKey } from "@/lib/roles";
 
@@ -23,8 +24,7 @@ export default function AssistantComposer({ portal }: Props) {
   const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
   const suggestions = useMemo(() => {
     const contextual = getPageContextSuggestions(portal, pathname, labels);
-    const merged = [...contextual, ...copy.suggestions];
-    return [...new Set(merged)].slice(0, 12);
+    return mergeAssistantSuggestions(contextual, copy.suggestions);
   }, [portal, pathname, labels, copy.suggestions]);
 
   useEffect(() => {

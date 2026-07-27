@@ -177,8 +177,8 @@ export function buildInternoNavTabs(labels: NicheLabels, niche: NicheId): NavTab
     },
     {
       href: "/interno/assistente",
-      label: "Assistente",
-      shortLabel: "Assistente",
+      label: "Regras do assistente",
+      shortLabel: "Regras",
       key: "assistente",
       group: "Administração",
       priority: "secondary",

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import ScrollableNavRail from "@/components/ui/ScrollableNavRail";
-import { useMenuKeyboard } from "@/hooks/useMenuKeyboard";
+import NavOverflowMenu from "@/components/ui/NavOverflowMenu";
 
 export type NavTab = {
   href: string;
@@ -75,37 +75,15 @@ export default function NavTabs({
     ? secondaryTabs.filter((tab) => tab.key !== active)
     : secondaryTabs;
 
-  const [moreOpen, setMoreOpen] = useState(false);
-  const [menuActive, setMenuActive] = useState(active);
-  const moreRef = useRef<HTMLDivElement>(null);
-  const moreTriggerRef = useRef<HTMLButtonElement>(null);
-  const moreMenuRef = useRef<HTMLDivElement>(null);
-  const moreMenuId = useId();
-
-  if (active !== menuActive) {
-    setMenuActive(active);
-    if (moreOpen) setMoreOpen(false);
-  }
-
-  useMenuKeyboard({
-    open: moreOpen,
-    menuRef: moreMenuRef,
-    triggerRef: moreTriggerRef,
-    onClose: () => setMoreOpen(false),
+  const [moreSession, setMoreSession] = useState<{ activeKey: string; open: boolean }>({
+    activeKey: active ?? "",
+    open: false,
   });
-
-  useEffect(() => {
-    if (!moreOpen) return;
-    const onPointer = (event: MouseEvent) => {
-      if (!moreRef.current?.contains(event.target as Node)) {
-        setMoreOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", onPointer);
-    return () => {
-      document.removeEventListener("mousedown", onPointer);
-    };
-  }, [moreOpen]);
+  const moreOpen = moreSession.open && moreSession.activeKey === (active ?? "");
+  const setMoreOpen = (open: boolean) => {
+    setMoreSession({ activeKey: active ?? "", open });
+  };
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <ScrollableNavRail className={className} activeKey={active}>
@@ -128,24 +106,35 @@ export default function NavTabs({
         ))}
 
         {moreTabs.length > 0 && (
-          <div ref={moreRef} className="relative shrink-0 snap-start self-stretch">
+          <div className="relative flex shrink-0 snap-start items-center self-stretch pl-0.5">
+            <span
+              className="mx-1 hidden h-5 w-px bg-[var(--border-default)] sm:block"
+              aria-hidden
+            />
             <button
               ref={moreTriggerRef}
               type="button"
               data-tour-nav="more"
               aria-expanded={moreOpen}
-              aria-controls={moreMenuId}
               aria-haspopup="menu"
               title="Mais módulos"
-              onClick={() => setMoreOpen((open) => !open)}
+              onClick={() => setMoreOpen(!moreOpen)}
               className={cn(
-                tabClassName(false, activeClass, idleClass),
-                "inline-flex items-center gap-1",
-                moreOpen && "border-[var(--border-accent)] text-[var(--brand-accent)]",
+                "mb-1 inline-flex min-h-9 items-center gap-1 rounded-[var(--radius-button)] px-2.5 py-1.5",
+                "text-sm font-medium transition touch-manipulation",
+                focusTabClass,
+                moreOpen
+                  ? "bg-[var(--surface-muted)] text-[var(--text-primary)]"
+                  : "text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]",
               )}
             >
               Mais
-              <svg className="h-3.5 w-3.5 opacity-70" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+              <svg
+                className={cn("h-3.5 w-3.5 opacity-70 transition-transform", moreOpen && "rotate-180")}
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                aria-hidden
+              >
                 <path
                   fillRule="evenodd"
                   d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
@@ -153,36 +142,15 @@ export default function NavTabs({
                 />
               </svg>
             </button>
-            {moreOpen && (
-              <div
-                id={moreMenuId}
-                ref={moreMenuRef}
-                role="menu"
-                aria-label="Mais módulos"
-                className="absolute right-0 top-full z-40 mt-1 min-w-[12rem] rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] py-1 shadow-lg"
-              >
-                {moreTabs.map((tab) => (
-                  <Link
-                    key={tab.href}
-                    role="menuitem"
-                    href={tab.href}
-                    title={tab.label}
-                    data-tour-nav={tab.key}
-                    onClick={() => setMoreOpen(false)}
-                    className={cn(
-                      "block px-3 py-2.5 text-sm font-medium transition hover:bg-[var(--surface-muted)]",
-                      focusTabClass,
-                      active === tab.key
-                        ? "text-[var(--brand-accent)]"
-                        : "text-[var(--text-secondary)]",
-                    )}
-                    aria-current={active === tab.key ? "page" : undefined}
-                  >
-                    {tab.label}
-                  </Link>
-                ))}
-              </div>
-            )}
+
+            <NavOverflowMenu
+              items={moreTabs}
+              activeKey={active}
+              open={moreOpen}
+              onOpenChange={setMoreOpen}
+              triggerRef={moreTriggerRef}
+              hasPinnedSecondary={Boolean(activeSecondary)}
+            />
           </div>
         )}
       </nav>
