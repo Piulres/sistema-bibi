@@ -49,8 +49,9 @@ export async function POST(request: Request) {
     });
 
     if ("error" in result) {
-      const status = result.error.includes("não encontrado") ? 404 : 400;
-      return NextResponse.json({ error: result.error }, { status });
+      const message = result.error ?? "Não foi possível agendar";
+      const status = message.includes("não encontrado") ? 404 : 400;
+      return NextResponse.json({ error: message }, { status });
     }
 
     return NextResponse.json(result);
