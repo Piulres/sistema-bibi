@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import LoadingState from "@/components/ui/LoadingState";
 import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
+import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
 import { useToast } from "@/components/ui/Toast";
 import { useLabels } from "@/hooks/useLabels";
@@ -13,6 +14,7 @@ import type {
   CedigPolypectomyTierId,
   CedigPriceTableId,
 } from "@/lib/clinic-finance/cedig-pricing";
+import { summarizeClinicMonthStrip } from "@/lib/clinic-finance/month-strip";
 import { civilDateISO } from "@/lib/timezone";
 
 function brl(v: number) {
@@ -90,6 +92,22 @@ type Kpis = {
 
 type Tab = "lancamentos" | "despesas" | "indicadores";
 
+function hasClinicalExtras(form: {
+  biopsies: string;
+  polypectomies: string;
+  polypectomyTier: string;
+  mucosectomies: string;
+  clips: string;
+}) {
+  return (
+    Number(form.biopsies) > 0 ||
+    Number(form.polypectomies) > 0 ||
+    Boolean(form.polypectomyTier) ||
+    Number(form.mucosectomies) > 0 ||
+    Number(form.clips) > 0
+  );
+}
+
 export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   const { labels } = useLabels();
   const { showToast } = useToast();
@@ -97,9 +115,13 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   const [tab, setTab] = useState<Tab>("lancamentos");
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
-  const [loading, setLoading] = useState(true);
+  const [bootLoading, setBootLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [kpisLoading, setKpisLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const metaReadyRef = useRef(false);
+  const kpisKeyRef = useRef<string | null>(null);
 
   const [providers, setProviders] = useState<Provider[]>([]);
   const [procedures, setProcedures] = useState<Procedure[]>([]);
@@ -138,6 +160,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   });
 
   const selectedProcedure = procedures.find((p) => p.id === form.procedureId);
+  const extrasActive = hasClinicalExtras(form);
 
   const suggestion = useMemo(() => {
     if (!selectedProcedure) return null;
@@ -159,6 +182,12 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     form.mucosectomies,
     form.clips,
   ]);
+
+  /** KPIs leves a partir das listas já carregadas — evita esperar a aba Indicadores. */
+  const stripKpis = useMemo(
+    () => summarizeClinicMonthStrip({ launches, expenses }),
+    [launches, expenses],
+  );
 
   function applySuggestion() {
     if (!suggestion) return;
@@ -189,72 +218,146 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     });
   }
 
-  async function loadAll() {
-    setLoading(true);
+  async function loadMeta(): Promise<{ ok: true } | { ok: false; error: string }> {
+    const metaRes = await fetch("/api/interno/clinic-finance/meta");
+    if (metaRes.status === 403) {
+      return {
+        ok: false,
+        error: "Sem permissão para acessar a gestão clínico-financeira.",
+      };
+    }
+    if (!metaRes.ok) {
+      return {
+        ok: false,
+        error: "Não foi possível carregar menus da gestão clínica. Tente novamente.",
+      };
+    }
+    const meta = await metaRes.json();
+    setProviders(meta.providers ?? []);
+    setProcedures(meta.procedures ?? []);
+    setPatients(meta.patients ?? []);
+    setPaymentMethods(meta.paymentMethods ?? []);
+    setExpenseCategories(meta.expenseCategories ?? []);
+    setPriceTables(meta.priceTables ?? []);
+    setPolypectomyTiers(meta.polypectomyTiers ?? []);
+    setForm((f) => {
+      const firstProc = meta.procedures?.[0];
+      const nextProcId = f.procedureId || firstProc?.id || "";
+      const proc =
+        (meta.procedures as Procedure[] | undefined)?.find((p) => p.id === nextProcId) ??
+        firstProc;
+      const sug = proc
+        ? suggestCedigAmount({
+            procedureCode: proc.code,
+            priceTable: (f.priceTable || "PARTICULAR") as CedigPriceTableId,
+          })
+        : null;
+      return {
+        ...f,
+        providerId: f.providerId || meta.providers?.[0]?.id || "",
+        procedureId: nextProcId,
+        amountReceived:
+          f.amountReceived || (sug ? String(sug.total) : String(proc?.basePrice ?? "")),
+      };
+    });
+    metaReadyRef.current = true;
+    return { ok: true };
+  }
+
+  async function loadPeriod(opts?: { soft?: boolean; includeKpis?: boolean }) {
+    const soft = opts?.soft ?? false;
+    const includeKpis = opts?.includeKpis ?? false;
+    if (soft) setRefreshing(true);
     setLoadError(null);
     const q = `year=${year}&month=${month}`;
-    const [metaRes, launchesRes, expensesRes, kpisRes] = await Promise.all([
-      fetch("/api/interno/clinic-finance/meta"),
-      fetch(`/api/interno/clinic-finance/launches?${q}`),
-      fetch(`/api/interno/clinic-finance/expenses?${q}`),
-      fetch(`/api/interno/clinic-finance/kpis?${q}`),
-    ]);
+    const periodKey = `${year}-${month}`;
 
-    if (metaRes.status === 403 || kpisRes.status === 403) {
-      setLoadError("Sem permissão para acessar a gestão clínico-financeira.");
-      setLoading(false);
+    try {
+      const fetches: Promise<Response>[] = [
+        fetch(`/api/interno/clinic-finance/launches?${q}`),
+        fetch(`/api/interno/clinic-finance/expenses?${q}`),
+      ];
+      if (includeKpis) {
+        setKpisLoading(true);
+        fetches.push(fetch(`/api/interno/clinic-finance/kpis?${q}`));
+      }
+
+      const responses = await Promise.all(fetches);
+      const [launchesRes, expensesRes, kpisRes] = responses;
+
+      if (launchesRes.status === 403 || expensesRes.status === 403) {
+        setLoadError("Sem permissão para acessar a gestão clínico-financeira.");
+        return;
+      }
+      if (!launchesRes.ok && !expensesRes.ok) {
+        setLoadError(
+          "Não foi possível carregar a gestão clínico-financeira. Tente novamente.",
+        );
+        return;
+      }
+
+      if (launchesRes.ok) {
+        const launchesJson = await launchesRes.json();
+        setLaunches(launchesJson.launches ?? []);
+      }
+      if (expensesRes.ok) {
+        const expensesJson = await expensesRes.json();
+        setExpenses(expensesJson.expenses ?? []);
+      }
+      if (includeKpis && kpisRes) {
+        if (kpisRes.status === 403) {
+          setLoadError("Sem permissão para acessar a gestão clínico-financeira.");
+          return;
+        }
+        if (kpisRes.ok) {
+          const kpisJson = await kpisRes.json();
+          setKpis(kpisJson.kpis ?? null);
+          kpisKeyRef.current = periodKey;
+        }
+      } else if (kpisKeyRef.current !== periodKey) {
+        // Mês mudou — invalida KPIs detalhados até a aba Indicadores pedir de novo
+        setKpis(null);
+        kpisKeyRef.current = null;
+      }
+    } finally {
+      if (soft) setRefreshing(false);
+      setKpisLoading(false);
+    }
+  }
+
+  async function boot() {
+    setBootLoading(true);
+    setLoadError(null);
+    const meta = await loadMeta();
+    if (!meta.ok) {
+      setLoadError(meta.error);
+      setBootLoading(false);
       return;
     }
-    if (!metaRes.ok && !launchesRes.ok && !kpisRes.ok) {
-      setLoadError("Não foi possível carregar a gestão clínico-financeira. Tente novamente.");
-      setLoading(false);
-      return;
-    }
-
-    const meta = await metaRes.json();
-    const launchesJson = await launchesRes.json();
-    const expensesJson = await expensesRes.json();
-    const kpisJson = await kpisRes.json();
-
-    if (metaRes.ok) {
-      setProviders(meta.providers ?? []);
-      setProcedures(meta.procedures ?? []);
-      setPatients(meta.patients ?? []);
-      setPaymentMethods(meta.paymentMethods ?? []);
-      setExpenseCategories(meta.expenseCategories ?? []);
-      setPriceTables(meta.priceTables ?? []);
-      setPolypectomyTiers(meta.polypectomyTiers ?? []);
-      setForm((f) => {
-        const firstProc = meta.procedures?.[0];
-        const nextProcId = f.procedureId || firstProc?.id || "";
-        const proc =
-          (meta.procedures as Procedure[] | undefined)?.find((p) => p.id === nextProcId) ??
-          firstProc;
-        const sug = proc
-          ? suggestCedigAmount({
-              procedureCode: proc.code,
-              priceTable: (f.priceTable || "PARTICULAR") as CedigPriceTableId,
-            })
-          : null;
-        return {
-          ...f,
-          providerId: f.providerId || meta.providers?.[0]?.id || "",
-          procedureId: nextProcId,
-          amountReceived:
-            f.amountReceived || (sug ? String(sug.total) : String(proc?.basePrice ?? "")),
-        };
-      });
-    }
-    if (launchesRes.ok) setLaunches(launchesJson.launches ?? []);
-    if (expensesRes.ok) setExpenses(expensesJson.expenses ?? []);
-    if (kpisRes.ok) setKpis(kpisJson.kpis ?? null);
-    setLoading(false);
+    await loadPeriod({ soft: false, includeKpis: false });
+    setBootLoading(false);
   }
 
   useEffect(() => {
     let active = true;
     (async () => {
-      await loadAll();
+      await boot();
+      if (!active) return;
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- boot once
+  }, []);
+
+  useEffect(() => {
+    if (!metaReadyRef.current) return;
+    let active = true;
+    (async () => {
+      await loadPeriod({
+        soft: true,
+        includeKpis: tab === "indicadores",
+      });
       if (!active) return;
     })();
     return () => {
@@ -262,6 +365,40 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reload on month/year
   }, [year, month]);
+
+  useEffect(() => {
+    if (tab !== "indicadores") return;
+    const periodKey = `${year}-${month}`;
+    if (kpisKeyRef.current === periodKey && kpis) return;
+    let active = true;
+    (async () => {
+      setKpisLoading(true);
+      setLoadError(null);
+      try {
+        const kpisRes = await fetch(
+          `/api/interno/clinic-finance/kpis?year=${year}&month=${month}`,
+        );
+        if (!active) return;
+        if (kpisRes.status === 403) {
+          setLoadError("Sem permissão para acessar a gestão clínico-financeira.");
+          return;
+        }
+        if (!kpisRes.ok) {
+          setLoadError("Não foi possível carregar os indicadores. Tente novamente.");
+          return;
+        }
+        const kpisJson = await kpisRes.json();
+        setKpis(kpisJson.kpis ?? null);
+        kpisKeyRef.current = periodKey;
+      } finally {
+        if (active) setKpisLoading(false);
+      }
+    })();
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- lazy KPIs on tab
+  }, [tab, year, month]);
 
   async function submitLaunch(e: React.FormEvent) {
     e.preventDefault();
@@ -285,6 +422,7 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       });
       let json: {
         error?: string;
+        launch?: Launch;
         bridge?: { bridgeStatus?: string; bridgeNote?: string | null } | null;
       } = {};
       try {
@@ -328,7 +466,9 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
         clips: "0",
         notes: "",
       }));
-      await loadAll();
+      // Soft refresh: mantém o formulário visível; meta não é recarregada
+      kpisKeyRef.current = null;
+      await loadPeriod({ soft: true, includeKpis: tab === "indicadores" });
     } catch {
       showToast({
         message: "Falha de rede ao salvar o lançamento. Verifique a conexão.",
@@ -370,7 +510,8 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
       }
       showToast({ message: "Despesa registrada.", tone: "success" });
       setExpenseForm((f) => ({ ...f, description: "", amount: "" }));
-      await loadAll();
+      kpisKeyRef.current = null;
+      await loadPeriod({ soft: true, includeKpis: tab === "indicadores" });
     } catch {
       showToast({
         message: "Falha de rede ao salvar a despesa. Verifique a conexão.",
@@ -381,24 +522,34 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
     }
   }
 
-  if (loading) {
+  if (bootLoading) {
     return <LoadingState message="Carregando gestão clínica…" />;
   }
 
-  if (loadError) {
+  if (loadError && providers.length === 0 && launches.length === 0) {
     return (
       <div className="space-y-3">
         <Alert tone="danger">{loadError}</Alert>
-        <Button variant="secondary" onClick={() => void loadAll()}>
+        <Button variant="secondary" onClick={() => void boot()}>
           Tentar novamente
         </Button>
       </div>
     );
   }
 
-  const tabs: { id: Tab; label: string; shortLabel: string }[] = [
-    { id: "lancamentos", label: "1. Lançamentos", shortLabel: "Lançamentos" },
-    { id: "despesas", label: "2. Despesas", shortLabel: "Despesas" },
+  const tabs: { id: Tab; label: string; shortLabel: string; count?: number }[] = [
+    {
+      id: "lancamentos",
+      label: "1. Lançamentos",
+      shortLabel: "Lançamentos",
+      count: launches.length,
+    },
+    {
+      id: "despesas",
+      label: "2. Despesas",
+      shortLabel: "Despesas",
+      count: expenses.length,
+    },
     { id: "indicadores", label: "3. Indicadores", shortLabel: "Indicadores" },
   ];
 
@@ -445,6 +596,55 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
         </div>
       </div>
 
+      {/* Faixa de KPIs do mês — sempre visível, sem esperar aba Indicadores */}
+      <div
+        className="grid min-w-0 grid-cols-2 gap-2 sm:grid-cols-4"
+        data-cursor-id="clinic-finance-kpi-strip"
+        aria-busy={refreshing}
+      >
+        {(
+          [
+            ["Receita", brl(stripKpis.revenue)],
+            ["Exames", String(stripKpis.examCount)],
+            ["Despesas", brl(stripKpis.totalExpenses)],
+            ["Lucro", brl(stripKpis.operatingProfit)],
+          ] as const
+        ).map(([label, value]) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => setTab("indicadores")}
+            className="min-w-0 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)] px-3 py-2.5 text-left transition hover:border-[var(--brand-primary)]/40"
+          >
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-muted)]">
+              {label}
+            </p>
+            <p className="mt-0.5 truncate text-sm font-semibold tabular-nums text-[var(--text-primary)] sm:text-base">
+              {value}
+            </p>
+          </button>
+        ))}
+      </div>
+
+      {refreshing && (
+        <p className="text-xs text-[var(--text-muted)]" aria-live="polite">
+          Atualizando mês…
+        </p>
+      )}
+
+      {loadError && (
+        <Alert tone="danger">
+          {loadError}{" "}
+          <button
+            type="button"
+            className="underline"
+            onClick={() => void loadPeriod({ soft: true, includeKpis: tab === "indicadores" })}
+          >
+            Tentar novamente
+          </button>
+        </Alert>
+      )}
+
       {form.appointmentId ? (
         <p
           className="rounded-lg border border-teal-200 bg-teal-50/60 px-3 py-2 text-sm text-[var(--text-secondary)]"
@@ -472,8 +672,14 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
                 : "text-[var(--text-secondary)] hover:bg-[var(--surface-card)] sm:hover:bg-[var(--surface-muted)]"
             }`}
           >
-            <span className="sm:hidden">{t.shortLabel}</span>
-            <span className="hidden sm:inline">{t.label}</span>
+            <span className="sm:hidden">
+              {t.shortLabel}
+              {typeof t.count === "number" ? ` (${t.count})` : ""}
+            </span>
+            <span className="hidden sm:inline">
+              {t.label}
+              {typeof t.count === "number" ? ` (${t.count})` : ""}
+            </span>
           </button>
         ))}
       </div>
@@ -631,81 +837,99 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
               </div>
             </div>
 
-            <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] pt-4">
-              <h3 className={sectionTitleClass}>Extras clínicos</h3>
-              <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                <label className={labelClass}>
-                  Biópsias (frascos)
-                  <span className="ml-1 font-normal text-[var(--text-muted)]">
-                    · R$ 150/un
+            {/* Extras clínicos recolhidos — fluxo rápido sem biópsia/pólipo */}
+            <details
+              className="min-w-0 rounded-lg border border-[var(--border-default)] bg-[var(--surface-muted)]/40 open:bg-transparent"
+              data-cursor-id="clinic-finance-extras"
+            >
+              <summary className="cursor-pointer list-none px-3 py-3 text-sm font-medium text-[var(--text-primary)] marker:content-none [&::-webkit-details-marker]:hidden">
+                <span className="flex items-center justify-between gap-2">
+                  <span>
+                    Extras clínicos
+                    <span className="ml-2 font-normal text-[var(--text-muted)]">
+                      biópsias, polipectomia, clips
+                    </span>
                   </span>
-                  <input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    className={fieldClass}
-                    value={form.biopsies}
-                    onChange={(e) => patchForm({ biopsies: e.target.value })}
-                  />
-                </label>
-                <label className={labelClass}>
-                  Tipo de polipectomia
-                  <select
-                    className={fieldClass}
-                    value={form.polypectomyTier}
-                    onChange={(e) =>
-                      patchForm({
-                        polypectomyTier: e.target.value,
-                        polypectomies:
-                          e.target.value && form.polypectomies === "0"
-                            ? "1"
-                            : form.polypectomies,
-                      })
-                    }
-                  >
-                    <option value="">Nenhuma</option>
-                    {polypectomyTiers.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className={labelClass}>
-                  Qtd. polipectomias
-                  <input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    className={fieldClass}
-                    value={form.polypectomies}
-                    onChange={(e) => patchForm({ polypectomies: e.target.value })}
-                  />
-                </label>
-                <label className={labelClass}>
-                  Mucosectomias
-                  <input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    className={fieldClass}
-                    value={form.mucosectomies}
-                    onChange={(e) => patchForm({ mucosectomies: e.target.value })}
-                  />
-                </label>
-                <label className={labelClass}>
-                  Clips hemostáticos
-                  <input
-                    type="number"
-                    min={0}
-                    inputMode="numeric"
-                    className={fieldClass}
-                    value={form.clips}
-                    onChange={(e) => patchForm({ clips: e.target.value })}
-                  />
-                </label>
+                  <span className="shrink-0 text-xs text-[var(--text-muted)]">
+                    {extrasActive ? "com valores" : "opcional"}
+                  </span>
+                </span>
+              </summary>
+              <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] px-3 pb-3 pt-3">
+                <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <label className={labelClass}>
+                    Biópsias (frascos)
+                    <span className="ml-1 font-normal text-[var(--text-muted)]">
+                      · R$ 150/un
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      className={fieldClass}
+                      value={form.biopsies}
+                      onChange={(e) => patchForm({ biopsies: e.target.value })}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Tipo de polipectomia
+                    <select
+                      className={fieldClass}
+                      value={form.polypectomyTier}
+                      onChange={(e) =>
+                        patchForm({
+                          polypectomyTier: e.target.value,
+                          polypectomies:
+                            e.target.value && form.polypectomies === "0"
+                              ? "1"
+                              : form.polypectomies,
+                        })
+                      }
+                    >
+                      <option value="">Nenhuma</option>
+                      {polypectomyTiers.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className={labelClass}>
+                    Qtd. polipectomias
+                    <input
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      className={fieldClass}
+                      value={form.polypectomies}
+                      onChange={(e) => patchForm({ polypectomies: e.target.value })}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Mucosectomias
+                    <input
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      className={fieldClass}
+                      value={form.mucosectomies}
+                      onChange={(e) => patchForm({ mucosectomies: e.target.value })}
+                    />
+                  </label>
+                  <label className={labelClass}>
+                    Clips hemostáticos
+                    <input
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      className={fieldClass}
+                      value={form.clips}
+                      onChange={(e) => patchForm({ clips: e.target.value })}
+                    />
+                  </label>
+                </div>
               </div>
-            </div>
+            </details>
 
             <div className="min-w-0 space-y-3 border-t border-[var(--border-default)] pt-4">
               <h3 className={sectionTitleClass}>Valor</h3>
@@ -768,15 +992,31 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
               </div>
             </div>
 
-            <div className="min-w-0 border-t border-[var(--border-default)] pt-4">
-              <Button
-                type="submit"
-                variant="primary"
-                disabled={saving || providers.length === 0 || procedures.length === 0}
-                className="w-full sm:w-auto"
-              >
-                {saving ? "Salvando…" : "Registrar lançamento"}
-              </Button>
+            <div className="sticky bottom-2 z-10 min-w-0 rounded-xl border border-[var(--border-default)] bg-[var(--surface-card)]/95 p-3 shadow-sm backdrop-blur supports-[backdrop-filter]:bg-[var(--surface-card)]/80 sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none sm:border-t sm:border-[var(--border-default)] sm:pt-4">
+              <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p className="min-w-0 text-sm text-[var(--text-secondary)]">
+                  Total:{" "}
+                  <strong className="tabular-nums text-[var(--text-primary)]">
+                    {form.amountReceived
+                      ? brl(Number(form.amountReceived) || 0)
+                      : "—"}
+                  </strong>
+                  {suggestion &&
+                    Number(form.amountReceived) !== suggestion.total && (
+                      <span className="ml-2 text-xs text-[var(--text-muted)]">
+                        (sugestão {brl(suggestion.total)})
+                      </span>
+                    )}
+                </p>
+                <Button
+                  type="submit"
+                  variant="primary"
+                  disabled={saving || providers.length === 0 || procedures.length === 0}
+                  className="w-full sm:w-auto"
+                >
+                  {saving ? "Salvando…" : "Registrar lançamento"}
+                </Button>
+              </div>
               {(providers.length === 0 || procedures.length === 0) && (
                 <p className="mt-2 text-xs text-[var(--text-muted)]">
                   Cadastre médicos (prestadores) e exames do catálogo CEDIG antes de lançar.
@@ -784,6 +1024,11 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
               )}
             </div>
           </form>
+
+          <SectionHeader
+            title={`Lançamentos do mês (${launches.length})`}
+            description="Cada linha sincroniza agenda, extrato do médico e fatura quando a ponte fica SYNCED."
+          />
 
           {/* Mobile: cards legíveis */}
           <div className="space-y-3 md:hidden">
@@ -976,6 +1221,8 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
             </div>
           </form>
 
+          <SectionHeader title={`Despesas do mês (${expenses.length})`} />
+
           <ul className="divide-y rounded-xl border border-[var(--border-default)]">
             {expenses.map((e) => (
               <li
@@ -1002,76 +1249,83 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
         </section>
       )}
 
-      {tab === "indicadores" && kpis && (
+      {tab === "indicadores" && (
         <section className="min-w-0 space-y-5 sm:space-y-6">
-          <div className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
-            {[
-              ["Receita do mês", brl(kpis.revenue)],
-              ["Total de despesas", brl(kpis.totalExpenses)],
-              ["Lucro operacional", brl(kpis.operatingProfit)],
-              ["Ticket médio", brl(kpis.averageTicket)],
-              ["Exames realizados", String(kpis.examCount)],
-              ["Frascos (lab)", String(kpis.labVials)],
-              ["Lucro por exame", brl(kpis.profitPerExam)],
-              [
-                "Bio / Pól / Muc / Clip",
-                `${kpis.totalsCounters.biopsies}/${kpis.totalsCounters.polypectomies}/${kpis.totalsCounters.mucosectomies}/${kpis.totalsCounters.clips}`,
-              ],
-            ].map(([label, value]) => (
-              <div
-                key={label}
-                className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4"
-              >
-                <p className="break-words text-xs uppercase text-[var(--text-muted)]">
-                  {label}
-                </p>
-                <p className="mt-1 break-words text-base font-semibold tabular-nums text-[var(--text-primary)] sm:text-lg">
-                  {value}
-                </p>
+          {kpisLoading && !kpis && (
+            <LoadingState message="Carregando indicadores do mês…" />
+          )}
+          {kpis && (
+            <>
+              <div className="grid min-w-0 grid-cols-2 gap-3 lg:grid-cols-4">
+                {[
+                  ["Receita do mês", brl(kpis.revenue)],
+                  ["Total de despesas", brl(kpis.totalExpenses)],
+                  ["Lucro operacional", brl(kpis.operatingProfit)],
+                  ["Ticket médio", brl(kpis.averageTicket)],
+                  ["Exames realizados", String(kpis.examCount)],
+                  ["Frascos (lab)", String(kpis.labVials)],
+                  ["Lucro por exame", brl(kpis.profitPerExam)],
+                  [
+                    "Bio / Pól / Muc / Clip",
+                    `${kpis.totalsCounters.biopsies}/${kpis.totalsCounters.polypectomies}/${kpis.totalsCounters.mucosectomies}/${kpis.totalsCounters.clips}`,
+                  ],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4"
+                  >
+                    <p className="break-words text-xs uppercase text-[var(--text-muted)]">
+                      {label}
+                    </p>
+                    <p className="mt-1 break-words text-base font-semibold tabular-nums text-[var(--text-primary)] sm:text-lg">
+                      {value}
+                    </p>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
 
-          <div className="grid min-w-0 gap-4 lg:grid-cols-2">
-            <div className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4">
-              <h3 className="font-medium">Exames por tipo</h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                {kpis.examsByType.map((row) => (
-                  <li
-                    key={row.name}
-                    className="flex items-start justify-between gap-3"
-                  >
-                    <span className="min-w-0 break-words">
-                      {row.name} · {row.count}x
-                    </span>
-                    <span className="shrink-0 tabular-nums">{brl(row.revenue)}</span>
-                  </li>
-                ))}
-                {kpis.examsByType.length === 0 && (
-                  <li className="text-[var(--text-muted)]">Sem dados.</li>
-                )}
-              </ul>
-            </div>
-            <div className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4">
-              <h3 className="font-medium">Produção por médico</h3>
-              <ul className="mt-3 space-y-2 text-sm">
-                {kpis.productionByDoctor.map((row) => (
-                  <li
-                    key={row.name}
-                    className="flex items-start justify-between gap-3"
-                  >
-                    <span className="min-w-0 break-words">
-                      {row.name} · {row.count} exames · {row.biopsies} frascos
-                    </span>
-                    <span className="shrink-0 tabular-nums">{brl(row.revenue)}</span>
-                  </li>
-                ))}
-                {kpis.productionByDoctor.length === 0 && (
-                  <li className="text-[var(--text-muted)]">Sem dados.</li>
-                )}
-              </ul>
-            </div>
-          </div>
+              <div className="grid min-w-0 gap-4 lg:grid-cols-2">
+                <div className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4">
+                  <h3 className="font-medium">Exames por tipo</h3>
+                  <ul className="mt-3 space-y-2 text-sm">
+                    {kpis.examsByType.map((row) => (
+                      <li
+                        key={row.name}
+                        className="flex items-start justify-between gap-3"
+                      >
+                        <span className="min-w-0 break-words">
+                          {row.name} · {row.count}x
+                        </span>
+                        <span className="shrink-0 tabular-nums">{brl(row.revenue)}</span>
+                      </li>
+                    ))}
+                    {kpis.examsByType.length === 0 && (
+                      <li className="text-[var(--text-muted)]">Sem dados.</li>
+                    )}
+                  </ul>
+                </div>
+                <div className="min-w-0 rounded-xl border border-[var(--border-default)] p-3 sm:p-4">
+                  <h3 className="font-medium">Produção por médico</h3>
+                  <ul className="mt-3 space-y-2 text-sm">
+                    {kpis.productionByDoctor.map((row) => (
+                      <li
+                        key={row.name}
+                        className="flex items-start justify-between gap-3"
+                      >
+                        <span className="min-w-0 break-words">
+                          {row.name} · {row.count} exames · {row.biopsies} frascos
+                        </span>
+                        <span className="shrink-0 tabular-nums">{brl(row.revenue)}</span>
+                      </li>
+                    ))}
+                    {kpis.productionByDoctor.length === 0 && (
+                      <li className="text-[var(--text-muted)]">Sem dados.</li>
+                    )}
+                  </ul>
+                </div>
+              </div>
+            </>
+          )}
         </section>
       )}
     </div>

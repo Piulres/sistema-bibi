@@ -5,8 +5,8 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 
 | Campo | Valor |
 |-------|-------|
-| **Atualizado em** | 2026-07-26 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.8** |
+| **Atualizado em** | 2026-07-27 |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.15** (pacote) · produção ver `RELEASES.md` |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
@@ -92,6 +92,7 @@ npx playwright test e2e/cedig-gestao.spec.ts --project=chromium
 
 | Data | Evento | Resultado |
 |------|--------|----------|
+| 2026-07-27 | UX `/interno/gestao`: KPI strip + refresh soft + extras recolhidos + `/kpis` sob demanda | ✅ |
 | 2026-07-26 | Pacote **v3.0.8** em `main`: jornada narrativa do consultório (`JORNADA_CONSULTORIO.md`) + playbook reset CEDIG documentado | ✅ |
 | 2026-07-26 | Reset operacional CEDIG (produção Blobs): zerou pacientes/agenda/lançamentos/faturas/despesas/PEP; manteve 11 usuários + 5 exames; restaurou 3 empresas + 15 PricingRules. Scripts `reset-cedig-transactional.mjs` + `cedig-ensure-commercial.ts` + `publish-operation-blob.mjs` · evento `CEDIG_TRANSACTIONAL_RESET` | ✅ |
 | 2026-07-26 | Pacote **v3.0.7** em produção: drawer mobile direita + dashboard executivo + gestão mobile + exports canônicos | ✅ |
