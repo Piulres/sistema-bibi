@@ -39,29 +39,40 @@ async function createUniqueAppointment(reason: string) {
   const patient = await prisma.patient.findFirst({ where: { cpf: "529.982.247-25" } });
   expect(patient).toBeTruthy();
 
-  const slot = new Date();
-  const dayOffset = 200 + (Date.now() % 40);
-  const minuteSlot = Math.floor(Date.now() / 100) % 48;
-  slot.setDate(slot.getDate() + dayOffset);
-  slot.setHours(7 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, 0, 0);
-
   await setSessionForEmail("recepcao@bibi.health");
   const { POST: createAppointmentPost } = await import("@/app/api/interno/appointments/route");
-  const apptRes = await createAppointmentPost(
-    jsonRequest("http://localhost/api/interno/appointments", {
-      method: "POST",
-      body: {
-        patientId: patient!.id,
-        providerId: provider.id,
-        scheduledAt: slot.toISOString(),
-        reason,
-        status: "CONFIRMADO",
-      },
-    }),
-  );
-  expect(apptRes.status, await apptRes.clone().text()).toBe(200);
-  const apptBody = await apptRes.json();
-  return apptBody.appointment.id as string;
+
+  // Evita colisão de slot com seed/operacional e entre testes paralelos do arquivo.
+  for (let attempt = 0; attempt < 8; attempt++) {
+    const slot = new Date();
+    const dayOffset = 260 + attempt * 3 + (Date.now() % 17);
+    const minuteSlot = (Date.now() + attempt * 13) % 48;
+    slot.setDate(slot.getDate() + dayOffset);
+    slot.setHours(6 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, attempt % 60, 0);
+
+    const apptRes = await createAppointmentPost(
+      jsonRequest("http://localhost/api/interno/appointments", {
+        method: "POST",
+        body: {
+          patientId: patient!.id,
+          providerId: provider.id,
+          scheduledAt: slot.toISOString(),
+          reason,
+          status: "CONFIRMADO",
+        },
+      }),
+    );
+    if (apptRes.status === 200) {
+      const apptBody = await apptRes.json();
+      return apptBody.appointment.id as string;
+    }
+    const text = await apptRes.text();
+    if (!/conflito|ocupado|indispon/i.test(text) && apptRes.status !== 400) {
+      expect.fail(`Falha ao criar agendamento (${apptRes.status}): ${text}`);
+    }
+  }
+
+  expect.fail("Não foi possível alocar slot único para o teste de estoque");
 }
 
 describe("Estoque clínico — catálogo, lotes, movimentos e alertas", () => {
