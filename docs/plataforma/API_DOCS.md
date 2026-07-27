@@ -257,6 +257,12 @@ Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer
 | `GET` | `/api/prestador/patients/{id}/medications` | prestador | Lista prescrições do paciente |
 | `POST` | `/api/prestador/patients/{id}/medications` | prestador | Nova prescrição (`prescriptionKind`: `COMUM` \| `CONTROLE_ESPECIAL`) |
 | `PATCH` | `/api/prestador/medications/{id}` | prestador | Transição de status: `ATIVA` \| `SUSPENSA` \| `ENCERRADA` |
+| `GET` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Lista receitas multi-item (`?appointmentId=` opcional) |
+| `POST` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Nova receita com N itens (`items[]`, `prescriptionKind`, `title?`) |
+| `GET` | `/api/prestador/appointments/{id}/participants` | prestador | Equipe vinculada ao atendimento |
+| `POST` | `/api/prestador/appointments/{id}/participants` | prestador | Adiciona profissional (`userId`, `role`, `chargeFee?`) |
+| `DELETE` | `/api/prestador/appointments/{id}/participants` | prestador | Remove participante (`?participantId=`) |
+| `GET` | `/api/prestador/appointments/{id}/participants/eligible` | prestador | Profissionais elegíveis (exclui já vinculados) |
 | `GET` | `/api/prestador/patients/{id}/exam-orders` | prestador | Lista pedidos (`?appointmentId=` opcional) |
 | `POST` | `/api/prestador/patients/{id}/exam-orders` | prestador | Cria pedido avulso (`examName` ou `procedureId`, `clinicalIndication?`) |
 | `PATCH` | `/api/prestador/exam-orders/{id}` | prestador | Atualiza status, laudo (`resultSummary`), `markReviewed` |
@@ -289,6 +295,42 @@ Campos obrigatórios: `medication`, `dosage`, `frequency`. Opcionais: `route`, `
 ```
 
 Reativar: `{ "status": "ATIVA" }`. Serviço: `src/lib/medication-service.ts` · `src/lib/exam-protocol-service.ts`.
+
+### Corpo — receita multi-item (`PrescriptionDocument`)
+
+```json
+{
+  "appointmentId": "apt_optional",
+  "prescriptionKind": "COMUM",
+  "title": "Pré-colonoscopia",
+  "notes": "Jejum absoluto",
+  "items": [
+    {
+      "medication": "Polietilenoglicol",
+      "dosage": "1 sachê",
+      "frequency": "Diluir conforme bula",
+      "route": "oral",
+      "durationDays": 1,
+      "quantity": "4 sachês"
+    }
+  ]
+}
+```
+
+Obrigatório: ao menos um item com `medication`, `dosage`, `frequency`. Serviço: `src/lib/prescription-document-service.ts` · UI: `PrescriptionDocumentForm.tsx`.
+
+### Corpo — adicionar membro à equipe
+
+```json
+{
+  "userId": "usr_abc",
+  "role": "ANESTESISTA",
+  "notes": "Sedação profunda",
+  "chargeFee": true
+}
+```
+
+Papéis válidos: `ANESTESISTA`, `TECNICO_ENFERMAGEM`, `ASSISTENTE`, `PARALEGAL`, `OUTRO` — rótulos por nicho em `team-roles.ts`. Com `chargeFee: true`, gera `ProcedureUsage` de taxa de equipe (código por papel). Requisitos obrigatórios vêm de `Procedure.teamRequirements` (JSON). Serviço: `src/lib/appointment-team-service.ts` · UI: `AppointmentTeamPanel.tsx`.
 
 ### Corpo — criar pedido de exame avulso
 
@@ -385,9 +427,9 @@ Fluxo de produto: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 · piloto:
 
 ---
 
-## 9. Exportações tabulares (v3.0.7)
+## 9. Exportações tabulares (v3.0.7+) · download autenticado (v3.0.13)
 
-Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI monta links via `ExportButtons` (`src/components/ExportButtons.tsx`).
+Relatórios e listagens usam o parâmetro de query **`format`** nos endpoints de export. A UI usa `ExportButtons` e `DownloadLink` com `downloadExportFile()` (`src/lib/ui/download-export.ts`) — **não** `<a download>` direto em rotas autenticadas.
 
 ### Formatos suportados
 

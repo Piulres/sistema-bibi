@@ -10,6 +10,7 @@ protocolos de exames, atestado, receita comum/especial e usabilidade mobile/desk
 | Protocolo de cuidado | `/interno/cadastros?tab=protocols` + aba Protocolos no atendimento | Editável + ativar/desativar |
 | Protocolo de exames | mesma aba Cadastros + aba Exames (aplicar em lote) | Editável + ativar/desativar |
 | Receita comum / controle especial | Care Chart (Medicação) + template PEP | Estruturada + reativar |
+| Receita multi-item | Aba **Receita** no atendimento (`PrescriptionDocumentForm`) | N medicamentos por documento; templates de preparo (ex.: colonoscopia) |
 | Atestado (afastamento / acompanhamento / comparecimento) | PEP → tipo Atestado | Texto estruturado CFM |
 | Assinatura digital / Atesta CFM / SNCR | — | Fora do escopo POC |
 
@@ -45,6 +46,39 @@ Base: **Portaria SVS/MS 344/1998**, atualizações **RDC 1000/2025** e prazos SN
 **Não coberto:** Notificações de Receita A/B (amarela/azul), numeração SNCR, retenção
 eletrônica Anvisa, modelos oficiais PDF tipográficos.
 
+## Receita multi-item (`PrescriptionDocument`) — v3.0.13
+
+Complementa a prescrição unitária (`MedicationPrescription`) com documentos que agrupam **vários medicamentos** em um único registro — útil para preparos (colonoscopia), kits e orientações combinadas.
+
+| Campo | Descrição |
+|-------|-----------|
+| `title` | Título do documento (ex.: "Pré-colonoscopia") |
+| `prescriptionKind` | `COMUM` ou `CONTROLE_ESPECIAL` |
+| `items[]` | Lista ordenada: `medication`, `dosage`, `frequency` (+ `route`, `durationDays`, `quantity`, `notes`) |
+| `appointmentId` | Vínculo opcional ao atendimento em curso |
+| `status` | `ATIVA` (default) |
+
+**Onde na UI:** `/prestador/atendimento/[id]` → aba **Receita** → `PrescriptionDocumentForm`.
+
+**Massa demo:** João (3 medicamentos) e Pedro (preparo colonoscopia) — ver [`MASSA_TESTES.md`](../plataforma/MASSA_TESTES.md).
+
+**API:** `GET/POST /api/prestador/patients/{id}/prescription-documents` — ver [`API_DOCS.md`](../plataforma/API_DOCS.md) §7.
+
+## Equipe no atendimento — v3.0.13
+
+Profissionais auxiliares vinculados ao agendamento via `AppointmentParticipant`.
+
+| Conceito | Detalhe |
+|----------|---------|
+| Papéis | `ANESTESISTA`, `TECNICO_ENFERMAGEM`, `ASSISTENTE`, `PARALEGAL`, `OUTRO` — rótulos por nicho |
+| Requisitos | `Procedure.teamRequirements` (JSON) — ex.: colonoscopia exige anestesista |
+| Custo PPU | `chargeFee: true` gera `ProcedureUsage` de taxa de equipe |
+| Validação | Bloqueia `REALIZADO` se papel obrigatório estiver ausente |
+
+**Onde na UI:** `/prestador/atendimento/[id]` → aba **Equipe** → `AppointmentTeamPanel`.
+
+**API:** `.../appointments/{id}/participants` — ver [`API_DOCS.md`](../plataforma/API_DOCS.md) §7.
+
 ## Protocolos de exames
 
 Modelo `ExamProtocolTemplate` — lista de nomes de exames + indicação clínica padrão.
@@ -63,6 +97,8 @@ No atendimento, **Aplicar protocolo** gera um `ExamOrder` por item. Pedidos avul
 - `src/lib/exam-protocol-service.ts` · `src/lib/pep-templates.ts`
 - `src/components/ExamProtocolTemplatesPanel.tsx` · `ProtocolTemplatesPanel.tsx`
 - `src/components/clinical/ClinicalCarePanel.tsx` · `AtendimentoView.tsx`
+- `src/lib/prescription-document-service.ts` · `src/lib/appointment-team-service.ts`
+- `src/components/clinical/PrescriptionDocumentForm.tsx` · `AppointmentTeamPanel.tsx`
 
 **Contrato HTTP:** [`plataforma/API_DOCS.md`](../plataforma/API_DOCS.md) §7 (protocolos de exames e prescrições).
 

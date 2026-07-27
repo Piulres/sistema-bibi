@@ -77,6 +77,10 @@ teste API (E2E só se houver UI crítica). Validar com `npm run test`.
 
 Cobertura v2.0 ServiceOS: `tests/unit/niche.test.ts` — `getNicheConfig`, `mergeNicheLabels`, landing por nicho e catálogo do seed multi-nicho.
 
+Cobertura v3.0.13 exportações autenticadas: `tests/unit/download-export.test.ts` (fetch+blob, `Content-Disposition` UTF-8) · `tests/api/exports-matrix.test.ts` (matriz de rotas).
+
+Cobertura v3.0.13 equipe e receita: `tests/unit/appointment-team.test.ts` (papéis por nicho, requisitos obrigatórios) · `tests/unit/prescription-document.test.ts` (receita multi-item).
+
 Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônicos, BOM UTF-8 via `arrayBuffer`, TXT pipe-delimited) · `tests/unit/interchange.test.ts` (dataset canônico CSV/JSON) · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ tabular).
 
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
@@ -394,10 +398,38 @@ Doc de componentes: [`DESIGN_SYSTEM.md`](DESIGN_SYSTEM.md) · [`produto/ARQUITET
 
 Pipeline em `.github/workflows/ci.yml` — dois jobs sequenciais:
 
-1. **unit-integration-api** — `lint` → `docs:verify` → `openapi:verify` → `db:bootstrap:demo` → `db:verify` → `test` → `build`
-2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`)
+1. **unit-integration-api** — `lint` → `docs:verify` → `openapi:verify` → `db:bootstrap:demo` → `db:verify` → `test` → **Job Summary Vitest** → `build`
+2. **e2e** — `db:bootstrap:demo` → Playwright (`CI=true`, porta `3100`) → **Job Summary Playwright** → upload de artefatos em falha
 
 **Runtime CI:** Node **24** · `actions/checkout@v6` · `actions/setup-node@v6`.
+
+### Job Summary (primeira leitura do revisor)
+
+O workflow escreve em `$GITHUB_STEP_SUMMARY` após cada suíte — visível na aba **Summary** do run no GitHub Actions.
+
+| Job | Step | Entrada | O que aparece |
+|-----|------|---------|----------------|
+| Vitest | `Job Summary — Vitest` | `reports/vitest-junit.xml` | Métricas passou/falhou/pulado, tabela de falhas (até 25), top 12 suites |
+| Playwright | `Job Summary — Playwright` | `reports/playwright-junit.xml` | Métricas da suite, amostra de casos com falha |
+
+**Reporters configurados:**
+
+| Runner | Arquivo | Reporters |
+|--------|---------|-----------|
+| Vitest | `vitest.config.ts` | `default` + `github-actions` + `junit` → `reports/vitest-junit.xml` |
+| Playwright | `playwright.config.ts` | `github` + `html` + `junit` → `reports/playwright-junit.xml` |
+
+Script Vitest: `scripts/ci-vitest-summary.mjs` — parseia JUnit e monta markdown. Variável opcional: `VITEST_JUNIT_PATH`.
+
+**Validar o summary localmente** (após `npm run test`):
+
+```bash
+VITEST_JUNIT_PATH=reports/vitest-junit.xml node scripts/ci-vitest-summary.mjs
+```
+
+**Artefatos em falha:** `vitest-junit` (sempre) · `playwright-report` + `test-results/` (só quando E2E falha).
+
+> Títulos WHAT+WHY nos testes alimentam diretamente o JUnit — nomes genéricos (`it("works")`) aparecem no Summary e dificultam o triage.
 
 **Otimização `test.db`:** o job unitário usa `DATABASE_URL=file:./test.db`. O helper `tests/helpers/db.ts` grava `prisma/.test-db-ready` com fingerprint de schema + seed; nos workers, `ensureTestDatabase()` pula subprocessos `prisma db push` quando o marker é válido (suíte ~112s → ~30s em runners lentos). Invalida ao mudar `schema.prisma` ou arquivos em `prisma/seed-data/`.
 

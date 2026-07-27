@@ -148,6 +148,8 @@ Detalhe técnico: [`FLUXOS.md`](FLUXOS.md) §3 · documentos: [`DOCUMENTOS_CLINI
 |------|--------|
 | **PEP** | Evolução / templates; atestado (afastamento, acompanhamento, comparecimento + CID com autorização); receita no texto |
 | **Medicação** | Receita `COMUM` ou `CONTROLE_ESPECIAL`; status `ATIVA` / `SUSPENSA` / `ENCERRADA` + reativar |
+| **Receita multi-item** | Documento com N medicamentos (preparo colonoscopia, kits) — aba **Receita** |
+| **Equipe** | Anestesista, técnico de enfermagem etc.; custo PPU opcional; validação antes de `REALIZADO` |
 | **Exames** | Pedido avulso; aplicar **protocolo de exames** (gera N `ExamOrder`); laudo |
 | **Protocolos de cuidado** | Templates cadastrados no interno (`/interno/cadastros?tab=protocols`) |
 | **Estoque** (lado interno) | Kits por procedimento, lotes, movimentações — apoio operacional |
@@ -248,7 +250,7 @@ Cenário: *cliente particular ou beneficiário já registrado chega, marca consu
 | 1 | Cliente | Chega (ou já tinha agendado self-service) | — |
 | 2 | Operador interno (recepção) | Walk-in: cadastra + agenda · Já cadastrado: só agenda · Já agendado: só confere | `/interno/agenda` → `AGENDADO` |
 | 3 | Operador interno (recepção) | Check-in de chegada | mesma agenda → `CONFIRMADO` |
-| 4 | Médico | Abre atendimento, lança procedimento(s), opcional PEP/receita/exames/protocolos | `/prestador/atendimento/[id]` → `REALIZADO` |
+| 4 | Médico | Abre atendimento, lança procedimento(s), opcional equipe/PEP/receita/receita multi-item/exames/protocolos | `/prestador/atendimento/[id]` → `REALIZADO` |
 | 5 | Operador interno (faturamento) | Emite fatura | `/interno` (Billing) → Invoice `FECHADA` |
 | 6 | Caixa / beneficiário | PIX interno, marcar paga, ou PIX no portal do cliente | Invoice `PAGA` |
 | 7 | (Opcional) | TISS, export, lembrete, gestão CEDIG, estoque, auditoria | módulos internos |

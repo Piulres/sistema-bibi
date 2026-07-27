@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.12** em produção (jul/2026) · pacote **v3.0.13** na `dev` (exportações autenticadas, equipe no atendimento, receita multi-item) — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md). Pacote v3.0.7: drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -232,7 +232,7 @@ Quando `User.mfaEnabled = true`:
 | Rota | Componente | Ações do usuário |
 |------|------------|------------------|
 | `/prestador` | `AgendaView` | Ver agenda do dia; abrir atendimento |
-| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, PEP, marcar REALIZADO |
+| `/prestador/atendimento/[id]` | `AtendimentoView` | Registrar procedimentos, equipe, PEP, receita multi-item, marcar REALIZADO |
 
 ### APIs disparadas
 
@@ -248,7 +248,10 @@ Quando `User.mfaEnabled = true`:
 | Aplicar protocolo de exames | `POST .../patients/[id]/exam-protocols` | N× `ExamOrder` a partir do template |
 | Prescrever (comum / controle especial) | `POST .../medications` | `MedicationPrescription.prescriptionKind` + status ATIVA/SUSPENSA/ENCERRADA |
 | Reativar / suspender prescrição | `PATCH /api/prestador/medications/[id]` `{ status }` | Transições ATIVA ↔ SUSPENSA ↔ ENCERRADA |
-| Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline |
+| Receita multi-item | `GET/POST .../patients/[id]/prescription-documents` | `PrescriptionDocument` com N itens (`items[]`) — ver [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) |
+| Equipe do atendimento | `GET/POST/DELETE .../appointments/[id]/participants` | `AppointmentParticipant` — papéis por nicho, custo PPU opcional (`chargeFee`) |
+| Elegíveis para equipe | `GET .../participants/eligible` | Prestadores/internos do tenant (exclui já vinculados) |
+| Concluir atendimento | `PATCH .../appointments/[id]` `{ status: "REALIZADO" }` | Status + timeline; valida requisitos de equipe do procedimento |
 
 ```mermaid
 flowchart LR
@@ -475,19 +478,22 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura.
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 
-### 4.11 Exportações tabulares (v3.0.7)
+### 4.11 Exportações tabulares (v3.0.7+) · download autenticado (v3.0.13)
 
 Motor unificado para relatórios e listagens nos portais.
 
 | Camada | Arquivo | Papel |
 |--------|---------|-------|
-| UI | `ExportButtons.tsx` | Botões por formato; query `?format=` no `baseUrl` |
+| UI | `ExportButtons.tsx` · `DownloadLink.tsx` | Botões por formato; `downloadExportFile()` via fetch+blob |
+| Download | `src/lib/ui/download-export.ts` | `buildExportUrl`, `parseContentDispositionFilename`, tratamento de erro JSON |
 | Tipos | `src/lib/exports/tabular-types.ts` | `TabularExport` / `TabularColumn` — contrato entre builders e servidor |
 | Formatos | `src/lib/exports/format.ts` | `EXPORT_FORMATS`, `LIST_EXPORT_FORMATS`, `REPORT_EXPORT_FORMATS` |
 | Builders | `src/lib/exports/builders.ts` | Monta `TabularExport` por domínio (PJ, auditoria, faturamento, …) |
 | Servidor | `src/lib/exports/serve.ts` | `serveTabularExport()` — CSV com BOM UTF-8, JSON, TXT, PDF tabular, XLSX |
 | TXT | `src/lib/exports/text.ts` | `buildTxtFromTabular` — colunas separadas por ` \| ` |
 | Intercâmbio | `src/lib/imports/interchange.ts` | Dataset canônico compartilhado com import CSV/JSON |
+
+**Por que fetch+blob (v3.0.13):** `<a download>` em rotas autenticadas falhava silenciosamente — respostas de erro JSON eram salvas como `.pdf`/`.xml`, e `Content-Disposition` com UTF-8 era ignorado.
 
 **Query comum:** `?format=pdf|csv|json|txt|xlsx` (fallback por rota em `parseExportFormat`).
 
@@ -501,7 +507,7 @@ Motor unificado para relatórios e listagens nos portais.
 | Prestador — extrato | `GET /api/prestador/extrato/export` | PDF, Excel, CSV, JSON |
 | Beneficiário | `GET /api/beneficiario/export?section=` | por seção |
 
-Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
+Testes: `tests/unit/download-export.test.ts` · `tests/api/exports-matrix.test.ts` · `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `tests/api/portal-flows.test.ts` (CSV PJ canônico).
 
 ---
 
