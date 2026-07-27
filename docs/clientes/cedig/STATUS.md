@@ -6,7 +6,7 @@ Agentes e humanos: **atualizem este arquivo** ao fechar entrega, homologação o
 | Campo | Valor |
 |-------|-------|
 | **Atualizado em** | 2026-07-27 |
-| **Produto** | Sistema Bibi - ServiceOS **v3.0.16** · produção `6a66e01e` |
+| **Produto** | Sistema Bibi - ServiceOS **v3.0.16** · produção `6a66e115` |
 | **Tenant** | `cedig` · `/?tenant=cedig` · store **operation** |
 | **Produção** | https://sistema-bibi.netlify.app · modo operação · CEDIG provisionado |
 | **Playbook diário** | [`OPERACAO.md`](OPERACAO.md) |
