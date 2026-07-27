@@ -17,7 +17,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.26** — deploy `6a679550` @ `822b65e` |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.27** pendente deploy · `dev` @ `c2dd4eb` |
+| **Release `main` / `dev`** | **v3.0.27** @ `01ca7eb` — pendente deploy produção |
 | **Pacote anterior em produção** | **3.0.25** — deploy `6a678e1a` @ `368d83b` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,8 +25,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.27** (fix círculo marca home) |
-| **Release** | `main` | **v3.0.26** → merge v3.0.27 pendente |
+| **Integração** | `dev` | **v3.0.27** @ `01ca7eb` |
+| **Release** | `main` | **v3.0.27** @ `01ca7eb` (merge #378) — pendente deploy |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.26** · deploy `6a679550` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
@@ -702,7 +702,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.24` em produção** — BrandMark + nav Mais + assistente · deploy `6a677dc5` |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | **`v3.0.26` em produção** · **`v3.0.27` em `main`** (BrandMark home) · deploy `6a679550` |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
