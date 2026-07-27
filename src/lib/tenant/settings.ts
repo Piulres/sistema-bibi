@@ -1,7 +1,10 @@
 import "server-only";
 import { getPrisma } from "@/lib/db";
 import type { TenantRuleOverride } from "@/lib/assistant/rules/types";
-import { parseTenantRuleOverrides } from "@/lib/assistant/rules/tenant-overrides";
+import {
+  normalizeTenantRuleOverrides,
+  parseTenantRuleOverrides,
+} from "@/lib/assistant/rules/tenant-overrides";
 
 /** Configurações operacionais do tenant (realm). */
 export type TenantAssistantSettings = {
@@ -57,12 +60,19 @@ export function mergeTenantSettings(
   current: TenantSettings,
   patch: Partial<{ assistant: Partial<TenantAssistantSettings> }>,
 ): TenantSettings {
-  return {
-    assistant: {
-      ...current.assistant,
-      ...patch.assistant,
-    },
+  const assistantPatch = patch.assistant ?? {};
+  const next: TenantAssistantSettings = {
+    ...current.assistant,
+    ...assistantPatch,
   };
+
+  if ("ruleOverrides" in assistantPatch) {
+    const normalized = normalizeTenantRuleOverrides(assistantPatch.ruleOverrides ?? []);
+    if (normalized.length > 0) next.ruleOverrides = normalized;
+    else delete next.ruleOverrides;
+  }
+
+  return { assistant: next };
 }
 
 export async function getTenantSettings(tenantId: string): Promise<TenantSettings> {

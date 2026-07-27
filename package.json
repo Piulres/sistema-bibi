@@ -1,6 +1,6 @@
 {
   "name": "sistema-bibi",
-  "version": "3.0.18",
+  "version": "3.0.19",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -31,7 +31,8 @@
     "db:bootstrap:operation": "APP_MODE=operation RUN_SEED_ON_BUILD=false npx tsx scripts/setup-database.ts",
     "db:migrate:deploy": "prisma migrate deploy",
     "db:reset": "prisma db push --force-reset && prisma db seed",
-    "smoke:netlify-pwa": "node scripts/smoke-netlify-pwa.mjs"
+    "smoke:netlify-pwa": "node scripts/smoke-netlify-pwa.mjs",
+    "icons:generate": "npx tsx scripts/generate-brand-icons.mts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"

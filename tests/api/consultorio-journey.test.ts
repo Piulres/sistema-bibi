@@ -62,12 +62,16 @@ function generateValidCpf(): string {
   return [...base, d1, d2].join("");
 }
 
+/** Contador monotônico — evita colisão de slot entre casos do arquivo e com o seed. */
+let slotSeq = 0;
+
 function uniqueSlot(): Date {
+  slotSeq += 1;
   const slot = new Date();
-  const dayOffset = 150 + (Date.now() % 40);
-  const halfHour = Math.floor(Date.now() / 1000) % 20;
+  const dayOffset = 180 + slotSeq * 2 + (Date.now() % 23);
+  const minuteSlot = (Date.now() + slotSeq * 17) % 48;
   slot.setDate(slot.getDate() + dayOffset);
-  slot.setHours(8 + Math.floor(halfHour / 2), (halfHour % 2) * 30, 0, 0);
+  slot.setHours(6 + Math.floor(minuteSlot / 4), (minuteSlot % 4) * 15, slotSeq % 60, 0);
   return slot;
 }
 
@@ -286,7 +290,7 @@ describe("Jornada consultório (API) — walk-in até pagamento e cadastros oper
         },
       }),
     );
-    expect(apptRes.status).toBe(200);
+    expect(apptRes.status, await apptRes.clone().text()).toBe(200);
     const appointmentId = (await apptRes.json()).appointment.id as string;
 
     await setSessionForEmail("dra.helena@bibi.health");

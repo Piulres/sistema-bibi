@@ -11,6 +11,9 @@ export default function LandingLogoLink({ branding }: Props) {
     <HomeBrandLink
       displayName={branding.displayName}
       logoUrl={branding.logoUrl}
+      primaryColor={branding.primaryColor}
+      accentColor={branding.accentColor}
+      heroTo={branding.heroTo}
       logoSize="md"
     />
   );
