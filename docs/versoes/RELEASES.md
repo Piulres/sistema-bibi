@@ -25,7 +25,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.24** (BrandMark gradiente + nav Mais + assistente) |
+| **Integração** | `dev` | **v3.0.24** em produção; PR [#373](https://github.com/Piulres/sistema-bibi/pull/373) — import CSV PJ + fix E2E estoque (pendente merge) |
 | **Release** | `main` | **v3.0.24** |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.24** · deploy `6a677dc5` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
@@ -44,6 +44,12 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Landing `/` | 200 · footer `v3.0.24` · deploy `6a677dc5` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/interno/login` | 200 |
+
+### Pendente integração `dev` (PR #373)
+
+- Import CSV colaboradores PJ (`POST/GET /api/pj/beneficiaries/import`).
+- Fix E2E flaky `estoque-fases` (combobox status de lote).
+- Docs sincronizadas para produção **v3.0.24** (este commit).
 
 ### Conteúdo do pacote v3.0.23
 
@@ -668,7 +674,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.22` em produção** — RBAC Fase 5 · deploy `6a670e42` |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.24` em produção** — BrandMark + nav Mais + assistente · deploy `6a677dc5` |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

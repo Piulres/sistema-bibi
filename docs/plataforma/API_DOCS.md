@@ -439,7 +439,7 @@ Fluxo completo por portal: [`produto/FLUXOS.md`](../produto/FLUXOS.md) §4.11 ·
 
 ---
 
-## 10. Portal PJ — CRUD colaboradores (v3.0.23)
+## 10. Portal PJ — CRUD colaboradores + import CSV (v3.0.23+)
 
 RH gerencia colaboradores vinculados à empresa sem passar pela recepção. Auth: `requirePj()` — escopo fixo em `user.companyId` (anti-IDOR B2B via `assertCompanyPatient`).
 
