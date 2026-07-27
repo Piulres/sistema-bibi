@@ -65,6 +65,7 @@ type TenantSettings = {
   assistant: {
     aiEnabled: boolean;      // add-on IA — default false
     rulesEnabled: boolean;   // motor regras — default true
+    ruleOverrides?: TenantRuleOverride[];  // Fase 3 — gatilhos/tools por tenant (runtime v3.0.21+)
   };
 };
 ```
@@ -83,7 +84,7 @@ type TenantSettings = {
 | Ação | Perfil |
 |------|--------|
 | Ver `/interno/assistente` | **ADMIN** |
-| Editar flag IA / regras (futuro) | **ADMIN** |
+| Editar flag IA / regras / `ruleOverrides` | **ADMIN** |
 | Usar chat nos portais | Todos (com tools filtradas por perfil) |
 
 ### Revisão RBAC global (paralelo)

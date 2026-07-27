@@ -37,6 +37,11 @@ Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp
 | `VOA_ENABLED` | Não | `false` | Assistente IA Voa no atendimento |
 | `VOA_INTEGRATION_TOKEN` | Se Voa ativo | — | Token plugin Voa Health |
 | `VOA_ENV` | Não | `homologacao` | `homologacao` \| `producao` (referência operacional) |
+| `ASSISTANT_ENABLED` | Não | ligado | `false` desliga UI + API do assistente |
+| `ASSISTANT_PROVIDER` | Não | — | `mock` força regras; `gateway`/`netlify-gateway` se `OPENAI_*` OK |
+| `ASSISTANT_MODEL` | Não | `gpt-4o-mini` | Modelo no gateway (modo IA) |
+| `OPENAI_BASE_URL` | Para IA | — | Netlify AI Gateway ou endpoint OpenAI-compatible |
+| `OPENAI_API_KEY` | Para IA | — | Chave do gateway — com `aiEnabled` no tenant ativa modo híbrido |
 | `NEXT_PUBLIC_SITE_URL` | Não | `URL` Netlify / localhost | SEO, sitemap, Open Graph, redirect OAuth e feeds ICS |
 | `GOOGLE_CALENDAR_CLIENT_ID` / `_SECRET` | Para push Google | — | OAuth Google Calendar |
 | `MICROSOFT_CALENDAR_CLIENT_ID` / `_SECRET` | Para push Microsoft | — | OAuth Microsoft Graph |
@@ -97,6 +102,32 @@ SESSION_SECRET="string-longa-aleatoria-min-32-chars"
 | **Efeito** | Nível de log Prisma; em dev, mock/console são registrados se gateway/provider não estiver definido |
 
 Não precisa estar no `.env` local — o Next define automaticamente.
+
+### Assistente operacional (`ASSISTANT_*`, `OPENAI_*`)
+
+| | |
+|---|---|
+| **Onde** | `src/lib/assistant/config.ts`, `plan-gateway.ts`, `mode.ts`, `runner.ts` |
+| **Doc** | [`ASSISTENTE_SERVERLESS.md`](../produto/ASSISTENTE_SERVERLESS.md) |
+
+| Variável | Padrão | Efeito |
+|----------|--------|--------|
+| `ASSISTANT_ENABLED` | ligado | `false` remove chat dos portais |
+| `OPENAI_BASE_URL` + `OPENAI_API_KEY` | ausentes | Modo **regras** apenas (`resolveAssistantMode` → `rules`) |
+| `ASSISTANT_PROVIDER` | opcional | `mock` força regras; `gateway`/`netlify-gateway` explícitos se env OK |
+| `ASSISTANT_MODEL` | `gpt-4o-mini` | Modelo no `planGatewayAssistant` |
+
+Modo **IA híbrida** exige **ambos**: gateway no ambiente (`OPENAI_*`) **e** `Tenant.settings.assistant.aiEnabled=true` (toggle ADMIN em `/interno/assistente`). Desde v3.0.21, `ASSISTANT_PROVIDER=gateway` **não** é obrigatório quando `OPENAI_*` estão configurados.
+
+```env
+# Dev local — regras/mock (padrão)
+# ASSISTANT_PROVIDER=mock
+
+# Produção com Netlify AI Gateway (exemplo)
+# OPENAI_BASE_URL=https://...
+# OPENAI_API_KEY=...
+# ASSISTANT_MODEL=gpt-4o-mini
+```
 
 ---
 
@@ -438,6 +469,11 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 | `VOA_ENABLED` | `src/lib/voa/config.ts` |
 | `VOA_INTEGRATION_TOKEN` | `src/lib/voa/config.ts` |
 | `VOA_PLUGIN_SCRIPT_URL` | `src/lib/voa/config.ts` |
+| `ASSISTANT_ENABLED` | `src/lib/assistant/config.ts` |
+| `ASSISTANT_PROVIDER` | `src/lib/assistant/config.ts`, `plan-gateway.ts` |
+| `ASSISTANT_MODEL` | `src/lib/assistant/config.ts` |
+| `OPENAI_BASE_URL` | `src/lib/assistant/config.ts` (`isGatewayConfigured`) |
+| `OPENAI_API_KEY` | `src/lib/assistant/config.ts` |
 | `NEXT_PUBLIC_SITE_URL` | `src/lib/landing/site-url.ts` |
 | `SEED_SCALE` | `prisma/seed-data/scale.ts` |
 | `ALLOW_DEMO_RESET` | `src/lib/demo-reset.ts` |

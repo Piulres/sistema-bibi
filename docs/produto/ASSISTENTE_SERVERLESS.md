@@ -45,14 +45,43 @@ Cliente                          API (serverless)
 - `timingSafeEqual` na verificação da assinatura
 - **JTI one-time** na confirmação — replay do mesmo `pendingActionId` retorna 410
 
-## Provider de IA
+## Provider de IA e pipeline híbrido (v3.0.20+)
 
-| Modo | Env | Comportamento |
-|------|-----|---------------|
-| **mock** (padrão) | `ASSISTANT_PROVIDER` ausente ou `mock` | 350+ gatilhos, extração regex, RAG local |
-| **gateway** | `ASSISTANT_PROVIDER=gateway` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` | Netlify AI Gateway / OpenAI-compatible; fallback automático para mock |
+### Modos efetivos
 
-Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
+| Modo | Ativação | Motor |
+|------|----------|-------|
+| **Regras** (padrão) | `Tenant.settings.assistant.aiEnabled=false` ou gateway ausente | Gatilhos + `ruleOverrides` + tools |
+| **IA híbrida** | `aiEnabled=true` **e** `OPENAI_BASE_URL` + `OPENAI_API_KEY` | LLM → validação regras → tools |
+
+Resolução: `resolveAssistantMode` (`src/lib/assistant/mode.ts`) · gateway: `shouldUseAssistantGateway` (`plan-gateway.ts`).
+
+### Variáveis de ambiente
+
+| Env | Padrão | Comportamento |
+|-----|--------|---------------|
+| `ASSISTANT_ENABLED` | ligado | `false` desliga UI + API |
+| `OPENAI_BASE_URL` + `OPENAI_API_KEY` | ausentes | Sem gateway — só modo regras |
+| `ASSISTANT_PROVIDER` | opcional | `mock` força mock mesmo com gateway; `gateway`/`netlify-gateway` aceitos se env OK |
+| `ASSISTANT_MODEL` | `gpt-4o-mini` | Modelo no gateway |
+
+> **v3.0.21:** com `aiEnabled=true` e gateway configurado, **não** é obrigatório `ASSISTANT_PROVIDER=gateway` — basta `OPENAI_*`. Use `ASSISTANT_PROVIDER=mock` em dev para forçar regras.
+
+### Pipeline híbrido (Fase 4)
+
+```
+Mensagem → resolveAssistantMode + ruleOverrides (Tenant.settings)
+         → [modo IA] planGatewayAssistant (LLM)
+         → planMockAssistant com ruleOverrides (regras)
+         → refineHybridPlan (allowlist + fallback seguro)
+         → tools → draft → confirm (JTI) → actions
+```
+
+- `ruleOverrides` do painel `/interno/assistente` entram no runtime via `resolveAssistantIntents` (v3.0.21).
+- Tools fora da allowlist são rejeitadas com mensagem humanizada (`hybridUnauthorizedTools`).
+- Falha do gateway → fallback automático para motor de regras/mock.
+
+Produção POC: **mock/regras** por padrão — gateway exige secrets no painel Netlify + toggle IA no tenant.
 
 ## UX do painel (v3.0.6)
 
@@ -77,8 +106,9 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
 | **Painel de regras** | — | ✅ Fase 3 — CRUD + preview em `/interno/assistente` |
 | **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` (LLM → allowlist regras → tools) |
+| **ruleOverrides no runtime** | — | ✅ v3.0.21 — overrides do tenant aplicados no chat |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
-| **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
+| **Gateway em produção** | Média | Configurar `OPENAI_*` + `aiEnabled` no tenant (sem `ASSISTANT_PROVIDER` obrigatório) |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
 | **OpenAPI assistente** | Baixa | Documentar `sessionState` no spec |
 | **Rate limit / abuse** | Média | Por usuário no chat (hoje só login/MFA) |
@@ -89,10 +119,12 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 - `tests/unit/assistant.test.ts` — multi-turno stateless
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
+- `tests/unit/assistant-hybrid.test.ts` — pipeline híbrido LLM × regras (v3.0.20+)
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare
 
 ## Referências
 
 - `docs/versoes/V2_3.md` — changelog do pacote
-- `src/lib/assistant/runner.ts` — orquestração
-- `docs/plataforma/VARIAVEIS_AMBIENTE.md` — `ASSISTANT_ENABLED`, `ASSISTANT_PROVIDER`
+- `docs/produto/ASSISTENTE_REGRAS_PLANO.md` — fases, schema `Tenant.settings`, matriz de testes
+- `src/lib/assistant/runner.ts` — orquestração (rules/ai + ruleOverrides)
+- `docs/plataforma/VARIAVEIS_AMBIENTE.md` — `ASSISTANT_*`, `OPENAI_*`
