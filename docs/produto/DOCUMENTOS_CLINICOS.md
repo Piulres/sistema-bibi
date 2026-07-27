@@ -67,5 +67,5 @@ Formulário estruturado no PEP; PDF via exportação de registro. Integração A
 1. Prestador → Atendimento → Medicação → emitir receita multi-item → PDF  
 2. Exames → aplicar protocolo → PDF do pedido  
 3. Documentos → template Cardiologia → emitir → PDF → pacote do atendimento  
-4. Beneficiário (`joao.pereira@email.com`) → Documentos → baixar PDF  
+4. Beneficiário (`joao.pereira@email.com`) → Documentos → baixar PDF (seed já inclui receita, exame, encaminhamento Endocrinologia e atestado)  
 5. Viewport estreito: abas com `shortLabel` e botões sem overflow  

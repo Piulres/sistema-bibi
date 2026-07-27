@@ -531,6 +531,57 @@ export async function runDatabaseSeed(prisma: PrismaClient): Promise<SeedRunResu
     patientName: "João Pereira",
   });
 
+  // Encaminhamento + atestado — documentos de saída visíveis em /beneficiario/documentos
+  const existingJoaoReferral = await prisma.clinicalReferral.findFirst({
+    where: { appointmentId: ag1.id },
+  });
+  if (!existingJoaoReferral) {
+    const referral = await prisma.clinicalReferral.create({
+      data: {
+        patientId: joaoId,
+        providerId: prestador.id,
+        appointmentId: ag1.id,
+        referralKind: "ESPECIALIDADE",
+        specialty: "Endocrinologia",
+        urgency: "ROTINA",
+        clinicalReason:
+          "Diabetes mellitus em acompanhamento com necessidade de avaliação endocrinológica.",
+        historySummary: "HbA1c alterada; em uso de metformina e losartana.",
+        requestedActions: "Revisar meta glicêmica, ajustar terapêutica e plano de seguimento.",
+      },
+    });
+    await prisma.timelineEvent.create({
+      data: {
+        tenantId: tenant.id,
+        entityType: TIMELINE_ENTITY_TYPES.CLINICAL_REFERRAL,
+        entityId: referral.id,
+        action: TIMELINE_ACTIONS.REFERRAL_CREATED,
+        description: "Encaminhamento para Endocrinologia — João Pereira",
+        createdBy: prestador.id,
+      },
+    });
+  }
+
+  const existingJoaoAtestado = await prisma.medicalRecord.findFirst({
+    where: { appointmentId: ag1.id, recordType: "ATESTADO" },
+  });
+  if (!existingJoaoAtestado) {
+    await prisma.medicalRecord.create({
+      data: {
+        patientId: joaoId,
+        providerId: prestador.id,
+        appointmentId: ag1.id,
+        recordType: "ATESTADO",
+        title: "Atestado de comparecimento",
+        content: `ATESTADO DE COMPARECIMENTO
+Paciente: João Pereira
+Data: ${new Date().toLocaleDateString("pt-BR")}
+Compareceu a consulta médica nesta data.
+Médico: Dra. Helena Costa`,
+      },
+    });
+  }
+
   console.log("Criando massa equipe + gastro/colonoscopia (Pedro)...");
   const teamStaff = await ensureTeamStaffUsers(prisma, tenant.id);
   if (
