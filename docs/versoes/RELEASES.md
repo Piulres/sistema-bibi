@@ -15,7 +15,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.16** — deploy `6a66e01e` @ `cbec2c7` (`bibi-poc-2026-07-27g`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.16** — deploy `6a66e102` @ `9e98494` (`bibi-poc-2026-07-27g`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
 | **Release `main` / `dev`** | **v3.0.16** · tip inclui estoque Fase 2 UI (#308) |
 | **Pacote anterior em produção** | **3.0.15** — deploy `6a66de5b` @ `4599bff` (`bibi-poc-2026-07-27f`) |
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.16** (reagendar + assistente + estoque UI) |
 | **Release** | `main` | **v3.0.16** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.16** · deploy `6a66e01e` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.16** · deploy `6a66e102` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.16
@@ -35,14 +35,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Beneficiário:** reagendar consulta (`benef-reschedule`) — mesmo registro, slot validado, timeline `RESCHEDULED`.
 - **Assistente Fase 0:** inventário, RBAC interno, `Tenant.settings`, painel `/interno/assistente`.
 - **Chat:** persistência local + auto-scroll + indicador de digitação.
+- **Auditoria RBAC fase 2:** busca sem oráculo de existência; encaminhamento/receita clínicos; export 360° com perfil.
 - **Estoque Fase 2 UI:** editar/inativar produto, status de lote, Reverter movimentação; taxonomia `SERVICO` + `KIT/SC/M3`.
-- **Qualidade:** `scheduling-reschedule` · `assistant-*` · `stock` · CI #282/#286/#306/#308 · pre-release OK · deploy `6a66e01e`.
+- **Qualidade:** `scheduling-reschedule` · `assistant-*` · `stock` · CI #282/#286/#304/#306/#308 · audit-rbac-content · deploy `6a66e102`.
 
 ### Smoke (27/07/2026) — produção v3.0.16
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.16` · deploy `6a66e01e` |
+| Landing `/` | 200 · footer `v3.0.16` · deploy `6a66e102` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/interno/login` | 200 |
 | `/interno/assistente` | 307 (auth) |
@@ -282,7 +283,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.16`** | `cbec2c7` | Reagendar beneficiário + Assistente Fase 0 · deploy `6a66e01e` · #282/#286/#306 |
+| **`v3.0.16`** | `cbec2c7` | Reagendar beneficiário + Assistente Fase 0 · deploy `6a66e102` · #282/#286/#306 |
 | **`v3.0.15`** | `4599bff` | Gestão clínica otimizada (KPI strip + soft refresh) · deploy `6a66de5b` · #290/#303 |
 | **`v3.0.14`** | `59700b5` | Auditoria RBAC + estoque + cadastros + documentos · deploy `6a66db43` |
 | **`v3.0.13`** | `78b575f` | Exportações autenticadas + equipe + receita multi-item · deploy `6a66d114` |

@@ -55,9 +55,16 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
           "Categorias/unidades multi-nicho (SERVICO, KIT, SC, M3)",
         ],
       },
+      {
+        title: "Auditoria / RBAC",
+        items: [
+          "Busca por descrição só em tipos full — sem oráculo de existência clínica/PII",
+          "Encaminhamento e receita classificados como clínicos; export 360° respeita perfil",
+        ],
+      },
     ],
     testStats:
-      "CI unit+E2E #282/#286/#306/#308 · scheduling-reschedule · assistant-* · stock · docs:verify · pre-release OK",
+      "CI unit+E2E #282/#286/#304/#306/#308 · audit-rbac-content · stock · prod 6a66e102",
   },
   {
     version: "3.0.15",
