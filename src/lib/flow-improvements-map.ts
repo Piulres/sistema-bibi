@@ -194,9 +194,9 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     flow: "Cadastros",
     title: "CRUD de colaboradores no portal PJ",
     description:
-      "RH inclui/exclui beneficiários da empresa sem depender da recepção; upload em lote opcional.",
+      "RH inclui/exclui beneficiários da empresa sem depender da recepção; importação CSV em lote.",
     status: "implemented",
-    api: "POST/PATCH/DELETE /api/pj/beneficiaries",
+    api: "POST/PATCH/DELETE /api/pj/beneficiaries · POST /api/pj/beneficiaries/import",
     docRef: "JORNADA_CLIENTE.md §4 · FLUXOS.md §5",
   },
 ];

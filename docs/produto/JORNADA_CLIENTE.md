@@ -359,7 +359,7 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 | 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | ✅ Cancelar + Reagendar (`benef-reschedule`) |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
-| 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 | ✅ `pj-beneficiary-crud` (CRUD colaboradores v3.0.23) · upload em lote: backlog |
+| 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 | ✅ `pj-beneficiary-crud` (CRUD + import CSV) |
 | 5 | Agenda semanal do prestador | Prestador | Operação clínica madura | 5 |
 | 6 | Navegação por abas no portal Beneficiário | Beneficiário | UX mobile | 5 | **Drawer mobile:** ✅ `MobileNavDrawer` em `BeneficiarioNav.tsx` (v3.0.6) — ver `e2e/mobile-nav.spec.ts` |
 | 7 | Notificações reais (e-mail/SMS) | Todos | Lembretes e confirmações | 5 |

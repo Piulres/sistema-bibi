@@ -15,6 +15,7 @@ import PjBeneficiaryForm, {
   usePjBeneficiaryDetach,
   type PjBeneficiaryRow,
 } from "@/components/PjBeneficiaryPanel";
+import PjBeneficiaryImportPanel from "@/components/PjBeneficiaryImportPanel";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
@@ -170,6 +171,7 @@ export default function PjView() {
 
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title={labels.beneficiaries} />
+        <PjBeneficiaryImportPanel onImported={() => void reload()} />
         <PjBeneficiaryForm
           onChanged={() => void reload()}
           editing={editingBeneficiary}
