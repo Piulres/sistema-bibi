@@ -11,24 +11,40 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.14** — auditoria RBAC + estoque + cadastros + documentos de saída **em produção**.
+> Pacote **v3.0.15** — gestão clínica otimizada **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.14** — deploy `6a66db43` @ `59700b5` (`bibi-poc-2026-07-27e`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.15** — deploy `6a66de5b` @ `4599bff` (`bibi-poc-2026-07-27f`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.14** · sincronizados @ `59700b5` |
-| **Pacote anterior em produção** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
+| **Release `main` / `dev`** | **v3.0.15** · sincronizados · artefato prod `@ 4599bff` |
+| **Pacote anterior em produção** | **3.0.14** — deploy `6a66db43` @ `59700b5` (`bibi-poc-2026-07-27e`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.14** (auditoria + estoque + cadastros + documentos de saída) |
-| **Release** | `main` | **v3.0.14** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.14** · deploy `6a66db43` · HTTP 200 · **Stop builds ON** |
+| **Integração** | `dev` | **v3.0.15** (gestão clínica UX) |
+| **Release** | `main` | **v3.0.15** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.15** · deploy `6a66de5b` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.15
+
+- **Gestão clínica (`/interno/gestao`):** faixa de KPIs do mês sempre visível; refresh soft ao trocar mês/salvar; extras clínicos recolhidos; `/kpis` sob demanda na aba Indicadores.
+- **Qualidade:** Vitest `clinic-finance-month-strip` · E2E `cedig-gestao` (assert KPI strip) · CI #290/#303 verdes · `docs:verify` · pre-release OK · deploy `6a66de5b`.
+
+### Smoke (27/07/2026) — produção v3.0.15
+
+| Check | Resultado |
+|-------|-----------|
+| Landing `/` | 200 · footer `v3.0.15` · deploy `6a66de5b` |
+| CSS `/_next/static/chunks/*.css` | 200 |
+| `/instalar` | 200 |
+| `/?tenant=cedig` | 200 |
+| `/interno/gestao` | 307 (auth) |
+| Cota Netlify | sem `503 usage_exceeded` |
 
 ### Conteúdo do pacote v3.0.14
 
@@ -247,6 +263,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
+| **`v3.0.15`** | `4599bff` | Gestão clínica otimizada (KPI strip + soft refresh) · deploy `6a66de5b` · #290/#303 |
 | **`v3.0.14`** | `59700b5` | Auditoria RBAC + estoque + cadastros + documentos · deploy `6a66db43` |
 | **`v3.0.13`** | `78b575f` | Exportações autenticadas + equipe + receita multi-item · deploy `6a66d114` |
 | **`v3.0.10`** | `b9ff9cb` | Mês operacional + jornada/testes + agenda/calendário · deploy `6a66a38b` |
@@ -492,7 +509,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.14` em produção** — auditoria RBAC + estoque + cadastros |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.15` em produção** — gestão clínica UX |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |
