@@ -26,10 +26,35 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.22",
+    version: "3.0.23",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Portal PJ: RH inclui, edita e desvincula colaboradores; E2E estoque fases 1–4; docs assistente alinhados.",
+    highlights: [
+      {
+        title: "Portal PJ",
+        items: [
+          "POST/PATCH/DELETE /api/pj/beneficiaries com anti-IDOR B2B",
+          "UI em /pj — incluir, editar, remover e agendar colaboradores",
+        ],
+      },
+      {
+        title: "Mapa / qualidade",
+        items: [
+          "pj-beneficiary-crud → implemented",
+          "E2E smoke estoque-fases · teste runner ruleOverrides assistente",
+        ],
+      },
+    ],
+    testStats: "CI #365 · pj-beneficiaries · estoque-fases · pre-release OK",
+  },
+  {
+    version: "3.0.22",
+    label: "Sistema Bibi - ServiceOS v3.0.22",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "RBAC Fase 5: mutações do portal interno exigem requireInternoModuleWrite; mapa de fluxos alinhado.",
     highlights: [
