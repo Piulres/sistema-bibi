@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.12** — Dashboard KPIs claros (cobrança vs produção clínica) — **em publicação**.
+> Pacote **v3.0.12** — Dashboard KPIs claros (cobrança vs produção clínica) **publicado em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.12** — deploy pendente (`bibi-poc-2026-07-27c`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.12** · sincronizadas |
+| **Release `main` / `dev`** | **v3.0.12** · sincronizadas · artefato prod `@ e5c1f50` |
 | **Pacote anterior em produção** | **3.0.11** — deploy `6a66b107` @ `546f014` (`bibi-poc-2026-07-27b`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -27,7 +27,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.12** |
 | **Release** | `main` | **v3.0.12** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.12** · deploy em andamento · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.12** · deploy `6a66c080` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.12
