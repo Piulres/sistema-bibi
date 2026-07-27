@@ -131,6 +131,8 @@ Fonte: `src/components/ui/NavTabs.tsx` + `NavOverflowMenu.tsx` + `src/lib/naviga
 
 Definição das abas: `buildInternoNavTabs()`, `buildPrestadorNavTabs()`, etc. em `src/lib/navigation/`. E2E: `e2e/mobile-nav.spec.ts`.
 
+**Ícones por módulo:** cada aba usa `NavModuleIcon` com o `key` da rota (`nav-icons.tsx`). Novo módulo = nova entrada no mapa SVG com a mesma chave — checklist em [`ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Checklist nav.
+
 ### Portal header (v3.0.5)
 
 `PortalHeader` nos quatro portais autenticados:

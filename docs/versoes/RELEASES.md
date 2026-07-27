@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.28** — Nav moderna + ícone PWA laranja + word mark BIBI **pendente deploy produção**.
+> Pacote **v3.0.28** mergeado em `main` (#379 @ `4bf417f`) — **pendente deploy produção** (Netlify ainda em **3.0.27**).
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.27** — deploy `6a679eaf` @ `01ca7eb` |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.28** pendente deploy |
+| **Release `main` / `dev`** | **v3.0.28** — aguardando deploy humano |
 | **Pacote anterior em produção** | **3.0.27** — deploy `6a679eaf` @ `01ca7eb` |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -26,7 +26,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.28** (nav pills, PWA laranja, BIBI tipografia) |
-| **Release** | `main` | **v3.0.27** → merge v3.0.28 pendente |
+| **Release** | `main` | **v3.0.28** (#379 @ `4bf417f`) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.27** · deploy `6a679eaf` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
@@ -36,6 +36,15 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **PWA iPhone:** ícone laranja/âmbar com BIBI — fim do círculo azul genérico; maskable 512.
 - **BrandMark home:** word mark **BIBI** caixa alta, 12px, margin-top 2px.
 - **Qualidade:** brand-mark · icons:generate · pre-release OK.
+
+### Smoke pós-deploy (v3.0.28 — checklist)
+
+| Check | Resultado esperado |
+|-------|-------------------|
+| Landing `/` | Footer `v3.0.28` |
+| Manifest `/manifest.webmanifest` | `theme_color` `#f97316` · ícone maskable 512 |
+| Nav interno desktop | Pills com ícones · menu **Mais** agrupado |
+| PWA iPhone | Ícone laranja BIBI (não círculo azul) após reinstalar atalho |
 
 ### Conteúdo do pacote v3.0.27
 

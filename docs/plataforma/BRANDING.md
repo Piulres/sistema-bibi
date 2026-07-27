@@ -48,8 +48,39 @@ Cada nicho tem cor primária customizada em `src/lib/theme/presets-energia-brasi
 - Focus rings em `#fb923c` (orange claro)
 - Animações respeitam `prefers-reduced-motion`
 
+## PWA — ícones e manifest (v3.0.28)
+
+Pipeline único em `src/lib/brand/brand-mark.ts` — UI React, OG, rotas dinâmicas Next e PNGs estáticos compartilham a mesma entrada.
+
+| Saída | Fonte | Observação |
+|-------|-------|------------|
+| UI (`BrandMark`) | `brandMarkFromBranding()` / `PLATFORM.brandMark` | Word mark **BIBI** na home da plataforma |
+| PWA / iPhone | `brandMarkPwaInput()` | Gradiente laranja `#f97316` → `#fbbf24` — evita círculo azul genérico |
+| PNG estático | `npm run icons:generate` | `public/icons/` — 180, 192, 512, 512 maskable (inset 12%), 1024 |
+| Rotas OG Next | `src/app/icon.tsx`, `apple-icon.tsx` | Mesmo `brandMarkPwaInput()` em runtime |
+| Manifest | `src/app/manifest.ts` | `theme_color: #f97316`; `purpose: maskable` no 512 |
+
+### Regenerar após mudar marca
+
+```bash
+npm run icons:generate      # PWA web (public/icons/)
+npm run mobile:resources    # Capacitor iOS/Android (mobile/resources → cap sync)
+```
+
+Commitar os PNGs gerados junto com a alteração de `brand-mark.ts` ou `brand-mark-og.tsx`.
+
+### Troubleshooting — ícone antigo no iPhone
+
+1. Remover o atalho **Adicionar à Tela de Início** existente.
+2. Limpar cache do Safari (ou abrir em aba anônima) e acessar `/instalar`.
+3. Reinstalar após deploy com os novos PNGs em `public/icons/`.
+4. Confirmar `apple-touch-icon` e `icon-512-maskable.png` no deploy (smoke: footer da landing + DevTools → Application → Manifest).
+
 ## Arquivos de referência
 
+- Marca circular: `src/lib/brand/brand-mark.ts` · `src/components/brand/BrandMark.tsx`
+- OG / gerador PNG: `src/lib/brand/brand-mark-og.tsx` · `scripts/generate-brand-icons.mts`
+- Ícones de módulo (nav): `src/lib/navigation/nav-icons.tsx` — ver [`ARQUITETURA_PORTAIS.md`](../produto/ARQUITETURA_PORTAIS.md) §Checklist nav
 - Tokens CSS: `src/app/globals.css`
 - Tokens TypeScript: `src/lib/theme/tokens.ts`
 - Presets nicho: `src/lib/theme/presets-energia-brasileira.ts`

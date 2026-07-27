@@ -89,6 +89,23 @@ flowchart TB
 
 **Regra para novos módulos:** declarar `priority: "secondary"` quando o portal tiver muitas abas (ex.: interno com 14 módulos). Tour onboarding referencia `data-tour-id="portal-nav"` — ver [`ONBOARDING_TOUR.md`](ONBOARDING_TOUR.md).
 
+### Checklist — novo módulo de navegação (v3.0.28)
+
+Ao expor uma rota nos portais autenticados, alinhar **definição da aba**, **ícone** e **testes**:
+
+| Passo | Arquivo | O que fazer |
+|-------|---------|-------------|
+| 1 | `src/lib/navigation/niche-nav.ts` (ou builder do portal) | Adicionar entrada com `key`, `href`, `label`, `shortLabel?`, `group`, `priority` |
+| 2 | `src/lib/navigation/nav-icons.tsx` | Registrar SVG em `NAV_ICON_MAP` com a **mesma chave** do `key` da aba |
+| 3 | `src/lib/navigation/routes.ts` | Garantir rota canônica e permissões (se interno) |
+| 4 | E2E | `e2e/mobile-nav.spec.ts` ou spec do portal — locators em [`TESTES.md`](../plataforma/TESTES.md) §nav |
+
+**Ícones:** `NavModuleIcon` resolve pelo `navKey` da aba. Sem entrada no mapa, cai no ícone genérico `more` (três pontos) — aceitável só como placeholder temporário.
+
+**Grupos no menu Mais:** `NavOverflowMenu` ordena por `GROUP_ORDER` — Operação, Financeiro, Administração, Agenda, Conta, Clínico, Obra. Grupos desconhecidos vão para o fim (ordem alfabética).
+
+**Pin de aba secundária:** quando o usuário abre um módulo `priority: "secondary"` pelo menu **Mais**, a aba ativa fica pinada na faixa principal até trocar de módulo (`hasPinnedSecondary` no overflow).
+
 ### Contrato a11y para E2E (v3.0.6)
 
 | Portal | Desktop nav | Drawer mobile (`< lg`) | PJ seções |

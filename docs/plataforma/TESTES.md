@@ -81,6 +81,8 @@ Cobertura v3.0.7 exports: `tests/unit/export-formats.test.ts` (formatos canônic
 
 Cobertura v3.0.6/v3.0.7 nav portais: `e2e/mobile-nav.spec.ts` — landing drawer, drawer nos 4 portais (painel à direita desde v3.0.7), menu **Mais** no interno desktop (aba secundária pinada na faixa). Helpers: `expectInternoNavHref` / `openInternoNav` em `e2e/helpers/auth.ts` — usados também em `interno-modules.spec.ts` e `rbac.spec.ts`.
 
+Cobertura v3.0.28 nav ícones: `tests/unit/brand-mark.test.ts` (PWA `brandMarkPwaInput`, word mark BIBI) · ícones SVG em `src/lib/navigation/nav-icons.tsx` (sem teste unitário dedicado — validar visualmente ou via E2E ao adicionar módulo; ver checklist em `ARQUITETURA_PORTAIS.md`).
+
 Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJourneyBilling`, `resolveCareJourneyStep` (faturado/pago no prestador).
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
