@@ -34,6 +34,11 @@ Template local: [`.env.example`](../../.env.example) → copiar para `.env` (`cp
 | `COMMUNICATION_PROVIDER` | Não | `console` (dev) | E-mail / SMS / WhatsApp |
 | `CRON_SECRET` | Sim (cron) | — | Jobs `/api/cron/*` |
 | `TELEMEDICINE_BASE_URL` | Não | `https://meet.bibi.health` | Links de telemedicina |
+| `ASSISTANT_ENABLED` | Não | `true` | Feature flag global do chat operacional |
+| `ASSISTANT_PROVIDER` | Não | `mock` | `mock` \| `gateway` \| `netlify-gateway` |
+| `ASSISTANT_MODEL` | Não | `gpt-4o-mini` | Modelo no gateway OpenAI-compatible |
+| `OPENAI_BASE_URL` | Se gateway | — | URL do Netlify AI Gateway ou OpenAI |
+| `OPENAI_API_KEY` | Se gateway | — | API key do gateway |
 | `VOA_ENABLED` | Não | `false` | Assistente IA Voa no atendimento |
 | `VOA_INTEGRATION_TOKEN` | Se Voa ativo | — | Token plugin Voa Health |
 | `VOA_ENV` | Não | `homologacao` | `homologacao` \| `producao` (referência operacional) |
@@ -261,6 +266,41 @@ VOA_ENABLED=false
 
 Contato sandbox: integration@voahealth.com
 
+### Assistente operacional (chat nos 4 portais)
+
+Documentação: [`ASSISTENTE_SERVERLESS.md`](../produto/ASSISTENTE_SERVERLESS.md) · [`ASSISTENTE_REGRAS_PLANO.md`](../produto/ASSISTENTE_REGRAS_PLANO.md).
+
+O assistente **operacional** (drawer nos portais, `/api/assistant/chat`) é distinto da integração **Voa Health** (IA clínica no atendimento prestador).
+
+| Variável | Obrigatória | Padrão | Descrição |
+|----------|-------------|--------|-----------|
+| `ASSISTANT_ENABLED` | Não | `true` | `false` desliga UI + APIs do assistente |
+| `ASSISTANT_PROVIDER` | Não | `mock` | `mock` força regras locais; `gateway` / `netlify-gateway` usam LLM quando configurado |
+| `ASSISTANT_MODEL` | Não | `gpt-4o-mini` | Modelo enviado ao gateway (`src/lib/assistant/config.ts`) |
+| `OPENAI_BASE_URL` | Sim (modo IA) | — | Base URL OpenAI-compatible (Netlify AI Gateway) |
+| `OPENAI_API_KEY` | Sim (modo IA) | — | Chave do gateway |
+
+```env
+# Desenvolvimento (padrão — sem custo de tokens)
+# ASSISTANT_ENABLED=true
+# ASSISTANT_PROVIDER=mock
+
+# Produção com IA híbrida (requer Tenant.settings.assistant.aiEnabled=true)
+# ASSISTANT_PROVIDER=netlify-gateway
+# OPENAI_BASE_URL=https://<site>.netlify.app/.netlify/ai-gateway/v1
+# OPENAI_API_KEY=<token do painel Netlify>
+# ASSISTANT_MODEL=gpt-4o-mini
+```
+
+**Modo efetivo por tenant** (não é env var):
+
+| Condição | Modo |
+|----------|------|
+| `aiEnabled=false` ou gateway não configurado | **Regras** — gatilhos + `ruleOverrides` |
+| `aiEnabled=true` + `OPENAI_*` + `ASSISTANT_PROVIDER≠mock` | **IA híbrida** — LLM → `refineHybridPlan` → tools |
+
+Lib: `src/lib/assistant/mode.ts` · `src/lib/assistant/plan-gateway.ts` · painel ADMIN: `/interno/assistente`.
+
 ---
 
 ## 6. SEO e URL pública
@@ -435,6 +475,11 @@ O agente usa o mesmo `.env.example`. Não há secrets Cursor-specific no reposit
 | `COMMUNICATION_PROVIDER` | `src/lib/communications/bootstrap.ts`, `communication-gateway.ts`, `api/interno/messages` |
 | `CRON_SECRET` | `src/app/api/cron/reminders/route.ts`, `cron/webhooks/route.ts` |
 | `TELEMEDICINE_BASE_URL` | `src/lib/telemedicine.ts` |
+| `ASSISTANT_ENABLED` | `src/lib/assistant/config.ts`, rotas `/api/assistant/*` |
+| `ASSISTANT_PROVIDER` | `src/lib/assistant/config.ts`, `plan-gateway.ts` |
+| `ASSISTANT_MODEL` | `src/lib/assistant/config.ts`, `provider/gateway.ts` |
+| `OPENAI_BASE_URL` | `src/lib/assistant/config.ts`, `provider/gateway.ts` |
+| `OPENAI_API_KEY` | `src/lib/assistant/config.ts`, `provider/gateway.ts` |
 | `VOA_ENABLED` | `src/lib/voa/config.ts` |
 | `VOA_INTEGRATION_TOKEN` | `src/lib/voa/config.ts` |
 | `VOA_PLUGIN_SCRIPT_URL` | `src/lib/voa/config.ts` |

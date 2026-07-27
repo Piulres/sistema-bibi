@@ -30,8 +30,20 @@ imprimir A4 → entregar em mãos **e** disponibilizar no painel do paciente.
 - Cor tipográfica do tenant + label de nicho na identificação
 - Área de assinatura/carimbo + rodapé sem colidir com o corpo
 - `Cache-Control: no-store` e auditoria `DOCUMENT_EXPORTED` em todo download
+- `Content-Disposition` com `filename*` UTF-8 para nomes acentuados (`serve.ts`)
 - Cancelar encaminhamento com confirmação; formulário com labels visíveis
 - Botão **Imprimir** ao lado do PDF (fluxo da recepção)
+
+## API de exportação PDF
+
+| Portal | Rota | `type` aceitos |
+|--------|------|----------------|
+| Prestador | `GET /api/prestador/clinical-guides/export` | `receita`, `exame`, `encaminhamento`, `atestado`, **`bundle`** (pacote do atendimento) |
+| Beneficiário | `GET /api/beneficiario/clinical-guides/export` | `receita`, `exame`, `encaminhamento`, `atestado` |
+
+Query comum: `?type=receita&id=<uuid>` ou `?type=bundle&appointmentId=<uuid>`. Só PDF; demais formatos retornam 400.
+
+Nome do arquivo: `clinicalGuideFilenameBase()` → ex. `receita-joao-pereira-2026-07-27.pdf` (slug sem acentos, data ISO).
 
 ## Encaminhamento
 
@@ -67,7 +79,8 @@ Formulário estruturado no PEP; PDF via exportação de registro. Integração A
 
 - `src/lib/clinical/encaminhamento.ts` · `receita.ts` · `atestado.ts`
 - `src/lib/clinical-referral-service.ts` · `clinical-discharge-service.ts`
-- `src/lib/exports/clinical-guide-pdf.ts` · `clinical-guide-service.ts`
+- `src/lib/exports/clinical-guide-pdf.ts` · `clinical-guide-service.ts` · `clinical-guide-filename.ts`
+- `src/lib/exports/serve.ts` — `serveBufferExport({ noStore: true })`, `filename*=UTF-8`
 - `src/components/clinical/ClinicalDischargePanel.tsx`
 - Prestador: `/api/prestador/clinical-guides/export` · `.../discharge-documents` · `.../referrals`
 - Beneficiário: `/beneficiario/documentos` · `/api/beneficiario/documents` · `.../clinical-guides/export`

@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.21** em `main` (jul/2026): documentos de saída (melhores práticas) + `ruleOverrides` no runtime do assistente — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). **Produção Netlify:** v3.0.20 até deploy. Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md) · assistente: [`ASSISTENTE_SERVERLESS.md`](ASSISTENTE_SERVERLESS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -744,6 +744,22 @@ Módulo: `src/lib/care-journey.ts` · testes: `tests/lib/care-journey.test.ts`.
 Documentos clínicos no atendimento (atestado, receita, protocolos): [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Regras self-service beneficiário: agendamento cria já em `CONFIRMADO` com e-mail de confirmação; cancelar/reagendar permitem `AGENDADO` ou `CONFIRMADO` futuros; reagendar atualiza o mesmo registro e valida slot livre excluindo o próprio id (`scheduling-service.ts`).
+
+### 8.10 Exportação de guias clínicas (v3.0.21)
+
+Fonte: `src/lib/exports/clinical-guide-service.ts` · PDF: `clinical-guide-pdf.ts` · filename: `clinical-guide-filename.ts` · resposta: `serve.ts` (`noStore: true`, `filename*=UTF-8`).
+
+| Portal | Endpoint | `type` | Parâmetros |
+|--------|----------|--------|------------|
+| Prestador | `GET /api/prestador/clinical-guides/export` | `receita` \| `exame` \| `encaminhamento` \| `atestado` \| **`bundle`** | `id`, `appointmentId`, `patientId` (opcional) |
+| Beneficiário | `GET /api/beneficiario/clinical-guides/export` | `receita` \| `exame` \| `encaminhamento` \| `atestado` | `id`, `appointmentId` — escopo fixo no `patientId` da sessão |
+
+- Formato: **somente PDF** (`?format=pdf` ou omitido).
+- Nome do arquivo: `{tipo}-{paciente-slug}-{YYYY-MM-DD}.pdf` (ex.: `receita-joao-pereira-2026-07-27.pdf`).
+- Cada download registra `DOCUMENT_EXPORTED` na timeline.
+- UI: aba **Documentos** no atendimento (`ClinicalDischargePanel`) · `/beneficiario/documentos` (`BeneficiarioView`).
+
+Testes: `tests/unit/documentos-saida.test.ts` · `tests/api/clinical-discharge.test.ts`.
 
 ---
 

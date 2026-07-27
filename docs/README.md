@@ -2,9 +2,9 @@
 
 Índice canônico da documentação. O ServiceOS é uma **plataforma horizontal Pay Per Use** — a mesma infraestrutura serve múltiplos segmentos de serviços profissionais, alterando vocabulário (labels), branding e landing por tenant.
 
-> **Produção:** **v3.0.20** @ https://sistema-bibi.netlify.app · deploy `bibi-poc-2026-07-27k` (`6a66fe63` @ `753d361`) · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
+> **Produção:** **v3.0.20** @ https://sistema-bibi.netlify.app · deploy `6a6702f7` (`bibi-poc-2026-07-27l`) · **release `main`:** v3.0.21 preparado · [`versoes/RELEASES.md`](versoes/RELEASES.md) · changelog [`versoes/V3_0.md`](versoes/V3_0.md) · PWA [`/instalar`](https://sistema-bibi.netlify.app/instalar).
 
-> **Última revisão factual:** 27/07/2026 — produção **v3.0.20** (`bibi-poc-2026-07-27k` @ `753d361`): estoque Fase 4 + Assistente híbrido + Capacitor B + PJ agendar — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
+> **Última revisão factual:** 27/07/2026 — release **v3.0.21** em `main` (documentos saída + fix assistente runtime); Netlify ainda **v3.0.20** até deploy — ver [`versoes/RELEASES.md`](versoes/RELEASES.md).
 
 > **Não é mais só HealthTech.** Saúde (`MEDICAL`) é um segmento entre vários (inclui Engenharia/`CONSTRUCTION`). Comece pelo segmento do seu tenant ou pela documentação de plataforma.
 
@@ -108,6 +108,8 @@ Senha demo universal: **`bibi123`**. Preview landing: `/?niche=VET`, `/?tenant=b
 | [`produto/ONBOARDING_TOUR.md`](produto/ONBOARDING_TOUR.md) | Tour guiado v3 (duas fases, micro-tours) |
 | [`produto/JORNADA_CLIENTE.md`](produto/JORNADA_CLIENTE.md) | Jornada UX por portal |
 | [`produto/DOCUMENTOS_CLINICOS.md`](produto/DOCUMENTOS_CLINICOS.md) | Atestado, receita comum/especial, protocolos de exames |
+| [`produto/ASSISTENTE_SERVERLESS.md`](produto/ASSISTENTE_SERVERLESS.md) | Chat operacional — stateless, híbrido LLM, confirmação JTI |
+| [`produto/ASSISTENTE_REGRAS_PLANO.md`](produto/ASSISTENTE_REGRAS_PLANO.md) | Fases do assistente — regras, overrides, RBAC |
 | [`produto/AUDITORIA_FLUXOS.md`](produto/AUDITORIA_FLUXOS.md) | Gaps mapeados |
 
 ---

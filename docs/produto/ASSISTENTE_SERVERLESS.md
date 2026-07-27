@@ -47,12 +47,39 @@ Cliente                          API (serverless)
 
 ## Provider de IA
 
-| Modo | Env | Comportamento |
-|------|-----|---------------|
-| **mock** (padrão) | `ASSISTANT_PROVIDER` ausente ou `mock` | 350+ gatilhos, extração regex, RAG local |
-| **gateway** | `ASSISTANT_PROVIDER=gateway` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` | Netlify AI Gateway / OpenAI-compatible; fallback automático para mock |
+| Modo | Ativação | Comportamento |
+|------|----------|---------------|
+| **Regras** (padrão) | `Tenant.settings.assistant.aiEnabled=false` ou gateway ausente | Gatilhos + `ruleOverrides` + extração regex |
+| **IA híbrida** | `aiEnabled=true` + `OPENAI_BASE_URL` + `OPENAI_API_KEY` + `ASSISTANT_PROVIDER≠mock` | LLM propõe → `refineHybridPlan` valida → tools |
 
-Produção hoje usa **mock** — gateway exige secrets no painel Netlify.
+Produção hoje usa **regras** — gateway exige secrets no painel Netlify **e** toggle IA no tenant (`/interno/assistente`).
+
+### Pipeline híbrido (Fase 4)
+
+```
+Mensagem → resolveAssistantMode(tenant)
+         → gateway: planGatewayAssistant (LLM)
+         → regras: planMockAssistant (+ ruleOverrides do tenant)
+         → refineHybridPlan (allowlist tools ∩ RBAC)
+         → executa tools → draft → confirm (JTI) → actions
+```
+
+| Etapa | Módulo | Regra |
+|-------|--------|-------|
+| Modo efetivo | `mode.ts` | IA só com `aiEnabled` **e** `OPENAI_*` configurados |
+| Gateway ativo? | `plan-gateway.ts` | `ASSISTANT_PROVIDER=mock` força regras mesmo com env |
+| Allowlist | `hybrid.ts` → `collectAllowedToolNames` | Interseção tools RBAC × motor de regras |
+| Refino | `hybrid.ts` → `refineHybridPlan` | Descarta tools fora do allowlist; mescla args (gateway prevalece) |
+| Fallback | `hybrid.ts` | Se LLM não propõe tool válida → plano de regras → texto |
+
+**`ruleOverrides` (Fase 3 → runtime v3.0.21):** overrides por tool (`addTriggers`, `removeTriggers`, `disabled`) persistidos em `Tenant.settings.assistant.ruleOverrides` e aplicados em **ambos** os modos via `resolveAssistantIntents` / `planMockAssistant` (`runner.ts`). O painel ADMIN em `/interno/assistente` edita via `PATCH /api/interno/assistant/settings`.
+
+| Modo | Env | Comportamento legado |
+|------|-----|---------------------|
+| **mock** (padrão dev) | `ASSISTANT_PROVIDER` ausente ou `mock` | 350+ gatilhos, extração regex, RAG local |
+| **gateway** | `ASSISTANT_PROVIDER=gateway` ou `netlify-gateway` + `OPENAI_*` | Netlify AI Gateway / OpenAI-compatible; fallback para regras se LLM falhar |
+
+Detalhes de env vars: [`VARIAVEIS_AMBIENTE.md`](../plataforma/VARIAVEIS_AMBIENTE.md) §Assistente operacional.
 
 ## UX do painel (v3.0.6)
 
@@ -76,9 +103,9 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 |------|------------|-------|
 | **Streaming SSE** | Média | Respostas longas do gateway; UX “digitando…” |
 | **Painel de regras** | — | ✅ Fase 3 — CRUD + preview em `/interno/assistente` |
-| **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` (LLM → allowlist regras → tools) |
+| **IA híbrida** | — | ✅ Fase 4 — `refineHybridPlan` + allowlist + `ruleOverrides` no runtime |
 | **E2E multi-nicho** | Baixa | VET adicionado; faltam LEGAL, CONSTRUCTION nos E2E |
-| **Gateway em produção** | Média | Configurar env vars + `ASSISTANT_PROVIDER=gateway` |
+| **Gateway em produção** | Média | `aiEnabled` no tenant + env vars + `ASSISTANT_PROVIDER=netlify-gateway` |
 | **Mais tools** | Contínua | Construction (obras), estoque, CRM no assistente |
 | **OpenAPI assistente** | Baixa | Documentar `sessionState` no spec |
 | **Rate limit / abuse** | Média | Por usuário no chat (hoje só login/MFA) |
@@ -87,12 +114,15 @@ Cada tool executada registra evento na timeline (`entityType: Assistant`, açõe
 ## Testes
 
 - `tests/unit/assistant.test.ts` — multi-turno stateless
+- `tests/unit/assistant-hybrid.test.ts` — `refineHybridPlan`, allowlist, merge de args
 - `tests/integration/assistant-flow.test.ts` — agendamento com confirmação
 - `tests/api/assistant.test.ts` — replay JTI, cancelamento
 - `e2e/assistant.spec.ts` — MEDICAL + VET PetCare
 
 ## Referências
 
-- `docs/versoes/V2_3.md` — changelog do pacote
-- `src/lib/assistant/runner.ts` — orquestração
-- `docs/plataforma/VARIAVEIS_AMBIENTE.md` — `ASSISTANT_ENABLED`, `ASSISTANT_PROVIDER`
+- `docs/versoes/V2_3.md` — changelog do pacote stateless
+- `docs/produto/ASSISTENTE_REGRAS_PLANO.md` — fases, schema, RBAC
+- `src/lib/assistant/runner.ts` — orquestração (rules vs IA híbrida)
+- `src/lib/assistant/provider/hybrid.ts` — validação LLM × regras
+- `docs/plataforma/VARIAVEIS_AMBIENTE.md` — `ASSISTANT_*`, `OPENAI_*`

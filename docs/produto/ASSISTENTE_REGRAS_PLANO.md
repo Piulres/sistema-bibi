@@ -65,13 +65,20 @@ type TenantSettings = {
   assistant: {
     aiEnabled: boolean;      // add-on IA — default false
     rulesEnabled: boolean;   // motor regras — default true
+    ruleOverrides?: Array<{  // Fase 3 — overrides por tool
+      tool: string;
+      disabled?: boolean;
+      addTriggers?: string[];
+      removeTriggers?: string[];
+    }>;
   };
 };
 ```
 
 - **Campo Prisma:** `Tenant.settings` (JSON string)
-- **Lib:** `src/lib/tenant/settings.ts`
+- **Lib:** `src/lib/tenant/settings.ts` · `src/lib/assistant/rules/tenant-overrides.ts`
 - **Modo efetivo:** `src/lib/assistant/mode.ts` → `resolveAssistantMode(settings)`
+- **Runtime:** `src/lib/assistant/runner.ts` passa `ruleOverrides` ao motor de regras em **rules** e **IA híbrida**
 - **API:** `GET/PATCH /api/interno/assistant/settings` (módulo `assistente`, write = ADMIN)
 
 ---
