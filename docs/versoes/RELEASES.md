@@ -11,13 +11,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **publicado em produção**.
+> Pacote **v3.0.13** — exportações autenticadas + equipe no atendimento + receita multi-item **em produção**.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.13** — deploy `6a66d0a1` @ `78b575f` (`bibi-poc-2026-07-27d`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.13** — deploy `6a66d114` @ `78b575f` (`bibi-poc-2026-07-27d`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.13** · sincronizadas · artefato prod `@ 78b575f` |
+| **Release `main` / `dev`** | **v3.0.13** · sincronizados · artefato prod `@ 78b575f` |
 | **Pacote anterior em produção** | **3.0.12** — deploy `6a66c080` @ `e5c1f50` (`bibi-poc-2026-07-27c`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
@@ -25,22 +25,23 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.13** |
+| **Integração** | `dev` | **v3.0.13** (exportações + equipe + prescrição) |
 | **Release** | `main` | **v3.0.13** |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d0a1` · HTTP 200 · **Stop builds ON** |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.13** · deploy `6a66d114` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.13
 
 - **Exportações:** downloads autenticados via fetch+blob (`ExportButtons`, `DownloadLink`); Content-Disposition UTF-8; TISS XML, LGPD JSON, import/export e .ics corrigidos.
 - **Portal Prestador:** equipe no atendimento (papéis por nicho, custos PPU); receita multi-medicamento; aba Equipe.
-- **Qualidade:** `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
+- **Faturamento:** PIX / Marcar paga só em faturas `FECHADA` (alinhado à API).
+- **Qualidade:** CI Job Summary (Vitest/Playwright) · massas com nomes realistas · reseed de `test.db` no fingerprint mismatch · `exports-matrix`, `download-export`, `appointment-team`, `prescription-document` · CI unit+E2E verdes · pre-release OK.
 
 ### Smoke (27/07/2026) — produção v3.0.13
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.13` · deploy `6a66d0a1` |
+| Landing `/` | 200 · footer `v3.0.13` · deploy `6a66d114` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/instalar` | 200 |
 | `/?tenant=cedig` | 200 |
@@ -81,6 +82,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **Dashboard executivo:** hierarquia de KPIs e menos ruído visual.
 - **Gestão clínica:** layout responsivo no mobile.
 - **Exports:** CSV/JSON/TXT/PDF canônicos nos portais.
+
 
 ### Smoke (27/07/2026) — produção v3.0.12
 
@@ -456,7 +458,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | **2.0.x** | [`V2_0.md`](V2_0.md) · [`V2_0_ARCHITECTURE.md`](V2_0_ARCHITECTURE.md) | Histórico — base multi-nicho |
 | **2.1.x** | [`V2_1.md`](V2_1.md) | Histórico — substituído por v2.2.0 |
 | **2.2.x** | onboarding tour | Histórico — substituído por v2.3.0 |
-| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.10` em produção** — mês operacional + agenda/calendário |
+| **3.0.x** | [`V3_0.md`](V3_0.md) | ✅ **`v3.0.13` em produção** — exportações + equipe + receita multi-item |
 | **2.6.x** | [`V2_6.md`](V2_6.md) | Histórico — CEDIG pontes (substituído por v3.0.0) |
 | **2.5.x** | [`V2_5.md`](V2_5.md) | Empilhado em v2.6.0 — login tenant/portal |
 | **2.4.x** | [`V2_4.md`](V2_4.md) | Histórico — substituído por v2.6.0 (CEDIG gestão clínica) |

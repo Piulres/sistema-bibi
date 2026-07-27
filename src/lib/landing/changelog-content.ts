@@ -50,7 +50,8 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
         ],
       },
     ],
-    testStats: "CI unit+E2E · exports-matrix · download-export · appointment-team · docs:verify · pre-release OK",
+    testStats:
+      "CI unit+E2E · Job Summary · exports-matrix · download-export · appointment-team · docs:verify · pre-release OK · prod 6a66d114",
   },
   {
     version: "3.0.12",
