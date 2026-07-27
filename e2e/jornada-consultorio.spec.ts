@@ -64,7 +64,7 @@ test.describe("Jornada consultório — módulos operacionais (Interno)", () => 
 
     await page.goto("/interno/cadastros?tab=procedures");
     await expect(
-      page.getByRole("navigation", { name: "Abas da página" }).getByRole("button", {
+      page.getByRole("tablist", { name: "Abas da página" }).getByRole("tab", {
         name: "Procedimentos",
       }),
     ).toBeVisible();
@@ -161,7 +161,12 @@ test.describe("Jornada consultório — walk-in → check-in → atendimento", (
     await link.click();
     await expect(page).toHaveURL(/\/prestador\/atendimento\//);
 
-    await expect(page.getByRole("button", { name: /Prontuário|PEP/i }).first()).toBeVisible();
+    // TabBar do atendimento usa role=tab (rótulo PEP no shortLabel)
+    await expect(
+      page
+        .getByRole("tablist", { name: "Abas do atendimento clínico" })
+        .getByRole("tab", { name: /Prontuário|PEP/i }),
+    ).toBeVisible();
     await expect(page.getByText(/procedimento|Pay Per Use|Registrar/i).first()).toBeVisible();
     await expect(page.getByRole("button", { name: /Marcar como realizado/i })).toBeVisible();
 

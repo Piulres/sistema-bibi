@@ -642,48 +642,60 @@ export default function StockView() {
                 onSubmit={editingProductId ? saveProductEdit : createProduct}
                 className="mt-4 space-y-3"
               >
-                <input
-                  className={fieldClass}
-                  placeholder="SKU"
-                  value={productForm.sku}
-                  onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })}
-                  required
-                  disabled={Boolean(editingProductId)}
-                />
-                <input
-                  className={fieldClass}
-                  placeholder="Nome"
-                  value={productForm.name}
-                  onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
-                  required
-                />
-                {!editingProductId && (
-                  <select
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  SKU
+                  <input
                     className={fieldClass}
-                    value={productForm.category}
-                    onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
-                  >
-                    {STOCK_PRODUCT_CATEGORIES.map((c) => (
-                      <option key={c} value={c}>
-                        {STOCK_CATEGORY_LABELS[c]}
-                      </option>
-                    ))}
-                  </select>
+                    value={productForm.sku}
+                    onChange={(e) => setProductForm({ ...productForm, sku: e.target.value })}
+                    required
+                    disabled={Boolean(editingProductId)}
+                    autoComplete="off"
+                  />
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Nome
+                  <input
+                    className={fieldClass}
+                    value={productForm.name}
+                    onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
+                    required
+                  />
+                </label>
+                {!editingProductId && (
+                  <label className="block text-sm text-[var(--text-secondary)]">
+                    Categoria
+                    <select
+                      className={fieldClass}
+                      value={productForm.category}
+                      onChange={(e) => setProductForm({ ...productForm, category: e.target.value })}
+                    >
+                      {STOCK_PRODUCT_CATEGORIES.map((c) => (
+                        <option key={c} value={c}>
+                          {STOCK_CATEGORY_LABELS[c]}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 )}
-                <input
-                  className={fieldClass}
-                  placeholder="Estoque mínimo"
-                  type="number"
-                  min="0"
-                  value={productForm.minStock}
-                  onChange={(e) => setProductForm({ ...productForm, minStock: e.target.value })}
-                />
-                <input
-                  className={fieldClass}
-                  placeholder="Registro ANVISA (opcional)"
-                  value={productForm.anvisaCode}
-                  onChange={(e) => setProductForm({ ...productForm, anvisaCode: e.target.value })}
-                />
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Estoque mínimo
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0"
+                    value={productForm.minStock}
+                    onChange={(e) => setProductForm({ ...productForm, minStock: e.target.value })}
+                  />
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Registro ANVISA (opcional)
+                  <input
+                    className={fieldClass}
+                    value={productForm.anvisaCode}
+                    onChange={(e) => setProductForm({ ...productForm, anvisaCode: e.target.value })}
+                  />
+                </label>
                 <div className="flex flex-wrap gap-2">
                   <Button
                     type="submit"
@@ -806,54 +818,67 @@ export default function StockView() {
             <Card className="p-4">
               <SectionHeader title="Entrada de estoque" />
               <form onSubmit={receiveEntry} className="mt-4 space-y-3">
-                <select
-                  className={fieldClass}
-                  value={entryForm.productId}
-                  onChange={(e) => setEntryForm({ ...entryForm, productId: e.target.value })}
-                  required
-                >
-                  <option value="">Produto</option>
-                  {products
-                    .filter((p) => p.active)
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.sku} — {p.name}
-                      </option>
-                    ))}
-                </select>
-                <input
-                  className={fieldClass}
-                  placeholder="Nº do lote"
-                  value={entryForm.lotNumber}
-                  onChange={(e) => setEntryForm({ ...entryForm, lotNumber: e.target.value })}
-                  required
-                />
-                <input
-                  className={fieldClass}
-                  type="date"
-                  value={entryForm.expiryDate}
-                  onChange={(e) => setEntryForm({ ...entryForm, expiryDate: e.target.value })}
-                  required
-                />
-                <input
-                  className={fieldClass}
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  placeholder="Quantidade"
-                  value={entryForm.quantity}
-                  onChange={(e) => setEntryForm({ ...entryForm, quantity: e.target.value })}
-                  required
-                />
-                <input
-                  className={fieldClass}
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  placeholder="Custo unitário (R$)"
-                  value={entryForm.unitCost}
-                  onChange={(e) => setEntryForm({ ...entryForm, unitCost: e.target.value })}
-                />
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Produto
+                  <select
+                    className={fieldClass}
+                    value={entryForm.productId}
+                    onChange={(e) => setEntryForm({ ...entryForm, productId: e.target.value })}
+                    required
+                  >
+                    <option value="">Selecione o produto</option>
+                    {products
+                      .filter((p) => p.active)
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.sku} — {p.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Nº do lote
+                  <input
+                    className={fieldClass}
+                    value={entryForm.lotNumber}
+                    onChange={(e) => setEntryForm({ ...entryForm, lotNumber: e.target.value })}
+                    required
+                    autoComplete="off"
+                  />
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Validade
+                  <input
+                    className={fieldClass}
+                    type="date"
+                    value={entryForm.expiryDate}
+                    onChange={(e) => setEntryForm({ ...entryForm, expiryDate: e.target.value })}
+                    required
+                  />
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Quantidade
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={entryForm.quantity}
+                    onChange={(e) => setEntryForm({ ...entryForm, quantity: e.target.value })}
+                    required
+                  />
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Custo unitário (R$)
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={entryForm.unitCost}
+                    onChange={(e) => setEntryForm({ ...entryForm, unitCost: e.target.value })}
+                  />
+                </label>
                 <Button type="submit" disabled={isBusy("entry")}>
                   Registrar entrada
                 </Button>
@@ -912,49 +937,60 @@ export default function StockView() {
             <Card className="p-4">
               <SectionHeader title="Nova movimentação" />
               <form onSubmit={registerMovement} className="mt-4 space-y-3">
-                <select
-                  className={fieldClass}
-                  value={movementForm.productId}
-                  onChange={(e) => setMovementForm({ ...movementForm, productId: e.target.value })}
-                  required
-                >
-                  <option value="">Produto</option>
-                  {products
-                    .filter((p) => p.active)
-                    .map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.sku} — {p.name}
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Produto
+                  <select
+                    className={fieldClass}
+                    value={movementForm.productId}
+                    onChange={(e) => setMovementForm({ ...movementForm, productId: e.target.value })}
+                    required
+                  >
+                    <option value="">Selecione o produto</option>
+                    {products
+                      .filter((p) => p.active)
+                      .map((p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.sku} — {p.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Tipo
+                  <select
+                    className={fieldClass}
+                    value={movementForm.type}
+                    onChange={(e) => setMovementForm({ ...movementForm, type: e.target.value })}
+                  >
+                    {STOCK_MOVEMENT_TYPES.filter(
+                      (t) => t !== "ENTRADA" && t !== "DISPENSACAO",
+                    ).map((t) => (
+                      <option key={t} value={t}>
+                        {STOCK_MOVEMENT_LABELS[t]}
                       </option>
                     ))}
-                </select>
-                <select
-                  className={fieldClass}
-                  value={movementForm.type}
-                  onChange={(e) => setMovementForm({ ...movementForm, type: e.target.value })}
-                >
-                  {STOCK_MOVEMENT_TYPES.filter(
-                    (t) => t !== "ENTRADA" && t !== "DISPENSACAO",
-                  ).map((t) => (
-                    <option key={t} value={t}>
-                      {STOCK_MOVEMENT_LABELS[t]}
-                    </option>
-                  ))}
-                </select>
-                <input
-                  className={fieldClass}
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={movementForm.quantity}
-                  onChange={(e) => setMovementForm({ ...movementForm, quantity: e.target.value })}
-                  required
-                />
-                <input
-                  className={fieldClass}
-                  placeholder="Motivo"
-                  value={movementForm.reason}
-                  onChange={(e) => setMovementForm({ ...movementForm, reason: e.target.value })}
-                />
+                  </select>
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Quantidade
+                  <input
+                    className={fieldClass}
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={movementForm.quantity}
+                    onChange={(e) => setMovementForm({ ...movementForm, quantity: e.target.value })}
+                    required
+                  />
+                </label>
+                <label className="block text-sm text-[var(--text-secondary)]">
+                  Motivo
+                  <input
+                    className={fieldClass}
+                    value={movementForm.reason}
+                    onChange={(e) => setMovementForm({ ...movementForm, reason: e.target.value })}
+                  />
+                </label>
                 <Button type="submit" disabled={isBusy("movement")}>
                   Registrar
                 </Button>
@@ -970,21 +1006,24 @@ export default function StockView() {
                 title="Kit de materiais por procedimento"
                 description="Baixa automática ao registrar Pay Per Use no atendimento (padrão iClinic/Feegow)."
               />
-              <select
-                className={`${fieldClass} mt-4 max-w-md`}
-                value={kitProcedureId}
-                onChange={(e) => {
-                  setKitProcedureId(e.target.value);
-                  setKitItems([]);
-                }}
-              >
-                <option value="">Selecione o procedimento</option>
-                {procedures.map((p) => (
-                  <option key={p.id} value={p.id}>
-                    {p.code} — {p.name}
-                  </option>
-                ))}
-              </select>
+              <label className="mt-4 block max-w-md text-sm text-[var(--text-secondary)]">
+                Procedimento
+                <select
+                  className={fieldClass}
+                  value={kitProcedureId}
+                  onChange={(e) => {
+                    setKitProcedureId(e.target.value);
+                    setKitItems([]);
+                  }}
+                >
+                  <option value="">Selecione o procedimento</option>
+                  {procedures.map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.code} — {p.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {kitProcedureId && kitItems.length === 0 && (
                 <EmptyState
                   className="mt-4"

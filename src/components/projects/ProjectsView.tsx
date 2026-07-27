@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Alert from "@/components/ui/Alert";
 import LoadingState from "@/components/ui/LoadingState";
+import { useRovingTablistKeyDown } from "@/components/ui/RovingTablist";
 import { PROJECT_STATUSES, projectStatusLabel } from "@/lib/project/constants";
 import { cn } from "@/lib/utils/cn";
 
@@ -204,13 +205,19 @@ export default function ProjectsView() {
     }
   }
 
+  const statusIds = useMemo(() => data?.statuses ?? [], [data?.statuses]);
+  const activeMobileStatus =
+    data && mobileStatus && data.statuses.includes(mobileStatus)
+      ? mobileStatus
+      : (data?.statuses[0] ?? "");
+  const { tabProps } = useRovingTablistKeyDown(
+    statusIds,
+    activeMobileStatus,
+    setMobileStatus,
+  );
+
   if (error) return <Alert tone="danger">{error}</Alert>;
   if (!data) return <LoadingState message="Carregando obras..." />;
-
-  const activeMobileStatus =
-    mobileStatus && data.statuses.includes(mobileStatus)
-      ? mobileStatus
-      : (data.statuses[0] ?? "");
 
   return (
     <div className="space-y-6">
@@ -300,11 +307,11 @@ export default function ProjectsView() {
               <button
                 key={status}
                 type="button"
-                role="tab"
-                aria-selected={active}
+                {...tabProps(status)}
                 onClick={() => setMobileStatus(status)}
                 className={cn(
                   "min-h-10 shrink-0 rounded-full border px-3 py-2 text-sm font-medium transition",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]",
                   active
                     ? "border-[var(--brand-accent)] bg-[var(--brand-accent)]/10 text-[var(--brand-accent)]"
                     : "border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)]",

@@ -8,6 +8,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Button from "@/components/ui/Button";
 import StatCard from "@/components/ui/StatCard";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
+import { useRovingTablistKeyDown } from "@/components/ui/RovingTablist";
 import AddToCalendarMenu from "@/components/calendar/AddToCalendarMenu";
 import CalendarFeedPanel from "@/components/calendar/CalendarFeedPanel";
 import { useAsyncData } from "@/hooks/useAsyncData";
@@ -56,6 +57,10 @@ export default function AgendaView() {
   const apptsLabel = labels.appointments;
   const [view, setView] = useState<View>("day");
   const [date, setDate] = useState(() => civilDateISO());
+  const viewIds = useMemo(() => ["day", "upcoming", "past"] as View[], []);
+  const { tabProps } = useRovingTablistKeyDown(viewIds, view, (id) =>
+    setView(id as View),
+  );
 
   const tabs = useMemo(
     () =>
@@ -109,104 +114,112 @@ export default function AgendaView() {
         : `${summary?.past ?? 0} atendimento(s) anteriores`;
 
   return (
-    <ViewStateBoundary
-      loading={loading}
-      error={error}
-      loadingMessage="Carregando agenda..."
-      onRetry={() => void reload()}
-    >
-      <div className="space-y-4">
-        <CalendarFeedPanel
-          apiPath="/api/prestador/calendar"
-          connectionsApiPath="/api/prestador/calendar/connections"
-          title="Levar agenda para Google, Outlook ou Apple"
-          description="Conecte Google ou Microsoft para push automático. Use o feed ICS para Apple. Em cada card, o botão Calendário adiciona um atendimento avulso."
-        />
+    <div className="space-y-4">
+      <CalendarFeedPanel
+        apiPath="/api/prestador/calendar"
+        connectionsApiPath="/api/prestador/calendar/connections"
+        title="Levar agenda para Google, Outlook ou Apple"
+        description="Conecte Google ou Microsoft para push automático. Use o feed ICS para Apple. Em cada card, o botão Calendário adiciona um atendimento avulso."
+      />
 
-        {summary && (
-          <div className="grid gap-4 sm:grid-cols-3">
-            <StatCard
-              label="Hoje"
-              value={summary.today}
-              info="Atendimentos agendados para a data de hoje."
-            />
-            <StatCard
-              label="Próximos"
-              value={summary.upcoming}
-              tone="accent"
-              info={`${apptsLabel} futuros a partir de hoje.`}
-            />
-            <StatCard
-              label="Histórico"
-              value={summary.past}
-              info="Atendimentos já realizados ou anteriores a hoje."
-            />
-          </div>
-        )}
-
-        <div className="flex flex-wrap gap-2">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setView(tab.id)}
-              className={cn(
-                "rounded-full px-4 py-2 text-sm font-medium transition",
-                view === tab.id
-                  ? "bg-[var(--portal-accent)] text-white"
-                  : "bg-[var(--surface-muted)] text-[var(--text-muted)] hover:bg-[var(--surface-card)]",
-              )}
-            >
-              {tab.label}
-              {summary && (
-                <span className="ml-1.5 tabular-nums opacity-80">
-                  ({tab.id === "day" ? summary.today : tab.id === "upcoming" ? summary.upcoming : summary.past})
-                </span>
-              )}
-            </button>
-          ))}
+      {summary && (
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard
+            label="Hoje"
+            value={summary.today}
+            info="Atendimentos agendados para a data de hoje."
+          />
+          <StatCard
+            label="Próximos"
+            value={summary.upcoming}
+            tone="accent"
+            info={`${apptsLabel} futuros a partir de hoje.`}
+          />
+          <StatCard
+            label="Histórico"
+            value={summary.past}
+            info="Atendimentos já realizados ou anteriores a hoje."
+          />
         </div>
+      )}
 
-        {view === "day" && (
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:w-auto sm:flex">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setDate(shiftCivilDate(date, -1))}
-                aria-label="Dia anterior"
-              >
-                <span className="sm:hidden">←</span>
-                <span className="hidden sm:inline">← Anterior</span>
-              </Button>
-              <input
-                type="date"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                className="ds-touch-select min-w-0 w-full"
-              />
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setDate(shiftCivilDate(date, 1))}
-                aria-label="Próximo dia"
-              >
-                <span className="sm:hidden">→</span>
-                <span className="hidden sm:inline">Próximo →</span>
-              </Button>
-            </div>
-            {!isToday && (
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setDate(civilDateISO())}
-              >
-                Hoje
-              </Button>
+      {/* Tablist fora do loading — evita perder foco ao trocar Dia/Próximos/Histórico */}
+      <div
+        className="flex flex-wrap gap-2"
+        role="tablist"
+        aria-label="Filtro da agenda"
+      >
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            {...tabProps(tab.id)}
+            onClick={() => setView(tab.id)}
+            className={cn(
+              "rounded-full px-4 py-2 text-sm font-medium transition",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2",
+              view === tab.id
+                ? "bg-[var(--portal-accent)] text-white"
+                : "bg-[var(--surface-muted)] text-[var(--text-muted)] hover:bg-[var(--surface-card)]",
             )}
-          </div>
-        )}
+          >
+            {tab.label}
+            {summary && (
+              <span className="ml-1.5 tabular-nums opacity-80">
+                ({tab.id === "day" ? summary.today : tab.id === "upcoming" ? summary.upcoming : summary.past})
+              </span>
+            )}
+          </button>
+        ))}
+      </div>
 
+      {view === "day" && (
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="grid w-full grid-cols-[auto_1fr_auto] items-center gap-2 sm:w-auto sm:flex">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setDate(shiftCivilDate(date, -1))}
+              aria-label="Dia anterior"
+            >
+              <span className="sm:hidden">←</span>
+              <span className="hidden sm:inline">← Anterior</span>
+            </Button>
+            <input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              aria-label="Data da agenda"
+              className="ds-touch-select min-w-0 w-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setDate(shiftCivilDate(date, 1))}
+              aria-label="Próximo dia"
+            >
+              <span className="sm:hidden">→</span>
+              <span className="hidden sm:inline">Próximo →</span>
+            </Button>
+          </div>
+          {!isToday && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setDate(civilDateISO())}
+            >
+              Hoje
+            </Button>
+          )}
+        </div>
+      )}
+
+      <ViewStateBoundary
+        loading={loading}
+        error={error}
+        loadingMessage="Carregando agenda..."
+        onRetry={() => void reload()}
+      >
         <SectionHeader title={headerTitle} description={headerDescription} />
 
         {appts.length === 0 ? (
@@ -290,7 +303,7 @@ export default function AgendaView() {
             Exibindo os {appts.length} atendimentos mais recentes de {summary?.past} no total.
           </p>
         )}
-      </div>
-    </ViewStateBoundary>
+      </ViewStateBoundary>
+    </div>
   );
 }

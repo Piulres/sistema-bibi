@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils/cn";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import type { SectionNavItem } from "@/components/ui/SectionNav";
 
 type Props = {
@@ -37,22 +38,18 @@ export default function MobileSectionDrawer({
     sections.find((s) => s.id === activeId);
   const currentLabel = activeSection?.label ?? title;
 
+  useFocusTrap({
+    enabled: open,
+    containerRef: panelRef,
+    restoreFocusRef: triggerRef,
+    onEscape: () => setOpen(false),
+    initialFocusSelector: "a[aria-current='page'], button[aria-current='true'], a, button",
+  });
+
   useEffect(() => {
     if (!open) return;
-
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        triggerRef.current?.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKey);
     document.body.style.overflow = "hidden";
-    panelRef.current?.querySelector<HTMLElement>("button")?.focus();
-
     return () => {
-      document.removeEventListener("keydown", onKey);
       document.body.style.overflow = "";
     };
   }, [open]);
@@ -71,7 +68,7 @@ export default function MobileSectionDrawer({
         type="button"
         data-tour-id="mobile-nav-trigger"
         onClick={() => setOpen(true)}
-        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--surface-muted)]"
+        className="flex w-full items-center justify-between gap-3 rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] px-4 py-3 text-left text-sm font-medium text-[var(--text-primary)] shadow-sm transition hover:bg-[var(--surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
         aria-expanded={open}
         aria-controls="mobile-section-drawer"
       >
@@ -108,7 +105,7 @@ export default function MobileSectionDrawer({
                   <button
                     type="button"
                     onClick={() => setOpen(false)}
-                    className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)]"
+                    className="rounded-md p-1.5 text-[var(--text-muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]"
                     aria-label="Fechar"
                   >
                     <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden>
@@ -150,10 +147,9 @@ export default function MobileSectionDrawer({
                   </ul>
                 </nav>
               </div>
-              <button
-                type="button"
+              <div
                 className="min-h-full min-w-0 flex-1 bg-black/40"
-                aria-label="Fechar menu"
+                aria-hidden="true"
                 onClick={() => setOpen(false)}
               />
             </div>,
