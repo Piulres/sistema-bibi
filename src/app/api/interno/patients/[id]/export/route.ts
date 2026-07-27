@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import { buildPatientLgpdExport } from "@/lib/patient-export";
-import { requireInternoModule, authErrorResponse } from "@/lib/api-auth";
+import {
+  ApiAuthError,
+  requireInternoModule,
+  authErrorResponse,
+} from "@/lib/api-auth";
+import { canAccessPatientClinicalDetail } from "@/lib/audit-access";
 import {
   buildPatientOverviewTabularExport,
   type PatientExportSection,
@@ -32,6 +37,12 @@ export async function GET(request: Request, { params }: Params) {
     const recordId = url.searchParams.get("recordId");
 
     if (recordId && format === "pdf") {
+      if (!canAccessPatientClinicalDetail(user.internoProfile)) {
+        throw new ApiAuthError(
+          403,
+          "Exportação de prontuário restrita ao perfil administrador",
+        );
+      }
       const buffer = await buildPepRecordPdf(user.tenantId, [recordId], { patientId: id });
       if (!buffer) {
         return NextResponse.json({ error: "Registro não encontrado" }, { status: 404 });

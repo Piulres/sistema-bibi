@@ -26,10 +26,36 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.16",
+    version: "3.0.17",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Cliente 360° sem backdoor clínico para RECEPCAO; a11y de teclado; confirmação automática de agenda self-service.",
+    highlights: [
+      {
+        title: "Auditoria / RBAC clínico",
+        items: [
+          "GET /clinical e corpo de PEP só para ADMIN — cadastros deixa de vazar prontuário",
+          "Overview/export omitem medicalRecords para perfis sem detalhe clínico",
+          "OpenAPI documenta capabilities da auditoria",
+        ],
+      },
+      {
+        title: "Acessibilidade",
+        items: [
+          "Focus trap, tab order e roving tabindex em overlays e TabBar",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #292/#317 · patient-clinical-rbac · a11y-focus · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.16",
+    label: "Sistema Bibi - ServiceOS v3.0.16",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Beneficiário reagenda consulta; Assistente Fase 0; estoque clínico com edição, status de lote e reversão na UI.",
     highlights: [

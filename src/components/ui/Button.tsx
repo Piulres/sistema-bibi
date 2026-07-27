@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import { cn } from "@/lib/utils/cn";
 
 const variants = {
@@ -27,15 +28,19 @@ type Props = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: keyof typeof sizes;
 };
 
-export default function Button({
-  variant = "primary",
-  size = "md",
-  className,
-  type = "button",
-  ...props
-}: Props) {
+const Button = forwardRef<HTMLButtonElement, Props>(function Button(
+  {
+    variant = "primary",
+    size = "md",
+    className,
+    type = "button",
+    ...props
+  },
+  ref,
+) {
   return (
     <button
+      ref={ref}
       type={type}
       className={cn(
         "inline-flex items-center justify-center rounded-[var(--radius-button)] transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60",
@@ -46,4 +51,6 @@ export default function Button({
       {...props}
     />
   );
-}
+});
+
+export default Button;

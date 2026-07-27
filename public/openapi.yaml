@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Sistema Bibi - ServiceOS — API
-  version: 3.0.16
+  version: 3.0.17
   description: >
     API do Sistema Bibi - ServiceOS v3.0.16 — plataforma Pay Per Use multi-nicho. Multi-tenant,
     quatro portais segregados por `role`, vocabulário adaptável por segmento.
@@ -318,7 +318,7 @@ components:
               actorName: { type: string, nullable: true }
     TimelineEvent:
       type: object
-      description: Evento de auditoria universal do sistema.
+      description: Evento de auditoria universal do sistema (já redigido por RBAC de conteúdo).
       properties:
         id: { type: string }
         tenantId: { type: string }
@@ -328,6 +328,24 @@ components:
         description: { type: string }
         createdAt: { type: string, format: date-time }
         createdBy: { type: string, nullable: true }
+        actorName: { type: string, nullable: true }
+        hasDiff: { type: boolean }
+        reversible: { type: boolean }
+        metadata:
+          type: object
+          nullable: true
+          additionalProperties: true
+    AuditViewerCapabilities:
+      type: object
+      description: Capacidades do perfil interno sobre a auditoria.
+      properties:
+        profile:
+          type: string
+          enum: [ADMIN, FATURAMENTO, RECEPCAO, READONLY]
+        canRestore: { type: boolean }
+        canExport: { type: boolean }
+        canViewFullDiff: { type: boolean }
+      required: [profile, canRestore, canExport, canViewFullDiff]
     SubscriptionView:
       type: object
       properties:
@@ -2168,14 +2186,66 @@ paths:
   /api/interno/audit:
     get:
       tags: *a3
-      summary: GET interno audit
+      summary: Lista eventos de auditoria com redação RBAC por perfil
+      parameters:
+        - name: entityType
+          in: query
+          schema: { type: string }
+        - name: action
+          in: query
+          schema: { type: string }
+        - name: search
+          in: query
+          description: Busca na descrição — só tipos com nível full para o perfil
+          schema: { type: string }
+        - name: from
+          in: query
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          schema: { type: string, format: date }
+        - name: page
+          in: query
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 100, default: 50 }
       responses:
         "200":
-          description: OK
+          description: Eventos paginados + capabilities do perfil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  events:
+                    type: array
+                    items: { $ref: "#/components/schemas/TimelineEvent" }
+                  total: { type: integer }
+                  page: { type: integer }
+                  limit: { type: integer }
+                  totalPages: { type: integer }
+                  capabilities: { $ref: "#/components/schemas/AuditViewerCapabilities" }
+                  allowedEntityTypes:
+                    type: array
+                    items: { type: string }
+                  filters:
+                    type: object
+                    properties:
+                      entityTypes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            value: { type: string }
+                            label: { type: string }
+                      actions:
+                        type: array
+                        items: { type: string }
         "401":
           description: Não autenticado
         "403":
-          description: Acesso negado (role != INTERNO)
+          description: Sem módulo auditoria
   /api/interno/billing/export:
     get:
       tags: *a4

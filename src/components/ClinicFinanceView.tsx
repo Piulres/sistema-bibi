@@ -6,6 +6,7 @@ import Alert from "@/components/ui/Alert";
 import Button from "@/components/ui/Button";
 import SectionHeader from "@/components/ui/SectionHeader";
 import ExportButtons from "@/components/ExportButtons";
+import { useRovingTablistKeyDown } from "@/components/ui/RovingTablist";
 import { useToast } from "@/components/ui/Toast";
 import { useLabels } from "@/hooks/useLabels";
 import { LIST_EXPORT_FORMATS } from "@/lib/exports/format";
@@ -92,6 +93,8 @@ type Kpis = {
 
 type Tab = "lancamentos" | "despesas" | "indicadores";
 
+const CLINIC_TAB_IDS: Tab[] = ["lancamentos", "despesas", "indicadores"];
+
 function hasClinicalExtras(form: {
   biopsies: string;
   polypectomies: string;
@@ -113,6 +116,9 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
   const { showToast } = useToast();
   const now = new Date();
   const [tab, setTab] = useState<Tab>("lancamentos");
+  const { tabProps } = useRovingTablistKeyDown(CLINIC_TAB_IDS, tab, (id) =>
+    setTab(id as Tab),
+  );
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [bootLoading, setBootLoading] = useState(true);
@@ -663,10 +669,9 @@ export default function ClinicFinanceView({ prefill }: { prefill?: Prefill }) {
           <button
             key={t.id}
             type="button"
-            role="tab"
-            aria-selected={tab === t.id}
+            {...tabProps(t.id)}
             onClick={() => setTab(t.id)}
-            className={`min-h-10 min-w-0 flex-1 rounded-lg px-2 py-2 text-center text-sm font-medium transition sm:flex-none sm:px-3 sm:text-left ${
+            className={`min-h-10 min-w-0 flex-1 rounded-lg px-2 py-2 text-center text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] sm:flex-none sm:px-3 sm:text-left ${
               tab === t.id
                 ? "bg-[var(--brand-primary)] text-white shadow-sm"
                 : "text-[var(--text-secondary)] hover:bg-[var(--surface-card)] sm:hover:bg-[var(--surface-muted)]"

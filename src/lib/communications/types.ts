@@ -10,6 +10,7 @@ export type CommunicationChannel = (typeof COMMUNICATION_CHANNELS)[number];
 
 /** Templates de mensagem previstos. */
 export const MESSAGE_TEMPLATES = [
+  "APPOINTMENT_CONFIRMATION",
   "APPOINTMENT_REMINDER",
   "INVOICE_DUE",
   "SUBSCRIPTION_DUE",

@@ -74,10 +74,10 @@ describe("rescheduleBeneficiaryAppointment — troca horário sem cancelar+criar
     expect(update).not.toHaveBeenCalled();
   });
 
-  it("rejeita status diferente de AGENDADO (só self-service futuro)", async () => {
+  it("rejeita status terminal (REALIZADO) — só futuros gerenciáveis", async () => {
     findFirst.mockResolvedValue({
       id: "a1",
-      status: "CONFIRMADO",
+      status: "REALIZADO",
       scheduledAt: futureOld,
       providerId: "prov1",
       patientId: "p1",
@@ -87,14 +87,14 @@ describe("rescheduleBeneficiaryAppointment — troca horário sem cancelar+criar
     });
     const result = await rescheduleBeneficiaryAppointment(baseInput);
     expect(result).toEqual({
-      error: "Somente consultas agendadas podem ser reagendadas",
+      error: "Somente consultas futuras (agendadas ou confirmadas) podem ser reagendadas",
     });
   });
 
-  it("atualiza scheduledAt no mesmo registro e grava timeline RESCHEDULED", async () => {
+  it("atualiza scheduledAt no mesmo registro CONFIRMADO e grava timeline RESCHEDULED", async () => {
     findFirst.mockResolvedValue({
       id: "a1",
-      status: "AGENDADO",
+      status: "CONFIRMADO",
       scheduledAt: futureOld,
       providerId: "prov1",
       patientId: "p1",

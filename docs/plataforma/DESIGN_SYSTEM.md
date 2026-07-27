@@ -88,7 +88,19 @@ Localizados em `src/components/ui/`:
 | `CalloutCard` | Destaque com borda lateral — walk-in, info, success |
 | `FlowStepper` | Progresso da jornada clínica (Agendado → Pago) |
 | `AppointmentCard` | Card de consulta com horário, status e faixa lateral por estado |
-| `TabBar` | Abas client-side com sublinhado — suporta `shortLabel` até `xl` (ex.: Cadastros, atendimento prestador) |
+| `TabBar` | Abas client-side (`role=tablist`) com roving tabindex + setas — suporta `shortLabel` até `xl` |
+| `Select` | Select com label associado (evita placeholder-as-label) |
+| `RovingTablist` | Tablist genérico / hook `useRovingTablistKeyDown` para filtros com setas |
+
+### Acessibilidade (teclado / foco)
+
+| Peça | Uso |
+|------|-----|
+| Skip link | `.ds-skip-link` → `#portal-main` (portais) / `#conteudo-principal` (landing) / `#login-main` |
+| Focus trap | `useFocusTrap` — dialogs, drawers, assistente, onboarding |
+| Menus | `useMenuKeyboard` — menu **Mais** (`NavTabs`) e “Adicionar ao calendário” |
+| Focus ring | `--ring-focus` + regra global `:focus-visible` em `globals.css` |
+| Helpers | `src/lib/a11y/focus.ts` (roving index, trap Tab) |
 
 Jornada visual: `src/lib/care-journey.ts` + `FlowStepper` no beneficiário, prestador e walk-in da agenda.
 

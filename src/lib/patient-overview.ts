@@ -2,6 +2,7 @@ import "server-only";
 import { formatDateTimeBR as dateTime } from "@/lib/timezone";
 import { getPrisma } from "@/lib/db";
 import { formatBRL } from "@/lib/pricing";
+import { canAccessPatientClinicalDetail } from "@/lib/audit-access";
 import { getPatientTimelineEvents, type TimelineEventView } from "@/lib/timeline";
 
 
@@ -185,6 +186,11 @@ export async function getPatientOverview(
       : undefined,
   );
 
+  const allowClinical =
+    !options || !("internoProfile" in options)
+      ? true
+      : canAccessPatientClinicalDetail(options.internoProfile);
+
   return {
     patient: {
       id: patient.id,
@@ -210,18 +216,20 @@ export async function getPatientOverview(
     },
     appointments,
     usages,
-    medicalRecords: patient.medicalRecords.map((record) => ({
-      id: record.id,
-      content: record.content,
-      recordType: record.recordType,
-      title: record.title,
-      createdAt: record.createdAt.toISOString(),
-      createdAtLabel: dateTime(record.createdAt),
-      providerName: record.provider.name,
-      appointmentDateLabel: record.appointment
-        ? dateTime(record.appointment.scheduledAt)
-        : null,
-    })),
+    medicalRecords: allowClinical
+      ? patient.medicalRecords.map((record) => ({
+          id: record.id,
+          content: record.content,
+          recordType: record.recordType,
+          title: record.title,
+          createdAt: record.createdAt.toISOString(),
+          createdAtLabel: dateTime(record.createdAt),
+          providerName: record.provider.name,
+          appointmentDateLabel: record.appointment
+            ? dateTime(record.appointment.scheduledAt)
+            : null,
+        }))
+      : [],
     invoices: patient.invoices.map((invoice) => ({
       id: invoice.id,
       total: invoice.total,

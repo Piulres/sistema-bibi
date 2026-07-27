@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useId, useRef, useState } from "react";
 import { cn } from "@/lib/utils/cn";
 import ScrollableNavRail from "@/components/ui/ScrollableNavRail";
+import { useMenuKeyboard } from "@/hooks/useMenuKeyboard";
 
 export type NavTab = {
   href: string;
@@ -28,6 +29,9 @@ type Props = {
   className?: string;
 };
 
+const focusTabClass =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)] focus-visible:ring-offset-2";
+
 function TabLabel({ tab }: { tab: NavTab }) {
   if (!tab.shortLabel) return <>{tab.label}</>;
   return (
@@ -46,6 +50,7 @@ function tabClassName(
   return cn(
     "-mb-px shrink-0 snap-start border-b-2 text-sm font-medium transition",
     "min-h-11 touch-manipulation px-2.5 py-2.5 sm:px-3 xl:px-4",
+    focusTabClass,
     isActive ? activeClass : idleClass,
   );
 }
@@ -73,12 +78,21 @@ export default function NavTabs({
   const [moreOpen, setMoreOpen] = useState(false);
   const [menuActive, setMenuActive] = useState(active);
   const moreRef = useRef<HTMLDivElement>(null);
+  const moreTriggerRef = useRef<HTMLButtonElement>(null);
+  const moreMenuRef = useRef<HTMLDivElement>(null);
   const moreMenuId = useId();
 
   if (active !== menuActive) {
     setMenuActive(active);
     if (moreOpen) setMoreOpen(false);
   }
+
+  useMenuKeyboard({
+    open: moreOpen,
+    menuRef: moreMenuRef,
+    triggerRef: moreTriggerRef,
+    onClose: () => setMoreOpen(false),
+  });
 
   useEffect(() => {
     if (!moreOpen) return;
@@ -87,14 +101,9 @@ export default function NavTabs({
         setMoreOpen(false);
       }
     };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMoreOpen(false);
-    };
     document.addEventListener("mousedown", onPointer);
-    document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("mousedown", onPointer);
-      document.removeEventListener("keydown", onKey);
     };
   }, [moreOpen]);
 
@@ -121,6 +130,7 @@ export default function NavTabs({
         {moreTabs.length > 0 && (
           <div ref={moreRef} className="relative shrink-0 snap-start self-stretch">
             <button
+              ref={moreTriggerRef}
               type="button"
               data-tour-nav="more"
               aria-expanded={moreOpen}
@@ -146,6 +156,7 @@ export default function NavTabs({
             {moreOpen && (
               <div
                 id={moreMenuId}
+                ref={moreMenuRef}
                 role="menu"
                 aria-label="Mais módulos"
                 className="absolute right-0 top-full z-40 mt-1 min-w-[12rem] rounded-[var(--radius-button)] border border-[var(--border-default)] bg-[var(--surface-card)] py-1 shadow-lg"
@@ -160,6 +171,7 @@ export default function NavTabs({
                     onClick={() => setMoreOpen(false)}
                     className={cn(
                       "block px-3 py-2.5 text-sm font-medium transition hover:bg-[var(--surface-muted)]",
+                      focusTabClass,
                       active === tab.key
                         ? "text-[var(--brand-accent)]"
                         : "text-[var(--text-secondary)]",

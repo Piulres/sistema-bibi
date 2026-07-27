@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { columnClassForStatus } from "@/lib/company-crm";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
+import { useRovingTablistKeyDown } from "@/components/ui/RovingTablist";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useAsyncAction } from "@/hooks/useAsyncAction";
 import { fetchJson } from "@/lib/ui/api-feedback";
@@ -82,6 +83,16 @@ export default function CrmPipelineView() {
       ? mobileStatus
       : (data?.statuses[0]?.value ?? "");
 
+  const statusIds = useMemo(
+    () => data?.statuses.map((s) => s.value) ?? [],
+    [data?.statuses],
+  );
+  const { tabProps } = useRovingTablistKeyDown(
+    statusIds,
+    activeMobileStatus,
+    setMobileStatus,
+  );
+
   async function updateStatus(companyId: string, companyName: string, status: string) {
     await run(
       companyId,
@@ -125,11 +136,11 @@ export default function CrmPipelineView() {
                   <button
                     key={status.value}
                     type="button"
-                    role="tab"
-                    aria-selected={active}
+                    {...tabProps(status.value)}
                     onClick={() => setMobileStatus(status.value)}
                     className={cn(
                       "min-h-10 shrink-0 rounded-full border px-3 py-2 text-sm font-medium transition",
+                      "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring-focus)]",
                       active
                         ? "border-[var(--brand-accent)] bg-[var(--brand-accent)]/10 text-[var(--brand-accent)]"
                         : "border-[var(--border-default)] bg-[var(--surface-card)] text-[var(--text-secondary)]",
