@@ -45,7 +45,7 @@ Execute **na mesma sessão** que atualiza `RELEASES.md` e `src/lib/platform.ts`:
   - [ ] `summary` em linguagem de produto (não jargão de PR/deploy)
   - [ ] `highlights` agrupados por tema (Segurança, Assistente, VET, Operação, Landing…)
   - [ ] `date` da publicação (DD/MM/AAAA)
-  - [ ] `testStats` com contagem real (`npm run test` / `pre-release`)
+  - [ ] `testStats` com suítes **desta release** (não copiar da anterior/seguinte) — ver [§testStats](#teststats-cobertura-por-release)
   - [ ] `label` da release atual usa `PLATFORM.versionLabel` (não hardcodar)
 - [ ] `docs/versoes/VX_Y.md` — changelog técnico completo
 - [ ] `docs/versoes/RELEASES.md` — pacote em produção
@@ -86,7 +86,30 @@ export type ChangelogRelease = {
 };
 ```
 
-**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (hoje **3.0.8**).
+**Ordem:** a primeira entrada de `CHANGELOG_RELEASES` deve ser a versão `current` (ver [`RELEASES.md`](../versoes/RELEASES.md)).
+
+### testStats — cobertura por release
+
+Campo opcional exibido no acordeão como “Cobertura de testes”. Deve descrever **apenas a release em que aparece** — erros comuns:
+
+| Erro | Correto |
+|------|---------|
+| Copiar `testStats` da release anterior ao promover | Gerar string nova com PRs/suítes **do pacote atual** |
+| Trocar blocos entre `3.0.20` e `3.0.21` | Cada versão lista seus próprios jobs (`#337`…`#343`) |
+| Contagem Vitest desatualizada sem suíte nomeada | Preferir suítes nomeadas + `pre-release OK` + deploy id |
+
+**Formato sugerido (técnico, curto):**
+
+```
+CI unit+E2E #NNN/#NNN · suite-a · suite-b · pre-release OK · prod <deploy-id>
+```
+
+Exemplos canônicos (jul/2026):
+
+- **v3.0.21:** `CI unit+E2E #342/#343 · documentos-saida · clinical-discharge · pre-release OK · prod 6a6708db`
+- **v3.0.20:** `CI unit+E2E #337/#338/#340/#335 · stock · assistant-hybrid · pj-appointments · prod 6a66fe7f · tip 6a6702f7 (#343)`
+
+Validar após editar: comparar com `docs/versoes/RELEASES.md` §Conteúdo do pacote e com o Job Summary do CI da release.
 
 ---
 
