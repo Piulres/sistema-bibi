@@ -13,8 +13,8 @@ import {
   STOCK_LOT_STATUS_LABELS,
   STOCK_LOT_STATUSES,
   STOCK_MOVEMENT_LABELS,
-  STOCK_MOVEMENT_TYPES,
   STOCK_PRODUCT_CATEGORIES,
+  STOCK_UI_MANUAL_MOVEMENT_TYPES,
   isStockReversibleType,
   isStockSyntheticLot,
 } from "@/lib/stock-constants";
@@ -63,6 +63,8 @@ type Movement = {
   quantity: number;
   reason: string | null;
   createdAtLabel: string;
+  reversed?: boolean;
+  isReversal?: boolean;
 };
 
 type AlertItem = {
@@ -112,7 +114,7 @@ const emptyProductForm = {
 function canReverseMovement(m: Movement): boolean {
   if (!m.lotNumber) return false;
   if (!isStockReversibleType(m.type)) return false;
-  if (m.reason?.toLowerCase().includes("reversão")) return false;
+  if (m.reversed || m.isReversal) return false;
   return true;
 }
 
@@ -1018,9 +1020,7 @@ export default function StockView() {
                     value={movementForm.type}
                     onChange={(e) => setMovementForm({ ...movementForm, type: e.target.value })}
                   >
-                    {STOCK_MOVEMENT_TYPES.filter(
-                      (t) => t !== "ENTRADA" && t !== "DISPENSACAO",
-                    ).map((t) => (
+                    {STOCK_UI_MANUAL_MOVEMENT_TYPES.map((t) => (
                       <option key={t} value={t}>
                         {STOCK_MOVEMENT_LABELS[t]}
                       </option>

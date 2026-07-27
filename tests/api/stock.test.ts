@@ -649,4 +649,171 @@ describe("Estoque clínico — kits Pay Per Use e dispensação no atendimento",
     const body = await dispense.json();
     expect(body.error).toMatch(/cancelado/i);
   });
+
+  it("segunda reversão do mesmo movimento retorna 400 — evita inflar saldo", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const sku = `MAT-REV2-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: { sku, name: "Gaze estéril 10x10", category: "MATERIAL", minStock: 1 },
+      }),
+    );
+    const productId = (await createRes.json()).product.id as string;
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    const lotNumber = `LR-${Date.now().toString(36).toUpperCase()}`;
+    await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: {
+          productId,
+          lotNumber,
+          quantity: 10,
+          expiryDate: expiry.toISOString(),
+          unitCost: 1.2,
+        },
+      }),
+    );
+
+    await movementsPost(
+      jsonRequest("http://localhost/api/interno/stock/movements", {
+        method: "POST",
+        body: { productId, type: "SAIDA", quantity: 2, reason: "Uso em curativo" },
+      }),
+    );
+    const saida = await prisma.stockMovement.findFirstOrThrow({
+      where: { productId, type: "SAIDA" },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const first = await reverseMovementPost(
+      jsonRequest(`http://localhost/api/interno/stock/movements/${saida.id}/reverse`, {
+        method: "POST",
+        body: { reason: "Estorno correto" },
+      }),
+      { params: Promise.resolve({ id: saida.id }) },
+    );
+    expect(first.status).toBe(200);
+
+    const second = await reverseMovementPost(
+      jsonRequest(`http://localhost/api/interno/stock/movements/${saida.id}/reverse`, {
+        method: "POST",
+        body: { reason: "Tentativa duplicada" },
+      }),
+      { params: Promise.resolve({ id: saida.id }) },
+    );
+    expect(second.status).toBe(400);
+    const body = await second.json();
+    expect(body.error).toMatch(/já foi revertida/i);
+
+    const list = await movementsGet(
+      jsonRequest("http://localhost/api/interno/stock/movements?limit=20"),
+    );
+    expect(list.status).toBe(200);
+    const data = await list.json();
+    const listed = data.movements.find((m: { id: string }) => m.id === saida.id);
+    expect(listed?.reversed).toBe(true);
+  });
+
+  it("FIFO ignora lote vencido ainda marcado DISPONIVEL após refresh na baixa", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const sku = `MAT-VENC-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: { sku, name: "Luvas procedimento M", category: "MATERIAL", minStock: 1 },
+      }),
+    );
+    const productId = (await createRes.json()).product.id as string;
+    const product = await prisma.medicalProduct.findFirstOrThrow({ where: { id: productId } });
+    const past = new Date();
+    past.setDate(past.getDate() - 10);
+    const lotNumber = `LV-${Date.now().toString(36).toUpperCase()}`;
+
+    await prisma.stockLot.create({
+      data: {
+        tenantId: product.tenantId,
+        productId,
+        lotNumber,
+        expiryDate: past,
+        quantity: 5,
+        unitCost: 0.5,
+        status: "DISPONIVEL",
+      },
+    });
+
+    const saida = await movementsPost(
+      jsonRequest("http://localhost/api/interno/stock/movements", {
+        method: "POST",
+        body: { productId, type: "SAIDA", quantity: 1, reason: "Tentativa em lote vencido" },
+      }),
+    );
+    expect(saida.status).toBe(400);
+    const body = await saida.json();
+    expect(body.error).toMatch(/insuficiente/i);
+
+    const lot = await prisma.stockLot.findFirstOrThrow({ where: { productId, lotNumber } });
+    expect(lot.status).toBe("VENCIDO");
+  });
+
+  it("reforço de entrada rejeita lote em QUARENTENA — não reabre sem liberação", async () => {
+    await setSessionForEmail("recepcao@bibi.health");
+    const prisma = getTestPrisma();
+    const sku = `MAT-QUA-${Date.now().toString(36).toUpperCase()}`;
+    const createRes = await productsPost(
+      jsonRequest("http://localhost/api/interno/stock/products", {
+        method: "POST",
+        body: { sku, name: "Álcool 70% 1L", category: "INSUMO", minStock: 1 },
+      }),
+    );
+    const productId = (await createRes.json()).product.id as string;
+    const expiry = new Date();
+    expiry.setFullYear(expiry.getFullYear() + 1);
+    const lotNumber = `LQ-${Date.now().toString(36).toUpperCase()}`;
+    const lotRes = await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: {
+          productId,
+          lotNumber,
+          quantity: 3,
+          expiryDate: expiry.toISOString(),
+          unitCost: 8,
+        },
+      }),
+    );
+    expect(lotRes.status).toBe(200);
+    const lotRow = await prisma.stockLot.findFirstOrThrow({ where: { productId, lotNumber } });
+
+    await lotPatch(
+      jsonRequest(`http://localhost/api/interno/stock/lots/${lotRow.id}`, {
+        method: "PATCH",
+        body: { status: "QUARENTENA" },
+      }),
+      { params: Promise.resolve({ id: lotRow.id }) },
+    );
+
+    const reinforce = await lotsPost(
+      jsonRequest("http://localhost/api/interno/stock/lots", {
+        method: "POST",
+        body: {
+          productId,
+          lotNumber,
+          quantity: 2,
+          expiryDate: expiry.toISOString(),
+          unitCost: 8,
+        },
+      }),
+    );
+    expect(reinforce.status).toBe(400);
+    const body = await reinforce.json();
+    expect(body.error).toMatch(/QUARENTENA/i);
+
+    const lot = await prisma.stockLot.findFirstOrThrow({ where: { id: lotRow.id } });
+    expect(lot.quantity).toBe(3);
+    expect(lot.status).toBe("QUARENTENA");
+  });
 });

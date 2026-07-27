@@ -446,19 +446,20 @@ Calendários externos (ICS / Google / Outlook): [`../plataforma/CALENDAR_INTEGRA
 
 Serviço: `src/lib/webhook-service.ts`
 
-### 4.8 Estoque médico (`StockView`) — v1.3 · Fase 2 UI · Fase 3 sem lote
+### 4.8 Estoque médico (`StockView`) — v1.3 · Fase 2–4
 
 | Ação | API | Efeito |
 |------|-----|--------|
 | Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita; `requiresLot` no POST |
 | Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade, saldo e status; se `requiresLot=false`, entrada sem nº/validade usa lote sintético `SEM-LOTE` |
-| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória — UI com botão Reverter |
+| Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Saída/ajuste/perda + reversão **idempotente** (`reversed` / `isReversal` na listagem) |
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
 Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
 Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.  
-`requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).
+`requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).  
+**Fase 4:** `refreshExpiredLots` antes de baixas; FIFO ignora vencidos; reforço não reabre QUARENTENA/BLOQUEADO; segunda reversão → 400.
 
 ### 4.9 Auditoria (`AuditoriaView`)
 

@@ -63,12 +63,15 @@ export function isStockReversibleType(type: string): boolean {
 export const STOCK_MOVEMENT_LABELS: Record<StockMovementType, string> = {
   ENTRADA: "Entrada",
   SAIDA: "Saída",
-  AJUSTE: "Ajuste de inventário",
-  DISPENSACAO: "Dispensação ao paciente",
+  AJUSTE: "Ajuste de inventário (baixa)",
+  DISPENSACAO: "Dispensação no atendimento",
   TRANSFERENCIA: "Transferência entre setores",
   PERDA: "Perda / avaria",
   DEVOLUCAO: "Devolução",
 };
+
+/** Tipos oferecidos no formulário de “Nova movimentação” (sem ENTRADA/dispensação/tipos sem UX). */
+export const STOCK_UI_MANUAL_MOVEMENT_TYPES = ["SAIDA", "AJUSTE", "PERDA"] as const;
 
 export const STOCK_LOT_STATUS_LABELS: Record<StockLotStatus, string> = {
   DISPONIVEL: "Disponível",
