@@ -4507,6 +4507,76 @@ paths:
             schema:
               type: object
 
+
+  # --- paths sincronizados (scripts/sync-openapi-paths.mjs) ---
+  /api/pj/appointments:
+    post:
+      tags: [PJ]
+      summary: RH agenda consulta em nome de colaborador da empresa
+      description: >
+        Valida ownership (patient.companyId = session.companyId), cria Appointment
+        em CONFIRMADO e enfileira APPOINTMENT_CONFIRMATION.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [patientId, scheduledAt]
+              properties:
+                patientId: { type: string }
+                providerId: { type: string }
+                procedureId: { type: string }
+                petId: { type: string, nullable: true }
+                scheduledAt: { type: string, format: date-time }
+                reason: { type: string, nullable: true }
+                modality: { type: string, enum: [PRESENCIAL, TELE] }
+                autoAssignProvider: { type: boolean }
+      responses:
+        "200":
+          description: Agendamento confirmado
+        "400":
+          description: Slot/prestador inválido
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PJ) ou sem companyId
+        "404":
+          description: Beneficiário fora do escopo da empresa
+  /api/pj/providers:
+    get:
+      tags: [PJ]
+      summary: Lista prestadores do tenant para o RH
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PJ)
+  /api/pj/slots:
+    get:
+      tags: [PJ]
+      summary: Lista horários disponíveis para agendamento RH
+      parameters:
+        - name: providerId
+          in: query
+          schema: { type: string }
+          description: ID do prestador, ou vazio/"any" para todos
+        - name: date
+          in: query
+          required: true
+          schema: { type: string, format: date }
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: date ausente
+        "401":
+          description: Não autenticado
+        "403":
+          description: Acesso negado (role != PJ)
+
   /api/cron/reminders:
     post:
       tags: [Cron]

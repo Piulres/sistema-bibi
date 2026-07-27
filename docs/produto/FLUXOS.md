@@ -121,7 +121,7 @@ flowchart TB
   PR --> PPU
   IN --> PPU & SUB
   BE --> PPU
-  PJ -.->|somente leitura| PPU
+  PJ -->||consumo + agendar| PPU
 ```
 
 | Conceito | Onde no código |
@@ -522,27 +522,33 @@ Testes: `tests/unit/export-formats.test.ts` · `tests/api/exports.test.ts` · `t
 
 ## 5. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **Somente leitura + export**
+**Role:** `PJ` · **Escopo:** `user.companyId` · **Leitura + export + agendamento RH**
 
 | Seção (`PjView`) | Dados |
 |------------------|-------|
 | Alertas | INADIMPLENTE, negociação, faturas abertas, cobranças vencidas |
 | KPIs | Contrato, beneficiários, consumo PPU, MRR |
-| Beneficiários | Consumo por colaborador |
+| Agendar | RH escolhe colaborador + slot → `CONFIRMADO` + e-mail |
+| Beneficiários | Consumo por colaborador · CTA Agendar |
 | Assinaturas | Planos e cobranças pendentes |
 | Faturas | Histórico corporativo |
 
 | Ação | API | Serviço |
 |------|-----|---------|
 | Painel | `GET /api/pj/overview` | `pj-portal-service.ts` |
+| Prestadores | `GET /api/pj/providers` | `listProviders` |
+| Slots | `GET /api/pj/slots?providerId&date` | `scheduling-service.ts` |
+| Agendar colaborador | `POST /api/pj/appointments` | `bookPjAppointment` → `bookBeneficiaryAppointment` (anti-IDOR `companyId`) |
 | Export | `GET /api/pj/reports?format=` | `buildPjTabularExport` + `serveTabularExport` (PDF/CSV/JSON/TXT) |
 
 ```mermaid
 flowchart LR
   RH[Usuário PJ] --> V[PjView]
   V --> O[GET /api/pj/overview]
+  V --> A[POST /api/pj/appointments]
   O --> S[pj-portal-service]
-  S --> DB[(Company + Patients + Invoices)]
+  A --> B[bookPjAppointment]
+  B --> DB[(Company.patients + Appointment)]
 ```
 
 ---

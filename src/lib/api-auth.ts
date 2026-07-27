@@ -70,6 +70,15 @@ export async function requireBeneficiary(): Promise<SessionUser & { patientId: s
   return { ...user, patientId: user.patientId };
 }
 
+/** Garante sessão PJ com empresa vinculada (escopo B2B). */
+export async function requirePj(): Promise<SessionUser & { companyId: string }> {
+  const user = await requireUser(["PJ"]);
+  if (!user.companyId) {
+    throw new ApiAuthError(403, "Conta sem empresa vinculada");
+  }
+  return { ...user, companyId: user.companyId };
+}
+
 export function authErrorResponse(error: unknown): NextResponse {
   if (error instanceof ApiAuthError) {
     return NextResponse.json({ error: error.message }, { status: error.status });

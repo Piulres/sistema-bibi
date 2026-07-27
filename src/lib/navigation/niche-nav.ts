@@ -401,6 +401,7 @@ export function buildBeneficiarioNavTabs(labels: NicheLabels, niche?: NicheId): 
 export function buildPjSectionNav(labels: NicheLabels, niche?: NicheId) {
   const sections: { id: string; label: string; shortLabel?: string; href?: string }[] = [
     { id: "resumo", label: "Resumo", shortLabel: "Resumo" },
+    { id: "agendar", label: "Agendar", shortLabel: "Agendar" },
     { id: "beneficiarios", label: labels.beneficiaries, shortLabel: compactLabel(labels.beneficiary) },
     { id: "assinaturas", label: "Assinaturas", shortLabel: "Assinaturas" },
     { id: "faturas", label: "Faturas", shortLabel: "Faturas" },
