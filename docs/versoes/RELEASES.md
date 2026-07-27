@@ -11,24 +11,30 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 ## Status agora (27/07/2026)
 
-> Pacote **v3.0.18** — Estoque Fase 3 + Assistente regras **em produção**.
+> Pacote **v3.0.19** — BrandMark + Assistente Fase 3 **pendente de deploy**.
 
 | Item | Valor |
 |------|-------|
 | **Versão em produção (sistema-bibi.netlify.app)** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
-| **Release `main` / `dev`** | **v3.0.18** · sincronizados @ `372b5cc` |
-| **Pacote anterior em produção** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
+| **Release `main` / `dev`** | **v3.0.19** (preparado) · prod ainda **v3.0.18** |
+| **Pacote anterior em produção** | **3.0.18** — deploy `6a66e9d6` @ `372b5cc` (`bibi-poc-2026-07-27i`) |
 | **Doc** | [`V3_0.md`](V3_0.md) |
 
 ### Sincronização de ambientes
 
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
-| **Integração** | `dev` | **v3.0.18** (Estoque Fase 3 + Assistente regras) |
-| **Release** | `main` | **v3.0.18** |
+| **Integração** | `dev` | **v3.0.19** (BrandMark + Assistente Fase 3) |
+| **Release** | `main` | **v3.0.18** (até merge) |
 | **Netlify** | **sistema-bibi.netlify.app** | **v3.0.18** · deploy `6a66e9d6` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
+
+### Conteúdo do pacote v3.0.19
+
+- **BrandMark:** marca circular whitelabel — PWA/favicon dinâmicos, UI e `/api/brand/mark` (#325).
+- **Assistente Fase 3:** CRUD de `ruleOverrides` + preview efetivo no painel ADMIN (#330).
+- **Qualidade:** `uniqueSlot` jornada/PPU (#329) · `brand-mark` · CI #325/#329/#330 · docs:verify.
 
 ### Conteúdo do pacote v3.0.18
 

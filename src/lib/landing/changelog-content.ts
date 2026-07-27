@@ -26,10 +26,35 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.18",
+    version: "3.0.19",
     label: PLATFORM.versionLabel,
     date: "27/07/2026",
     status: "current",
+    summary:
+      "Marca circular whitelabel (BrandMark) e Assistente Fase 3 com CRUD de regras por tenant.",
+    highlights: [
+      {
+        title: "Marca / PWA",
+        items: [
+          "BrandMark reutilizável na UI, favicon e ícones PWA",
+          "API /api/brand/mark com adaptação à paleta do tenant",
+        ],
+      },
+      {
+        title: "Assistente",
+        items: [
+          "CRUD de ruleOverrides e preview do motor efetivo no painel ADMIN",
+        ],
+      },
+    ],
+    testStats:
+      "CI unit+E2E #325/#329/#330 · brand-mark · assistant-rule-engine · docs:verify",
+  },
+  {
+    version: "3.0.18",
+    label: "Sistema Bibi - ServiceOS v3.0.18",
+    date: "27/07/2026",
+    status: "previous",
     summary:
       "Estoque Fase 3: produtos sem lote (SEM-LOTE); Assistente com motor de regras e overrides por nicho.",
     highlights: [
