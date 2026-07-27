@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.18** em produção (jul/2026): Estoque Fase 3 (`requiresLot` / `SEM-LOTE`) + motor de regras do Assistente — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Narrativa operacional: [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md). Pacote anterior (v3.0.17): RBAC clínico 360° + a11y + auto-confirm agenda.
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -286,6 +286,7 @@ flowchart LR
 | `branding` | `/interno/branding` | `BrandingView` | White label |
 | `integracoes` | `/interno/integracoes` | `IntegracoesView` | Webhooks B2B |
 | `seguranca` | `/interno/seguranca` | `SecurityView` | MFA TOTP, dual-store demo/operação, reset demo |
+| `assistente` | `/interno/assistente` | `AssistenteConfigView` | Motor de regras, toggles IA/regras, inventário de tools (ADMIN) |
 | *(sem módulo)* | `/interno/beneficiarios/[id]` | `PatientOverviewView` | Cliente 360° + export LGPD |
 
 Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
@@ -450,17 +451,43 @@ Serviço: `src/lib/webhook-service.ts`
 
 | Ação | API | Efeito |
 |------|-----|--------|
-| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita; `requiresLot` no POST |
+| Produtos | `GET/POST /api/interno/stock/products`, `PATCH .../[id]` | Catálogo (ativo/inativo via PATCH; sem DELETE físico) — UI cria e edita; `requiresLot` no POST/PATCH |
 | Lotes | `GET/POST /api/interno/stock/lots`, `PATCH .../lots/[id]` | Validade, saldo e status; se `requiresLot=false`, entrada sem nº/validade usa lote sintético `SEM-LOTE` |
 | Movimentações | `GET/POST /api/interno/stock/movements`, `POST .../movements/[id]/reverse` | Entrada/saída/ajuste e reversão compensatória — UI com botão Reverter |
 | Kits por procedimento | `GET/POST /api/interno/stock/procedure-kits/[procedureId]` | Vínculo insumo ↔ procedimento (upsert) |
 | Alertas | `GET /api/interno/stock/alerts` | Estoque baixo / vencimento |
 
-Serviço: `src/lib/stock-service.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
-Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.  
-`requiresLot=false`: saldo via lote sintético `SEM-LOTE` (FIFO/reverse intactos).
+Serviço: `src/lib/stock-service.ts` · constantes: `src/lib/stock-constants.ts` · RBAC: perfil **RECEPCAO** tem acesso (`interno-permissions.ts`).  
+Categorias: `MEDICAMENTO|MATERIAL|OPME|INSUMO|SERVICO` · unidades: `UN|ML|CX|PC|FR|KIT|SC|M3`.
 
-### 4.9 Auditoria (`AuditoriaView`)
+#### Produtos sem lote (`requiresLot=false`, Fase 3)
+
+| Comportamento | Detalhe |
+|---------------|---------|
+| Cadastro | Checkbox **Exige lote** no formulário; default `requiresLot=true` |
+| Entrada | Sem nº/validade → lote `SEM-LOTE`, validade `2099-12-31` (sem alerta de vencimento) |
+| Dispensação / saída | FIFO no lote sintético; reversão compensatória intacta |
+| UI | Badge **SEM LOTE** na listagem; campos de lote/validade ocultos quando desmarcado |
+
+Constantes: `STOCK_NO_LOT_NUMBER`, `STOCK_NO_LOT_EXPIRY_ISO`, `isStockSyntheticLot()` em `stock-constants.ts`.  
+Testes: `tests/api/stock.test.ts` (entrada sem lote + FIFO) · `tests/unit/stock-constants.test.ts`.
+
+### 4.9 Assistente operacional — chat + painel interno
+
+Chat nos **4 portais** (drawer `AssistantPanel`) e configuração em `/interno/assistente` (somente ADMIN).
+
+| Superfície | Rota / API | Efeito |
+|------------|------------|--------|
+| Chat | `POST /api/assistant/chat`, `POST /api/assistant/confirm` | Turno stateless com `sessionState` HMAC + confirmação JTI |
+| Config interna | `GET/PATCH /api/interno/assistant/settings` | Toggles `aiEnabled` / `rulesEnabled`; stats do motor de regras |
+| Painel | `/interno/assistente` | `AssistenteConfigView` — modo efetivo, inventário, contadores de gatilhos |
+
+**Motor de regras (v3.0.18):** `resolveAssistantIntents` mescla templates globais → overrides de nicho → `Tenant.settings.assistant.ruleOverrides` antes do match em `mock-match.ts`. Desativar `rulesEnabled` bloqueia chat operacional; IA segue se `aiEnabled=true` e gateway configurado.
+
+Arquitetura serverless: [`ASSISTENTE_SERVERLESS.md`](ASSISTENTE_SERVERLESS.md) · plano e schema: [`ASSISTENTE_REGRAS_PLANO.md`](ASSISTENTE_REGRAS_PLANO.md).  
+Testes: `tests/unit/assistant-rule-engine.test.ts` · `e2e/assistant.spec.ts` (MEDICAL + VET).
+
+### 4.10 Auditoria (`AuditoriaView`)
 
 | Ação | API | Efeito |
 |------|-----|--------|
@@ -479,7 +506,7 @@ Perfis **FATURAMENTO** e **READONLY** têm acesso somente leitura. Conteúdo sen
 
 Restore administrativo permanece **ADMIN**. Atividade recente do dashboard, timeline e export do Cliente 360° usam a mesma política. Busca por descrição (`?search=`) só cobre tipos com nível `full` — evita oráculo de existência em clínico/PII. Encaminhamento/receita (`ClinicalReferral`, `PrescriptionDocument`) são classe clínica. Detalhe clínico (`GET …/clinical`, corpo de PEP no overview/export) só **ADMIN** — RECEPCAO não usa `cadastros` como backdoor.
 
-### 4.10 Segurança e dual-store (`SecurityView`)
+### 4.11 Segurança e dual-store (`SecurityView`)
 
 | Ação | API / UI | Efeito |
 |------|----------|--------|
@@ -489,7 +516,7 @@ Restore administrativo permanece **ADMIN**. Atividade recente do dashboard, time
 
 Detalhes: [`../plataforma/OPERACAO_DADOS.md`](../plataforma/OPERACAO_DADOS.md).
 
-### 4.11 Exportações tabulares (v3.0.7)
+### 4.12 Exportações tabulares (v3.0.7)
 
 Motor unificado para relatórios e listagens nos portais.
 
@@ -761,6 +788,7 @@ Definido em `src/lib/interno-permissions.ts`. Perfil `null` = **ADMIN** (seed fa
 | branding | ✓ | ✗ | ✗ | ✗ |
 | integracoes | ✓ | ✗ | ✗ | ✗ |
 | seguranca | ✓ | ✗ | ✗ | ✗ |
+| assistente | ✓ | ✗ | ✗ | ✗ |
 
 ### Onde é aplicado
 
