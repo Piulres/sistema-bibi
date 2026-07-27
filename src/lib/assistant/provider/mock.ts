@@ -1,6 +1,7 @@
 import "server-only";
 import type { AssistantMessage, AssistantPlan, AssistantToolDefinition } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
+import type { TenantRuleOverride } from "@/lib/assistant/rules/types";
 import { planMockFromIntents } from "@/lib/assistant/provider/mock-match";
 
 /**
@@ -11,9 +12,10 @@ export function planMockAssistant(
   messages: AssistantMessage[],
   tools: AssistantToolDefinition[],
   user: SessionUser,
+  tenantOverrides?: readonly TenantRuleOverride[],
 ): AssistantPlan {
   const lastUser = [...messages].reverse().find((m) => m.role === "user");
   const raw = lastUser?.content ?? "";
   const toolNames = new Set(tools.map((t) => t.name));
-  return planMockFromIntents(raw, user, toolNames);
+  return planMockFromIntents(raw, user, toolNames, tenantOverrides);
 }

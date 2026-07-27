@@ -5,8 +5,8 @@ import type {
 } from "@/lib/assistant/types";
 import { isDraftToolResult } from "@/lib/assistant/types";
 import type { SessionUser } from "@/lib/session";
-import { resolveAssistantProvider } from "@/lib/assistant/config";
 import { resolveAssistantMode } from "@/lib/assistant/mode";
+import type { TenantSettings } from "@/lib/tenant/settings";
 import { getTenantSettings } from "@/lib/tenant/settings";
 import { buildAssistantSystemPrompt } from "@/lib/assistant/context";
 import { buildActions, formatToolResult } from "@/lib/assistant/format";
@@ -20,6 +20,9 @@ import {
 import { assertToolPermission, AssistantPermissionError } from "@/lib/assistant/permissions";
 import { planGatewayAssistant } from "@/lib/assistant/provider/gateway";
 import { planMockAssistant } from "@/lib/assistant/provider/mock";
+import { shouldUseAssistantGateway } from "@/lib/assistant/plan-gateway";
+import { getAllowedRuleTools } from "@/lib/assistant/rules/allowed-tools";
+import { validateGatewayPlan } from "@/lib/assistant/rules/validate-plan";
 import { findTool, getToolsForUser } from "@/lib/assistant/tools/registry";
 import {
   clearOperationDraft,
@@ -43,21 +46,31 @@ async function resolvePlan(
   messages: AssistantMessage[],
   tools: ReturnType<typeof getToolsForUser>,
   systemPrompt: string,
+  settings: TenantSettings,
 ) {
-  const settings = await getTenantSettings(user.tenantId);
   const mode = resolveAssistantMode(settings);
-  const provider = resolveAssistantProvider();
-  if (mode === "ai" && provider === "gateway") {
+  const ruleOverrides = settings.assistant.ruleOverrides;
+  const userToolNames = new Set(tools.map((t) => t.name));
+  const allowedRuleTools = getAllowedRuleTools(user, ruleOverrides);
+
+  if (shouldUseAssistantGateway(mode)) {
     try {
-      return await planGatewayAssistant(systemPrompt, messages, tools);
+      const gatewayPlan = await planGatewayAssistant(systemPrompt, messages, tools);
+      const validated = validateGatewayPlan(gatewayPlan, allowedRuleTools, userToolNames);
+      if (validated) {
+        if (validated.toolCalls.length > 0 || validated.fallback) {
+          return validated;
+        }
+      }
     } catch (error) {
       console.error("[assistant] gateway fallback to mock:", error);
     }
   }
+
   if (!settings.assistant.rulesEnabled) {
     return { toolCalls: [], fallback: rulesEngineDisabled() };
   }
-  return planMockAssistant(messages, tools, user);
+  return planMockAssistant(messages, tools, user, ruleOverrides);
 }
 
 export async function runAssistantChat(input: {
@@ -94,7 +107,7 @@ export async function runAssistantChat(input: {
   }
 
   const systemPrompt = buildAssistantSystemPrompt(input.user, input.pageContext);
-  const plan = await resolvePlan(input.user, input.messages, tools, systemPrompt);
+  const plan = await resolvePlan(input.user, input.messages, tools, systemPrompt, settings);
 
   if (plan.toolCalls.length === 0) {
     return {
