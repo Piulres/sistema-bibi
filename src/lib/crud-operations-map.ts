@@ -507,14 +507,15 @@ export const CRUD_OPERATIONS_MAP: CrudEntityMap[] = [
     description: "Painel da empresa logada + agendamento RH para colaboradores.",
     create: [
       ui("Agendar colaborador", "/pj → Agendar", "POST /api/pj/appointments"),
+      ui("Incluir colaborador", "/pj → Beneficiários", "POST /api/pj/beneficiaries"),
     ],
     read: [
       ui("Painel TechCorp", "/pj", "GET /api/pj/overview"),
       apiOnly("Prestadores (RH)", "GET /api/pj/providers"),
       apiOnly("Slots (RH)", "GET /api/pj/slots"),
     ],
-    update: none,
-    delete: none,
+    update: [apiOnly("Editar colaborador", "PATCH /api/pj/beneficiaries/[id]")],
+    delete: [apiOnly("Desvincular colaborador", "DELETE /api/pj/beneficiaries/[id]")],
   },
   {
     entity: "Relatório corporativo",
