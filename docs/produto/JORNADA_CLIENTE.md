@@ -8,7 +8,7 @@ jornadas típicas, pontos fortes, gaps conhecidos e backlog de melhorias prioriz
 Complementa [`FLUXOS.md`](FLUXOS.md) (ações técnicas e APIs) e [`BENCHMARK.md`](../plataforma/BENCHMARK.md)
 (posicionamento vs mercado). Para credenciais demo, ver [`README.md`](../README.md).
 
-Última revisão: **ServiceOS v3.0.8** em produção — narrativa operacional do consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacote v3.0.7: drawer mobile direita, exports canônicos multi-formato, dashboard executivo com hierarquia de KPIs; labels por tenant, jornada faturada no prestador, documentos clínicos estruturados.
+Última revisão: **ServiceOS v3.0.12** em produção — dashboard executivo com eixos Cobrança vs Produção clínica ([`FLUXOS.md`](FLUXOS.md) §4.0.1); narrativa consultório em [`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md); pacotes anteriores: drawer mobile, exports canônicos, labels por tenant.
 
 ---
 
@@ -109,7 +109,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | 2. Agendar | Escolhe prestador, data, slot, modalidade | Card “Agendar consulta” | `Appointment` AGENDADO; webhook `APPOINTMENT_CREATED` |
 | 3. Consulta | Acessa link telemedicina (TELE) ou comparece presencial | Tabela “Minha agenda” | — |
 | 4. Pós-atendimento | Consulta consumo Pay Per Use | Seção “Consumo Pay Per Use” | Vê procedimentos `billed` / não `billed` |
-| 5. Faturamento | Aguarda fatura emitida pelo interno | KPI “Total faturado” | — |
+| 5. Faturamento | Aguarda fatura emitida pelo interno | Seção “Faturas” | Vê status da fatura (FECHADA → PAGA) |
 | 6. Pagamento | Gera PIX → confirma pagamento | Seção “Faturas” | `Invoice` PAGA |
 | 7. Acompanhamento | Consulta PEP, assinatura, timeline | Seções inferiores | Somente leitura |
 
@@ -240,7 +240,7 @@ flowchart LR
 
 | Módulo | Rota | Jornada principal |
 |--------|------|-------------------|
-| Dashboard | `/interno/dashboard` | KPIs → links rápidos (faturamento, CRM, recorrência) |
+| Dashboard | `/interno/dashboard` | Cobrança (a receber/recebido/a faturar) + produção clínica do mês → links rápidos |
 | Faturamento | `/interno` | Pendências PPU → gerar fatura → PIX / marcar paga → TISS XML |
 | Agenda | `/interno/agenda` | CRUD agendamentos, **walk-in particular**, check-in, modalidade TELE |
 | Cadastros | `/interno/cadastros` | Beneficiários, empresas, procedimentos, usuários (criar + **editar**) |

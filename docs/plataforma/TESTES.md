@@ -73,6 +73,10 @@ Cobertura v3.0.5 jornada PPU: `tests/lib/care-journey.test.ts` — `deriveCareJo
 
 Cobertura jornada consultório (v3.0.8+): `tests/api/consultorio-journey.test.ts` — Atos 1–4 (walk-in → check-in → PEP → procedimento/estoque → REALIZADO → fatura PIX/marcar paga) + RBAC cadastros/estoque · doc [`JORNADA_CONSULTORIO.md`](../produto/JORNADA_CONSULTORIO.md).
 
+Cobertura v3.0.11 persistência Blob: `tests/unit/sqlite-transaction-flush.test.ts` — flush só após COMMIT de `$transaction` no modo operação · runbook [`OPERACAO_DADOS.md`](OPERACAO_DADOS.md) §Flush em transação.
+
+Cobertura v3.0.12 dashboard KPIs: `tests/unit/executive-dashboard-kpis.test.ts` — `summarizeInvoiceMoney` (a receber / recebido / emitido, ignora ANULADA) · E2E `interno-modules.spec.ts` e `cedig-gestao.spec.ts` (headings Cobrança, `dashboard-billing-kpis`) · doc [`FLUXOS.md`](../produto/FLUXOS.md) §4.0.1.
+
 Cobertura v3.0.5 documentos clínicos: `tests/unit/documentos-clinicos.test.ts` — atestado CFM, receita comum/controle especial, protocolos de exames.
 
 Banco de testes isolado: `prisma/test.db` (criado automaticamente no primeiro `npm run test`).

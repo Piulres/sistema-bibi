@@ -283,15 +283,21 @@ Alinha com iClinic/Feegow no dia a dia:
 
 ## 12. KPIs do Dashboard Executivo
 
-| KPI | Fonte |
-|-----|-------|
-| Pendente Pay Per Use | `ProcedureUsage` com `billed=false` |
-| Total faturado | Soma de `Invoice.total` |
+> Atualizado v3.0.12 — ver `FLUXOS.md` §4.0.1 e `ARQUITETURA.md` §15.
+
+| KPI (UI) | Fonte |
+|----------|-------|
+| A receber | `Invoice` FECHADA/ABERTA — `summarizeInvoiceMoney().open` |
+| Recebido | `Invoice` PAGA — `summarizeInvoiceMoney().paid` |
+| A faturar | `ProcedureUsage` com `billed=false` |
+| Atendimentos hoje | `Appointment` do dia civil BRT |
 | MRR estimado | Assinaturas ATIVA normalizadas para mensal |
-| Atendimentos hoje | `Appointment` do dia |
+| Produção clínica (mês) | `clinicFinance` — exames, valor lançado, despesas, resultado (**não** é total de faturas) |
 | Pipeline CRM | Contagem de `Company` por status |
 | Mensagens na fila | `Message` com status PENDENTE |
 | Atividade recente | Últimos 10 `TimelineEvent` |
+
+**Pitfall:** não somar “Recebido” (faturas PAGA) com “Valor lançado” (Gestão clínica).
 
 ---
 

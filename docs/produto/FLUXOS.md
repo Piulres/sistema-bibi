@@ -3,7 +3,7 @@
 Documentação de **todos os fluxos de usuário e de negócio**, derivada do código-fonte
 (páginas App Router, componentes de view, Route Handlers e serviços em `src/lib/`).
 
-> **ServiceOS v3.0.8** em produção (jul/2026): narrativa operacional do consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset transacional CEDIG — ver [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacote anterior (v3.0.7): drawer mobile pela direita, dashboard executivo com hierarquia de KPIs, exports canônicos CSV/JSON/TXT/PDF — ver [§4.0.1](#401-dashboard-executivo-v307), [§4.11](#411-exportações-tabulares-v307) e [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
+> **ServiceOS v3.0.12** em produção (jul/2026): dashboard executivo com eixos **Cobrança** vs **Produção clínica** — ver [§4.0.1](#401-dashboard-executivo-v3012) · [`../versoes/RELEASES.md`](../versoes/RELEASES.md). Pacotes anteriores: narrativa consultório ([`JORNADA_CONSULTORIO.md`](JORNADA_CONSULTORIO.md)), reset CEDIG, exports canônicos — [§4.11](#411-exportações-tabulares-v307) · [§8.9](#89-melhorias-de-fluxo-jornada-clínica). CEDIG: [`../clientes/cedig/STATUS.md`](../clientes/cedig/STATUS.md) · documentos clínicos: [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
 Para setup e credenciais demo, ver [`README.md`](../../README.md). Para arquitetura e ER,
 ver [`ARQUITETURA.md`](../plataforma/ARQUITETURA.md). Para posicionamento vs mercado (POC × referências),
@@ -290,18 +290,36 @@ flowchart LR
 
 Nav: **14 abas** em `INTERNO_NAV_TABS` (`routes.ts`) + **Obras** (`projetos`) condicional por nicho (`niche-nav.ts`), filtrada em `InternoNav` por `internoPermissions`. A aba **Gestão clínica** aparece somente para nichos `MEDICAL` e `DENTAL`. Sem permissão → redirect `/interno/dashboard`.
 
-### 4.0.1 Dashboard executivo (v3.0.7)
+### 4.0.1 Dashboard executivo (v3.0.12)
 
 **Rota:** `/interno/dashboard` · **View:** `ExecutiveDashboardView` · **API:** `GET /api/interno/dashboard`
 
-Hierarquia visual revisada em v3.0.7:
+A partir de v3.0.12 o dashboard separa **cobrança de faturas** de **produção clínica do mês** — o card ambíguo “Total faturado” foi removido.
 
-1. **Alerta de fonte** — explica que lançamentos/despesas operacionais ficam em Gestão clínica (evita dupla contagem com PPU).
-2. **Indicadores principais** — grid `StatCard` com PPU pendente, total faturado, MRR e atendimentos do dia.
-3. **Métricas secundárias** — faixa compacta com totais de beneficiários, empresas, mensagens pendentes.
-4. **Receita / CRM / atividade** — cards em colunas com links rápidos para módulos.
+| Seção | `data-cursor-id` | KPIs | Fonte |
+|-------|------------------|------|-------|
+| **Cobrança** | `dashboard-billing-kpis` | A receber · Recebido · A faturar · Atendimentos hoje | `summarizeInvoiceMoney()` + `ProcedureUsage` + `Appointment` |
+| **Produção clínica · MM/AAAA** | `dashboard-clinic-finance` | Exames lançados · Valor lançado · Despesas · Resultado do mês | `getClinicFinanceKpis()` — mês civil BRT |
+| **Pipeline CRM** | — | Empresas por estágio | `Company.status` |
+| **Maiores pendências a faturar** | — | Top 5 PPU sem fatura | `ProcedureUsage.billed=false` |
+| **Atividade recente** | — | Últimos 10 eventos | `TimelineEvent` |
 
-Serviço: `src/lib/executive-dashboard.ts` (`getExecutiveDashboard()`). KPIs de gestão clínica (`clinicFinance`) aparecem quando o tenant tem dados no mês corrente.
+**Cobrança** (grid `StatCard`):
+
+| KPI | Significado | Cálculo |
+|-----|-------------|---------|
+| A receber | Faturas emitidas ainda não pagas | Soma `Invoice.total` com status `FECHADA` ou `ABERTA` |
+| Recebido | Faturas já liquidadas | Soma `Invoice.total` com status `PAGA` |
+| A faturar | PPU ainda sem fatura | Soma `ProcedureUsage.priceCharged` com `billed=false` |
+| Atendimentos hoje | Agenda do dia | `Appointment` no intervalo civil BRT, exceto `CANCELADO` |
+
+Faixa secundária (mesma seção): beneficiários, empresas/contratos, MRR, recorrência pendente, mensagens na fila. Atalhos rápidos para Faturamento, Gestão clínica, CRM, Recorrência, Comunicação e Auditoria.
+
+**Produção clínica** aparece somente quando `clinicFinance` tem exames ou despesas no mês corrente (`civilDateISO()` em BRT). **Não somar** “Recebido” com “Valor lançado” — são eixos distintos (faturas vs lançamentos operacionais em Gestão clínica).
+
+Serviço: `src/lib/executive-dashboard.ts` (`getExecutiveDashboard()`). Helper puro: `src/lib/executive-dashboard-kpis.ts` (`summarizeInvoiceMoney`). Campo legado `totalInvoicedLabel` permanece na API (`open + paid`) mas não é exibido na UI.
+
+**Pitfall:** confundir “A receber” (faturas abertas) com “A faturar” (procedimentos sem fatura). Ver `tests/unit/executive-dashboard-kpis.test.ts` e E2E `interno-modules.spec.ts` / `cedig-gestao.spec.ts`.
 
 ### 4.1 Faturamento (`BillingView`)
 

@@ -19,9 +19,24 @@ O modo ativo é escolhido em **`/interno/seguranca`** → card **Base de dados �
 
 - Configuração persistida em **Netlify Blobs** (`bibi-config/data-store-mode`)
 - Banco de **operação** persistido em **Netlify Blobs** (`bibi-databases/operation.db`)
-- Escritas no modo operação são salvas no Blob após cada mutação (flush imediato; em `$transaction`, só após o COMMIT)
+- Escritas no modo operação são salvas no Blob após cada mutação (flush imediato; em `$transaction`, só após o COMMIT — ver [§Flush em transação](#flush-em-transação-v3011))
 
 **Sem Postgres:** a operação real usa SQLite + Blobs como armazenamento compartilhado entre instâncias Lambda.
+
+### Flush em transação (v3.0.11)
+
+No modo **operação** em Lambda, o SQLite é persistido no Netlify Blob após cada escrita. Antes de v3.0.11 o flush podia ocorrer **no meio** de `prisma.$transaction`, gravando um snapshot parcial no Blob.
+
+| Sintoma | Causa provável |
+|---------|----------------|
+| “Marcar paga” OK na UI, fatura volta a `FECHADA` após cold start | Flush do Blob antes do COMMIT da transação |
+| Idempotência quebrada em pagamento MANUAL | Mesmo mecanismo — estado intermediário persistido |
+
+**Implementação:** `src/lib/sqlite-transaction-flush.ts` (`runWithSqliteTransactionTracking`, `shouldFlushSqliteWriteAfterOperation`) + `withOperationBlobFlush` em `src/lib/db.ts`. O flush só dispara quando a transação SQLite está **settled** (COMMIT ou ROLLBACK).
+
+**Validação:** `tests/unit/sqlite-transaction-flush.test.ts` · `tests/api/consultorio-journey.test.ts` (marcar paga) · E2E jornada consultório.
+
+**Não confundir** com reset de fluxos CEDIG ([§Reset de fluxos CEDIG](#reset-de-fluxos-cedig-voltar-ao-zero-operacional)) — aquele script zera massa; este tópico é persistência transacional do Blob.
 
 ---
 
