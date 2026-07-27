@@ -137,7 +137,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 
 ## 3. Portal PJ (Empresa)
 
-**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** somente leitura + export multi-formato
+**Role:** `PJ` · **Escopo:** `user.companyId` · **View:** `PjView` · **Modo:** leitura + export + agendamento RH
 
 ### 3.1 Jornada típica
 
@@ -146,20 +146,22 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | 1. Entrada | Login PJ | `/pj/login` | Escopo limitado ao `companyId` |
 | 2. Alertas | Lê avisos de inadimplência, faturas abertas, cobranças vencidas | Topo da página | Alertas com âncoras (`#assinaturas`) |
 | 3. KPIs | Vê contrato, beneficiários, consumo PPU, MRR | Cards de resumo | `getPjPortalOverview()` |
-| 4. Drill-down | Analisa consumo por colaborador | Tabela “Beneficiários” | Consumo e pendente por CPF |
-| 5. Export | Baixa relatório | `ExportButtons` (PDF, CSV, JSON, TXT) | `GET /api/pj/reports?format=` |
+| 4. Agendar | RH escolhe colaborador, data e horário | `#agendar` / CTA na tabela | `POST /api/pj/appointments` → `CONFIRMADO` |
+| 5. Drill-down | Analisa consumo por colaborador | Tabela “Beneficiários” | Consumo e pendente por CPF |
+| 6. Export | Baixa relatório | `ExportButtons` (PDF, CSV, JSON, TXT) | `GET /api/pj/reports?format=` |
 
 ### 3.2 Pontos fortes
 
 - Alertas proativos (inadimplência, negociação, faturas abertas).
 - Consumo granular por beneficiário — core B2B.
+- RH agenda consulta do colaborador sem impersonar o portal beneficiário.
 - Export multi-formato (PDF/CSV/JSON/TXT) para integração com ERP/planilha.
 
 ### 3.3 Gaps e melhorias
 
 | Prioridade | Gap | Sugestão |
 |:----------:|-----|----------|
-| Alta | 100% somente leitura — RH não executa ações | Gestão de beneficiários (incluir/excluir), upload em lote |
+| Alta | Gestão de beneficiários (incluir/excluir) ainda na recepção | CRUD de colaboradores no portal PJ + upload em lote |
 | Alta | Sem pagamento corporativo consolidado | Fatura por empresa + boleto/PIX corporativo |
 | Média | Sem filtros por período ou status | Filtros + gráfico de tendência de consumo |
 | Média | Alertas sem ação resolutiva (só âncora na página) | Contato comercial, abertura de chamado |
@@ -167,7 +169,7 @@ Descrições de cada portal: `src/lib/niche/landing-content.ts` (`getNicheLandin
 | Baixa | Sem SSO corporativo | OAuth/SAML via IdP da empresa |
 | Baixa | Sem contrato digital | Visualização/assinatura de proposta no portal |
 
-**Código:** `src/components/PjView.tsx` · `src/lib/pj-portal-service.ts`
+**Código:** `src/components/PjView.tsx` · `src/components/PjScheduleForm.tsx` · `src/lib/pj-portal-service.ts` · `src/lib/pj-appointment-service.ts`
 
 ---
 
@@ -352,10 +354,10 @@ Top 10 melhorias por impacto na jornada do cliente (ordenado por prioridade suge
 
 | # | Melhoria | Portal(es) | Impacto | Tier sugerido |
 |---|----------|------------|---------|---------------|
-| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | **Cancelar:** ✅ `PATCH …/beneficiario/appointments/[id]` · Reagendar: backlog |
+| 1 | Cancelar/reagendar consulta | Beneficiário | Reduz carga da recepção | 5 | ✅ Cancelar + Reagendar (`benef-reschedule`) |
 | 2 | PIX com confirmação automática | Beneficiário, Interno | Elimina passo manual | 5 |
 | 3 | RBAC 100% nas APIs internas | Interno | Segurança enterprise | 5 |
-| 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 |
+| 4 | Gestão de beneficiários no portal PJ | PJ | Desbloqueia valor B2B | 5 | **Agendar:** ✅ `pj-appointment-request` · CRUD colaboradores: backlog |
 | 5 | Agenda semanal do prestador | Prestador | Operação clínica madura | 5 |
 | 6 | Navegação por abas no portal Beneficiário | Beneficiário | UX mobile | 5 | **Drawer mobile:** ✅ `MobileNavDrawer` em `BeneficiarioNav.tsx` (v3.0.6) — ver `e2e/mobile-nav.spec.ts` |
 | 7 | Notificações reais (e-mail/SMS) | Todos | Lembretes e confirmações | 5 |

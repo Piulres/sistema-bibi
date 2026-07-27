@@ -1,14 +1,16 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import Card from "@/components/ui/Card";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SectionHeader from "@/components/ui/SectionHeader";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
 import Alert from "@/components/ui/Alert";
+import Button from "@/components/ui/Button";
 import ViewStateBoundary from "@/components/ui/ViewStateBoundary";
 import ExportButtons from "@/components/ExportButtons";
+import PjScheduleForm from "@/components/PjScheduleForm";
 import { useAsyncData } from "@/hooks/useAsyncData";
 import { useLabels } from "@/hooks/useLabels";
 import { fetchJson } from "@/lib/ui/api-feedback";
@@ -71,12 +73,18 @@ const alertTone = {
 
 export default function PjView() {
   const { labels } = useLabels();
+  const [schedulePatientId, setSchedulePatientId] = useState("");
   const loadOverview = useCallback(
     () => fetchJson<Overview>("/api/pj/overview", undefined, "Falha ao carregar dados da empresa"),
     [],
   );
 
   const { data, loading, error, reload } = useAsyncData(loadOverview, []);
+
+  function goSchedule(patientId?: string) {
+    if (patientId) setSchedulePatientId(patientId);
+    document.getElementById("agendar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
 
   return (
     <ViewStateBoundary
@@ -147,6 +155,13 @@ export default function PjView() {
       </div>
       </section>
 
+      <section id="agendar" data-tour-id="section-agendar">
+        <PjScheduleForm
+          beneficiaries={beneficiaries.map((b) => ({ id: b.id, name: b.name }))}
+          initialPatientId={schedulePatientId}
+        />
+      </section>
+
       <section id="beneficiarios" data-tour-id="section-beneficiarios">
         <SectionHeader title={labels.beneficiaries} />
         <ul className="mt-4 space-y-2 md:hidden">
@@ -164,6 +179,11 @@ export default function PjView() {
                   {b.usageCount} procedimento{b.usageCount === 1 ? "" : "s"}
                   {b.pendingLabel ? ` · Pendente ${b.pendingLabel}` : ""}
                 </p>
+                <div className="mt-3">
+                  <Button type="button" size="sm" variant="secondary" onClick={() => goSchedule(b.id)}>
+                    Agendar
+                  </Button>
+                </div>
               </Card>
             </li>
           ))}
@@ -177,6 +197,7 @@ export default function PjView() {
                 <th className="px-4 py-2 font-medium">Procedimentos</th>
                 <th className="px-4 py-2 text-right font-medium">Consumo</th>
                 <th className="px-4 py-2 text-right font-medium">Pendente</th>
+                <th className="px-4 py-2 text-right font-medium">Ação</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-default)]">
@@ -189,6 +210,11 @@ export default function PjView() {
                     {b.consumedLabel}
                   </td>
                   <td className="px-4 py-2 text-right text-[var(--text-muted)]">{b.pendingLabel}</td>
+                  <td className="px-4 py-2 text-right">
+                    <Button type="button" size="sm" variant="secondary" onClick={() => goSchedule(b.id)}>
+                      Agendar
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
