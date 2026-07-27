@@ -153,7 +153,7 @@ O sync automático cobre **123 paths** de **163** Route Handlers — **40** aind
 | Domínio | Paths | Doc canônica |
 |---------|-------|--------------|
 | Gestão clínica CEDIG | `/api/interno/clinic-finance/*` (6 rotas) | §8 · [`FLUXOS.md`](../produto/FLUXOS.md) §4.2.1 |
-| Documentos clínicos | `/api/interno/exam-protocol-templates`, `.../{id}`, `/api/prestador/patients/{id}/exam-protocols` | §7 · [`DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
+| Documentos clínicos | `/api/interno/exam-protocol-templates`, `.../{id}`, `/api/prestador/patients/{id}/exam-protocols`, `.../referrals`, `.../discharge-documents`, `/api/prestador/clinical-guides/export`, `/api/beneficiario/documents`, `/api/beneficiario/clinical-guides/export` | §7 · [`DOCUMENTOS_CLINICOS.md`](../produto/DOCUMENTOS_CLINICOS.md) |
 | Obras / Engenharia | `/api/interno/projects/*`, `/api/interno/construction/*`, `/api/pj/projects/*`, `/api/prestador/campo/projects`, `/api/prestador/field-reports/*`, `/api/beneficiario/projects/*` (26 rotas) | [`segmentos/construction/README.md`](../segmentos/construction/README.md) |
 | Anexos (upload/download) | `/api/interno/attachments`, `.../download`, `/api/pj/attachments/{id}/download`, `/api/interno/field-reports/attachments/{id}/download`, `/api/prestador/field-reports/attachments/*` | construction README · `src/lib/attachments/` |
 | Operação CEDIG | `/api/interno/operation/provision-cedig` | [`clientes/cedig/OPERACAO.md`](../clientes/cedig/OPERACAO.md) |
@@ -260,6 +260,15 @@ Endpoints do pacote **v3.0.5** para protocolos de exames e prescrições. Requer
 | `GET` | `/api/prestador/patients/{id}/exam-orders` | prestador | Lista pedidos (`?appointmentId=` opcional) |
 | `POST` | `/api/prestador/patients/{id}/exam-orders` | prestador | Cria pedido avulso (`examName` ou `procedureId`, `clinicalIndication?`) |
 | `PATCH` | `/api/prestador/exam-orders/{id}` | prestador | Atualiza status, laudo (`resultSummary`), `markReviewed` |
+| `GET` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Lista receitas multi-item |
+| `POST` | `/api/prestador/patients/{id}/prescription-documents` | prestador | Emite receita multi-item |
+| `GET` | `/api/prestador/patients/{id}/referrals` | prestador | Lista encaminhamentos |
+| `POST` | `/api/prestador/patients/{id}/referrals` | prestador | Emite encaminhamento (templates em `encaminhamento.ts`) |
+| `PATCH` | `/api/prestador/referrals/{id}` | prestador | Cancela (`status: CANCELADO`) |
+| `GET` | `/api/prestador/patients/{id}/discharge-documents` | prestador | Hub de guias de saída (+ `referralTemplates`) |
+| `GET` | `/api/prestador/clinical-guides/export` | prestador | PDF guia (`type=receita\|exame\|encaminhamento\|atestado\|bundle`) |
+| `GET` | `/api/beneficiario/documents` | beneficiário | Lista guias disponíveis no painel |
+| `GET` | `/api/beneficiario/clinical-guides/export` | beneficiário | PDF da guia (`type` + `id`) |
 | `GET` | `/api/prestador/patients/{id}/clinical-overview` | prestador | Visão agregada: medicações ativas, exames pendentes, protocolos |
 | `GET` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Perfil clínico estruturado (alergias, condições crônicas) |
 | `PUT` | `/api/prestador/patients/{id}/clinical-profile` | prestador | Atualiza perfil clínico |
