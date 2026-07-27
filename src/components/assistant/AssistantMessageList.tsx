@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import type { AssistantMessage } from "@/lib/assistant/types";
 import { useLabels } from "@/hooks/useLabels";
 import { buildPortalUiCopy } from "@/lib/assistant/portal-ui";
+import AssistantTypingIndicator from "@/components/assistant/AssistantTypingIndicator";
 import type { PortalKey } from "@/lib/roles";
 
 function renderInlineMarkdown(text: string) {
@@ -46,30 +47,37 @@ type Props = {
 export default function AssistantMessageList({ portal, messages, loading }: Props) {
   const { labels } = useLabels();
   const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, loading]);
 
   if (messages.length === 0 && !loading) {
     return (
-      <div className="flex flex-1 flex-col justify-end gap-3 p-4 text-sm text-[var(--text-muted)]">
+      <div
+        ref={scrollRef}
+        className="flex flex-1 flex-col justify-end gap-3 overflow-y-auto p-4 text-sm text-[var(--text-muted)]"
+      >
         <p>{copy.emptyIntro}</p>
         <ul className="list-disc space-y-1 pl-4">
           {copy.emptyExamples.map((example) => (
             <li key={example}>{example}</li>
           ))}
         </ul>
+        <div ref={bottomRef} />
       </div>
     );
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
+    <div ref={scrollRef} className="flex flex-1 flex-col gap-3 overflow-y-auto p-4">
       {messages.map((message, index) => (
         <MessageBlock key={`${message.role}-${index}`} message={message} />
       ))}
-      {loading && (
-        <div className="text-sm text-[var(--text-muted)]" aria-live="polite">
-          {copy.loading}
-        </div>
-      )}
+      {loading && <AssistantTypingIndicator label={copy.loading} />}
+      <div ref={bottomRef} />
     </div>
   );
 }

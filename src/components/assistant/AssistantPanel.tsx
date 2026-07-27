@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function AssistantPanel({ portal }: Props) {
-  const { open, setOpen, messages, actions, loading, error } = useAssistant();
+  const { open, setOpen, messages, actions, loading, error, resetConversation } = useAssistant();
   const { labels } = useLabels();
   const copy = useMemo(() => buildPortalUiCopy(portal, labels), [portal, labels]);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -58,23 +58,37 @@ export default function AssistantPanel({ portal }: Props) {
       />
       <aside
         ref={panelRef}
+        id="assistant-panel"
         role="dialog"
         aria-label="Assistente ServiceOS"
         className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-[var(--border-muted)] bg-[var(--surface-card)] shadow-2xl"
       >
         <header className="flex items-center justify-between border-b border-[var(--border-muted)] px-4 py-3">
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-semibold text-[var(--text-primary)]">{copy.title}</p>
-            <p className="text-xs text-[var(--text-muted)]">{copy.subtitle}</p>
+            <p className="truncate text-xs text-[var(--text-muted)]">{copy.subtitle}</p>
           </div>
-          <button
-            type="button"
-            onClick={() => setOpen(false)}
-            className="rounded-lg px-2 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
-            aria-label="Fechar"
-          >
-            ✕
-          </button>
+          <div className="flex shrink-0 items-center gap-1">
+            {messages.length > 0 && (
+              <button
+                type="button"
+                onClick={resetConversation}
+                disabled={loading}
+                className="rounded-lg px-2 py-1 text-xs text-[var(--text-muted)] hover:bg-[var(--surface-muted)] disabled:opacity-50"
+                aria-label="Nova conversa"
+              >
+                Nova conversa
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-2 py-1 text-sm text-[var(--text-muted)] hover:bg-[var(--surface-muted)]"
+              aria-label="Fechar"
+            >
+              ✕
+            </button>
+          </div>
         </header>
 
         {error && (
