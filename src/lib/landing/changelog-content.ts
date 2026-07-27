@@ -26,10 +26,37 @@ export type ChangelogRelease = {
  */
 export const CHANGELOG_RELEASES: ChangelogRelease[] = [
   {
-    version: "3.0.9",
+    version: "3.0.10",
     label: PLATFORM.versionLabel,
-    date: "26/07/2026",
+    date: "27/07/2026",
     status: "current",
+    summary:
+      "Mês operacional sempre atual na demo, suite completa da jornada do consultório e agenda sincronizada com Google/Outlook/Apple.",
+    highlights: [
+      {
+        title: "Massa e testes",
+        items: [
+          "Seed de ~30 dias com walk-in, corporativo, autosserviço, descontos, PEP, estoque e timeline",
+          "Suite Vitest + E2E alinhada à jornada do consultório (Atos 1–4)",
+          "Launches CEDIG e despesas na janela do mês operacional",
+        ],
+      },
+      {
+        title: "Agenda e calendário",
+        items: [
+          "Integração ICS + OAuth Google/Microsoft com push da agenda",
+          "Disponibilidade do prestador (grade de slots e bloqueios)",
+          "Adicionar à agenda a partir do atendimento",
+        ],
+      },
+    ],
+    testStats: "CI unit+E2E · operation-month · jornada-consultorio · docs:verify · pre-release OK",
+  },
+  {
+    version: "3.0.9",
+    label: "Sistema Bibi - ServiceOS v3.0.9",
+    date: "26/07/2026",
+    status: "previous",
     summary:
       "Hotfix de fuso horário: agendas, slots e labels passam a usar America/Sao_Paulo de forma consistente em produção (UTC).",
     highlights: [
