@@ -19,17 +19,28 @@ import {
 } from "@/lib/clinic-finance/cedig-pricing";
 import { bridgeExamLaunchToOperations } from "@/lib/clinic-finance/bridge";
 import type { TabularExport } from "@/lib/exports/tabular";
+import { civilDateISO, zonedDateTimeToUtc } from "@/lib/timezone";
 
+/** Intervalo [início, fim) do mês civil no fuso da app (America/Sao_Paulo). */
 function monthRange(year: number, month: number) {
-  const start = new Date(year, month - 1, 1, 0, 0, 0, 0);
-  const end = new Date(year, month, 1, 0, 0, 0, 0);
+  const start = zonedDateTimeToUtc({ year, month, day: 1, hour: 0, minute: 0, second: 0 });
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+  const end = zonedDateTimeToUtc({
+    year: nextYear,
+    month: nextMonth,
+    day: 1,
+    hour: 0,
+    minute: 0,
+    second: 0,
+  });
   return { start, end };
 }
 
 function parseMonth(year?: number, month?: number) {
-  const now = new Date();
-  const y = year && year > 2000 ? year : now.getFullYear();
-  const m = month && month >= 1 && month <= 12 ? month : now.getMonth() + 1;
+  const [civilYear, civilMonth] = civilDateISO().split("-").map(Number);
+  const y = year && year > 2000 ? year : civilYear;
+  const m = month && month >= 1 && month <= 12 ? month : civilMonth;
   return { year: y, month: m, ...monthRange(y, m) };
 }
 

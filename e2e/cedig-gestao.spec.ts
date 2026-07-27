@@ -91,12 +91,16 @@ test.describe("CEDIG — gestão clínica fase 2 / F", () => {
     });
   });
 
-  test("dashboard interno mostra hint da gestão clínica", async ({ page }) => {
+  test("dashboard interno separa cobrança e produção clínica", async ({ page }) => {
     await loginAs(page, "interno", "operacao@cedig.demo", "bibi123", "cedig");
     await page.goto("/interno/dashboard");
-    await expect(page.locator('[data-cursor-id="dashboard-gestao-hint"]')).toBeVisible({
+    await expect(page.locator('[data-cursor-id="dashboard-billing-kpis"]')).toBeVisible({
       timeout: 20_000,
     });
+    await expect(page.getByRole("heading", { name: "Cobrança", exact: true })).toBeVisible();
+    await expect(page.getByText("A receber", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("Recebido", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("A faturar", { exact: true }).first()).toBeVisible();
   });
 
   test("gestão clínica não estoura horizontal no mobile", async ({ page }) => {

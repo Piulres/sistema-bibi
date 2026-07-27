@@ -9,7 +9,7 @@ export default async function ExecutiveDashboardPage() {
     <>
       <PageHeader
         title="Dashboard Executivo"
-        description="Receita, operação e CRM do tenant — o que precisa de atenção agora."
+        description="Cobrança (faturas), produção clínica do mês e CRM — cada bloco com um eixo claro."
       />
       <ExecutiveDashboardView />
     </>
