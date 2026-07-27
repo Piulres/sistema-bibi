@@ -1,0 +1,21 @@
+{
+  "appId": "br.com.sistemabibi.serviceos",
+  "appName": "ServiceOS",
+  "webDir": "www",
+  "server": {
+    "url": "https://sistema-bibi.netlify.app",
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1800,
+      "launchAutoHide": true,
+      "backgroundColor": "#1e293b",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
+  }
+}
