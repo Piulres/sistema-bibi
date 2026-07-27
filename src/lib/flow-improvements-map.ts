@@ -170,7 +170,8 @@ export const FLOW_IMPROVEMENTS_MAP: FlowImprovement[] = [
     flow: "Agendamento",
     title: "Reagendar consulta",
     description: "Trocar horário sem cancelar e criar novo agendamento.",
-    status: "planned",
+    status: "implemented",
+    docRef: "FLUXOS.md §8.9",
   },
   {
     id: "interno-rbac-hardening",

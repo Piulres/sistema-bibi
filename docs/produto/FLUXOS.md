@@ -711,6 +711,7 @@ Fonte canônica: `src/lib/flow-improvements-map.ts` · UI: `/interno/cadastros?t
 | Nav portais v3.0.7 | Cross-portal | Drawer direita + categorias com separador | — |
 | Nav portais v3.0.6 | Cross-portal | NavTabs + menu Mais + drawer nos 4 portais | — |
 | Cancelar consulta | Beneficiário | `/beneficiario` → Minha agenda | `PATCH /api/beneficiario/appointments/[id]` `{ action: "cancel" }` |
+| Reagendar consulta | Beneficiário | `/beneficiario` → Minha agenda → Reagendar | `PATCH …/appointments/[id]` `{ action: "reschedule", scheduledAt }` |
 | Confirmar presença | Prestador | `/prestador/atendimento/[id]` | `PATCH …/prestador/appointments/[id]` `{ status: "CONFIRMADO" }` |
 | Stepper PPU | Beneficiário / Prestador | FlowStepper no resumo e atendimento | `care-journey.ts` |
 | Stepper faturado/pago (v3.0.5) | Prestador | `/prestador/atendimento/[id]` — passos **Faturado** e **Pago** | `deriveCareJourneyBilling()` + `invoiceStatus` nos usages |
@@ -732,7 +733,7 @@ Módulo: `src/lib/care-journey.ts` · testes: `tests/lib/care-journey.test.ts`.
 
 Documentos clínicos no atendimento (atestado, receita, protocolos): [`DOCUMENTOS_CLINICOS.md`](DOCUMENTOS_CLINICOS.md).
 
-Regras de cancelamento beneficiário: somente `AGENDADO`, consulta futura; libera slot (`scheduling-service.ts`).
+Regras de cancelamento/reagendamento beneficiário: somente `AGENDADO`, consulta futura; reagendar atualiza o mesmo registro (sem cancelar+criar) e valida slot livre excluindo o próprio id (`scheduling-service.ts`).
 
 ---
 
