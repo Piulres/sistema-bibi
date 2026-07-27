@@ -15,7 +15,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Item | Valor |
 |------|-------|
-| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.17** — deploy `6a66e5f9` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
+| **Versão em produção (sistema-bibi.netlify.app)** | **3.0.17** — deploy `6a66e772` @ `c3eb563` (`bibi-poc-2026-07-27h`) |
 | **Modo de dados** | **operação** (Netlify Blobs) · tenant CEDIG |
 | **Release `main` / `dev`** | **v3.0.18** preparado · produção ainda **v3.0.17** até deploy |
 | **Pacote anterior em produção** | **3.0.16** — deploy `6a66e115` @ `9e98494` (`bibi-poc-2026-07-27g`) |
@@ -26,8 +26,8 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 | Ambiente | Branch | Conteúdo |
 |----------|--------|----------|
 | **Integração** | `dev` | **v3.0.18** (Estoque Fase 3) |
-| **Release** | `main` | **v3.0.17** (até merge) |
-| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.17** · deploy `6a66e5f9` · HTTP 200 · **Stop builds ON** |
+| **Release** | `main` | **v3.0.18** (preparado) |
+| **Netlify** | **sistema-bibi.netlify.app** | **v3.0.17** · deploy `6a66e772` · HTTP 200 · **Stop builds ON** |
 | **Preview** | deploy-preview | Desligado via Stop builds |
 
 ### Conteúdo do pacote v3.0.18
@@ -42,13 +42,13 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 - **OpenAPI:** `AuditViewerCapabilities` + contrato de `GET /api/interno/audit`.
 - **A11y:** focus trap, tab order, roving tabindex (#292).
 - **Agenda:** confirmação automática no self-service (`cross-auto-confirm` · #318).
-- **Qualidade:** `patient-clinical-rbac` · `scheduling-auto-confirm` · `a11y-focus` · CI #292/#317/#318 · pre-release OK · deploy `6a66e5f9`.
+- **Qualidade:** `patient-clinical-rbac` · `scheduling-auto-confirm` · `a11y-focus` · CI #292/#317/#318 · pre-release OK · deploy `6a66e772`.
 
 ### Smoke (27/07/2026) — produção v3.0.17
 
 | Check | Resultado |
 |-------|-----------|
-| Landing `/` | 200 · footer `v3.0.17` · deploy `6a66e5f9` |
+| Landing `/` | 200 · footer `v3.0.17` · deploy `6a66e772` |
 | CSS `/_next/static/chunks/*.css` | 200 |
 | `/interno/login` | 200 |
 | `/interno/cadastros` | 307 (auth) |
@@ -302,7 +302,7 @@ e do histórico de publicações. Use este arquivo como fonte única de verdade.
 
 | Tag | Commit aprox. | Conteúdo |
 |-----|---------------|----------|
-| **`v3.0.17`** | `c3eb563` | RBAC clínico 360° + a11y + auto-confirm · deploy `6a66e5f9` · #292/#317/#318 |
+| **`v3.0.17`** | `c3eb563` | RBAC clínico 360° + a11y + auto-confirm · deploy `6a66e772` · #292/#317/#318 |
 | **`v3.0.16`** | `9e98494` | Reagendar + Assistente Fase 0 + estoque UI · deploy `6a66e115` · #282/#286/#306/#308 |
 | **`v3.0.15`** | `4599bff` | Gestão clínica otimizada (KPI strip + soft refresh) · deploy `6a66de5b` · #290/#303 |
 | **`v3.0.14`** | `59700b5` | Auditoria RBAC + estoque + cadastros + documentos · deploy `6a66db43` |
