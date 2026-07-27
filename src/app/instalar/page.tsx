@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PLATFORM } from "@/lib/platform";
 import { PwaInstallGuide } from "@/components/pwa/PwaInstallGuide";
+import { ServiceWorkerRegister } from "@/components/pwa/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   title: "Instalar app",
@@ -29,6 +30,7 @@ export default function InstalarPage() {
         </p>
 
         <PwaInstallGuide />
+        <ServiceWorkerRegister />
 
         <p className="mt-10 text-sm text-slate-400">
           {PLATFORM.shortName} v{PLATFORM.release} — experiência de aplicativo no

@@ -20,6 +20,7 @@ const SIZES = [
   { name: "apple-touch-icon.png", size: 180 },
   { name: "icon-192.png", size: 192 },
   { name: "icon-512.png", size: 512 },
+  { name: "icon-1024.png", size: 1024 },
 ] as const;
 
 async function renderPng(size: number): Promise<Buffer> {

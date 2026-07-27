@@ -1,0 +1,26 @@
+{
+  "name": "sistema-bibi-mobile",
+  "private": true,
+  "version": "3.0.19",
+  "description": "Shell Capacitor (iOS/Android) — embute Sistema Bibi - ServiceOS via server.url",
+  "scripts": {
+    "sync": "cap sync",
+    "open:android": "cap open android",
+    "open:ios": "cap open ios",
+    "assets": "capacitor-assets generate --assetPath resources --iconBackgroundColor '#0a1018' --splashBackgroundColor '#1e293b' --splashBackgroundColorDark '#0a1018'"
+  },
+  "devDependencies": {
+    "@capacitor/android": "^7.6.8",
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.6.8",
+    "@capacitor/core": "^7.6.8",
+    "@capacitor/ios": "^7.6.8",
+    "@capacitor/splash-screen": "^7.0.5"
+  },
+  "capacitor": {
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  }
+}
