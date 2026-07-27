@@ -55,7 +55,7 @@ export const CHANGELOG_RELEASES: ChangelogRelease[] = [
       },
     ],
     testStats:
-      "CI unit+E2E #292/#317/#318 · patient-clinical-rbac · scheduling-auto-confirm · a11y-focus · docs:verify",
+      "CI unit+E2E #292/#317/#318 · patient-clinical-rbac · scheduling-auto-confirm · a11y-focus · prod 6a66e5f9",
   },
   {
     version: "3.0.16",
