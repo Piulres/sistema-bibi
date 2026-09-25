@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   getDataStoreMode,
   invalidateDataStoreModeCache,
@@ -74,5 +74,26 @@ describe("data-store-mode", () => {
     await setDataStoreMode("operation");
     invalidateDataStoreModeCache();
     expect(await getDataStoreMode()).toBe("operation");
+  });
+
+  it("grava o modo em /tmp (não em process.cwd()) em runtime Lambda, evitando EROFS no bundle somente-leitura", async () => {
+    setEnv("DATABASE_URL", "file:./dev.db");
+    setEnv("NODE_ENV", "development");
+    setEnv("DUAL_DATA_STORE", "true");
+    setEnv("AWS_LAMBDA_FUNCTION_NAME", "bibi-server-handler");
+    delete process.env.VITEST;
+
+    vi.resetModules();
+    const lambdaModule = await import("@/lib/data-store-mode");
+    try {
+      await lambdaModule.setDataStoreMode("operation");
+      lambdaModule.invalidateDataStoreModeCache();
+      expect(await lambdaModule.getDataStoreMode()).toBe("operation");
+      expect(existsSync("/tmp/bibi-data-store-mode")).toBe(true);
+    } finally {
+      rmSync("/tmp/bibi-data-store-mode", { force: true });
+      delete process.env.AWS_LAMBDA_FUNCTION_NAME;
+      vi.resetModules();
+    }
   });
 });
