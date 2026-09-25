@@ -1,12 +1,15 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { isSqliteDatabaseUrl } from "@/lib/database-env";
+import { dirname, join } from "node:path";
+import { isLambdaSqliteRuntime, isSqliteDatabaseUrl } from "@/lib/database-env";
 
 export type DataStoreMode = "demo" | "operation";
 
 const BLOB_STORE = "bibi-config";
 const BLOB_KEY = "data-store-mode";
-const LOCAL_MODE_FILE = join(process.cwd(), "prisma", ".data-store-mode");
+// Em Lambda, process.cwd() (/var/task) é somente leitura — só /tmp aceita escrita.
+const LOCAL_MODE_FILE = isLambdaSqliteRuntime()
+  ? "/tmp/bibi-data-store-mode"
+  : join(process.cwd(), "prisma", ".data-store-mode");
 
 let cachedMode: DataStoreMode | null = null;
 let cacheExpiresAt = 0;
@@ -41,7 +44,7 @@ function readLocalModeFile(): DataStoreMode | null {
 }
 
 function writeLocalModeFile(mode: DataStoreMode): void {
-  mkdirSync(join(process.cwd(), "prisma"), { recursive: true });
+  mkdirSync(dirname(LOCAL_MODE_FILE), { recursive: true });
   writeFileSync(LOCAL_MODE_FILE, mode, "utf8");
 }
 
